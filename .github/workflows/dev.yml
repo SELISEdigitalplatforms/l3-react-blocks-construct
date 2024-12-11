@@ -37,8 +37,8 @@ jobs:
       CI_BUILD: 'build'
     secrets:
       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_CREDENTIALS }}
       AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-      ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
-      CLUSTER_NAME: ${{ secrets.DEV_CLUSTER }}
+      ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_RESOURCE_GROUP }}
+      CLUSTER_NAME: ${{ secrets.AKS_DEV_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ACR_RESOURCE_GROUP }}
