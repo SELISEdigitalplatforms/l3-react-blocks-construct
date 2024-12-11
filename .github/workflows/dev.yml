@@ -1,9 +1,9 @@
-name: Build (dev)
+name: Build (dev-aks)
 
 on:
   push:
     branches:
-      - dev
+      - dev-aks
 
 env:
   RUN_SONARQUBE: 'false'
@@ -37,8 +37,8 @@ jobs:
       CI_BUILD: 'build'
     secrets:
       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
-      ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
-      CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
-      ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
+      CLUSTER_NAME: ${{ secrets.DEV_CLUSTER }}
+      ACR_RESOURCE_GROUP: ${{ secrets.ACR_RESOURCE_GROUP }}
