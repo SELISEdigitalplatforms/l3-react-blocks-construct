@@ -1,5 +1,5 @@
-import { clients, HttpError } from "@/lib/https";
-import { useAuthStore } from "@/state/store/auth";
+import { clients, HttpError } from "../../../lib/https";
+import { useAuthStore } from "../../../state/store/auth";
 
 export const signin = async (data: { username: string; password: string }) => {
   const formData = new URLSearchParams();
@@ -27,6 +27,7 @@ export const signin = async (data: { username: string; password: string }) => {
 };
 
 export const signout = async () => {
+  // eslint-disable-next-line no-useless-catch
   try {
     const url = "/authentication/v1/Authentication/Logout";
     const res = await clients.post(

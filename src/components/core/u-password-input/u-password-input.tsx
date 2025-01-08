@@ -1,5 +1,4 @@
-"use client";
-import { Input, InputProps } from "@/components/ui/input";
+import { Input, InputProps } from "../../../components/ui/input";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { forwardRef, useState } from "react";
 

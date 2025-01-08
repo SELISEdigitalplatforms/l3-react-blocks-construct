@@ -1,6 +1,6 @@
 "use client";
 
-import { redirect, usePathname } from "next/navigation";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { useAuthStore } from "./store/auth";
 
@@ -24,13 +24,15 @@ export const useAuthState = () => {
 };
 
 export const ClientMiddleware = ({ children }: { children: ReactNode }) => {
-  const currentPath = usePathname();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
   const { isMounted, isAuthenticated } = useAuthState();
   const isPublicRoute = publicRoutes.includes(currentPath);
 
   useLayoutEffect(() => {
-    if (isMounted && !isAuthenticated && !isPublicRoute) redirect("/signin");
-  }, [isAuthenticated, isMounted, isPublicRoute]);
+    if (isMounted && !isAuthenticated && !isPublicRoute) navigate("/signin");
+  }, [isAuthenticated, isMounted, isPublicRoute, navigate]);
 
   if (!isMounted) return null;
   if (isPublicRoute) return children;

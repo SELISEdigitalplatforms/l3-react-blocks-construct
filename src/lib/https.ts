@@ -1,5 +1,5 @@
-import { getRefreshToken } from "@/features/auth/services/auth.service";
-import { useAuthStore } from "@/state/store/auth";
+import { getRefreshToken } from "../features/auth/services/auth.service";
+import { useAuthStore } from "../state/store/auth";
 
 interface Https {
   get<T>(url: string, headers?: HeadersInit): Promise<T>;
@@ -73,6 +73,7 @@ export const clients: Https = {
     config.body = body;
     const fullUrl = process.env.NEXT_PUBLIC_BACKEND_URL + url;
 
+    // eslint-disable-next-line no-useless-catch
     try {
       const response = await fetch(fullUrl, config);
       if (!response.ok) {

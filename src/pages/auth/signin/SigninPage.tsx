@@ -1,20 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Facebook } from "lucide-react";
-import { SigninForm } from "@/features/auth/components/signin-form";
-export default function SigninPage() {
+import { Button } from "../../../components/ui/button";
+import { SigninForm } from "../../../features/auth/components/signin-form";
+
+export function SigninPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="text-primary">
-        <h2 className=" text-5xl">Hello,</h2>
+        <h2 className="text-5xl">Hello,</h2>
         <h1 className="text-7xl font-bold">Welcome!</h1>
       </div>
       <SigninForm />
       <div>
         <div className="flex items-center gap-4 my-8">
           <div className="flex-1">
-            <hr className="h-[2px] bg-gray-200 border-0 rounded " />
+            <hr className="h-[2px] bg-gray-200 border-0 rounded" />
           </div>
-          <div className=" text-primary">Or login with</div>
+          <div className="text-primary">Or login with</div>
           <div className="flex-1">
             <hr className="h-[2px] bg-gray-200 border-0 rounded" />
           </div>
@@ -39,7 +39,7 @@ export default function SigninPage() {
             className="flex-1 border-blue-600 text-blue-600"
             variant="outline"
           >
-            <Facebook className="" />
+            {/* <Facebook /> */}
             Facebook
           </Button>
         </div>

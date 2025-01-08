@@ -1,6 +1,6 @@
 import { accountActivation, signin, signout } from "../services/auth.service";
-import { useToast } from "@/hooks/use-toast";
-import { useGlobalMutation } from "@/state/query-client/hooks";
+import { useToast } from "../../../hooks/use-toast";
+import { useGlobalMutation } from "../../../state/query-client/hooks";
 
 export const useSigninMutation = () => {
   const { toast } = useToast();

@@ -4,7 +4,6 @@ import {
   ChevronRight,
   FileUser,
 } from "lucide-react";
-import blockLogo from "@/assets/blocks_logo.png";
 import {
   Sidebar,
   SidebarContent,
@@ -16,31 +15,29 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import Image from "next/image";
+} from "../../../components/ui/sidebar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import Link from "next/link";
+} from "../../../components/ui/collapsible";
 
 export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
         <SidebarGroupLabel className="my-2 flex justify-center items-center w-full">
-          <Image src={blockLogo} alt="logo" width="100" />
+          {/* <Image src={blockLogo} alt="logo" width="100" /> */}
         </SidebarGroupLabel>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link href="/">
+              {/* <Link href="/"> */}
                 <LayoutDashboardIcon />
                 <span>Dashboard</span>
-              </Link>
+              {/* </Link> */}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -57,10 +54,10 @@ export function AppSidebar() {
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
                     <SidebarMenuSubButton asChild>
-                      <Link href="/settings/profile">
+                      {/* <Link href="/settings/profile"> */}
                         <FileUser />
                         <span>Profile</span>
-                      </Link>
+                      {/* </Link> */}
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>

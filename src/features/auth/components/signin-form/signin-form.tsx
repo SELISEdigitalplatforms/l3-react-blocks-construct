@@ -1,4 +1,13 @@
-"use client";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+
+import {
+  signinFormDefaultValue,
+  signinFormType,
+  signinFormValidationSchema,
+} from "./utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+// src/features/auth/components/signin-form/signin-form.tsx
 import {
   Form,
   FormControl,
@@ -6,24 +15,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import {
-  signinFormDefaultValue,
-  signinFormType,
-  signinFormValidationSchema,
-} from "./utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import { UPasswordInput } from "@/components/core/u-password-input";
-import { Button } from "@/components/ui/button";
-import { UCheckbox } from "@/components/core/uCheckbox";
+} from "../../../../components/ui/form";
+import { Input } from "../../../../components/ui/input";
+import { Button } from "../../../../components/ui/button";
+import { UCheckbox } from "../../../../components/core/uCheckbox";
+import { UPasswordInput } from "../../../../components/core/u-password-input";
 import { useSigninMutation } from "../../hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/state/store/auth";
+import { useAuthStore } from "../../../../state/store/auth";
+
+
 
 export const SigninForm = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { login } = useAuthStore();
   const form = useForm<signinFormType>({
     defaultValues: signinFormDefaultValue,
@@ -36,9 +39,12 @@ export const SigninForm = () => {
     try {
       const res = await mutateAsync(values);
       login(res.access_token, res.refresh_token);
-      router.replace("/");
-    } catch (_error) {}
+      navigate("/");
+    } catch (_error) {
+      // Error handling can be added here
+    }
   };
+
   return (
     <Form {...form}>
       <form
@@ -52,7 +58,7 @@ export const SigninForm = () => {
             <FormItem>
               <FormLabel>User name</FormLabel>
               <FormControl>
-                <Input placeholder="enter your user name" {...field} />
+                <Input placeholder="Enter your user name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,11 +80,11 @@ export const SigninForm = () => {
         <div className="flex justify-between items-center">
           <UCheckbox
             label="Remember me"
-            labelClassName=" text-gray-400 hover:text-primary"
+            labelClassName="text-gray-400 hover:text-primary"
           />
-          <p className="text-gray-400 text-sm font-medium hover:text-primary cursor-pointer">
-            Froget password?
-          </p>
+          <Link to="/reset-password" className="ml-auto inline-block text-sm text-primary">
+            Forgot password?
+          </Link>
         </div>
         <div className="flex gap-10">
           <Button
@@ -94,6 +100,7 @@ export const SigninForm = () => {
             className="flex-1 font-extrabold border-primary text-primary"
             variant="outline"
             size="lg"
+            onClick={() => navigate('/signup')}
           >
             Sign up
           </Button>
