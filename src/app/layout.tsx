@@ -7,6 +7,7 @@ import { ClientMiddleware } from "@/state/client-middleware";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+// commenting
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -17,6 +18,7 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
+
 
 export const metadata: Metadata = {
   title: "Consumer",
