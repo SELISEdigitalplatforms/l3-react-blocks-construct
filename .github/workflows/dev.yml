@@ -6,7 +6,7 @@ on:
       - dev-aks
 
 env:
-  RUN_SONARQUBE: 'false'
+  RUN_SONARQUBE: 'true'
 
 jobs:
   initialization:
@@ -42,3 +42,4 @@ jobs:
       ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_RESOURCE_GROUP }}
       CLUSTER_NAME: ${{ secrets.AKS_DEV_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ACR_RESOURCE_GROUP }}
+    needs: [sonarqube-job]
