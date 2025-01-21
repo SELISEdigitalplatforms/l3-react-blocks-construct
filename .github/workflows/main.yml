@@ -1,50 +1,50 @@
-# name: Build (main)
+name: Build (main)
 
-# on:
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches:
-#       - main
-#     types:
-#       - opened
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
 
-# env:
-#   RUN_SONARQUBE: 'false'
+env:
+  RUN_SONARQUBE: 'false'
 
-# jobs:
-#   initialization:
-#     runs-on: ubuntu-latest
-#     outputs:
-#       envvalue1: ${{ steps.setvar.outputs.envvar1 }}
-#     steps:
-#       - name: set value
-#         id: setvar
-#         run: |
-#           echo envvar1="$RUN_SONARQUBE" >> $GITHUB_OUTPUT
+jobs:
+  initialization:
+    runs-on: ubuntu-latest
+    outputs:
+      envvalue1: ${{ steps.setvar.outputs.envvar1 }}
+    steps:
+      - name: set value
+        id: setvar
+        run: |
+          echo envvar1="$RUN_SONARQUBE" >> $GITHUB_OUTPUT
 
-#   sonarqube-job:
-#     if: ${{ success() && needs.initialization.outputs.envvalue1=='true' }}
-#     uses: ./.github/workflows/2_sonar.yml
-#     secrets:
-#       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-#       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
-#     needs: [initialization]
+  sonarqube-job:
+    if: ${{ success() && needs.initialization.outputs.envvalue1=='true' }}
+    uses: ./.github/workflows/2_sonar.yml
+    secrets:
+      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
+    needs: [initialization]
 
-#   cd-job:
-#     if: ${{ github.event_name == 'push' && (success() || needs.initialization.outputs.envvalue1=='false') }}
-#     uses: ./.github/workflows/3_web.yml
-#     with:
-#       CONTAINER_NAME: 'prod-$SERVICE_NAME'
-#       NAMESPACE: 'prod-$SERVICE_NAME'
-#       SERVICE_NAME: $SERVICE_NAME
-#       CI_BUILD: 'build:prod'
-#     secrets:
-#       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-#       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS_URSTAMM }}
-#       AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-#       ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
-#       CLUSTER_NAME: ${{ secrets.URSTAMM_AKS_CLUSTER }}
-#       ACR_RESOURCE_GROUP: ${{ secrets.ACR_RESOURCE_GROUP }}
-#     needs: [sonarqube-job]
+  cd-job:
+    if: ${{ github.event_name == 'push' && (success() || needs.initialization.outputs.envvalue1=='false') }}
+    uses: ./.github/workflows/3_web.yml
+    with:
+      CONTAINER_NAME: 'prod-$SERVICE_NAME'
+      NAMESPACE: 'prod-$SERVICE_NAME'
+      SERVICE_NAME: $SERVICE_NAME
+      CI_BUILD: 'build:prod'
+    secrets:
+      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS_URSTAMM }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
+      CLUSTER_NAME: ${{ secrets.URSTAMM_AKS_CLUSTER }}
+      ACR_RESOURCE_GROUP: ${{ secrets.ACR_RESOURCE_GROUP }}
+    needs: [sonarqube-job]
