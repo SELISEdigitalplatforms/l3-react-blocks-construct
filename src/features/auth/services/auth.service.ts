@@ -46,7 +46,7 @@ export const signin = async (data: {
   return response.json();
 };
 
-export const signout = async () => {
+export const signout = async (): Promise<{ isSuccess: true }> => {
   // eslint-disable-next-line no-useless-catch
   try {
     localStorage.removeItem('auth-storage');

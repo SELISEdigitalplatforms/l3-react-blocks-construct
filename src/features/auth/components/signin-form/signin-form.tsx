@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 
 import { signinFormDefaultValue, signinFormType, signinFormValidationSchema } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-// src/features/auth/components/signin-form/signin-form.tsx
 import {
   Form,
   FormControl,
@@ -14,11 +13,10 @@ import {
 } from '../../../../components/ui/form';
 import { Input } from '../../../../components/ui/input';
 import { Button } from '../../../../components/ui/button';
-// import { UCheckbox } from '../../../../components/core/uCheckbox';
 import { UPasswordInput } from '../../../../components/core/u-password-input';
 import { useSigninMutation } from '../../hooks/use-auth';
 import { useAuthStore } from '../../../../state/store/auth';
-import { TriangleAlert } from 'lucide-react';
+import ErrorAlert from 'components/blocks/error-alert/error-alert';
 
 export const SigninForm = () => {
   const navigate = useNavigate();
@@ -27,7 +25,7 @@ export const SigninForm = () => {
     defaultValues: signinFormDefaultValue,
     resolver: zodResolver(signinFormValidationSchema),
   });
-  const { isPending, mutateAsync, isError } = useSigninMutation();
+  const { isPending, mutateAsync, isError, errorDetails } = useSigninMutation();
 
   const onSubmitHandler = async (values: signinFormType) => {
     try {
@@ -42,19 +40,7 @@ export const SigninForm = () => {
 
   return (
     <div>
-      {isError && (
-        <div className="rounded-lg bg-error-background border border-error p-4 mb-2">
-          <div className="flex items-center gap-1">
-            <TriangleAlert className="text-error-high-emphasis w-4 h-4" />
-            <h1 className="text-error-high-emphasis text-sm font-semibold">
-              Invalid user name or password!
-            </h1>
-          </div>
-          <p className="text-error-high-emphasis text-xs font-normal">
-            Your user name or password is not valid.
-          </p>
-        </div>
-      )}
+      <ErrorAlert isError={isError} title={errorDetails.title} message={errorDetails.message} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmitHandler)} className="flex flex-col gap-4">
           <FormField
@@ -84,7 +70,6 @@ export const SigninForm = () => {
             )}
           />
           <div className="flex justify-between items-center">
-            {/* <UCheckbox label="Remember me" labelClassName="text-medium-emphasis" /> */}
             <Link
               to="/forgot-password"
               className="ml-auto inline-block text-sm text-primary hover:text-primary-dark hover:underline"

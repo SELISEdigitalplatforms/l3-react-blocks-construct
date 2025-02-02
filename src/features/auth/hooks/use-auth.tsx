@@ -9,28 +9,49 @@ import {
 } from '../services/auth.service';
 import { useToast } from '../../../hooks/use-toast';
 import { useGlobalMutation } from '../../../state/query-client/hooks';
+import { useState } from 'react';
+
+interface ApiError extends Error {
+  response?: {
+    status: number;
+  };
+}
 
 export const useSigninMutation = () => {
+  const [errorDetails, setErrorDetails] = useState({
+    title: '',
+    message: '',
+  });
+
   const { toast } = useToast();
 
-  return useGlobalMutation({
+  const mutation = useGlobalMutation({
     mutationKey: ['signin'],
     mutationFn: signin,
     onSuccess: () => {
+      setErrorDetails({ title: '', message: '' });
       toast({
         color: 'blue',
-        title: 'Sucesss',
-        description: 'You are sucessfully logged in',
+        title: 'Success',
+        description: 'You are successfully logged in',
       });
     },
-    // onError: () => {
-    //   toast({
-    //     variant: 'destructive',
-    //     title: 'Invalid user name or password!',
-    //     description: 'Your user name or password is not valid.',
-    //   });
-    // },
+    onError: (error: ApiError) => {
+      const isInvalidCredentials = error.response?.status === 400;
+
+      setErrorDetails({
+        title: isInvalidCredentials ? 'Invalid user name or password!' : 'Something went wrong',
+        message: isInvalidCredentials
+          ? 'Your user name or password is not valid.'
+          : 'Please try again.',
+      });
+    },
   });
+
+  return {
+    ...mutation,
+    errorDetails,
+  };
 };
 
 export const useSignoutMutation = () => {

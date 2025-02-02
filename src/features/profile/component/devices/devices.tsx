@@ -3,114 +3,72 @@ import { Button } from 'components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import SessionsService, { IDeviceSession } from '../../services/device.service';
-import { getAccount } from '../../services/accounts.service';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { IDeviceSession } from '../../services/device.service';
+import { useGetSessions } from '../../hooks/use-sessions';
 
 export const Devices = () => {
   const [deviceSessions, setDeviceSessions] = useState<IDeviceSession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [page, setPage] = useState(0);
   const loadingRef = useRef<HTMLDivElement>(null);
   const PAGE_SIZE = 10;
 
-  const parseMongoDBString = (mongoString: string | IDeviceSession): IDeviceSession | null => {
-    try {
-      if (typeof mongoString === 'object' && mongoString !== null) {
-        const typedSession = mongoString as IDeviceSession;
-        return {
-          ...typedSession,
-          IssuedUtc: new Date(typedSession.IssuedUtc),
-          ExpiresUtc: new Date(typedSession.ExpiresUtc),
-          CreateDate: new Date(typedSession.CreateDate),
-          UpdateDate: new Date(typedSession.UpdateDate),
-        };
-      }
+  const { data: sessions, isLoading, isFetching } = useGetSessions(page, PAGE_SIZE);
 
-      const cleanedJson = mongoString
+  const parseMongoSession = (sessionStr: string) => {
+    try {
+      const cleanedJson = sessionStr
         .replace(/ObjectId\("([^"]*)"\)/g, '"$1"')
         .replace(/ISODate\("([^"]*)"\)/g, '"$1"')
         .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
 
-      const parsedData = JSON.parse(cleanedJson);
-
-      const dateFields = ['IssuedUtc', 'ExpiresUtc', 'CreateDate', 'UpdateDate'];
-      dateFields.forEach((field) => {
-        if (parsedData[field]) {
-          parsedData[field] = new Date(parsedData[field]);
-        }
-      });
-
-      return parsedData as IDeviceSession;
+      return JSON.parse(cleanedJson);
     } catch (error) {
-      console.error('Error parsing MongoDB JSON string:', error);
+      console.error('Error parsing session:', error);
       return null;
     }
   };
 
-  const fetchSessions = useCallback(async (pageNumber: number) => {
-    try {
-      setIsLoading(true);
-      const response = await SessionsService.getSessions({
-        page: pageNumber,
-        pageSize: PAGE_SIZE,
-        projectkey: 'ef5d4fd7b2fa4c59b6a3df7b17c8c41e',
-        filter: {
-          userId: await (await getAccount()).itemId,
-        },
+  useEffect(() => {
+    if (sessions) {
+      const sessionsArray = sessions as unknown as string[];
+
+      const processedSessions = sessionsArray
+        .map((sessionStr) => {
+          const parsed = parseMongoSession(sessionStr);
+          if (!parsed) return null;
+
+          return {
+            ...parsed,
+            IssuedUtc: new Date(parsed.IssuedUtc),
+            ExpiresUtc: new Date(parsed.ExpiresUtc),
+            CreateDate: new Date(parsed.CreateDate),
+            UpdateDate: new Date(parsed.UpdateDate),
+          } as IDeviceSession;
+        })
+        .filter((session): session is IDeviceSession => session !== null);
+
+      setDeviceSessions((prev) => {
+        const newSessions = page === 0 ? processedSessions : [...prev, ...processedSessions];
+        return newSessions;
       });
-
-      const dataToProcess = Array.isArray(response) ? response : response?.data;
-
-      if (dataToProcess && Array.isArray(dataToProcess)) {
-        const parsedSessions = dataToProcess
-          .map((session) => {
-            const parsed = parseMongoDBString(session);
-            return parsed;
-          })
-          .filter((session): session is IDeviceSession => {
-            const isValid = session !== null && session.DeviceInformation !== undefined;
-            return isValid;
-          });
-
-        setDeviceSessions((prev) =>
-          pageNumber === 0 ? parsedSessions : [...prev, ...parsedSessions]
-        );
-        setHasMore(parsedSessions.length === PAGE_SIZE);
-      } else {
-        console.warn('No valid data array found in response:', response);
-        if (pageNumber === 0) {
-          setDeviceSessions([]);
-        }
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error('Failed to fetch device sessions:', error);
-      if (pageNumber === 0) {
+      setHasMore(processedSessions.length === PAGE_SIZE);
+    } else {
+      if (page === 0) {
         setDeviceSessions([]);
       }
       setHasMore(false);
-    } finally {
-      setIsLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchSessions(0);
-  }, [fetchSessions]);
+  }, [sessions, page]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const first = entries[0];
-        if (first.isIntersecting && hasMore && !isLoading) {
-          setPage((prevPage) => {
-            const nextPage = prevPage + 1;
-            fetchSessions(nextPage);
-            return nextPage;
-          });
+        if (first.isIntersecting && hasMore && !isLoading && !isFetching) {
+          setPage((prevPage) => prevPage + 1);
         }
       },
       { threshold: 1.0 }
@@ -126,7 +84,7 @@ export const Devices = () => {
         observer.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, isLoading, fetchSessions]);
+  }, [hasMore, isLoading, isFetching]);
 
   const getDeviceIcon = (deviceInfo: IDeviceSession['DeviceInformation']) => {
     if (!deviceInfo?.Device) return <Monitor className="w-5 h-5 text-blue" />;
@@ -246,8 +204,12 @@ export const Devices = () => {
                   <TableRow>
                     <TableCell colSpan={columns.length}>
                       <div ref={loadingRef} className="h-8 flex items-center justify-center">
-                        {isLoading && <Loader2 className="h-6 w-6 animate-spin text-primary" />}
-                        {!hasMore && <span className="text-gray-500">No more devices!</span>}
+                        {(isLoading || isFetching) && (
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        )}
+                        {!hasMore && !isLoading && !isFetching && (
+                          <span className="text-gray-500">No more devices!</span>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -255,13 +217,13 @@ export const Devices = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    {isLoading ? (
+                    {isLoading || isFetching ? (
                       <div className="flex items-center justify-center">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                       </div>
-                    ) : (
+                    ) : deviceSessions.length === 0 ? (
                       <p className="text-center">No devices found.</p>
-                    )}
+                    ) : null}
                   </TableCell>
                 </TableRow>
               )}

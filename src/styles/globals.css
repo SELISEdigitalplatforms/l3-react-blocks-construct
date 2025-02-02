@@ -8,6 +8,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html.dark {
+  transition: background-color var(--transition-duration) ease;
+}
+
+.theme-toggle-icon {
+  transition: all var(--transition-duration) ease;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -79,6 +87,8 @@ body {
     --blue: 202 68% 53%;
     --deepPurple: 300 33% 42%;
     --emerald-green-500: 157 40% 42%;
+
+    --transition-duration: 200ms;
   }
 
   .dark {

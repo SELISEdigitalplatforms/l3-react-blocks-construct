@@ -29,7 +29,7 @@ jobs:
       CONTAINER_NAME: 'dev-$SERVICE_NAME-webclient'
       NAMESPACE: 'dev-$REPO_NAME'
       SERVICE_NAME: $SERVICE_NAME
-      CI_BUILD: 'build'
+      CI_BUILD: 'build-dev'
     secrets:
       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}

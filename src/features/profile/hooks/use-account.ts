@@ -17,7 +17,6 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
     mutationKey: ['updateAccount'],
     mutationFn: updateAccount,
     onSuccess: () => {
-      // Handle global success actions
       queryClient.invalidateQueries({ queryKey: ['getAccount'] });
       toast({
         color: 'blue',

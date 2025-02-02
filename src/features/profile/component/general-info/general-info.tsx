@@ -1,49 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Lock, Pencil, ShieldCheck } from 'lucide-react';
-import { useToast } from 'hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Separator } from 'components/ui/separator';
 import { Dialog } from 'components/ui/dialog';
 import { EditProfile } from '../modals/edit-profile/edit-profile';
 import DummyProfile from '../../../../assets/images/dummy_profile.png';
-import { User } from 'types/user.type';
-import { getAccount } from '../../services/accounts.service';
 import { UpdatePassword } from '../modals/update-password/update-password';
 import { Skeleton } from 'components/ui/skeleton';
+import { useGetAccount } from '../../hooks/use-account';
 
 export const GeneralInfo = () => {
-  const { toast } = useToast();
-  const [userInfo, setUserInfo] = useState<User | null>(null);
-  const [isFetching, setIsFetching] = useState(true);
+  const { data: userInfo, isLoading, isFetching } = useGetAccount();
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const fetchAccountData = async () => {
-    setIsFetching(true);
-    try {
-      const data = await getAccount();
-      setUserInfo(data);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Profile Unavailable!',
-        description: 'Failed to fetch account information.',
-      });
-    } finally {
-      setIsFetching(false);
-    }
-  };
-  useEffect(() => {
-    fetchAccountData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast, refreshTrigger]);
 
   const handleEditProfileClose = () => {
     setIsEditProfileModalOpen(false);
-    setRefreshTrigger((prev) => prev + 1);
-    fetchAccountData();
   };
 
   const joinedDate = userInfo ? new Date(userInfo.createdDate) : null;
@@ -60,7 +33,7 @@ export const GeneralInfo = () => {
           <div className="flex justify-between">
             <div className="flex items-center">
               <div className="relative w-16 h-16 rounded-full border overflow-hidden border-white shadow-sm">
-                {isFetching ? (
+                {isLoading || isFetching ? (
                   <Skeleton className="w-16 h-16 rounded-full" />
                 ) : (
                   <img
@@ -70,21 +43,9 @@ export const GeneralInfo = () => {
                     className="w-full h-full object-cover"
                   />
                 )}
-                {/* TODO: upload profile need to implemented later */}
-                {/* <div className="absolute bottom-0 right-0 w-6 h-6 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center shadow-lg">
-                  <label htmlFor="profileImageUpload" className="cursor-pointer">
-                    <Camera className="text-primary h-3 w-3" />
-                  </label>
-                  <input
-                    id="profileImageUpload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div> */}
               </div>
               <div className="flex flex-col gap-1 ml-9">
-                {isFetching ? (
+                {isLoading || isFetching ? (
                   <>
                     <Skeleton className="w-40 h-5" />
                     <Skeleton className="w-48 h-4 mt-1" />
@@ -111,7 +72,7 @@ export const GeneralInfo = () => {
           </div>
           <Separator orientation="horizontal" />
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-            {isFetching ? (
+            {isLoading || isFetching ? (
               Array.from({ length: 3 }).map((_, index) => (
                 <div key={index}>
                   <Skeleton className="h-3 w-20 mb-1" />

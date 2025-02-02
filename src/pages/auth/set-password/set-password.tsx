@@ -26,13 +26,13 @@ export function SetPasswordPage() {
         </div>
       </div>
 
-      <div className="w-full mx-auto">
+      {/* <div className="w-full mx-auto">
         <div className="rounded-lg bg-success-background border border-success p-4">
           <p className="text-xs font-normal text-success-high-emphasis">
             Your email has been verified successfully.
           </p>
         </div>
-      </div>
+      </div> */}
 
       <SetpasswordForm code={code} />
     </div>

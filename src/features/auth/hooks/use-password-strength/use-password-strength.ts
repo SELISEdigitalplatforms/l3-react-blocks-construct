@@ -13,7 +13,7 @@ export interface PasswordRequirement {
 }
 
 export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
-  { key: 'length', label: 'At least 8 characters' },
+  { key: 'length', label: 'Between 8 and 30 characters' },
   { key: 'case', label: 'At least 1 uppercase and 1 lowercase letter' },
   { key: 'number', label: 'At least 1 digit' },
   { key: 'special', label: 'At least 1 special character' },
@@ -35,7 +35,7 @@ export const usePasswordStrength = (password: string) => {
 
   const validatePassword = useCallback(() => {
     const newChecks: PasswordChecks = {
-      length: password.length >= 8,
+      length: password.length >= 8 && password.length <= 30,
       case: hasLowercase.test(password) && hasUppercase.test(password),
       number: hasNumber.test(password),
       special: hasSpecialChar.test(password),

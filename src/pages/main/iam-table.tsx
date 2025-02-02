@@ -68,6 +68,7 @@ const IamTablePage: React.FC = () => {
   const columns: ColumnDef<IamData>[] = [
     {
       id: 'fullName',
+      accessorFn: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim(),
       header: ({ column }) => {
         return (
           <Button
@@ -76,25 +77,12 @@ const IamTablePage: React.FC = () => {
             className="p-0 hover:bg-transparent"
           >
             Name
-            {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => `${row.original.firstName} ${row.original.lastName}`,
-      sortingFn: (rowA, rowB) => {
-        const firstNameA = rowA.original.firstName || '';
-        const lastNameA = rowA.original.lastName || '';
-        const firstNameB = rowB.original.firstName || '';
-        const lastNameB = rowB.original.lastName || '';
 
-        const fullNameA = `${firstNameA} ${lastNameA}`.trim();
-        const fullNameB = `${firstNameB} ${lastNameB}`.trim();
-
-        return fullNameA.localeCompare(fullNameB, undefined, {
-          sensitivity: 'base',
-          numeric: true,
-        });
-      },
       enableSorting: true,
     },
     {

@@ -1,5 +1,5 @@
+import API_CONFIG from 'config/api';
 import { clients } from 'lib/https';
-import { getAccount } from './accounts.service';
 
 export interface IDeviceSession {
   RefreshToken: string;
@@ -57,15 +57,13 @@ class SessionsService {
     return response.data;
   }
 
-  static async getActiveDeviceSessions(): Promise<IDeviceSessionResponse> {
-    const account = await getAccount();
-
+  static async getActiveDeviceSessions(userId: string): Promise<IDeviceSessionResponse> {
     return this.getSessions({
       page: 0,
       pageSize: 10,
-      projectkey: 'ef5d4fd7b2fa4c59b6a3df7b17c8c41e',
+      projectkey: API_CONFIG.blocksKey,
       filter: {
-        userId: account.itemId,
+        userId,
       },
     });
   }
