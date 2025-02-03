@@ -234,9 +234,9 @@ const IamTablePage: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="h-full flex-1 flex-col space-y-8 md:flex">
-        <div className="flex items-center justify-between space-y-2">
+    <div className="flex flex-col h-full w-full">
+      <div className="h-full flex-col space-y-8 flex w-full">
+        <div className="flex w-full items-center justify-between space-y-2">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Identity Access Management</h2>
           </div>
@@ -265,7 +265,7 @@ const IamTablePage: React.FC = () => {
         description={`Activating the user ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email}) will restore their access. Are you sure you want to proceed?`}
         onConfirm={handleConfirmActivation}
       />
-    </>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { IDeviceSession } from '../../services/device.service';
 import { useGetSessions } from '../../hooks/use-sessions';
+import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
 
 export const Devices = () => {
   const [deviceSessions, setDeviceSessions] = useState<IDeviceSession[]>([]);
@@ -110,9 +111,9 @@ export const Devices = () => {
     () => [
       {
         id: 'device',
-        header: () => <span>Device</span>,
+        header: () => <span className="flex w-[150px] items-center md:w-[200px]">Device</span>,
         cell: ({ row }) => (
-          <div className="flex items-center">
+          <div className="flex w-[150px] items-center md:w-[200px]">
             {getDeviceIcon(row.original.DeviceInformation)}
             <span className="ml-2">
               {(row.original.DeviceInformation?.Brand || row.original.DeviceInformation?.Device) ??
@@ -123,14 +124,16 @@ export const Devices = () => {
       },
       {
         id: 'browser',
-        header: () => <span>Browser</span>,
+        header: () => <span className="flex w-[150px] items-center md:w-[200px]">Browser</span>,
         cell: ({ row }) => (
           <span>{row.original.DeviceInformation?.Browser ?? 'Unknown Browser'}</span>
         ),
       },
       {
         id: 'lastAccessed',
-        header: () => <span>Last Accessed</span>,
+        header: () => (
+          <span className="flex w-[150px] items-center md:w-[200px]">Last Accessed</span>
+        ),
         cell: ({ row }) => <span>{formatDate(row.original.UpdateDate)}</span>,
       },
       {
@@ -172,63 +175,66 @@ export const Devices = () => {
           <CardDescription />
         </CardHeader>
         <CardContent>
-          <Table className="text-sm">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="px-4 py-3 hover:bg-transparent">
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="font-bold text-medium-emphasis">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {deviceSessions.length > 0 ? (
-                <>
-                  {table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className="cursor-pointer font-normal text-medium-emphasis"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                  <TableRow>
-                    <TableCell colSpan={columns.length}>
-                      <div ref={loadingRef} className="h-8 flex items-center justify-center">
-                        {(isLoading || isFetching) && (
+          <ScrollArea className="w-full">
+            <Table className="text-sm">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className="px-4 py-3 hover:bg-transparent">
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="font-bold text-medium-emphasis">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {deviceSessions.length > 0 ? (
+                  <>
+                    {table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        className="cursor-pointer font-normal text-medium-emphasis"
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell colSpan={columns.length}>
+                        <div ref={loadingRef} className="h-8 flex items-center justify-center">
+                          {(isLoading || isFetching) && (
                           <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         )}
-                        {!hasMore && !isLoading && !isFetching && (
+                          {!hasMore && !isLoading && !isFetching && (
                           <span className="text-gray-500">No more devices!</span>
                         )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </>
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    {isLoading || isFetching ? (
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  </>
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      {isLoading || isFetching ? (
                       <div className="flex items-center justify-center">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                       </div>
                     ) : deviceSessions.length === 0 ? (
                       <p className="text-center">No devices found.</p>
                     ) : null}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </CardContent>
       </Card>
     </div>

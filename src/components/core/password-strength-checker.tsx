@@ -29,16 +29,14 @@ const PasswordStrengthChecker: React.FC<PasswordStrengthCheckerProps> = ({
       </div>
 
       <p className="text-medium-emphasis mb-2 text-xs">Check your password strength.</p>
-
       <p className="text-medium-emphasis mb-2 text-xs">Your password must contain:</p>
-
       <ul className="space-y-1 text-medium-emphasis text-xs">
         {requirements.map((requirement) => (
           <li key={requirement.key} className="flex items-center gap-2">
             {checks[requirement.key] ? (
               <Check className="w-4 h-4 text-success" />
             ) : (
-              <X className="w-4 h-4 text-red-500" />
+              <X className="w-4 h-4 text-error" />
             )}
             {requirement.label}
           </li>

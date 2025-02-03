@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import 'react-phone-number-input/style.css';
 import {
   DialogContent,
   DialogDescription,

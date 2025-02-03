@@ -1,4 +1,3 @@
-import 'react-phone-number-input/style.css';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {

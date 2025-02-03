@@ -1,0 +1,11 @@
+.PhoneInput {
+  align-items: unset !important;
+}
+
+.PhoneInput input {
+  background-color: transparent !important;
+}
+
+.PhoneInput input:focus-visible {
+  outline: none !important;
+}

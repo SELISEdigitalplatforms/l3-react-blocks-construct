@@ -44,7 +44,7 @@ export const GeneralInfo = () => {
                   />
                 )}
               </div>
-              <div className="flex flex-col gap-1 ml-9">
+              <div className="flex flex-col gap-1 ml-3 sm:ml-9">
                 {isLoading || isFetching ? (
                   <>
                     <Skeleton className="w-40 h-5" />

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Trash, Upload } from 'lucide-react';
 import 'react-phone-number-input/style.css';
+import './edit-profile.css';
 import PhoneInput from 'react-phone-number-input';
 import {
   DialogContent,
@@ -221,7 +222,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
                   defaultCountry="CH"
                   international
                   countryCallingCodeEditable={false}
-                  className="mt-1 flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm text-primary-foreground transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  className="PhoneInput mt-1 flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 />
               )}
             />

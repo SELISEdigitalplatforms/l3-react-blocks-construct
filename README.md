@@ -118,6 +118,12 @@ Replace `<project-name>` with your project’s name.
 - Find your **Project Key** on your **Project Dashboard** and enter it when prompted.
 - The GitHub repository for **SELISE Blocks Construct** will now be cloned and installed on your local machine.
 
+#### Choose your preferred environment
+
+- You can select either the Development(dev) or Stage(stg) environment to start your project.
+
+*Note: The Development(dev) environment is for building and testing, while the Stage(stg) environment is for final testing before going live.*
+
 #### Navigate to the Project Directory
 
 ```sh

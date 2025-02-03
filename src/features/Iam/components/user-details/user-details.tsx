@@ -64,8 +64,8 @@ const UserDetails: React.FC<UserDetailsSheetProps> = ({ open, onOpenChange, sele
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
-        <SheetContent className="w-full sm:min-w-[450px] md:min-w-[450px] lg:min-w-[450px] sm:fixed sm:top-[57px]">
-          <div className="flex flex-col h-[calc(100vh-6rem)] justify-between">
+        <SheetContent className="w-full sm:min-w-[450px] md:min-w-[450px] lg:min-w-[450px] sm:fixed sm:top-[57px] overflow-y-auto">
+          <div className="flex flex-col h-[calc(100vh-15rem)] sm:h-[calc(100vh-6rem)]">
             <div>
               <SheetHeader>
                 <SheetTitle className="flex items-center space-x-4 mb-4">
@@ -103,7 +103,7 @@ const UserDetails: React.FC<UserDetailsSheetProps> = ({ open, onOpenChange, sele
               {selectedUser && (
                 <div className="space-y-6">
                   <div className="flex items-center space-x-4">
-                    <div className="text-base font-thin text-medium-emphasis w-24 ">Mobile no.</div>
+                    <div className="text-base font-thin text-medium-emphasis w-24">Mobile no.</div>
                     <div className="flex items-center gap-2">
                       <Phone className="w-5 h-5 text-high-emphasis" />
                       <div className="text-base font-normal text-high-emphasis">
@@ -156,22 +156,19 @@ const UserDetails: React.FC<UserDetailsSheetProps> = ({ open, onOpenChange, sele
                 </div>
               )}
             </div>
-
-            <div className="pt-6 pb-2">
-              <div className="flex space-x-4">
-                <Button variant="outline" className="flex-1" onClick={() => handleButtonClick()}>
-                  {selectedUser?.active ? 'Reset Password' : 'Resend Activation Link'}
+            <div className="flex w-full justify-end flex-col sm:flex-row gap-4 mt-auto">
+              <Button variant="outline" className="w-full" onClick={() => handleButtonClick()}>
+                {selectedUser?.active ? 'Reset Password' : 'Resend Activation Link'}
+              </Button>
+              {selectedUser?.active && (
+                <Button
+                  variant="outline"
+                  className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
+                  onClick={() => {}}
+                >
+                  Deactivate User
                 </Button>
-                {selectedUser?.active ? (
-                  <Button
-                    variant={selectedUser?.active ? 'outline' : 'default'}
-                    className={`flex-1 disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50`}
-                    onClick={() => {}}
-                  >
-                    {selectedUser?.active ? 'Deactivate User' : null}
-                  </Button>
-                ) : null}
-              </div>
+              )}
             </div>
           </div>
         </SheetContent>

@@ -13,13 +13,13 @@ export function IamTableToolbar<TData>({ table }: IamTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+    <div className="flex w-full items-center justify-between">
+      <div className="flex items-center w-full gap-2">
         <Input
           placeholder="Search..."
           value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
-          className="h-9 w-[350px] lg:w-[300px] rounded-md bg-background"
+          className="h-9 w-full sm:w-[300px] rounded-md bg-background"
         />
 
         {isFiltered && (

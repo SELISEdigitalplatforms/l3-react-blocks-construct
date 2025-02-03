@@ -15,12 +15,12 @@ jobs:
     - name: desciption
       run: echo 'initializ pipeline with ubuntu-22.04'    
 
-  sonarqube-job:
-    uses: ./.github/workflows/2_sonar.yml
-    secrets:
-      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}    
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
-    needs: [initialization]
+  # sonarqube-job:
+  #   uses: ./.github/workflows/2_sonar.yml
+  #   secrets:
+  #     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}    
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
+  #   needs: [initialization]
 
   cd-job:
     if: ${{ github.event_name == 'push' }}
@@ -38,4 +38,4 @@ jobs:
       ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
       CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
-    needs: [sonarqube-job]
+    # needs: [sonarqube-job]

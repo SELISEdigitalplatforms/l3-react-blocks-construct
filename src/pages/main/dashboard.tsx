@@ -125,7 +125,7 @@ export function Dashboard() {
             <CardDescription />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="flex justify-between">
                 <div>
                   <h3 className="text-sm font-normal text-high-emphasis">Total users</h3>
@@ -311,7 +311,7 @@ export function Dashboard() {
             <CardDescription />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="flex items-center gap-6 sm:gap-4">
                 <CircularProgress percentage={58.9} strokeColor="#FFC107" />
                 <div>

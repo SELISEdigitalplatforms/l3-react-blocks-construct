@@ -19,6 +19,7 @@ import { DataTablePagination } from './data-table-pagination';
 import { IamTableToolbar } from 'features/Iam/components/iam-table/iam-table-toolbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Skeleton } from 'components/ui/skeleton';
+import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -92,62 +93,65 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-5">
       <IamTableToolbar table={table} />
-      <Card className="w-full border-none rounded-[4px] shadow-sm">
-        <CardHeader className="hidden">
-          <CardTitle />
-          <CardDescription />
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} colSpan={header.colSpan}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  renderSkeletonRows()
-                ) : table.getRowModel().rows.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                      onClick={() => !error && onRowClick?.(row.original)}
-                      className={error ? 'text-gray-500' : 'cursor-pointer'}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className={cell.column.id === 'actions' ? 'flex justify-end' : ''}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
+      <div className="flex">
+        <Card className="w-full border-none rounded-[4px] shadow-sm">
+          <CardHeader className="hidden">
+            <CardTitle />
+            <CardDescription />
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="w-full">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      No results found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    renderSkeletonRows()
+                  ) : table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && 'selected'}
+                        onClick={() => !error && onRowClick?.(row.original)}
+                        className={error ? 'text-gray-500' : 'cursor-pointer'}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className={cell.column.id === 'actions' ? 'flex justify-end' : ''}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className="h-24 text-center">
+                        No results found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
       <DataTablePagination table={table} />
     </div>
   );

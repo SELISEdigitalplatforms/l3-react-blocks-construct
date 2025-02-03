@@ -24,8 +24,8 @@ function LanguageSelector() {
 
   return (
     <DropdownMenu onOpenChange={(open) => setIsDropdownOpen(open)}>
-      <DropdownMenuTrigger asChild className="cursor-pointer p-2 rounded-full hover:bg-muted">
-        <div className="flex items-center justify-center gap-1 w-8 h-8 bg-muted rounded-full">
+      <DropdownMenuTrigger asChild className="cursor-pointer  rounded-full hover:bg-muted">
+        <div className="flex items-center justify-center gap-1 w-[34px] h-[34px] bg-muted rounded-full">
           <span className="text-sm font-semibold uppercase">{language}</span>
           {/* {isDropdownOpen ? (
             <ChevronUp className="h-4 w-4 text-medium-emphasis" />
