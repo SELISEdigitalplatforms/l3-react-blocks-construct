@@ -79,7 +79,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="rounded-md sm:max-w-[500px]">
+        <DialogContent className="rounded-md sm:max-w-[500px] overflow-y-auto max-h-screen">
           <DialogHeader>
             <DialogTitle>Update Password</DialogTitle>
             <DialogDescription>Secure your account with a new password.</DialogDescription>

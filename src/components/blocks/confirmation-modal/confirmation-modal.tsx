@@ -35,15 +35,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <div className="flex justify-end space-x-2">
-            <AlertDialogCancel className="rounded-[6px]">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-primary text-primary-foreground rounded-[6px]"
-              onClick={onConfirm}
-            >
-              Confirm
-            </AlertDialogAction>
-          </div>
+          <AlertDialogCancel className="rounded-[6px]">Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-primary text-primary-foreground rounded-[6px]"
+            onClick={onConfirm}
+          >
+            Confirm
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

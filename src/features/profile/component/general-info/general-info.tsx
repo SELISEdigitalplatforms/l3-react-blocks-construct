@@ -25,7 +25,7 @@ export const GeneralInfo = () => {
   return (
     <div className="flex flex-col gap-4">
       <Card className="w-full border-none rounded-[8px] shadow-sm">
-        <CardHeader className="p-0">
+        <CardHeader className="p-0 hidden">
           <CardTitle />
           <CardDescription />
         </CardHeader>
@@ -107,7 +107,7 @@ export const GeneralInfo = () => {
         </CardContent>
       </Card>
       <Card className="w-full border-none rounded-[8px] shadow-sm">
-        <CardHeader className="space-y-0 p-0">
+        <CardHeader className="space-y-0 p-0 hidden">
           <CardTitle />
           <CardDescription />
         </CardHeader>

@@ -65,6 +65,18 @@ const IamTablePage: React.FC = () => {
     setOpenSheet(true);
   };
 
+  useEffect(() => {
+    if (openSheet) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [openSheet]);
+
   const columns: ColumnDef<IamData>[] = [
     {
       id: 'fullName',

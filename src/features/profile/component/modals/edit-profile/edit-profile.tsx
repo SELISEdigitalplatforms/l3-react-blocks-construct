@@ -143,7 +143,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
   };
 
   return (
-    <DialogContent className="rounded-md sm:max-w-[700px]">
+    <DialogContent className="rounded-md sm:max-w-[700px] overflow-y-auto max-h-screen">
       <DialogHeader>
         <DialogTitle>Edit profile details</DialogTitle>
         <DialogDescription>Keep your details accurate and up to date.</DialogDescription>
@@ -155,7 +155,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
             alt="Profile"
             className="w-[100px] h-[100px] rounded-full object-cover border shadow-sm"
           />
-          <div className="flex flex-col gap-2 ml-9">
+          <div className="flex flex-col gap-2 ml-4 sm:ml-9">
             <h1 className="text-xl font-semibold">
               {userInfo.firstName} {userInfo.lastName}
             </h1>
