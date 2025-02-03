@@ -7,7 +7,6 @@ export interface PasswordChecks {
   case: boolean;
   number: boolean;
   special: boolean;
-  disallowedChars: boolean;
 }
 
 export interface PasswordRequirement {
@@ -23,7 +22,6 @@ export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
     key: 'special',
     label: `At least 1 special character (${ALLOWED_SPECIAL_CHARS.split('').join(' ')})`,
   },
-  { key: 'disallowedChars', label: 'No disallowed special characters' },
 ];
 
 export const usePasswordStrength = (password: string) => {
@@ -33,27 +31,20 @@ export const usePasswordStrength = (password: string) => {
     case: false,
     number: false,
     special: false,
-    disallowedChars: false,
   });
 
   const validatePassword = useCallback(() => {
-    const specialCharsRegex = new RegExp(
-      // eslint-disable-next-line no-useless-escape
-      `[^A-Za-z\\d${ALLOWED_SPECIAL_CHARS.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}]`
-    );
-
     const newChecks: PasswordChecks = {
       length: password.length >= 8 && password.length <= 30,
       case: /(?=.*[a-z])(?=.*[A-Z])/.test(password),
       number: /(?=.*\d)/.test(password),
       special: /(?=.*[@$!%*?&])/.test(password),
-      disallowedChars: !specialCharsRegex.test(password),
     };
 
     setChecks(newChecks);
 
-    const strengthScore = Object.values(newChecks).filter(Boolean).length;
-    setStrength(strengthScore * 20);
+    const strengthScore = Object.values(newChecks).filter(Boolean).length * 25; // Adjusted to 25 for 100% scale
+    setStrength(strengthScore);
 
     return Object.values(newChecks).every(Boolean);
   }, [password]);
@@ -63,10 +54,9 @@ export const usePasswordStrength = (password: string) => {
   }, [validatePassword]);
 
   const getStrengthColor = () => {
-    if (strength <= 20) return 'bg-red-500';
-    if (strength <= 40) return 'bg-orange-500';
-    if (strength <= 60) return 'bg-yellow-500';
-    if (strength <= 80) return 'bg-green-500';
+    if (strength <= 25) return 'bg-red-500';
+    if (strength <= 50) return 'bg-orange-500';
+    if (strength <= 75) return 'bg-yellow-500';
     return 'bg-green-600';
   };
 

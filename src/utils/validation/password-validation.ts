@@ -2,9 +2,14 @@ import { z } from 'zod';
 
 const ALLOWED_SPECIAL_CHARS = '@$!%*?&';
 
+// const PASSWORD_REGEX = new RegExp(
+//   // eslint-disable-next-line no-useless-escape
+//   `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d${ALLOWED_SPECIAL_CHARS.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}]{8,30}$`
+// );
+
 const PASSWORD_REGEX = new RegExp(
   // eslint-disable-next-line no-useless-escape
-  `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d${ALLOWED_SPECIAL_CHARS.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}]{8,30}$`
+  `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])[A-Za-z\\d\\W_]{8,30}$`
 );
 
 export const createPasswordValidationSchema = () =>
@@ -51,9 +56,9 @@ export const PASSWORD_REQUIREMENTS = [
     label: `At least 1 special character (${ALLOWED_SPECIAL_CHARS.split('').join(' ')})`,
     regex: (password: string) => /(?=.*[@$!%*?&])/.test(password),
   },
-  {
-    key: 'disallowedChars',
-    label: 'No disallowed special characters',
-    regex: (password: string) => !/[^A-Za-z\d@$!%*?&]/.test(password),
-  },
+  // {
+  //   key: 'disallowedChars',
+  //   label: 'No disallowed special characters',
+  //   regex: (password: string) => !/[^A-Za-z\d@$!%*?&]/.test(password),
+  // },
 ];
