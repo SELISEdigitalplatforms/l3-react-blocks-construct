@@ -5,7 +5,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build-dev": "cross-env NODE_OPTIONS=--max-old-space-size=8192 react-scripts build",
+    "set-env": "node set-env.js",
+    "build:dev": "BUILD_ENV=dev npm run set-env && react-scripts build",
+    "build:stg": "BUILD_ENV=stg npm run set-env && react-scripts build",
+    "build:prod": "BUILD_ENV=prod npm run set-env && react-scripts build",
     "test": "jest",
     "test:coverage": "jest --coverage --coverageDirectory=./coverage",
     "test:clear": "jest --clearCache",

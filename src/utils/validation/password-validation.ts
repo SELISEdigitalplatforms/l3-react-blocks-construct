@@ -3,7 +3,7 @@ import { z } from 'zod';
 const hasLowercase = /[a-z]/;
 const hasUppercase = /[A-Z]/;
 const hasNumber = /\d/;
-const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;
+const hasSpecialChar = /[@$!%*?&]/;
 
 export const createPasswordValidationSchema = () =>
   z

@@ -18,14 +18,21 @@ export function AuthLayout() {
 
   if (!isMounted) return null;
 
+  const getBackgroundImage = () => {
+    if (theme === 'system') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? bgAuthDark : bgAuthLight;
+    }
+    return theme === 'dark' ? bgAuthDark : bgAuthLight;
+  };
+
   return (
     <div className="flex h-screen">
       <div className="hidden md:block w-[32rem] relative bg-primary-shade-50">
         <img
-          src={theme === 'light' ? bgAuthLight : bgAuthDark}
+          src={getBackgroundImage()}
           alt="bg-auth"
           className="w-full h-full object-cover"
-          key={theme}
+          key={theme ?? 'default'}
         />
       </div>
       <div className="flex-1 flex justify-center items-center px-4">

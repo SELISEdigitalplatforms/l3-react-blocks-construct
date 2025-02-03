@@ -11,9 +11,12 @@ import { useToast } from '../../../hooks/use-toast';
 import { useGlobalMutation } from '../../../state/query-client/hooks';
 import { useState } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ApiError extends Error {
   response?: {
     status: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data?: any;
   };
 }
 
@@ -36,11 +39,15 @@ export const useSigninMutation = () => {
         description: 'You are successfully logged in',
       });
     },
-    onError: (error: ApiError) => {
-      const isInvalidCredentials = error.response?.status === 400;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      const isInvalidCredentials =
+        JSON.stringify(error).includes('invalid_usename_password') ||
+        error.message?.includes('invalid_usename_password') ||
+        error.response?.data?.message?.includes('invalid_usename_password');
 
       setErrorDetails({
-        title: isInvalidCredentials ? 'Invalid user name or password!' : 'Something went wrong',
+        title: isInvalidCredentials ? 'Invalid Credentials' : 'Something went wrong',
         message: isInvalidCredentials
           ? 'Your user name or password is not valid.'
           : 'Please try again.',

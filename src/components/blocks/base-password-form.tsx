@@ -1,13 +1,12 @@
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
 import { Button } from 'components/ui/button';
 import { UPasswordInput } from 'components/core/u-password-input';
-import PasswordStrengthChecker from 'components/core/password-strength-checker';
+import { SharedPasswordStrengthChecker } from '../core/shared-password-strength-checker';
 
 interface BasePasswordFormProps {
   code: string;
@@ -20,15 +19,15 @@ interface BasePasswordFormProps {
   isPending: boolean;
 }
 
-export const BasePasswordForm = ({
+export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
   code,
   onSubmit,
   validationSchema,
   defaultValues,
   isPending,
-}: BasePasswordFormProps) => {
+}) => {
   const navigate = useNavigate();
-  const [passwordRequirementsMet, setPasswordRequirementsMet] = useState(false);
+  const [requirementsMet, setRequirementsMet] = useState(false);
 
   const form = useForm({
     defaultValues,
@@ -44,10 +43,8 @@ export const BasePasswordForm = ({
     }
   };
 
-  const arePasswordsMatching = () => {
-    const { password, confirmPassword } = form.getValues();
-    return password === confirmPassword && confirmPassword !== '';
-  };
+  const password = form.watch('password');
+  const confirmPassword = form.watch('confirmPassword');
 
   return (
     <Form {...form}>
@@ -80,12 +77,11 @@ export const BasePasswordForm = ({
           )}
         />
 
-        <div className="mt-2">
-          <PasswordStrengthChecker
-            password={form.watch('password')}
-            onRequirementsMet={setPasswordRequirementsMet}
-          />
-        </div>
+        <SharedPasswordStrengthChecker
+          password={password}
+          confirmPassword={confirmPassword}
+          onRequirementsMet={setRequirementsMet}
+        />
 
         <div className="flex gap-10 mt-5">
           <Button
@@ -93,7 +89,7 @@ export const BasePasswordForm = ({
             size="lg"
             type="submit"
             loading={isPending}
-            disabled={isPending || !passwordRequirementsMet || !arePasswordsMatching()}
+            disabled={isPending || !requirementsMet}
           >
             Confirm
           </Button>
