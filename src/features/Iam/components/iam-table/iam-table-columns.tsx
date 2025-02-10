@@ -1,68 +1,122 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from 'components/ui/badge';
 
-import { labels, priorities, statuses } from './iam-table-filter-data';
-import { Task } from '../../../../components/blocks/data-table/schema';
-import { DataTableColumnHeader } from '../../../../components/blocks/data-table/data-table-column-header';
-import { DataTableRowActions } from '../../../../components/blocks/data-table/data-table-row-actions';
+import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
+import { DataTableRowActions } from 'features/iam/components/iam-table/iam-table-row-actions';
+import { IamData } from '../../services/user-service';
 
-export const columns: ColumnDef<Task>[] = [
+const userStatuses = [
+  { value: 'active', label: 'Active', color: 'success' },
+  { value: 'inactive', label: 'Inactive', color: 'error' },
+];
+
+const mfaStatuses = [
+  { value: true, label: 'Enabled', color: 'success' },
+  { value: false, label: 'Disabled', color: 'error' },
+];
+
+interface ColumnFactoryProps {
+  onViewDetails: (user: IamData) => void;
+  onResetPassword: (user: IamData) => void;
+  onResendActivation?: (user: IamData) => void;
+}
+
+export const createIamTableColumns = ({
+  onViewDetails,
+  onResetPassword,
+  onResendActivation,
+}: ColumnFactoryProps): ColumnDef<IamData>[] => [
   {
-    accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Task" />,
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue('id')}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'title',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Title" />,
+    id: 'fullName',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+    accessorFn: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim(),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
+      const fullName = `${row.original.firstName} ${row.original.lastName}`.trim();
       return (
-        <div className="flex space-x-2">
-          {label && <Badge variant="outline">{label.label}</Badge>}
-          <span className="max-w-[500px] truncate font-medium">{row.getValue('title')}</span>
+        <div className="flex items-center">
+          <span className="max-w-[300px] truncate font-medium">{fullName}</span>
         </div>
       );
     },
   },
   {
-    accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    accessorKey: 'email',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+    cell: ({ row }) => (
+      <div className="flex items-center">
+        <span className="max-w-[300px] truncate">{row.original.email}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'mfaEnabled',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="MFA" />,
     cell: ({ row }) => {
-      const status = statuses.find((status) => status.value === row.getValue('status'));
+      const mfaStatus = mfaStatuses.find((status) => status.value === row.original.mfaEnabled);
 
-      if (!status) {
-        return null;
-      }
+      if (!mfaStatus) return null;
 
-      return (
-        <div className="flex w-[100px] items-center">
-          {status.icon && <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
-          <span>{status.label}</span>
-        </div>
-      );
+      return <div className="flex items-center">{mfaStatus.label}</div>;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
   },
   {
-    accessorKey: 'priority',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Priority" />,
+    accessorKey: 'createdDate',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Joined On" />,
     cell: ({ row }) => {
-      const priority = priorities.find((priority) => priority.value === row.getValue('priority'));
-
-      if (!priority) {
-        return null;
+      const date = new Date(row.original.createdDate);
+      return (
+        <div className="flex items-center">
+          <span>{date.toLocaleDateString()}</span>
+        </div>
+      );
+    },
+    sortingFn: (rowA, rowB) => {
+      const a = new Date(rowA.original.createdDate).getTime();
+      const b = new Date(rowB.original.createdDate).getTime();
+      return a < b ? -1 : a > b ? 1 : 0;
+    },
+  },
+  {
+    accessorKey: 'lastLoggedInTime',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Last Login" />,
+    cell: ({ row }) => {
+      const date = new Date(row.original.lastLoggedInTime);
+      if (date.getFullYear() === 1) {
+        return <div className="text-muted-foreground">-</div>;
       }
+      return (
+        <div>
+          <span>{date.toLocaleString()}</span>
+        </div>
+      );
+    },
+    sortingFn: (rowA, rowB) => {
+      const a = new Date(rowA.original.lastLoggedInTime).getTime();
+      const b = new Date(rowB.original.lastLoggedInTime).getTime();
+      return a < b ? -1 : a > b ? 1 : 0;
+    },
+  },
+  {
+    accessorKey: 'active',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    cell: ({ row }) => {
+      const status = userStatuses.find(
+        (status) => status.value === (row.original.active ? 'active' : 'inactive')
+      );
+
+      if (!status) return null;
 
       return (
         <div className="flex items-center">
-          {priority.icon && <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />}
-          <span>{priority.label}</span>
+          <Badge
+            variant="outline"
+            className={status.color === 'success' ? 'text-success' : 'text-error'}
+          >
+            {status.label}
+          </Badge>
         </div>
       );
     },
@@ -72,6 +126,13 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => (
+      <DataTableRowActions
+        row={row}
+        onViewDetails={onViewDetails}
+        onResetPassword={onResetPassword}
+        onResendActivation={onResendActivation}
+      />
+    ),
   },
 ];

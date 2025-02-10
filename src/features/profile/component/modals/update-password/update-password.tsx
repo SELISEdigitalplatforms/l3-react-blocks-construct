@@ -63,7 +63,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
           console.error('Error:', error);
           form.setError('oldPassword', {
             type: 'manual',
-            message: error?.message || 'Failed to change password',
+            message: error?.error?.message || 'Failed to change password',
           });
         },
       }
