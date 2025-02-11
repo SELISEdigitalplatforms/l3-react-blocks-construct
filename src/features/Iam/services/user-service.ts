@@ -20,12 +20,24 @@ export interface IamData {
   mfaEnabled: boolean;
 }
 
-export const getUsers = (payload: { page: number; pageSize: number }) => {
+export interface UserFilter {
+  email?: string;
+  name?: string;
+}
+
+export interface GetUsersPayload {
+  page: number;
+  pageSize: number;
+  filter?: UserFilter;
+}
+
+export const getUsers = (payload: GetUsersPayload) => {
   const requestBody = {
-    ...payload,
+    page: payload.page,
+    pageSize: payload.pageSize,
     filter: {
-      email: '',
-      name: '',
+      email: payload.filter?.email || '',
+      name: payload.filter?.name || '',
     },
   };
 

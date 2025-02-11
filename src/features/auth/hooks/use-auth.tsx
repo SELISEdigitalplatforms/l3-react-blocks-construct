@@ -41,15 +41,25 @@ export const useSigninMutation = () => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
+      let errorObj = error;
+      try {
+        if (typeof error === 'string') {
+          errorObj = JSON.parse(error);
+        }
+      } catch (e) {
+        console.error('Error parsing error response:', e);
+      }
+
       const isInvalidCredentials =
-        JSON.stringify(error).includes('invalid_usename_password') ||
-        error.message?.includes('invalid_usename_password') ||
-        error.response?.data?.message?.includes('invalid_usename_password');
+        (errorObj?.status === 400 && errorObj?.error?.error === 'invalid_username_password') ||
+        (errorObj?.response?.status === 400 &&
+          (errorObj?.response?.data?.error === 'invalid_username_password' ||
+            errorObj?.response?.data?.error?.error === 'invalid_username_password'));
 
       setErrorDetails({
         title: isInvalidCredentials ? 'Invalid Credentials' : 'Something went wrong',
         message: isInvalidCredentials
-          ? 'Your user name or password is not valid.'
+          ? 'Your email or password is not valid.'
           : 'Please try again.',
       });
     },

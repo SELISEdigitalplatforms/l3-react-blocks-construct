@@ -31,7 +31,7 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
         variant: 'destructive',
         title: 'Something went wrong!',
         description:
-          error?.message || 'Profile update failed. Please check your input and try again.',
+          error?.error?.message || 'Profile update failed. Please check your input and try again.',
       });
     },
   });

@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Trash, Upload } from 'lucide-react';
 import 'react-phone-number-input/style.css';
 import './edit-profile.css';
-import PhoneInput from 'react-phone-number-input';
+import PhoneInput, { isPossiblePhoneNumber, isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import DummyProfile from '../../../../../assets/images/dummy_profile.png';
+import { User } from '@/types/user.type';
+import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from 'components/ui/dialog';
 import { Button } from 'components/ui/button';
 import { Separator } from 'components/ui/separator';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
-import DummyProfile from '../../../../../assets/images/dummy_profile.png';
-import { User } from '@/types/user.type';
-import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
-import { useQueryClient } from '@tanstack/react-query';
+import { Form, FormField, FormItem, FormControl, FormMessage } from 'components/ui/form';
 
 type FormData = {
   itemId: string;
@@ -48,16 +49,11 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
       navigate('/profile');
     },
   });
+
   const [previewImage, setPreviewImage] = useState<string | null>(DummyProfile);
   const [isFormChanged, setIsFormChanged] = useState(false);
 
-  const {
-    handleSubmit,
-    control,
-    setValue,
-    formState: { errors },
-    watch,
-  } = useForm<FormData>({
+  const form = useForm<FormData>({
     defaultValues: {
       itemId: '',
       fullName: '',
@@ -67,6 +63,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
     },
   });
 
+  const { watch, setValue, handleSubmit, control } = form;
   const watchedValues = watch();
 
   useEffect(() => {
@@ -81,18 +78,16 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
 
   useEffect(() => {
     const initialValues = {
-      fullName: `${userInfo.firstName} ${userInfo.lastName}` || '',
-      email: userInfo.email || '',
-      phoneNumber: userInfo.phoneNumber || '',
+      fullName: `${userInfo.firstName} ${userInfo.lastName}`,
+      phoneNumber: userInfo.phoneNumber,
       profileImageUrl: userInfo.profileImageUrl || '',
     };
 
-    const hasChanged =
+    setIsFormChanged(
       watchedValues.fullName !== initialValues.fullName ||
-      watchedValues.phoneNumber !== initialValues.phoneNumber ||
-      watchedValues.profileImageUrl !== initialValues.profileImageUrl;
-
-    setIsFormChanged(hasChanged);
+        watchedValues.phoneNumber !== initialValues.phoneNumber ||
+        watchedValues.profileImageUrl !== initialValues.profileImageUrl
+    );
   }, [watchedValues, userInfo]);
 
   const onSubmit = async (data: FormData) => {
@@ -148,96 +143,113 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
         <DialogTitle>Edit profile details</DialogTitle>
         <DialogDescription>Keep your details accurate and up to date.</DialogDescription>
       </DialogHeader>
-      <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex items-center">
-          <img
-            src={previewImage || DummyProfile}
-            alt="Profile"
-            className="w-[100px] h-[100px] rounded-full object-cover border shadow-sm"
-          />
-          <div className="flex flex-col gap-2 ml-4 sm:ml-9">
-            <h1 className="text-xl font-semibold">
-              {userInfo.firstName} {userInfo.lastName}
-            </h1>
-            <p className="text-sm">*.png, *.jpeg files up to 2MB, minimum size 400x400px.</p>
-            <div className="flex gap-4">
-              <Button size="sm" variant="outline" type="button">
-                <Upload className="w-4 h-4" />
-                <Label className="text-xs font-medium">
-                  Upload Image
-                  <input
-                    type="file"
-                    accept="image/png, image/jpeg"
-                    className="hidden cursor-pointer"
-                    onChange={handleImageUpload}
-                  />
-                </Label>
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                type="button"
-                onClick={handleRemoveImage}
-                className="text-destructive hover:text-destructive"
-              >
-                <Trash className="w-4 h-4" />
-                Remove
-              </Button>
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+          <div className="flex items-start sm:items-center">
+            <img
+              src={previewImage || DummyProfile}
+              alt="Profile"
+              className="w-[90px] h-[90px] sm:w-[100px] sm:h-[100px] rounded-full object-cover border shadow-sm"
+            />
+            <div className="flex flex-col gap-2 ml-4 sm:ml-9">
+              <h1 className="text-xl font-semibold">
+                {userInfo.firstName} {userInfo.lastName}
+              </h1>
+              <p className="text-sm">*.png, *.jpeg files up to 2MB, minimum size 400x400px.</p>
+              <div className="flex gap-2 sm:gap-4">
+                <Button size="sm" variant="outline" type="button">
+                  <Upload className="w-4 h-4" />
+                  <Label className="text-xs font-medium">
+                    Upload Image
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                    />
+                  </Label>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash className="w-4 h-4" />
+                  Remove
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-        <Separator />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="col-span-1 sm:col-span-2">
-            <Label htmlFor="full-name">Full Name*</Label>
-            <Controller
-              name="fullName"
+          <Separator />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
               control={control}
+              name="fullName"
               rules={{ required: 'Full Name is required' }}
               render={({ field }) => (
-                <Input {...field} id="full-name" placeholder="Enter your full name" />
+                <FormItem className="col-span-1 sm:col-span-2">
+                  <Label>Full Name*</Label>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter your full name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.fullName && <span>{errors.fullName.message}</span>}
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Controller
+            <FormField
+              control={control}
               name="email"
-              control={control}
               render={({ field }) => (
-                <Input {...field} id="email" disabled placeholder="Enter your email" />
+                <FormItem>
+                  <Label>Email</Label>
+                  <FormControl>
+                    <Input {...field} disabled />
+                  </FormControl>
+                </FormItem>
               )}
             />
-          </div>
-          <div>
-            <Label htmlFor="phoneNumber">Mobile No.</Label>
-            <Controller
+            <FormField
+              control={control}
               name="phoneNumber"
-              control={control}
+              rules={{
+                validate: (value) => {
+                  if (!value) return 'Phone number is required';
+                  if (!isPossiblePhoneNumber(value)) return 'Phone number length is invalid';
+                  if (!isValidPhoneNumber(value)) return 'Invalid phone number';
+                  return true;
+                },
+              }}
               render={({ field }) => (
-                <PhoneInput
-                  {...field}
-                  placeholder="Enter your mobile number"
-                  defaultCountry="CH"
-                  international
-                  countryCallingCodeEditable={false}
-                  className="PhoneInput mt-1 flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                <FormItem>
+                  <Label>Mobile No.</Label>
+                  <FormControl>
+                    <PhoneInput
+                      {...field}
+                      onChange={(value) => setValue('phoneNumber', value || '')}
+                      className="flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="Enter your mobile number"
+                      defaultCountry="CH"
+                      countryCallingCodeEditable={false}
+                      international
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
-            {errors.phoneNumber && <span>{errors.phoneNumber.message}</span>}
           </div>
-        </div>
-        <DialogFooter className="mt-5 flex justify-end gap-2">
-          <DialogTrigger asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogTrigger>
-          <Button type="submit" loading={isPending} disabled={isPending || !isFormChanged}>
-            Save
-          </Button>
-        </DialogFooter>
-      </form>
+          <DialogFooter className="mt-5 flex justify-end gap-2">
+            <Button variant="outline" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={isPending} disabled={isPending || !isFormChanged}>
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
+      </Form>
     </DialogContent>
   );
 };

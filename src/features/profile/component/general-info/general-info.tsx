@@ -71,7 +71,7 @@ export const GeneralInfo = () => {
             </Dialog>
           </div>
           <Separator orientation="horizontal" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             {isLoading || isFetching ? (
               Array.from({ length: 3 }).map((_, index) => (
                 <div key={index}>

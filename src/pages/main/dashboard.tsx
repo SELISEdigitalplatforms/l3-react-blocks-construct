@@ -171,8 +171,8 @@ export function Dashboard() {
             </div>
           </CardContent>
         </Card>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Card className="w-full sm:w-[40%] border-none rounded-[8px] shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4">
+          <Card className="w-full md:w-[40%] border-none rounded-[8px] shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl text-high-emphasis">Users by platform</CardTitle>
@@ -249,7 +249,7 @@ export function Dashboard() {
               </ChartContainer>
             </CardContent>
           </Card>
-          <Card className="w-full sm:w-[60%] border-none rounded-[8px] shadow-sm">
+          <Card className="w-full md:w-[60%] border-none rounded-[8px] shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl text-high-emphasis">User activity trends</CardTitle>

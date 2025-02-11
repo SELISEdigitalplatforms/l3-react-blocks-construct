@@ -81,7 +81,7 @@ export const UProfileMenu = () => {
         <DropdownMenuItem disabled>Privacy Policy</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="flex justify-between items-center cursor-pointer transition-colors"
+          className="flex justify-between items-center transition-colors"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
           <span>Theme</span>

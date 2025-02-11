@@ -12,13 +12,13 @@ export default function MainLayout() {
       <SidebarProvider>
         <AppSidebar />
         <div className="flex flex-col w-full h-full">
-          <div className="sticky bg-card z-[1] top-0 border-b py-2 px-4 sm:px-8 flex justify-between items-center w-full">
+          <div className="sticky bg-card z-[1] top-0 border-b py-2 px-4 sm:px-6 md:px-8 flex justify-between items-center w-full">
             <SidebarTrigger />
-            <div className="flex justify-between items-center gap-1 sm:gap-8">
-              <Button variant="ghost" size="icon" className="hover:rounded-full hover:bg-muted">
+            <div className="flex justify-between items-center gap-1 sm:gap-3 md:gap-8">
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
                 <Library className="!w-5 !h-5 text-medium-emphasis" />
               </Button>
-              <Button variant="ghost" size="icon" className="hover:rounded-full hover:bg-muted">
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
                 <Bell className="!w-5 !h-5 text-medium-emphasis" />
               </Button>
               <LanguageSelector />
@@ -26,7 +26,7 @@ export default function MainLayout() {
               <UProfileMenu />
             </div>
           </div>
-          <div className="flex h-full bg-surface p-4 sm:p-8">
+          <div className="flex h-full bg-surface p-4 sm:p-6 md:p-8">
             <Outlet />
           </div>
         </div>

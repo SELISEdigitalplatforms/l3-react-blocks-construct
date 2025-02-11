@@ -12,9 +12,13 @@ import {
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({
+  table,
+  onPaginationChange,
+}: DataTablePaginationProps<TData>) {
   return (
     <div className="flex w-full items-center justify-between px-2">
       <div className="text-sm text-muted-foreground">
@@ -27,7 +31,12 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              const newSize = Number(value);
+              table.setPageSize(newSize);
+              onPaginationChange?.({
+                pageSize: newSize,
+                pageIndex: 0,
+              });
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
@@ -49,38 +58,65 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
+            onClick={() => {
+              table.setPageIndex(0);
+              onPaginationChange?.({
+                pageIndex: 0,
+                pageSize: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to first page</span>
-            <ChevronsLeft />
+            <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => table.previousPage()}
+            onClick={() => {
+              const previousPage = table.getState().pagination.pageIndex - 1;
+              table.previousPage();
+              onPaginationChange?.({
+                pageIndex: previousPage,
+                pageSize: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to previous page</span>
-            <ChevronLeft />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => table.nextPage()}
+            onClick={() => {
+              const nextPage = table.getState().pagination.pageIndex + 1;
+              table.nextPage();
+              onPaginationChange?.({
+                pageIndex: nextPage,
+                pageSize: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to next page</span>
-            <ChevronRight />
+            <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => {
+              const lastPage = table.getPageCount() - 1;
+              table.setPageIndex(lastPage);
+              onPaginationChange?.({
+                pageIndex: lastPage,
+                pageSize: table.getState().pagination.pageSize,
+              });
+            }}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to last page</span>
-            <ChevronsRight />
+            <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
       </div>

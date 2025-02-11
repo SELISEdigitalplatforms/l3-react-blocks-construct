@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import {
   ColumnDef,
@@ -12,11 +13,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  Table as TableInstance,
 } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
 import { DataTablePagination } from './data-table-pagination';
-import { IamTableToolbar } from 'features/Iam/components/iam-table/iam-table-toolbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Skeleton } from 'components/ui/skeleton';
 import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
@@ -27,6 +28,14 @@ export interface DataTableProps<TData, TValue> {
   onRowClick?: (data: TData) => void;
   isLoading?: boolean;
   error?: Error | null;
+  toolbar?: (table: TableInstance<TData>) => React.ReactNode;
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+    totalCount: number;
+  };
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+  manualPagination?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -35,37 +44,41 @@ export function DataTable<TData, TValue>({
   onRowClick,
   isLoading = false,
   error = null,
+  toolbar,
+  pagination,
+  onPaginationChange,
+  manualPagination = false,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const renderPlaceholderData = () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return Array.from({ length: 1 }).map((_, index) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const placeholderRow: Record<string, any> = {};
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      columns.forEach((column: any) => {
-        if (column.accessorKey || column.id) {
-          placeholderRow[column.accessorKey || column.id] = 'No user found';
-        }
-      });
-      return placeholderRow;
-    });
-  };
-
-  const tableData = error ? renderPlaceholderData() : data;
-
   const table = useReactTable({
-    data: tableData as TData[],
+    data: error ? [] : data,
     columns,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination: {
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      },
+    },
+    manualPagination,
+    pageCount: Math.ceil(pagination.totalCount / pagination.pageSize),
+    onPaginationChange: (updater) => {
+      if (typeof updater === 'function') {
+        const newPagination = updater({
+          pageIndex: pagination.pageIndex,
+          pageSize: pagination.pageSize,
+        });
+        onPaginationChange?.(newPagination);
+      } else {
+        onPaginationChange?.(updater);
+      }
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -81,7 +94,7 @@ export function DataTable<TData, TValue>({
   });
 
   const renderSkeletonRows = () => {
-    return Array.from({ length: 10 }).map((_, rowIndex) => (
+    return Array.from({ length: pagination.pageSize }).map((_, rowIndex) => (
       <TableRow key={`skeleton-${rowIndex}`}>
         {columns.map((_, colIndex) => (
           <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`}>
@@ -94,7 +107,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-5">
-      <IamTableToolbar table={table} />
+      {toolbar ? toolbar(table) : null}
       <div className="flex">
         <Card className="w-full border-none rounded-[4px] shadow-sm">
           <CardHeader className="hidden">
@@ -120,13 +133,19 @@ export function DataTable<TData, TValue>({
                 <TableBody>
                   {isLoading ? (
                     renderSkeletonRows()
+                  ) : error ? (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className="h-24 text-center text-error">
+                        Error loading data: {error.message}
+                      </TableCell>
+                    </TableRow>
                   ) : table.getRowModel().rows.length ? (
                     table.getRowModel().rows.map((row) => (
                       <TableRow
                         key={row.id}
                         data-state={row.getIsSelected() && 'selected'}
-                        onClick={() => !error && onRowClick?.(row.original)}
-                        className={error ? 'text-gray-500' : 'cursor-pointer'}
+                        onClick={() => onRowClick?.(row.original)}
+                        className="cursor-pointer"
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell
@@ -152,7 +171,7 @@ export function DataTable<TData, TValue>({
           </CardContent>
         </Card>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} onPaginationChange={onPaginationChange} />
     </div>
   );
 }

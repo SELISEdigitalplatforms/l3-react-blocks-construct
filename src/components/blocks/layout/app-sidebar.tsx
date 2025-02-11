@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -6,6 +6,7 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  useSidebar,
 } from '../../ui/sidebar';
 import { menuItems } from 'constant/sidebar-menu';
 import { SidebarMenuItemComponent } from './sidebar-menu-Item';
@@ -15,6 +16,11 @@ export function AppSidebar() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showText, setShowText] = useState(true);
   const { pathname } = useLocation();
+  const { setOpenMobile } = useSidebar();
+
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [pathname, setOpenMobile]);
 
   return (
     <Sidebar className="bg-white">

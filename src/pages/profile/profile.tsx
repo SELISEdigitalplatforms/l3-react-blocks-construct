@@ -7,12 +7,12 @@ export function Profile() {
 
   return (
     <div className="flex w-full flex-col">
-      <div className="mb-[18px] flex items-center text-base text-high-emphasis md:mb-[24px]">
+      <div className="mb-2 md:mb-[18px] flex items-center text-base text-high-emphasis">
         <h3 className="text-2xl font-bold tracking-tight">My Profile</h3>
       </div>
 
       <Tabs value={tabId}>
-        <div className="mb-5 mt-6 flex items-center rounded text-base">
+        <div className="my-3 sm:my-5 flex items-center rounded text-base">
           <TabsList>
             <TabsTrigger onClick={() => setTabId('generalInfo')} value="generalInfo">
               General info
