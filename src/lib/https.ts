@@ -62,6 +62,7 @@ export const clients: Https = {
         // ...(!isPublicEndpoint && {
         //   Authorization: `bearer ${useAuthStore.getState().accessToken}`,
         // }),
+        Authorization: `bearer ${useAuthStore.getState().accessToken}`,
         ...(headers instanceof Headers ? Object.fromEntries(headers.entries()) : headers),
       }),
     };
