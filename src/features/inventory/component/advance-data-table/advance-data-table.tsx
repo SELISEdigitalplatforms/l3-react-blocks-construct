@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import {
   ColumnDef,
@@ -61,6 +61,18 @@ export function AdvanceDataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [expanded, setExpanded] = useState({});
+  const [isMobile, setIsMobile] = useState(false);
+
+  //TODO: Quick fixes of the expandableContent, need to look into better solution
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const table = useReactTable({
     data: error ? [] : data,
@@ -126,7 +138,11 @@ export function AdvanceDataTable<TData, TValue>({
             <CardDescription />
           </CardHeader>
           <CardContent className="p-0 md:p-0">
-            <div className="relative w-full overflow-auto">
+            <div
+              className={`relative w-full ${
+                table.getIsSomeRowsExpanded() && !isMobile ? 'overflow-x-hidden' : 'overflow-x-auto'
+              }`}
+            >
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
