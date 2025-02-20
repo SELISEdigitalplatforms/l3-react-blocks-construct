@@ -41,6 +41,7 @@ html.dark {
     --medium-emphasis: 0, 0%, 31%;
     --low-emphasis: 0, 0%, 62%;
 
+    --neutral-25: 0, 0%, 98%;
     --neutral-200: 0, 0%, 85%;
 
     --success: 134, 61%, 41%;
@@ -102,6 +103,7 @@ html.dark {
     --medium-emphasis: 0, 0%, 69%;
     --low-emphasis: 0, 0%, 82%;
 
+    --neutral-25: 0, 0%, 98%;
     --neutral-200: 0, 0%, 33%;
 
     --success: 133, 59%, 38%;

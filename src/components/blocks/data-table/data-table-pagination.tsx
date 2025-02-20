@@ -19,6 +19,12 @@ export function DataTablePagination<TData>({
   table,
   onPaginationChange,
 }: DataTablePaginationProps<TData>) {
+  const totalRows = table.getFilteredRowModel().rows.length;
+  const pageSizes = Array.from(
+    { length: Math.min(5, Math.ceil(totalRows / 10)) },
+    (_, i) => (i + 1) * 10
+  );
+
   return (
     <div className="flex w-full items-center justify-between px-2">
       <div className="text-sm text-muted-foreground">
@@ -43,7 +49,7 @@ export function DataTablePagination<TData>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {pageSizes.map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

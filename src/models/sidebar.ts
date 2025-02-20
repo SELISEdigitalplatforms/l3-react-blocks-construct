@@ -9,6 +9,7 @@ export interface MenuItem {
     | 'ChevronRight'
     | 'User'
     | 'Server'
+    | 'Store'
     | 'CircleHelp';
   children?: MenuItem[];
 }

@@ -22,6 +22,9 @@ import { Storage } from './pages/services/storage/storage';
 import { Mail } from './pages/services/mail/mail';
 import { Help } from './pages/help/help';
 import { ThemeProvider } from './components/core/theme-provider';
+import { Inventory } from './pages/inventory/inventory';
+import { InventoryDetails } from './pages/inventory/inventory-details';
+import { SidebarProvider } from 'components/ui/sidebar';
 
 const queryClient = new QueryClient();
 
@@ -48,30 +51,34 @@ function AppContent() {
       <RedirectHandler />
       <ClientMiddleware>
         <ThemeProvider>
-          <Routes>
-            <Route element={<AuthLayout />}>
-              <Route path="/login" element={<SigninPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/sent-email" element={<EmailVerification />} />
-              <Route path="/activate" element={<SetPasswordPage />} />
-              <Route path="/resetpassword" element={<ResetPasswordPage />} />
-              <Route path="/success" element={<ActivationSuccess />} />
-              <Route path="/activate-failed" element={<VerificationFailed />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            </Route>
-            <Route element={<MainLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/identity-management" element={<TaskPage />} />
-              <Route path="/services/storage" element={<Storage />} />
-              <Route path="/services/mail" element={<Mail />} />
-            </Route>
+          <SidebarProvider>
+            <Routes>
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<SigninPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/sent-email" element={<EmailVerification />} />
+                <Route path="/activate" element={<SetPasswordPage />} />
+                <Route path="/resetpassword" element={<ResetPasswordPage />} />
+                <Route path="/success" element={<ActivationSuccess />} />
+                <Route path="/activate-failed" element={<VerificationFailed />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              </Route>
+              <Route element={<MainLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/inventory-details/:itemId" element={<InventoryDetails />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/identity-management" element={<TaskPage />} />
+                <Route path="/services/storage" element={<Storage />} />
+                <Route path="/services/mail" element={<Mail />} />
+              </Route>
 
-            {/* redirecting */}
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-            {/* <Route path="*" element={<Navigate to="/login" replace />}/> */}
-          </Routes>
+              {/* redirecting */}
+              <Route path="/" element={<Navigate to="/dashboard" />} />
+              {/* <Route path="*" element={<Navigate to="/login" replace />}/> */}
+            </Routes>
+          </SidebarProvider>
         </ThemeProvider>
       </ClientMiddleware>
       <Toaster />

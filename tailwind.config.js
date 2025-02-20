@@ -66,6 +66,7 @@ module.exports = {
 
         warning: 'hsl(var(--warning))',
 
+        'neutral-25': 'hsl(var(--neutral-25))',
         'neutral-200': 'hsl(var(--neutral-200))',
 
         border: 'hsl(var(--border))',

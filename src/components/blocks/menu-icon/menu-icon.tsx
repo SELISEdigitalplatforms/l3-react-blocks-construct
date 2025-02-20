@@ -6,6 +6,7 @@ import {
   FileUser,
   Users,
   Server,
+  Store,
   CircleHelp,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
@@ -17,6 +18,7 @@ const iconMap = {
   FileUser,
   Users,
   Server,
+  Store,
   CircleHelp,
 } as const;
 

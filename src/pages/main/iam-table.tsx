@@ -98,7 +98,7 @@ const IamTablePage: React.FC = () => {
     setOpenSheet(true);
   };
 
-  //Disabled the scrolling when useDetail sheet open
+  //Disabled the scrolling when userDetails sheet open
   useEffect(() => {
     if (openSheet) {
       document.body.style.overflow = 'hidden';
