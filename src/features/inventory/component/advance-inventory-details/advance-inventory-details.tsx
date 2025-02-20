@@ -14,33 +14,48 @@ import {
   SelectItem,
 } from 'components/ui/select';
 import { Switch } from 'components/ui/switch';
-import { inventoryData, InventoryStatus, statusColors } from '../../services/inventory-service';
 import { Checkbox } from 'components/ui/checkbox';
-import DesktopImage1 from 'assets/images/desktop_1.png';
-import DesktopImage2 from 'assets/images/desktop_2.webp';
-import DesktopImage3 from 'assets/images/desktop_3.webp';
-
-const images = [DesktopImage1, DesktopImage2, DesktopImage3];
+import {
+  categoryOptions,
+  checkedTags,
+  images,
+  inventoryData,
+  InventoryStatus,
+  locationOptions,
+  statusColors,
+  tags,
+} from '../../services/inventory-service';
 
 export function AdvanceInventoryDetails() {
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const [editDetails, setEditDetails] = useState(false);
   const [searchTags, setSearchTags] = useState('');
-  const [selectedTags, setSelectedTags] = useState(['Electronic', 'Gaming', 'Monitor']);
+  const [selectedTags, setSelectedTags] = useState(checkedTags);
   const [warranty, setWarranty] = useState(true);
   const [replacement, setReplacement] = useState(true);
   const [discount, setDiscount] = useState(false);
   const [thumbnail, setThumbnail] = useState(images);
+  const [editedFields, setEditedFields] = useState({});
   const navigate = useNavigate();
 
   const { itemId } = useParams();
-  const selectedInventory = inventoryData.find((item) => item.itemId === itemId);
-
-  const tags = ['Accessories', 'Electronic', 'Gaming', 'Monitor'];
+  const initialInventory = inventoryData.find((item) => item.itemId === itemId);
+  const [selectedInventory, setSelectedInventory] = useState(initialInventory);
 
   const handleEditDetails = () => setEditDetails(true);
-  const handleCancelEdit = () => setEditDetails(false);
-  const handleUpdateDetails = () => setEditDetails(false);
+  const handleCancelEdit = () => {
+    setEditDetails(false);
+    setEditedFields({});
+  };
+
+  const handleUpdateDetails = () => {
+    if (selectedInventory) {
+      const updatedInventory = { ...selectedInventory, ...editedFields };
+      setSelectedInventory(updatedInventory);
+      setEditDetails(false);
+      // console.log('Updated Inventory:', updatedInventory);
+    }
+  };
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
@@ -52,8 +67,13 @@ export function AdvanceInventoryDetails() {
     tag.toLowerCase().includes(searchTags.toLowerCase())
   );
 
+  const handleFieldChange = (field: string, value: string | number) => {
+    setEditedFields((prev) => ({ ...prev, [field]: value }));
+  };
+
   const renderField = (
     label: string,
+    field: string,
     value: string | number,
     editable: boolean,
     isSelect = false,
@@ -64,7 +84,10 @@ export function AdvanceInventoryDetails() {
       {!editable ? (
         <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>{value}</span>
       ) : isSelect ? (
-        <Select defaultValue={value as string}>
+        <Select
+          defaultValue={value as string}
+          onValueChange={(newValue) => handleFieldChange(field, newValue)}
+        >
           <SelectTrigger>
             <SelectValue placeholder={label} />
           </SelectTrigger>
@@ -77,20 +100,15 @@ export function AdvanceInventoryDetails() {
           </SelectContent>
         </Select>
       ) : (
-        <Input placeholder={`Enter ${label.toLowerCase()}`} defaultValue={value} />
+        <Input
+          placeholder={`Enter ${label.toLowerCase()}`}
+          defaultValue={value}
+          onChange={(e) => handleFieldChange(field, e.target.value)}
+        />
       )}
     </div>
   );
 
-  const categoryOptions = [
-    'Supplies',
-    'Electronics',
-    'Furniture',
-    'Apparel',
-    'Accessories',
-    'Wearables',
-  ];
-  const locationOptions = ['Warehouse A', 'Warehouse B'];
   const statusOptions = Object.values(InventoryStatus);
 
   const handleDeleteImage = (img: string) => {
@@ -199,26 +217,29 @@ export function AdvanceInventoryDetails() {
               </div>
               {selectedInventory ? (
                 <div className="grid grid-cols-2 gap-4 w-[70%]">
-                  {renderField('Item Name', selectedInventory.itemName, editDetails)}
+                  {renderField('Item Name', 'itemName', selectedInventory.itemName, editDetails)}
                   {renderField(
                     'Category',
+                    'category',
                     selectedInventory.category,
                     editDetails,
                     true,
                     categoryOptions
                   )}
-                  {renderField('Supplier', selectedInventory.supplier, editDetails)}
+                  {renderField('Supplier', 'supplier', selectedInventory.supplier, editDetails)}
                   {renderField(
                     'Item location',
+                    'itemLoc',
                     selectedInventory.itemLoc,
                     editDetails,
                     true,
                     locationOptions
                   )}
-                  {renderField('Price(CHF)', selectedInventory.price, editDetails)}
-                  {renderField('Stock', selectedInventory.stock || 0, editDetails)}
+                  {renderField('Price(CHF)', 'price', selectedInventory.price, editDetails)}
+                  {renderField('Stock', 'stock', selectedInventory.stock || 0, editDetails)}
                   {renderField(
                     'Status',
+                    'status',
                     selectedInventory.status,
                     editDetails,
                     true,

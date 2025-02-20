@@ -7,10 +7,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from 'components/ui/button';
 import { UPasswordInput } from 'components/core/u-password-input';
 import { SharedPasswordStrengthChecker } from '../../core/shared-password-strength-checker';
+import { ReCaptcha } from 'features/captcha/reCaptcha';
 
 interface BasePasswordFormProps {
   code: string;
-  onSubmit: (password: string, code: string) => Promise<void>;
+  onSubmit: (password: string, code: string, captchaToken: string) => Promise<void>;
   validationSchema: z.ZodSchema;
   defaultValues: {
     password: string;
@@ -28,15 +29,29 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const [requirementsMet, setRequirementsMet] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
 
   const form = useForm({
     defaultValues,
     resolver: zodResolver(validationSchema),
   });
 
+  const handleCaptchaVerify = (token: string) => {
+    setCaptchaToken(token);
+  };
+
+  const handleCaptchaExpired = () => {
+    setCaptchaToken('');
+  };
+
   const onSubmitHandler = async (values: { password: string; confirmPassword: string }) => {
+    if (!captchaToken) {
+      // Show error or alert that captcha is required
+      return;
+    }
+
     try {
-      await onSubmit(values.password, code);
+      await onSubmit(values.password, code, captchaToken);
       navigate('/success');
     } catch (_error) {
       // Error handling can be added here
@@ -83,13 +98,24 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
           onRequirementsMet={setRequirementsMet}
         />
 
+        <div className="my-2">
+          <ReCaptcha
+            siteKey="6LckI90qAAAAAK8RP2t0Nohwii1CeKOETsXPVNQA"
+            onVerify={handleCaptchaVerify}
+            onExpired={handleCaptchaExpired}
+            theme="light"
+            size="normal"
+            type="reCaptcha"
+          />
+        </div>
+
         <div className="flex gap-10 mt-5">
           <Button
             className="flex-1 font-extrabold"
             size="lg"
             type="submit"
             loading={isPending}
-            disabled={isPending || !requirementsMet}
+            disabled={isPending || !requirementsMet || !captchaToken}
           >
             Confirm
           </Button>

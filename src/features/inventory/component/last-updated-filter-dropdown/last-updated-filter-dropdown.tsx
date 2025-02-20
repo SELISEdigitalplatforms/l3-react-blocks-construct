@@ -63,6 +63,18 @@ export function LastUpdatedFilterDropdown({ setFilterValue }: LastUpdatedFilterD
             placeholder="Date"
             className="rounded-[6px] h-10 pl-10"
             onFocus={() => setOpenLastUpdatedDropdown(true)}
+            value={
+              selectedOption === 'no_entry'
+                ? 'No entry'
+                : selectedOption === 'date_range'
+                  ? dateRange?.from && dateRange?.to
+                    ? `${format(dateRange.from, 'yyyy-MM-dd')} - ${format(dateRange.to, 'yyyy-MM-dd')}`
+                    : ''
+                  : date
+                    ? format(date, 'yyyy-MM-dd')
+                    : ''
+            }
+            readOnly
           />
         </div>
         <DropdownMenuTrigger asChild>

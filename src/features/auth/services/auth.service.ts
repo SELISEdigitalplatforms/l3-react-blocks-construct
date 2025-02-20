@@ -20,6 +20,7 @@ interface AccountActivationPayload extends AccountActivationData {
 export const signin = async (data: {
   username: string;
   password: string;
+  captchaToken?: string;
 }): Promise<SignInResponse> => {
   const formData = new URLSearchParams();
   formData.append('grant_type', 'password');

@@ -7,20 +7,13 @@ import { Checkbox } from 'components/ui/checkbox';
 import { Button } from 'components/ui/button';
 import { Switch } from 'components/ui/switch';
 import { Separator } from 'components/ui/separator';
-import DesktopImage1 from 'assets/images/desktop_1.png';
-import DesktopImage2 from 'assets/images/desktop_2.webp';
-import DesktopImage3 from 'assets/images/desktop_3.webp';
-import { InventoryData } from '../../services/inventory-service';
+import { checkedTags, images, InventoryData, tags } from '../../services/inventory-service';
 
 interface AdvanceExpandRowContentProps {
   rowId?: string;
   columnLength?: number;
   data: InventoryData[];
 }
-
-const images = [DesktopImage1, DesktopImage2, DesktopImage3];
-
-const tags = ['Accessories', 'Electronic', 'Gaming', 'Monitor'];
 
 export const AdvanceExpandRowContent = ({
   rowId,
@@ -33,7 +26,7 @@ export const AdvanceExpandRowContent = ({
   const [replacement, setReplacement] = useState(true);
   const [discount, setDiscount] = useState(false);
   const [stock, setStock] = useState(30);
-  const [selectedTags, setSelectedTags] = useState(['Electronic', 'Gaming', 'Monitor']);
+  const [selectedTags, setSelectedTags] = useState(checkedTags);
   const navigate = useNavigate();
 
   const handleTagToggle = (tag: string) => {
