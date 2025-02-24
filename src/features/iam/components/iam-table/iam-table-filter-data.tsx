@@ -1,71 +1,21 @@
-import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUp,
-  CheckCircle,
-  Circle,
-  CircleOff,
-  HelpCircle,
-  Timer,
-} from "lucide-react"
-
-export const labels = [
-  {
-    value: "bug",
-    label: "Bug",
-  },
-  {
-    value: "feature",
-    label: "Feature",
-  },
-  {
-    value: "documentation",
-    label: "Documentation",
-  },
-]
-
 export const statuses = [
   {
-    value: "backlog",
-    label: "Backlog",
-    icon: HelpCircle,
+    value: 'true',
+    label: 'Active',
   },
   {
-    value: "todo",
-    label: "Todo",
-    icon: Circle,
+    value: 'false',
+    label: 'Inactive',
   },
-  {
-    value: "in progress",
-    label: "In Progress",
-    icon: Timer,
-  },
-  {
-    value: "done",
-    label: "Done",
-    icon: CheckCircle,
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-    icon: CircleOff,
-  },
-]
+];
 
-export const priorities = [
+export const mfaEnabled = [
   {
-    label: "Low",
-    value: "low",
-    icon: ArrowDown,
+    value: 'true',
+    label: 'Enabled',
   },
   {
-    label: "Medium",
-    value: "medium",
-    icon: ArrowRight,
+    value: 'false',
+    label: 'Disabled',
   },
-  {
-    label: "High",
-    value: "high",
-    icon: ArrowUp,
-  },
-]
+];

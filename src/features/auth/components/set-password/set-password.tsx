@@ -1,4 +1,4 @@
-import { BasePasswordForm } from 'components/blocks/base-password-form';
+import { BasePasswordForm } from 'components/blocks/base-password-form/base-password-form';
 import { useAccountActivation } from '../../hooks/use-auth';
 import { setPasswordFormDefaultValue, setPasswordFormValidationSchema } from './utils';
 

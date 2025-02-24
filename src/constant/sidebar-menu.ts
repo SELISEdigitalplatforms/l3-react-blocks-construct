@@ -13,6 +13,12 @@ export const menuItems: MenuItem[] = [
     path: '/identity-management',
     icon: 'Users',
   },
+  {
+    id: 'inventory',
+    name: 'Inventory',
+    path: '/inventory',
+    icon: 'Store',
+  },
   // {
   //   id: 'services',
   //   name: 'Services',

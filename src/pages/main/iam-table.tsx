@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { DataTable } from 'components/blocks/data-table/data-table';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { useForgotPassword, useResendActivation } from 'features/auth/hooks/use-auth';
 import { useGetUsersQuery } from 'features/iam/hooks/use-iam';
 import { createIamTableColumns } from 'features/iam/components/iam-table/iam-table-columns';
 import { IamTableToolbar } from 'features/iam/components/iam-table/iam-table-toolbar';
-import { UserDetails } from 'features/iam/components/user-details/user-details';
 import { IamData } from 'features/iam/services/user-service';
+import { useIsMobile } from 'hooks/use-mobile';
+import { UserDetails } from 'features/iam/components/user-details/user-details';
+import ExpandedUserDetails from 'features/iam/components/user-details-mobile-view/expanded-user-details';
+import { Table } from '@tanstack/react-table';
+import DataTable from 'components/blocks/data-table/data-table';
 
 interface PaginationState {
   pageIndex: number;
@@ -15,6 +18,7 @@ interface PaginationState {
 }
 
 const IamTablePage: React.FC = () => {
+  const isMobile = useIsMobile();
   const [openSheet, setOpenSheet] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IamData | null>(null);
   const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
@@ -94,7 +98,7 @@ const IamTablePage: React.FC = () => {
     setOpenSheet(true);
   };
 
-  //Disabled the scrolling when useDetail sheet open
+  //Disabled the scrolling when userDetails sheet open
   useEffect(() => {
     if (openSheet) {
       document.body.style.overflow = 'hidden';
@@ -127,6 +131,16 @@ const IamTablePage: React.FC = () => {
     return <div className="p-4 text-error">Error loading users: {error.error?.message}</div>;
   }
 
+  const renderExpandedContent = (user: IamData) => {
+    return (
+      <ExpandedUserDetails
+        user={user}
+        onResetPassword={handleResetPassword}
+        onResendActivation={handleResendActivation}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       <div className="h-full flex-col flex w-full gap-6 md:gap-8">
@@ -137,7 +151,9 @@ const IamTablePage: React.FC = () => {
           onRowClick={handleViewDetails}
           isLoading={isLoading}
           error={error}
-          toolbar={(table) => <IamTableToolbar table={table} onSearch={handleSearch} />}
+          toolbar={(table: Table<IamData>) => (
+            <IamTableToolbar table={table} onSearch={handleSearch} columns={columns} />
+          )}
           pagination={{
             pageIndex: paginationState.pageIndex,
             pageSize: paginationState.pageSize,
@@ -145,10 +161,15 @@ const IamTablePage: React.FC = () => {
           }}
           onPaginationChange={handlePaginationChange}
           manualPagination={true}
+          expandedContent={renderExpandedContent}
+          mobileColumns={['fullName']}
+          expandable={true}
         />
       </div>
 
-      <UserDetails open={openSheet} onOpenChange={setOpenSheet} selectedUser={selectedUser} />
+      {!isMobile && (
+        <UserDetails open={openSheet} onOpenChange={setOpenSheet} selectedUser={selectedUser} />
+      )}
 
       <ConfirmationModal
         open={isResetPasswordModalOpen}

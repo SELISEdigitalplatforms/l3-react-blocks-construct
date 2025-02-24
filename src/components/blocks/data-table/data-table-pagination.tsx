@@ -13,19 +13,29 @@ import {
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+  showSelectedRowContent?: boolean;
 }
 
 export function DataTablePagination<TData>({
   table,
   onPaginationChange,
+  showSelectedRowContent = true,
 }: DataTablePaginationProps<TData>) {
+  const totalRows = table.getFilteredRowModel().rows.length;
+  const pageSizes = Array.from(
+    { length: Math.min(5, Math.ceil(totalRows / 10)) },
+    (_, i) => (i + 1) * 10
+  );
+
   return (
     <div className="flex w-full items-center justify-between px-2">
-      <div className="text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{' '}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
-      <div className="flex items-center">
+      {showSelectedRowContent ? (
+        <div className="text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+      ) : null}
+      <div className={`flex  items-center ${!showSelectedRowContent && 'w-full justify-end'}`}>
         <div className="flex items-center space-x-2">
           <p className="hidden sm:flex text-sm font-medium">Rows per page</p>
           <Select
@@ -43,7 +53,7 @@ export function DataTablePagination<TData>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {pageSizes.map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

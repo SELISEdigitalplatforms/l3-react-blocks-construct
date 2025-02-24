@@ -1,4 +1,4 @@
-import { BasePasswordForm } from 'components/blocks/base-password-form';
+import { BasePasswordForm } from '../../../../components/blocks/base-password-form/base-password-form';
 import { useResetPassword } from '../../hooks/use-auth';
 import { resetPasswordFormDefaultValue, resetPasswordFormValidationSchema } from './utils';
 

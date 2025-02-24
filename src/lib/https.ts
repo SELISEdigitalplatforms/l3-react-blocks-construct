@@ -53,15 +53,37 @@ export const clients: Https = {
 
     // const isPublicEndpoint = PUBLIC_ENDPOINTS.some((endpoint) => url.includes(endpoint));
 
+    // const config: RequestInit = {
+    //   method,
+    //   ...(process.env.REACT_APP_COOKIE_ENABLED === 'true' && {
+    //     credentials: 'include',
+    //   }),
+    //   headers: new Headers({
+    //     'Content-Type': 'application/json',
+    //     'x-blocks-key': BLOCKS_KEY,
+    //     // ...(!isPublicEndpoint && {
+    //     //   Authorization: `bearer ${useAuthStore.getState().accessToken}`,
+    //     // }),
+    //     ...(process.env.REACT_APP_COOKIE_ENABLED === 'true' && {
+    //       Authorization: `bearer ${useAuthStore.getState().accessToken}`,
+    //     }),
+
+    //     ...(headers instanceof Headers ? Object.fromEntries(headers.entries()) : headers),
+    //   }),
+    // };
+
     const config: RequestInit = {
       method,
-      credentials: 'include',
+      ...(process.env.REACT_APP_COOKIE_ENABLED === 'true' && {
+        credentials: 'include',
+      }),
       headers: new Headers({
         'Content-Type': 'application/json',
         'x-blocks-key': BLOCKS_KEY,
-        // ...(!isPublicEndpoint && {
-        //   Authorization: `bearer ${useAuthStore.getState().accessToken}`,
-        // }),
+        ...(process.env.REACT_APP_COOKIE_ENABLED === 'true' &&
+          useAuthStore.getState().accessToken && {
+            Authorization: `bearer ${useAuthStore.getState().accessToken}`,
+          }),
         ...(headers instanceof Headers ? Object.fromEntries(headers.entries()) : headers),
       }),
     };

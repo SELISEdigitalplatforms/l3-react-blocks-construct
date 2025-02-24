@@ -10,15 +10,7 @@ import {
 import { useToast } from '../../../hooks/use-toast';
 import { useGlobalMutation } from '../../../state/query-client/hooks';
 import { useState } from 'react';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface ApiError extends Error {
-  response?: {
-    status: number;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data?: any;
-  };
-}
+import { ErrorResponse, useCustomToast } from './use-custom-toast/use-custom-toast';
 
 export const useSigninMutation = () => {
   const [errorDetails, setErrorDetails] = useState({
@@ -79,142 +71,67 @@ export const useSignoutMutation = () => {
 };
 
 export const useAccountActivation = () => {
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
   return useGlobalMutation({
     mutationKey: ['accountActivation'],
     mutationFn: accountActivation,
+
     onSuccess: () => {
-      toast({
-        color: 'blue',
-        title: 'Sucesss',
+      showSuccessToast({
         description: 'You are sucessfully acctivated your account',
       });
     },
-    onError: ({
-      error,
-    }: {
-      status: number;
-      error: { isSuccess: boolean; errors: { Code: string } };
-    }) => {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: (
-          <div className="flex flex-col gap-1">
-            {Object.values(error.errors)
-              .filter(Boolean)
-              .map((message) => (
-                <div key={message}>{message}</div>
-              ))}
-          </div>
-        ),
-      });
+    onError: ({ error }: ErrorResponse) => {
+      showErrorToast(error);
     },
   });
 };
 
 export const useForgotPassword = () => {
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
   return useGlobalMutation({
     mutationKey: ['forgotPassword'],
     mutationFn: forgotPassword,
     onSuccess: () => {
-      toast({
-        color: 'blue',
-        title: 'Sucesss',
+      showSuccessToast({
         description: 'A link has been sent your email',
       });
     },
-    onError: ({
-      error,
-    }: {
-      status: number;
-      error: { isSuccess: boolean; errors: { Code: string } };
-    }) => {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: (
-          <div className="flex flex-col gap-1">
-            {Object.values(error.errors)
-              .filter(Boolean)
-              .map((message) => (
-                <div key={message}>{message}</div>
-              ))}
-          </div>
-        ),
-      });
+    onError: ({ error }: ErrorResponse) => {
+      showErrorToast(error);
     },
   });
 };
 
 export const useResetPassword = () => {
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
   return useGlobalMutation({
     mutationKey: ['resetPassword'],
     mutationFn: resetPassword,
     onSuccess: () => {
-      toast({
-        color: 'blue',
-        title: 'Sucesss',
-        description: 'You have sucessfully set your password',
+      showSuccessToast({
+        description: 'You have successfully set your password',
       });
     },
-    onError: ({
-      error,
-    }: {
-      status: number;
-      error: { isSuccess: boolean; errors: { Code: string } };
-    }) => {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: (
-          <div className="flex flex-col gap-1">
-            {Object.values(error.errors)
-              .filter(Boolean)
-              .map((message) => (
-                <div key={message}>{message}</div>
-              ))}
-          </div>
-        ),
-      });
+    onError: ({ error }: ErrorResponse) => {
+      showErrorToast(error);
     },
   });
 };
 
 export const useResendActivation = () => {
-  const { toast } = useToast();
+  const { showSuccessToast, showErrorToast } = useCustomToast();
+
   return useGlobalMutation({
     mutationKey: ['resendActivation'],
     mutationFn: resendActivation,
     onSuccess: () => {
-      toast({
-        color: 'blue',
-        title: 'Sucesss',
+      showSuccessToast({
         description: 'A link has been sent your email',
       });
     },
-    onError: ({
-      error,
-    }: {
-      status: number;
-      error: { isSuccess: boolean; errors: { Code: string } };
-    }) => {
-      toast({
-        variant: 'destructive',
-        color: 'blue',
-        title: 'Error',
-        description: (
-          <div className="flex flex-col gap-1">
-            {Object.values(error.errors)
-              .filter(Boolean)
-              .map((message) => (
-                <div key={message}>{message}</div>
-              ))}
-          </div>
-        ),
-      });
+    onError: ({ error }: ErrorResponse) => {
+      showErrorToast(error);
     },
   });
 };

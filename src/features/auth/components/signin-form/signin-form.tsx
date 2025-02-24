@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { SetStateAction, useState } from 'react';
 
 import { signinFormDefaultValue, signinFormType, signinFormValidationSchema } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,20 +17,39 @@ import { Button } from '../../../../components/ui/button';
 import { UPasswordInput } from '../../../../components/core/u-password-input';
 import { useSigninMutation } from '../../hooks/use-auth';
 import { useAuthStore } from '../../../../state/store/auth';
-import ErrorAlert from 'components/blocks/error-alert/error-alert';
+import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
+import { ReCaptcha } from '../../../../features/captcha/reCaptcha';
 
 export const SigninForm = () => {
   const navigate = useNavigate();
   const { login } = useAuthStore();
-  const form = useForm<signinFormType>({
+  const [captchaToken, setCaptchaToken] = useState('');
+  const form = useForm({
     defaultValues: signinFormDefaultValue,
     resolver: zodResolver(signinFormValidationSchema),
   });
   const { isPending, mutateAsync, isError, errorDetails } = useSigninMutation();
 
+  const handleCaptchaVerify = (token: SetStateAction<string>) => {
+    setCaptchaToken(token);
+  };
+
+  const handleCaptchaExpired = () => {
+    setCaptchaToken('');
+  };
+
   const onSubmitHandler = async (values: signinFormType) => {
+    if (!captchaToken) {
+      // Show error or alert that captcha is required
+      return;
+    }
+
     try {
-      const res = await mutateAsync(values);
+      // Include captcha token with the sign-in request
+      const res = await mutateAsync({
+        ...values,
+        captchaToken,
+      });
       login(res.access_token, res.refresh_token);
       navigate('/');
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -39,16 +59,17 @@ export const SigninForm = () => {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-md space-y-6">
       <ErrorAlert isError={isError} title={errorDetails.title} message={errorDetails.message} />
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitHandler)} className="flex flex-col gap-4">
+        <form onSubmit={form.handleSubmit(onSubmitHandler)} className="space-y-4">
           <FormField
             control={form.control}
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-high-emphasis font-normal">Email</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter your email" {...field} />
                 </FormControl>
@@ -61,7 +82,7 @@ export const SigninForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-high-emphasis font-normal">Password</FormLabel>
+                <FormLabel>Password</FormLabel>
                 <FormControl>
                   <UPasswordInput placeholder="Enter your password" {...field} />
                 </FormControl>
@@ -69,25 +90,27 @@ export const SigninForm = () => {
               </FormItem>
             )}
           />
-          <div className="flex justify-between items-center">
-            <Link
-              to="/forgot-password"
-              className="ml-auto inline-block text-sm text-primary hover:text-primary-dark hover:underline"
-            >
+
+          <div className="flex justify-end">
+            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
               Forgot password?
             </Link>
           </div>
-          <div className="flex gap-10 mt-6">
-            <Button
-              className="flex-1 font-extrabold"
-              size="lg"
-              type="submit"
-              loading={isPending}
-              disabled={isPending}
-            >
-              Log in
-            </Button>
+
+          <div className="my-4">
+            <ReCaptcha
+              siteKey="6LckI90qAAAAAK8RP2t0Nohwii1CeKOETsXPVNQA"
+              onVerify={handleCaptchaVerify}
+              onExpired={handleCaptchaExpired}
+              theme="light"
+              size="normal"
+              type="reCaptcha"
+            />
           </div>
+
+          <Button type="submit" className="w-full" disabled={isPending || !captchaToken}>
+            Log in
+          </Button>
         </form>
       </Form>
     </div>
