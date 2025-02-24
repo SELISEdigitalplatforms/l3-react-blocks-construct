@@ -25,11 +25,10 @@ export function SigninPage() {
           </Link>
         </div>
       </div>
-      <div className="max-w-4xl mx-2">
+      <div className="max-w-4xl mx-2 h-0">
         <div className="rounded-lg">
           <p className="text-xs font-normal text-success-high-emphasis invisible">
             Log in to explore the complete Demo and Documentation. Use the credentials:{' '}
-            {/* <span className="font-semibold">demo.construct@seliseblocks.com</span> with password:{' '} */}
             <span className="font-semibold">H%FE*FYi5oTQ!VyT6TkEy</span>
           </p>
         </div>
