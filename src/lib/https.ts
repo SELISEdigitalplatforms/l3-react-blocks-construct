@@ -28,8 +28,8 @@ export class HttpError extends Error {
   }
 }
 
-const BASE_URL = process.env.REACT_APP_PUBLIC_BACKEND_URL?.replace(/\/$/, '');
-const BLOCKS_KEY = process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY || '';
+const BASE_URL = process.env.VITE_PUBLIC_BACKEND_URL?.replace(/\/$/, '');
+const BLOCKS_KEY = process.env.VITE_PUBLIC_X_BLOCKS_KEY || '';
 
 export const clients: Https = {
   async get<T>(url: string, headers: HeadersInit = {}): Promise<T> {

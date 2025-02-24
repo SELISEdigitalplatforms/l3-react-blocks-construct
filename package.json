@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
     "set-env": "node set-env.js",
-    "build:dev": "BUILD_ENV=dev npm run set-env && react-scripts build",
-    "build:stg": "BUILD_ENV=stg npm run set-env && react-scripts build",
-    "build:prod": "BUILD_ENV=prod npm run set-env && react-scripts build",
+    "build:dev": "BUILD_ENV=dev npm run set-env && tsc && vite build",
+    "build:stg": "BUILD_ENV=stg npm run set-env && tsc && vite build",
+    "build:prod": "BUILD_ENV=prod npm run set-env && tsc && vite build",
     "test": "jest",
     "test:coverage": "jest --coverage --coverageDirectory=./coverage",
     "test:clear": "jest --clearCache",
@@ -65,7 +66,6 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
     "@testing-library/dom": "^10.4.0",

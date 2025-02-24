@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from './components/ui/toaster';
 import { ClientMiddleware } from './state/client-middleware';
-import MainLayout from 'pages/main/main-layout';
 import { AuthLayout } from './pages/auth/auth-layout';
 import { SigninPage } from 'pages/auth/signin/signin-page';
 import { SignupPage } from 'pages/auth/signup/signup-page';
@@ -25,6 +24,7 @@ import { ThemeProvider } from './components/core/theme-provider';
 import { Inventory } from './pages/inventory/inventory';
 import { InventoryDetails } from './pages/inventory/inventory-details';
 import { SidebarProvider } from 'components/ui/sidebar';
+import { MainLayout } from './pages/main/main-layout';
 
 const queryClient = new QueryClient();
 

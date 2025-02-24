@@ -6,7 +6,7 @@ import { SidebarTrigger, useSidebar } from 'components/ui/sidebar';
 import LanguageSelector from 'components/blocks/language-selector/language-selector';
 import { Button } from 'components/ui/button';
 
-export default function MainLayout() {
+export function MainLayout() {
   const { open, isMobile } = useSidebar();
 
   return (
