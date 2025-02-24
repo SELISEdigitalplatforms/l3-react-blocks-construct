@@ -152,6 +152,13 @@ export const createIamTableColumns = ({
         </div>
       );
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = rowA.getValue(columnId);
+      const b = rowB.getValue(columnId);
+
+      if (b === a) return 0;
+      return a ? -1 : 1;
+    },
     filterFn: (row, id, value: string[]) => {
       if (value.length === 0) return true;
       const cellValue = row.getValue(id) as boolean;
