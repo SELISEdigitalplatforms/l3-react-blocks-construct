@@ -74,13 +74,13 @@ export const clients: Https = {
 
     const config: RequestInit = {
       method,
-      ...(process.env.REACT_APP_COOKIE_ENABLED === 'false' && {
+      ...(process.env.REACT_APP_COOKIE_ENABLED === 'true' && {
         credentials: 'include',
       }),
       headers: new Headers({
         'Content-Type': 'application/json',
         'x-blocks-key': BLOCKS_KEY,
-        ...(process.env.REACT_APP_COOKIE_ENABLED === 'false' &&
+        ...(process.env.REACT_APP_COOKIE_ENABLED === 'true' &&
           useAuthStore.getState().accessToken && {
             Authorization: `bearer ${useAuthStore.getState().accessToken}`,
           }),
