@@ -6,9 +6,11 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^pages/(.*)$': '<rootDir>/src/pages/$1',
+    '^@assets/(.*)$': '<rootDir>/src/assets/$1',
+    '^@components/(.*)$': '<rootDir>/src/components/$1',
+    '^@pages/(.*)$': '<rootDir>/src/pages/$1',
     '^features/(.*)$': '<rootDir>/src/features/$1',
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^state/(.*)$': '<rootDir>/src/state/$1',
   },
   testMatch: ['**/*.spec.{ts,tsx}'],
   collectCoverage: true,
