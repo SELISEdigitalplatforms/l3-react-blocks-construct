@@ -43,14 +43,11 @@ export const SigninForm = () => {
   };
 
   const onSubmitHandler = async (values: signinFormType) => {
-    // Only check for captcha if we're showing it (after 2 failed attempts)
     if (showCaptcha && !captchaToken) {
-      // Show error or alert that captcha is required
       return;
     }
 
     try {
-      // Include captcha token with the sign-in request (if available)
       const res = await mutateAsync({
         ...values,
         ...(showCaptcha && { captchaToken }),
@@ -59,12 +56,10 @@ export const SigninForm = () => {
       login(res.access_token, res.refresh_token);
       navigate('/');
     } catch (_error) {
-      // Increment failed attempts counter
       const newFailedAttempts = failedAttempts + 1;
       setFailedAttempts(newFailedAttempts);
 
-      // Show captcha after 2 failed attempts
-      if (newFailedAttempts >= 2 && !showCaptcha) {
+      if (newFailedAttempts >= 3 && !showCaptcha) {
         setShowCaptcha(true);
       }
     }
