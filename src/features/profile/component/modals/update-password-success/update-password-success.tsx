@@ -48,7 +48,7 @@ export const UpdatePasswordSuccess: React.FC<UpdatePasswordSuccessProps> = ({ on
   return (
     <DialogContent className="rounded-md sm:max-w-[500px]">
       <div className="flex w-full items-center justify-center mb-3">
-        <img src={SecurityOn} />
+        <img src={SecurityOn} alt="security icon" />
       </div>
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold">Password updated successfully</DialogTitle>

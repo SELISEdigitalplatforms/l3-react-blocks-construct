@@ -7,11 +7,15 @@ import { Button } from 'components/ui/button';
 interface AdvancedTableColumnsToolbarProps<TData> {
   table: Table<TData>;
   title?: string;
+  disabledColumns?: string[];
+  columnVisibility?: { [key: string]: boolean };
 }
 
 export function AdvancedTableColumnsToolbar<TData>({
   table,
   title,
+  disabledColumns,
+  columnVisibility,
 }: AdvancedTableColumnsToolbarProps<TData>) {
   const selectedRows = table.getSelectedRowModel().rows;
   const selectedLength = selectedRows.length;
@@ -49,7 +53,11 @@ export function AdvancedTableColumnsToolbar<TData>({
             </Button>
           </div>
         ) : (
-          <AdvanceTableViewOptions table={table} />
+          <AdvanceTableViewOptions
+            disabledColumns={disabledColumns}
+            columnVisibility={columnVisibility}
+            table={table}
+          />
         )}
       </div>
     </div>

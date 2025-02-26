@@ -19,7 +19,7 @@ export function SigninPage() {
           <span className="text-sm font-normal text-medium-emphasis">Don’t have an account?</span>
           <Link
             to={'/signup'}
-            className="text-sm font-bold text-primary hover:text-primary-dark hover:underline"
+            className="text-sm font-bold text-primary hover:text-primary-600 hover:underline"
           >
             Sign up
           </Link>

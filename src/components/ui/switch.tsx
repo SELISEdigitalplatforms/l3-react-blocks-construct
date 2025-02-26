@@ -11,7 +11,7 @@ const Switch = React.forwardRef<
   <SwitchPrimitive.Root
     ref={ref}
     className={cn(
-      'relative h-[24px] w-[44px] cursor-pointer rounded-full bg-primary-shade-50 data-[state=checked]:bg-primary',
+      'relative h-[24px] w-[44px] cursor-pointer rounded-full bg-primary-50 data-[state=checked]:bg-primary',
       className
     )}
     {...props}

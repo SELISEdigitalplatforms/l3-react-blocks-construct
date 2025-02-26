@@ -13,7 +13,7 @@ export default function MainLayout() {
     <div className="flex w-full min-h-screen">
       <AppSidebar />
       <div className="flex flex-col w-full h-full">
-        <div className="sticky bg-card z-[1] top-0 border-b py-2 px-4 sm:px-6 md:px-8 flex justify-between items-center w-full">
+        <div className="sticky bg-card z-[20] top-0 border-b py-2 px-4 sm:px-6 md:px-8 flex justify-between items-center w-full">
           <SidebarTrigger />
           <div className="flex justify-between items-center gap-1 sm:gap-3 md:gap-8">
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">

@@ -19,7 +19,6 @@ module.exports = {
         background: 'hsl(var(--background))',
         surface: 'hsl(var(--surface))',
         foreground: 'hsl(var(--foreground))',
-        foreground: 'hsl(var(--foreground))',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
@@ -29,14 +28,103 @@ module.exports = {
           foreground: 'hsl(var(--popover-foreground))',
         },
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          dark: 'hsl(var(--primary-dark))',
+          DEFAULT: 'hsl(var(--primary-500))',
+          50: 'hsl(var(--primary-50))',
+          100: 'hsl(var(--primary-100))',
+          200: 'hsl(var(--primary-200))',
+          300: 'hsl(var(--primary-300))',
+          400: 'hsl(var(--primary-400))',
+          600: 'hsl(var(--primary-600))',
+          700: 'hsl(var(--primary-700))',
+          800: 'hsl(var(--primary-800))',
+          900: 'hsl(var(--primary-900))',
           foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
+          DEFAULT: 'hsl(var(--secondary-500))',
+          50: 'hsl(var(--secondary-50))',
+          100: 'hsl(var(--secondary-100))',
+          200: 'hsl(var(--secondary-200))',
+          300: 'hsl(var(--secondary-300))',
+          400: 'hsl(var(--secondary-400))',
+          600: 'hsl(var(--secondary-600))',
+          700: 'hsl(var(--secondary-700))',
+          800: 'hsl(var(--secondary-800))',
+          900: 'hsl(var(--secondary-900))',
           foreground: 'hsl(var(--secondary-foreground))',
         },
+        neutral: {
+          DEFAULT: 'hsl(var(--neutral-500))',
+          25: 'hsl(var(--neutral-25))',
+          50: 'hsl(var(--neutral-50))',
+          100: 'hsl(var(--neutral-100))',
+          200: 'hsl(var(--neutral-200))',
+          300: 'hsl(var(--neutral-300))',
+          400: 'hsl(var(--neutral-400))',
+          600: 'hsl(var(--neutral-600))',
+          700: 'hsl(var(--neutral-700))',
+          800: 'hsl(var(--neutral-800))',
+          900: 'hsl(var(--neutral-900))',
+        },
+
+        purple: {
+          DEFAULT: 'hsl(var(--purple-500))',
+          25: 'hsl(var(--purple-25))',
+          50: 'hsl(var(--purple-50))',
+          100: 'hsl(var(--purple-100))',
+          200: 'hsl(var(--purple-200))',
+          300: 'hsl(var(--purple-300))',
+          400: 'hsl(var(--purple-400))',
+          600: 'hsl(var(--purple-600))',
+          700: 'hsl(var(--purple-700))',
+          800: 'hsl(var(--purple-800))',
+          900: 'hsl(var(--purple-900))',
+        },
+
+        pink: {
+          DEFAULT: 'hsl(var(--pink-500))',
+          50: 'hsl(var(--pink-50))',
+          100: 'hsl(var(--pink-100))',
+          200: 'hsl(var(--pink-200))',
+          300: 'hsl(var(--pink-300))',
+          400: 'hsl(var(--pink-400))',
+          600: 'hsl(var(--pink-600))',
+          700: 'hsl(var(--pink-700))',
+          800: 'hsl(var(--pink-800))',
+          900: 'hsl(var(--pink-900))',
+        },
+
+        green: {
+          DEFAULT: 'hsl(var(--green-500))',
+          50: 'hsl(var(--green-50))',
+          100: 'hsl(var(--green-100))',
+          200: 'hsl(var(--green-200))',
+          300: 'hsl(var(--green-300))',
+          400: 'hsl(var(--green-400))',
+          600: 'hsl(var(--green-600))',
+          700: 'hsl(var(--green-700))',
+          800: 'hsl(var(--green-800))',
+          900: 'hsl(var(--green-900))',
+        },
+
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          background: 'hsl(var(--success-background))',
+          'high-emphasis': 'hsl(var(--success-high-emphasis))',
+        },
+
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          background: 'hsl(var(--warning-background))',
+          'high-emphasis': 'hsl(var(--warning-high-emphasis))',
+        },
+
+        error: {
+          DEFAULT: 'hsl(var(--error))',
+          background: 'hsl(var(--error-background))',
+          'high-emphasis': 'hsl(var(--error-high-emphasis))',
+        },
+
         muted: {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
@@ -50,38 +138,13 @@ module.exports = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
 
-        'primary-shade-50': 'hsl(var(--primary-shade-50))',
-
         'high-emphasis': 'hsl(var(--high-emphasis))',
         'medium-emphasis': 'hsl(var(--medium-emphasis))',
         'low-emphasis': 'hsl(var(--low-emphasis))',
 
-        success: 'hsl(var(--success))',
-        'success-background': 'hsl(var(--success-background))',
-        'success-high-emphasis': 'hsl(var(--success-high-emphasis))',
-
-        error: 'hsl(var(--error))',
-        'error-background': 'hsl(var(--error-background))',
-        'error-high-emphasis': 'hsl(var(--error-high-emphasis))',
-
-        warning: 'hsl(var(--warning))',
-
-        'neutral-25': 'hsl(var(--neutral-25))',
-        'neutral-200': 'hsl(var(--neutral-200))',
-
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
-        chart: {
-          50: 'hsl(var(--chart-50))',
-          200: 'hsl(var(--chart-200))',
-          500: 'hsl(var(--chart-500))',
-          800: 'hsl(var(--chart-800))',
-        },
-        blue: 'hsl(var(--blue))',
-        emeraldGreen: {
-          500: 'hsl(var(--emerald-green-500))',
-        },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
@@ -98,6 +161,11 @@ module.exports = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+
+      boxShadow: {
+        'inset-right': 'inset -7px 0 5px -6px hsl(var(--surface))',
+        'inset-left': 'inset 7px 0 5px -6px hsl(var(--surface))',
       },
     },
   },

@@ -92,7 +92,10 @@ export const SigninForm = () => {
           />
 
           <div className="flex justify-end">
-            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-primary hover:text-primary-600 hover:underline"
+            >
               Forgot password?
             </Link>
           </div>

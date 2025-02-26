@@ -1,6 +1,15 @@
 import DesktopImage1 from 'assets/images/desktop_1.png';
 import DesktopImage2 from 'assets/images/desktop_2.webp';
 import DesktopImage3 from 'assets/images/desktop_3.webp';
+import CoffeePods from 'assets/images/inventory/coffee_pod.webp';
+import MonitorArm from 'assets/images/inventory/monitor_arm.png';
+import NoiseCancelling from 'assets/images/inventory/noise_cancelling.png';
+import WirelessMouse from 'assets/images/inventory/wireless_mouse.png';
+import OfficeChair from 'assets/images/inventory/office_chair.png';
+import SmartWatch from 'assets/images/inventory/smart_watch.png';
+import StandingDesk from 'assets/images/inventory/standing_desk.png';
+import Sneaker from 'assets/images/inventory/sneaker.png';
+import UsbCHub from 'assets/images/inventory/usb_c_hub.webp';
 
 export interface InventoryData {
   itemId: string;
@@ -44,7 +53,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '58944167',
     itemName: 'Coffee Pods (Pack)',
-    itemImage: DesktopImage2,
+    itemImage: CoffeePods,
     category: 'Supplies',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -68,7 +77,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '28391730',
     itemName: 'Monitor Arm',
-    itemImage: DesktopImage2,
+    itemImage: MonitorArm,
     category: 'Accessories',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -80,7 +89,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '71029237',
     itemName: 'Wireless Mouse',
-    itemImage: DesktopImage2,
+    itemImage: WirelessMouse,
     category: 'Electronics',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -92,7 +101,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '45379810',
     itemName: 'Noise-Canceling Headphones',
-    itemImage: DesktopImage2,
+    itemImage: NoiseCancelling,
     category: 'Electronics',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -104,7 +113,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '86573219',
     itemName: 'Office Chair',
-    itemImage: DesktopImage2,
+    itemImage: OfficeChair,
     category: 'Furniture',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -116,7 +125,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '64205138',
     itemName: 'Smartwatch',
-    itemImage: DesktopImage2,
+    itemImage: SmartWatch,
     category: 'Wearables',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -128,7 +137,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '12985703',
     itemName: 'Standing Desk',
-    itemImage: DesktopImage2,
+    itemImage: StandingDesk,
     category: 'Furniture',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -140,7 +149,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '73029846',
     itemName: 'Urban Explorer Sneakers',
-    itemImage: DesktopImage2,
+    itemImage: Sneaker,
     category: 'Apparel',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -152,7 +161,7 @@ export const inventoryData: InventoryData[] = [
   {
     itemId: '49821730',
     itemName: 'USB-C Hub',
-    itemImage: DesktopImage2,
+    itemImage: UsbCHub,
     category: 'Electronics',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse A',
@@ -163,9 +172,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '98765432',
-    itemName: 'Laptop',
-    itemImage: DesktopImage2,
-    category: 'Electronics',
+    itemName: 'Coffee Pods (Pack)',
+    itemImage: CoffeePods,
+    category: 'Supplies',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
     stock: 25,
@@ -175,9 +184,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '54321098',
-    itemName: 'Keyboard',
-    itemImage: DesktopImage2,
-    category: 'Electronics',
+    itemName: 'Monitor Arm',
+    itemImage: MonitorArm,
+    category: 'Accessories',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
     stock: 50,
@@ -187,9 +196,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '13579111',
-    itemName: 'Mousepad',
-    itemImage: DesktopImage2,
-    category: 'Accessories',
+    itemName: 'Wireless Mouse',
+    itemImage: WirelessMouse,
+    category: 'Electronics',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
     stock: 75,
@@ -199,9 +208,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '24680222',
-    itemName: 'Webcam',
-    itemImage: DesktopImage2,
-    category: 'Electronics',
+    itemName: 'Urban Explorer Sneakers',
+    itemImage: Sneaker,
+    category: 'Apparel',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
     stock: 30,
@@ -211,9 +220,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '35791333',
-    itemName: 'External Hard Drive',
-    itemImage: DesktopImage2,
-    category: 'Electronics',
+    itemName: 'Standing Desk',
+    itemImage: StandingDesk,
+    category: 'Furniture',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
     stock: 40,
@@ -223,8 +232,8 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '46802444',
-    itemName: 'Desk Lamp',
-    itemImage: DesktopImage2,
+    itemName: 'Standing Desk',
+    itemImage: StandingDesk,
     category: 'Furniture',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
@@ -235,9 +244,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '57913555',
-    itemName: 'File Cabinet',
-    itemImage: DesktopImage2,
-    category: 'Furniture',
+    itemName: 'USB-C Hub',
+    itemImage: UsbCHub,
+    category: 'Electronics',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
     stock: 20,
@@ -247,8 +256,8 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '91357999',
-    itemName: 'Whiteboard',
-    itemImage: DesktopImage2,
+    itemName: 'Office Chair',
+    itemImage: OfficeChair,
     category: 'Furniture',
     supplier: 'Office Essentials Ltd.',
     itemLoc: 'Warehouse B',
@@ -259,7 +268,7 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '12345678',
-    itemName: 'Ergonomic Keyboard',
+    itemName: 'Monitor',
     itemImage: DesktopImage2,
     category: 'Electronics',
     supplier: 'Tech Gadgets Inc.',
@@ -271,9 +280,9 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '87654321',
-    itemName: 'Gaming Mouse',
-    itemImage: DesktopImage2,
-    category: 'Electronics',
+    itemName: 'Coffee Pods (Pack)',
+    itemImage: CoffeePods,
+    category: 'Supplies',
     supplier: 'Tech Gadgets Inc.',
     itemLoc: 'Warehouse A',
     stock: 40,
@@ -283,8 +292,8 @@ export const inventoryData: InventoryData[] = [
   },
   {
     itemId: '98765432',
-    itemName: 'Bluetooth Speaker',
-    itemImage: DesktopImage2,
+    itemName: 'USB-C Hub',
+    itemImage: UsbCHub,
     category: 'Electronics',
     supplier: 'Audio Excellence Co.',
     itemLoc: 'Warehouse B',

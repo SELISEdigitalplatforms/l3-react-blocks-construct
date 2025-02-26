@@ -34,7 +34,7 @@ const chartData = [
 const chartConfig = {
   noOfActions: {
     label: 'Number of actions',
-    color: 'hsl(var(--blue))',
+    color: 'hsl(var(--secondary-500))',
   },
 } satisfies ChartConfig;
 
@@ -50,19 +50,19 @@ const pieChartConfig = {
   },
   windows: {
     label: 'Windows',
-    color: 'hsl(var(--chart-800))',
+    color: 'hsl(var(--purple-800))',
   },
   mac: {
     label: 'Mac',
-    color: 'hsl(var(--chart-500))',
+    color: 'hsl(var(--purple-500))',
   },
   ios: {
     label: 'IOS',
-    color: 'hsl(var(--chart-50))',
+    color: 'hsl(var(--purple-200))',
   },
   android: {
     label: 'Android',
-    color: 'hsl(var(--chart-200))',
+    color: 'hsl(var(--purple-50))',
   },
 } satisfies ChartConfig;
 
@@ -151,7 +151,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="flex h-14 w-14 bg-surface rounded-[4px] items-center justify-center">
-                  <UserCog className="h-7 w-7 text-blue" />
+                  <UserCog className="h-7 w-7 text-secondary" />
                 </div>
               </div>
               <div className="flex justify-between">
@@ -165,7 +165,7 @@ export function Dashboard() {
                   </div>
                 </div>
                 <div className="flex h-14 w-14 bg-surface rounded-[4px] items-center justify-center">
-                  <UserPlus className="h-7 w-7 text-emeraldGreen-500" />
+                  <UserPlus className="h-7 w-7 text-green" />
                 </div>
               </div>
             </div>
@@ -313,7 +313,7 @@ export function Dashboard() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="flex items-center gap-6 sm:gap-4">
-                <CircularProgress percentage={58.9} strokeColor="#FFC107" />
+                <CircularProgress percentage={58.9} strokeColor="hsl(var(--warning))" />
                 <div>
                   <h3 className="text-sm font-normal text-high-emphasis">API calls</h3>
                   <span>
@@ -323,7 +323,7 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-6 sm:gap-4">
-                <CircularProgress percentage={100} strokeColor="#CD407B" />
+                <CircularProgress percentage={100} strokeColor="hsl(var(--pink-500))" />
                 <div>
                   <h3 className="text-sm font-normal text-high-emphasis">Bandwidth</h3>
                   <span>
@@ -333,7 +333,7 @@ export function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-6 sm:gap-4">
-                <CircularProgress percentage={30.9} strokeColor="#28A745" />
+                <CircularProgress percentage={30.9} strokeColor="hsl(var(--green-500))" />
                 <div>
                   <h3 className="text-sm font-normal text-high-emphasis">Concurrent Users</h3>
                   <span>

@@ -23,9 +23,9 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
   }, [password, confirmPassword, checks, passwordsMatch, onRequirementsMet]);
 
   return (
-    <div className="w-full mx-auto px-6 py-4 rounded-lg shadow-sm border border-primary-shade-50">
+    <div className="w-full mx-auto px-6 py-4 rounded-lg shadow-sm border border-primary-50">
       <h2 className="text-sm font-semibold text-high-emphasis mb-2">Password Requirements</h2>
-      <div className="h-1 w-full bg-primary-shade-50 rounded mb-2">
+      <div className="h-1 w-full bg-primary-50 rounded mb-2">
         <div
           className={`h-1 rounded-full transition-all duration-300 ${getStrengthColor()}`}
           style={{ width: `${strength}%` }}

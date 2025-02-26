@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Table } from '@tanstack/react-table';
 import { Settings2 } from 'lucide-react';
-
 import { Button } from 'components/ui/button';
 import {
   DropdownMenu,
@@ -15,12 +14,26 @@ import { Label } from 'components/ui/label';
 
 interface AdvanceTableViewOptionsProps<TData> {
   table: Table<TData>;
+  disabledColumns?: string[];
+  columnVisibility?: { [key: string]: boolean };
 }
 
-export function AdvanceTableViewOptions<TData>({ table }: AdvanceTableViewOptionsProps<TData>) {
+export function AdvanceTableViewOptions<TData>({
+  table,
+  disabledColumns = [],
+  columnVisibility = {},
+}: AdvanceTableViewOptionsProps<TData>) {
   const [allChecked, setAllChecked] = useState(
     table.getAllColumns().every((column) => column.getIsVisible() || !column.getCanHide())
   );
+
+  useEffect(() => {
+    table.getAllColumns().forEach((column) => {
+      if (columnVisibility[column.id] !== undefined) {
+        column.toggleVisibility(columnVisibility[column.id]);
+      }
+    });
+  }, [columnVisibility, table]);
 
   const handleToggleAll = () => {
     const newCheckedState = !allChecked;
@@ -54,13 +67,13 @@ export function AdvanceTableViewOptions<TData>({ table }: AdvanceTableViewOption
           .getAllColumns()
           .filter((column) => column.id !== 'select')
           .map((column) => {
-            const isDisabled =
-              ['itemName', 'stock', 'status', 'price'].includes(column.id) || !column.getCanHide();
+            const isDisabled = disabledColumns.includes(column.id) || !column.getCanHide();
+            const isChecked = columnVisibility[column.id] ?? column.getIsVisible();
 
             return (
               <div key={column.id} className="flex items-center gap-2 p-2">
                 <Checkbox
-                  checked={column.getIsVisible()}
+                  checked={isChecked}
                   onCheckedChange={(checked) => column.toggleVisibility(!!checked)}
                   disabled={isDisabled}
                   className="data-[state=checked]:border-none data-[disabled]:bg-low-emphasis"

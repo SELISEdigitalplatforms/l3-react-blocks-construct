@@ -49,7 +49,7 @@ export const UProfileMenu = () => {
             ) : (
               <img
                 src={data?.profileImageUrl || DummyProfile}
-                alt="profile pic"
+                alt="profile"
                 loading="lazy"
                 className="w-full h-full object-cover"
               />

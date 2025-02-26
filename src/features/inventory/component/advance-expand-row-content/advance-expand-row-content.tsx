@@ -11,15 +11,11 @@ import { checkedTags, images, InventoryData, tags } from '../../services/invento
 
 interface AdvanceExpandRowContentProps {
   rowId?: string;
-  columnLength?: number;
+  colSpan?: number;
   data: InventoryData[];
 }
 
-export const AdvanceExpandRowContent = ({
-  rowId,
-  columnLength,
-  data,
-}: AdvanceExpandRowContentProps) => {
+export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandRowContentProps) => {
   const [searchTags, setSearchTags] = useState('');
   const [selectedImage, setSelectedImage] = useState(images[0]);
   const [warranty, setWarranty] = useState(true);
@@ -50,9 +46,9 @@ export const AdvanceExpandRowContent = ({
 
   return (
     <TableRow key={`expanded-${rowId}`} className="hover:bg-transparent">
-      <TableCell colSpan={columnLength} className="!p-0 bg-neutral-25">
+      <TableCell colSpan={colSpan} className="!p-0 bg-neutral-25">
         <div className="flex gap-6 justify-between pt-4 px-4">
-          <div className="flex gap-2 flex-col">
+          <div className="flex gap-4 flex-col">
             <img
               src={selectedImage}
               alt="Product"
@@ -60,15 +56,20 @@ export const AdvanceExpandRowContent = ({
             />
             <div className="flex w-full items-center justify-between">
               {images.map((img) => (
-                <img
+                <Button
+                  variant="ghost"
                   key={img}
-                  src={img}
-                  alt="Thumbnail"
-                  className={`w-12 h-12 object-cover rounded-md cursor-pointer border ${
-                    selectedImage === img ? 'border-[1.5px] border-primary' : ''
-                  }`}
+                  className="p-0 rounded-md focus:outline-none"
                   onClick={() => setSelectedImage(img)}
-                />
+                >
+                  <img
+                    src={img}
+                    alt="Thumbnail"
+                    className={`w-12 h-12 object-cover rounded-md border ${
+                      selectedImage === img ? 'border-[1.5px] border-primary' : ''
+                    }`}
+                  />
+                </Button>
               ))}
             </div>
           </div>

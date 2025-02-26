@@ -83,7 +83,7 @@ export const GeneralInfo = () => {
               <>
                 <div>
                   <p className="text-medium-emphasis text-xs font-normal">Mobile No.</p>
-                  <p className="text-high-emphasis text-sm">{userInfo?.phoneNumber || '-'}</p>
+                  <p className="text-high-emphasis text-sm">{userInfo?.phoneNumber ?? '-'}</p>
                 </div>
                 <div>
                   <p className="text-medium-emphasis text-xs font-normal">Joined On</p>

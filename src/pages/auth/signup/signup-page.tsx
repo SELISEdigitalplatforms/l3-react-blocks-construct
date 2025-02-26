@@ -21,7 +21,7 @@ export function SignupPage() {
           <span className="text-sm font-normal text-medium-emphasis">Already have an account?</span>
           <Link
             to={'/login'}
-            className="text-sm font-bold text-primary hover:text-primary-dark hover:underline"
+            className="text-sm font-bold text-primary hover:text-primary-600 hover:underline"
           >
             Log in
           </Link>

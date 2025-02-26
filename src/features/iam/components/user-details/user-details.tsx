@@ -80,7 +80,7 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
               <div className="relative overflow-hidden rounded-full border shadow-sm border-white h-16 w-16">
                 <img
                   src={selectedUser?.profileImageUrl || DummyProfile}
-                  alt="profile pic"
+                  alt="profile"
                   loading="lazy"
                   className="w-full h-full object-cover"
                 />

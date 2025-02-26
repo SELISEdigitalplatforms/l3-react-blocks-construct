@@ -5,7 +5,6 @@ import { Trash, Upload } from 'lucide-react';
 import 'react-phone-number-input/style.css';
 import './edit-profile.css';
 import PhoneInput, { isPossiblePhoneNumber, isValidPhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
 import DummyProfile from '../../../../../assets/images/dummy_profile.png';
 import { User } from '@/types/user.type';
 import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
@@ -68,10 +67,10 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
 
   useEffect(() => {
     if (userInfo) {
-      setValue('fullName', `${userInfo.firstName} ${userInfo.lastName}` || '');
-      setValue('email', userInfo.email || '');
-      setValue('phoneNumber', userInfo.phoneNumber || '');
-      setValue('itemId', userInfo.itemId || '');
+      setValue('fullName', `${userInfo.firstName ?? ''} ${userInfo.lastName ?? ''}`.trim());
+      setValue('email', userInfo.email ?? '');
+      setValue('phoneNumber', userInfo.phoneNumber ?? '');
+      setValue('itemId', userInfo.itemId ?? '');
       setPreviewImage(userInfo.profileImageUrl || DummyProfile);
     }
   }, [userInfo, setValue]);

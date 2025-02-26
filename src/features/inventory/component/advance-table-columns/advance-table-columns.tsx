@@ -7,22 +7,27 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
   {
     id: 'select',
     header: () => <span className="text-xs font-medium">Action</span>,
+    accessorKey: 'select',
     meta: 'Action',
     enableSorting: false,
     enableHiding: false,
+    enablePinning: true,
+    size: 80,
   },
   {
     id: 'itemName',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Item name" />,
     meta: 'Item Name',
+    enablePinning: true,
     accessorFn: (row) => `${row.itemName || ''}`.trim(),
+    size: 160,
     cell: ({ row }) => {
       return (
-        <div className="flex w-[200px] items-center gap-2">
+        <div className="flex items-center gap-2">
           <div className="flex items-center p-[2px] justify-center rounded-md cursor-pointer border w-10 h-10">
             <img
               src={row.original.itemImage}
-              alt="item image"
+              alt={row.original.itemName}
               className="w-full h-full object-contain"
             />
           </div>
@@ -60,9 +65,10 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
     accessorFn: (row) => `${row.itemLoc || ''}`.trim(),
     header: ({ column }) => <DataTableColumnHeader column={column} title="Item location" />,
     meta: 'Item location',
+    size: 180,
     cell: ({ row }) => {
       return (
-        <div className="flex w-[180px] items-center">
+        <div className="flex items-center">
           <span className="truncate">{row.original.itemLoc}</span>
         </div>
       );
@@ -72,10 +78,11 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
     id: 'stock',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Stock" />,
     meta: 'Stock',
-    accessorFn: (row) => `${row.stock || ''}`.trim(),
+    accessorFn: (row) => `${row.stock ?? 0}`.trim(),
+    size: 100,
     cell: ({ row }) => {
       return (
-        <div className="flex items-center w-[100px]">
+        <div className="flex items-center">
           <span className="truncate">{row.original.stock}</span>
         </div>
       );
@@ -102,6 +109,7 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
     id: 'lastupdated',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Last updated" />,
     meta: 'Last updated',
+    size: 180,
     accessorFn: (row) => (row.lastupdated ? format(new Date(row.lastupdated), 'yyyy-MM-dd') : ''),
     cell: ({ row }) => {
       const lastUpdated = row.original.lastupdated;
@@ -110,7 +118,7 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
         : '-';
 
       return (
-        <div className="flex w-[180px] items-center">
+        <div className="flex items-center">
           <span className="truncate">{date}</span>
         </div>
       );
@@ -120,7 +128,7 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
         return true;
       }
 
-      const rowDate = row.getValue(columnId) as string;
+      const rowDate = String(row.getValue(columnId));
 
       if (typeof filterValue === 'object' && filterValue !== null) {
         const { type, date, from, to } = filterValue;
@@ -163,10 +171,11 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
     id: 'price',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
     meta: 'Price',
+    size: 100,
     accessorFn: (row) => `${row.price || ''}`.trim(),
     cell: ({ row }) => {
       return (
-        <div className="flex items-center w-[100px]">
+        <div className="flex items-center">
           <span className="truncate">{row.original.price}</span>
         </div>
       );
@@ -176,13 +185,14 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
     id: 'status',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     meta: 'Status',
+    size: 100,
     accessorFn: (row) => `${row.status || ''}`.trim(),
     cell: ({ row }) => {
       const status: InventoryStatus =
         (row.original.status as InventoryStatus) || InventoryStatus.DISCONTINUED;
 
       return (
-        <div className="flex w-[100px] items-center">
+        <div className="flex items-center">
           <span className={`px-2 py-1 rounded-md truncate text-${statusColors[status]}`}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </span>

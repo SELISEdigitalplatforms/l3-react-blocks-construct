@@ -32,26 +32,92 @@ html.dark {
 
   :root {
     --white: 0, 0%, 100%;
-    --primary: 179, 100%, 28%;
-    --primary-dark: 179, 100%, 22%;
-    --primary-shade-50: 183, 41%, 91%;
-    --surface: 220 33% 96%;
+    --primary-50: 183, 41%, 91%;
+    --primary-100: 183, 41%, 78%;
+    --primary-200: 181, 40%, 64%;
+    --primary-300: 181, 40%, 49%;
+    --primary-400: 180, 63%, 38%;
+    --primary-500: 179, 100%, 28%;
+    --primary-600: 179, 98%, 26%;
+    --primary-700: 178, 97%, 23%;
+    --primary-800: 177, 89%, 21%;
+    --primary-900: 175, 80%, 15%;
+    --primary-foreground: 240 10% 3.9%;
+
+    --secondary-50: 198, 76%, 93%;
+    --secondary-100: 198, 74%, 83%;
+    --secondary-200: 198, 73%, 72%;
+    --secondary-300: 199, 71%, 62%;
+    --secondary-400: 200, 70%, 57%;
+    --secondary-500: 202, 68%, 53%;
+    --secondary-600: 202, 62%, 49%;
+    --secondary-700: 204, 63%, 44%;
+    --secondary-800: 205, 63%, 39%;
+    --secondary-900: 210, 64%, 31%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --neutral-25: 0, 0%, 98%;
+    --neutral-50: 0, 0%, 96%;
+    --neutral-100: 0, 0%, 91%;
+    --neutral-200: 0, 0%, 85%;
+    --neutral-300: 0, 0%, 77%;
+    --neutral-400: 0, 0%, 62%;
+    --neutral-500: 0, 0%, 48%;
+    --neutral-600: 0, 0%, 33%;
+    --neutral-700: 0, 0%, 26%;
+    --neutral-800: 0, 0%, 15%;
+    --neutral-900: 0, 0%, 0%;
+
+    --surface: 220, 33%, 96%;
 
     --high-emphasis: 0, 0%, 6%;
     --medium-emphasis: 0, 0%, 31%;
     --low-emphasis: 0, 0%, 62%;
 
-    --neutral-25: 0, 0%, 98%;
-    --neutral-200: 0, 0%, 85%;
-
     --success: 134, 61%, 41%;
     --success-background: 131, 48%, 95%;
     --success-high-emphasis: 134, 62%, 25%;
-    --warning: 45 100% 51%;
+
+    --warning: 45, 100%, 51%;
+    --warning-background: 47, 100%, 96%;
+    --warning-high-emphasis: 35, 100%, 33%;
 
     --error: 354, 70%, 54%;
     --error-background: 354, 70%, 95%;
-    --error-high-emphasis: 354, 80%, 30%;
+    --error-high-emphasis: 355, 60%, 34%;
+
+    --purple-50: 300, 26%, 93%;
+    --purple-100: 300, 27%, 81%;
+    --purple-200: 301, 28%, 69%;
+    --purple-300: 300, 26%, 57%;
+    --purple-400: 300, 26%, 49%;
+    --purple-500: 300, 33%, 42%;
+    --purple-600: 296, 33%, 40%;
+    --purple-700: 296, 34%, 39%;
+    --purple-800: 285, 37%, 33%;
+    --purple-900: 277, 36%, 27%;
+
+    --pink-50: 328, 49%, 93%;
+    --pink-100: 327, 49%, 83%;
+    --pink-200: 328, 52%, 73%;
+    --pink-300: 330, 54%, 64%;
+    --pink-400: 332, 54%, 57%;
+    --pink-500: 335, 59%, 53%;
+    --pink-600: 334, 51%, 49%;
+    --pink-700: 331, 49%, 44%;
+    --pink-800: 328, 47%, 39%;
+    --pink-900: 320, 43%, 30%;
+
+    --green-50: 161, 38%, 92%;
+    --green-100: 159, 37%, 80%;
+    --green-200: 159, 38%, 68%;
+    --green-300: 159, 36%, 56%;
+    --green-400: 158, 36%, 48%;
+    --green-500: 157, 40%, 42%;
+    --green-600: 156, 40%, 39%;
+    --green-700: 154, 40%, 34%;
+    --green-800: 153, 40%, 30%;
+    --green-900: 148, 41%, 22%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -68,9 +134,6 @@ html.dark {
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary-foreground: 240 10% 3.9%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
     --accent: 240 4.8% 95.9%;
@@ -81,39 +144,99 @@ html.dark {
     --input: 240 5.9% 90%;
     --ring: 142.1 76.2% 36.3%;
     --radius: 0.3rem;
-    --chart-50: 328 49% 93%;
-    --chart-200: 301 28% 69%;
-    --chart-500: 300 33% 42%;
-    --chart-800: 285 37% 33%;
-    --blue: 202 68% 53%;
-    --deepPurple: 300 33% 42%;
     --emerald-green-500: 157 40% 42%;
 
     --transition-duration: 200ms;
   }
 
   .dark {
-    --white: 0, 0%, 85%;
-    --primary: 181, 100%, 26%;
-    --primary-dark: 179, 100%, 22%;
-    --primary-shade-50: 178, 100%, 12%;
-    --surface: 220, 20%, 18%;
+    --white: 0, 0%, 9%;
+    --primary-50: 178, 100%, 12%;
+    --primary-100: 180, 100%, 17%;
+    --primary-200: 180, 100%, 21%;
+    --primary-300: 181, 100%, 24%;
+    --primary-400: 181, 100%, 26%;
+    --primary-500: 182, 76%, 35%;
+    --primary-600: 183, 44%, 47%;
+    --primary-700: 185, 40%, 63%;
+    --primary-800: 185, 40%, 77%;
+    --primary-900: 187, 39%, 91%;
+    --primary-foreground: 144.9 80.4% 10%;
+
+    --secondary-50: 201, 63%, 17%;
+    --secondary-100: 200, 64%, 22%;
+    --secondary-200: 201, 64%, 28%;
+    --secondary-300: 201, 63%, 36%;
+    --secondary-400: 201, 64%, 40%;
+    --secondary-500: 201, 42%, 52%;
+    --secondary-600: 201, 42%, 60%;
+    --secondary-700: 201, 42%, 72%;
+    --secondary-800: 201, 42%, 81%;
+    --secondary-900: 198, 42%, 94%;
+    --secondary-foreground: 0 0% 98%;
+
+    --neutral-25: 0, 0%, 15%;
+    --neutral-50: 0, 0%, 26%;
+    --neutral-100: 0, 0%, 33%;
+    --neutral-200: 0, 0%, 48%;
+    --neutral-300: 0, 0%, 62%;
+    --neutral-400: 0, 0%, 77%;
+    --neutral-500: 0, 0%, 85%;
+    --neutral-600: 0, 0%, 91%;
+    --neutral-700: 0, 0%, 96%;
+    --neutral-800: 0, 0%, 98%;
+    --neutral-900: 0, 0%, 100%;
+
+    --surface: 0, 0%, 16%;
 
     --high-emphasis: 0, 0%, 100%;
     --medium-emphasis: 0, 0%, 69%;
     --low-emphasis: 0, 0%, 82%;
 
-    --neutral-25: 0, 0%, 98%;
-    --neutral-200: 0, 0%, 33%;
-
     --success: 133, 59%, 38%;
     --success-background: 156, 30%, 17%;
     --success-high-emphasis: 123, 52%, 92%;
-    --warning: 45 100% 51%;
 
-    --error: 354, 70%, 64%;
-    --error-background: 354, 70%, 20%;
-    --error-high-emphasis: 354, 100%, 85%;
+    --warning: 44, 92%, 49%;
+    --warning-background: 33, 50%, 16%;
+    --warning-high-emphasis: 45, 100%, 92%;
+
+    --error: 353, 64%, 52%;
+    --error-background: 351, 40%, 17%;
+    --error-high-emphasis: 345, 100%, 98%;
+
+    --purple-50: 262, 38%, 29%;
+    --purple-100: 271, 38%, 35%;
+    --purple-200: 276, 37%, 39%;
+    --purple-300: 281, 36%, 42%;
+    --purple-400: 286, 35%, 45%;
+    --purple-500: 285, 30%, 52%;
+    --purple-600: 286, 31%, 55%;
+    --purple-700: 286, 31%, 60%;
+    --purple-800: 284, 33%, 82%;
+    --purple-900: 289, 30%, 93%;
+
+    --pink-50: 319, 100%, 23%;
+    --pink-100: 325, 100%, 31%;
+    --pink-200: 328, 100%, 35%;
+    --pink-300: 329, 100%, 39%;
+    --pink-400: 331, 100%, 43%;
+    --pink-500: 331, 72%, 52%;
+    --pink-600: 332, 70%, 61%;
+    --pink-700: 331, 68%, 72%;
+    --pink-800: 330, 66%, 83%;
+    --pink-900: 331, 66%, 93%;
+
+    --green-50: 144, 58%, 23%;
+    --green-100: 145, 55%, 31%;
+    --green-200: 144, 54%, 36%;
+    --green-300: 144, 51%, 42%;
+    --green-400: 144, 50%, 46%;
+    --green-500: 143, 42%, 54%;
+    --green-600: 142, 41%, 63%;
+    --green-700: 142, 40%, 73%;
+    --green-800: 141, 40%, 84%;
+    --green-900: 141, 41%, 93%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -130,9 +253,6 @@ html.dark {
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 15%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 12 6.5% 15.1%;
@@ -142,12 +262,5 @@ html.dark {
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 142.4 71.8% 29.2%;
-    --chart-50: 328 49% 93%;
-    --chart-200: 301 28% 69%;
-    --chart-500: 300 33% 42%;
-    --chart-800: 285 37% 33%;
-    --blue: 202 68% 53%;
-    --deepPurple: 300 33% 42%;
-    --emerald-green-500: 157 40% 42%;
   }
 }

@@ -88,7 +88,7 @@ export const Devices = () => {
   }, [hasMore, isLoading, isFetching]);
 
   const getDeviceIcon = (deviceInfo: IDeviceSession['DeviceInformation']) => {
-    if (!deviceInfo?.Device) return <Monitor className="w-5 h-5 text-blue" />;
+    if (!deviceInfo?.Device) return <Monitor className="w-5 h-5 text-secondary" />;
 
     const deviceType = deviceInfo.Device.toLowerCase();
     if (
@@ -97,9 +97,9 @@ export const Devices = () => {
       deviceType.includes('android') ||
       deviceType.includes('smartphone')
     ) {
-      return <Smartphone className="w-5 h-5 text-blue" />;
+      return <Smartphone className="w-5 h-5 text-secondary" />;
     }
-    return <Monitor className="w-5 h-5 text-blue" />;
+    return <Monitor className="w-5 h-5 text-secondary" />;
   };
 
   const formatDate = (date: Date) => {
@@ -209,11 +209,11 @@ export const Devices = () => {
                       <TableCell colSpan={columns.length}>
                         <div ref={loadingRef} className="h-8 flex items-center justify-center">
                           {(isLoading || isFetching) && (
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                        )}
+                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          )}
                           {!hasMore && !isLoading && !isFetching && (
-                          <span className="text-gray-500">No more devices!</span>
-                        )}
+                            <span className="text-gray-500">No more devices!</span>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -222,12 +222,12 @@ export const Devices = () => {
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-24 text-center">
                       {isLoading || isFetching ? (
-                      <div className="flex items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      </div>
-                    ) : deviceSessions.length === 0 ? (
-                      <p className="text-center">No devices found.</p>
-                    ) : null}
+                        <div className="flex items-center justify-center">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        </div>
+                      ) : deviceSessions.length === 0 ? (
+                        <p className="text-center">No devices found.</p>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 )}
