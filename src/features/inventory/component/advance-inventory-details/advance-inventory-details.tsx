@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
 import { Button } from 'components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 import { Separator } from 'components/ui/separator';
@@ -134,14 +135,22 @@ export function AdvanceInventoryDetails() {
     }
   };
 
-  const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const newThumbnailArray = [...thumbnail, URL.createObjectURL(file)];
+  const onDrop = (acceptedFiles: File[]) => {
+    const remainingSlots = 5 - thumbnail.length;
+    const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+    if (filesToAdd.length > 0) {
+      const newImages = filesToAdd.map((file) => URL.createObjectURL(file));
+      const newThumbnailArray = [...thumbnail, ...newImages];
       setThumbnail(newThumbnailArray);
       setSelectedImage(newThumbnailArray[newThumbnailArray.length - 1]);
     }
   };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: true,
+  });
 
   return (
     <div className="flex flex-col w-full">
@@ -187,7 +196,7 @@ export function AdvanceInventoryDetails() {
                 <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border">
                   <img src={selectedImage} alt="Product" className="w-full h-full object-contain" />
                 </div>
-                <div className={`flex w-full items-center justify-between`}>
+                <div className="flex w-full items-center justify-between">
                   {thumbnail.map((img) => (
                     <div key={img} className="relative">
                       {editDetails && (
@@ -217,17 +226,12 @@ export function AdvanceInventoryDetails() {
                     </div>
                   ))}
                   {editDetails && thumbnail.length < 5 && (
-                    <div className="border border-dashed rounded-md w-12 h-12 flex items-center justify-center hover:bg-slate-100">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAddImage}
-                        style={{ display: 'none' }}
-                        id="image-upload"
-                      />
-                      <Label htmlFor="image-upload">
-                        <Plus className="text-high-emphasis cursor-pointer" />
-                      </Label>
+                    <div
+                      {...getRootProps()}
+                      className="border border-dashed rounded-md w-12 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                    >
+                      <input {...getInputProps()} />
+                      <Plus className="text-high-emphasis" />
                     </div>
                   )}
                 </div>

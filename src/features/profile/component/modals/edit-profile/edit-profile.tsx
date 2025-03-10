@@ -21,6 +21,7 @@ import { Separator } from 'components/ui/separator';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
 import { Form, FormField, FormItem, FormControl, FormMessage } from 'components/ui/form';
+import { useDropzone } from 'react-dropzone';
 
 type FormData = {
   itemId: string;
@@ -114,14 +115,6 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
     navigate('/profile');
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setValue('profileImageUrl', file);
-      setPreviewImage(URL.createObjectURL(file));
-    }
-  };
-
   const handleRemoveImage = () => {
     setValue('profileImageUrl', '');
     setPreviewImage(DummyProfile);
@@ -135,6 +128,23 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
       reader.onerror = () => reject(new Error('Failed to read file as Base64'));
     });
   };
+
+  const onDrop = (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      setValue('profileImageUrl', file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+    },
+    multiple: false,
+  });
 
   return (
     <DialogContent className="rounded-md sm:max-w-[700px] overflow-y-auto max-h-screen">
@@ -156,18 +166,13 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
               </h1>
               <p className="text-sm">*.png, *.jpeg files up to 2MB, minimum size 400x400px.</p>
               <div className="flex gap-2 sm:gap-4">
-                <Button size="sm" variant="outline" type="button">
-                  <Upload className="w-4 h-4" />
-                  <Label className="text-xs font-medium cursor-pointer">
-                    Upload Image{' '}
-                    <input
-                      type="file"
-                      accept="image/png, image/jpeg"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </Label>
-                </Button>
+                <div {...getRootProps()} className="inline-block">
+                  <Button size="sm" variant="outline" type="button">
+                    <Upload className="w-4 h-4" />
+                    <Label className="text-xs font-medium cursor-pointer">Upload Image</Label>
+                    <input {...getInputProps()} className="hidden" />
+                  </Button>
+                </div>
                 <Button
                   size="sm"
                   variant="outline"
