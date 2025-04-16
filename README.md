@@ -105,14 +105,14 @@ blocks v
 1. Open a terminal.
 2. Run the following command:
    ```sh
-   blocks new <project-name>
+   blocks new web <project-name>
    ```
    - Replace `<project-name>` with your desired folder name. The repository will be cloned into this folder.
 
 ### Enter Project Details
-1. When prompted, enter the **domain** you registered earlier.
-2. Retrieve the **Project Key** from the **Project Dashboard**.
-3. Copy and paste the Project Key into the terminal when prompted.
+1. When prompted, enter the **Project Key** from the **Project Dashboard**.
+2. Retrieve the **domain** you registered earlier.
+3. Copy and paste the **API Url** into the terminal when prompted.
 4. Configure cookies:
    - You will be asked whether to enable or disable cookies.
    - Use the **arrow keys** (Up/Down) to select your preference and press **Enter**.
