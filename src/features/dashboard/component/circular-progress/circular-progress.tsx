@@ -1,3 +1,20 @@
+/**
+ * CircularProgress component displays a circular progress bar that visually represents a percentage.
+ * The component allows customization of the progress bar's stroke color.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {number} props.percentage - The percentage of progress to be shown (between 0 and 100).
+ * @param {string} [props.strokeColor='#4F7BFF'] - The color of the progress bar stroke. Defaults to '#4F7BFF'.
+ *
+ * @example
+ * return (
+ *   <CircularProgress percentage={75} strokeColor="#4CAF50" />
+ * )
+ *
+ * @returns {JSX.Element} - A circular progress bar with the specified percentage and stroke color.
+ */
+
 interface CircularProgressBarProps {
   percentage: number;
   strokeColor?: string;

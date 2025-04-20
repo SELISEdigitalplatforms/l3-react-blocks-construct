@@ -1,10 +1,37 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from 'components/ui/badge';
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
+import { DataTableColumnHeader } from '../../../../components/blocks/data-table/data-table-column-header';
 import { IamData } from '../../services/user-service';
 import { DataTableRowActions } from './iam-table-row-actions';
+
+/**
+ * Creates the columns for the IAM (Identity and Access Management) table.
+ *
+ * This function generates the column configuration for a table displaying user data,
+ * including user details like name, email, MFA status, account creation date, last login,
+ * user status (active/inactive), and actions (view details, reset password, resend activation).
+ *
+ * Features:
+ * - Displays user information with sorting and filtering capabilities
+ * - Supports custom actions such as viewing details, resetting passwords, and resending activations
+ * - Filters by date range for both creation and last login dates
+ * - Displays user status with color-coded badges based on active/inactive status
+ * - Displays MFA status with enabled/disabled labels
+ *
+ * @param {ColumnFactoryProps} props - The props for configuring the table columns
+ * @param {function} props.onViewDetails - Callback function triggered when the "View Details" action is clicked
+ * @param {function} props.onResetPassword - Callback function triggered when the "Reset Password" action is clicked
+ * @param {function} [props.onResendActivation] - Optional callback function triggered when the "Resend Activation" action is clicked
+ *
+ * @returns {ColumnDef<IamData, any>[]} - An array of column definitions for the IAM table
+ *
+ * @example
+ * const columns = createIamTableColumns({
+ *   onViewDetails: (user) => console.log(user),
+ *   onResetPassword: (user) => console.log('Resetting password for:', user),
+ *   onResendActivation: (user) => console.log('Resending activation for:', user),
+ * });
+ */
 
 const userStatuses = [
   { value: 'active', label: 'Active', color: 'success' },
@@ -30,7 +57,7 @@ export const createIamTableColumns = ({
   {
     id: 'fullName',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-    accessorFn: (row) => `${row.firstName || ''} ${row.lastName || ''}`.trim(),
+    accessorFn: (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim(),
     cell: ({ row }) => {
       const fullName = `${row.original.firstName} ${row.original.lastName}`.trim();
       return (
@@ -61,7 +88,7 @@ export const createIamTableColumns = ({
     },
     filterFn: (row, id, value: string[]) => {
       if (value.length === 0) return true;
-      const cellValue = row.getValue(id) as boolean;
+      const cellValue = row.getValue(id);
       return value.includes(String(cellValue));
     },
   },
@@ -161,7 +188,7 @@ export const createIamTableColumns = ({
     },
     filterFn: (row, id, value: string[]) => {
       if (value.length === 0) return true;
-      const cellValue = row.getValue(id) as boolean;
+      const cellValue = row.getValue(id);
       return value.includes(String(cellValue));
     },
   },

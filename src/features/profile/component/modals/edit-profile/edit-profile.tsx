@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Trash, Upload } from 'lucide-react';
-import 'react-phone-number-input/style.css';
-import './edit-profile.css';
-import PhoneInput, { isPossiblePhoneNumber, isValidPhoneNumber } from 'react-phone-number-input';
-import DummyProfile from '../../../../../assets/images/dummy_profile.png';
-import { User } from '@/types/user.type';
+import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
+import { useDropzone } from 'react-dropzone';
+import { User } from 'types/user.type';
 import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
 import { useQueryClient } from '@tanstack/react-query';
+
 import {
   DialogContent,
   DialogDescription,
@@ -21,6 +20,32 @@ import { Separator } from 'components/ui/separator';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
 import { Form, FormField, FormItem, FormControl, FormMessage } from 'components/ui/form';
+import UIPhoneInput from 'components/core/phone-input/phone-input';
+import DummyProfile from 'assets/images/dummy_profile.png';
+
+/**
+ * `EditProfile` component allows the user to edit their profile details, including their full name, email, phone number, and profile image.
+ * It provides a form to upload a new profile image, edit personal information, and validates phone number input.
+ * Once the form is successfully submitted, it triggers an update request to save the changes and navigate to the profile page.
+ *
+ * @component
+ * @example
+ * const userInfo = {
+ *   fullName: 'John Doe',
+ *   email: 'john.doe@example.com',
+ *   phoneNumber: '+1234567890',
+ *   profileImageUrl: 'http://example.com/profile.jpg',
+ *   itemId: '12345'
+ * };
+ *
+ * <EditProfile userInfo={userInfo} onClose={() => {}} />
+ *
+ * @param {Object} props - The component's props
+ * @param {User} props.userInfo - The user information object containing current details to be edited
+ * @param {Function} props.onClose - Callback function to close the dialog/modal
+ *
+ * @returns {React.Element} The rendered component
+ */
 
 type FormData = {
   itemId: string;
@@ -114,14 +139,6 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
     navigate('/profile');
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setValue('profileImageUrl', file);
-      setPreviewImage(URL.createObjectURL(file));
-    }
-  };
-
   const handleRemoveImage = () => {
     setValue('profileImageUrl', '');
     setPreviewImage(DummyProfile);
@@ -135,6 +152,23 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
       reader.onerror = () => reject(new Error('Failed to read file as Base64'));
     });
   };
+
+  const onDrop = (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      setValue('profileImageUrl', file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      'image/jpeg': [],
+      'image/png': [],
+    },
+    multiple: false,
+  });
 
   return (
     <DialogContent className="rounded-md sm:max-w-[700px] overflow-y-auto max-h-screen">
@@ -156,18 +190,13 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
               </h1>
               <p className="text-sm">*.png, *.jpeg files up to 2MB, minimum size 400x400px.</p>
               <div className="flex gap-2 sm:gap-4">
-                <Button size="sm" variant="outline" type="button">
-                  <Upload className="w-4 h-4" />
-                  <Label className="text-xs font-medium cursor-pointer">
-                    Upload Image{' '}
-                    <input
-                      type="file"
-                      accept="image/png, image/jpeg"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </Label>
-                </Button>
+                <div {...getRootProps()} className="inline-block">
+                  <Button size="sm" variant="outline" type="button">
+                    <Upload className="w-4 h-4" />
+                    <Label className="text-xs font-medium cursor-pointer">Upload Image</Label>
+                    <input {...getInputProps()} className="hidden" />
+                  </Button>
+                </div>
                 <Button
                   size="sm"
                   variant="outline"
@@ -224,10 +253,9 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
                 <FormItem>
                   <Label>Mobile No.</Label>
                   <FormControl>
-                    <PhoneInput
+                    <UIPhoneInput
                       {...field}
-                      onChange={(value) => setValue('phoneNumber', value || '')}
-                      className="flex h-11 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      onChange={(value: Value) => setValue('phoneNumber', value ?? '')}
                       placeholder="Enter your mobile number"
                       defaultCountry="CH"
                       countryCallingCodeEditable={false}

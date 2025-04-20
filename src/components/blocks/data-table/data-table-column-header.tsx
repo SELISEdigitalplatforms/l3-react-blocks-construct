@@ -3,6 +3,31 @@ import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
 
+/**
+ * DataTableColumnHeader Component
+ *
+ * A reusable header component for columns in the DataTable that supports:
+ * - Sorting functionality with ascending, descending, and unsorted states.
+ * - Customizable column title and sorting icon.
+ * - Integration with the `@tanstack/react-table` column sorting API.
+ * - Responsiveness with customizable styles.
+ *
+ * Features:
+ * - Sorts data based on the column's state.
+ * - Displays the appropriate sorting icon (ascending, descending, or unsorted).
+ * - Provides a clean and customizable layout for table headers.
+ * - Allows toggling of sorting through user interaction.
+ *
+ * Props:
+ * @template TData - The type of data displayed in the table.
+ * @template TValue - The type of value in the column.
+ * @param {Column<TData, TValue>} column - The column definition from `@tanstack/react-table`.
+ * @param {string} title - The title of the column to be displayed.
+ * @param {string} [className] - Optional additional class names to apply to the header container.
+ *
+ * @returns {JSX.Element} The table column header with sorting functionality and title.
+ */
+
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>;
   title: string;
@@ -18,7 +43,7 @@ export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
   className,
-}: DataTableColumnHeaderProps<TData, TValue>) {
+}: Readonly<DataTableColumnHeaderProps<TData, TValue>>) {
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>;
   }

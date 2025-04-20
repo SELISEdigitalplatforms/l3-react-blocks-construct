@@ -7,13 +7,29 @@ import {
   DialogTitle,
 } from 'components/ui/dialog';
 import { Button } from 'components/ui/button';
-import SecurityOn from '../../../../../assets/images/security_on.svg';
+import SecurityOn from 'assets/images/security_on.svg';
 import { Checkbox } from 'components/ui/checkbox';
 import { Label } from 'components/ui/label';
 import { useLogoutAllMutation, useSignoutMutation } from 'features/auth/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from 'state/store/auth';
 import { useToast } from 'hooks/use-toast';
+
+/**
+ * Component to display a success message after a password has been updated.
+ * It provides an option to log out from all devices and redirects the user to the login page after the update.
+ *
+ * @component
+ *
+ * @param {Object} props - The component props.
+ * @param {Function} props.onClose - The function to call when the modal/dialog should be closed.
+ *
+ * @returns {JSX.Element} - The rendered component.
+ *
+ * @example
+ * // Example usage
+ * <UpdatePasswordSuccess onClose={() => setDialogOpen(false)} />
+ */
 
 type UpdatePasswordSuccessProps = {
   onClose: () => void;

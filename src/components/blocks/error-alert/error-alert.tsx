@@ -1,6 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { TriangleAlert } from 'lucide-react';
 
+/**
+ * ErrorAlert Component
+ *
+ * A reusable alert component that displays error messages with automatic timeout functionality.
+ * The alert will automatically disappear after 5 seconds when an error is triggered.
+ *
+ * Features:
+ * - Automatic visibility management based on error state
+ * - Configurable title and message
+ * - Automatic dismissal after 5 seconds
+ * - Visual styling for error states with smooth transitions
+ *
+ * Props:
+ * @param {boolean} isError - Whether an error state is active, triggering the alert to display
+ * @param {string} [title='Error'] - The title text displayed in the alert header
+ * @param {string} [message='An error occurred.'] - The detailed error message to display
+ *
+ * @returns {JSX.Element|null} The error alert component when visible, or null when not visible
+ *
+ * @example
+ * // Basic usage
+ * <ErrorAlert isError={hasError} />
+ *
+ * // With custom title and message
+ * <ErrorAlert
+ *   isError={submitFailed}
+ *   title="Submission Failed"
+ *   message="Please check your form inputs and try again."
+ * />
+ */
+
 interface ErrorAlertProps {
   isError: boolean;
   title?: string;

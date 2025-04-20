@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ReactNode } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';

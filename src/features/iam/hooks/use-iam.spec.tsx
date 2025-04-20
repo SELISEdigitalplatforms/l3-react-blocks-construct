@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { useGetUsersQuery } from './use-iam';
-import { useGlobalQuery } from '@/state/query-client/hooks';
+import { useGlobalQuery } from 'state/query-client/hooks';
 
-jest.mock('@/state/query-client/hooks', () => ({
+jest.mock('state/query-client/hooks', () => ({
   useGlobalQuery: jest.fn(),
 }));
 

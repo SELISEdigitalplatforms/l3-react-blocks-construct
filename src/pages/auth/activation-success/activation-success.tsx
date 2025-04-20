@@ -1,6 +1,6 @@
-import { Button } from '../../../components/ui/button';
-import successIcon from '../../../assets/images/verification-success.svg';
 import { Link } from 'react-router-dom';
+import { Button } from 'components/ui/button';
+import successIcon from 'assets/images/verification-success.svg';
 
 export function ActivationSuccess() {
   return (

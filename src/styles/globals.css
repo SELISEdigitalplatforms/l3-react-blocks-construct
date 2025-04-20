@@ -4,10 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 html.dark {
   transition: background-color var(--transition-duration) ease;
 }
@@ -28,6 +24,40 @@ html.dark {
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  th,
+  td {
+    @apply relative;
+  }
+
+  th::before,
+  th::after,
+  td::before,
+  td::after {
+    content: '';
+    @apply absolute left-0 w-full;
+  }
+
+  th::before,
+  td::before {
+    @apply -top-px border-t border-border;
+  }
+
+  th::after,
+  td::after {
+    @apply -bottom-px border-b border-border;
+  }
+
+  input[type="time"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+  input[type="time"]::-moz-calendar-picker-indicator {
+    display: none !important;
   }
 
   :root {
@@ -67,6 +97,17 @@ html.dark {
     --neutral-700: 0, 0%, 26%;
     --neutral-800: 0, 0%, 15%;
     --neutral-900: 0, 0%, 0%;
+
+    --burgundy-50: 0, 0%, 91%;
+    --burgundy-100: 346, 46%, 84%;
+    --burgundy-200: 351, 40%, 67%;
+    --burgundy-300: 351, 38%, 54%;
+    --burgundy-400: 350, 53%, 48%;
+    --burgundy-500: 350, 72%, 43%;
+    --burgundy-600: 348, 76%, 39%;
+    --burgundy-700: 346, 83%, 34%;
+    --burgundy-800: 345, 89%, 30%;
+    --burgundy-900: 345, 100%, 25%;
 
     --surface: 220, 33%, 96%;
 
@@ -187,6 +228,17 @@ html.dark {
     --neutral-800: 0, 0%, 98%;
     --neutral-900: 0, 0%, 100%;
 
+    --burgundy-50: 0, 0%, 91%;
+    --burgundy-100: 346, 46%, 84%;
+    --burgundy-200: 351, 40%, 67%;
+    --burgundy-300: 351, 38%, 54%;
+    --burgundy-400: 350, 53%, 48%;
+    --burgundy-500: 350, 72%, 43%;
+    --burgundy-600: 348, 76%, 39%;
+    --burgundy-700: 346, 83%, 34%;
+    --burgundy-800: 345, 89%, 30%;
+    --burgundy-900: 345, 100%, 25%;
+
     --surface: 0, 0%, 16%;
 
     --high-emphasis: 0, 0%, 100%;
@@ -263,4 +315,11 @@ html.dark {
     --input: 240 3.7% 15.9%;
     --ring: 142.4 71.8% 29.2%;
   }
+}
+
+.ql-toolbar {
+  @apply rounded-t-md border border-gray-200;
+}
+.ql-container {
+  @apply rounded-b-md border border-gray-200;
 }

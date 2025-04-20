@@ -2,6 +2,7 @@ export interface MenuItem {
   id: string;
   name: string;
   path: string;
+  isIntegrated?: boolean;
   icon?:
     | 'LayoutDashboard'
     | 'Users'
@@ -10,7 +11,11 @@ export interface MenuItem {
     | 'User'
     | 'Server'
     | 'Store'
-    | 'CircleHelp';
+    | 'CircleHelp'
+    | 'Inbox'
+    | 'FileClock'
+    | 'Presentation'
+    | 'Calendar';
   children?: MenuItem[];
 }
 
@@ -18,4 +23,5 @@ export interface SidebarMenuItemProps {
   item: MenuItem;
   showText: boolean;
   isActive: boolean;
+  onClick?: () => void;
 }

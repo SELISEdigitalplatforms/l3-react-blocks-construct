@@ -5,17 +5,18 @@ import { Menu } from 'lucide-react';
 
 import { useIsMobile } from '../../hooks/use-mobile';
 import { cn } from '../../lib/utils';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Separator } from '../../components/ui/separator';
-import { Sheet, SheetContent } from '../../components/ui/sheet';
-import { Skeleton } from '../../components/ui/skeleton';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { Separator } from 'components/ui/separator';
+import { Sheet, SheetContent } from 'components/ui/sheet';
+import { Skeleton } from 'components/ui/skeleton';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '../../components/ui/tooltip';
+} from 'components/ui/tooltip';
+import DynamicBreadcrumb from '../core/dynamic-breadcrumb/dynamic-breadcrumb';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -256,21 +257,24 @@ const SidebarTrigger = React.forwardRef<
   const { toggleSidebar } = useSidebar();
 
   return (
-    <Button
-      ref={ref}
-      data-sidebar="trigger"
-      variant="ghost"
-      size="icon"
-      className={cn('h-8 w-8', className)}
-      onClick={(event) => {
-        onClick?.(event);
-        toggleSidebar();
-      }}
-      {...props}
-    >
-      <Menu className="!w-5 !h-5 text-medium-emphasis" />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    <div className="flex items-center gap-4">
+      <Button
+        ref={ref}
+        data-sidebar="trigger"
+        variant="ghost"
+        size="icon"
+        className={cn('h-8 w-8', className)}
+        onClick={(event) => {
+          onClick?.(event);
+          toggleSidebar();
+        }}
+        {...props}
+      >
+        <Menu className="!w-5 !h-5 text-medium-emphasis" />
+        <span className="sr-only">Toggle Sidebar</span>
+      </Button>
+      <DynamicBreadcrumb />
+    </div>
   );
 });
 SidebarTrigger.displayName = 'SidebarTrigger';

@@ -1,14 +1,14 @@
-import DesktopImage1 from 'assets/images/desktop_1.png';
+import DesktopImage1 from 'assets/images/desktop_1.webp';
 import DesktopImage2 from 'assets/images/desktop_2.webp';
 import DesktopImage3 from 'assets/images/desktop_3.webp';
 import CoffeePods from 'assets/images/inventory/coffee_pod.webp';
-import MonitorArm from 'assets/images/inventory/monitor_arm.png';
-import NoiseCancelling from 'assets/images/inventory/noise_cancelling.png';
-import WirelessMouse from 'assets/images/inventory/wireless_mouse.png';
-import OfficeChair from 'assets/images/inventory/office_chair.png';
-import SmartWatch from 'assets/images/inventory/smart_watch.png';
-import StandingDesk from 'assets/images/inventory/standing_desk.png';
-import Sneaker from 'assets/images/inventory/sneaker.png';
+import MonitorArm from 'assets/images/inventory/monitor_arm.webp';
+import NoiseCancelling from 'assets/images/inventory/noise_cancelling.webp';
+import WirelessMouse from 'assets/images/inventory/wireless_mouse.webp';
+import OfficeChair from 'assets/images/inventory/office_chair.webp';
+import SmartWatch from 'assets/images/inventory/smart_watch.webp';
+import StandingDesk from 'assets/images/inventory/standing_desk.webp';
+import Sneaker from 'assets/images/inventory/sneaker.webp';
 import UsbCHub from 'assets/images/inventory/usb_c_hub.webp';
 
 export interface InventoryData {
@@ -302,4 +302,11 @@ export const inventoryData: InventoryData[] = [
     price: 'CHF 120.00',
     status: 'Active',
   },
+];
+
+export const categories = [
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'furniture', label: 'Furniture' },
+  { value: 'accessories', label: 'Accessories' },
+  { value: 'apparel', label: 'Apparel' },
 ];

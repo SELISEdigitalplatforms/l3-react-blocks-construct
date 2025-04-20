@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { Devices, GeneralInfo } from 'features/profile';
+import { DevicesTable, GeneralInfo } from 'features/profile';
 
 export function Profile() {
   const [tabId, setTabId] = useState('generalInfo');
@@ -28,7 +28,7 @@ export function Profile() {
         </TabsContent>
 
         <TabsContent value="devices">
-          <Devices />
+          <DevicesTable />
         </TabsContent>
       </Tabs>
     </div>

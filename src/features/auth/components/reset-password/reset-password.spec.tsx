@@ -12,8 +12,6 @@ type BasePasswordFormProps = {
   onSubmit: (password: string, code: string) => Promise<void>;
   isPending: boolean;
   code: string;
-  validationSchema: unknown;
-  defaultValues: unknown;
 };
 
 jest.mock('../../../../components/blocks/base-password-form/base-password-form', () => ({

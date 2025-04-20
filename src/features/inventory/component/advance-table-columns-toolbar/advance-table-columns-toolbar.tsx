@@ -1,8 +1,40 @@
-import { Download } from 'lucide-react';
+import { Download, Plus } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 import Papa from 'papaparse';
 import { AdvanceTableViewOptions } from '../advance-table-view-options/advance-table-view-options';
 import { Button } from 'components/ui/button';
+import { Link } from 'react-router-dom';
+
+/**
+ * A toolbar component for managing table columns, displaying selected row information,
+ * and providing export and item addition functionalities. The toolbar supports exporting
+ * selected rows to a CSV file and navigating to an "Add Item" page.
+ *
+ * @template TData - The type of data the table is displaying.
+ *
+ * @param {AdvancedTableColumnsToolbarProps<TData>} props - The properties for the columns toolbar.
+ * @param {Table<TData>} props.table - The table instance, which provides access to table state and methods.
+ * @param {string} props.title - The title to be displayed in the toolbar.
+ * @param {string[]} [props.disabledColumns] - A list of column IDs that are disabled for visibility toggling.
+ * @param {Record<string, boolean>} [props.columnVisibility] - An object that represents the visibility state
+ * of each column by column ID.
+ *
+ * @returns {JSX.Element} The rendered toolbar containing the following features:
+ * - Display of the title of the table.
+ * - Information about selected rows.
+ * - A button to export selected rows as a CSV file.
+ * - A button to add a new item, navigating to the inventory add page.
+ * - Options to toggle the visibility of table columns.
+ *
+ * @example
+ * // Example usage:
+ * <AdvancedTableColumnsToolbar
+ *   table={tableInstance}
+ *   title="Inventory Management"
+ *   disabledColumns={['price', 'stock']}
+ *   columnVisibility={{ name: true, stock: false }}
+ * />
+ */
 
 interface AdvancedTableColumnsToolbarProps<TData> {
   table: Table<TData>;
@@ -16,9 +48,14 @@ export function AdvancedTableColumnsToolbar<TData>({
   title,
   disabledColumns,
   columnVisibility,
-}: AdvancedTableColumnsToolbarProps<TData>) {
+}: Readonly<AdvancedTableColumnsToolbarProps<TData>>) {
   const selectedRows = table.getSelectedRowModel().rows;
   const selectedLength = selectedRows.length;
+
+  /**
+   * Exports the selected rows as a CSV file.
+   * If no rows are selected, the function returns early.
+   */
 
   const exportCSV = () => {
     if (selectedRows.length === 0) return;
@@ -41,7 +78,7 @@ export function AdvancedTableColumnsToolbar<TData>({
       <div className="flex items-center text-base text-high-emphasis">
         <h3 className="text-2xl font-bold tracking-tight">{title}</h3>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         {selectedLength ? (
           <div className="flex items-center gap-4">
             <p className="text-medium-emphasis text-sm font-normal">
@@ -59,6 +96,12 @@ export function AdvancedTableColumnsToolbar<TData>({
             table={table}
           />
         )}
+        <Link to="/inventory/add">
+          <Button size="sm" className="text-sm font-bold">
+            <Plus />
+            Add Item
+          </Button>
+        </Link>
       </div>
     </div>
   );

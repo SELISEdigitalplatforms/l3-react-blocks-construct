@@ -12,6 +12,34 @@ import {
 import { Checkbox } from 'components/ui/checkbox';
 import { Label } from 'components/ui/label';
 
+/**
+ * A component for managing column visibility options in a table. This component provides a dropdown menu
+ * that allows users to toggle the visibility of individual columns, as well as toggle all columns at once.
+ * It ensures that certain columns cannot be hidden (such as `itemName`, `stock`, `status`, and `price`),
+ * and allows for selective visibility management based on the provided props.
+ *
+ * @template TData - The type of data the table is displaying.
+ *
+ * @param {AdvanceTableViewOptionsProps<TData>} props - The properties for managing column visibility.
+ * @param {Table<TData>} props.table - The table instance that holds the state and structure of the table.
+ * @param {string[]} [props.disabledColumns=[]] - An optional list of column IDs that cannot be toggled for visibility.
+ * @param {Object} [props.columnVisibility={}] - An optional object where the keys are column IDs and the values are booleans
+ * indicating whether the respective column should be visible or not. This will override the default visibility.
+ *
+ * @returns {JSX.Element} The rendered column visibility options dropdown, which includes:
+ * - A "Select all" checkbox for toggling visibility of all columns at once.
+ * - A list of individual checkboxes for each column (except `select`) to toggle visibility.
+ * - Disabled columns are displayed with a different visual style to indicate that they cannot be toggled.
+ *
+ * @example
+ * // Example usage:
+ * <AdvanceTableViewOptions
+ *   table={tableInstance}
+ *   disabledColumns={['itemName', 'price']}
+ *   columnVisibility={{ stock: false, status: true }}
+ * />
+ */
+
 interface AdvanceTableViewOptionsProps<TData> {
   table: Table<TData>;
   disabledColumns?: string[];
@@ -22,7 +50,7 @@ export function AdvanceTableViewOptions<TData>({
   table,
   disabledColumns = [],
   columnVisibility = {},
-}: AdvanceTableViewOptionsProps<TData>) {
+}: Readonly<AdvanceTableViewOptionsProps<TData>>) {
   const [allChecked, setAllChecked] = useState(
     table.getAllColumns().every((column) => column.getIsVisible() || !column.getCanHide())
   );

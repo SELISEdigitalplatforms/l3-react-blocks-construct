@@ -14,7 +14,7 @@ const API_CONFIG: IAPIConfig = {
   baseUrl: process.env.REACT_APP_PUBLIC_BACKEND_URL,
   blocksKey: process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY,
   auth: {
-    token: '/authentication/v1/oauth/token',
+    token: '/authentication/v1/OAuth/Token',
   },
 };
 

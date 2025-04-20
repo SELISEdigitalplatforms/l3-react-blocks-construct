@@ -1,5 +1,5 @@
-import { Button } from '../../../components/ui/button';
-import emailSentIcon from '../../../assets/images/email_sent.svg';
+import { Button } from 'components/ui/button';
+import emailSentIcon from 'assets/images/email_sent.svg';
 import { Link } from 'react-router-dom';
 
 export function EmailVerification() {

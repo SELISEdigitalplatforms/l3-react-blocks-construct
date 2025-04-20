@@ -12,6 +12,7 @@ export const menuItems: MenuItem[] = [
     name: 'IAM',
     path: '/identity-management',
     icon: 'Users',
+    isIntegrated: true,
   },
   {
     id: 'inventory',
@@ -19,28 +20,34 @@ export const menuItems: MenuItem[] = [
     path: '/inventory',
     icon: 'Store',
   },
-  // {
-  //   id: 'services',
-  //   name: 'Services',
-  //   path: '/services',
-  //   icon: 'Server',
-  //   children: [
-  //     {
-  //       id: 'mail',
-  //       name: 'Mail',
-  //       path: '/services/mail',
-  //     },
-  //     {
-  //       id: 'storage',
-  //       name: 'Storage',
-  //       path: '/services/storage',
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 'help',
-  //   name: 'Help',
-  //   path: '/help',
-  //   icon: 'CircleHelp',
-  // },
+  {
+    id: 'mail',
+    name: 'Mail',
+    path: '/mail',
+    icon: 'Inbox',
+  },
+  {
+    id: 'calendar',
+    name: 'Calendar',
+    path: '/calendar',
+    icon: 'Calendar',
+  },
+  {
+    id: 'activity-log-v1',
+    name: 'Activity log 1',
+    path: '/activity-log-v1',
+    icon: 'FileClock',
+  },
+  {
+    id: 'activity-log-v2',
+    name: 'Activity log 2',
+    path: '/activity-log-v2',
+    icon: 'FileClock',
+  },
+  {
+    id: 'task-manager',
+    name: 'Task Manager',
+    path: '/task-manager',
+    icon: 'Presentation',
+  },
 ];

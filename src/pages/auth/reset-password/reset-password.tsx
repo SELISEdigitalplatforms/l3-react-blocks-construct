@@ -1,12 +1,11 @@
-import { redirect } from 'react-router-dom';
 import { useLayoutEffect } from 'react';
-import { useAuthState } from '../../../state/client-middleware';
-import { useSearchParams } from 'react-router-dom';
-import { ResetpasswordForm } from '../../../features/auth/components/reset-password';
+import { redirect, useSearchParams } from 'react-router-dom';
+import { useAuthState } from 'state/client-middleware';
+import { ResetpasswordForm } from 'features/auth/components/reset-password';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
-  const code = searchParams.get('code') || '';
+  const code = searchParams.get('code') ?? '';
   const { isMounted, isAuthenticated } = useAuthState();
 
   useLayoutEffect(() => {

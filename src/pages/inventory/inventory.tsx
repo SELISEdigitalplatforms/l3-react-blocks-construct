@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Table } from '@tanstack/react-table';
 import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
 import AdvanceDataTable from 'features/inventory/component/advance-data-table/advance-data-table';
 import { createAdvanceTableColumns } from 'features/inventory/component/advance-table-columns/advance-table-columns';
 import { InventoryData, inventoryData } from 'features/inventory/services/inventory-service';
 import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
 import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
-
 interface PaginationState {
   pageIndex: number;
   pageSize: number;
   totalCount: number;
 }
+
+const columns = createAdvanceTableColumns();
 
 export function Inventory() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +29,7 @@ export function Inventory() {
     const timer = setTimeout(() => {
       setData(inventoryData);
       setIsLoading(false);
-    }, 2000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -44,10 +46,24 @@ export function Inventory() {
   );
 
   const handleInventoryDetails = (data: InventoryData) => {
-    navigate(`/inventory-details/${data.itemId}`);
+    navigate(`/inventory/${data.itemId}`);
   };
 
-  const columns = createAdvanceTableColumns();
+  const renderColumnsToolbar = (table: Table<InventoryData>) => (
+    <AdvancedTableColumnsToolbar
+      disabledColumns={['itemName', 'stock', 'price', 'status']}
+      table={table}
+      title="Inventory"
+    />
+  );
+
+  const renderExpandRowContent = (rowId: string, colSpan: number) => (
+    <AdvanceExpandRowContent rowId={rowId} colSpan={colSpan} data={data} />
+  );
+
+  const renderFilterToolbar = (table: Table<InventoryData>) => (
+    <AdvanceTableFilterToolbar table={table} />
+  );
 
   return (
     <div className="flex w-full flex-col">
@@ -57,17 +73,9 @@ export function Inventory() {
         onRowClick={handleInventoryDetails}
         isLoading={isLoading}
         error={null}
-        columnsToolbar={(table) => (
-          <AdvancedTableColumnsToolbar
-            disabledColumns={['itemName', 'stock', 'price', 'status']}
-            table={table}
-            title="Inventory"
-          />
-        )}
-        filterToolbar={(table) => <AdvanceTableFilterToolbar table={table} />}
-        expandRowContent={(rowId, colSpan) => (
-          <AdvanceExpandRowContent rowId={rowId} colSpan={colSpan} data={data} />
-        )}
+        columnsToolbar={renderColumnsToolbar}
+        filterToolbar={renderFilterToolbar}
+        expandRowContent={renderExpandRowContent}
         pagination={{
           pageIndex: paginationState.pageIndex,
           pageSize: paginationState.pageSize,

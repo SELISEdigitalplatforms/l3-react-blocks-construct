@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,17 +7,57 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from 'components/ui/button';
 import { UPasswordInput } from 'components/core/u-password-input';
 import { SharedPasswordStrengthChecker } from '../../core/shared-password-strength-checker';
-import { ReCaptcha } from 'features/captcha/reCaptcha';
+import { Captcha } from 'features/captcha';
+
+/**
+ * BasePasswordForm Component
+ *
+ * A form component for password creation/reset that includes validation, strength checking,
+ * and optional CAPTCHA verification for enhanced security.
+ *
+ * Features:
+ * - Password and confirmation fields with validation
+ * - Password strength requirements checker
+ * - Optional Google reCAPTCHA integration
+ * - Form state management using React Hook Form
+ * - Zod schema validation
+ * - Loading state handling
+ * - Navigation after successful submission
+ *
+ * Props:
+ * @param {string} code - Verification code used for the password operation
+ * @param {(password: string, code: string, captchaToken?: string) => Promise<void>} onSubmit - Callback for form submission
+ * @param {z.ZodSchema} validationSchema - Zod schema for form validation
+ * @param {{password: string, confirmPassword: string}} defaultValues - Default values for the form fields
+ * @param {boolean} isPending - Loading state flag for form submission
+ * @param {boolean} [isCaptchaValid] - Optional flag indicating if CAPTCHA is valid
+ * @param {(isValid: boolean) => void} [onCaptchaValidation] - Optional callback when CAPTCHA validation state changes
+ *
+ * @returns {JSX.Element} A password form with validation and optional CAPTCHA
+ *
+ * @example
+ * // Basic usage
+ * <BasePasswordForm
+ *   code="reset123"
+ *   onSubmit={handlePasswordReset}
+ *   validationSchema={passwordSchema}
+ *   defaultValues={{ password: "", confirmPassword: "" }}
+ *   isPending={isSubmitting}
+ *   onCaptchaValidation={setIsCaptchaValid}
+ * />
+ */
 
 interface BasePasswordFormProps {
   code: string;
-  onSubmit: (password: string, code: string, captchaToken: string) => Promise<void>;
+  onSubmit: (password: string, code: string, captchaToken?: string) => Promise<void>;
   validationSchema: z.ZodSchema;
   defaultValues: {
     password: string;
     confirmPassword: string;
   };
   isPending: boolean;
+  isCaptchaValid?: boolean;
+  onCaptchaValidation?: (isValid: boolean) => void;
 }
 
 export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
@@ -26,27 +66,53 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
   validationSchema,
   defaultValues,
   isPending,
+  onCaptchaValidation,
 }) => {
   const navigate = useNavigate();
   const [requirementsMet, setRequirementsMet] = useState(false);
   const [captchaToken, setCaptchaToken] = useState('');
+  const [showCaptcha, setShowCaptcha] = useState(false);
+
+  const googleSiteKey = process.env.REACT_APP_GOOGLE_SITE_KEY || '';
 
   const form = useForm({
     defaultValues,
     resolver: zodResolver(validationSchema),
   });
 
-  const handleCaptchaVerify = (token: string) => {
+  const password = form.watch('password');
+  const confirmPassword = form.watch('confirmPassword');
+
+  useEffect(() => {
+    if (requirementsMet && password && confirmPassword && password === confirmPassword) {
+      setShowCaptcha(true);
+    } else {
+      setShowCaptcha(false);
+      if (captchaToken) {
+        setCaptchaToken('');
+        if (onCaptchaValidation) {
+          onCaptchaValidation(false);
+        }
+      }
+    }
+  }, [requirementsMet, password, confirmPassword, captchaToken, onCaptchaValidation]);
+
+  const handleCaptchaVerify = (token: React.SetStateAction<string>) => {
     setCaptchaToken(token);
+    if (onCaptchaValidation) {
+      onCaptchaValidation(!!token);
+    }
   };
 
   const handleCaptchaExpired = () => {
     setCaptchaToken('');
+    if (onCaptchaValidation) {
+      onCaptchaValidation(false);
+    }
   };
 
   const onSubmitHandler = async (values: { password: string; confirmPassword: string }) => {
     if (!captchaToken) {
-      // Show error or alert that captcha is required
       return;
     }
 
@@ -54,12 +120,11 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
       await onSubmit(values.password, code, captchaToken);
       navigate('/success');
     } catch (_error) {
-      // Error handling can be added here
+      // Handle error if needed
     }
   };
 
-  const password = form.watch('password');
-  const confirmPassword = form.watch('confirmPassword');
+  const isSubmitDisabled = isPending || !requirementsMet || !captchaToken;
 
   return (
     <Form {...form}>
@@ -98,16 +163,18 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
           onRequirementsMet={setRequirementsMet}
         />
 
-        <div className="my-2">
-          <ReCaptcha
-            siteKey="6LckI90qAAAAAK8RP2t0Nohwii1CeKOETsXPVNQA"
-            onVerify={handleCaptchaVerify}
-            onExpired={handleCaptchaExpired}
-            theme="light"
-            size="normal"
-            type="reCaptcha"
-          />
-        </div>
+        {showCaptcha && (
+          <div className="my-4">
+            <Captcha
+              type="reCaptcha"
+              siteKey={googleSiteKey}
+              theme="light"
+              onVerify={handleCaptchaVerify}
+              onExpired={handleCaptchaExpired}
+              size="normal"
+            />
+          </div>
+        )}
 
         <div className="flex gap-10 mt-5">
           <Button
@@ -115,7 +182,7 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
             size="lg"
             type="submit"
             loading={isPending}
-            disabled={isPending || !requirementsMet || !captchaToken}
+            disabled={isSubmitDisabled}
           >
             Confirm
           </Button>

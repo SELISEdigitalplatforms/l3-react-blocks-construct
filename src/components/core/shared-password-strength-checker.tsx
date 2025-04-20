@@ -2,6 +2,42 @@ import React, { useState, useEffect } from 'react';
 import { Check, X } from 'lucide-react';
 import { usePasswordStrength } from 'features/auth/hooks/use-password-strength/use-password-strength';
 
+/**
+ * SharedPasswordStrengthChecker Component
+ *
+ * A visual component that displays password strength and requirement checks
+ * to help users create strong, compliant passwords.
+ *
+ * Features:
+ * - Real-time password strength visualization with color indicators
+ * - Checklist of password requirements with pass/fail status
+ * - Password matching validation
+ * - Callback for parent components when all requirements are met
+ * - Styled container with consistent visual design
+ *
+ * Props:
+ * @param {string} password - The current password value to check against requirements
+ * @param {string} confirmPassword - The confirmation password to verify matching
+ * @param {(met: boolean) => void} onRequirementsMet - Callback that triggers when requirements status changes
+ *
+ * @returns {JSX.Element} A password strength indicator with requirement checklist
+ *
+ * @example
+ * // Basic usage
+ * <SharedPasswordStrengthChecker
+ *   password={password}
+ *   confirmPassword={confirmPassword}
+ *   onRequirementsMet={setIsValid}
+ * />
+ *
+ * @remarks
+ * This component relies on the `usePasswordStrength` hook which should provide:
+ * - `strength`: Numerical value (0-100) representing password strength
+ * - `checks`: Object with boolean values for each requirement
+ * - `getStrengthColor`: Function that returns appropriate CSS color class
+ * - `requirements`: Array of requirement objects with keys and labels
+ */
+
 interface SharedPasswordStrengthCheckerProps {
   password: string;
   confirmPassword: string;

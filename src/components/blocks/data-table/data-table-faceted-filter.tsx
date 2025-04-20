@@ -17,6 +17,31 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Separator } from 'components//ui/separator';
 
+/**
+ * DataTableFacetedFilter Component
+ *
+ * A filter component that allows users to filter data based on predefined options.
+ * The component displays a button with an icon, a label, and the number of selected filters.
+ * It allows users to open a popover to select from a list of available options.
+ * It integrates with `@tanstack/react-table` for setting the filter values based on the selected options.
+ *
+ * Features:
+ * - Displays a button with the title and selected options.
+ * - Allows users to filter data based on options passed as props.
+ * - Displays a popover with a list of options for users to select.
+ * - Shows a badge displaying the number of selected filters.
+ * - Allows clearing the applied filters.
+ *
+ * @template TData - The type of data used in the table.
+ * @template TValue - The type of value for the column being filtered.
+ *
+ * @param {Column<TData, TValue>} [column] - The column to be filtered, passed from `@tanstack/react-table`.
+ * @param {string} [title] - The title to be displayed for the filter button.
+ * @param {{ label: string; value: string; icon?: React.ComponentType<{ className?: string }> }[]} options - A list of options to be used in the filter. Each option contains a label, a value, and an optional icon.
+ *
+ * @returns {JSX.Element} A faceted filter component.
+ */
+
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title?: string;
@@ -31,7 +56,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
   options,
-}: DataTableFacetedFilterProps<TData, TValue>) {
+}: Readonly<DataTableFacetedFilterProps<TData, TValue>>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
 

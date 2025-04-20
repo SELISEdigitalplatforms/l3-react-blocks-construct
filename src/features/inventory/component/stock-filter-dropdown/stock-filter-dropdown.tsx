@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { Input } from 'components/ui/input';
 import { Updater } from '@tanstack/react-table';
 import {
@@ -11,16 +10,35 @@ import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { Button } from 'components/ui/button';
 import { Label } from 'components/ui/label';
 
+/**
+ * StockFilterDropdown is a dropdown component that allows users to filter stock items based on the stock amount.
+ * Users can specify a filter option (e.g., "Less than", "More than", "Equal to", or "No entry") and enter a stock amount to apply the filter.
+ * It provides an option to clear the filter.
+ *
+ * @component
+ * @example
+ * const setFilterValue = (filter) => {
+ *   // Logic to set the filter value
+ * };
+ * return (
+ *   <StockFilterDropdown setFilterValue={setFilterValue} />
+ * );
+ *
+ * @param {Object} props - The props for the StockFilterDropdown component.
+ * @param {function} props.setFilterValue - Callback function to set the selected filter value.
+ * @param {React.Ref} ref - A reference that can be used to call the `clearFilter` method.
+ *
+ * @returns {JSX.Element} The rendered StockFilterDropdown component.
+ */
+
 interface StockFilterDropdownProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFilterValue: (updater: Updater<any>) => void;
-  resetDropdownValue: boolean;
 }
 
-export function StockFilterDropdown({
-  setFilterValue,
-  resetDropdownValue,
-}: StockFilterDropdownProps) {
+const StockFilterDropdown = forwardRef<
+  { clearFilter: VoidFunction },
+  Readonly<StockFilterDropdownProps>
+>(({ setFilterValue }, ref) => {
   const [openStockDropdown, setOpenStockDropdown] = useState(false);
   const [stockAmount, setStockAmount] = useState('0');
   const [stockFilter, setStockFilter] = useState('');
@@ -53,11 +71,9 @@ export function StockFilterDropdown({
     setOpenStockDropdown(false);
   };
 
-  useEffect(() => {
-    if (resetDropdownValue) {
-      handleClearFilter();
-    }
-  }, [resetDropdownValue]);
+  useImperativeHandle(ref, () => ({
+    clearFilter: handleClearFilter,
+  }));
 
   return (
     <DropdownMenu open={openStockDropdown} onOpenChange={setOpenStockDropdown}>
@@ -102,4 +118,8 @@ export function StockFilterDropdown({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+});
+
+StockFilterDropdown.displayName = 'StockFilterDropdown';
+
+export default StockFilterDropdown;

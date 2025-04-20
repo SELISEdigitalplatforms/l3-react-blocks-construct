@@ -2,6 +2,35 @@ import { ReCaptcha } from './reCaptcha';
 import { HCaptcha } from './hCaptcha';
 import { CaptchaProps } from './index.type';
 
+/**
+ * Captcha Component
+ *
+ * A dynamic CAPTCHA renderer that supports both Google reCAPTCHA and hCaptcha.
+ * It accepts a `type` prop to determine which CAPTCHA to display, and passes through all additional props
+ * to the appropriate CAPTCHA component.
+ *
+ * Features:
+ * - Supports `reCaptcha` (Google) and `hCaptcha`
+ * - Throws errors for missing or unsupported `type`
+ * - Reuses underlying `<ReCaptcha />` and `<HCaptcha />` components
+ *
+ * Props:
+ * - `type`: `'reCaptcha' | 'hCaptcha'` (required) – defines which CAPTCHA provider to use
+ * - `...rest`: Additional props forwarded to the selected CAPTCHA component
+ *
+ * @param {CaptchaProps} props - The props for CAPTCHA selection and rendering
+ * @returns {JSX.Element} The rendered CAPTCHA component based on the provided type
+ *
+ * @throws {Error} If no `type` is passed or an unsupported `type` is provided
+ *
+ * @example
+ * <Captcha
+ *   type="reCaptcha"
+ *   siteKey={REACT_APP_GOOGLE_SITE_KEY}
+ *   onVerify={handleVerify}
+ * />
+ */
+
 export const Captcha = (props: CaptchaProps) => {
   const { type, ...rest } = props;
   if (!type) {

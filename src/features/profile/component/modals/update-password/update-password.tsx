@@ -22,6 +22,28 @@ import { useChangePassword } from 'features/profile/hooks/use-account';
 import { UpdatePasswordSuccess } from '../update-password-success/update-password-success';
 import { SharedPasswordStrengthChecker } from 'components/core/shared-password-strength-checker';
 
+/**
+ * Component to allow users to update their password.
+ * It includes form validation, password strength checking, and feedback on successful or failed password change.
+ *
+ * @component
+ *
+ * @param {Object} props - The component props.
+ * @param {Function} props.onClose - The function to call when the modal/dialog should be closed.
+ * @param {boolean} [props.open] - Optional flag to control the open state of the dialog.
+ * @param {Function} [props.onOpenChange] - Optional function to be called when the open state of the dialog changes.
+ *
+ * @returns {JSX.Element} - The rendered component.
+ *
+ * @example
+ * // Example usage
+ * <UpdatePassword
+ *   open={isDialogOpen}
+ *   onClose={() => setDialogOpen(false)}
+ *   onOpenChange={setDialogOpen}
+ * />
+ */
+
 type UpdatePasswordProps = {
   onClose: () => void;
   open?: boolean;
@@ -63,7 +85,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
           console.error('Error:', error);
           form.setError('oldPassword', {
             type: 'manual',
-            message: error?.error?.message || 'Failed to change password',
+            message: error?.error?.message ?? 'Failed to change password',
           });
         },
       }

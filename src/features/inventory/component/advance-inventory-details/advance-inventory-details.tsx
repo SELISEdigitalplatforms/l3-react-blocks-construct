@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
 import { Button } from 'components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 import { Separator } from 'components/ui/separator';
@@ -25,6 +26,24 @@ import {
   statusColors,
   tags,
 } from '../../services/inventory-service';
+
+/**
+ * A detailed view and editing interface for an individual inventory item.
+ * This component allows the user to view and edit general and additional information
+ * about an inventory item, including image management, tags, warranty, replacement eligibility, and discounts.
+ *
+ * @returns {JSX.Element} The rendered inventory detail view with the following features:
+ * - A button to navigate back to the previous page.
+ * - Editable fields for general information (e.g., item name, category, price, stock, etc.).
+ * - Image selection and management with a limit of 5 images.
+ * - Toggle switches for warranty, replacement eligibility, and discount status.
+ * - Tag management with search and selection functionality.
+ * - A button to edit the inventory item details, with options to cancel or save updates.
+ *
+ * @example
+ * // Example usage:
+ * <AdvanceInventoryDetails />
+ */
 
 export function AdvanceInventoryDetails() {
   const [selectedImage, setSelectedImage] = useState(images[0]);
@@ -77,36 +96,52 @@ export function AdvanceInventoryDetails() {
     editable: boolean,
     isSelect = false,
     options: string[] = []
-  ) => (
-    <div className="flex flex-col gap-2">
-      <Label>{label}</Label>
-      {!editable ? (
-        <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>{value}</span>
-      ) : isSelect ? (
-        <Select
-          defaultValue={value as string}
-          onValueChange={(newValue) => handleFieldChange(field, newValue)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={label} />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ) : (
+  ) => {
+    const renderContent = () => {
+      if (!editable) {
+        return (
+          <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>
+            {value}
+          </span>
+        );
+      }
+
+      if (isSelect) {
+        return (
+          <Select
+            defaultValue={value as string}
+            onValueChange={(newValue) => handleFieldChange(field, newValue)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={label} />
+            </SelectTrigger>
+            <SelectContent>
+              {options.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      }
+
+      return (
         <Input
           placeholder={`Enter ${label.toLowerCase()}`}
           defaultValue={value}
           onChange={(e) => handleFieldChange(field, e.target.value)}
         />
-      )}
-    </div>
-  );
+      );
+    };
+
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>{label}</Label>
+        {renderContent()}
+      </div>
+    );
+  };
 
   const statusOptions = Object.values(InventoryStatus);
 
@@ -118,14 +153,22 @@ export function AdvanceInventoryDetails() {
     }
   };
 
-  const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const newThumbnailArray = [...thumbnail, URL.createObjectURL(file)];
+  const onDrop = (acceptedFiles: File[]) => {
+    const remainingSlots = 5 - thumbnail.length;
+    const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+    if (filesToAdd.length > 0) {
+      const newImages = filesToAdd.map((file) => URL.createObjectURL(file));
+      const newThumbnailArray = [...thumbnail, ...newImages];
       setThumbnail(newThumbnailArray);
       setSelectedImage(newThumbnailArray[newThumbnailArray.length - 1]);
     }
   };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: true,
+  });
 
   return (
     <div className="flex flex-col w-full">
@@ -171,7 +214,7 @@ export function AdvanceInventoryDetails() {
                 <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border">
                   <img src={selectedImage} alt="Product" className="w-full h-full object-contain" />
                 </div>
-                <div className={`flex w-full items-center justify-between`}>
+                <div className="flex w-full items-center justify-between">
                   {thumbnail.map((img) => (
                     <div key={img} className="relative">
                       {editDetails && (
@@ -201,17 +244,12 @@ export function AdvanceInventoryDetails() {
                     </div>
                   ))}
                   {editDetails && thumbnail.length < 5 && (
-                    <div className="border border-dashed rounded-md w-12 h-12 flex items-center justify-center hover:bg-slate-100">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAddImage}
-                        style={{ display: 'none' }}
-                        id="image-upload"
-                      />
-                      <Label htmlFor="image-upload">
-                        <Plus className="text-high-emphasis cursor-pointer" />
-                      </Label>
+                    <div
+                      {...getRootProps()}
+                      className="border border-dashed rounded-md w-12 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                    >
+                      <input {...getInputProps()} />
+                      <Plus className="text-high-emphasis" />
                     </div>
                   )}
                 </div>

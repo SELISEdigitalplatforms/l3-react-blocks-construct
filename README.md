@@ -1,174 +1,173 @@
-# SELISE `<blocks />` Construct
+# SELISE `<blocks />` Constructᵇᵉᵗᵃ
 
 SELISE `<blocks/>` Construct is a fully functional application blueprint designed to accelerate development with **SELISE `<blocks />`**. Pre-integrated with SELISE `<blocks />` microservices, it offers a seamless full-stack foundation, complete with essential features, prebuilt modules, and practical use cases. Whether starting fresh or enhancing an existing project, **SELISE Blocks Construct** provides a scalable framework that streamlines workflows, ensures best practices, and maximizes **SELISE `<blocks />`'** capabilities.
 
+## Live Links
 
-### 🌍 Live Links  
+- **SELISE `<blocks />` Construct** → [construct.seliseblocks.com](https://construct.seliseblocks.com)
+- **SELISE `<blocks />` Cloud App** → [cloud.seliseblocks.com](https://cloud.seliseblocks.com)
 
-*SELISE `<blocks />` Construct* - https://construct.seliseblocks.com
+## Other Links
 
-*SELISE `<blocks />` Cloud App* - https://cloud.seliseblocks.com
+### Frontend
 
-### 🔗 Other Links  
+- **SELISE `<blocks />` CLI (NPM)** → [@seliseblocks/cli](https://www.npmjs.com/package/@seliseblocks/cli)
+- **GitHub Repository** → [l3-react-blocks-construct](https://github.com/SELISEdigitalplatforms/l3-react-blocks-construct)
 
-**Frontend**
+### Backend
 
-SELISE `<blocks />` cli npm package - https://www.npmjs.com/package/@seliseblocks/cli
-
-Open-source GitHub repo link - https://github.com/SELISEdigitalplatforms/l3-react-blocks-construct
-
-**Backend**
-
-SELISE `<blocks />` cli nuget package - https://www.nuget.org/packages/SeliseBlocks.CLI
-
-Open-source GitHub repo link - https://github.com/SELISEdigitalplatforms/l3-net-blocks-consumer
+- **SELISE `<blocks />` CLI (NuGet)** → [SeliseBlocks.CLI](https://www.nuget.org/packages/SeliseBlocks.CLI)
+- **GitHub Repository** → [l3-net-blocks-consumer](https://github.com/SELISEdigitalplatforms/l3-net-blocks-consumer)
 
 ---
 
+## Setting Up Blocks Construct Using CLI
 
+<details>
+  <summary><strong>1. Access SELISE Blocks Cloud </strong></summary>
 
+### Open the Cloud App
+1. In your browser, go to [SELISE `<blocks />` Cloud App](https://cloud.seliseblocks.com).
 
+### Create an Account
+1. Click **Sign Up** and follow the instructions to create an account.
+2. Once registered, log in with your credentials.
 
+### Access the Console
+1. After logging in, you will land on the **Console** where you can manage projects.
 
-
-
-## 📌 Setting Up Blocks Construct Using CLI
-
-
-### Step 1: Access SELISE `<blocks />` Cloud App's Console
-
-#### Visit SELISE `<blocks />` Cloud App
-
-- Open your browser and navigate to [SELISE `<blocks />` Cloud App](https://cloud.seliseblocks.com).
-
-#### Sign Up for an Account
-
-- Click on the **Sign Up** button to create a new account.
-
-#### Log In to Your Account
-
-- Once signed up, log in with your credentials and proceed to the **Console** section.
+</details>
 
 ---
 
-### Step 2: Create a New Project
+<details>
+  <summary><strong>2. Create a New Project</strong></summary>
 
-#### Start a New Project
+### Before You Begin
+Ensure that you:
+- Have a registered web domain for your application.
+- Have full administrative access to its DNS settings.
 
-- In the **Console**, click on **Create New Project**.
+### Create Your Project
+1. In the **Console**, click **Create New Project**.
+2. Enter a **unique project name**.
+3. Select an **environment**:
+   - Choose either **Sandbox** or **Production**.
+   - The page will expand to display the **domain input field**.
+4. (Optional) Enable **Cookie Domain**:
+   - Check the box to see the **cookie domain in use**.
+   - Follow the provided instructions for DNS settings.
+5. Click **Create** to initialize the project.
+6. The Console will update to display your project.
 
-#### Project Name (Step 1)
-
-- Enter a **unique name** for your project.
-
-#### Domain (Step 2)
-
-- Provide the **domain** associated with your project.
-
-#### Access Your Project Dashboard
-
-- After creating your project, navigate to the **Project Dashboard**.
+</details>
 
 ---
 
-### Step 3: Install SELISE Blocks CLI
+<details>
+  <summary><strong>3. Install SELISE Blocks CLI</strong></summary>
 
-#### Install SELISE Blocks CLI Globally
+### Check System Requirements
+Ensure your system has the following installed:
 
-**Prerequisites:** Make sure you have NVM and Node.js (version 20.x or later) installed on your machine before proceeding with the installation. 
+- **Node.js (v20.x or later)** → [Download Node.js](https://nodejs.org/en/download)
+- **NVM (Node Version Manager)** → [Install NVM](https://www.freecodecamp.org/news/how-to-install-node-in-your-machines-macos-linux-windows/)
+- **Git** → [Download Git](https://git-scm.com/downloads)
 
-Detailed installation steps - [How to Install Node on a MacOS, Linux, or Windows Machine Using NVM](https://www.freecodecamp.org/news/how-to-install-node-in-your-machines-macos-linux-windows/)
-
+### Install SELISE Blocks CLI
+Run the following command in your terminal:
 ```sh
 npm install -g @seliseblocks/cli
 ```
-**Note:** In case you are facing any permission-related issues on your Linux/MacOS, use `sudo` before the command.
+If you encounter permission issues on Linux/macOS, use:
+```sh
+sudo npm install -g @seliseblocks/cli
+```
 
-#### Verify the Installation (Optional)
-
+### Verify Installation
+To confirm installation, run:
+```sh
+blocks
+```
+To check the installed version:
 ```sh
 blocks v
-# or
-blocks version
 ```
 
-If you receive a version number, the installation is successful. If no response appears, re-run the previous command.
-![Screenshot 2025-02-10 at 2 39 24 PM](https://github.com/user-attachments/assets/ef2198cb-0040-44e4-8f36-50bf398892af)
-
-
+</details>
 
 ---
 
-### Step 4: Set Up Your Project
+<details>
+  <summary><strong>4. Create a New Project Locally</strong></summary>
 
-#### Create a New Project Locally
+### Initialize the Project
+1. Open a terminal.
+2. Run the following command:
+   ```sh
+   blocks new <project-name>
+   ```
+   - Replace `<project-name>` with your desired folder name. The repository will be cloned into this folder.
 
-```sh
-blocks new <project-name>
-```
+### Enter Project Details
+1. When prompted, enter the **domain** you registered earlier.
+2. Retrieve the **Project Key** from the **Project Dashboard**.
+3. Copy and paste the Project Key into the terminal when prompted.
+4. Configure cookies:
+   - You will be asked whether to enable or disable cookies.
+   - Use the **arrow keys** (Up/Down) to select your preference and press **Enter**.
+5. The repository will be downloaded with your project configured.
 
-Replace `<project-name>` with your project’s name.
-
-#### Enter Your Domain
-
-- When prompted, enter the domain you provided earlier.
-
-#### Enter the Project Key
-
-- Find your **Project Key** on your **Project Dashboard** and enter it when prompted.
-- The GitHub repository for **SELISE Blocks Construct** will now be cloned and installed on your local machine.
-
-
-#### Navigate to the Project Directory
-
-```sh
-cd <project-name>
-```
-
-Replace `<project-name>` with your actual project’s name.
+</details>
 
 ---
 
-### Step 5: Start SELISE Blocks Construct
+<details>
+  <summary><strong>5. Start SELISE Blocks Construct</strong></summary>
 
-#### Launch the Application
+### Navigate to the Project Directory
+1. In your terminal, navigate to the project folder:
+   ```sh
+   cd <project-name>
+   ```
+   Replace `<project-name>` with the actual project name.
 
-To run the project using your application domain, you will need to add an entry for your application domain in the hosts file of your machine. Then, use:
-
-```sh
-npm run start:local
-```
-How to give entry in the hostfile? [Please read this](https://www.manageengine.com/network-monitoring/how-to/how-to-add-static-entry.html)
-
-Or 
-
-To run the project using localhost, use:
-
+### Start the Application Locally
+Run the following command to start the project:
 ```sh
 npm start
 ```
 
-- The **login page** for your project should now appear.
+### Run Using Your Application Domain
+1. Add an entry for your domain in the **hosts file** of your machine. Follow [this guide](https://www.manageengine.com/network-monitoring/how-to/how-to-add-static-entry.html) for instructions.
+2. Register your site on **Google reCAPTCHA** by visiting [this page](https://www.google.com/recaptcha/admin/create).
+3. Update the `siteKey` value in your project wherever reCAPTCHA is integrated.
+
+Then, run:
+```sh
+npm run start:local
+```
+
+The **login page** should now be accessible.
+
+</details>
 
 ---
 
-### Step 6: Create and Log In
+<details>
+  <summary><strong>6. Create and Log In</strong></summary>
 
-#### Create a User on SELISE `<blocks />` Cloud App
+### Create a User
+1. In the **User Management Service** on [SELISE `<blocks />` Cloud App](https://cloud.seliseblocks.com/), invite a new user.
+2. The user will receive an activation email.
+3. They must click the activation link and set a password.
 
-- If you haven't already, invite a user from User Management Service on the [**SELISE `<blocks />` Cloud App**](https://cloud.seliseblocks.com/) application.
+### Log In to SELISE Blocks Construct
+- Go to your application's domain (the one you entered earlier) or use `localhost` if running locally, and log in using the newly created credentials.
 
-![Screenshot 2025-01-29 at 11 30 28 AM](https://github.com/user-attachments/assets/96185c96-a2e3-4502-8124-29a18f0ad30b)
+</details>
 
-An activation email will be sent to the user's email for your project portal. Upon clicking it, the user will be able to set a password for the portal, and their account will be activated.
+---
 
-#### Log In to SELISE Blocks Construct
-
-- Use your new credentials to log in to [**SELISE Blocks Construct**](https://construct.seliseblocks.com).
-
-
-
-
-## 🎯 You're all set!
-
-Now, you can start building and customizing your application using **SELISE Blocks Construct**. 🚀
+## Next Steps
+You are now ready to start building and customizing your application with **SELISE Blocks Construct**.

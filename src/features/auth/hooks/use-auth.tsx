@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   accountActivation,
   forgotPassword,
@@ -6,32 +7,55 @@ import {
   signin,
   signout,
   logoutAll,
+  PasswordSigninPayload,
+  MFASigninPayload,
 } from '../services/auth.service';
-import { useToast } from '../../../hooks/use-toast';
-import { useGlobalMutation } from '../../../state/query-client/hooks';
-import { useState } from 'react';
+import { useGlobalMutation } from 'state/query-client/hooks';
 import { ErrorResponse, useCustomToast } from './use-custom-toast/use-custom-toast';
 
-export const useSigninMutation = () => {
+/**
+ * Authentication Mutations
+ *
+ * A collection of reusable hooks for handling authentication-related operations using `useGlobalMutation`.
+ * These hooks manage server communication, error handling, and success feedback for various auth flows,
+ * including sign-in, sign-out, password reset, and account activation.
+ *
+ * Hooks:
+ * - `useSigninMutation`: Handles password or MFA-based sign-in logic with error messaging
+ * - `useSignoutMutation`: Handles user sign-out
+ * - `useAccountActivation`: Activates a newly registered user account with toast notifications
+ * - `useForgotPassword`: Sends a password reset link to the user's email
+ * - `useResetPassword`: Resets user password after verification
+ * - `useResendActivation`: Resends account activation link to user's email
+ * - `useLogoutAllMutation`: Logs out user from all devices
+ *
+ * Features:
+ * - Generic mutation handling using a global mutation wrapper
+ * - Custom toast notifications for success and error feedback
+ * - Flexible payload typing for sign-in variants (password or MFA)
+ * - Detailed error parsing and user-friendly messaging
+ *
+ * Example:
+ * ```tsx
+ * const { mutate: signin, errorDetails } = useSigninMutation<'password'>();
+ * signin({ username, password });
+ * ```
+ *
+ * @module authMutations
+ */
+
+export const useSigninMutation = <T extends 'password' | 'mfa_code'>() => {
   const [errorDetails, setErrorDetails] = useState({
     title: '',
     message: '',
   });
 
-  const { toast } = useToast();
-
   const mutation = useGlobalMutation({
     mutationKey: ['signin'],
-    mutationFn: signin,
+    mutationFn: async (payload: PasswordSigninPayload | MFASigninPayload) => signin<T>(payload),
     onSuccess: () => {
       setErrorDetails({ title: '', message: '' });
-      toast({
-        color: 'blue',
-        title: 'Success',
-        description: 'You are successfully logged in',
-      });
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
       let errorObj = error;
       try {

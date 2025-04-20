@@ -1,17 +1,17 @@
-import { Button } from '../../../components/ui/button';
-import githubIcon from '../../../assets/images/social_media_github.svg';
-import linkedinIcon from '../../../assets/images/social_media_in.svg';
-import microsoftIcon from '../../../assets/images/social_media_ms.svg';
-import googleIcon from '../../../assets/images/social_media_google.svg';
-import { SignupForm } from 'features/auth/components/signup-form';
 import { Link } from 'react-router-dom';
-import logo from '../../../assets/images/selise_Blocks_logo.svg';
+import { Button } from 'components/ui/button';
+import githubIcon from 'assets/images/social_media_github.svg';
+import linkedinIcon from 'assets/images/social_media_in.svg';
+import microsoftIcon from 'assets/images/social_media_ms.svg';
+import googleIcon from 'assets/images/social_media_google.svg';
+import { SignupForm } from 'features/auth/components/signup-form';
+import logo from 'assets/images/selise_Blocks_logo.svg';
 
 export function SignupPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="w-32 h-14 mb-2">
-        <img src={logo} alt="logo" />
+        <img src={logo} className="w-full h-full" alt="logo" />
       </div>
       <div>
         <h2 className="text-2xl font-bold text-high-emphasis">

@@ -10,6 +10,28 @@ import {
   SelectValue,
 } from 'components/ui/select';
 
+/**
+ * DataTablePagination Component
+ *
+ * A pagination component for navigating and controlling the page size of a data table.
+ * It integrates with the `@tanstack/react-table` pagination API to allow users to
+ * navigate between pages and select the number of rows per page.
+ *
+ * Features:
+ * - Displays the current page and total number of pages.
+ * - Allows selecting the number of rows per page from predefined options.
+ * - Includes navigation buttons to move to the first, previous, next, and last pages.
+ * - Optionally displays the number of selected rows in the table.
+ *
+ * @template TData - The type of data used in the table.
+ *
+ * @param {Table<TData>} table - The instance of the table being paginated, from `@tanstack/react-table`.
+ * @param {(pagination: { pageIndex: number; pageSize: number }) => void} [onPaginationChange] - Optional callback to handle pagination changes (e.g., when the page size or page index changes).
+ * @param {boolean} [showSelectedRowContent=true] - Whether to show the content related to selected rows (defaults to true).
+ *
+ * @returns {JSX.Element} A pagination component for controlling table pagination.
+ */
+
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
@@ -20,7 +42,7 @@ export function DataTablePagination<TData>({
   table,
   onPaginationChange,
   showSelectedRowContent = true,
-}: DataTablePaginationProps<TData>) {
+}: Readonly<DataTablePaginationProps<TData>>) {
   const totalRows = table.getFilteredRowModel().rows.length;
   const pageSizes = Array.from(
     { length: Math.min(5, Math.ceil(totalRows / 10)) },

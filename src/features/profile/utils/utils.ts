@@ -1,8 +1,22 @@
 import { z } from 'zod';
 
+export const createUserFormValidationSchema = z.object({
+  firstName: z.string().min(1, "First name can't be empty"),
+  lastName: z.string().min(1, "Last name can't be empty"),
+  email: z.string().email(),
+});
+
+export type CreateUserFormType = typeof profileFormDefaultvalue;
+
+export const createUserFormDefaultvalue = {
+  firstName: '',
+  lastName: '',
+  email: '',
+};
+
 export const profileFormValidationSchema = z.object({
   firstName: z.string().min(1, "First name can't be empty"),
-  lastName: z.string().min(1, "First name can't be empty"),
+  lastName: z.string().min(1, "Last name can't be empty"),
   // email: z.string().email(),
 });
 

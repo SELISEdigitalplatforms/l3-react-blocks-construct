@@ -1,5 +1,5 @@
-import { Button } from '../../../components/ui/button';
-import emailSentIcon from '../../../assets/images//verification-failed.svg';
+import { Button } from 'components/ui/button';
+import emailSentIcon from 'assets/images//verification-failed.svg';
 
 export function VerificationFailed() {
   return (

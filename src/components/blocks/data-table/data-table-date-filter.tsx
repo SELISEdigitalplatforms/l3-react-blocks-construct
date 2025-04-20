@@ -10,6 +10,31 @@ import usePopoverWidth from 'hooks/use-popover-width';
 import { Calendar } from 'components/ui/calendar';
 import { DateRange } from 'react-day-picker';
 
+/**
+ * DateRangeFilter Component
+ *
+ * A filter component that allows users to select a date range from a calendar.
+ * This component integrates with `@tanstack/react-table` to filter data based on the selected date range.
+ * It supports both desktop and mobile views, with responsive layouts and popover behavior.
+ *
+ * Features:
+ * - Allows users to select a range of dates using a calendar UI.
+ * - Displays the selected date range in the filter button.
+ * - Clears the selected date range with a "Clear filter" button.
+ * - Integrates with `@tanstack/react-table` to filter data based on the selected date range.
+ * - Supports mobile-friendly views with responsive layouts.
+ *
+ * @template TData - The type of data used in the table.
+ * @template TValue - The type of value for the column being filtered.
+ *
+ * @param {Column<TData, TValue>} [column] - The column to be filtered, passed from `@tanstack/react-table`.
+ * @param {string} title - The title to be displayed for the date range filter.
+ * @param {DateRange | undefined} date - The current selected date range.
+ * @param {(date: DateRange | undefined) => void} onDateChange - Callback to handle changes to the selected date range.
+ *
+ * @returns {JSX.Element} A date range filter component.
+ */
+
 interface DateRangeFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title: string;
@@ -22,27 +47,28 @@ export function DateRangeFilter<TData, TValue>({
   title,
   date,
   onDateChange,
-}: DateRangeFilterProps<TData, TValue>) {
+}: Readonly<DateRangeFilterProps<TData, TValue>>) {
   const isMobile = useIsMobile();
-  const [buttonRef, popoverWidth] = usePopoverWidth();
+  const [buttonRef] = usePopoverWidth();
   const [open, setOpen] = React.useState(false);
   const [localDateRange, setLocalDateRange] = React.useState<DateRange | undefined>(date);
+  const [month, setMonth] = React.useState<Date>(date?.from || new Date());
 
   React.useEffect(() => {
     setLocalDateRange(date);
+    if (date?.from) {
+      setMonth(date.from);
+    }
   }, [date]);
 
   const handleDateSelect = (selectedDateRange: DateRange | undefined) => {
     setLocalDateRange(selectedDateRange);
-
     onDateChange(selectedDateRange);
 
     if (selectedDateRange?.from && selectedDateRange?.to) {
       column?.setFilterValue(selectedDateRange);
-      setOpen(true);
     } else if (!selectedDateRange?.from) {
       column?.setFilterValue(undefined);
-      setOpen(true);
     }
   };
 
@@ -52,7 +78,14 @@ export function DateRangeFilter<TData, TValue>({
     setLocalDateRange(undefined);
     onDateChange(undefined);
     column?.setFilterValue(undefined);
+    setMonth(new Date());
     setOpen(false);
+  };
+
+  const handlePopoverKeyDown = (e: React.KeyboardEvent) => {
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      e.stopPropagation();
+    }
   };
 
   const hasActiveFilter = localDateRange?.from != null;
@@ -92,15 +125,25 @@ export function DateRangeFilter<TData, TValue>({
         className="p-0"
         align="start"
         sideOffset={8}
+        onKeyDown={handlePopoverKeyDown}
         style={{
-          width: isMobile ? (popoverWidth ? `${popoverWidth}px` : '100%') : 'auto',
+          width: '100%',
           maxWidth: '100vw',
+          background: 'white',
         }}
       >
-        <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <button
+          className="flex flex-col"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          type="button"
+        >
           <Calendar
             initialFocus
             mode="range"
+            month={month}
+            onMonthChange={setMonth}
             defaultMonth={localDateRange?.from || new Date()}
             selected={localDateRange || { from: new Date(), to: undefined }}
             onSelect={handleDateSelect}
@@ -112,7 +155,7 @@ export function DateRangeFilter<TData, TValue>({
               Clear filter
             </Button>
           </div>
-        </div>
+        </button>
       </PopoverContent>
     </Popover>
   );

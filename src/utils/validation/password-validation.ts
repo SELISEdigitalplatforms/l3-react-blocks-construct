@@ -2,11 +2,6 @@ import { z } from 'zod';
 
 const ALLOWED_SPECIAL_CHARS = '@$!%*?&';
 
-// const PASSWORD_REGEX = new RegExp(
-//   // eslint-disable-next-line no-useless-escape
-//   `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d${ALLOWED_SPECIAL_CHARS.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}]{8,30}$`
-// );
-
 const PASSWORD_REGEX = new RegExp(
   // eslint-disable-next-line no-useless-escape
   `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])[A-Za-z\\d\\W_]{8,30}$`
@@ -51,7 +46,7 @@ export const PASSWORD_REQUIREMENTS = [
   {
     key: 'number',
     label: 'At least 1 digit',
-    regex: (password: string) => /[0-9]/.test(password),
+    regex: (password: string) => /\d/.test(password),
   },
   {
     key: 'special',

@@ -37,7 +37,7 @@ export const usePasswordStrength = (password: string) => {
     const newChecks: PasswordChecks = {
       length: password.length >= 8 && password.length <= 30,
       case: /[a-z]/.test(password) && /[A-Z]/.test(password),
-      number: /[0-9]/.test(password),
+      number: /\d/.test(password),
       special: /[@$!%*?&]/.test(password),
     };
 
