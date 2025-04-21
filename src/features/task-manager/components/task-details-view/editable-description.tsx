@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from 'components/ui/button';
 import { ChevronDown, PenLine } from 'lucide-react';
 import { Label } from 'components/ui/label';
+import { useTaskDetails } from '../../hooks/use-task-details';
 
 interface EditableDescriptionProps {
+  taskId?: string;
   initialContent?: string;
   onContentChange?: (content: string) => void;
 }
 
-export function EditableDescription({ initialContent, onContentChange }: EditableDescriptionProps) {
+export function EditableDescription({ initialContent, onContentChange, taskId }: EditableDescriptionProps) {
+  const {task, updateTaskDetails} = useTaskDetails(taskId);
   const [content, setContent] = useState(initialContent);
   const [isEditing, setIsEditing] = useState(initialContent ? false : true);
   const [isHovering, setIsHovering] = useState(false);
@@ -38,6 +41,10 @@ export function EditableDescription({ initialContent, onContentChange }: Editabl
   const handleSave = () => {
     if (onContentChange) {
       content && onContentChange(content);
+    }
+
+    if (content && task) {
+      updateTaskDetails({ description: content });
     }
 
     setEditorComponent(null);

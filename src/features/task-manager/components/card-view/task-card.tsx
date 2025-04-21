@@ -30,21 +30,19 @@ export function TaskCard({ task, index, handleTaskClick }: ITaskCardProps) {
   };
 
   return (
-    <div
-      onClick={() => handleTaskClick(task.id)}
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="mb-3"
-    >
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="mb-3">
       <Card className="p-3 cursor-grab bg-white rounded-xl hover:shadow-md border-none">
         <div className="flex justify-between items-start">
           <div className="flex gap-2 flex-grow mr-2">
             <div className="mt-0.5 flex-shrink-0">
               <StatusCircle isCompleted={task.isCompleted} />
             </div>
-            <p className="text-sm text-gray-700 font-medium">{task.content}</p>
+            <p
+              onClick={() => handleTaskClick(task.id)}
+              className="text-sm text-gray-700 font-medium cursor-pointer hover:underline"
+            >
+              {task.content}
+            </p>
           </div>
           <div className="flex-shrink-0">
             <MoreVertical className="h-4 w-4 text-gray-400 cursor-pointer" />
@@ -64,14 +62,16 @@ export function TaskCard({ task, index, handleTaskClick }: ITaskCardProps) {
             {task.dueDate && (
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                <span>{new Date(task.dueDate)
-              .toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-              })
-              .split('/')
-              .join('/')}</span>
+                <span>
+                  {new Date(task.dueDate)
+                    .toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })
+                    .split('/')
+                    .join('/')}
+                </span>
               </div>
             )}
 

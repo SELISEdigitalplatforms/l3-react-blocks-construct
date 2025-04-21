@@ -14,7 +14,7 @@ interface TaskContextType {
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
-export const TaskProvider = ({ children }: { children: ReactNode }) => {
+export const TasksProvider = ({ children }: { children: ReactNode }) => {
   const [taskService] = useState(() => new TaskService());
   const [tasks, setTasks] = useState<TaskDetails[]>([]);
   const [iTasks, setITasks] = useState<ITask[]>([]);
@@ -27,7 +27,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   }, [taskService]);
 
   const toggleMark = () => {
-    setMark((prev) => !prev); // Toggle the mark state
+    setMark((prev) => !prev); 
   };
 
   const addTask = (task: TaskDetails) => {

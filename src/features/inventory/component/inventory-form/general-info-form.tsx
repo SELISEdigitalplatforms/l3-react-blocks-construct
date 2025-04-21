@@ -138,7 +138,10 @@ export function GeneralInfoForm({
           <Input
             id="price"
             value={formData.price}
-            onChange={(e) => handleInputChange('price', e.target.value)}
+            onChange={(e) => {
+              const numericValue = e.target.value.replace(/[^0-9.]/g, '');
+              handleInputChange('price', numericValue);
+            }}
             placeholder="Enter price"
           />
         </div>

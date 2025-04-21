@@ -10,7 +10,6 @@ import {
   DragEndEvent,
   DragOverlay,
 } from '@dnd-kit/core';
-import { useTasks } from 'features/task-manager/hooks/useTasks';
 import { ITask } from 'features/task-manager/types/task';
 import {
   NewTaskRow,
@@ -20,10 +19,9 @@ import {
 } from 'features/task-manager/components/list-view';
 import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { TaskDetails, TaskService } from 'features/task-manager/services/task-service';
-import { convertTasksToSampleTasks } from 'features/task-manager/services/convert-task';
 import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
-import { useTaskContext } from 'features/task-manager/hooks/use-task-context';
+import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
 
 interface TaskListViewProps {
   task?: TaskDetails[];
@@ -31,12 +29,11 @@ interface TaskListViewProps {
 }
 
 export function TaskListView({ taskService }: TaskListViewProps) {
-  const { tasks: modalTasks, addTask: modalAddTask } = useTaskContext();
-  const updatedTaskDetails = taskService.getTasks();
-  const taskData = convertTasksToSampleTasks(updatedTaskDetails);
-  const { tasks, addTask, deleteTask, updateTaskOrder, getFilteredTasks } = useTasks(taskData);
-  const [, setTasks] = useState<TaskDetails[]>(taskService.getTasks());
-  const [statusFilter] = useState<string | null>(null);
+  const { tasks,
+    createTask,
+    updateTaskOrder,
+    getFilteredTasks } = useListTasks();
+  const [statusFilter] = useState<"todo" | "inprogress" | "done" | null>(null);
   const [activeTask, setActiveTask] = useState<ITask | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
   const [isTaskDetailsModalOpen, setTaskDetailsModalOpen] = useState(false);
@@ -80,27 +77,7 @@ export function TaskListView({ taskService }: TaskListViewProps) {
   );
 
   const handleAddTask = (title: string, status: string) => {
-    const lastTask = modalTasks[modalTasks.length - 1];
-    const newId = lastTask ? String(Number(lastTask.id) + 1) : '1';
-    const newTask: TaskDetails = {
-      id: newId,
-      title,
-      mark: false,
-      section: status,
-      priority: '',
-      dueDate: null,
-      assignees: [],
-      description: '',
-      tags: [],
-      attachments: [],
-      comments: [],
-      isCompleted: false,
-    };
-    modalAddTask(newTask);
-    taskService.addTask(newTask);
-    setTasks(taskService.getTasks());
-
-    if (addTask(title, status as 'todo' | 'inprogress' | 'done')) {
+    if (createTask(title, status as 'todo' | 'inprogress' | 'done')) {
       setShowNewTaskInput(false);
     }
   };
@@ -138,12 +115,6 @@ export function TaskListView({ taskService }: TaskListViewProps) {
 
   const filteredTasks = getFilteredTasks(statusFilter);
   const taskIds = filteredTasks.map((task) => `task-${task.id}`);
-
-  const handleDeleteTask = (id: string) => {
-    deleteTask(id);
-    taskService.deleteTask(id);
-    setTaskDetailsModalOpen(false);
-  };
 
   const handleTaskClick = (id: string) => {
     setSelectedTaskId(id);
@@ -199,7 +170,6 @@ export function TaskListView({ taskService }: TaskListViewProps) {
             taskService={taskService}
             taskId={selectedTaskId}
             onClose={() => setTaskDetailsModalOpen(false)}
-            handleDeleteTask={handleDeleteTask}
           />
         )}
       </Dialog>

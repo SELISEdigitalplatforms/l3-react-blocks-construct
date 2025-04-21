@@ -28,7 +28,6 @@ export function SortableTaskItem({ task, handleTaskClick }: SortableTaskItemProp
 
   return (
     <div
-      onClick={() => handleTaskClick(task.id)}
       ref={setNodeRef}
       style={style}
       className={`flex items-center min-w-max border-b border-gray-200 hover:bg-gray-50 h-14 ${
@@ -48,7 +47,12 @@ export function SortableTaskItem({ task, handleTaskClick }: SortableTaskItemProp
       </div>
 
       <div className="w-64 pl-2 mr-4">
-        <p className="text-sm font-medium text-gray-900 truncate">{task.content}</p>
+        <p
+          onClick={() => handleTaskClick(task.id)}
+          className="text-sm font-medium text-gray-900 cursor-pointer hover:underline truncate"
+        >
+          {task.content}
+        </p>
       </div>
 
       <div className="w-24 flex-shrink-0">
@@ -58,7 +62,7 @@ export function SortableTaskItem({ task, handleTaskClick }: SortableTaskItemProp
       </div>
 
       <div className="w-24 flex-shrink-0">
-        <PriorityBadge priority={task.priority || 'low'} />
+        {task.priority && <PriorityBadge priority={task.priority} />}
       </div>
 
       <div className="w-28 flex-shrink-0">

@@ -3,8 +3,10 @@ import { PenLine } from 'lucide-react';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { TaskService } from '../../services/task-service';
+import { useTaskDetails } from '../../hooks/use-task-details';
 
 interface EditableHeadingProps {
+  taskId?: string;
   initialValue?: string;
   className?: string;
   onValueChange?: (value: string) => void;
@@ -13,11 +15,13 @@ interface EditableHeadingProps {
 }
 
 export function EditableHeading({
+  taskId,
   initialValue,
   className = '',
   onValueChange,
   isNewTaskModalOpen,
 }: EditableHeadingProps) {
+  const {task, updateTaskDetails} = useTaskDetails(taskId);
   const [value, setValue] = useState(initialValue);
   const [isEditing, setIsEditing] = useState(isNewTaskModalOpen);
   const [isHovering, setIsHovering] = useState(false);
@@ -31,7 +35,14 @@ export function EditableHeading({
   }, [isEditing]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    const newValue = e.target.value;
+    setValue(newValue);
+
+    if (task) {
+      // Create a new object to avoid mutating the original task
+      const updatedTask = { ...task, title: newValue };
+      updateTaskDetails(updatedTask);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -43,12 +54,14 @@ export function EditableHeading({
   };
 
   const saveChanges = () => {
+    value && setIsEditing(false);
     if (value && onValueChange) {
       onValueChange(value);
     }
   };
 
   const cancelEditing = () => {
+    value && setIsEditing(false);
     setValue(initialValue ?? '');
   };
 

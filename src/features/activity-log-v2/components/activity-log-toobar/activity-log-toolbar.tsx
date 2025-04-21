@@ -6,7 +6,14 @@ import { debounce } from 'lodash';
 import { DateRange } from 'react-day-picker';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from 'components/ui/command';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from 'components/ui/command';
 import { cn } from 'lib/utils';
 
 interface ActivityLogToolbarProps {
@@ -78,12 +85,11 @@ export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: Activi
 
   const handleClearModules = () => {
     setSelectedModules(new Set());
-
   };
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-      <div className="relative w-64">
+    <div className="flex flex-col gap-2 mt-2 sm:mt-0 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative w-full sm:w-64">
         <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
         <Input
           placeholder="Search by description..."
@@ -95,7 +101,7 @@ export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: Activi
 
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8 border-dashed">
+          <Button variant="outline" size="sm" className="h-8 border-dashed hidden sm:inline-flex">
             <PlusCircle />
             Date
           </Button>
@@ -119,7 +125,7 @@ export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: Activi
 
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="sm" className="h-8 border-dashed">
+          <Button variant="outline" size="sm" className="h-8 border-dashed hidden sm:inline-flex">
             <PlusCircle />
             Module
           </Button>

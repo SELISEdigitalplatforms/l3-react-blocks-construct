@@ -95,11 +95,6 @@ export function TaskColumn({
     setTaskDetailsModalOpen(true);
   };
 
-  const handleDeleteTask = (id: string) => {
-    taskService.deleteTask(id);
-    setTaskDetailsModalOpen(false);
-  };
-
   return (
     <div className="w-80 shrink-0">
       <div className="flex justify-between items-center mb-3 px-1">
@@ -177,7 +172,6 @@ export function TaskColumn({
             taskService={taskService}
             taskId={selectedTaskId}
             onClose={() => setTaskDetailsModalOpen(false)}
-            handleDeleteTask={handleDeleteTask}
             onTaskAddedList={onTaskAdded}
           />
         )}

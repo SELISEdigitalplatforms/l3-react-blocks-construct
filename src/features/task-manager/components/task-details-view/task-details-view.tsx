@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -21,9 +21,10 @@ import { AttachmentsSection } from './attachment-section';
 import { Separator } from 'components/ui/separator';
 import { Tags } from './tag-selector';
 import { AssigneeSelector } from './assignee-selector';
-import { EditableCommentInput } from './editable-comment-input';
+// import { EditableCommentInput } from './editable-comment-input';
 import { TaskDetails, TaskService } from '../../services/task-service';
 import { useTaskContext } from '../../hooks/use-task-context';
+import { useTaskDetails } from '../../hooks/use-task-details';
 
 interface Assignee {
   id: string;
@@ -35,7 +36,6 @@ type TaskDetailsViewProps = {
   onClose: () => void;
   taskId?: string;
   taskService: TaskService;
-  handleDeleteTask: (id: string) => void;
   isNewTaskModalOpen?: boolean;
   onTaskAddedList?: () => void;
   onTaskAddedCard?: (columnId: string, taskTitle: string) => void;
@@ -46,14 +46,12 @@ export default function TaskDetailsView({
   onClose,
   taskId,
   taskService,
-  handleDeleteTask,
   isNewTaskModalOpen,
   onTaskAddedList,
   onTaskAddedCard,
 }: TaskDetailsViewProps) {
-  const { tasks, addTask, toggleMark } = useTaskContext();
-  // const tasks = taskService.getTasks();
-  const task = tasks.find((task) => task.id === taskId);
+  const { tasks, addTask } = useTaskContext();
+  const { task, toggleTaskCompletion, removeTask, updateTaskDetails } = useTaskDetails(taskId);
   const [date, setDate] = useState<Date | undefined>(task?.dueDate ?? undefined);
   const [title, setTitle] = useState<string>(task?.title ?? '');
   const [mark, setMark] = useState<boolean>(task?.isCompleted ?? false);
@@ -62,7 +60,7 @@ export default function TaskDetailsView({
   const [priority, setPriority] = useState<string>(
     task?.priority === 'Low' || task?.priority === 'Medium' || task?.priority === 'High'
       ? task.priority
-      : '' // Default value
+      : ''
   );
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
@@ -144,6 +142,7 @@ export default function TaskDetailsView({
   const handlePriorityChange = (value: string) => {
     if (value === 'Low' || value === 'Medium' || value === 'High') {
       setPriority(value);
+      updateTaskDetails({ priority: value });
     }
   };
 
@@ -176,7 +175,7 @@ export default function TaskDetailsView({
 
   const handleAddItem = () => {
     if (isNewTaskModalOpen === true && onTaskAddedCard) {
-      onTaskAddedCard(section == "To Do" ? '1' : section == 'In Progress' ? '2' : '3', title);
+      onTaskAddedCard(section == 'To Do' ? '1' : section == 'In Progress' ? '2' : '3', title);
       const lastTask = tasks[tasks.length - 1];
       const newId = lastTask ? String(Number(lastTask.id) + 1) : '1';
       const newTask: TaskDetails = {
@@ -200,15 +199,26 @@ export default function TaskDetailsView({
   };
 
   const handleUpdateStatus = () => {
-    setMark(true);
-    toggleMark
-  }
+    setMark(!mark);
+    toggleTaskCompletion(!mark);
+  };
 
   const handleClose = () => {
     onClose();
     if (isNewTaskModalOpen) {
       handleAddItem();
     }
+  };
+
+  useEffect(() => {
+    if (task && section !== task.section) {
+      updateTaskDetails({ section });
+    }
+  }, [section, task, updateTaskDetails]);
+
+  const handleDeleteTask = () => {
+    removeTask();
+    onClose();
   };
 
   return (
@@ -221,6 +231,7 @@ export default function TaskDetailsView({
       >
         <div>
           <EditableHeading
+            taskId={taskId}
             taskService={taskService}
             isNewTaskModalOpen={isNewTaskModalOpen}
             initialValue={title}
@@ -299,7 +310,7 @@ export default function TaskDetailsView({
               <Input
                 value={date ? format(date, 'dd.MM.yyyy') : ''}
                 readOnly
-                placeholder='Choose a date'
+                placeholder="Choose a date"
                 className="h-[28px] px-2 py-1"
                 onClick={() => setShowCalendar(!showCalendar)}
               />
@@ -311,8 +322,12 @@ export default function TaskDetailsView({
                   mode="single"
                   selected={date}
                   onSelect={(newDate) => {
-                    setDate(newDate);
-                    setShowCalendar(false);
+                    if (newDate) {
+                      const formattedDate = new Date(newDate); // Format as 'YYYY-MM-DD'
+                      setDate(formattedDate); // Update local state
+                      updateTaskDetails({ dueDate: formattedDate }); // Trigger updateTaskDetails with the formatted date
+                    }
+                    setShowCalendar(false); // Close the calendar
                   }}
                   initialFocus
                 />
@@ -331,6 +346,7 @@ export default function TaskDetailsView({
 
         <div>
           <EditableDescription
+            taskId={taskId}
             initialContent={description}
             onContentChange={(newContent) => {
               setDescription(newContent);
@@ -348,23 +364,51 @@ export default function TaskDetailsView({
             <Label className="text-high-emphasis text-base font-semibold">Comments</Label>
             <div className="space-y-4 mt-3">
               {isWritingComment ? (
-                <EditableCommentInput
-                  initialContent={newCommentContent}
-                  onSubmit={(content) => {
-                    handleSubmitComment(content);
-                    setIsWritingComment(false);
-                  }}
-                  onCancel={handleCancelComment}
-                />
+                <>
+                  <div className="flex gap-2">
+                    <div className="h-10 w-10 rounded-full bg-gray-300 text-xs flex items-center justify-center border-2 border-white">
+                      {'B'}
+                    </div>
+                    <Input
+                      value={newCommentContent}
+                      placeholder="Write a comment..."
+                      className="flex-1 text-sm"
+                      onChange={(e) => setNewCommentContent(e.target.value)} // Update the comment content
+                    />
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-sm font-semibold border"
+                        onClick={handleCancelComment}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="text-sm font-semibold ml-2"
+                        onClick={() => {
+                          handleSubmitComment(newCommentContent); // Save the comment
+                          setIsWritingComment(false); // Exit writing mode
+                        }}
+                      >
+                        save
+                      </Button>
+                    </div>
+                  </div>
+                </>
               ) : (
                 <div className="flex gap-2">
                   <div className="h-10 w-10 rounded-full bg-gray-300 text-xs flex items-center justify-center border-2 border-white">
-                    {'P'}
+                    {'B'}
                   </div>
                   <Input
                     placeholder="Write a comment..."
                     className="flex-1 text-sm"
-                    onClick={handleStartWritingComment}
+                    onClick={handleStartWritingComment} // Enter writing mode
                     readOnly
                   />
                 </div>
@@ -386,7 +430,7 @@ export default function TaskDetailsView({
 
         <div className="flex justify-between mt-4">
           <Button
-            onClick={() => handleDeleteTask}
+            onClick={handleDeleteTask}
             variant="ghost"
             size="icon"
             className="text-red-500 bg-white w-12 h-10 border"
@@ -395,7 +439,7 @@ export default function TaskDetailsView({
           </Button>
           <div className="flex gap-2">
             {mark ? (
-              <Button variant="ghost" className="h-10 border" onClick={() => setMark(false)}>
+              <Button variant="ghost" className="h-10 border" onClick={handleUpdateStatus}>
                 <CircleDashed className="h-4 w-4 text-primary" />
                 <span className="text-sm font-bold text-black">Reopen Task</span>
               </Button>
