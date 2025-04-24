@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
+import { useCardTasks } from '../../hooks/use-card-tasks';
 
 interface NewTaskRowProps {
   onAdd: (title: string, status: string) => void;
@@ -17,8 +18,9 @@ interface NewTaskRowProps {
 }
 
 export function NewTaskRow({ onAdd, onCancel }: NewTaskRowProps) {
+  const { columns} = useCardTasks();
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
-  const [newTaskStatus, setNewTaskStatus] = useState<'todo' | 'inprogress' | 'done'>('todo');
+  const [newTaskStatus, setNewTaskStatus] = useState<string>('To Do');
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -52,16 +54,18 @@ export function NewTaskRow({ onAdd, onCancel }: NewTaskRowProps) {
       <div className="w-24 flex-shrink-0">
         <Select
           value={newTaskStatus}
-          onValueChange={(value) => setNewTaskStatus(value as 'todo' | 'inprogress' | 'done')}
+          onValueChange={setNewTaskStatus}
         >
           <SelectTrigger className="h-8 text-sm">
             <SelectValue placeholder="To Do" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="todo">To Do</SelectItem>
-              <SelectItem value="inprogress">In Progress</SelectItem>
-              <SelectItem value="done">Done</SelectItem>
+            {columns.map((column) => (
+                  <SelectItem key={column.id} value={column.title}>
+                    {column.title}
+                  </SelectItem>
+                ))}
             </SelectGroup>
           </SelectContent>
         </Select>

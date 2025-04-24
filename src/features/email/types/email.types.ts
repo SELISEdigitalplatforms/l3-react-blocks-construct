@@ -1,6 +1,6 @@
 export interface TEmail {
   id: string;
-  sender?: string;
+  sender?: string[];
   subject: string;
   preview: string;
   content?: string;
@@ -48,9 +48,9 @@ export interface TEmailData {
 export interface TFormProps {
   images: string[];
   attachments: string[];
-  to: string;
-  cc?: string;
-  bcc?: string;
+  to: string[];
+  cc?: string[];
+  bcc?: string[];
   subject: string;
 }
 
@@ -98,4 +98,7 @@ export interface EmailViewProps {
   onGoBack?: () => void;
   deleteEmailsPermanently: (emailIds: string[]) => void;
   restoreEmailsToCategory: (emailIds: string[]) => void;
+  expandedReplies: number[];
+  toggleExpand: (emailIds: number) => void;
+  onSetActiveActionFalse: () => void;
 }

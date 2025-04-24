@@ -7,7 +7,7 @@ export interface ITask {
   comments?: number;
   attachments?: number;
   assignees?: string[];
-  status?: 'todo' | 'inprogress' | 'done';
+  status?: string;
   isCompleted: boolean;
 }
 
@@ -33,3 +33,5 @@ export const statusDisplay = {
   inprogress: 'In Progress',
   done: 'Done',
 };
+
+export type TPriority = 'normal' | 'High' | 'Medium' | 'Low';

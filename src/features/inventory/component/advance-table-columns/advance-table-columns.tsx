@@ -2,6 +2,7 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { InventoryData, InventoryStatus, statusColors } from '../../services/inventory-service';
+import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
 /**
  * Creates column definitions for an advanced inventory table.
@@ -138,8 +139,15 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
     accessorFn: (row) => (row.lastupdated ? format(new Date(row.lastupdated), 'yyyy-MM-dd') : ''),
     cell: ({ row }) => {
       const lastUpdated = row.original.lastupdated;
+
+      // const date = lastUpdated
+      //   ? new Date(lastUpdated.replace(/\//g, '-')).toISOString().split('T')[0]
+      //   : '-';
+
       const date = lastUpdated
-        ? new Date(lastUpdated.replace(/\//g, '-')).toISOString().split('T')[0]
+        ? CustomtDateFormat(lastUpdated, {
+            showTime: false,
+          })
         : '-';
 
       return (

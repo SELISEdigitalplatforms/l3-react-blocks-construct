@@ -77,7 +77,7 @@ export function TaskListView({ taskService }: TaskListViewProps) {
   );
 
   const handleAddTask = (title: string, status: string) => {
-    if (createTask(title, status as 'todo' | 'inprogress' | 'done')) {
+    if (createTask(title, status)) {
       setShowNewTaskInput(false);
     }
   };

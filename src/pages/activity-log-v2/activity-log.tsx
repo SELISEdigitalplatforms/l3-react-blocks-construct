@@ -4,18 +4,26 @@ import ActivityLogTimeline from 'features/activity-log-v2/components/activity-lo
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
+const transformCategory = (category: string): string => {
+  return category.toLowerCase().replace(/\s+/g, '_');
+};
+
 export default function ActivityLogPage2() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [filteredActivities, setFilteredActivities] = useState(activities);
 
-  const filterActivities = (query: string, range: DateRange | undefined) => {
+  const filterActivities = (
+    query: string,
+    range: DateRange | undefined,
+    categories: string[]
+  ) => {
     let filtered = activities;
 
     if (range?.from && range?.to) {
       const fromDate = range.from.getTime();
       const toDate = range.to.getTime();
-
       filtered = filtered.filter((activity) => {
         const activityDate = new Date(activity.date).getTime();
         return activityDate >= fromDate && activityDate <= toDate;
@@ -33,17 +41,33 @@ export default function ActivityLogPage2() {
         .filter((group) => group.items.length > 0);
     }
 
+    if (categories.length > 0) {
+      filtered = filtered
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) =>
+            categories.includes(transformCategory(item.category))
+          ),
+        }))
+        .filter((group) => group.items.length > 0);
+    }
+
     setFilteredActivities(filtered);
   };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    filterActivities(query, dateRange);
+    filterActivities(query, dateRange, selectedCategory);
   };
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
     setDateRange(range);
-    filterActivities(searchQuery, range);
+    filterActivities(searchQuery, range, selectedCategory);
+  };
+
+  const handleCategoryChange = (categories: string[]) => {
+    setSelectedCategory(categories);
+    filterActivities(searchQuery, dateRange, categories);
   };
 
   return (
@@ -53,6 +77,8 @@ export default function ActivityLogPage2() {
         <ActivityLogToolbar
           onSearchChange={handleSearchChange}
           onDateRangeChange={handleDateRangeChange}
+          onCategoryChange={handleCategoryChange}
+          selectedCategory={selectedCategory}
         />
       </div>
       <ActivityLogTimeline activities={filteredActivities} />

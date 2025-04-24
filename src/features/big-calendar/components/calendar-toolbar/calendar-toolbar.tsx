@@ -36,7 +36,13 @@ import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
  * />
  */
 
-export const CalendarToolbar = ({ view, onNavigate, onView, label, views }: ToolbarProps) => {
+export const CalendarToolbar = ({
+  view,
+  onNavigate,
+  onView,
+  label,
+  views,
+}: Readonly<ToolbarProps>) => {
   const allViews = views as View[];
 
   return (

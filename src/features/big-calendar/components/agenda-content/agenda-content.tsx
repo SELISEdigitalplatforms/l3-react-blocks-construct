@@ -6,6 +6,7 @@ import { WEEK_DAYS } from '../../constants/calendar.constants';
 interface AgendaContentProps {
   events: CalendarEvent[];
   date: Date;
+  onSelectEvent?: (event: CalendarEvent) => void;
 }
 
 /**
@@ -31,7 +32,7 @@ interface AgendaContentProps {
  * <AgendaContent events={eventList} date={new Date()} />
  */
 
-export const AgendaContent = ({ events, date }: AgendaContentProps) => {
+export const AgendaContent = ({ events, date, onSelectEvent }: AgendaContentProps) => {
   const weekEvents = useMemo(() => {
     const startOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - date.getDay());
@@ -68,13 +69,15 @@ export const AgendaContent = ({ events, date }: AgendaContentProps) => {
                   {format(currentDay, 'MMM, EEE')}
                 </p>
               </div>
-              <div className="flex flex-col sm:w-[75%] w-full gap-2">
+              <div className="flex flex-col sm:w-[85%] w-full gap-2">
                 {weekEvents
                   .filter((event) => isSameDay(event.start, currentDay))
                   .map((event, index) => (
                     <div
                       key={index}
-                      className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6"
+                      role="button"
+                      onClick={() => onSelectEvent?.(event)}
+                      className="cursor-pointer flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 hover:bg-surface p-2 hover:rounded transition-colors"
                     >
                       <div className="flex items-center gap-3 w-full sm:w-[23%]">
                         <div

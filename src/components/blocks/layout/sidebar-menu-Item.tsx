@@ -81,7 +81,6 @@ export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
           <CollapsibleContent>
             <SidebarMenuSub>
               {item.children?.map((child) => {
-                // Check if current path starts with child path for nested routes
                 const isChildActive = pathname.startsWith(child.path);
                 return (
                   <SidebarMenuSubItem key={child.id}>

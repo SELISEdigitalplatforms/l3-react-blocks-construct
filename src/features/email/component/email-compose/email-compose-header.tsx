@@ -35,7 +35,7 @@ export function EmailComposeHeader({
   isMaximized,
 }: Readonly<EmailComposeHeaderProps>) {
   return (
-    <div className="hidden md:flex items-center bg-surface justify-between  rounded-t px-3 py-2">
+    <div className="hidden md:flex items-center bg-surface justify-between  rounded-t px-3 py-2 ">
       <div className="font-medium  text-medium-emphasis">New message</div>
       <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onMinimize}>

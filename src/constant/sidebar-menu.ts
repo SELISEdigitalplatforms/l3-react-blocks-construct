@@ -23,7 +23,7 @@ export const menuItems: MenuItem[] = [
   {
     id: 'mail',
     name: 'Mail',
-    path: '/mail',
+    path: '/mail/inbox',
     icon: 'Inbox',
   },
   {

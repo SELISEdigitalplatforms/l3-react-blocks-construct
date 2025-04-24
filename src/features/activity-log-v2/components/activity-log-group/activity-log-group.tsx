@@ -44,7 +44,7 @@ const ActivityLogGroup = ({ date, items, isLastIndex }: ActivityLogGroupProps) =
     <div className="relative">
       {items.map((activity, index) => (
         <ActivityLogItem
-          key={activity.time}
+          key={`${activity.time}-${index}`}
           {...activity}
           isEven={index % 2 === 0}
           isFirst={index === 0}

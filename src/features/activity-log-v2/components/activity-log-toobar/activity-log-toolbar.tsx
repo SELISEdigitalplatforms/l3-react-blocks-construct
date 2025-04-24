@@ -19,6 +19,8 @@ import { cn } from 'lib/utils';
 interface ActivityLogToolbarProps {
   onSearchChange?: (query: string) => void;
   onDateRangeChange?: (dateRange: DateRange | undefined) => void;
+  onCategoryChange: (categories: string[]) => void;
+  selectedCategory: string[];
 }
 
 type Module = {
@@ -27,19 +29,23 @@ type Module = {
 };
 
 const availableModules: Module[] = [
-  { id: '1', label: 'Task Manager' },
-  { id: '2', label: 'Calender' },
-  { id: '3', label: 'Email' },
-  { id: '4', label: 'IAM' },
-  { id: '5', label: 'Inventory' },
-  { id: '6', label: 'Dashboard' },
+  { id: 'task_manager', label: 'Task Manager' },
+  { id: 'calendar', label: 'Calendar' },
+  { id: 'mail', label: 'Email' },
+  { id: 'iam', label: 'IAM' },
+  { id: 'inventory', label: 'Inventory' },
+  { id: 'dashboard', label: 'Dashboard' },
 ];
 
-export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: ActivityLogToolbarProps) {
+export function ActivityLogToolbar({
+  onSearchChange,
+  onDateRangeChange,
+  onCategoryChange,
+  selectedCategory
+}: ActivityLogToolbarProps) {
   const [searchValue, setSearchValue] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
 
   const debouncedSearch = debounce((value: string) => {
     if (onSearchChange) {
@@ -71,20 +77,14 @@ export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: Activi
   };
 
   const handleModuleSelect = (moduleId: string) => {
-    setSelectedModules((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(moduleId)) {
-        newSet.delete(moduleId);
-      } else {
-        newSet.add(moduleId);
-      }
-
-      return newSet;
-    });
+    const newSelectedCategories = selectedCategory.includes(moduleId)
+      ? selectedCategory.filter(id => id !== moduleId)
+      : [...selectedCategory, moduleId];
+    onCategoryChange(newSelectedCategories);
   };
 
   const handleClearModules = () => {
-    setSelectedModules(new Set());
+    onCategoryChange([]);
   };
 
   return (
@@ -137,7 +137,7 @@ export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: Activi
               <CommandEmpty>No modules found.</CommandEmpty>
               <CommandGroup>
                 {availableModules.map((module) => {
-                  const isSelected = selectedModules.has(module.id);
+                  const isSelected = selectedCategory.includes(module.id);
                   return (
                     <CommandItem
                       key={module.id}
@@ -157,7 +157,7 @@ export function ActivityLogToolbar({ onSearchChange, onDateRangeChange }: Activi
                   );
                 })}
               </CommandGroup>
-              {selectedModules.size > 0 && (
+              {selectedCategory.length > 0 && (
                 <div className="border-t p-2">
                   <Button
                     variant="ghost"

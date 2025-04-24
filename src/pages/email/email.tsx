@@ -4,10 +4,10 @@ import { EmailSidebar } from 'features/email/component/email-sidebar/email-sideb
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { emailData } from 'features/email/services/email-data';
-import { TEmail } from 'features/email/types/email.types';
+import { TActiveAction, TEmail } from 'features/email/types/email.types';
 import {
-  ArchiveRestore,
   ArrowLeft,
+  History,
   Mail,
   MailOpen,
   Menu,
@@ -22,8 +22,11 @@ import { EmailCompose } from 'features/email';
 import { useDebounce } from 'features/email/services/use-debounce';
 import { makeFirstLetterUpperCase } from 'features/email/services/email';
 
+import EmailTooltipConfirmAction from 'features/email/component/email-ui/email-tooltip-confirm-action';
+
 export function Email() {
   const navigate = useNavigate();
+
   const { category, emailId } = useParams<{
     category: string;
     emailId?: string;
@@ -42,12 +45,20 @@ export function Email() {
     isCompose: false,
     isForward: false,
   });
+  const [activeAction, setActiveAction] = useState<TActiveAction>({
+    reply: false,
+    replyAll: false,
+    forward: false,
+  });
   const [isAllSelected, setIsAllSelected] = useState<boolean>(false);
   const [checkedEmailIds, setCheckedEmailIds] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const searchRef = useRef<HTMLInputElement | null>(null);
   const [hasUnreadSelected, setHasUnreadSelected] = useState(false);
+  const [isReplyVisible, setIsReplyVisible] = useState(false);
+  const [isCollapsedEmailSidebar, setIsCollapsedEmailSidebar] = useState(false);
+
   const debouncedSearch = useDebounce(searchTerm, 500);
 
   useEffect(() => {
@@ -61,6 +72,7 @@ export function Email() {
       } else {
         setFilteredEmails([]);
       }
+      setCheckedEmailIds([]);
     }
   }, [category, emailId, emails]);
 
@@ -71,8 +83,14 @@ export function Email() {
     }
   }, [emailId, filteredEmails]);
 
-  const handleComposeEmail = () => setIsComposing({ isCompose: true, isForward: false });
-  const handleComposeEmailForward = () => setIsComposing({ isCompose: false, isForward: true });
+  const handleComposeEmail = () => {
+    setIsComposing({ isCompose: true, isForward: false });
+    onSetActiveActionFalse();
+  };
+  const handleComposeEmailForward = () => {
+    setIsComposing({ isCompose: false, isForward: true });
+    onSetActiveActionFalse();
+  };
   const handleCloseCompose = () => setIsComposing({ isCompose: false, isForward: false });
 
   const updateEmail = (emailId: string, updates: Partial<TEmail>) => {
@@ -274,7 +292,7 @@ export function Email() {
     const filtered = allEmails.filter((email) => {
       return (
         email.subject?.toLowerCase().includes(lowerSearch) ||
-        email.sender?.toLowerCase().includes(lowerSearch)
+        email.sender?.join(' ').toLowerCase().includes(lowerSearch)
       );
     });
 
@@ -367,6 +385,13 @@ export function Email() {
         }
       }
     });
+
+    if (emailId && idsToRestore.includes(emailId)) {
+      setSelectedEmail(null);
+      if (category) {
+        navigate(`/mail/${category}`, { replace: true });
+      }
+    }
   };
 
   const deleteEmailsPermanently = (emailIds: string | string[]) => {
@@ -388,7 +413,50 @@ export function Email() {
     setCheckedEmailIds((prev) => prev.filter((id) => !idsToDelete.includes(id)));
     if (selectedEmail && idsToDelete.includes(selectedEmail.id)) {
       setSelectedEmail(null);
+      if (emailId && category) {
+        navigate(`/mail/${category}`, { replace: true });
+      }
     }
+  };
+
+  const handleEmailSelection = (email: TEmail) => {
+    setSelectedEmail(email);
+    setEmails((prev) => ({
+      ...prev,
+      ...(category
+        ? {
+            [category]: prev[category]?.map((e) =>
+              e.id === email.id ? { ...e, isRead: true } : e
+            ),
+          }
+        : {}),
+    }));
+    onSetActiveActionFalse();
+    setIsReplyVisible(false);
+    setCheckedEmailIds([]);
+    setIsComposing({ isCompose: false, isForward: false });
+    navigate(`/mail/${category}/${email.id}`);
+  };
+
+  const handleSetActive = (actionType: keyof TActiveAction) => {
+    setActiveAction((prevState) => {
+      const newState: TActiveAction = {
+        reply: false,
+        replyAll: false,
+        forward: false,
+      };
+      newState[actionType] = !prevState[actionType];
+      handleCloseCompose();
+      return newState;
+    });
+  };
+
+  const onSetActiveActionFalse = () => {
+    setActiveAction({
+      reply: false,
+      replyAll: false,
+      forward: false,
+    });
   };
 
   return (
@@ -396,12 +464,23 @@ export function Email() {
       {/* Grid View */}
       <div className="hidden md:block w-full ">
         <div className="flex bg-white ">
-          <div className=" p-4 md:min-w-[280px] md:max-w-[280px] ">
+          <div
+            className={`p-4 transition-all duration-300 ${
+              isCollapsedEmailSidebar
+                ? 'md:min-w-[70px] md:max-w-[70px]'
+                : 'md:min-w-[280px] md:max-w-[280px]'
+            }
+            
+        `}
+          >
             <h2 className="text-2xl font-bold tracking-tight">Mail</h2>
           </div>
-          <div className="hidden md:flex   border-l justify-between w-full  px-4 py-3 border-b border-Low-Emphasis">
+          <div className="hidden md:flex   border-l justify-between w-full  px-4 py-3 ">
             <div className="flex items-center gap-4">
-              <Menu className="w-6 h-6 text-medium-emphasis" />
+              <Menu
+                className="w-6 h-6 text-medium-emphasis cursor-pointer"
+                onClick={() => setIsCollapsedEmailSidebar(!isCollapsedEmailSidebar)}
+              />
               {makeFirstLetterUpperCase(category || '')}
             </div>
             <div className="flex items-center  gap-4">
@@ -466,38 +545,25 @@ export function Email() {
                   )}
                   {(category === 'trash' || category === 'spam') && (
                     <>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <ArchiveRestore
-                            className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
-                            onClick={() => restoreEmailsToCategory(checkedEmailIds)}
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          className="bg-surface text-medium-emphasis"
-                          side="top"
-                          align="center"
-                        >
-                          <p>Restore {checkedEmailIds.length} items</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Trash2
-                            className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
-                            onClick={() => {
-                              deleteEmailsPermanently(checkedEmailIds);
-                            }}
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          className="bg-surface text-medium-emphasis"
-                          side="top"
-                          align="center"
-                        >
-                          <p>Delete {checkedEmailIds.length} items Permanently</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <EmailTooltipConfirmAction
+                        tooltipLabel={`Restore ${checkedEmailIds.length} items`}
+                        confirmTitle="Restore Emails"
+                        confirmDescription={`Are you sure you want to restore ${checkedEmailIds.length} selected item(s)?`}
+                        onConfirm={() => restoreEmailsToCategory(checkedEmailIds)}
+                        toastDescription={`Restored ${checkedEmailIds.length} items`}
+                      >
+                        <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
+                      </EmailTooltipConfirmAction>
+
+                      <EmailTooltipConfirmAction
+                        tooltipLabel={`Delete ${checkedEmailIds.length} items permanently`}
+                        confirmTitle="Delete Emails Permanently"
+                        confirmDescription={`Are you sure you want to permanently delete ${checkedEmailIds.length} selected item(s)? This action cannot be undone.`}
+                        onConfirm={() => deleteEmailsPermanently(checkedEmailIds)}
+                        toastDescription={`Deleted ${checkedEmailIds.length} items`}
+                      >
+                        <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
+                      </EmailTooltipConfirmAction>
                     </>
                   )}
                   {category !== 'trash' && category !== 'spam' && (
@@ -556,10 +622,11 @@ export function Email() {
                 isComposing={isComposing}
                 handleComposeEmail={handleComposeEmail}
                 handleCloseCompose={handleCloseCompose}
+                isCollapsedEmailSidebar={isCollapsedEmailSidebar}
               />
             </div>
 
-            <div className="flex w-full">
+            <div className="flex w-full border-t border-Low-Emphasis">
               <div className="flex flex-1 flex-col border-x w-full border-Low-Emphasis">
                 <EmailList
                   emails={filteredEmails}
@@ -572,9 +639,10 @@ export function Email() {
                   checkedEmailIds={checkedEmailIds}
                   isComposing={isComposing}
                   handleComposeEmail={handleComposeEmail}
+                  handleEmailSelection={handleEmailSelection}
                 />
               </div>
-              <div className=" flex w-full border-x border-Low-Emphasis">
+              <div className=" flex w-full border-x border-t border-Low-Emphasis">
                 <EmailView
                   isComposing={isComposing}
                   handleCloseCompose={handleCloseCompose}
@@ -593,6 +661,12 @@ export function Email() {
                   category={category || ''}
                   restoreEmailsToCategory={restoreEmailsToCategory}
                   deleteEmailsPermanently={deleteEmailsPermanently}
+                  activeAction={activeAction}
+                  setActiveAction={setActiveAction}
+                  isReplyVisible={isReplyVisible}
+                  setIsReplyVisible={setIsReplyVisible}
+                  handleSetActive={handleSetActive}
+                  onSetActiveActionFalse={onSetActiveActionFalse}
                 />
               </div>
             </div>
@@ -626,7 +700,7 @@ export function Email() {
               {checkedEmailIds.length === 0 && !selectedEmail && (
                 <>
                   <div className="flex gap-3 items-center ">
-                    <Menu className="h-4 w-4 cursor-pointer" onClick={() => onGoBack()} />
+                    <Menu className="h-4 w-4 cursor-pointer" onClick={() => navigate('/mail')} />
                     <div className="text-xl font-semibold">{category}</div>
                   </div>
                   <div className="flex items-center justify-end gap-2 flex-1 ">
@@ -743,38 +817,27 @@ export function Email() {
                     )}
                     {(category === 'trash' || category === 'spam') && (
                       <>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <ArchiveRestore
-                              className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
-                              onClick={() => restoreEmailsToCategory(checkedEmailIds)}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent
-                            className="bg-surface text-medium-emphasis"
-                            side="top"
-                            align="center"
+                        <>
+                          <EmailTooltipConfirmAction
+                            tooltipLabel={`Restore ${checkedEmailIds.length} items`}
+                            confirmTitle="Restore Emails"
+                            confirmDescription={`Are you sure you want to restore ${checkedEmailIds.length} selected item(s)?`}
+                            onConfirm={() => restoreEmailsToCategory(checkedEmailIds)}
+                            toastDescription={`Restored ${checkedEmailIds.length} items`}
                           >
-                            <p>Restore {checkedEmailIds.length} items</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Trash2
-                              className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
-                              onClick={() => {
-                                deleteEmailsPermanently(checkedEmailIds);
-                              }}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent
-                            className="bg-surface text-medium-emphasis"
-                            side="top"
-                            align="center"
+                            <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
+                          </EmailTooltipConfirmAction>
+
+                          <EmailTooltipConfirmAction
+                            tooltipLabel={`Delete ${checkedEmailIds.length} items permanently`}
+                            confirmTitle="Delete Emails Permanently"
+                            confirmDescription={`Are you sure you want to permanently delete ${checkedEmailIds.length} selected item(s)? This action cannot be undone.`}
+                            onConfirm={() => deleteEmailsPermanently(checkedEmailIds)}
+                            toastDescription={`Deleted ${checkedEmailIds.length} items`}
                           >
-                            <p>Delete {checkedEmailIds.length} items Permanently</p>
-                          </TooltipContent>
-                        </Tooltip>
+                            <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
+                          </EmailTooltipConfirmAction>
+                        </>
                       </>
                     )}
                   </div>
@@ -794,6 +857,7 @@ export function Email() {
                   checkedEmailIds={checkedEmailIds}
                   isComposing={isComposing}
                   handleComposeEmail={handleComposeEmail}
+                  handleEmailSelection={handleEmailSelection}
                 />
               </div>
             )}
@@ -818,6 +882,12 @@ export function Email() {
                   category={category || ''}
                   restoreEmailsToCategory={restoreEmailsToCategory}
                   deleteEmailsPermanently={deleteEmailsPermanently}
+                  activeAction={activeAction}
+                  setActiveAction={setActiveAction}
+                  isReplyVisible={isReplyVisible}
+                  setIsReplyVisible={setIsReplyVisible}
+                  handleSetActive={handleSetActive}
+                  onSetActiveActionFalse={onSetActiveActionFalse}
                 />
               </div>
             )}

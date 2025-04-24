@@ -41,10 +41,9 @@ export interface TaskDetails {
 }
 
 export class TaskService {
-  private tasks: TaskDetails[]; // Manage an array of tasks
+  private tasks: TaskDetails[];
 
   constructor() {
-    // Initialize with dummy data
     this.tasks = [
       {
         id: '1',

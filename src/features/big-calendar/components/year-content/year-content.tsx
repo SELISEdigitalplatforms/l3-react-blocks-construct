@@ -57,7 +57,7 @@ interface YearContentProps {
  *   onSelectEvent={(eventOrDate) => console.log('Selected:', eventOrDate)}
  * />
  */
-export const YearContent = ({ date, events, onSelectEvent }: YearContentProps) => {
+export const YearContent = ({ date, events, onSelectEvent }: Readonly<YearContentProps>) => {
   const yearStart = startOfYear(date);
   const eventDates = new Set(events.map((event) => format(event.start, 'yyyy-MM-dd')));
 
@@ -127,7 +127,7 @@ const renderMonthDays = (
     const dayEvents = events.filter((event) => format(event.start, 'yyyy-MM-dd') === dateString);
 
     const handleClick = () => {
-      if (dayEvents.length > 0) {
+      if (dayEvents.length === 1) {
         onSelectEvent(dayEvents[0]);
       } else {
         onSelectEvent(day);

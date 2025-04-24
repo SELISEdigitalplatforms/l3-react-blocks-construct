@@ -47,9 +47,11 @@ import {
 interface ConfirmationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
+  title: string | React.ReactNode;
   description: string | React.ReactNode;
   onConfirm: () => void;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -58,6 +60,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   title,
   description,
   onConfirm,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -69,9 +73,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="rounded-[6px]">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="rounded-[6px]">{cancelText}</AlertDialogCancel>
           <AlertDialogAction className="bg-primary rounded-[6px]" onClick={onConfirm}>
-            Confirm
+            {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

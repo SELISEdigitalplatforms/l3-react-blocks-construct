@@ -7,7 +7,7 @@ import {
 } from 'components/ui/dropdown-menu';
 import { TActiveAction, TEmail } from '../../types/email.types';
 import { Button } from 'components/ui/button';
-import EmailAvatar from '../email-ui/email-avatar';
+import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
 
 /**
  * EmailViewResponseMore component provides additional email response options such as Reply, Reply All, Forward,
@@ -98,7 +98,7 @@ const EmailActionsPanel = ({
         <div className="">
           {activeAction.reply && (
             <Button variant={'outline'}>
-              <EmailAvatar
+              <CustomAvatar
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg"
                 alt="Profile avatar"
                 height={24}
@@ -110,7 +110,7 @@ const EmailActionsPanel = ({
           {activeAction.replyAll && (
             <div className="flex gap-2">
               <Button variant={'outline'}>
-                <EmailAvatar
+                <CustomAvatar
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg"
                   alt="Profile avatar"
                   height={24}
@@ -119,7 +119,7 @@ const EmailActionsPanel = ({
                 <span className="hidden md:block">{selectedEmail?.sender}</span>
               </Button>
               <Button variant={'outline'}>
-                <EmailAvatar
+                <CustomAvatar
                   src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Profile avatar"
                   height={24}
@@ -128,7 +128,7 @@ const EmailActionsPanel = ({
                 <span className="hidden md:block">{selectedEmail?.sender}</span>
               </Button>
               <Button variant={'outline'}>
-                <EmailAvatar
+                <CustomAvatar
                   src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Profile avatar"
                   height={24}

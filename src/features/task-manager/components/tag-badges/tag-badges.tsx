@@ -8,7 +8,7 @@ interface TagProps {
  * A single tag badge component
  */
 export function Tag({ name, className = '', onClick }: TagProps) {
-  const defaultClasses = 'px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs';
+  const defaultClasses = 'inline-flex px-2 h-[22px] items-center bg-surface text-xs text-high-emphasis font-normal border rounded-lg';
 
   return (
     <span

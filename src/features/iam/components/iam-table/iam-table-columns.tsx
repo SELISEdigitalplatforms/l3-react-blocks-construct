@@ -3,6 +3,7 @@ import { Badge } from 'components/ui/badge';
 import { DataTableColumnHeader } from '../../../../components/blocks/data-table/data-table-column-header';
 import { IamData } from '../../services/user-service';
 import { DataTableRowActions } from './iam-table-row-actions';
+import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
 /**
  * Creates the columns for the IAM (Identity and Access Management) table.
@@ -100,16 +101,7 @@ export const createIamTableColumns = ({
       const date = new Date(row.original.createdDate);
       return (
         <div className="flex items-center">
-          <span>
-            {new Date(date)
-              .toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-              })
-              .split('/')
-              .join('/')}
-          </span>
+          <span>{CustomtDateFormat(date)}</span>
         </div>
       );
     },
@@ -135,16 +127,7 @@ export const createIamTableColumns = ({
       }
       return (
         <div>
-          <span>
-            {new Date(date)
-              .toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-              })
-              .split('/')
-              .join('/')}
-          </span>
+          <span>{CustomtDateFormat(date)}</span>
         </div>
       );
     },

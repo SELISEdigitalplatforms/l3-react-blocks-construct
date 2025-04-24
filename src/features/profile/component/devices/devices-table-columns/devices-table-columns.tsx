@@ -2,6 +2,7 @@ import { Monitor, Smartphone, Trash } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { IDeviceSession } from '../../../services/device.service';
+import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
 /**
  * Custom hook that defines and returns the columns for the device session table.
@@ -32,10 +33,10 @@ export const useDeviceTableColumns = () => {
     return <Monitor className="w-5 h-5 text-secondary" />;
   };
 
-  const formatDate = (date: Date) => {
-    if (!date) return '';
-    return new Date(date).toLocaleString();
-  };
+  // const formatDate = (date: Date) => {
+  //   if (!date) return '';
+  //   return new Date(date).toLocaleString();
+  // };
 
   const BrowserCell = ({ deviceInfo }: IBrowserCellProps) => {
     return <span>{deviceInfo?.Browser ?? 'Unknown Browser'}</span>;
@@ -63,7 +64,7 @@ export const useDeviceTableColumns = () => {
     {
       id: 'lastAccessed',
       header: () => <span className="flex w-[150px] items-center md:w-[200px]">Last Accessed</span>,
-      cell: ({ row }) => <span>{formatDate(row.original.UpdateDate)}</span>,
+      cell: ({ row }) => <span>{CustomtDateFormat(row.original.UpdateDate)}</span>,
     },
     {
       id: 'actions',

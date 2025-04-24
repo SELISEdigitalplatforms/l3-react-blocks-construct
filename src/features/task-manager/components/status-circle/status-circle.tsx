@@ -34,9 +34,9 @@ interface StatusCircleProps {
 export function StatusCircle({ isCompleted }: StatusCircleProps) {
   if (isCompleted) {
     return (
-      <div className="w-4 h-4 rounded-full border-2 border-green-400 flex items-center justify-center">
+      <div className="w-4 h-4 rounded-full border-2 border-secondary flex items-center justify-center">
         <svg
-          className="w-3 h-3 text-green-400"
+          className="w-3 h-3 text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -53,5 +53,5 @@ export function StatusCircle({ isCompleted }: StatusCircleProps) {
     );
   }
 
-  return <div className="w-4 h-4 rounded-full border-2 border-dashed border-blue-400"></div>;
+  return <div className="w-4 h-4 rounded-full border-2 border-dashed border-secondary"></div>;
 }

@@ -72,14 +72,6 @@ export const BigCalendarHeader = ({
   const [openSheet, setOpenSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
 
-  const handleFilters = () => {
-    setOpenSheet(true);
-  };
-
-  const handleSettings = () => {
-    setOpenSettingsSheet(true);
-  };
-
   useEffect(() => {
     if (openSheet || openSettingsSheet) {
       document.body.style.overflow = 'hidden';
@@ -97,7 +89,7 @@ export const BigCalendarHeader = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <h1 className="text-2xl font-bold leading-9">{title}</h1>
         <div className="flex items-center gap-2 sm:justify-end">
-          <div className="relative w-[45%]">
+          <div className="relative w-full sm:w-[45%]">
             <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
             <Input
               placeholder={searchPlaceholder}
@@ -109,7 +101,7 @@ export const BigCalendarHeader = ({
             variant="outline"
             size="sm"
             className="text-sm font-bold sm:min-w-[116px]"
-            onClick={handleFilters}
+            onClick={() => setOpenSheet(true)}
           >
             <ListFilter className="w-5 h-5" />
             <span className="sr-only sm:not-sr-only">Filters</span>
@@ -118,7 +110,7 @@ export const BigCalendarHeader = ({
             variant="outline"
             size="sm"
             className="text-sm font-bold sm:min-w-[116px]"
-            onClick={handleSettings}
+            onClick={() => setOpenSettingsSheet(true)}
           >
             <Settings className="w-5 h-5" />
             <span className="sr-only sm:not-sr-only">Settings</span>

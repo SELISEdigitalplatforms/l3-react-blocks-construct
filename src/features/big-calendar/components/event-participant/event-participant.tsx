@@ -59,8 +59,8 @@ export const EventParticipant = ({
     return Array.from(uniqueMap.values());
   }, [editMembers]);
 
-  const filteredMembers = allMembers.filter((member) =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMembers = allMembers.filter(
+    (member) => member.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false
   );
 
   const toggleSelection = (id: string) => {
@@ -74,7 +74,7 @@ export const EventParticipant = ({
           const member = allMembers.find((m) => m.id === id);
           if (!member) return null;
           return (
-            <Avatar key={id} className="ring-2 ring-neutral-50 shadow-md">
+            <Avatar key={`selected-${member.id}`} className="ring-2 ring-neutral-50 shadow-md">
               <AvatarImage alt={member.name} src={member.image} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
@@ -102,7 +102,7 @@ export const EventParticipant = ({
             </div>
             <div className="flex flex-col gap-2">
               {filteredMembers?.map((member) => (
-                <div key={member.id} className="flex items-center gap-2">
+                <div key={`member-${member.id}`} className="flex items-center gap-2">
                   <Checkbox
                     id={`member-${member.id}`}
                     checked={selected.includes(member.id)}

@@ -16,7 +16,7 @@ import { useState } from 'react';
  *
  * @example
  * return (
- *   <EmailAvatar
+ *   <CustomAvatar
  *     src="https://example.com/avatar.jpg"
  *     alt="User Avatar"
  *     width={60}
@@ -26,7 +26,7 @@ import { useState } from 'react';
  * )
  */
 
-interface EmailAvatarProps {
+interface CustomAvatarProps {
   src?: string;
   alt: string;
   width?: number;
@@ -35,14 +35,14 @@ interface EmailAvatarProps {
   height?: number;
 }
 
-export default function EmailAvatar({
+export default function CustomAvatar({
   src,
   alt,
   width = 50,
   height = 50,
   showGrid = true,
   name = '',
-}: Readonly<EmailAvatarProps>) {
+}: Readonly<CustomAvatarProps>) {
   const [isLoaded, setIsLoaded] = useState(false);
   const showImage = !!src;
 

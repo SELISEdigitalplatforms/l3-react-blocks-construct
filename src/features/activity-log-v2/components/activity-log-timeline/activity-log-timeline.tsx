@@ -68,7 +68,7 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
     <>
       {visibleActivities.length === 0 ? (
         <div className="flex h-full w-full flex-col gap-6 items-center justify-center p-8 text-center">
-          <img src={no_activity} className='h-[160px] w-[240px]'/>
+          <img src={no_activity} className="h-[160px] w-[240px]" />
           <h3 className="text-xl font-medium">We couldn’t find anything matching your search.</h3>
         </div>
       ) : (
@@ -85,7 +85,7 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
 
               {visibleActivities.map((group, index) => (
                 <ActivityLogGroup
-                  key={group.date}
+                  key={`${group.date}-${index}`}
                   isLastIndex={index === visibleActivities.length - 1}
                   isFirstIndex={index === 0}
                   {...group}

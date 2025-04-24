@@ -57,7 +57,7 @@ export function DeleteRecurringEvent({
   onOpenChange,
   eventTitle,
   onConfirm,
-}: DeleteRecurringEventProps) {
+}: Readonly<DeleteRecurringEventProps>) {
   const [deleteOption, setDeleteOption] = useState<DeleteOption>('this');
 
   const handleConfirm = () => {

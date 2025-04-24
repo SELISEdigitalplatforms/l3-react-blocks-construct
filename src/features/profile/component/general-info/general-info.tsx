@@ -162,7 +162,9 @@ export const GeneralInfo = () => {
           <h1 className="text-xl text-high-emphasis font-semibold">Account security</h1>
           <Separator orientation="horizontal" />
           <div className="flex flex-col py-2 gap-10">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              className={`flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between ${userInfo?.email === 'demo.construct@seliseblocks.com' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
               <div className="flex flex-col gap-1">
                 <h1 className="text-sm text-high-emphasis font-bold">Two-factor authentication</h1>
                 <p className="text-sm text-medium-emphasis">
@@ -179,6 +181,7 @@ export const GeneralInfo = () => {
                       variant="outline"
                       className="text-sm font-bold text-primary hover:text-primary"
                       onClick={() => setCurrentDialog(MfaDialogState.TWO_FACTOR_SETUP)}
+                      disabled={userInfo?.email === 'demo.construct@seliseblocks.com'}
                     >
                       <ShieldCheck className="w-4 h-4" />
                       {userInfo?.mfaEnabled ? 'Manage' : 'Enable'}
@@ -186,7 +189,11 @@ export const GeneralInfo = () => {
                   )}
                 </TooltipTrigger>
                 <TooltipContent className="bg-neutral-700 text-white text-center max-w-[100px]">
-                  {userInfo?.mfaEnabled ? 'Click here to manage MFA' : 'Click here to enable MFA'}
+                  {userInfo?.email === 'demo.construct@seliseblocks.com'
+                    ? 'Not available for demo accounts'
+                    : userInfo?.mfaEnabled
+                      ? 'Click here to manage MFA'
+                      : 'Click here to enable MFA'}
                 </TooltipContent>
               </Tooltip>
               {currentDialog === MfaDialogState.TWO_FACTOR_SETUP && (
@@ -196,7 +203,6 @@ export const GeneralInfo = () => {
                   onClose={closeAllModals}
                 />
               )}
-
               {currentDialog === MfaDialogState.AUTHENTICATOR_APP_SETUP && (
                 <AuthenticatorAppSetup
                   userInfo={userInfo}
@@ -211,7 +217,6 @@ export const GeneralInfo = () => {
                   onNext={() => setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION)}
                 />
               )}
-
               {currentDialog === MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION && (
                 <ManageTwoFactorAuthentication
                   userInfo={userInfo}

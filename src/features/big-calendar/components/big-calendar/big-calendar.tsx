@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Calendar,
   Views,
-  DateLocalizer,
   View,
   EventPropGetter,
   Event,
@@ -18,7 +17,7 @@ import { AgendaContent } from '../agenda-content/agenda-content';
 import { CalendarToolbar } from '../calendar-toolbar/calendar-toolbar';
 import { EventsContent } from '../events-content/events-content';
 import { YearContent } from '../year-content/year-content';
-import { calendarLocalizer, calendarTimeFormat } from '../../utils/locales';
+import { calendarTimeFormat, useCustomLocalizer } from '../../utils/locales';
 import { ShowMorePopup } from '../show-more-popup/show-more-popup';
 import { CalendarEvent } from '../../types/calendar-event.types';
 import { getTextColorClassFromBg } from '../../utils/date-utils';
@@ -30,7 +29,6 @@ const DnDCalendar = withDragAndDrop(Calendar);
 
 interface BigCalendarProps {
   eventList?: Event[];
-  localizer?: DateLocalizer;
   onSelectSlot: ((slotInfo: SlotInfo) => void) | undefined;
   onSelectEvent?: ((event: Event, e: React.SyntheticEvent<HTMLElement>) => void) | undefined;
   onEventDrop?: (args: EventInteractionArgs<Event>) => void;
@@ -54,7 +52,6 @@ interface BigCalendarProps {
  *
  * Props:
  * - `eventList`: Array of calendar events to render
- * - `localizer`: Optional date localizer (defaults to predefined localizer)
  * - `onSelectSlot`: Function to handle slot selection
  * - `onSelectEvent`: Function to handle event selection
  * - `onEventDrop`: Function to handle event drop
@@ -75,7 +72,6 @@ interface BigCalendarProps {
 
 export function BigCalendar({
   eventList,
-  localizer = calendarLocalizer,
   onSelectSlot,
   onSelectEvent,
   onEventDrop,
@@ -117,6 +113,8 @@ export function BigCalendar({
     [eventList]
   );
 
+  const customLocalizer = useCustomLocalizer(settings);
+
   const eventPropGetter = useCallback<EventPropGetter<Event>>((event) => {
     const defaultColor = 'hsl(var(--primary-500))';
     const eventColor = event?.resource?.color || defaultColor;
@@ -129,8 +127,8 @@ export function BigCalendar({
     };
 
     return {
-      style: style,
-      className: '',
+      style,
+      className: 'cursor-pointer filter hover:brightness-90 transition',
     };
   }, []);
 
@@ -146,6 +144,15 @@ export function BigCalendar({
     };
   }, []);
 
+  const handleSelect = (eventOrDate: Event | Date, e: React.SyntheticEvent<HTMLElement>) => {
+    if (eventOrDate instanceof Date) {
+      onNavigate(eventOrDate);
+      onView(Views.DAY);
+    } else {
+      onSelectEvent?.(eventOrDate, e);
+    }
+  };
+
   return (
     <div ref={calendarRef}>
       <DnDCalendar
@@ -157,7 +164,7 @@ export function BigCalendar({
         events={events}
         dayPropGetter={dayPropGetter}
         eventPropGetter={eventPropGetter}
-        localizer={localizer}
+        localizer={customLocalizer}
         style={{ height: '79dvh', width: '100%' }}
         showMultiDayTimes
         slotPropGetter={slotPropGetter}
@@ -166,7 +173,7 @@ export function BigCalendar({
         onView={onView}
         view={view}
         popup={false}
-        onSelectEvent={onSelectEvent}
+        onSelectEvent={handleSelect}
         doShowMoreDrillDown={false}
         selectable="ignoreEvents"
         onSelectSlot={onSelectSlot}

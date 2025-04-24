@@ -126,11 +126,7 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   return (
     <>
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent
-          onInteractOutside={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
             <DialogDescription />

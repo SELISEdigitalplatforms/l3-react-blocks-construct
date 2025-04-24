@@ -13,9 +13,9 @@ interface CalendarSettingsContextType {
 }
 
 const defaultSettings: CalendarSettings = {
-  firstDayOfWeek: 1, // Monday (Monday-Sunday)
-  timeScale: 30, // 30 minutes
-  defaultDuration: 30, // 30 minutes
+  firstDayOfWeek: 1,
+  timeScale: 30,
+  defaultDuration: 30,
 };
 
 const CalendarSettingsContext = createContext<CalendarSettingsContextType | undefined>(undefined);

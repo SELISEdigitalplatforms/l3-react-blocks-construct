@@ -52,7 +52,11 @@ interface ShowMorePopupProps {
  *   onClose={() => console.log('Popover closed')}
  * />
  */
-export const ShowMorePopup = ({ count, remainingEvents, onClose }: ShowMorePopupProps) => {
+export const ShowMorePopup = ({
+  count,
+  remainingEvents,
+  onClose,
+}: Readonly<ShowMorePopupProps>) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const date = remainingEvents?.[0]?.start || new Date();
@@ -78,7 +82,7 @@ export const ShowMorePopup = ({ count, remainingEvents, onClose }: ShowMorePopup
           </Button>
         </div>
         <div className="flex flex-col gap-[6px] py-2 px-3">
-          {remainingEvents.map((event) => {
+          {remainingEvents.map((event: CalendarEvent) => {
             const textColorClass = getTextColorClassFromBg(event.resource?.color);
             const bgColorClass = `${event.resource?.color}`;
             return (

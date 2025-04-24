@@ -12,7 +12,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { ITask, ITaskManagerColumn } from '../types/task';
 import { TaskService } from '../services/task-service';
 
-export function useTaskBoard(taskService: TaskService, onTasksUpdated?: () => void) {
+export function useTaskBoard(taskService: TaskService) {
   const initialColumns: ITaskManagerColumn[] = [
     {
       id: '1',
@@ -149,9 +149,7 @@ export function useTaskBoard(taskService: TaskService, onTasksUpdated?: () => vo
       setNextTaskId(nextTaskId + 1);
 
       // Trigger the callback to notify the parent component
-      if (onTasksUpdated) {
-        onTasksUpdated();
-      }
+      
     }
   };
 

@@ -11,8 +11,8 @@ export function useListTasks() {
       updateTask
     } = useTaskContext();
 
-    const createTask = (title: string, status: 'todo' | 'inprogress' | 'done' = 'todo') => {
-      const section = status === 'todo' ? 'To Do' : status === 'inprogress' ? 'In Progress' : 'Done';
+    const createTask = (title: string, status: string) => {
+      const section = status;
 
       return addTask({
         title,

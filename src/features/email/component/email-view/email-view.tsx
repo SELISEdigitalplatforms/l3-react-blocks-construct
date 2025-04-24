@@ -51,6 +51,12 @@ interface EmailViewProps {
   category: string;
   deleteEmailsPermanently: (emailIds: string[]) => void;
   restoreEmailsToCategory: (emailIds: string[]) => void;
+  setActiveAction: React.Dispatch<React.SetStateAction<TActiveAction>>;
+  activeAction: TActiveAction;
+  setIsReplyVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isReplyVisible: boolean;
+  onSetActiveActionFalse: () => void;
+  handleSetActive: (action: 'reply' | 'replyAll' | 'forward') => void;
 }
 
 const statusLabels: Record<string, { label: string; border: string; text: string }> = {
@@ -77,17 +83,19 @@ export function EmailView({
   category,
   restoreEmailsToCategory,
   deleteEmailsPermanently,
+  activeAction,
+  setActiveAction,
+  setIsReplyVisible,
+  isReplyVisible,
+  onSetActiveActionFalse,
+  handleSetActive,
 }: Readonly<EmailViewProps>) {
-  const [activeAction, setActiveAction] = useState<TActiveAction>({
-    reply: false,
-    replyAll: false,
-    forward: false,
-  });
   const navigate = useNavigate();
   const [viewState, setViewState] = useState<TViewState>({});
 
   const [content, setContent] = useState('');
-  const [isReplyVisible, setIsReplyVisible] = useState(false);
+
+  const [expandedReplies, setExpandedReplies] = useState<number[]>([]);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
@@ -117,18 +125,6 @@ export function EmailView({
         tags: { ...selectedEmail.tags, [tag]: checked },
       });
     }
-  };
-
-  const handleSetActive = (actionType: keyof TActiveAction) => {
-    setActiveAction((prevState) => {
-      const newState: TActiveAction = {
-        reply: false,
-        replyAll: false,
-        forward: false,
-      };
-      newState[actionType] = !prevState[actionType];
-      return newState;
-    });
   };
 
   const handleSendEmail = (emailId: string) => {
@@ -176,6 +172,12 @@ export function EmailView({
     setIsReplyVisible(!isReplyVisible);
   };
 
+  const toggleExpand = (index: number) => {
+    setExpandedReplies((prev) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
+  };
+
   return (
     <>
       <EmailViewGrid
@@ -204,6 +206,9 @@ export function EmailView({
         isReplyVisible={isReplyVisible}
         restoreEmailsToCategory={restoreEmailsToCategory}
         deleteEmailsPermanently={deleteEmailsPermanently}
+        toggleExpand={toggleExpand}
+        expandedReplies={expandedReplies}
+        onSetActiveActionFalse={onSetActiveActionFalse}
       />
 
       <EmailViewMobile
@@ -233,6 +238,9 @@ export function EmailView({
         onGoBack={onGoBack}
         restoreEmailsToCategory={restoreEmailsToCategory}
         deleteEmailsPermanently={deleteEmailsPermanently}
+        toggleExpand={toggleExpand}
+        expandedReplies={expandedReplies}
+        onSetActiveActionFalse={onSetActiveActionFalse}
       />
     </>
   );

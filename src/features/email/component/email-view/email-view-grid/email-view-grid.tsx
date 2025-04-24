@@ -1,4 +1,3 @@
-import React from 'react';
 import { EmailViewProps } from 'features/email/types/email.types';
 import empty_email from 'assets/images/empty_email.svg';
 import {
@@ -7,13 +6,13 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 import {
-  ArchiveRestore,
   Bookmark,
   ChevronDown,
   ChevronUp,
   Download,
   FileText,
   Forward,
+  History,
   Image,
   MailOpen,
   Paperclip,
@@ -34,6 +33,8 @@ import EmailActionsPanel from '../email-actions-panel';
 import EmailTextEditor from '../../email-ui/email-text-editor';
 import { EmailCompose } from '../../email-compose/email-compose';
 import { htmlToPlainText } from 'features/email/services/email';
+import React from 'react';
+import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 
 export function EmailViewGrid({
   selectedEmail,
@@ -61,11 +62,14 @@ export function EmailViewGrid({
   category,
   restoreEmailsToCategory,
   deleteEmailsPermanently,
+  expandedReplies,
+  toggleExpand,
+  onSetActiveActionFalse,
 }: EmailViewProps) {
   return (
     <>
       <div
-        className={`hidden md:flex h-[calc(100vh-130px)] w-full flex-col overflow-y-auto ${!selectedEmail && 'bg-surface'}`}
+        className={`hidden md:flex h-[calc(100vh-130px)] w-full flex-col overflow-y-auto  ${!selectedEmail && 'bg-surface'}`}
       >
         {!selectedEmail && (
           <div className="flex h-full w-full flex-col gap-6 items-center justify-center p-8 text-center">
@@ -201,44 +205,25 @@ export function EmailViewGrid({
                   )}
                   {(category === 'trash' || category === 'spam') && (
                     <>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <ArchiveRestore
-                            className="h-5 w-5 cursor-pointer text-medium-emphasis"
-                            onClick={() => {
-                              if (selectedEmail) {
-                                restoreEmailsToCategory([selectedEmail.id]);
-                              }
-                            }}
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          className="bg-surface text-medium-emphasis"
-                          side="top"
-                          align="center"
-                        >
-                          <p>Restore</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Trash2
-                            className="h-5 w-5 cursor-pointer text-medium-emphasis"
-                            onClick={() => {
-                              if (selectedEmail) {
-                                deleteEmailsPermanently([selectedEmail.id]);
-                              }
-                            }}
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          className="bg-surface text-medium-emphasis"
-                          side="top"
-                          align="center"
-                        >
-                          <p>Delete permanently</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <EmailTooltipConfirmAction
+                        tooltipLabel={`Restore item`}
+                        confirmTitle="Restore item"
+                        confirmDescription={`Are you sure you want to restore selected item?`}
+                        onConfirm={() => restoreEmailsToCategory([selectedEmail.id])}
+                        toastDescription={`Mail restored`}
+                      >
+                        <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
+                      </EmailTooltipConfirmAction>
+
+                      <EmailTooltipConfirmAction
+                        tooltipLabel={`Delete item permanently`}
+                        confirmTitle="Delete mail Permanently"
+                        confirmDescription={`Are you sure you want to permanently delete selected item? This action cannot be undone.`}
+                        onConfirm={() => deleteEmailsPermanently([selectedEmail.id])}
+                        toastDescription={`Mail deleted permanently`}
+                      >
+                        <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
+                      </EmailTooltipConfirmAction>
                     </>
                   )}
                 </div>
@@ -294,13 +279,13 @@ export function EmailViewGrid({
                             <Paperclip className="w-4 h-4" />
                             <p>{`${(selectedEmail?.images?.length ?? 0) + (selectedEmail?.attachments?.length ?? 0)} attachments`}</p>
                             {!isReplyVisible && (
-                              <ChevronUp
+                              <ChevronDown
                                 className="h-4 w-4 cursor-pointer"
                                 onClick={() => handleToggleReplyVisibility()}
                               />
                             )}
                             {isReplyVisible && (
-                              <ChevronDown
+                              <ChevronUp
                                 className="h-4 w-4 cursor-pointer"
                                 onClick={() => handleToggleReplyVisibility()}
                               />
@@ -313,7 +298,7 @@ export function EmailViewGrid({
                             </Button>
                           </div>
                         </div>
-                        {!isReplyVisible && (
+                        {isReplyVisible && (
                           <div className="grid grid-cols-2 gap-4">
                             {(selectedEmail?.attachments?.length ?? 0) > 0 &&
                               (selectedEmail?.attachments ?? []).map((attachment, index) => (
@@ -365,24 +350,79 @@ export function EmailViewGrid({
 
                     <div className="bg-low-emphasis h-px my-6" />
 
-                    {selectedEmail.reply.slice(1).map((reply, index) => (
-                      <div key={index + 1} className="">
-                        <div className="my-6 px-4 flex items-center justify-between">
-                          <EmailViewResponseType selectedEmail={selectedEmail} />
-                          <p className="text-sm text-medium-emphasis">
-                            {formatDateTime(selectedEmail?.date)}
-                          </p>
-                        </div>
-                        <div
-                          className={`line-clamp-1 text-sm`}
-                          dangerouslySetInnerHTML={{
-                            __html: htmlToPlainText(reply),
-                          }}
-                        />
+                    {/* {selectedEmail.reply.map((reply, index) => {
+                      const isExpanded = expandedReplies.includes(index);
+                      return (
+                        <div key={index + 1}>
+                          <div className="my-6 px-4 flex items-center justify-between">
+                            <EmailViewResponseType selectedEmail={selectedEmail} />
+                            <p className="text-sm text-medium-emphasis">
+                              {formatDateTime(selectedEmail?.date)}
+                            </p>
+                          </div>
 
-                        <div className="bg-low-emphasis h-px my-6" />
-                      </div>
-                    ))}
+                          {!isExpanded ? (
+                            <div
+                              className={`line-clamp-1 text-sm`}
+                              dangerouslySetInnerHTML={{
+                                __html: htmlToPlainText(reply),
+                              }}
+                            />
+                          ) : (
+                            <div
+                              className={` text-sm`}
+                              dangerouslySetInnerHTML={{
+                                __html: reply,
+                              }}
+                            />
+                          )}
+
+                          <div className="flex justify-end">
+                            <Button variant={'link'} onClick={() => toggleExpand(index)}>
+                              {isExpanded ? 'Show less' : 'Show more'}
+                            </Button>
+                          </div>
+
+                          <div className="bg-low-emphasis h-px my-6" />
+                        </div>
+                      );
+                    })} */}
+                    {selectedEmail &&
+                      selectedEmail.reply &&
+                      selectedEmail.reply.slice(1).map((reply, index) => {
+                        const isExpanded = expandedReplies.includes(index);
+
+                        return (
+                          <div key={index + 1}>
+                            <div className="my-6 flex flex-col ">
+                              <EmailViewResponseType selectedEmail={selectedEmail} />
+                              <p className="text-sm text-medium-emphasis text-end">
+                                {formatDateTime(selectedEmail?.date)}
+                              </p>
+                            </div>
+
+                            <div
+                              className={`text-sm cursor-pointer ${!isExpanded ? 'line-clamp-1' : ''}`}
+                              onClick={() => {
+                                if (!isExpanded) toggleExpand(index); // Expand only on first click
+                              }}
+                              dangerouslySetInnerHTML={{
+                                __html: isExpanded ? reply : htmlToPlainText(reply),
+                              }}
+                            />
+
+                            {isExpanded && (
+                              <div className="flex justify-end">
+                                <Button variant="link" onClick={() => toggleExpand(index)}>
+                                  Show less
+                                </Button>
+                              </div>
+                            )}
+
+                            <div className="bg-low-emphasis h-px my-6" />
+                          </div>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -436,6 +476,9 @@ export function EmailViewGrid({
                         cancelButton="Discard"
                         showIcons={true}
                         onSubmit={() => handleSendEmail(selectedEmail.id)}
+                        onCancel={() => {
+                          onSetActiveActionFalse();
+                        }}
                       />
                     </div>
                   </div>

@@ -39,7 +39,7 @@ export function AddColumnDialog({ onAddColumn }: AddColumnDialogProps) {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
-            placeholder="Column Title"
+            placeholder="List title"
             value={newColumnTitle}
             onChange={(e) => setNewColumnTitle(e.target.value)}
             className="col-span-3"
@@ -52,7 +52,7 @@ export function AddColumnDialog({ onAddColumn }: AddColumnDialogProps) {
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button onClick={handleAddColumn}>Add Column</Button>
+            <Button onClick={handleAddColumn}>Add List</Button>
           </DialogClose>
         </div>
       </DialogContent>

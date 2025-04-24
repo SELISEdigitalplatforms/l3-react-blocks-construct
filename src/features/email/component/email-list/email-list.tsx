@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Checkbox } from 'components/ui/checkbox';
 import { parseISO, format } from 'date-fns';
 import { Label } from 'components/ui/label';
-import { useNavigate } from 'react-router-dom';
 import CustomPaginationEmail from 'components/blocks/custom-pagination-email/custom-pagination-email';
 import { Button } from 'components/ui/button';
 import { htmlToPlainText } from '../../services/email';
@@ -39,20 +38,18 @@ interface EmailListProps {
   checkedEmailIds: string[];
   isComposing: TIsComposing;
   handleComposeEmail: () => void;
+  handleEmailSelection: (email: TEmail) => void;
 }
 
 export function EmailList({
-  onSelectEmail,
   selectedEmail,
   emails,
-  setEmails,
-  category,
   setIsAllSelected,
   setCheckedEmailIds,
   checkedEmailIds,
   handleComposeEmail,
+  handleEmailSelection
 }: Readonly<EmailListProps>) {
-  const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -70,14 +67,7 @@ export function EmailList({
 
   const formatReceivedDate = (dateString: string) => format(parseISO(dateString), 'dd.MM.yy');
 
-  const handleEmailSelection = (email: TEmail) => {
-    onSelectEmail(email);
-    setEmails((prev) => ({
-      ...prev,
-      [category]: prev[category]?.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)),
-    }));
-    navigate(`/mail/${category}/${email.id}`);
-  };
+  
 
   const isAllChecked =
     paginatedEmails.length > 0 &&
@@ -148,7 +138,7 @@ export function EmailList({
                           setCheckedEmailIds((prev) =>
                             checked ? [...prev, email.id] : prev.filter((id) => id !== email.id)
                           );
-                        }}
+                        }} 
                       />
                     </div>
                     <div className="flex flex-col gap-1 w-full">

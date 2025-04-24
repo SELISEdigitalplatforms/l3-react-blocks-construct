@@ -96,11 +96,7 @@ export function EventInvitation({
   return (
     <>
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent
-          onInteractOutside={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{event.title}</DialogTitle>
             <DialogDescription />

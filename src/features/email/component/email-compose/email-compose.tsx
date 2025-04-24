@@ -5,6 +5,7 @@ import EmailTextEditor from '../email-ui/email-text-editor';
 import { TEmail, TFormProps, TIsComposing } from '../../types/email.types';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from 'hooks/use-toast';
+import { EmailTagInput } from '../email-ui/email-tag-input';
 
 /**
  * EmailCompose component allows users to compose and send an email. It includes options to minimize, maximize,
@@ -42,10 +43,14 @@ export function EmailCompose({
   const [showBcc, setShowBcc] = useState(false);
   const { toast } = useToast();
 
+  const [toTags, setToTags] = useState<string[]>([]);
+  const [ccTags, setCcTags] = useState<string[]>([]);
+  const [bccTags, setBccTags] = useState<string[]>([]);
+
   const [formData, setFormData] = useState<TFormProps>({
-    to: '',
-    cc: '',
-    bcc: '',
+    to: [],
+    cc: [],
+    bcc: [],
     subject: '',
     images: [],
     attachments: [],
@@ -60,8 +65,16 @@ export function EmailCompose({
         subject: 'fw: ' + selectedEmail.subject,
         images: selectedEmail.images || [],
         attachments: selectedEmail.attachments || [],
-        ...(selectedEmail.cc && { cc: selectedEmail.cc }),
-        ...(selectedEmail.bcc && { bcc: selectedEmail.bcc }),
+        cc: Array.isArray(selectedEmail.cc)
+          ? selectedEmail.cc
+          : selectedEmail.cc
+            ? [selectedEmail.cc]
+            : undefined,
+        bcc: Array.isArray(selectedEmail.bcc)
+          ? selectedEmail.bcc
+          : selectedEmail.bcc
+            ? [selectedEmail.bcc]
+            : undefined,
       }));
 
       setContent(
@@ -73,9 +86,9 @@ export function EmailCompose({
   useEffect(() => {
     if (isComposing.isCompose) {
       setFormData({
-        to: '',
-        cc: '',
-        bcc: '',
+        to: [],
+        cc: [],
+        bcc: [],
         subject: '',
         images: [],
         attachments: [],
@@ -101,9 +114,9 @@ export function EmailCompose({
   const handleSendEmail = () => {
     const emailData = {
       id: Date.now().toString(),
-      sender: formData.to?.trim() || '',
-      cc: formData.cc?.trim() || '',
-      bcc: formData.bcc?.trim() || '',
+      sender: [toTags[0]],
+      cc: ccTags.join(', '),
+      bcc: bccTags.join(', '),
       subject: formData.subject || '',
       content: content.trim(),
       preview: '',
@@ -126,7 +139,7 @@ export function EmailCompose({
       isDeleted: false,
     };
 
-    if (!emailData.sender || !emailData.subject) {
+    if (toTags.length === 0 || !emailData.subject.trim()) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -164,7 +177,7 @@ export function EmailCompose({
         className={`hidden md:flex fixed  ${
           isMaximized
             ? 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh] overflow-y-auto'
-            : 'bottom-0 right-4 w-[560px] h-[65vh]'
+            : 'bottom-0 right-4 w-[560px] min-h-[480px] max-h-[90vh] scroll-auto'
         } border shadow-md rounded-t overflow-hidden z-50 flex flex-col bg-white`}
       >
         <EmailComposeHeader
@@ -173,21 +186,17 @@ export function EmailCompose({
           onClose={onClose}
           isMaximized={isMaximized}
         />
-        <div className="flex flex-col p-4 gap-4 flex-1 overflow-auto">
+        <div className="flex flex-col px-4 pt-4 gap-4 flex-1 overflow-auto">
           <div className="relative">
-            <EmailInput
-              value={formData.to}
-              onChange={(e) => setFormData((prev) => ({ ...prev, to: e.target.value }))}
-              placeholder="To"
-            />
+            <EmailTagInput value={toTags} type="email" onChange={setToTags} placeholder="To" />
             <p
-              className="absolute right-12 top-1/2 -translate-y-1/2   cursor-pointer text-primary-400 hover:underline "
+              className="absolute right-12 bottom-2 -translate-y-1/2   cursor-pointer text-primary-400 hover:underline "
               onClick={() => setShowCc(!showCc)}
             >
               Cc
             </p>
             <p
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary-400 hover:underline cursor-pointer"
+              className="absolute right-2 bottom-2 -translate-y-1/2 text-primary-400 hover:underline cursor-pointer"
               onClick={() => setShowBcc(!showBcc)}
             >
               Bcc
@@ -195,18 +204,10 @@ export function EmailCompose({
           </div>
 
           {showCc && (
-            <EmailInput
-              placeholder="Cc"
-              value={formData.cc}
-              onChange={(e) => setFormData((prev) => ({ ...prev, cc: e.target.value }))}
-            />
+            <EmailTagInput type="email" value={ccTags} onChange={setCcTags} placeholder="Cc" />
           )}
           {showBcc && (
-            <EmailInput
-              placeholder="Bcc"
-              value={formData.bcc}
-              onChange={(e) => setFormData((prev) => ({ ...prev, bcc: e.target.value }))}
-            />
+            <EmailTagInput type="email" value={bccTags} onChange={setBccTags} placeholder="Bcc" />
           )}
           <EmailInput
             value={formData.subject}
@@ -243,19 +244,15 @@ export function EmailCompose({
         />
         <div className="flex flex-col p-4 gap-4 flex-1 overflow-auto">
           <div className="relative">
-            <EmailInput
-              placeholder="To"
-              value={formData.to}
-              onChange={(e) => setFormData((prev) => ({ ...prev, to: e.target.value }))}
-            />
+            <EmailTagInput type="email" value={toTags} onChange={setToTags} placeholder="To" />
             <p
-              className="absolute right-12 top-1/2 -translate-y-1/2   cursor-pointer text-primary-400 hover:underline "
+              className="absolute right-12 bottom-2 -translate-y-1/2   cursor-pointer text-primary-400 hover:underline "
               onClick={() => setShowCc(!showCc)}
             >
               Cc
             </p>
             <p
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary-400 hover:underline cursor-pointer"
+              className="absolute right-2 bottom-2 -translate-y-1/2 text-primary-400 hover:underline cursor-pointer"
               onClick={() => setShowBcc(!showBcc)}
             >
               Bcc
@@ -263,18 +260,10 @@ export function EmailCompose({
           </div>
 
           {showCc && (
-            <EmailInput
-              placeholder="Cc"
-              value={formData.cc}
-              onChange={(e) => setFormData((prev) => ({ ...prev, cc: e.target.value }))}
-            />
+            <EmailTagInput type="email" value={ccTags} onChange={setCcTags} placeholder="Cc" />
           )}
           {showBcc && (
-            <EmailInput
-              value={formData.bcc}
-              onChange={(e) => setFormData((prev) => ({ ...prev, bcc: e.target.value }))}
-              placeholder="Bcc"
-            />
+            <EmailTagInput type="email" value={bccTags} onChange={setBccTags} placeholder="Bcc" />
           )}
           <EmailInput
             type="text"

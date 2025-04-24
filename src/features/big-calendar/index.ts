@@ -4,6 +4,8 @@ export * from './enums/calendar.enum';
 export * from './services/calendar-services';
 export * from './types/calendar-event.types';
 export * from './constants/calendar.constants';
+export { useCalendarEvents } from './hooks/use-calendar-events';
+export { useCalendarUI } from './hooks/use-calendar-ui';
 export { AddEvent } from './components/modals/add-event/add-event';
 export { BigCalendarHeader } from './components/big-calendar-header/big-calendar-header';
 export { CalendarToolbar } from './components/calendar-toolbar/calendar-toolbar';

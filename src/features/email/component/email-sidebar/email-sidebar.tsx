@@ -31,6 +31,7 @@ interface NavItemProps {
   isActive?: boolean;
   href: string;
   onClick: () => void;
+  isCollapsedEmailSidebar?: boolean;
 }
 
 interface EmailSidebarProps {
@@ -39,22 +40,28 @@ interface EmailSidebarProps {
   handleCloseCompose: () => void;
   setSelectedEmail: (email: TEmail | null) => void;
   emails: Partial<TEmailData>;
+  isCollapsedEmailSidebar?: boolean;
 }
 
-function NavItem({ icon, label, count, isActive, onClick }: NavItemProps) {
+function NavItem({ icon, label, count, isActive, isCollapsedEmailSidebar, onClick }: NavItemProps) {
   return (
     <Button
       variant="ghost"
       onClick={onClick}
       className={cn(
         'flex w-full justify-start gap-2 h-10 text-high-emphasis',
-        isActive && 'bg-primary-50 text-primary-600'
+        isActive && 'bg-primary-50 text-primary-600',
+        isCollapsedEmailSidebar && 'justify-center'
       )}
     >
       {icon}
-      <span className="flex-1 text-left text-base">{label}</span>
-      {count !== undefined && (
-        <span className={`text-sm ${isActive && 'text-primary-600'}`}>{count}</span>
+      {!isCollapsedEmailSidebar && (
+        <>
+          <span className="flex-1 text-left text-base">{label}</span>
+          {count !== undefined && (
+            <span className={`text-sm ${isActive && 'text-primary-600'}`}>{count}</span>
+          )}
+        </>
       )}
     </Button>
   );
@@ -64,6 +71,7 @@ export function EmailSidebar({
   handleComposeEmail,
   setSelectedEmail,
   emails,
+  isCollapsedEmailSidebar,
 }: Readonly<EmailSidebarProps>) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -86,24 +94,39 @@ export function EmailSidebar({
 
   return (
     <>
-      <div className="flex w-full  md:min-w-[280px] md:max-w-[280px] flex-col">
-        <div className="py-4 px-2">
-          <Button className="flex items-center w-full" onClick={handleComposeEmail}>
+      <div
+        className={`
+          'flex w-full flex-col transition-all duration-300 border-t border-Low-Emphasis',
+        ${
+          isCollapsedEmailSidebar
+            ? 'md:min-w-[70px] md:max-w-[70px]'
+            : 'md:min-w-[280px] md:max-w-[280px]'
+        }
+            
+        `}
+      >
+        <div className="flex items-center justify-between px-2 py-4">
+          <Button className="flex items-center gap-2 w-full" onClick={handleComposeEmail}>
             <SquarePen size={20} />
-            Compose
+            {!isCollapsedEmailSidebar && <span className="text-base">Compose</span>}
           </Button>
         </div>
+
         <div className="flex-1 px-2">
           {navItems.map((item, index) => (
-            <NavItem key={index} {...item} />
+            <NavItem key={index} {...item} isCollapsedEmailSidebar={isCollapsedEmailSidebar} />
           ))}
 
-          <h2 className="px-4 py-2 text-[10px] font-semibold uppercase text-medium-emphasis">
-            Labels
-          </h2>
-          {labelItems.map((item, index) => (
-            <NavItem key={index} {...item} />
-          ))}
+          {!isCollapsedEmailSidebar && (
+            <>
+              <h2 className="px-4 py-2 text-[10px] font-semibold uppercase text-medium-emphasis">
+                Labels
+              </h2>
+              {labelItems.map((item, index) => (
+                <NavItem key={index} {...item} isCollapsedEmailSidebar={isCollapsedEmailSidebar} />
+              ))}
+            </>
+          )}
         </div>
       </div>
 
