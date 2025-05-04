@@ -62,6 +62,9 @@ export const ForgotpasswordForm = () => {
 
   const googleSiteKey = process.env.REACT_APP_GOOGLE_SITE_KEY || '';
 
+  // Check if captcha is enabled (site key is not empty)
+  const captchaEnabled = googleSiteKey !== '';
+
   const emailValue = form.watch('email');
 
   useEffect(() => {
@@ -81,7 +84,7 @@ export const ForgotpasswordForm = () => {
   };
 
   const onSubmitHandler = async (values: forgotPasswordFormType) => {
-    if (showCaptcha && !captchaToken) {
+    if (captchaEnabled && showCaptcha && !captchaToken) {
       return;
     }
 
@@ -101,7 +104,8 @@ export const ForgotpasswordForm = () => {
 
   const isEmailValid = emailValue && emailValue.trim() !== '' && !emailError;
 
-  const isButtonDisabled = isPending || !isEmailValid || (showCaptcha && !captchaToken);
+  const isButtonDisabled =
+    isPending || !isEmailValid || (captchaEnabled && showCaptcha && !captchaToken);
 
   return (
     <Form {...form}>
@@ -120,7 +124,7 @@ export const ForgotpasswordForm = () => {
           )}
         />
 
-        {showCaptcha && (
+        {captchaEnabled && showCaptcha && (
           <div className="my-4">
             <Captcha
               type="reCaptcha"
