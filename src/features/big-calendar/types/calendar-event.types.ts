@@ -7,6 +7,15 @@ export interface Member {
   image: string;
   status?: MEMBER_STATUS;
 }
+export interface RecurrencePattern {
+  selectedDays: string[];
+  period: string;
+  interval: number;
+  endType: 'never' | 'on' | 'after';
+  onDate?: string;
+  occurrenceCount?: number;
+}
+
 export interface CalendarEvent extends Event {
   eventId?: string;
   title: string;
@@ -22,5 +31,6 @@ export interface CalendarEvent extends Event {
     recurring?: boolean;
     patternChanged?: boolean;
     invitationAccepted?: boolean;
+    recurrencePattern?: RecurrencePattern;
   };
 }

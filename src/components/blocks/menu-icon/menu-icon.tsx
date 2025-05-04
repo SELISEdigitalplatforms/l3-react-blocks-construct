@@ -12,6 +12,7 @@ import {
   FileClock,
   Presentation,
   Calendar,
+  History,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -64,6 +65,7 @@ const iconMap = {
   FileClock,
   Presentation,
   Calendar,
+  History
 } as const;
 
 export type IconName = keyof typeof iconMap;

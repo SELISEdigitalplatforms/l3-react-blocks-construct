@@ -15,6 +15,7 @@ export interface MenuItem {
     | 'Inbox'
     | 'FileClock'
     | 'Presentation'
+    | 'History'
     | 'Calendar';
   children?: MenuItem[];
 }

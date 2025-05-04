@@ -36,6 +36,7 @@ import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring
 import { generateTimePickerRange } from '../../../utils/date-utils';
 import { useCalendarSettings } from '../../../contexts/calendar-settings.context';
 import { WEEK_DAYS } from '../../../constants/calendar.constants';
+import { UpdateRecurringEvent } from '../update-recurring-event/update-recurring-event';
 
 type DeleteOption = 'this' | 'thisAndFollowing' | 'all';
 
@@ -43,7 +44,7 @@ interface EditEventProps {
   event: CalendarEvent;
   onClose: () => void;
   onNext: () => void;
-  onUpdate: (event: CalendarEvent) => void;
+  onUpdate: (event: CalendarEvent, updateOption?: 'this' | 'thisAndFollowing' | 'all') => void;
   onDelete: (eventId: string, deleteOption?: DeleteOption) => void;
 }
 
@@ -69,7 +70,7 @@ interface EditEventProps {
  * @param {() => void} onClose - Callback for closing the dialog
  * @param {() => void} onNext - Callback triggered for recurrence configuration
  * @param {(event: CalendarEvent) => void} onUpdate - Callback to update the event with new data
- * @param {(eventId: string) => void} onDelete - Callback to delete the event by ID
+ * @param {(eventId: string, deleteOption?: DeleteOption) => void} onDelete - Callback to delete the event by ID
  *
  * @returns {JSX.Element} Edit event modal dialog with form fields and action buttons
  *
@@ -138,6 +139,7 @@ export function EditEvent({
   const [recurringEvents, setRecurringEvents] = useState<CalendarEvent[]>(
     initialEventData.events || []
   );
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
 
   useEffect(() => {
     if (initialEventData.resource?.recurring) {
@@ -243,6 +245,10 @@ export function EditEvent({
       const parsedSavedStart = new Date(parsed.start);
       const parsedSavedEnd = new Date(parsed.end);
 
+      // Get the current members from the form or initialEventData
+      const currentMembers =
+        form.getValues('members') || initialEventData.resource?.members?.map((m) => m.id) || [];
+
       // Reset form with all saved values
       form.reset({
         title: parsed.title,
@@ -253,7 +259,7 @@ export function EditEvent({
         color: parsed.resource?.color ?? '',
         description: parsed.resource?.description ?? '',
         recurring: parsed.resource?.recurring ?? false,
-        members: parsed.resource?.members ? parsed.resource.members.map((m) => m.id) : [],
+        members: currentMembers, // Use current members instead of parsed members
       });
 
       // Update other state values
@@ -273,6 +279,10 @@ export function EditEvent({
               ...evt,
               start: new Date(evt.start),
               end: new Date(evt.end),
+              resource: {
+                ...evt.resource,
+                members: initialEventData.resource?.members || [], // Preserve original members
+              },
             })) || [];
         } catch (error) {
           console.error('Error parsing tempEditEvent', error);
@@ -287,6 +297,10 @@ export function EditEvent({
               ...evt,
               start: new Date(evt.start),
               end: new Date(evt.end),
+              resource: {
+                ...evt.resource,
+                members: initialEventData.resource?.members || [], // Preserve original members
+              },
             }));
           } catch (error) {
             console.error('Error parsing tempRecurringEvents', error);
@@ -304,10 +318,7 @@ export function EditEvent({
         color: initialEventData.resource?.color ?? '',
         description: initialEventData.resource?.description ?? '',
         recurring: initialEventData.resource?.recurring ?? false,
-        members:
-          (initialEventData.resource?.members
-            ? initialEventData.resource.members.map((m) => m.id)
-            : []) || [],
+        members: initialEventData.resource?.members?.map((m) => m.id) || [],
       });
 
       setStartDate(parsedStart);
@@ -318,7 +329,10 @@ export function EditEvent({
     }
   }, [initialEventData, form, parsedStart, parsedEnd]);
 
-  const onSubmit = (data: AddEventFormValues) => {
+  const onSubmit = (
+    data: AddEventFormValues,
+    updateOption?: 'this' | 'thisAndFollowing' | 'all'
+  ) => {
     try {
       const memberIds: string[] = data.members ?? [];
 
@@ -346,100 +360,40 @@ export function EditEvent({
         )
         .filter((member): member is Member => Boolean(member));
 
-      const tempRecurringEvents = window.localStorage.getItem('tempRecurringEvents');
-
-      let updatedEvent: CalendarEvent = {
+      const updatedEvent: CalendarEvent = {
         ...initialEventData,
         title: data.title,
         start: startDateTime,
         end: endDateTime,
         allDay: data.allDay,
-        events: undefined,
+        events:
+          recurringEvents.length > 0
+            ? recurringEvents.map((evt) => ({
+                ...evt,
+                title: data.title,
+                resource: {
+                  ...evt.resource,
+                  meetingLink: data.meetingLink ?? '',
+                  color:
+                    data.color || initialEventData.resource?.color || 'hsl(var(--primary-500))',
+                  description: editorContent,
+                  members: selectedMembers,
+                  recurring: true,
+                  patternChanged: true,
+                },
+              }))
+            : undefined,
         resource: {
           meetingLink: data.meetingLink ?? '',
           color: data.color || initialEventData.resource?.color || 'hsl(var(--primary-500))',
           description: editorContent,
-          recurring: false,
-          patternChanged: undefined,
+          recurring: initialEventData.resource?.recurring ?? false,
           members: selectedMembers,
+          patternChanged: true,
         },
       };
 
-      if (data.recurring) {
-        if (tempRecurringEvents) {
-          try {
-            const parsedRecurringEvents = JSON.parse(tempRecurringEvents) as CalendarEvent[];
-
-            const processedRecurringEvents = parsedRecurringEvents.map((evt) => ({
-              ...evt,
-              title: data.title,
-              start: evt.start instanceof Date ? evt.start : new Date(evt.start),
-              end: evt.end instanceof Date ? evt.end : new Date(evt.end),
-              allDay: data.allDay,
-              resource: {
-                meetingLink: data.meetingLink ?? '',
-                description: editorContent,
-                color: data.color || initialEventData.resource?.color || 'hsl(var(--primary-500))',
-                recurring: true,
-                members: selectedMembers,
-              },
-            }));
-
-            updatedEvent = {
-              ...initialEventData,
-              title: data.title,
-              start: startDateTime,
-              end: endDateTime,
-              allDay: data.allDay,
-              events: processedRecurringEvents,
-              resource: {
-                meetingLink: data.meetingLink ?? '',
-                color: data.color || initialEventData.resource?.color || 'hsl(var(--primary-500))',
-                description: editorContent,
-                recurring: true,
-                patternChanged: true,
-                members: selectedMembers,
-              },
-            };
-          } catch (error) {
-            console.error('Error processing recurring events:', error);
-            toast({
-              variant: 'destructive',
-              title: 'Error Processing Recurring Events',
-              description: 'There was an error processing the recurring events. Please try again.',
-            });
-            return;
-          }
-        } else {
-          console.warn('No tempRecurringEvents found in localStorage'); // Debug log
-          toast({
-            variant: 'destructive',
-            title: 'Missing Recurring Events Data',
-            description:
-              'Could not find recurring events data. Please try configuring the recurrence again.',
-          });
-          return;
-        }
-      }
-
-      const finalUpdatedEvent = {
-        ...updatedEvent,
-        start:
-          updatedEvent.start instanceof Date ? updatedEvent.start : new Date(updatedEvent.start),
-        end: updatedEvent.end instanceof Date ? updatedEvent.end : new Date(updatedEvent.end),
-        events: updatedEvent.events
-          ? updatedEvent.events.map((evt) => ({
-              ...evt,
-              start: evt.start instanceof Date ? evt.start : new Date(evt.start),
-              end: evt.end instanceof Date ? evt.end : new Date(evt.end),
-            }))
-          : undefined,
-      };
-
-      window.localStorage.removeItem('tempEditEvent');
-      window.localStorage.removeItem('tempRecurringEvents');
-
-      onUpdate(finalUpdatedEvent);
+      onUpdate(updatedEvent, updateOption);
       onClose();
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -460,7 +414,7 @@ export function EditEvent({
   };
 
   const handleDeleteConfirm = () => {
-    onDelete(initialEventData.eventId ?? '');
+    onDelete(initialEventData.eventId ?? '', 'this');
     onClose();
     setShowDeleteDialog(false);
     toast({
@@ -474,11 +428,6 @@ export function EditEvent({
     onDelete(initialEventData.eventId ?? '', deleteOption);
     onClose();
     setShowRecurringDeleteDialog(false);
-    toast({
-      variant: 'success',
-      title: 'Recurring Event Deleted',
-      description: 'The recurring event has been removed from your calendar.',
-    });
   };
 
   const startRef = useRef<HTMLDivElement>(null);
@@ -504,6 +453,26 @@ export function EditEvent({
     return () => window.removeEventListener('resize', update);
   }, []);
 
+  const handleFormSubmit = (data: AddEventFormValues) => {
+    if (initialEventData.resource?.recurring) {
+      setShowUpdateDialog(true);
+      // Store the form data temporarily
+      window.localStorage.setItem('tempUpdateData', JSON.stringify(data));
+    } else {
+      onSubmit(data);
+    }
+  };
+
+  const handleUpdateConfirm = (updateOption: 'this' | 'thisAndFollowing' | 'all') => {
+    const tempData = window.localStorage.getItem('tempUpdateData');
+    if (tempData) {
+      const formData = JSON.parse(tempData) as AddEventFormValues;
+      onSubmit(formData, updateOption);
+      window.localStorage.removeItem('tempUpdateData');
+    }
+    setShowUpdateDialog(false);
+  };
+
   return (
     <>
       <Dialog open={true} onOpenChange={handleClose}>
@@ -513,7 +482,7 @@ export function EditEvent({
             <DialogDescription />
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="title"
@@ -531,7 +500,7 @@ export function EditEvent({
                 name="meetingLink"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-normal text-sm">Meeting Link*</FormLabel>
+                    <FormLabel className="font-normal text-sm">Meeting Link</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your meeting link" {...field} />
                     </FormControl>
@@ -849,6 +818,14 @@ export function EditEvent({
         eventTitle={initialEventData.title}
         onConfirm={handleRecurringDeleteConfirm}
       />
+      {showUpdateDialog && (
+        <UpdateRecurringEvent
+          open={showUpdateDialog}
+          onOpenChange={setShowUpdateDialog}
+          eventTitle={initialEventData.title}
+          onConfirm={handleUpdateConfirm}
+        />
+      )}
     </>
   );
 }

@@ -19,6 +19,35 @@ import {
 } from 'components/ui/select';
 import { ITaskManagerColumn } from '../../types/task';
 
+/**
+ * AddTaskDialog Component
+ *
+ * A reusable dialog component for adding a new task to a column.
+ * This component supports:
+ * - Entering a task title
+ * - Selecting a column to add the task to
+ *
+ * Features:
+ * - Provides an input field for entering the task title
+ * - Includes a dropdown for selecting the column
+ * - Includes buttons for adding or canceling the task creation
+ *
+ * Props:
+ * @param {string | null} activeColumn - The ID of the currently active column
+ * @param {ITaskManagerColumn[]} columns - The list of available columns
+ * @param {(columnId: string, content: string) => void} onAddTask - Callback triggered when the task is added
+ *
+ * @returns {JSX.Element} The add task dialog component
+ *
+ * @example
+ * // Basic usage
+ * <AddTaskDialog
+ *   activeColumn="1"
+ *   columns={[{ id: '1', title: 'To Do' }]}
+ *   onAddTask={(columnId, content) => console.log('Task added:', columnId, content)}
+ * />
+ */
+
 interface AddTaskDialogProps {
   activeColumn: string | null;
   columns: ITaskManagerColumn[];

@@ -16,6 +16,38 @@ import {
 } from 'components/ui/command';
 import { cn } from 'lib/utils';
 
+/**
+ * ActivityLogToolbar Component
+ *
+ * A reusable toolbar component for filtering and searching activity logs.
+ * This component supports:
+ * - Searching activities by description
+ * - Filtering activities by date range
+ * - Filtering activities by module categories
+ *
+ * Features:
+ * - Debounced search input for optimized performance
+ * - Date range picker with clear filter functionality
+ * - Module selector with multi-select and clear all options
+ *
+ * Props:
+ * @param {(query: string) => void} [onSearchChange] - Callback triggered when the search query changes
+ * @param {(dateRange: DateRange | undefined) => void} [onDateRangeChange] - Callback triggered when the date range changes
+ * @param {(categories: string[]) => void} onCategoryChange - Callback triggered when the selected categories change
+ * @param {string[]} selectedCategory - The currently selected module categories
+ *
+ * @returns {JSX.Element} The activity log toolbar component
+ *
+ * @example
+ * // Basic usage
+ * <ActivityLogToolbar
+ *   onSearchChange={(query) => console.log('Search query:', query)}
+ *   onDateRangeChange={(range) => console.log('Date range:', range)}
+ *   onCategoryChange={(categories) => console.log('Selected categories:', categories)}
+ *   selectedCategory={['task_manager', 'calendar']}
+ * />
+ */
+
 interface ActivityLogToolbarProps {
   onSearchChange?: (query: string) => void;
   onDateRangeChange?: (dateRange: DateRange | undefined) => void;

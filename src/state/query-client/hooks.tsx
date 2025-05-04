@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -9,6 +10,7 @@ import {
 } from '@tanstack/react-query';
 import { useAuthStore } from '../store/auth';
 import { publicRoutes } from 'constant/auth-public-routes';
+import { useToast } from 'hooks/use-toast';
 
 /**
  * useGlobalQuery Hook
@@ -47,9 +49,19 @@ interface ApiError {
   };
 }
 
+const overlay = document.createElement('div');
+overlay.style.position = 'fixed';
+overlay.style.top = '0';
+overlay.style.left = '0';
+overlay.style.width = '100%';
+overlay.style.height = '100%';
+overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+overlay.style.zIndex = '40';
+overlay.id = 'session-expired-overlay';
+
 export const useGlobalQuery = <
   TQueryFnData = unknown,
-  TError = ApiError, // Use the custom error type
+  TError = ApiError,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 >(
@@ -61,17 +73,35 @@ export const useGlobalQuery = <
 
   const queryResult = useQuery(option);
   const isPublicRoute = publicRoutes.includes(currentPath);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (queryResult.error) {
       const errorMessage = (queryResult.error as ApiError).error?.error;
 
       if (errorMessage === 'invalid_refresh_token' && !isPublicRoute) {
-        logout();
-        navigate('/login');
+        document.body.appendChild(overlay);
+
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Logging out due to session expiration',
+          duration: 2000,
+        });
+
+        new Promise((resolve) => setTimeout(resolve, 1500)).then(() => {
+          logout();
+          navigate('/login');
+
+          const existingOverlay = document.getElementById('session-expired-overlay');
+
+          if (existingOverlay && existingOverlay.parentNode) {
+            existingOverlay.parentNode.removeChild(existingOverlay);
+          }
+        });
       }
     }
-  }, [queryResult.error, logout, isPublicRoute, navigate]);
+  }, [queryResult.error, logout, isPublicRoute, navigate, toast]);
 
   return queryResult;
 };
@@ -116,6 +146,7 @@ export const useGlobalMutation = <
 ) => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   return useMutation({
     ...option,
@@ -123,8 +154,25 @@ export const useGlobalMutation = <
       const errorMessage = (error as ApiError).error?.error;
 
       if (errorMessage === 'invalid_refresh_token') {
-        logout();
-        navigate('/login');
+        document.body.appendChild(overlay);
+
+        toast({
+          variant: 'success',
+          title: 'Success',
+          description: 'Logging out due to session expiration',
+          duration: 2000,
+        });
+
+        new Promise((resolve) => setTimeout(resolve, 1500)).then(() => {
+          logout();
+
+          navigate('/login');
+
+          const existingOverlay = document.getElementById('session-expired-overlay');
+          if (existingOverlay && existingOverlay.parentNode) {
+            existingOverlay.parentNode.removeChild(existingOverlay);
+          }
+        });
       }
 
       if (option.onError) {

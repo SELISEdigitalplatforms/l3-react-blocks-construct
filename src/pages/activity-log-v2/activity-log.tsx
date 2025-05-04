@@ -4,6 +4,25 @@ import ActivityLogTimeline from 'features/activity-log-v2/components/activity-lo
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
+/**
+ * ActivityLogPage2 Component
+ *
+ * A timeline page that displays filtered user activity logs with search,
+ * date range, and category filtering. Uses local state to manage filter criteria
+ * and automatically applies filtering logic on updates.
+ *
+ * Features:
+ * - Search query filtering
+ * - Date range filtering
+ * - Category-based filtering with normalization
+ * - Dynamic UI updates via `ActivityLogToolbar` and `ActivityLogTimeline` components
+ *
+ * @returns {JSX.Element} The full activity log timeline UI with filtering controls
+ *
+ * @example
+ * <ActivityLogPage2 />
+ */
+
 const transformCategory = (category: string): string => {
   return category.toLowerCase().replace(/\s+/g, '_');
 };
@@ -73,7 +92,7 @@ export default function ActivityLogPage2() {
   return (
     <div className="flex w-full flex-col">
       <div className="mb-[18px] flex flex-col sm:flex-row sm:items-center sm:justify-between md:mb-[32px]">
-        <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">Activity Log</h3>
+        <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">Timeline</h3>
         <ActivityLogToolbar
           onSearchChange={handleSearchChange}
           onDateRangeChange={handleDateRangeChange}

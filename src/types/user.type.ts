@@ -14,6 +14,7 @@ export type User = {
   isVarified: boolean;
   profileImageUrl: string;
   lastLoggedInTime: string;
+  isMfaVerified: boolean;
   mfaEnabled: boolean;
   userMfaType: number;
 };

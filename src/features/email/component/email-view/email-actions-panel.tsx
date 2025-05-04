@@ -5,36 +5,45 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
-import { TActiveAction, TEmail } from '../../types/email.types';
+import { TActiveAction, TEmail, TReply } from '../../types/email.types';
 import { Button } from 'components/ui/button';
 import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
 
 /**
- * EmailViewResponseMore component provides additional email response options such as Reply, Reply All, Forward,
- * and Pop out reply. It also displays the sender's avatar and name with a button that triggers these actions.
- * It is typically used within an email view interface where users can choose to interact with the email in various ways.
+ * EmailActionsPanel Component
  *
- * @component
- * @param {Object} props - The component props.
- * @param {boolean} props.isReply - A flag indicating whether the user is in reply mode.
- * @param {Function} props.setIsReply - A function to toggle the reply mode state.
- * @param {TEmail} [props.selectedEmail] - The selected email object containing details like the sender's name and avatar.
+ * A toolbar panel for email actions such as reply, reply all, and forward.
+ * It displays action icons and a dropdown menu for users to interact with an email in different ways.
+ * When actions are selected, sender avatars and buttons appear to indicate the active state.
  *
- * @returns {JSX.Element} - The EmailViewResponseMore component with response options and sender information.
+ * Features:
+ * - Inline icon controls for common email actions (Reply, Reply All, Forward)
+ * - Dropdown menu with additional actions, including pop-out reply
+ * - Dynamic display of sender avatars when in reply modes
+ * - Uses Lucide icons and a dropdown UI from the component library
+ *
+ * Props:
+ * @param {TEmail} [selectedEmail] - The currently selected email to reply to or forward.
+ * @param {TActiveAction} activeAction - Object representing the currently active action (e.g., reply, replyAll, forward).
+ * @param {(action: 'reply' | 'replyAll' | 'forward') => void} handleSetActive - Callback to activate a specific reply action.
+ * @param {(replyData?: TReply) => void} handleComposeEmailForward - Function to trigger forwarding or pop-out reply logic.
+ * @param {(action: TActiveAction) => void} setActiveAction - Function to update the overall active action state.
+ *
+ * @returns {JSX.Element} The action panel UI for email replies and forwarding.
  *
  * @example
- * return (
- *   <EmailViewResponseMore
- *     isReply={isReply}
- *     setIsReply={setIsReply}
- *     selectedEmail={selectedEmail}
- *   />
- * )
+ * <EmailActionsPanel
+ *   selectedEmail={email}
+ *   activeAction={{ reply: false, replyAll: false, forward: false }}
+ *   handleSetActive={(action) => setActive(action)}
+ *   handleComposeEmailForward={(reply) => forward(reply)}
+ *   setActiveAction={(action) => setState(action)}
+ * />
  */
 
 interface EmailActionsPanelTypeProps {
   selectedEmail?: TEmail;
-  handleComposeEmailForward: () => void;
+  handleComposeEmailForward: (replyData?: TReply) => void;
   setActiveAction: (action: TActiveAction) => void;
   activeAction: TActiveAction;
   handleSetActive: (action: 'reply' | 'replyAll' | 'forward') => void;
@@ -79,14 +88,14 @@ const EmailActionsPanel = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex p-3 gap-2 hover:bg-surface "
-                onClick={handleComposeEmailForward}
+                onClick={() => handleComposeEmailForward({} as TReply)}
               >
                 <Forward className="h-5 w-5 text-medium-emphasis" />
                 <p className="text-high-emphasis font-normal">Forward</p>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex p-3 gap-2 hover:bg-surface "
-                onClick={handleComposeEmailForward}
+                onClick={() => handleComposeEmailForward({} as TReply)}
               >
                 <Trash2 className="h-5 w-5 text-medium-emphasis" />
                 <p className="text-high-emphasis font-normal">Pop out reply</p>

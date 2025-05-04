@@ -10,6 +10,32 @@ import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 
+/**
+ * TaskCard Component
+ *
+ * A reusable component for rendering a task card in a Kanban-style task manager.
+ * This component supports:
+ * - Drag-and-drop functionality for reordering tasks
+ * - Displaying task details such as title, status, priority, due date, assignees, and tags
+ * - Interactive actions like toggling completion, deleting, and moving tasks
+ *
+ * Features:
+ * - Integrates with the `@dnd-kit` library for drag-and-drop functionality
+ * - Displays task metadata in a structured layout
+ * - Provides a dropdown menu for task actions
+ *
+ * Props:
+ * @param {ITask} task - The task object to display
+ * @param {number} index - The index of the task in the list
+ * @param {(id: string) => void} handleTaskClick - Callback triggered when the task title is clicked
+ *
+ * @returns {JSX.Element} The task card component
+ *
+ * @example
+ * // Basic usage
+ * <TaskCard task={task} index={0} handleTaskClick={(id) => console.log('Task clicked:', id)} />
+ */
+
 interface ITaskCardProps {
   task: ITask;
   index: number;
@@ -147,7 +173,7 @@ export function TaskCard({ task, index, handleTaskClick }: ITaskCardProps) {
             )}
 
             <div className="flex items-center text-medium-emphasis text-xs gap-3">
-              {task.comments && task.comments > 0 && (
+              {task.comments !== undefined && task.comments > 0 && (
                 <span className="flex items-center gap-1" onClick={handleInteractiveElementClick}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +192,7 @@ export function TaskCard({ task, index, handleTaskClick }: ITaskCardProps) {
                 </span>
               )}
 
-              {task.attachments && task.attachments > 0 && (
+              {task.attachments !== undefined && task.attachments > 0 && (
                 <span className="flex items-center gap-1" onClick={handleInteractiveElementClick}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

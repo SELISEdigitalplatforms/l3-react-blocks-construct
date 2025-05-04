@@ -1,3 +1,26 @@
+/**
+ * AssigneeAvatars Component
+ *
+ * A reusable component for displaying a list of assignee avatars.
+ * This component supports:
+ * - Displaying up to three avatars
+ * - Showing a "+X" badge for additional assignees
+ *
+ * Features:
+ * - Displays up to three avatars with initials
+ * - Shows a count of additional assignees if there are more than three
+ * - Provides a compact and visually appealing layout
+ *
+ * Props:
+ * @param {string[]} [assignees] - The list of assignee names
+ *
+ * @returns {JSX.Element|null} The assignee avatars component, or null if no assignees are provided
+ *
+ * @example
+ * // Basic usage
+ * <AssigneeAvatars assignees={['Alice', 'Bob', 'Charlie', 'David']} />
+ */
+
 interface AssigneeAvatarsProps {
   assignees?: string[];
 }

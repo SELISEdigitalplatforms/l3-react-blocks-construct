@@ -11,21 +11,45 @@ import {
 } from 'components/ui/dialog';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
+import { Attachment } from '../../contexts/task-context';
 
-interface Attachment {
-  id: string;
-  name: string;
-  size: string;
-  type: 'pdf' | 'image' | 'other';
-  file?: File;
-}
+/**
+ * AttachmentsSection Component
+ *
+ * A reusable component for managing task attachments. This component allows users to:
+ * - Upload files via drag-and-drop or file selection
+ * - View uploaded attachments with details such as name, size, and type
+ * - Delete attachments
+ * - Show more or fewer attachments in a paginated view
+ *
+ * Features:
+ * - Drag-and-drop file upload with visual feedback
+ * - File type and size validation
+ * - Displays attachments in a grid layout
+ * - Allows users to delete attachments
+ * - Supports showing more or fewer attachments with a toggle button
+ *
+ * Props:
+ * @param {Attachment[]} attachments - The list of current attachments
+ * @param {React.Dispatch<React.SetStateAction<Attachment[]>>} setAttachments - Callback to update the attachments list
+ *
+ * @returns {JSX.Element} The attachments section component
+ *
+ * @example
+ * // Basic usage
+ * <AttachmentsSection
+ *   attachments={taskAttachments}
+ *   setAttachments={setTaskAttachments}
+ * />
+ */
 
-interface AttachmentSectionProps {
-  attachment?: Attachment[];
-}
-
-export function AttachmentsSection({attachment}: AttachmentSectionProps) {
-  const [attachments, setAttachments] = useState<Attachment[]>(attachment || []);
+export function AttachmentsSection({
+  attachments,
+  setAttachments,
+}: {
+  attachments: Attachment[];
+  setAttachments: React.Dispatch<React.SetStateAction<Attachment[]>>;
+}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
@@ -43,18 +67,21 @@ export function AttachmentsSection({attachment}: AttachmentSectionProps) {
     return 'other';
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const newAttachments = acceptedFiles.map((file) => ({
-      id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-      name: file.name,
-      size: formatFileSize(file.size),
-      type: getFileType(file),
-      file: file,
-    }));
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const newAttachments = acceptedFiles.map((file) => ({
+        id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+        name: file.name,
+        size: formatFileSize(file.size),
+        type: getFileType(file),
+        file: file,
+      }));
 
-    setAttachments((prev) => [...prev, ...newAttachments]);
-    setIsDialogOpen(false);
-  }, []);
+      setAttachments((prev) => [...prev, ...newAttachments]);
+      setIsDialogOpen(false);
+    },
+    [setAttachments]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

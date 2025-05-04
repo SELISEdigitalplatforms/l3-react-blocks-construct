@@ -53,13 +53,16 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
 
   useEffect(() => {
     if (!userInfo) return;
-    generateOTP(userInfo.itemId, {
-      onSuccess: (res) => {
-        if (res?.isSuccess && res?.isSuccess) {
-          setMfaId(res?.mfaId);
-        }
-      },
-    });
+    generateOTP(
+      { userId: userInfo.itemId, mfaType: 1 },
+      {
+        onSuccess: (res) => {
+          if (res?.isSuccess && res?.isSuccess) {
+            setMfaId(res?.mfaId);
+          }
+        },
+      }
+    );
   }, [generateOTP, userInfo]);
 
   useEffect(() => {
@@ -100,7 +103,7 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
     const verifyPayload: VerifyOTP = {
       verificationCode: otpValue,
       mfaId: mfaId,
-      authType: userInfo?.userMfaType ?? 0,
+      authType: 1,
     };
 
     verifyOTP(verifyPayload, {
@@ -116,7 +119,7 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
         setOtpError('Verification failed. Please try again.');
       },
     });
-  }, [onNext, otpValue, toast, mfaId, userInfo?.userMfaType, verifyOTP]);
+  }, [onNext, otpValue, toast, mfaId, verifyOTP]);
 
   useEffect(() => {
     if (

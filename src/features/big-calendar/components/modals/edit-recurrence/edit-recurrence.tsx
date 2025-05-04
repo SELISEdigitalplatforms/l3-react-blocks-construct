@@ -294,20 +294,30 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
     if (selectedDays.length > 0) {
       ruleString += `;BYDAY=${selectedDays.join(',')}`;
     }
+
+    // Set the end date for recurrence
+    let endDateTime: Date;
     if (endType === 'on' && onDate) {
+      endDateTime = onDate;
       ruleString += `;UNTIL=${format(onDate, 'yyyyMMdd')}T${format(onDate, 'HHmmss')}Z`;
     } else if (endType === 'after') {
       ruleString += `;COUNT=${occurrenceCount}`;
+      // For COUNT, set a far future date to ensure we get all occurrences
+      endDateTime = new Date(baseEvent.start.getTime() + 10 * 365 * 24 * 60 * 60 * 1000); // 10 years
+    } else {
+      // If no end date or count is specified, generate events for 2 years by default
+      endDateTime = new Date(baseEvent.start.getTime() + 2 * 365 * 24 * 60 * 60 * 1000);
+      ruleString += `;UNTIL=${format(endDateTime, 'yyyyMMdd')}T${format(endDateTime, 'HHmmss')}Z`;
     }
 
     const rule = RRule.fromString(ruleString);
 
-    const eventOccurrences = rule.between(
-      baseEvent.start,
-      endType === 'on' && onDate
-        ? onDate
-        : new Date(new Date(baseEvent.start).getTime() + 365 * 24 * 60 * 60 * 1000)
-    );
+    // Get all occurrences between start and end date
+    const eventOccurrences = rule.between(baseEvent.start, endDateTime);
+
+    // If using COUNT, limit to the specified number of occurrences
+    const limitedOccurrences =
+      endType === 'after' ? eventOccurrences.slice(0, occurrenceCount) : eventOccurrences;
 
     const eventDuration = baseEvent.end.getTime() - baseEvent.start.getTime();
     const originalStartHours = baseEvent.start.getHours();
@@ -315,7 +325,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
     const originalStartSeconds = baseEvent.start.getSeconds();
     const originalStartMs = baseEvent.start.getMilliseconds();
 
-    return eventOccurrences.map((date) => {
+    return limitedOccurrences.map((date) => {
       const newStart = new Date(date);
       newStart.setHours(
         originalStartHours,
@@ -335,6 +345,12 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
           ...baseEvent.resource,
           color: baseEvent.resource?.color || 'hsl(var(--primary-500))',
           recurring: true,
+          selectedDays,
+          period,
+          interval,
+          endType,
+          onDate: onDate?.toISOString(),
+          occurrenceCount,
           members: baseEvent.resource?.members || [],
           meetingLink: baseEvent.resource?.meetingLink || '',
           description: baseEvent.resource?.description || '',
@@ -346,80 +362,120 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
   const handleSave = () => {
     const recurringEvents = generateRecurringEvents(initialRecurrenceEvent);
 
-    if (recurringEvents.length > 0) {
-      try {
-        const serializedEvents = recurringEvents.map((event) => ({
-          id: event.eventId,
-          start: event.start.toISOString(),
-          end: event.end.toISOString(),
-          title: event.title,
-          allDay: event.allDay,
-          resource: {
-            color: event.resource?.color,
-            recurring: true,
-            members: event.resource?.members,
-            meetingLink: event.resource?.meetingLink,
-            description: event.resource?.description,
+    if (recurringEvents.length === 0) {
+      console.error('No recurring events were generated');
+      return;
+    }
+
+    try {
+      // Store the complete event template with all necessary data
+      const eventTemplate: CalendarEvent = {
+        ...initialRecurrenceEvent,
+        start: new Date(initialRecurrenceEvent.start),
+        end: new Date(initialRecurrenceEvent.end),
+        resource: {
+          ...initialRecurrenceEvent.resource,
+          recurring: true,
+          members: initialRecurrenceEvent.resource?.members || [],
+          meetingLink: initialRecurrenceEvent.resource?.meetingLink || '',
+          description: initialRecurrenceEvent.resource?.description || '',
+          color: initialRecurrenceEvent.resource?.color || 'hsl(var(--primary-500))',
+          patternChanged: true,
+          recurrencePattern: {
+            selectedDays,
+            period,
+            interval,
+            endType,
+            onDate: onDate?.toISOString(),
+            occurrenceCount,
           },
-        }));
+        },
+      };
 
-        window.localStorage.removeItem('tempRecurringEvents');
-        window.localStorage.setItem('tempRecurringEvents', JSON.stringify(serializedEvents));
+      // Clear existing data before saving
+      window.localStorage.removeItem('tempEditEvent');
+      window.localStorage.setItem('tempEditEvent', JSON.stringify(eventTemplate));
 
-        const tempEventData = {
+      // Store all recurring events with complete data and convert dates to ISO strings
+      const allEvents = recurringEvents.map((event) => ({
+        ...event,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        resource: {
+          ...event.resource,
+          recurring: true,
+          members: event.resource?.members || [],
+          meetingLink: event.resource?.meetingLink || '',
+          description: event.resource?.description || '',
+          color: event.resource?.color || 'hsl(var(--primary-500))',
+          patternChanged: true,
+          recurrencePattern: {
+            selectedDays,
+            period,
+            interval,
+            endType,
+            onDate: onDate?.toISOString(),
+            occurrenceCount,
+          },
+        },
+      }));
+
+      // Save all events to localStorage
+      window.localStorage.setItem('tempRecurringEvents', JSON.stringify(allEvents));
+
+      // Update the events state with parsed dates
+      setEvents(allEvents);
+      onNext();
+    } catch (error) {
+      console.error('Error saving recurring events:', error);
+
+      try {
+        // If storage fails, try with minimal data
+        const minimalTemplate = {
           ...initialRecurrenceEvent,
-          events: recurringEvents,
+          start: initialRecurrenceEvent.start.toISOString(),
+          end: initialRecurrenceEvent.end.toISOString(),
           resource: {
             ...initialRecurrenceEvent.resource,
             recurring: true,
+            selectedDays,
+            period,
+            interval,
+            members: initialRecurrenceEvent.resource?.members || [],
           },
         };
-        window.localStorage.setItem('tempEditEvent', JSON.stringify(tempEventData));
+
+        window.localStorage.setItem('tempEditEvent', JSON.stringify(minimalTemplate));
+
+        // Store only essential event data
+        const firstEvent = recurringEvents[0];
+        if (firstEvent) {
+          const minimalEvents = [
+            {
+              ...firstEvent,
+              start: firstEvent.start.toISOString(),
+              end: firstEvent.end.toISOString(),
+              resource: {
+                ...firstEvent.resource,
+                recurring: true,
+                selectedDays,
+                period,
+                interval,
+                members: initialRecurrenceEvent.resource?.members || [],
+              },
+            },
+          ];
+          window.localStorage.setItem('tempRecurringEvents', JSON.stringify(minimalEvents));
+        }
+
         setEvents(recurringEvents);
         onNext();
-      } catch (error) {
-        console.error('Error saving recurring events:', error);
-        try {
-          const minimalEvents = recurringEvents.slice(0, 50).map((event) => ({
-            id: event.eventId,
-            start: event.start.toISOString(),
-            end: event.end.toISOString(),
-            title: event.title,
-            allDay: event.allDay,
-            resource: {
-              color: event.resource?.color,
-              recurring: true,
-              members: event.resource?.members,
-              meetingLink: event.resource?.meetingLink,
-              description: event.resource?.description,
-            },
-          }));
-          window.localStorage.setItem('tempRecurringEvents', JSON.stringify(minimalEvents));
-          setEvents(recurringEvents);
-          onNext();
-        } catch (e) {
-          console.error('Failed to save even minimal events:', e);
-          const firstEvent = {
-            id: recurringEvents[0].eventId,
-            start: recurringEvents[0].start.toISOString(),
-            end: recurringEvents[0].end.toISOString(),
-            title: recurringEvents[0].title,
-            allDay: recurringEvents[0].allDay,
-            resource: {
-              color: recurringEvents[0].resource?.color,
-              recurring: true,
-              members: recurringEvents[0].resource?.members,
-              meetingLink: recurringEvents[0].resource?.meetingLink,
-              description: recurringEvents[0].resource?.description,
-            },
-          };
-          window.localStorage.setItem('tempRecurringEvents', JSON.stringify([firstEvent]));
-          setEvents(recurringEvents);
-          onNext();
-        }
+      } catch (e) {
+        console.error('Failed to save even minimal data:', e);
+        // If all else fails, just update the state and proceed
+        setEvents(recurringEvents);
+        onNext();
       }
-    } else {
-      console.error('No recurring events were generated');
     }
   };
 
@@ -557,7 +613,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
             </div>
           </div>
         </div>
-        <DialogFooter className="flex w-full !flex-row !items-center gap-4 !mt-6">
+        <DialogFooter className="flex w-full !flex-row !items-center !justify-end gap-4 !mt-6">
           <Button variant="outline" onClick={onNext}>
             Cancel
           </Button>

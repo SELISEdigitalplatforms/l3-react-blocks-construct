@@ -21,6 +21,40 @@ import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation
 import { useToast } from 'hooks/use-toast';
 import { ITask } from 'features/task-manager/types/task';
 
+/**
+ * TaskManagerDropdownMenu Component
+ *
+ * A reusable dropdown menu component for managing task actions.
+ * This component supports:
+ * - Marking tasks as complete or reopening them
+ * - Moving tasks to different columns
+ * - Deleting tasks with confirmation
+ *
+ * Features:
+ * - Dropdown menu with submenus for moving tasks
+ * - Confirmation modal for task deletion
+ * - Toast notifications for successful actions
+ *
+ * Props:
+ * @param {ITask} task - The task object being managed
+ * @param {{ id: string; title: string }[]} columns - The list of columns for moving tasks
+ * @param {() => void} onToggleComplete - Callback triggered to toggle task completion
+ * @param {() => void} onDelete - Callback triggered to delete the task
+ * @param {(title: string) => void} onMoveToColumn - Callback triggered to move the task to a specific column
+ *
+ * @returns {JSX.Element} The task manager dropdown menu component
+ *
+ * @example
+ * // Basic usage
+ * <TaskManagerDropdownMenu
+ *   task={task}
+ *   columns={columns}
+ *   onToggleComplete={() => console.log('Task toggled')}
+ *   onDelete={() => console.log('Task deleted')}
+ *   onMoveToColumn={(column) => console.log('Moved to column:', column)}
+ * />
+ */
+
 interface TaskDropdownMenuProps {
   task: ITask;
   columns: { id: string; title: string }[];

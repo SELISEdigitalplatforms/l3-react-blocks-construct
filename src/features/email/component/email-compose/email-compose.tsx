@@ -2,26 +2,42 @@ import { useEffect, useState } from 'react';
 import { EmailComposeHeader } from './email-compose-header';
 import { EmailInput } from '../email-ui/email-input';
 import EmailTextEditor from '../email-ui/email-text-editor';
-import { TEmail, TFormProps, TIsComposing } from '../../types/email.types';
+import { TEmail, TFormData, TFormProps, TIsComposing } from '../../types/email.types';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from 'hooks/use-toast';
 import { EmailTagInput } from '../email-ui/email-tag-input';
 
 /**
- * EmailCompose component allows users to compose and send an email. It includes options to minimize, maximize,
- * and send the email, with fields for To, Cc, Bcc, Subject, and email content. It also features a text editor
- * for the email content and supports showing and hiding the Cc and Bcc fields.
+ * EmailCompose Component
  *
- * @component
+ * A reusable component for composing and sending emails.
+ * This component supports:
+ * - Minimizing, maximizing, and closing the email compose modal
+ * - Adding recipients (To, Cc, Bcc) and attachments
+ * - Writing email content with a rich text editor
+ * - Sending emails with validation
  *
- * @param {Object} props - The props for the component.
- * @param {function} props.onClose - A callback function that is triggered when the email compose modal is closed.
+ * Features:
+ * - Dynamic state management for To, Cc, Bcc, and email content
+ * - Supports forwarding and replying to emails
+ * - Provides a responsive UI for both desktop and mobile views
  *
- * @returns {JSX.Element} - The EmailCompose component displaying the email compose interface.
+ * Props:
+ * @param {() => void} onClose - Callback triggered when the email compose modal is closed
+ * @param {(email: TEmail) => void} addOrUpdateEmailInSent - Callback to add or update the email in the sent folder
+ * @param {TEmail | null} selectedEmail - The currently selected email for forwarding or replying
+ * @param {TIsComposing} isComposing - State indicating whether the email is being composed or forwarded
+ *
+ * @returns {JSX.Element} The email compose component
  *
  * @example
- * const handleClose = () => { console.log('Email compose closed'); };
- * <EmailCompose onClose={handleClose} />
+ * // Basic usage
+ * <EmailCompose
+ *   onClose={() => console.log('Closed')}
+ *   addOrUpdateEmailInSent={(email) => console.log('Email sent:', email)}
+ *   selectedEmail={null}
+ *   isComposing={{ isCompose: true, isForward: false }}
+ * />
  */
 
 interface EmailComposeProps {
@@ -78,10 +94,14 @@ export function EmailCompose({
       }));
 
       setContent(
-        `<div className="bg-low-emphasis "></div><p>from: ${selectedEmail.sender} &lt;${selectedEmail.email}&gt;</p><p>date: ${selectedEmail.date}</p><p>subject: ${selectedEmail.subject}</p><p>to: me &lt;demo@blocks.construct&gt;</p><p>${selectedEmail.content ?? selectedEmail.preview}</p>`
+        `<div className="bg-low-emphasis "></div><p>from: ${selectedEmail.sender || selectedEmail.preview} &lt;${selectedEmail.email}&gt;</p><p>date: ${selectedEmail.date}</p><p>subject: ${selectedEmail.subject}</p><p>to: me &lt;demo@blocks.construct&gt;</p><p>${selectedEmail.content ?? selectedEmail.preview}</p>${
+          isComposing?.replyData && Object.keys(isComposing.replyData).length > 0
+            ? `${isComposing.replyData.prevData ?? ''} ${isComposing.replyData.reply ?? ''}`
+            : ''
+        }`
       );
     }
-  }, [isComposing.isForward, selectedEmail]);
+  }, [isComposing, selectedEmail]);
 
   useEffect(() => {
     if (isComposing.isCompose) {
@@ -174,7 +194,7 @@ export function EmailCompose({
     <>
       {/* Grid View */}
       <div
-        className={`hidden md:flex fixed  ${
+        className={`hidden md:flex fixed ${
           isMaximized
             ? 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh] overflow-y-auto'
             : 'bottom-0 right-4 w-[560px] min-h-[480px] max-h-[90vh] scroll-auto'
@@ -224,8 +244,10 @@ export function EmailCompose({
               onCancel={onClose}
               submitName="Send"
               cancelButton="Discard"
-              setFormData={setFormData}
               formData={formData}
+              setFormData={
+                setFormData as React.Dispatch<React.SetStateAction<TFormProps | TFormData>>
+              }
             />
           </div>
         </div>
@@ -280,7 +302,9 @@ export function EmailCompose({
               onCancel={onClose}
               submitName="Send"
               cancelButton="Discard"
-              setFormData={setFormData}
+              setFormData={
+                setFormData as React.Dispatch<React.SetStateAction<TFormProps | TFormData>>
+              }
               formData={formData}
             />
           </div>

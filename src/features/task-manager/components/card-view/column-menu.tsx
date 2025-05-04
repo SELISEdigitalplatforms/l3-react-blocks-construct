@@ -18,6 +18,37 @@ import {
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 
+/**
+ * ColumnMenu Component
+ *
+ * A reusable dropdown menu component for managing column actions in a task manager.
+ * This component supports:
+ * - Renaming a column
+ * - Deleting a column with confirmation
+ *
+ * Features:
+ * - Dropdown menu with options for renaming and deleting columns
+ * - Confirmation modal for column deletion
+ * - Input dialog for renaming columns
+ *
+ * Props:
+ * @param {string} columnId - The ID of the column being managed
+ * @param {string} columnTitle - The current title of the column
+ * @param {(columnId: string, newTitle: string) => void} onRename - Callback triggered when the column is renamed
+ * @param {(columnId: string) => void} onDelete - Callback triggered when the column is deleted
+ *
+ * @returns {JSX.Element} The column menu component
+ *
+ * @example
+ * // Basic usage
+ * <ColumnMenu
+ *   columnId="1"
+ *   columnTitle="To Do"
+ *   onRename={(id, title) => console.log('Renamed:', id, title)}
+ *   onDelete={(id) => console.log('Deleted:', id)}
+ * />
+ */
+
 interface ColumnMenuProps {
   columnId: string;
   columnTitle: string;

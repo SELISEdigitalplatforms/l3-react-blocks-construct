@@ -124,21 +124,11 @@ export const activities: ActivityGroup[] = [
         category: 'Inventory',
         description: 'Deleted item "Adhesives" from inventory',
       },
-      {
-        time: '2025-03-07T22:32:00Z',
-        category: 'Task manager',
-        description: 'Deleted task "Follow-up on Vendor Contract"',
-      },
     ],
   },
   {
     date: '2025-03-06T00:00:00Z',
     items: [
-      {
-        time: '2025-03-06T22:32:00Z',
-        category: 'Task manager',
-        description: 'User Adrian Müller completed the task "Finalize Q1 Budget"',
-      },
       {
         time: '2025-03-06T22:32:00Z',
         category: 'Calendar',

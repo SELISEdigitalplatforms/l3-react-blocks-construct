@@ -1,4 +1,4 @@
-import { Mail, Star, Send, AlertTriangle, Trash2, Bookmark, File } from 'lucide-react';
+import { Mail, Star, Send, AlertTriangle, Trash2, File } from 'lucide-react';
 
 export const getNavItems = (emails: any, location: any, navigate: any, setSelectedEmail: any) => {
   return [
@@ -14,12 +14,7 @@ export const getNavItems = (emails: any, location: any, navigate: any, setSelect
       href: '/mail/starred',
       count: emails['starred']?.length ?? 0,
     },
-    {
-      icon: <Bookmark className="h-4 w-4" />,
-      label: 'Important',
-      href: '/mail/important',
-      count: emails['important']?.length ?? 0,
-    },
+
     {
       icon: <Send className="h-4 w-4" />,
       label: 'Sent',

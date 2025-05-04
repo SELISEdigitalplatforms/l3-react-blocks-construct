@@ -4,14 +4,18 @@ import githubIcon from 'assets/images/social_media_github.svg';
 import linkedinIcon from 'assets/images/social_media_in.svg';
 import microsoftIcon from 'assets/images/social_media_ms.svg';
 import googleIcon from 'assets/images/social_media_google.svg';
-import logo from 'assets/images/selise_Blocks_logo.svg';
 import { Link } from 'react-router-dom';
+import darklogo from 'assets/images/construct_logo_dark.svg';
+import lightlogo from 'assets/images/construct_logo_light.svg';
+import { useTheme } from 'components/core/theme-provider';
 
 export function SigninPage() {
+  const { theme } = useTheme();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="w-32 h-14 mb-2">
-        <img src={logo} className="w-full h-full" alt="logo" />
+        <img src={theme == 'dark' ? darklogo : lightlogo} className="w-full h-full" alt="logo" />
       </div>
       <div>
         <div className="text-2xl font-bold text-high-emphasis">Log in</div>

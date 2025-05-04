@@ -5,13 +5,17 @@ import linkedinIcon from 'assets/images/social_media_in.svg';
 import microsoftIcon from 'assets/images/social_media_ms.svg';
 import googleIcon from 'assets/images/social_media_google.svg';
 import { SignupForm } from 'features/auth/components/signup-form';
-import logo from 'assets/images/selise_Blocks_logo.svg';
+import darklogo from 'assets/images/construct_logo_dark.svg';
+import lightlogo from 'assets/images/construct_logo_light.svg';
+import { useTheme } from 'components/core/theme-provider';
 
 export function SignupPage() {
+  const { theme } = useTheme();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="w-32 h-14 mb-2">
-        <img src={logo} className="w-full h-full" alt="logo" />
+        <img src={theme == 'dark' ? darklogo : lightlogo} className="w-full h-full" alt="logo" />
       </div>
       <div>
         <h2 className="text-2xl font-bold text-high-emphasis">

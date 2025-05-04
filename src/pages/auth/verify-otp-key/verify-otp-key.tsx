@@ -41,7 +41,7 @@ export function VerifyOtpKey() {
     onResend: () => {
       if (!mfaId) return;
       resendOtp(mfaId, {
-        onSuccess: (data) => {
+        onSuccess: (data: { mfaId?: string }) => {
           if (data?.mfaId) {
             setNewMfaId(data.mfaId);
           }

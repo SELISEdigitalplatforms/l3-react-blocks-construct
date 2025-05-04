@@ -9,26 +9,28 @@ import { parseISO, format } from 'date-fns';
 import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
 
 /**
- * EmailViewResponseType component displays the sender's information, recipient details, and provides a dropdown
- * menu to view more information about the email (such as sender, recipient, subject, date, and email body).
- * It is typically used in the context of an email view to show metadata about the selected email.
+ * EmailViewResponseType Component
  *
- * @component
- * @param {Object} props - The component props.
- * @param {TEmail} props.selectedEmail - The selected email object that contains details like sender, subject, and other metadata.
- * @param {boolean} props.isReply - A flag indicating whether the user is in reply mode.
- * @param {Function} props.setIsReply - A function to toggle the reply mode state.
+ * Displays the sender's information, recipient details, and provides a dropdown menu
+ * to view more information about the email, such as sender, recipient, subject, date,
+ * and email body. Typically used in the context of an email view to show metadata about
+ * the selected email.
  *
- * @returns {JSX.Element} - The EmailViewResponseType component displaying the sender, recipient, subject, and additional metadata.
+ * Features:
+ * - Displays sender's name with avatar
+ * - Shows recipient details and subject
+ * - Formats and displays email date and time
+ * - Dropdown menu with additional email metadata (from, to, cc, subject, date)
+ * - Responsive layout for both mobile and desktop views
+ *
+ * Props:
+ * @param {TEmail} selectedEmail - The selected email object containing details such as sender, subject, and metadata
+ *
+ * @returns {JSX.Element} The component displaying the email metadata, sender information, and the dropdown for more options
  *
  * @example
- * return (
- *   <EmailViewResponseType
- *     selectedEmail={selectedEmail}
- *     isReply={isReply}
- *     setIsReply={setIsReply}
- *   />
- * )
+ * // Basic usage
+ * <EmailViewResponseType selectedEmail={selectedEmail} />
  */
 
 interface EmailViewResponseTypeProps {
@@ -43,11 +45,20 @@ const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseType
 
   return (
     <>
-      <div className="flex justify-start items-center gap-2 h-fit">
+      <div className="flex justify-start items-center gap-2 h-fit ">
         <div className="flex justify-center items-center gap-4">
-          <CustomAvatar name={Array.isArray(selectedEmail.sender) ? selectedEmail.sender.join(', ') : selectedEmail.sender} alt="Profile avatar" height={48} width={48} />
+          <CustomAvatar
+            name={
+              Array.isArray(selectedEmail.sender)
+                ? selectedEmail.sender.join(', ')
+                : selectedEmail.sender
+            }
+            alt="Profile avatar"
+            height={48}
+            width={48}
+          />
           <div>
-            <p className="text-high-emphasis">{selectedEmail.sender}</p>
+            <p className="text-high-emphasis line-clamp-1">{selectedEmail.sender}</p>
             <div className="flex gap-1">
               <div className="text-sm text-medium-emphasis">
                 to <span className="text-high-emphasis font-semibold">me</span> and{' '}

@@ -13,6 +13,36 @@ import {
 import { arrayMove } from '@dnd-kit/sortable';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 
+/**
+ * useCardTasks Hook
+ *
+ * A custom hook for managing tasks and columns in a Kanban-style task manager.
+ * This hook supports:
+ * - Adding, renaming, and deleting columns
+ * - Adding tasks to columns
+ * - Drag-and-drop functionality for reordering tasks and moving them between columns
+ *
+ * Features:
+ * - Integrates with the `@dnd-kit` library for drag-and-drop functionality
+ * - Provides sensors for touch, pointer, and mouse interactions
+ * - Manages active tasks and columns during drag-and-drop operations
+ *
+ * @returns {Object} An object containing task and column management functions, sensors, and state
+ *
+ * @example
+ * // Basic usage
+ * const {
+ *   columns,
+ *   addColumn,
+ *   renameColumn,
+ *   deleteColumn,
+ *   addTask,
+ *   handleDragStart,
+ *   handleDragOver,
+ *   handleDragEnd,
+ * } = useCardTasks();
+ */
+
 export function useCardTasks() {
   const {
     columnTasks,

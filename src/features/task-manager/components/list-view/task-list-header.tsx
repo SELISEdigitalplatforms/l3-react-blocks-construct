@@ -1,3 +1,21 @@
+/**
+ * TaskListHeader Component
+ *
+ * A reusable component for rendering the header of a task list.
+ * This component supports:
+ * - Displaying column headers for task properties such as title, status, priority, due date, assignees, and tags
+ *
+ * Features:
+ * - Provides a structured layout for task list headers
+ * - Ensures consistent alignment with task rows
+ *
+ * @returns {JSX.Element} The task list header component
+ *
+ * @example
+ * // Basic usage
+ * <TaskListHeader />
+ */
+
 export function TableHeader() {
   return (
     <div className="border-b border-gray-200 sticky top-0 bg-white z-10">

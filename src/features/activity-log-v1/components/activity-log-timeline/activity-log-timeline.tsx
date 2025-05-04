@@ -6,6 +6,30 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import no_activity from 'assets/images/Illustration.svg';
 import { debounce } from 'lodash';
 
+/**
+ * ActivityLogTimeline Component
+ *
+ * A reusable component for rendering a timeline of activity logs.
+ * This component supports:
+ * - Displaying activity groups with a scrollable timeline
+ * - Dynamically loading more activity groups as the user scrolls
+ * - Showing a placeholder when no activities are available
+ *
+ * Features:
+ * - Infinite scrolling with debounce for performance optimization
+ * - Displays activity groups with a vertical timeline indicator
+ * - Handles empty states with a user-friendly message and illustration
+ *
+ * Props:
+ * @param {ActivityGroup[]} activities - The list of activity groups to display
+ *
+ * @returns {JSX.Element} The activity log timeline component
+ *
+ * @example
+ * // Basic usage
+ * <ActivityLogTimeline activities={activityGroups} />
+ */
+
 const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) => {
   const [visibleCount, setVisibleCount] = useState(5);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -56,12 +80,6 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
                   {...group}
                 />
               ))}
-
-              {visibleCount < activities.length && (
-                <div className="text-center py-4 text-gray-500 text-sm">
-                  Scroll for more activities...
-                </div>
-              )}
             </div>
           </div>
         </Card>

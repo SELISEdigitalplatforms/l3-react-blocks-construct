@@ -6,6 +6,26 @@ import TaskCardView from './task-card-view';
 import { TasksProvider } from 'features/task-manager/hooks/use-task-context';
 import { TaskProvider } from 'features/task-manager/contexts/task-context';
 
+/**
+ * TaskManager Component
+ *
+ * A central task management component that enables users to view, add, and manage tasks.
+ * Supports both list and board (card) views, and handles state for view modes and task data.
+ *
+ * Features:
+ * - Board and list view modes for task visualization
+ * - Integration with `TaskService` for task retrieval
+ * - New task modal handling
+ * - Toolbar for user interaction and view toggling
+ * - Context providers for shared task state and logic
+ *
+ * @returns {JSX.Element} The TaskManager UI with current tasks rendered in the selected view
+ *
+ * @example
+ * // Usage in a route or page
+ * <TaskManager />
+ */
+
 const taskService = new TaskService();
 
 export default function TaskManager() {

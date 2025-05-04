@@ -4,14 +4,51 @@ import { ChevronDown, PenLine } from 'lucide-react';
 import { Label } from 'components/ui/label';
 import { useTaskDetails } from '../../hooks/use-task-details';
 
+/**
+ * EditableDescription Component
+ *
+ * A reusable component for displaying and editing task descriptions.
+ * This component supports:
+ * - Inline editing of descriptions with a rich text editor
+ * - Saving or canceling changes
+ * - Automatically focusing the editor when editing starts
+ * - Showing or hiding additional lines of content
+ *
+ * Features:
+ * - Allows users to edit descriptions inline
+ * - Dynamically loads a custom text editor to reduce initial bundle size
+ * - Saves changes on button click
+ * - Cancels editing and reverts to the original description
+ * - Displays a "Show More" or "Show Less" button for long descriptions
+ *
+ * Props:
+ * @param {string} [taskId] - The ID of the task associated with the description
+ * @param {string} [initialContent] - The initial content of the description
+ * @param {(content: string) => void} [onContentChange] - Callback triggered when the description is saved
+ *
+ * @returns {JSX.Element} The editable description component
+ *
+ * @example
+ * // Basic usage
+ * <EditableDescription
+ *   taskId="123"
+ *   initialContent="This is a task description."
+ *   onContentChange={(newContent) => console.log('Saved description:', newContent)}
+ * />
+ */
+
 interface EditableDescriptionProps {
   taskId?: string;
   initialContent?: string;
   onContentChange?: (content: string) => void;
 }
 
-export function EditableDescription({ initialContent, onContentChange, taskId }: EditableDescriptionProps) {
-  const {task, updateTaskDetails} = useTaskDetails(taskId);
+export function EditableDescription({
+  initialContent,
+  onContentChange,
+  taskId,
+}: EditableDescriptionProps) {
+  const { task, updateTaskDetails } = useTaskDetails(taskId);
   const [content, setContent] = useState(initialContent);
   const [isEditing, setIsEditing] = useState(initialContent ? false : true);
   const [isHovering, setIsHovering] = useState(false);

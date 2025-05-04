@@ -62,7 +62,11 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
 
   const visibleActivities = activities.slice(0, visibleCount);
 
-  const isShowingAllActivities = visibleCount >= activities.length;
+  // const isShowingAllActivities = visibleCount >= activities.length;
+  // ${
+  //   isShowingAllActivities ? 'h-[calc(100%-110px)]' : 'h-[calc(100%-20px)]'
+  // }
+
 
   return (
     <>
@@ -77,9 +81,7 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
             <div className="relative">
               {visibleActivities.length > 0 && (
                 <div
-                  className={`absolute left-1/2 transform -translate-x-1/2 w-[2px] bg-low-emphasis top-[60px] ${
-                    isShowingAllActivities ? 'h-[calc(100%-110px)]' : 'h-[calc(100%-20px)]'
-                  } z-0`}
+                  className={`absolute left-1/2 transform -translate-x-1/2 w-[2px] bg-low-emphasis top-[60px] h-[calc(100%-110px)] z-0`}
                 />
               )}
 
@@ -91,12 +93,6 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
                   {...group}
                 />
               ))}
-
-              {visibleCount < activities.length && (
-                <div className="text-center py-4 text-gray-500 text-sm">
-                  Scroll for more activities...
-                </div>
-              )}
             </div>
           </div>
         </Card>

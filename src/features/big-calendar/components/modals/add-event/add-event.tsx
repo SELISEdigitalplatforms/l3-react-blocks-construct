@@ -438,7 +438,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               name="meetingLink"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-normal text-sm">Meeting Link*</FormLabel>
+                  <FormLabel className="font-normal text-sm">Meeting Link</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter your meeting link" {...field} />
                   </FormControl>

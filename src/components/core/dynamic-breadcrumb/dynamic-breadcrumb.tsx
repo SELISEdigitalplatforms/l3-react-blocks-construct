@@ -1,6 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Breadcrumb, BreadcrumbLink, BreadcrumbList } from 'components/ui/breadcrumb';
+import {
+  Breadcrumb,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from 'components/ui/breadcrumb';
 import { DYNAMIC_BREADCRUMB_TITLES } from 'constant/dynamic-breadcrumb-title';
 
 /**
@@ -59,34 +66,48 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
     ? dynamicBreadcrumbs.slice(breadcrumbIndex - 1)
     : dynamicBreadcrumbs;
 
+  if (displayedCrumbs.length === 1 && DYNAMIC_BREADCRUMB_TITLES[displayedCrumbs[0].href]) {
+    return null;
+  }
+
   return (
     <Breadcrumb className="hidden md:flex">
       <BreadcrumbList>
-        {/* Multi Breadcrumbs */}
-        {/* {displayedCrumbs.map((breadcrumb, index) => (
-          <React.Fragment key={breadcrumb.href}>
-            <BreadcrumbItem>
-              {index === displayedCrumbs.length - 1 ? (
-                <BreadcrumbPage className="text-muted-foreground">
-                  {DYNAMIC_BREADCRUMB_TITLES[breadcrumb.href] || breadcrumb.label}
-                </BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink asChild>
-                  <Link to={breadcrumb.href} className="hover:text-primary">
-                    {DYNAMIC_BREADCRUMB_TITLES[breadcrumb.href] || breadcrumb.label}
-                  </Link>
-                </BreadcrumbLink>
-              )}
-            </BreadcrumbItem>
-            {index < displayedCrumbs.length - 1 && <BreadcrumbSeparator />}
-          </React.Fragment>
-        ))} */}
-        {/* Single Breadcrumbs */}
-        <BreadcrumbLink asChild>
-          <Link to={displayedCrumbs[0].href} className="hover:text-primary">
-            {DYNAMIC_BREADCRUMB_TITLES[displayedCrumbs[0].href] || displayedCrumbs[0].label}
-          </Link>
-        </BreadcrumbLink>
+        {displayedCrumbs.map((breadcrumb, index) => {
+          const isLast = index === displayedCrumbs.length - 1;
+          const title = DYNAMIC_BREADCRUMB_TITLES[breadcrumb.href];
+
+          const isDynamicSegment = breadcrumb.label.includes('[') && breadcrumb.label.includes(']');
+          const parentPath = breadcrumb.href.split('/').slice(0, -1).join('/');
+          const parentTitle = parentPath ? DYNAMIC_BREADCRUMB_TITLES[parentPath] : null;
+
+          const displayLabel =
+            isDynamicSegment && parentTitle
+              ? `${parentTitle} > ${breadcrumb.label.replace(/[[\]]/g, '')}`
+              : title || breadcrumb.label;
+
+          return (
+            <React.Fragment key={breadcrumb.href}>
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage className="text-xs text-muted-foreground">
+                    {displayLabel}
+                  </BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link
+                      to={breadcrumb.href}
+                      className="text-xs text-high-emphasis font-semibold hover:text-primary"
+                    >
+                      {displayLabel}
+                    </Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              {!isLast && <BreadcrumbSeparator />}
+            </React.Fragment>
+          );
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   );

@@ -23,17 +23,39 @@ import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
 import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
 
+/**
+ * TaskListView Component
+ *
+ * A task list interface that supports drag-and-drop reordering, task creation,
+ * and filtering, built using `@dnd-kit/core` for drag behavior and contextual
+ * task logic via `useListTasks`.
+ *
+ * Features:
+ * - Drag-and-drop sorting with visual overlays
+ * - Task filtering based on status
+ * - Inline new task creation
+ * - Modal support for task details viewing
+ * - Auto-wires "Add Item" button click to open task input row
+ *
+ * Props:
+ * @param {TaskDetails[]} [task] - Optional array of task data (unused in this version, handled by context)
+ * @param {TaskService} taskService - Service for interacting with task details and updates
+ *
+ * @returns {JSX.Element} A drag-and-drop-enabled list of tasks with task creation and modal support
+ *
+ * @example
+ * // Basic usage inside a task manager
+ * <TaskListView taskService={new TaskService()} />
+ */
+
 interface TaskListViewProps {
   task?: TaskDetails[];
   taskService: TaskService;
 }
 
 export function TaskListView({ taskService }: TaskListViewProps) {
-  const { tasks,
-    createTask,
-    updateTaskOrder,
-    getFilteredTasks } = useListTasks();
-  const [statusFilter] = useState<"todo" | "inprogress" | "done" | null>(null);
+  const { tasks, createTask, updateTaskOrder, getFilteredTasks } = useListTasks();
+  const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
   const [activeTask, setActiveTask] = useState<ITask | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
   const [isTaskDetailsModalOpen, setTaskDetailsModalOpen] = useState(false);
@@ -155,7 +177,7 @@ export function TaskListView({ taskService }: TaskListViewProps) {
                       <StatusCircle isCompleted={true} />
                     </div>
                     <div className="flex-grow">
-                      <p className="text-sm font-medium text-gray-900">{activeTask.content}</p>
+                      <p className="font-medium text-sm text-high-emphasis">{activeTask.content}</p>
                     </div>
                   </div>
                 )}

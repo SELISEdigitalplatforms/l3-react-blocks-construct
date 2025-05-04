@@ -3,9 +3,13 @@ import { useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, useSidebar } from '../../ui/sidebar';
 import { menuItems } from '../../../constant/sidebar-menu';
 import { SidebarMenuItemComponent } from './sidebar-menu-Item';
-import logo from 'assets/images/selise_Blocks_logo.svg';
-import smallLogo from 'assets/images/selise_logo_small.svg';
+import darklogo from 'assets/images/construct_logo_dark.svg';
+import lightlogo from 'assets/images/construct_logo_light.svg';
+import lightsmallLogo from 'assets/images/construct_logo_small_light.svg';
+import darksmallLogo from 'assets/images/construct_logo_small_dark.svg';
+
 import { X } from 'lucide-react';
+import { useTheme } from 'components/core/theme-provider';
 
 /**
  * AppSidebar Component
@@ -46,6 +50,7 @@ import { X } from 'lucide-react';
  */
 
 export function AppSidebar() {
+  const { theme } = useTheme();
   const { pathname } = useLocation();
   const { setOpenMobile, open, isMobile, openMobile } = useSidebar();
 
@@ -91,7 +96,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-2">
         <div className="relative h-10 w-full">
           <img
-            src={logo}
+            src={theme == 'dark' ? darklogo : lightlogo}
             alt="logo"
             className={`absolute left-4 top-1 h-10 w-auto max-w-full transition-all duration-300 ${
               open || isMobile ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -99,9 +104,9 @@ export function AppSidebar() {
           />
 
           <img
-            src={smallLogo}
+            src={theme == 'dark' ? darksmallLogo : lightsmallLogo}
             alt="smallLogo"
-            className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-8 w-8 transition-all duration-300 ${
+            className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-5 w-5 transition-all duration-300  ${
               open || isMobile ? 'opacity-0 pointer-events-none' : 'opacity-100'
             }`}
           />

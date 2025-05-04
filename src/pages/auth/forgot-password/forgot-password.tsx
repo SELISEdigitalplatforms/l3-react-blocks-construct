@@ -1,5 +1,5 @@
 import { ForgotpasswordForm } from 'features/auth/components/forgot-password';
-import logo from 'assets/images/selise_Blocks_logo.svg';
+import logo from 'assets/images/construct_logo.svg';
 
 export function ForgotPasswordPage() {
   return (

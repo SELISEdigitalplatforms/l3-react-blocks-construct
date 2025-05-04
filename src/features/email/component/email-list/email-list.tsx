@@ -1,6 +1,6 @@
-import { Paperclip, Star, Bookmark, SquarePen } from 'lucide-react';
+import { Paperclip, Star, SquarePen } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { TEmail, TIsComposing } from '../../types/email.types';
+import { TEmail } from '../../types/email.types';
 import { useState } from 'react';
 import { Checkbox } from 'components/ui/checkbox';
 import { parseISO, format } from 'date-fns';
@@ -10,21 +10,48 @@ import { Button } from 'components/ui/button';
 import { htmlToPlainText } from '../../services/email';
 
 /**
- * EmailList component displays a list of emails with pagination, filtering options (All and Unread),
- * and allows users to select an email. It renders email data with additional information such as sender,
- * subject, preview, and metadata like attachments or starred status.
+ * EmailList Component
  *
- * @component
+ * A reusable component for displaying a list of emails with filtering, pagination, and selection capabilities.
+ * This component supports:
+ * - Filtering emails by "All" or "Unread"
+ * - Selecting individual or all emails for bulk actions
+ * - Paginating the email list
+ * - Displaying email details such as sender, subject, preview, and metadata (e.g., attachments, starred status)
  *
- * @param {Object} props - The props for the component.
- * @param {function} props.onSelectEmail - A callback function that is triggered when an email is selected.
- * @param {TEmail | null} props.selectedEmail - The currently selected email, if any.
+ * Features:
+ * - Responsive design for both desktop and mobile views
+ * - Supports bulk selection and filtering
+ * - Pagination for managing large email lists
  *
- * @returns {JSX.Element} - The EmailList component displaying a list of emails with filtering and pagination.
+ * Props:
+ * @param {(email: TEmail | null) => void} onSelectEmail - Callback triggered when an email is selected
+ * @param {TEmail | null} selectedEmail - The currently selected email
+ * @param {TEmail[]} emails - The list of emails to display
+ * @param {React.Dispatch<React.SetStateAction<Record<string, TEmail[]>>>} setEmails - State setter for updating email data
+ * @param {string} category - The current email category (e.g., inbox, sent)
+ * @param {React.Dispatch<React.SetStateAction<boolean>>} setIsAllSelected - State setter for bulk selection
+ * @param {React.Dispatch<React.SetStateAction<string[]>>} setCheckedEmailIds - State setter for selected email IDs
+ * @param {string[]} checkedEmailIds - The list of selected email IDs
+ * @param {() => void} handleComposeEmail - Callback triggered to open the compose email modal
+ * @param {(email: TEmail) => void} handleEmailSelection - Callback triggered when an email is clicked
+ *
+ * @returns {JSX.Element} The email list component
  *
  * @example
- * const onSelectEmail = (email) => { console.log(email); };
- * <EmailList onSelectEmail={onSelectEmail} selectedEmail={null} />
+ * // Basic usage
+ * <EmailList
+ *   onSelectEmail={(email) => console.log(email)}
+ *   selectedEmail={null}
+ *   emails={emailData}
+ *   setEmails={setEmails}
+ *   category="inbox"
+ *   setIsAllSelected={setIsAllSelected}
+ *   setCheckedEmailIds={setCheckedEmailIds}
+ *   checkedEmailIds={[]}
+ *   handleComposeEmail={() => console.log('Compose Email')}
+ *   handleEmailSelection={(email) => console.log('Selected Email:', email)}
+ * />
  */
 
 interface EmailListProps {
@@ -36,7 +63,6 @@ interface EmailListProps {
   setIsAllSelected: React.Dispatch<React.SetStateAction<boolean>>;
   setCheckedEmailIds: React.Dispatch<React.SetStateAction<string[]>>;
   checkedEmailIds: string[];
-  isComposing: TIsComposing;
   handleComposeEmail: () => void;
   handleEmailSelection: (email: TEmail) => void;
 }
@@ -48,7 +74,7 @@ export function EmailList({
   setCheckedEmailIds,
   checkedEmailIds,
   handleComposeEmail,
-  handleEmailSelection
+  handleEmailSelection,
 }: Readonly<EmailListProps>) {
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,8 +92,6 @@ export function EmailList({
   };
 
   const formatReceivedDate = (dateString: string) => format(parseISO(dateString), 'dd.MM.yy');
-
-  
 
   const isAllChecked =
     paginatedEmails.length > 0 &&
@@ -91,7 +115,7 @@ export function EmailList({
       {/* Grid view */}
       <Tabs
         defaultValue="all"
-        className="hidden md:flex min-w-[307px] h-[calc(100vh-130px)] flex-col gap-3"
+        className="hidden  md:flex min-w-[307px] h-[calc(100vh-130px)] flex-col gap-3"
       >
         <div className="flex items-center  justify-between px-4 py-3 gap-4 border-b">
           <div className="flex items-center space-x-2 ">
@@ -103,7 +127,7 @@ export function EmailList({
 
             <Label className="text-sm font-medium ">Select All</Label>
           </div>
-          <TabsList className="grid grid-cols-2 min-w-[124px] text-sm p-1 bg-surface">
+          <TabsList className="grid grid-cols-2 rounded-md min-w-[124px] text-sm p-1 bg-surface">
             <TabsTrigger
               className="[&[data-state=active]]:bg-white rounded"
               value="all"
@@ -127,7 +151,7 @@ export function EmailList({
               {paginatedEmails?.map((email) => (
                 <div
                   key={email.id}
-                  className={`cursor-pointer p-4  transition-colors hover:bg-surface flex flex-col gap-1 ${selectedEmail?.id === email.id && 'bg-surface'} ${checkedEmailIds?.includes(email?.id) && 'bg-primary-50'} `}
+                  className={`cursor-pointer p-4  transition-colors hover:bg-neutral-50 flex flex-col gap-1 ${selectedEmail?.id === email.id && 'bg-surface'} ${checkedEmailIds?.includes(email?.id) && 'bg-primary-50'} ${email.isRead && 'bg-neutral-25'} `}
                   onClick={() => handleEmailSelection(email)}
                 >
                   <div className="flex flex-row gap-2 ">
@@ -138,29 +162,46 @@ export function EmailList({
                           setCheckedEmailIds((prev) =>
                             checked ? [...prev, email.id] : prev.filter((id) => id !== email.id)
                           );
-                        }} 
+                        }}
                       />
                     </div>
                     <div className="flex flex-col gap-1 w-full">
                       <div className="flex items-center justify-between ">
-                        <h3
-                          className={`text-high-emphasis ${email.isRead ? 'font-normal' : 'font-bold'}`}
-                        >
-                          {email?.sender ?? email?.recipient}
-                        </h3>
+                        <div className="flex gap-2">
+                          <h3
+                            className={`text-high-emphasis ${email.isRead ? 'font-normal' : 'font-bold'}`}
+                          >
+                            {email?.sender ?? email?.recipient}
+                          </h3>
+                          {!email.isRead && (
+                            <div className="flex items-center justify-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="8"
+                                height="8"
+                                viewBox="0 0 8 8"
+                                fill="none"
+                              >
+                                <circle cx="4" cy="4" r="4" fill="#349DD8" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
                         <p className="text-xs text-medium-emphasis">
                           {formatReceivedDate(email.date)}
                         </p>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className={`text-sm ${email.isRead ? 'font-normal' : 'font-bold'}`}>
+                        <p
+                          className={`text-sm line-clamp-1 ${email.isRead ? 'font-normal' : 'font-bold'}`}
+                        >
                           {email.subject}
                         </p>
                         <div className="flex gap-2 items-center">
                           {(email.images.length > 0 || email.attachments?.length > 0) && (
                             <Paperclip className="h-4 w-4 text-medium-emphasis" />
                           )}
-                          {email.isImportant && <Bookmark className="h-4 w-4 text-secondary-400" />}
+
                           {email.isStarred && <Star className="h-4 w-4 text-warning" />}
                         </div>
                       </div>
@@ -201,7 +242,7 @@ export function EmailList({
         >
           <div className="flex flex-col items-center  justify-between px-4 py-3 gap-4 border-b">
             {checkedEmailIds?.length === 0 && (
-              <TabsList className="grid grid-cols-2 w-full text-sm p-1 bg-surface">
+              <TabsList className="grid grid-cols-2 rounded-md w-full text-sm p-1 bg-surface">
                 <TabsTrigger
                   className="[&[data-state=active]]:bg-white rounded"
                   value="all"
@@ -238,7 +279,8 @@ export function EmailList({
                   {paginatedEmails.map((email) => (
                     <div
                       key={email.id}
-                      className={`cursor-pointer p-4 transition-colors  flex flex-col gap-1  ${checkedEmailIds?.includes(email.id) && 'bg-primary-50'}`}
+                      // className={`cursor-pointer p-4 transition-colors  flex flex-col gap-1  ${checkedEmailIds?.includes(email.id) && 'bg-primary-50'}`}
+                      className={`cursor-pointer p-4  transition-colors hover:bg-neutral-50 flex flex-col gap-1 ${selectedEmail?.id === email.id && 'bg-surface'} ${checkedEmailIds?.includes(email?.id) && 'bg-primary-50'} ${email.isRead && 'bg-neutral-25'} `}
                       onClick={() => handleEmailSelection(email)}
                     >
                       <div className="flex flex-row gap-2">
@@ -254,26 +296,41 @@ export function EmailList({
                         </div>
                         <div className="flex flex-col gap-1 w-full">
                           <div className="flex items-center justify-between">
-                            <h3
-                              className={`text-high-emphasis ${email.isRead ? 'font-normal' : 'font-bold'}`}
-                            >
-                              {email?.sender ?? email?.recipient}
-                            </h3>
+                            <div className="flex gap-2 justify-center items-center">
+                              <h3
+                                className={`text-high-emphasis ${email.isRead ? 'font-normal' : 'font-bold'}`}
+                              >
+                                {email?.sender ?? email?.recipient}
+                              </h3>
+                              {!email.isRead && (
+                                <div>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="8"
+                                    height="8"
+                                    viewBox="0 0 8 8"
+                                    fill="none"
+                                  >
+                                    <circle cx="4" cy="4" r="4" fill="#349DD8" />
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
                             <p className="text-xs text-medium-emphasis">
                               {formatReceivedDate(email.date)}
                             </p>
                           </div>
                           <div className="flex items-center justify-between">
-                            <p className={`text-sm ${email.isRead ? 'font-normal' : 'font-bold'}`}>
+                            <p
+                              className={`text-sm line-clamp-1 ${email.isRead ? 'font-normal' : 'font-bold'}`}
+                            >
                               {email.subject}
                             </p>
                             <div className="flex gap-2 items-center">
                               {(email.images.length > 0 || email.attachments?.length > 0) && (
                                 <Paperclip className="h-4 w-4 text-medium-emphasis" />
                               )}
-                              {email.isImportant && (
-                                <Bookmark className="h-4 w-4 text-secondary-400" />
-                              )}
+
                               {email.isStarred && <Star className="h-4 w-4 text-warning" />}
                             </div>
                           </div>

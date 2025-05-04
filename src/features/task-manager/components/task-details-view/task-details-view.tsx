@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -14,14 +14,13 @@ import { format } from 'date-fns';
 import { Label } from 'components/ui/label';
 import { EditableHeading } from './editable-heading';
 import { EditableComment } from './editable-comment';
-import { DialogContent } from 'components/ui/dialog';
+import { DialogContent, DialogTitle } from 'components/ui/dialog';
 import { EditableDescription } from './editable-description';
 import { AttachmentsSection } from './attachment-section';
 import { Separator } from 'components/ui/separator';
 import { Tags } from './tag-selector';
 import { AssigneeSelector } from './assignee-selector';
 import { TaskDetails, TaskService } from '../../services/task-service';
-import { useTaskContext } from '../../hooks/use-task-context';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useToast } from 'hooks/use-toast';
@@ -29,6 +28,46 @@ import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { TPriority } from '../../types/task';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import { Attachment, Tag, useTaskContext } from '../../contexts/task-context';
+import { DialogDescription } from '@radix-ui/react-dialog';
+
+/**
+ * TaskDetailsView Component
+ *
+ * A comprehensive component for managing and displaying task details.
+ * This component supports:
+ * - Viewing and editing task details such as title, description, priority, due date, and assignees
+ * - Adding, editing, and deleting comments
+ * - Managing tags and attachments
+ * - Marking tasks as complete or reopening them
+ * - Deleting tasks with confirmation
+ *
+ * Features:
+ * - Inline editing for task title and description
+ * - Dynamic updates for task properties (e.g., priority, section, due date)
+ * - Comment management with inline editing and deletion
+ * - Attachment management with drag-and-drop support
+ * - Confirmation modal for task deletion
+ *
+ * Props:
+ * @param {() => void} onClose - Callback to close the task details view
+ * @param {string} [taskId] - The ID of the task being viewed
+ * @param {TaskService} taskService - Service for managing task-related operations
+ * @param {boolean} [isNewTaskModalOpen] - Whether the modal is open for creating a new task
+ * @param {() => void} [onTaskAddedList] - Callback triggered when a task is added to the list
+ * @param {(columnId: string, taskTitle: string) => void} [onTaskAddedCard] - Callback for adding a task to a specific column
+ * @param {(columnId: string) => void} [setActiveColumn] - Callback to set the active column
+ *
+ * @returns {JSX.Element} The task details view component
+ *
+ * @example
+ * // Basic usage
+ * <TaskDetailsView
+ *   onClose={() => console.log('Closed')}
+ *   taskId="123"
+ *   taskService={taskServiceInstance}
+ * />
+ */
 
 interface Assignee {
   id: string;
@@ -52,15 +91,18 @@ export default function TaskDetailsView({
   taskService,
   isNewTaskModalOpen,
   onTaskAddedList,
-  onTaskAddedCard,
 }: TaskDetailsViewProps) {
-  const { tasks, addTask } = useTaskContext();
+  const { addTask, tags, assignees: availableAssignees } = useTaskContext();
   const { columns } = useCardTasks();
-  const { task, toggleTaskCompletion, removeTask, updateTaskDetails } = useTaskDetails(taskId);
+  const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
+  const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
+  const { task, toggleTaskCompletion, removeTask, updateTaskDetails } =
+    useTaskDetails(currentTaskId);
   const [date, setDate] = useState<Date | undefined>(task?.dueDate ?? undefined);
   const [title, setTitle] = useState<string>(task?.title ?? '');
   const [mark, setMark] = useState<boolean>(task?.isCompleted ?? false);
   const [section, setSection] = useState<string>(task?.section ?? 'To Do');
+  const [attachments, setAttachments] = useState<Attachment[]>(task?.attachments || []);
   const [priority, setPriority] = useState<string>(
     task?.priority === 'Low' || task?.priority === 'Medium' || task?.priority === 'High'
       ? task.priority
@@ -74,32 +116,17 @@ export default function TaskDetailsView({
   const { toast } = useToast();
   const badgeArray = ['Low', 'Medium', 'High'];
 
-  const availableAssignees: Assignee[] = [
-    {
-      id: '1',
-      name: 'Aaron Green',
-      avatar:
-        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
-    },
-    {
-      id: '2',
-      name: 'Adrian Müller',
-      avatar:
-        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
-    },
-    {
-      id: '3',
-      name: 'Blocks Smith',
-      avatar:
-        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
-    },
-    {
-      id: '4',
-      name: 'Sarah Pavan',
-      avatar:
-        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
-    },
-  ];
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  useEffect(() => {
+    if (calendarOpen && !date) {
+      // Slight delay allows the popover to fully render
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [calendarOpen, date]);
 
   const [description, setDescription] = useState(task?.description);
   const [comments, setComments] = useState(
@@ -118,23 +145,6 @@ export default function TaskDetailsView({
       },
     ]
   );
-
-  interface Tag {
-    id: string;
-    label: string;
-  }
-
-  const tags: Tag[] = [
-    { id: 'calendar', label: 'Calendar' },
-    { id: 'ui-ux', label: 'UI/UX' },
-    { id: 'frontend', label: 'Frontend' },
-    { id: 'design', label: 'Design' },
-    { id: 'accessibility', label: 'Accessibility' },
-    { id: 'mobile', label: 'Mobile' },
-    { id: 'responsive', label: 'Responsive' },
-    { id: 'performance', label: 'Performance' },
-    { id: 'usability', label: 'Usability' },
-  ];
 
   const handleEditComment = (id: string, newText: string) => {
     setComments(
@@ -181,28 +191,29 @@ export default function TaskDetailsView({
   };
 
   const handleAddItem = () => {
-    const column = columns.find((col) => col.title === section);
-    const columnId = column && column.id;
-    if (isNewTaskModalOpen === true && onTaskAddedCard && columnId) {
-      onTaskAddedCard(columnId, title);
-      const lastTask = tasks[tasks.length - 1];
-      const newId = lastTask ? String(Number(lastTask.id) + 1) : '1';
-      const newTask: TaskDetails = {
-        id: newId,
+    // const column = columns.find((col) => col.title === section);
+    // const columnId = column && column.id;
+    if (isNewTaskModalOpen === true && !newTaskAdded) {
+      const newTags: Tag[] = selectedTags
+        .map((tagId) => tags.find((tag) => tag.id === tagId))
+        .filter((tag): tag is Tag => tag !== undefined);
+
+      const newTask: Partial<TaskDetails> = {
         section: section,
         isCompleted: mark,
         title: title,
         mark: false,
         priority: priority,
         dueDate: date === undefined ? null : date,
-        assignees: [],
+        assignees: selectedAssignees,
         description: description ?? '',
-        tags: [],
-        attachments: [],
+        tags: newTags,
+        attachments: attachments,
         comments: [],
       };
-      addTask(newTask);
-      taskService?.addTask(newTask);
+      const newTaskId = title && addTask(newTask);
+      setCurrentTaskId(newTaskId);
+      setNewTaskAdded(true);
       onTaskAddedList && onTaskAddedList();
     }
   };
@@ -214,7 +225,7 @@ export default function TaskDetailsView({
 
   const handleClose = () => {
     onClose();
-    if (isNewTaskModalOpen) {
+    if (isNewTaskModalOpen && !newTaskAdded) {
       handleAddItem();
     }
   };
@@ -224,6 +235,25 @@ export default function TaskDetailsView({
       updateTaskDetails({ section });
     }
   }, [section, task, updateTaskDetails]);
+
+  useEffect(() => {
+    if (task && selectedAssignees !== task.assignees) {
+      updateTaskDetails({ assignees: selectedAssignees });
+    }
+  }, [selectedAssignees, task, updateTaskDetails]);
+
+  useEffect(() => {
+    if (task && selectedTags !== task.tags.map((tag) => tag.id)) {
+      const updatedTags = tags.filter((tag) => selectedTags.includes(tag.id));
+      updateTaskDetails({ tags: updatedTags });
+    }
+  }, [selectedTags, task, tags, updateTaskDetails]);
+
+  useEffect(() => {
+    if (task && attachments !== task.attachments) {
+      updateTaskDetails({ attachments: attachments });
+    }
+  }, [attachments, task, updateTaskDetails]);
 
   const handleDeleteTask = () => {
     removeTask();
@@ -242,6 +272,8 @@ export default function TaskDetailsView({
 
   return (
     <div>
+      <DialogTitle />
+      <DialogDescription />
       <DialogContent
         className="rounded-md sm:max-w-[720px] xl:max-h-[800px] max-h-screen flex flex-col p-0"
         onInteractOutside={() => handleAddItem()}
@@ -311,11 +343,12 @@ export default function TaskDetailsView({
           <div className="grid grid-cols-2 gap-4 mt-6">
             <div className="relative">
               <Label className="text-high-emphasis text-base font-semibold">Due date</Label>
-              <Popover>
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <div className="relative mt-2">
                     <Input
-                      value={date ? format(date, 'dd.MM.yyyy') : ''}
+                      ref={inputRef}
+                      value={date ? date.toLocaleDateString('en-GB') : ''}
                       readOnly
                       placeholder="Choose a date"
                       className="h-[28px] px-2 py-1"
@@ -329,10 +362,11 @@ export default function TaskDetailsView({
                       mode="single"
                       selected={date}
                       onSelect={(newDate) => {
-                        if (newDate) {
-                          const formattedDate = new Date(newDate);
-                          setDate(formattedDate);
-                          updateTaskDetails({ dueDate: formattedDate });
+                        if (newDate instanceof Date && !isNaN(newDate.getTime())) {
+                          setDate(newDate);
+                          updateTaskDetails({ dueDate: newDate });
+                        } else {
+                          console.error('Invalid date selected:', newDate);
                         }
                       }}
                       initialFocus
@@ -376,11 +410,11 @@ export default function TaskDetailsView({
             <Tags availableTags={tags} selectedTags={selectedTags} onChange={setSelectedTags} />
           </div>
           <div className="mt-6">
-            <AttachmentsSection attachment={task?.attachments} />
+            <AttachmentsSection attachments={attachments} setAttachments={setAttachments} />
           </div>
           <Separator className="my-6" />
           {!isNewTaskModalOpen && (
-            <div>
+            <div className="mb-4">
               <Label className="text-high-emphasis text-base font-semibold">Comments</Label>
               <div className="space-y-4 mt-3">
                 <div className="flex flex-col gap-2">
@@ -440,7 +474,7 @@ export default function TaskDetailsView({
         </div>
         <div className="fixed bottom-0 left-0 right-0 h-16 bg-background">
           <Separator className="mb-3" />
-          <div className=" flex justify-between items-center px-6">
+          <div className="flex justify-between items-center px-6">
             <Button
               onClick={() => setOpen(true)}
               variant="ghost"

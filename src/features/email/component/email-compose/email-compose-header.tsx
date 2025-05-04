@@ -2,23 +2,35 @@ import { Minus, X, Expand, Minimize2 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 
 /**
- * EmailComposeHeader component renders the header section of the email compose window.
- * It includes buttons for minimizing, maximizing, and closing the window.
+ * EmailComposeHeader Component
  *
- * @component
+ * A reusable header component for the email compose modal.
+ * This component supports:
+ * - Minimizing the email compose window
+ * - Maximizing/restoring the email compose window
+ * - Closing the email compose window
  *
- * @param {Object} props - The props for the component.
- * @param {function} [props.onMinimize] - An optional callback function to minimize the email compose window.
- * @param {function} [props.onMaximize] - An optional callback function to maximize the email compose window.
- * @param {function} [props.onClose] - An optional callback function to close the email compose window.
+ * Features:
+ * - Provides buttons for minimizing, maximizing, and closing the modal
+ * - Dynamically switches between maximize and restore icons based on the current state
+ * - Accessible with screen reader-friendly labels
  *
- * @returns {JSX.Element} - The header UI of the email compose modal.
+ * Props:
+ * @param {() => void} [onMinimize] - Callback triggered when the minimize button is clicked
+ * @param {() => void} [onMaximize] - Callback triggered when the maximize/restore button is clicked
+ * @param {() => void} [onClose] - Callback triggered when the close button is clicked
+ * @param {boolean} isMaximized - Whether the email compose window is currently maximized
+ *
+ * @returns {JSX.Element} The header UI of the email compose modal
  *
  * @example
- * const handleMinimize = () => { console.log('Minimized'); };
- * const handleMaximize = () => { console.log('Maximized'); };
- * const handleClose = () => { console.log('Closed'); };
- * <EmailComposeHeader onMinimize={handleMinimize} onMaximize={handleMaximize} onClose={handleClose} />
+ * // Basic usage
+ * <EmailComposeHeader
+ *   onMinimize={() => console.log('Minimized')}
+ *   onMaximize={() => console.log('Maximized')}
+ *   onClose={() => console.log('Closed')}
+ *   isMaximized={false}
+ * />
  */
 
 interface EmailComposeHeaderProps {

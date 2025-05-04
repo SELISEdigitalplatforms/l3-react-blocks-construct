@@ -18,7 +18,6 @@ import { AuthState } from './index.type';
  *
  * State:
  * @property {boolean} isAuthenticated - Whether the user is currently authenticated
- * @property {boolean} isMfaEnabled - Whether multi-factor authentication is enabled for the user
  * @property {Object|null} user - The current user data or null if not authenticated
  * @property {string|null} accessToken - The current JWT access token
  * @property {string|null} refreshToken - The current JWT refresh token
@@ -49,14 +48,12 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       isAuthenticated: false,
-      isMfaEnabled: false,
       user: null,
       accessToken: null,
       refreshToken: null,
       login: (accessToken, refreshToken) =>
         set({
           isAuthenticated: true,
-          isMfaEnabled: true,
           accessToken,
           refreshToken,
         }),
@@ -67,7 +64,6 @@ export const useAuthStore = create<AuthState>()(
       logout: () =>
         set({
           isAuthenticated: false,
-          isMfaEnabled: false,
           accessToken: null,
           refreshToken: null,
         }),

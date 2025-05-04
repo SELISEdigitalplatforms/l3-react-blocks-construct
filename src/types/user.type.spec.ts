@@ -15,6 +15,7 @@ describe('User Type', () => {
     roles: ['user', 'admin'],
     active: true,
     isVarified: true,
+    isMfaVerified: true,
     profileImageUrl: 'https://example.com/profile.jpg',
     lastLoggedInTime: '2023-01-03T00:00:00Z',
     mfaEnabled: true,

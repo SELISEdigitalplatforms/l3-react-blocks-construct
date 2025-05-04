@@ -34,15 +34,18 @@ export const SetpasswordForm = ({ code }: { code: string }) => {
   const { isPending, mutateAsync } = useAccountActivation();
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
 
+  // Check if captcha is enabled
+  const captchaEnabled = (process.env.REACT_APP_GOOGLE_SITE_KEY || '') !== '';
+
   const handleSubmit = async (password: string, code: string, captchaToken?: string) => {
-    if (!captchaToken) {
+    if (captchaEnabled && !captchaToken) {
       return;
     }
 
     await mutateAsync({
       password,
       code,
-      captchaCode: captchaToken,
+      captchaCode: captchaToken || '',
     });
   };
 

@@ -11,9 +11,9 @@ import {
 import { Button } from 'components/ui/button';
 import { Separator } from 'components/ui/separator';
 import { MfaDialogState } from 'features/profile/enums/mfa-dialog-state.enum';
+import { Skeleton } from 'components/ui/skeleton';
 import { User } from '/types/user.type';
-import { UserMfaType } from '../../../enums/user-mfa-type-enum';
-import { useConfigureUserMfa } from '../../../hooks/use-mfa';
+import { useGetMfaTemplate } from '../../../hooks/use-mfa';
 
 /**
  * Component to manage the 2-factor authentication settings for a user.
@@ -39,21 +39,11 @@ type TwoFactorAuthenticationSetupProps = {
 export const TwoFactorAuthenticationSetup: React.FC<
   Readonly<TwoFactorAuthenticationSetupProps>
 > = ({ userInfo, onClose, setCurrentDialog }) => {
-  const { mutate: configureUserMfa } = useConfigureUserMfa();
+  const { data: mfaTemplate, isLoading } = useGetMfaTemplate();
 
-  const handleEnableMFA = (mfaType: number) => {
-    if (!userInfo?.itemId || userInfo.mfaEnabled) return;
-
-    const payload = {
-      userId: userInfo.itemId,
-      mfaEnabled: true,
-      userMfaType: mfaType,
-      isMfaVerified: true,
-    };
-    if (!userInfo?.mfaEnabled) {
-      configureUserMfa(payload);
-    }
-  };
+  const isAuthenticatorAppEnabled = mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(1);
+  const isEmailVerificationEnabled =
+    mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(2);
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -65,66 +55,95 @@ export const TwoFactorAuthenticationSetup: React.FC<
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col w-full">
-          <div
-            className={`
+          {isLoading ? (
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-[40px] h-[40px]" />
+                <Skeleton className="w-[119px] h-[20px]" />
+              </div>
+              <Skeleton className="w-[20px] h-[20px]" />
+            </div>
+          ) : (
+            <div
+              className={`
               flex items-center justify-between p-4
               ${
-                userInfo?.userMfaType === UserMfaType.AUTHENTICATOR_APP ||
-                userInfo?.userMfaType === UserMfaType.NONE
+                isAuthenticatorAppEnabled
                   ? 'hover:bg-muted/50 cursor-pointer'
                   : 'opacity-50 cursor-not-allowed'
               }
             `}
-            onClick={() => {
-              if (
-                userInfo?.userMfaType === UserMfaType.AUTHENTICATOR_APP ||
-                userInfo?.userMfaType === UserMfaType.NONE
-              ) {
-                handleEnableMFA(UserMfaType.AUTHENTICATOR_APP);
-                setCurrentDialog(MfaDialogState.AUTHENTICATOR_APP_SETUP);
-              }
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-surface rounded-md">
-                <Smartphone className="text-secondary" size={24} />
+              onClick={() => {
+                if (isAuthenticatorAppEnabled) {
+                  if (
+                    userInfo?.isMfaVerified &&
+                    userInfo?.mfaEnabled &&
+                    userInfo?.userMfaType === 1
+                  ) {
+                    setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION);
+                  } else {
+                    setCurrentDialog(MfaDialogState.AUTHENTICATOR_APP_SETUP);
+                  }
+                }
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-surface rounded-md">
+                  <Smartphone className="text-secondary" size={24} />
+                </div>
+                <h3 className="text-sm font-semibold text-high-emphasis">Authenticator App</h3>
               </div>
-              <h3 className="text-sm font-semibold text-high-emphasis">Authenticator App</h3>
+              <ChevronRight className="text-primary" size={20} />
             </div>
-            <ChevronRight className="text-primary" size={20} />
-          </div>
+          )}
           <Separator />
-          <div
-            className={`
+          {isLoading ? (
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-[40px] h-[40px]" />
+                <div className="flex flex-col gap-1">
+                  <Skeleton className="w-[119px] h-[18px]" />
+                  <Skeleton className="w-[119px] h-[10px]" />
+                </div>
+              </div>
+              <Skeleton className="w-[20px] h-[20px]" />
+            </div>
+          ) : (
+            <div
+              className={`
               flex items-center justify-between p-4
               ${
-                userInfo?.userMfaType === UserMfaType.EMAIL_VERIFICATION ||
-                userInfo?.userMfaType === UserMfaType.NONE
+                isEmailVerificationEnabled
                   ? 'hover:bg-muted/50 cursor-pointer'
                   : 'opacity-50 cursor-not-allowed'
               }
             `}
-            onClick={() => {
-              if (
-                userInfo?.userMfaType === UserMfaType.EMAIL_VERIFICATION ||
-                userInfo?.userMfaType === UserMfaType.NONE
-              ) {
-                handleEnableMFA(UserMfaType.EMAIL_VERIFICATION);
-                setCurrentDialog(MfaDialogState.EMAIL_VERIFICATION);
-              }
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-surface rounded-md">
-                <Mail className="text-secondary" size={24} />
+              onClick={() => {
+                if (isEmailVerificationEnabled) {
+                  if (
+                    userInfo?.isMfaVerified &&
+                    userInfo?.mfaEnabled &&
+                    userInfo?.userMfaType === 2
+                  ) {
+                    setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION);
+                  } else {
+                    setCurrentDialog(MfaDialogState.EMAIL_VERIFICATION);
+                  }
+                }
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-surface rounded-md">
+                  <Mail className="text-secondary" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-high-emphasis">Email Verification</h3>
+                  <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-semibold text-high-emphasis">Email Verification</h3>
-                <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
-              </div>
+              <ChevronRight className="text-primary" size={20} />
             </div>
-            <ChevronRight className="text-primary" size={20} />
-          </div>
+          )}
         </div>
 
         <DialogFooter className="mt-5 flex justify-end">

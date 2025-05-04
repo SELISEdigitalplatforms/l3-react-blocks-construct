@@ -78,25 +78,28 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
           },
         });
       } else {
-        generateOTP(userInfo.itemId, {
-          onSuccess: (data) => {
-            if (data?.isSuccess) {
-              setMfaId(data.mfaId);
+        generateOTP(
+          { userId: userInfo.itemId, mfaType: 2 },
+          {
+            onSuccess: (data: { isSuccess?: boolean; mfaId?: string }) => {
+              if (data?.isSuccess) {
+                data.mfaId && setMfaId(data.mfaId);
+                toast({
+                  variant: 'success',
+                  title: 'OTP Sent',
+                  description: 'A new verification code has been sent to your email',
+                });
+              }
+            },
+            onError: () => {
               toast({
-                variant: 'success',
-                title: 'OTP Sent',
-                description: 'A new verification code has been sent to your email',
+                variant: 'destructive',
+                title: 'Resend Failed',
+                description: 'Failed to send a new verification code. Please try again.',
               });
-            }
-          },
-          onError: () => {
-            toast({
-              variant: 'destructive',
-              title: 'Resend Failed',
-              description: 'Failed to send a new verification code. Please try again.',
-            });
-          },
-        });
+            },
+          }
+        );
       }
     },
   });
@@ -104,18 +107,21 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
   useEffect(() => {
     if (!userInfo) return;
 
-    generateOTP(userInfo.itemId, {
-      onSuccess: (data) => {
-        if (data?.isSuccess) setMfaId(data.mfaId);
-      },
-      onError: () => {
-        toast({
-          variant: 'destructive',
-          title: 'Failed to generate OTP',
-          description: 'Please try again later',
-        });
-      },
-    });
+    generateOTP(
+      { userId: userInfo.itemId, mfaType: 2 },
+      {
+        onSuccess: (data) => {
+          if (data?.isSuccess) setMfaId(data.mfaId);
+        },
+        onError: () => {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to generate OTP',
+            description: 'Please try again later',
+          });
+        },
+      }
+    );
   }, [userInfo, generateOTP, toast]);
 
   const onVerify = useCallback(() => {
@@ -131,11 +137,11 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
     const verifyPayload: VerifyOTP = {
       verificationCode: otpValue,
       mfaId: newMfaId ?? mfaId ?? '',
-      authType: userInfo?.userMfaType ?? 0,
+      authType: 2,
     };
 
     verifyOTP(verifyPayload, {
-      onSuccess: (res) => {
+      onSuccess: (res: { isSuccess?: boolean; isValid?: boolean }) => {
         if (res?.isSuccess && res?.isValid) {
           onNext();
         } else {
@@ -146,7 +152,7 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
         setOtpError('Verification failed. Please try again.');
       },
     });
-  }, [mfaId, otpValue, newMfaId, userInfo?.userMfaType, verifyOTP, toast, onNext]);
+  }, [mfaId, otpValue, newMfaId, verifyOTP, toast, onNext]);
 
   useEffect(() => {
     if (

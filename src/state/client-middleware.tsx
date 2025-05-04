@@ -13,10 +13,9 @@ import { publicRoutes } from 'constant/auth-public-routes';
  * @returns {AuthState} An object containing authentication status information
  *   - isMounted: Whether the auth state has been initialized
  *   - isAuthenticated: Whether the user is authenticated
- *   - isMfaEnabled: Whether multi-factor authentication is enabled
  *
  * @example
- * const { isMounted, isAuthenticated, isMfaEnabled } = useAuthState();
+ * const { isMounted, isAuthenticated } = useAuthState();
  *
  * if (!isMounted) {
  *   return <LoadingSpinner />;
@@ -28,24 +27,21 @@ import { publicRoutes } from 'constant/auth-public-routes';
 interface AuthState {
   isMounted: boolean;
   isAuthenticated: boolean;
-  isMfaEnabled: boolean;
 }
 
 export const useAuthState = () => {
-  const { isAuthenticated, isMfaEnabled } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [isAuth, setIsAuth] = useState<AuthState>({
     isMounted: false,
     isAuthenticated: false,
-    isMfaEnabled: false,
   });
 
   useEffect(() => {
     setIsAuth({
       isMounted: true,
       isAuthenticated: isAuthenticated,
-      isMfaEnabled: isMfaEnabled,
     });
-  }, [isAuthenticated, isMfaEnabled]);
+  }, [isAuthenticated]);
 
   return isAuth;
 };
@@ -80,14 +76,14 @@ export const ClientMiddleware: React.FC<ClientMiddlewareProps> = ({ children }) 
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const { isMounted, isAuthenticated, isMfaEnabled } = useAuthState();
+  const { isMounted, isAuthenticated } = useAuthState();
   const isPublicRoute = publicRoutes.includes(currentPath);
 
   useLayoutEffect(() => {
-    if (isMounted && !isAuthenticated && !isPublicRoute && !isMfaEnabled) {
+    if (isMounted && !isAuthenticated && !isPublicRoute) {
       navigate('/login');
     }
-  }, [isAuthenticated, isMounted, isMfaEnabled, isPublicRoute, navigate]);
+  }, [isAuthenticated, isMounted, isPublicRoute, navigate]);
 
   if ((!isMounted || !isAuthenticated) && !isPublicRoute) return null;
 

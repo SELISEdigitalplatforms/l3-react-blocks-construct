@@ -1,6 +1,33 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 
+/**
+ * TaskContext
+ *
+ * A context provider for managing tasks and columns in a task manager application.
+ * This context supports:
+ * - Managing tasks and columns
+ * - Filtering tasks based on various criteria
+ * - Adding, updating, and deleting tasks and columns
+ * - Drag-and-drop functionality for reordering tasks
+ *
+ * Features:
+ * - Provides a centralized state for tasks and columns
+ * - Supports filtering by search query, priority, status, assignees, tags, and due dates
+ * - Includes utility functions for managing task details, comments, attachments, and more
+ *
+ * Props:
+ * @param {ReactNode} children - The child components that will consume the context
+ *
+ * @returns {JSX.Element} The task context provider
+ *
+ * @example
+ * // Basic usage
+ * <TaskProvider>
+ *   <TaskManager />
+ * </TaskProvider>
+ */
+
 export interface Assignee {
   id: string;
   name: string;
@@ -124,7 +151,7 @@ const initialTasks: TaskDetails[] = [
     assignees: [
       {
         id: '3',
-        name: 'John Doe',
+        name: 'Blocks Smith',
         avatar:
           'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
       },
@@ -164,7 +191,7 @@ const initialTasks: TaskDetails[] = [
     section: 'To Do',
     priority: 'High',
     dueDate: new Date('2025-04-03'),
-    assignees: [{ id: '4', name: 'Sara Kim', avatar: 'https://i.pravatar.cc/150?img=4' }],
+    assignees: [{ id: '4', name: 'Sarah Pavan', avatar: 'https://i.pravatar.cc/150?img=4' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -197,7 +224,7 @@ const initialTasks: TaskDetails[] = [
     section: 'In Progress',
     priority: 'High',
     dueDate: new Date('2025-04-04'),
-    assignees: [{ id: '5', name: 'Alex Wang', avatar: 'https://i.pravatar.cc/150?img=5' }],
+    assignees: [{ id: '5', name: 'Sara Kim', avatar: 'https://i.pravatar.cc/150?img=5' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -224,7 +251,7 @@ const initialTasks: TaskDetails[] = [
     section: 'Done',
     priority: 'Medium',
     dueDate: new Date('2025-04-06'),
-    assignees: [{ id: '6', name: 'Emily Clark', avatar: 'https://i.pravatar.cc/150?img=6' }],
+    assignees: [{ id: '6', name: 'Lio Chan', avatar: 'https://i.pravatar.cc/150?img=6' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -251,7 +278,7 @@ const initialTasks: TaskDetails[] = [
     section: 'Done',
     priority: 'High',
     dueDate: new Date('2025-04-09'),
-    assignees: [{ id: '7', name: 'Leo Chan', avatar: 'https://i.pravatar.cc/150?img=7' }],
+    assignees: [{ id: '6', name: 'Leo Chan', avatar: 'https://i.pravatar.cc/150?img=7' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -282,11 +309,10 @@ const initialTasks: TaskDetails[] = [
     priority: 'Medium',
     dueDate: new Date('2025-04-10'),
     assignees: [
-      { id: '8', name: 'Natalie Perez', avatar: 'https://i.pravatar.cc/150?img=8' },
-      { id: '8', name: 'Natalie Perez', avatar: 'https://i.pravatar.cc/150?img=8' },
-      { id: '8', name: 'Natalie Perez', avatar: 'https://i.pravatar.cc/150?img=8' },
-      { id: '8', name: 'Natalie Perez', avatar: 'https://i.pravatar.cc/150?img=8' },
-      { id: '8', name: 'Natalie Perez', avatar: 'https://i.pravatar.cc/150?img=8' },
+      { id: '3', name: 'Blocks Smith', avatar: 'https://i.pravatar.cc/150?img=8' },
+      { id: '4', name: 'Sarah Pavan', avatar: 'https://i.pravatar.cc/150?img=8' },
+      { id: '5', name: 'Sara Kim', avatar: 'https://i.pravatar.cc/150?img=8' },
+      { id: '6', name: 'Lio Chan', avatar: 'https://i.pravatar.cc/150?img=8' },
     ],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
@@ -311,7 +337,7 @@ const initialTasks: TaskDetails[] = [
     section: 'In Progress',
     priority: 'Low',
     dueDate: new Date('2025-03-01'),
-    assignees: [{ id: '9', name: 'Ivy Thompson', avatar: 'https://i.pravatar.cc/150?img=9' }],
+    assignees: [{ id: '6', name: 'Lio Chan', avatar: 'https://i.pravatar.cc/150?img=9' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -338,7 +364,7 @@ const initialTasks: TaskDetails[] = [
     section: 'Done',
     priority: 'High',
     dueDate: new Date('2025-04-01'),
-    assignees: [{ id: '10', name: 'Carlos Mendes', avatar: 'https://i.pravatar.cc/150?img=10' }],
+    assignees: [{ id: '3', name: 'Blocks Smith', avatar: 'https://i.pravatar.cc/150?img=10' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -365,7 +391,7 @@ const initialTasks: TaskDetails[] = [
     section: 'To Do',
     priority: 'Medium',
     dueDate: new Date('2025-04-01'),
-    assignees: [{ id: '11', name: 'Priya Singh', avatar: 'https://i.pravatar.cc/150?img=11' }],
+    assignees: [{ id: '5', name: 'Sara Kim', avatar: 'https://i.pravatar.cc/150?img=11' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -392,7 +418,7 @@ const initialTasks: TaskDetails[] = [
     section: 'In Progress',
     priority: 'High',
     dueDate: new Date('2025-04-01'),
-    assignees: [{ id: '12', name: 'Omar Raza', avatar: 'https://i.pravatar.cc/150?img=12' }],
+    assignees: [{ id: '4', name: 'Sarah Pavan', avatar: 'https://i.pravatar.cc/150?img=12' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -419,7 +445,7 @@ const initialTasks: TaskDetails[] = [
     section: 'Done',
     priority: 'Low',
     dueDate: new Date('2025-04-01'),
-    assignees: [{ id: '13', name: 'Mina Park', avatar: 'https://i.pravatar.cc/150?img=13' }],
+    assignees: [{ id: '6', name: 'Leo Chan', avatar: 'https://i.pravatar.cc/150?img=13' }],
     description: `1. Create engaging visual for error page.
 2. Add search bar or redirection links.
 3. Include humor or creativity to reduce bounce rate.
@@ -650,8 +676,8 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
       isCompleted: task.isCompleted || false,
     };
 
-    setTaskDetails((prev) => [...prev, newTask]);
-    setOrginalTasks((prev) => [...prev, newTask]);
+    setTaskDetails((prev) => [newTask, ...prev]);
+    setOrginalTasks((prev) => [newTask, ...prev]);
     setNextTaskId((prev) => prev + 1);
     return id;
   };
@@ -667,10 +693,15 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
 
   const deleteTask = (taskId: string): void => {
     setTaskDetails((prev) => prev.filter((task) => task.id !== taskId));
+    setOrginalTasks((prev) => prev.filter((task) => task.id !== taskId));
   };
 
   const updateTaskStatus = (taskId: string, isCompleted: boolean): void => {
     setTaskDetails((prev) =>
+      prev.map((task) => (task.id === taskId ? { ...task, isCompleted } : task))
+    );
+
+    setOrginalTasks((prev) =>
       prev.map((task) => (task.id === taskId ? { ...task, isCompleted } : task))
     );
   };
@@ -890,15 +921,56 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     Boolean
   );
 
-  const assignees = Array.from(
-    new Map(
-      originalTasks.flatMap((task) => task.assignees).map((assignee) => [assignee.id, assignee])
-    ).values()
-  );
+  const assignees: Assignee[] = [
+    {
+      id: '1',
+      name: 'Aaron Green',
+      avatar:
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    },
+    {
+      id: '2',
+      name: 'Adrian Müller',
+      avatar:
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    },
+    {
+      id: '3',
+      name: 'Blocks Smith',
+      avatar:
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    },
+    {
+      id: '4',
+      name: 'Sarah Pavan',
+      avatar:
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    },
+    {
+      id: '5',
+      name: 'Sara Kim',
+      avatar:
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    },
+    {
+      id: '6',
+      name: 'Lio Chan',
+      avatar:
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    },
+  ];
 
-  const tags = Array.from(
-    new Map(originalTasks.flatMap((task) => task.tags).map((tag) => [tag.id, tag])).values()
-  );
+  const tags: Tag[] = [
+    { id: 'calendar', label: 'Calendar' },
+    { id: 'ui-ux', label: 'UI/UX' },
+    { id: 'frontend', label: 'Frontend' },
+    { id: 'design', label: 'Design' },
+    { id: 'accessibility', label: 'Accessibility' },
+    { id: 'mobile', label: 'Mobile' },
+    { id: 'responsive', label: 'Responsive' },
+    { id: 'performance', label: 'Performance' },
+    { id: 'usability', label: 'Usability' },
+  ];
 
   const statuses = Array.from(new Set(originalTasks.map((task) => task.section))).filter(Boolean);
 

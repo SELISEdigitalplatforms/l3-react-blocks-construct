@@ -22,6 +22,6 @@ export const signinFormValidationSchema = z.object({
 export type signinFormType = z.infer<typeof signinFormValidationSchema>;
 
 export const signinFormDefaultValue: signinFormType = {
-  username: 'demo.construct@seliseblocks.com',
-  password: 'H%FE*FYi5oTQ!VyT6TkEy',
+  username: '',
+  password: '',
 };

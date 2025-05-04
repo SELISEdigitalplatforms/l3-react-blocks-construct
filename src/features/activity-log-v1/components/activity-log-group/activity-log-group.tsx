@@ -2,6 +2,36 @@ import { Separator } from 'components/ui/separator';
 import { ActivityGroup } from '../../services/activity-log.types';
 import ActivityLogItem from './activity-log-item';
 
+/**
+ * ActivityLogGroup Component
+ *
+ * A reusable component for rendering a group of activity log items.
+ * This component supports:
+ * - Displaying a formatted date label for the group
+ * - Rendering a list of activity log items
+ * - Adding a separator between groups
+ *
+ * Features:
+ * - Dynamically formats the date label based on the activity date
+ * - Displays a list of activities for the given date
+ * - Adds a separator between groups unless it is the last group
+ *
+ * Props:
+ * @param {string} date - The date of the activity group
+ * @param {Array} items - The list of activity log items for the group
+ * @param {boolean} isLastIndex - Whether this is the last group in the list
+ *
+ * @returns {JSX.Element} The activity log group component
+ *
+ * @example
+ * // Basic usage
+ * <ActivityLogGroup
+ *   date="2025-05-04"
+ *   items={[{ id: 1, description: 'Task completed', category: 'Work' }]}
+ *   isLastIndex={false}
+ * />
+ */
+
 const getFormattedDateLabel = (date: string) => {
   const activityDate = new Date(date);
   const today = new Date();

@@ -74,6 +74,8 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
   const [showCaptcha, setShowCaptcha] = useState(false);
 
   const googleSiteKey = process.env.REACT_APP_GOOGLE_SITE_KEY || '';
+  // Check if captcha is enabled (site key is not empty)
+  const captchaEnabled = googleSiteKey !== '';
 
   const form = useForm({
     defaultValues,
@@ -84,7 +86,13 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
   const confirmPassword = form.watch('confirmPassword');
 
   useEffect(() => {
-    if (requirementsMet && password && confirmPassword && password === confirmPassword) {
+    if (
+      captchaEnabled &&
+      requirementsMet &&
+      password &&
+      confirmPassword &&
+      password === confirmPassword
+    ) {
       setShowCaptcha(true);
     } else {
       setShowCaptcha(false);
@@ -95,7 +103,14 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
         }
       }
     }
-  }, [requirementsMet, password, confirmPassword, captchaToken, onCaptchaValidation]);
+  }, [
+    requirementsMet,
+    password,
+    confirmPassword,
+    captchaToken,
+    onCaptchaValidation,
+    captchaEnabled,
+  ]);
 
   const handleCaptchaVerify = (token: React.SetStateAction<string>) => {
     setCaptchaToken(token);
@@ -112,19 +127,19 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
   };
 
   const onSubmitHandler = async (values: { password: string; confirmPassword: string }) => {
-    if (!captchaToken) {
+    if (captchaEnabled && !captchaToken) {
       return;
     }
 
     try {
-      await onSubmit(values.password, code, captchaToken);
+      await onSubmit(values.password, code, captchaEnabled ? captchaToken : undefined);
       navigate('/success');
     } catch (_error) {
       // Handle error if needed
     }
   };
 
-  const isSubmitDisabled = isPending || !requirementsMet || !captchaToken;
+  const isSubmitDisabled = isPending || !requirementsMet || (captchaEnabled && !captchaToken);
 
   return (
     <Form {...form}>
@@ -163,7 +178,7 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
           onRequirementsMet={setRequirementsMet}
         />
 
-        {showCaptcha && (
+        {captchaEnabled && showCaptcha && (
           <div className="my-4">
             <Captcha
               type="reCaptcha"

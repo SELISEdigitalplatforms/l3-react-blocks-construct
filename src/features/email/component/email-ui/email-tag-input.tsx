@@ -1,6 +1,40 @@
 import * as React from 'react';
 import { X } from 'lucide-react';
 
+/**
+ * EmailTagInput Component
+ *
+ * A reusable input component for entering multiple tags (such as email addresses).
+ * Users can type and press Enter to add a tag, and remove them via a close button.
+ *
+ * Features:
+ * - Supports dynamic tag entry via input
+ * - Automatically trims and prevents duplicate tags
+ * - Notifies parent components of changes through onChange
+ * - Clean, flexible UI for managing tag lists
+ *
+ * Props:
+ * @param {string} [placeholder='Enter and press enter...'] - Placeholder text for the input field
+ * @param {string} [className] - Optional custom class names for styling the wrapper
+ * @param {string[]} [value=[]] - Initial list of tags
+ * @param {(tags: string[]) => void} [onChange] - Callback fired when the tags list changes
+ * @param {string} type - Input type (e.g., 'email', 'text')
+ *
+ * @returns {JSX.Element} A tag input field component
+ *
+ * @example
+ * // Basic usage
+ * <EmailTagInput type="email" />
+ *
+ * // With state management
+ * const [emails, setEmails] = useState<string[]>([]);
+ * <EmailTagInput
+ *   type="email"
+ *   value={emails}
+ *   onChange={setEmails}
+ * />
+ */
+
 export interface TagInputProps {
   placeholder?: string;
   className?: string;

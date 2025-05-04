@@ -56,6 +56,9 @@ export const SigninForm = () => {
   const [showCaptcha, setShowCaptcha] = useState(false);
   const googleSiteKey = process.env.REACT_APP_GOOGLE_SITE_KEY || '';
 
+  // Check if captcha is enabled (site key is not empty)
+  const captchaEnabled = googleSiteKey !== '';
+
   const form = useForm({
     defaultValues: signinFormDefaultValue,
     resolver: zodResolver(signinFormValidationSchema),
@@ -72,7 +75,7 @@ export const SigninForm = () => {
   };
 
   const onSubmitHandler = async (values: signinFormType) => {
-    if (showCaptcha && !captchaToken) {
+    if (captchaEnabled && showCaptcha && !captchaToken) {
       return;
     }
 
@@ -97,11 +100,13 @@ export const SigninForm = () => {
         });
       }
     } catch (_error) {
-      const newFailedAttempts = failedAttempts + 1;
-      setFailedAttempts(newFailedAttempts);
+      if (captchaEnabled) {
+        const newFailedAttempts = failedAttempts + 1;
+        setFailedAttempts(newFailedAttempts);
 
-      if (newFailedAttempts >= 3 && !showCaptcha) {
-        setShowCaptcha(true);
+        if (newFailedAttempts >= 3 && !showCaptcha) {
+          setShowCaptcha(true);
+        }
       }
     }
   };
@@ -148,7 +153,7 @@ export const SigninForm = () => {
             </Link>
           </div>
 
-          {showCaptcha && (
+          {captchaEnabled && showCaptcha && (
             <div className="my-4">
               <Captcha
                 type="reCaptcha"
@@ -164,7 +169,7 @@ export const SigninForm = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={isPending || (showCaptcha && !captchaToken)}
+            disabled={isPending || (captchaEnabled && showCaptcha && !captchaToken)}
           >
             Log in
           </Button>

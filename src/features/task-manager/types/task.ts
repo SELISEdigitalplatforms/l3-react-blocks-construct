@@ -25,7 +25,7 @@ export interface ITaskColumnProps {
   };
   tasks: any[];
   setActiveColumn: (columnId: string) => void;
-  onAddTask: (columnId: string, taskTitle: string) => void;
+  onAddTask: (columnId: string, taskTitle: string) => string | null;
 }
 
 export const statusDisplay = {

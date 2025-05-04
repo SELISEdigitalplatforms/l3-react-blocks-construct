@@ -3,6 +3,29 @@ import { ITask, TPriority } from '../../types/task';
 import { StatusCircle } from '../status-circle/status-circle';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 
+/**
+ * TaskDragOverlay Component
+ *
+ * A reusable component for rendering a visual overlay during drag-and-drop operations for tasks.
+ * This component supports:
+ * - Displaying the task's content, priority, and tags
+ * - Providing a compact and visually appealing drag preview
+ *
+ * Features:
+ * - Displays task metadata such as status, priority, and tags
+ * - Provides a semi-transparent overlay for better drag-and-drop UX
+ * - Dynamically adjusts based on the active task being dragged
+ *
+ * Props:
+ * @param {ITask | null} activeTask - The task object currently being dragged, or null if no task is active
+ *
+ * @returns {JSX.Element | null} The drag overlay component when a task is active, or null otherwise
+ *
+ * @example
+ * // Basic usage
+ * <TaskDragOverlay activeTask={task} />
+ */
+
 interface TaskDragOverlayProps {
   activeTask: ITask | null;
 }

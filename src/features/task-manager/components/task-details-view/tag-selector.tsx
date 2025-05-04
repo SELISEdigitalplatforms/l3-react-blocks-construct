@@ -13,6 +13,40 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Label } from 'components/ui/label';
 
+/**
+ * TagSelector Component
+ *
+ * A reusable component for selecting and managing tags.
+ * This component allows users to:
+ * - View selected tags
+ * - Add or remove tags from a list of available tags
+ * - Search for tags using a search input
+ *
+ * Features:
+ * - Displays selected tags as badges
+ * - Provides a searchable dropdown for selecting or deselecting tags
+ * - Allows clearing all selected tags with a single button
+ * - Uses a popover for a compact and user-friendly UI
+ *
+ * Props:
+ * @param {Tag[]} availableTags - The list of all available tags
+ * @param {string[]} selectedTags - The list of currently selected tag IDs
+ * @param {(selectedTagIds: string[]) => void} onChange - Callback triggered when the selected tags change
+ *
+ * @returns {JSX.Element} The tag selector component
+ *
+ * @example
+ * // Basic usage
+ * <Tags
+ *   availableTags={[
+ *     { id: '1', label: 'Frontend' },
+ *     { id: '2', label: 'Backend' },
+ *   ]}
+ *   selectedTags={['1']}
+ *   onChange={(updatedTags) => console.log('Selected tags:', updatedTags)}
+ * />
+ */
+
 interface Tag {
   id: string;
   label: string;

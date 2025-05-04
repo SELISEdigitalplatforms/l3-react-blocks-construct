@@ -10,6 +10,38 @@ import TaskDetailsView from 'features/task-manager/components/task-details-view/
 import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 
+/**
+ * TaskCardView Component
+ *
+ * A card-based (Kanban-style) task board for managing tasks within draggable columns.
+ * Built using `@dnd-kit/core` for drag-and-drop and internal task management
+ * via the `useCardTasks` hook. Supports adaptive drag sensitivity based on device.
+ *
+ * Features:
+ * - Drag-and-drop columns and tasks
+ * - Touch & mouse sensor adaptation using `useDeviceCapabilities`
+ * - Inline task and column creation
+ * - Modal support for task details
+ * - External "Add Task" dialog support
+ *
+ * Props:
+ * @param {any} task - (Unused) legacy prop
+ * @param {any} taskService - Service for interacting with task details
+ * @param {boolean} isNewTaskModalOpen - Controls visibility of the task details modal
+ * @param {(isOpen: boolean) => void} setNewTaskModalOpen - Handler to toggle task modal state
+ * @param {() => void} [onTaskAdded] - Optional callback triggered after task creation
+ *
+ * @returns {JSX.Element} A drag-and-drop-enabled Kanban board for tasks
+ *
+ * @example
+ * <TaskCardView
+ *   taskService={myTaskService}
+ *   isNewTaskModalOpen={isModalOpen}
+ *   setNewTaskModalOpen={setModalOpen}
+ *   onTaskAdded={() => refreshTasks()}
+ * />
+ */
+
 interface TaskCardViewProps {
   task?: any;
   taskService?: any;

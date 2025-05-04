@@ -6,8 +6,9 @@ import {
   DashboardUserPlatform,
 } from 'features/dashboard';
 import { Button } from 'components/ui/button';
-
 import { useGetAccount } from 'features/profile/hooks/use-account';
+import { Dialog } from 'components/ui/dialog';
+import { EnableMfa } from 'features/profile';
 
 export function Dashboard() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -49,11 +50,13 @@ export function Dashboard() {
             </div>
             <DashboardSystemOverview />
           </div>
-          {/* {!data?.mfaEnabled && (
-            <Dialog open={!data?.mfaEnabled}>
-              <EnableMfa />
-            </Dialog>
-          )} */}
+          {!data?.mfaEnabled &&
+            !data?.isMfaVerified &&
+            data?.email !== 'demo.construct@seliseblocks.com' && (
+              <Dialog open={!data?.mfaEnabled}>
+                <EnableMfa />
+              </Dialog>
+            )}
         </div>
       )}
     </>
