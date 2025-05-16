@@ -2,7 +2,7 @@ import { Button } from 'components/ui/button';
 import { RefreshCcw } from 'lucide-react';
 import temporaryUnavailable from 'assets/images/unavailable.svg';
 
-/*testing from own branch*/
+// testing from own branch
 export default function ServiceUnavailable() {
   return (
     <div className="flex justify-center items-center w-full">

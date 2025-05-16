@@ -2,6 +2,8 @@ import notFound from 'assets/images/not_found.svg';
 import { Button } from 'components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
+// testing from own branch
+
 export default function NotFound() {
   return (
     <div className="flex justify-center items-center w-full">
