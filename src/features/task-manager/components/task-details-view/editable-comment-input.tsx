@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 
 /**
@@ -60,12 +61,13 @@ export function EditableCommentInput({
   initialContent,
   onSubmit,
   onCancel,
-  submitName = 'Comment',
-  cancelButton = 'Cancel',
+  submitName = 'COMMENT',
+  cancelButton = 'CANCEL',
 }: EditableCommentInputProps) {
   const [content, setContent] = useState(initialContent);
   const [isMounted, setIsMounted] = useState(false);
   const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsMounted(true);
@@ -107,7 +109,7 @@ export function EditableCommentInput({
                 className="text-sm font-semibold border"
                 onClick={handleCancel}
               >
-                {cancelButton}
+                {t(cancelButton)}
               </Button>
               <Button
                 variant="default"
@@ -115,13 +117,13 @@ export function EditableCommentInput({
                 className="text-sm font-semibold ml-2"
                 onClick={handleSave}
               >
-                {submitName}
+                {t(submitName)}
               </Button>
             </div>
           </div>
         </div>
       ) : (
-        <div className="border rounded-md p-4">Loading editor...</div>
+        <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CircleIcon, GripVertical, Plus, X } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -42,10 +43,15 @@ interface NewTaskRowProps {
   onCancel: () => void;
 }
 
+const toTranslationKey = (title: string): string => {
+  return title.replace(/\s+/g, '_').toUpperCase();
+};
+
 export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
   const { columns } = useCardTasks();
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
   const [newTaskStatus, setNewTaskStatus] = useState<string>('To Do');
+  const { t } = useTranslation();
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -67,7 +73,7 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
 
       <div className="w-96 pl-2 mr-4">
         <Input
-          placeholder="Enter a title"
+          placeholder={t('ENTER_A_TITLE')}
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -79,13 +85,13 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
       <div className="w-24 flex-shrink-0">
         <Select value={newTaskStatus} onValueChange={setNewTaskStatus}>
           <SelectTrigger className="h-8 text-sm">
-            <SelectValue placeholder="To Do" />
+            <SelectValue placeholder={t('TO_DO')} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
               {columns.map((column) => (
                 <SelectItem key={column.id} value={column.title}>
-                  {column.title}
+                  {t(toTranslationKey(column.title))}
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -93,17 +99,17 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
         </Select>
       </div>
 
-      <div className="w-24 flex-shrink-0"></div>
-      <div className="w-28 flex-shrink-0"></div>
-      <div className="w-32 flex-shrink-0"></div>
-      <div className="w-32 flex-shrink-0"></div>
+      <div className="w-24 flex-shrink-0" />
+      <div className="w-28 flex-shrink-0" />
+      <div className="w-32 flex-shrink-0" />
+      <div className="w-32 flex-shrink-0" />
 
       <div className="flex items-center gap-2 ml-auto pr-4">
         <Button
           onClick={() => onAdd(newTaskTitle, newTaskStatus)}
           className="h-8 bg-primary hover:bg-primary-700 text-white px-4"
         >
-          <Plus className="h-4 w-4 mr-1" /> Add
+          <Plus className="h-4 w-4 mr-1" /> {t('ADD')}
         </Button>
         <Button
           variant="ghost"

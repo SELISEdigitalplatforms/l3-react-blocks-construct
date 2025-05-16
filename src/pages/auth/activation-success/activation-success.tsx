@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 export function ActivationSuccess() {
   const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-center align-center">

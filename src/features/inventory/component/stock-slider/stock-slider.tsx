@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
 import { cn } from 'lib/utils';
@@ -46,7 +47,7 @@ type StockSliderProps = Readonly<{
 }>;
 
 export function StockSlider({
-  label = 'Stock',
+  label = 'STOCK',
   value = 0,
   min = 0,
   max = 1000,
@@ -55,6 +56,7 @@ export function StockSlider({
   onChange,
   className,
 }: StockSliderProps) {
+  const { t } = useTranslation();
   const [sliderValue, setSliderValue] = useState<number>(value);
   const [inputValue, setInputValue] = useState<string>(value.toString());
 
@@ -97,7 +99,7 @@ export function StockSlider({
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       <div className="flex items-center justify-between">
-        <Label>{label}</Label>
+        <Label>{t(label)}</Label>
         <Input
           type="text"
           value={inputValue}

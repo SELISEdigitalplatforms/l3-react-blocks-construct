@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   DialogContent,
   DialogDescription,
@@ -51,6 +52,7 @@ type AddUserProps = {
 
 export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { mutate: createAccount } = useCreateAccount({
     onSuccess: () => {
@@ -103,9 +105,9 @@ export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
       onClick={handleDialogClick}
     >
       <DialogHeader>
-        <DialogTitle className="mb-2">Add user</DialogTitle>
+        <DialogTitle className="mb-2">{t('ADD_USER')}</DialogTitle>
         <DialogDescription className="text-medium-emphasis font-normal">
-          Please enter the user&apos;s email address to send an invitation.
+          {t('ADD_USER_DESCRIPTION')}
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
@@ -114,12 +116,16 @@ export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
             <FormField
               control={control}
               name="firstName"
-              rules={{ required: 'Full Name is required' }}
+              rules={{ required: t('FULL_NAME_REQUIRED') }}
               render={({ field }) => (
                 <FormItem className="col-span-1 sm:col-span-2">
-                  <Label className="text-high-emphasis">First Name*</Label>
+                  <Label className="text-high-emphasis">{t('FIRST_NAME')}*</Label>
                   <FormControl>
-                    <Input {...field} placeholder="Enter your first name" className="rounded-lg" />
+                    <Input
+                      {...field}
+                      placeholder={t('ENTER_YOUR_FIRST_NAME')}
+                      className="rounded-lg"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -128,12 +134,16 @@ export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
             <FormField
               control={control}
               name="lastName"
-              rules={{ required: 'Full Name is required' }}
+              rules={{ required: t('FULL_NAME_REQUIRED') }}
               render={({ field }) => (
                 <FormItem className="col-span-1 sm:col-span-2">
-                  <Label className="text-high-emphasis">Last Name*</Label>
+                  <Label className="text-high-emphasis">{t('LAST_NAME')}*</Label>
                   <FormControl>
-                    <Input {...field} placeholder="Enter your last name" className="rounded-lg" />
+                    <Input
+                      {...field}
+                      placeholder={t('ENTER_YOUR_LAST_NAME')}
+                      className="rounded-lg"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,11 +154,11 @@ export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
               name="email"
               render={({ field }) => (
                 <FormItem className="col-span-1 sm:col-span-2">
-                  <Label className="text-high-emphasis">Email</Label>
+                  <Label className="text-high-emphasis">{t('EMAIL')}</Label>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="Enter your email address"
+                      placeholder={t('ENTER_YOUR_EMAIL_ADDRESS')}
                       className="rounded-lg"
                     />
                   </FormControl>
@@ -158,9 +168,9 @@ export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
           </div>
           <DialogFooter className="mt-5 flex justify-end gap-2">
             <Button variant="outline" type="button" onClick={onClose}>
-              Cancel
+              {t('CANCEL')}
             </Button>
-            <Button type="submit">Invite User</Button>
+            <Button type="submit">{t('INVITE_USER')}</Button>
           </DialogFooter>
         </form>
       </Form>

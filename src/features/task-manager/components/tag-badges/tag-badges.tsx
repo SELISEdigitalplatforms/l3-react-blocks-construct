@@ -56,7 +56,6 @@ export function Tag({ name, className = '', onClick }: Readonly<TagProps>) {
             }
           : undefined
       }
-      role="button"
       tabIndex={onClick ? 0 : undefined}
     >
       {name}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -65,10 +66,12 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   title,
   description,
   onConfirm,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText = 'CONFIRM',
+  cancelText = 'CANCEL',
   preventAutoClose = false,
 }) => {
+  const { t } = useTranslation();
+
   const handleConfirmClick = () => {
     onConfirm();
     if (!preventAutoClose) {
@@ -90,14 +93,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <Button variant="outline" onClick={handleCancelClick} className="rounded-[6px]">
-            {cancelText}
+            {t(cancelText)}
           </Button>
           <Button
             variant="default"
             className="bg-primary rounded-[6px]"
             onClick={handleConfirmClick}
           >
-            {confirmText}
+            {t(confirmText)}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

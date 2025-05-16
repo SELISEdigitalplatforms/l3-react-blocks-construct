@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { format, addMonths } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import {
   DialogContent,
@@ -136,6 +137,7 @@ const analyzeRecurringPattern = (events: CalendarEvent[]) => {
 };
 
 export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurrenceProps>) {
+  const { t } = useTranslation();
   // Load any temp event data saved before navigating here
   const [initialRecurrenceEvent] = useState<CalendarEvent>(() => {
     if (typeof window !== 'undefined') {
@@ -504,12 +506,12 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
     <Dialog open={true} onOpenChange={onNext}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Recurrence</DialogTitle>
+          <DialogTitle>{t('EDIT_RECURRENCE')}</DialogTitle>
           <DialogDescription />
         </DialogHeader>
         <div className="flex flex-col w-full gap-4">
           <div className="flex flex-col gap-[6px]">
-            <p className="font-normal text-sm text-high-emphasis">Repeat every</p>
+            <p className="font-normal text-sm text-high-emphasis">{t('REPEAT_EVERY')}</p>
             <div className="flex items-center gap-3 w-[60%]">
               <Input
                 type="number"
@@ -525,7 +527,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
                 <SelectContent>
                   {CALENDER_PERIOD.map((period) => (
                     <SelectItem key={period} value={period}>
-                      {period}
+                      {t(period)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -533,7 +535,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
             </div>
           </div>
           <div className="flex flex-col gap-[6px]">
-            <p className="font-normal text-sm text-high-emphasis">Repeat on</p>
+            <p className="font-normal text-sm text-high-emphasis">{t('REPEAT_ON')}</p>
             <div className="flex items-center w-full gap-2">
               {WEEK_DAYS_RRULE.map((day) => (
                 <Button
@@ -549,7 +551,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
             </div>
           </div>
           <div className="flex flex-col gap-3">
-            <p className="font-normal text-sm text-high-emphasis">Ends</p>
+            <p className="font-normal text-sm text-high-emphasis">{t('ENDS')}</p>
             <div className="flex items-center gap-3 w-full">
               <RadioGroup
                 value={endType}
@@ -559,14 +561,14 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="never" id="status-never" />
                   <Label htmlFor="status-never" className="cursor-pointer">
-                    Never
+                    {t('NEVER')}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2 w-full">
                   <div className="flex items-center gap-2 w-[40%]">
                     <RadioGroupItem value="on" id="status-on" />
                     <Label htmlFor="status-on" className="cursor-pointer">
-                      On
+                      {t('RECURRING_ON')}
                     </Label>
                   </div>
                   <Popover>
@@ -597,7 +599,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
                   <div className="flex items-center gap-2 w-[40%]">
                     <RadioGroupItem value="after" id="status-after" />
                     <Label htmlFor="status-after" className="cursor-pointer">
-                      After
+                      {t('AFTER')}
                     </Label>
                   </div>
                   <Input
@@ -615,9 +617,9 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
         </div>
         <DialogFooter className="flex w-full !flex-row !items-center !justify-end gap-4 !mt-6">
           <Button variant="outline" onClick={onNext}>
-            Cancel
+            {t('CANCEL')}
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave}>{t('SAVE')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

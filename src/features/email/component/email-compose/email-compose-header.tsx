@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Minus, X, Expand, Minimize2 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 
@@ -46,29 +47,31 @@ export function EmailComposeHeader({
   onClose,
   isMaximized,
 }: Readonly<EmailComposeHeaderProps>) {
+  const { t } = useTranslation();
+
   return (
-    <div className="hidden md:flex items-center bg-surface justify-between  rounded-t px-3 py-2 ">
-      <div className="font-medium  text-medium-emphasis">New message</div>
+    <div className="hidden md:flex items-center bg-surface justify-between rounded-t px-3 py-2 ">
+      <div className="font-medium  text-medium-emphasis">{t('NEW_MESSAGE')}</div>
       <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onMinimize}>
           <Minus className="h-4 w-4" />
-          <span className="sr-only">Minimize</span>
+          <span className="sr-only">{t('MINIMIZE')}</span>
         </Button>
         {!isMaximized && (
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onMaximize}>
             <Expand className="h-4 w-4" />
-            <span className="sr-only">Maximize</span>
+            <span className="sr-only">{t('MAXIMIZE')}</span>
           </Button>
         )}
         {isMaximized && (
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onMaximize}>
             <Minimize2 className="h-4 w-4" />
-            <span className="sr-only">Maximize</span>
+            <span className="sr-only">{t('MAXIMIZE')}</span>
           </Button>
         )}
         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onClose}>
           <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
+          <span className="sr-only">{t('CLOSE')}</span>
         </Button>
       </div>
     </div>

@@ -68,11 +68,11 @@ describe('DashboardOverview Component', () => {
   });
 
   test('renders the card with the Overview title', () => {
-    expect(screen.getByTestId('card-title')).toHaveTextContent('Overview');
+    expect(screen.getByTestId('card-title')).toHaveTextContent('OVERVIEW');
   });
 
   test('renders the select with default placeholder "This month"', () => {
-    expect(screen.getByTestId('select-value')).toHaveTextContent('This month');
+    expect(screen.getByTestId('select-value')).toHaveTextContent('THIS_MONTH');
   });
 
   test('renders months in the select dropdown', () => {
@@ -99,23 +99,23 @@ describe('DashboardOverview Component', () => {
   });
 
   test('renders the "Total users" section with correct details', () => {
-    expect(screen.getByText('Total users')).toBeInTheDocument();
+    expect(screen.getByText('TOTAL_USERS')).toBeInTheDocument();
     expect(screen.getByText('10,000')).toBeInTheDocument();
     expect(screen.getByText('+2.5%')).toBeInTheDocument();
-    expect(screen.getAllByText('from last month')).toHaveLength(3);
+    expect(screen.getAllByText('FROM_LAST_MONTH')).toHaveLength(3);
     expect(screen.getAllByTestId('icon-trending-up')).toHaveLength(3);
     expect(screen.getByTestId('icon-users')).toBeInTheDocument();
   });
 
   test('renders the "Total active users" section with correct details', () => {
-    expect(screen.getByText('Total active users')).toBeInTheDocument();
+    expect(screen.getByText('TOTAL_ACTIVE_USERS')).toBeInTheDocument();
     expect(screen.getByText('7,000')).toBeInTheDocument();
     expect(screen.getByText('+5%')).toBeInTheDocument();
     expect(screen.getByTestId('icon-user-cog')).toBeInTheDocument();
   });
 
   test('renders the "New sign-ups" section with correct details', () => {
-    expect(screen.getByText('New sign-ups')).toBeInTheDocument();
+    expect(screen.getByText('NEW_SIGN_UPS')).toBeInTheDocument();
     expect(screen.getByText('1,200')).toBeInTheDocument();
     expect(screen.getByText('+8%')).toBeInTheDocument();
     expect(screen.getByTestId('icon-user-plus')).toBeInTheDocument();

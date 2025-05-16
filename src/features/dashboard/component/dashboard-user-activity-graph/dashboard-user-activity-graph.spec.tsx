@@ -5,7 +5,12 @@ import { DashboardUserActivityGraph } from './dashboard-user-activity-graph';
 
 jest.mock('components/ui/chart', () => ({
   ...jest.requireActual('components/ui/chart'),
-  ChartTooltipContent: () => <div data-testid="tooltip-content" />,
+  ChartContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ChartTooltip: ({ content }: { content: any }) => {
+    const mockPayload = [{ value: 10 }];
+    const mockLabel = 'Week 1';
+    return content({ payload: mockPayload, label: mockLabel });
+  },
 }));
 
 interface MockComponentProps {
@@ -78,7 +83,8 @@ describe('DashboardUserActivityGraph Component', () => {
     fireEvent.mouseOver(barElement);
 
     await waitFor(() => {
-      expect(screen.getByTestId('tooltip-content')).toBeInTheDocument();
+      expect(screen.getByText('Week 1:')).toBeInTheDocument();
+      expect(screen.getByText(/10 ACTION/)).toBeInTheDocument();
     });
   });
 });

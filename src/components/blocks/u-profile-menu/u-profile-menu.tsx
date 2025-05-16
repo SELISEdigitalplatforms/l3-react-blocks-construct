@@ -92,7 +92,7 @@ export const UProfileMenu = () => {
             ) : (
               <h2 className="text-xs font-semibold text-high-emphasis">{fullName}</h2>
             )}
-            <p className="text-[10px] text-low-emphasis capitalize">Admin</p>
+            <p className="text-[10px] text-low-emphasis capitalize">{t('ADMIN')}</p>
           </div>
           {isDropdownOpen ? (
             <ChevronUp className="h-5 w-5 text-medium-emphasis" />
@@ -108,20 +108,20 @@ export const UProfileMenu = () => {
         sideOffset={10}
       >
         <DropdownMenuItem onClick={() => navigate('profile')}>{t('MY_PROFILE')}</DropdownMenuItem>
-        <DropdownMenuItem disabled>About</DropdownMenuItem>
-        <DropdownMenuItem disabled>Privacy Policy</DropdownMenuItem>
+        <DropdownMenuItem disabled>{t('ABOUT')}</DropdownMenuItem>
+        <DropdownMenuItem disabled>{t('PRIVACY_POLICY')}</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex justify-between items-center transition-colors"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          <span>Theme</span>
+          <span>{t('THEME')}</span>
           <button className="p-1 rounded-full transition-colors">
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={signoutHandler}>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={signoutHandler}>{t('LOG_OUT')}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

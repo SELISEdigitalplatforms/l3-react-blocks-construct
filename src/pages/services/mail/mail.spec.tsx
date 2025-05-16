@@ -6,7 +6,7 @@ describe('Mail Component', () => {
   test('renders the Mail heading', () => {
     render(<Mail />);
 
-    const headingElement = screen.getByText('Mail');
+    const headingElement = screen.getByText('MAIL');
     expect(headingElement).toBeInTheDocument();
 
     expect(headingElement).toHaveClass('text-2xl');

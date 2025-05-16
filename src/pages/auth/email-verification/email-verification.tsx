@@ -1,7 +1,7 @@
-import { Button } from 'components/ui/button';
-import emailSentIcon from 'assets/images/email_sent.svg';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Button } from 'components/ui/button';
+import emailSentIcon from 'assets/images/email_sent.svg';
 
 export function EmailVerification() {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ export function EmailVerification() {
       </div>
 
       <div>
-        <div className="text-2xl font-bold text-high-emphasis mb-4">Email sent</div>
+        <div className="text-2xl font-bold text-high-emphasis mb-4">{t('EMAIL_SENT')}</div>
         <div className="flex gap-1 mt-1">
           <div className="text-base font-normal text-medium-emphasis leading-6">
             {t('EMAIL_SENT_REGISTERED_EMAIL')}

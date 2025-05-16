@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import {
   changePasswordFormDefaultValue,
   changePasswordFormType,
-  changePasswordFormValidationSchema,
+  getValidationSchemas,
 } from 'features/profile/utils/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useChangePassword } from 'features/profile/hooks/use-account';
@@ -58,7 +58,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
 
   const form = useForm<changePasswordFormType>({
     defaultValues: changePasswordFormDefaultValue,
-    resolver: zodResolver(changePasswordFormValidationSchema),
+    resolver: zodResolver(getValidationSchemas(t).changePasswordFormValidationSchema),
   });
 
   const { mutate: changePassword, isPending } = useChangePassword();

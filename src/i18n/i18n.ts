@@ -1,3 +1,11 @@
+/**
+ * @fileoverview i18n configuration and utility functions for internationalization.
+ * This module sets up i18next with React integration and provides utilities for
+ * dynamic translation loading.
+ *
+ * @module i18n
+ */
+
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { getUilmFile } from 'components/blocks/language-selector/services/language.service';
@@ -9,7 +17,13 @@ declare module 'i18next' {
   }
 }
 
-// Initialize i18n instance
+/**
+ * Initialize i18next instance with default configuration.
+ * - Sets English (US) as the default and fallback language
+ * - Disables HTML escaping for interpolation
+ * - Ensures null is never returned (always returns string)
+ * - Starts with empty resources (loaded dynamically)
+ */
 i18n.use(initReactI18next).init({
   lng: 'en-US',
   fallbackLng: 'en-US',
@@ -17,26 +31,27 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
   returnNull: false,
-  resources: {}, // Empty initially, will be loaded dynamically
+  resources: {},
 });
 
 /**
- * Load translations for a specific language and module
+ * Loads and registers translations for a specific language and module.
  *
- * @param language - Language code to load translations for
- * @param moduleName - Module name to load translations for
- * @returns Promise that resolves when translations are loaded
- */
-/**
- * Load translations for a specific language and module
+ * This function fetches translations from the API and adds them to the i18n instance.
+ * It handles the translations in two ways:
+ * 1. Adds them to the default 'translation' namespace for direct access
+ * 2. Adds them to a module-specific namespace for organized access
  *
- * This function handles fetching translations from the API and adding them to the i18n instance.
- * It includes error handling and will not throw errors to avoid breaking the UI.
+ * The function includes error handling and will not throw errors to avoid breaking the UI.
  *
- * @param language - Language code to load translations for
- * @param moduleName - Module name to load translations for
- * @param retryCount - Number of retries attempted (internal use)
- * @returns Promise that resolves when translations are loaded
+ * @param {string} language - The language code to load translations for (e.g., 'en-US', 'fr-FR')
+ * @param {string} moduleName - The module name to load translations for (e.g., 'common', 'dashboard')
+ * @returns {Promise<void>} Resolves when translations are loaded and registered
+ * @throws {never} Catches all errors internally to prevent UI disruption
+ *
+ * @example
+ * // Load translations for the dashboard module in French
+ * await loadTranslations('fr-FR', 'dashboard');
  */
 export const loadTranslations = async (language: string, moduleName: string): Promise<void> => {
   try {

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button } from 'components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
+import { Button } from 'components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { CalendarEvent } from '../../types/calendar-event.types';
 import { getTextColorClassFromBg } from '../../utils/date-utils';
@@ -58,6 +59,7 @@ export const ShowMorePopup = ({
   onClose,
 }: Readonly<ShowMorePopupProps>) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   const date = remainingEvents?.[0]?.start || new Date();
 
@@ -71,7 +73,7 @@ export const ShowMorePopup = ({
     >
       <PopoverTrigger asChild>
         <span className="text-xs font-normal text-medium-emphasis hover:text-high-emphasis hover:underline">
-          +{count} more
+          +{count} {t('MORE')}
         </span>
       </PopoverTrigger>
       <PopoverContent className="w-64 p-0">

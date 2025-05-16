@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const ALLOWED_SPECIAL_CHARS = '@$!%*?&';
 
@@ -14,18 +15,20 @@ export interface PasswordRequirement {
   label: string;
 }
 
-export const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
-  { key: 'length', label: 'Between 8 and 30 characters' },
-  { key: 'case', label: 'At least 1 uppercase and 1 lowercase letter' },
-  { key: 'number', label: 'At least 1 digit' },
+export const getPasswordRequirements = (t: (key: string) => string): PasswordRequirement[] => [
+  { key: 'length', label: t('BETWEEN_EIGHT_THIRTY_CHARACTERS') },
+  { key: 'case', label: t('AT_LEAST_ONE_UPPERCASE_AND_ONE_LOWERCASE_LETTER') },
+  { key: 'number', label: t('AT_LEAST_ONE_DIGIT') },
   {
     key: 'special',
-    label: `At least 1 special character (${ALLOWED_SPECIAL_CHARS.split('').join(' ')})`,
+    label: `${t('AT_LEAST_ONE_SPECIAL_CHARACTER')} (${ALLOWED_SPECIAL_CHARS.split('').join(' ')})`,
   },
 ];
 
 export const usePasswordStrength = (password: string) => {
+  const { t } = useTranslation();
   const [strength, setStrength] = useState(0);
+  const requirements = getPasswordRequirements(t);
   const [checks, setChecks] = useState<PasswordChecks>({
     length: false,
     case: false,
@@ -65,6 +68,6 @@ export const usePasswordStrength = (password: string) => {
     checks,
     allRequirementsMet: Object.values(checks).every(Boolean),
     getStrengthColor,
-    requirements: PASSWORD_REQUIREMENTS,
+    requirements,
   };
 };

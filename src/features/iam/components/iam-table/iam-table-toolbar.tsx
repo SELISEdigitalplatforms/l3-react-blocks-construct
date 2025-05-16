@@ -3,6 +3,7 @@
 
 import { Table } from '@tanstack/react-table';
 import { X, Mail, User, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import { DataTableViewOptions } from 'components/blocks/data-table/data-table-view-options';
@@ -53,6 +54,7 @@ export function IamTableToolbar<TData>({ table, onSearch }: Readonly<IamTableToo
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const [dateRangeCreate, setDateRangeCreate] = useState<DateRange | undefined>(undefined);
   const [dateRangeLastLogin, setDateRangeLastLogin] = useState<DateRange | undefined>(undefined);
+  const { t } = useTranslation();
 
   const getFilterColumn = (columnId: string) => {
     return table.getAllFlatColumns().find((col) => col.id === columnId);
@@ -128,7 +130,7 @@ export function IamTableToolbar<TData>({ table, onSearch }: Readonly<IamTableToo
         <div className="flex items-center gap-2">
           <div className="relative flex-1 sm:w-[300px] min-w-[200px]">
             <Input
-              placeholder={`Search by ${searchMode}...`}
+              placeholder={`${t('SEARCH_BY')} ${searchMode === 'email' ? t('EMAIL').toLowerCase() : t('NAME').toLowerCase()}...`}
               value={filters[searchMode]}
               onChange={(event) => handleFilterChange(event.target.value)}
               className="h-8 w-full rounded-lg bg-background pr-20"
@@ -158,7 +160,7 @@ export function IamTableToolbar<TData>({ table, onSearch }: Readonly<IamTableToo
               </SheetTrigger>
               <SheetContent side="bottom" className="w-full" aria-describedby="filter-description">
                 <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
+                  <SheetTitle>{t('FILTERS')}</SheetTitle>
                 </SheetHeader>
                 <div className="py-4">
                   <FilterControls
@@ -171,7 +173,7 @@ export function IamTableToolbar<TData>({ table, onSearch }: Readonly<IamTableToo
                 </div>
                 {isFiltered && (
                   <Button variant="ghost" onClick={handleResetFilters} className="h-8 px-2 w-full">
-                    Reset
+                    {t('RESET')}
                     <X className="ml-2 h-4 w-4" />
                   </Button>
                 )}
@@ -194,7 +196,7 @@ export function IamTableToolbar<TData>({ table, onSearch }: Readonly<IamTableToo
 
           {isFiltered && (
             <Button variant="ghost" onClick={handleResetFilters} className="h-8 px-2 lg:px-3">
-              Reset
+              {t('RESET')}
               <X className="ml-2 h-4 w-4" />
             </Button>
           )}

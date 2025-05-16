@@ -1,21 +1,26 @@
-export const statuses = [
+type FilterOption = {
+  value: string;
+  label: string;
+};
+
+export const getStatusOptions = (t: (key: string) => string): FilterOption[] => [
   {
     value: 'true',
-    label: 'Active',
+    label: t('ACTIVE'),
   },
   {
     value: 'false',
-    label: 'Inactive',
+    label: t('INACTIVE'),
   },
 ];
 
-export const mfaEnabled = [
+export const getMfaEnabledOptions = (t: (key: string) => string): FilterOption[] => [
   {
     value: 'true',
-    label: 'Enabled',
+    label: t('ENABLED'),
   },
   {
     value: 'false',
-    label: 'Disabled',
+    label: t('DISABLED'),
   },
 ];

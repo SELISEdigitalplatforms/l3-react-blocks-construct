@@ -7,19 +7,19 @@ const PASSWORD_REGEX = new RegExp(
   `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])[A-Za-z\\d\\W_]{8,30}$`
 );
 
-export const createPasswordValidationSchema = () =>
+export const createPasswordValidationSchema = (t: (key: string) => string) =>
   z
     .object({
       password: z.string().refine((password) => PASSWORD_REGEX.test(password), {
-        message: `Password must contain lowercase, uppercase, number, and only these special characters: ${ALLOWED_SPECIAL_CHARS}`,
+        message: `${t('PASSWORD_CONTAIN_LOWER_UPPER_SPECAIAL_CHARACTERS')} (${ALLOWED_SPECIAL_CHARS})`,
       }),
       confirmPassword: z
         .string()
-        .min(8, 'Password must be at least 8 characters long')
-        .max(30, 'Password must not exceed 30 characters'),
+        .min(8, { message: t('PASSWORD_MUST_LEAST_EIGHT_CHARACTERS') })
+        .max(30, { message: t('PASSWORD_MUST_NOT_EXCEED_THIRTY_CHAR') }),
     })
     .refine((data) => data.password === data.confirmPassword, {
-      message: 'Passwords must match',
+      message: t('PASSWORDS_MUST_MATCH'),
       path: ['confirmPassword'],
     });
 
@@ -30,27 +30,27 @@ export const passwordFormDefaultValues: PasswordFormType = {
   confirmPassword: '',
 };
 
-export const PASSWORD_REQUIREMENTS = [
+export const getPasswordRequirements = (t: (key: string) => string) => [
   {
     key: 'length',
-    label: 'Between 8 and 30 characters',
+    label: t('BETWEEN_EIGHT_THIRTY_CHARACTERS'),
     regex: (password: string) => password.length >= 8 && password.length <= 30,
   },
   {
     key: 'case',
-    label: 'At least 1 uppercase and 1 lowercase letter',
+    label: t('AT_LEAST_ONE_UPPERCASE_AND_ONE_LOWERCASE_LETTER'),
     regex: (password: string) => {
       return /[a-z]/.test(password) && /[A-Z]/.test(password);
     },
   },
   {
     key: 'number',
-    label: 'At least 1 digit',
+    label: t('AT_LEAST_ONE_DIGIT'),
     regex: (password: string) => /\d/.test(password),
   },
   {
     key: 'special',
-    label: `At least 1 special character (${ALLOWED_SPECIAL_CHARS.split('').join(' ')})`,
+    label: t('AT_LEAST_ONE_SPECIAL_CHARACTER'),
     regex: (password: string) => /[@$!%*?&]/.test(password),
   },
 ];

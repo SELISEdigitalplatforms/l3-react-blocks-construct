@@ -8,15 +8,21 @@ import { CustomtDateFormat } from 'lib/custom-date-formatter';
  * Creates column definitions for an advanced inventory table.
  * @returns {ColumnDef<InventoryData>[]} An array of column definitions for the table.
  */
-export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
+interface AdvanceTableColumnProps {
+  t: (key: string) => string;
+}
+
+export const createAdvanceTableColumns = ({
+  t,
+}: AdvanceTableColumnProps): ColumnDef<InventoryData>[] => [
   /**
    * Column for selecting an action on the inventory item.
    */
   {
     id: 'select',
-    header: () => <span className="text-xs font-medium">Action</span>,
+    header: () => <span className="text-xs font-medium">{t('ACTION')}</span>,
     accessorKey: 'select',
-    meta: 'Action',
+    meta: 'ACTION',
     enableSorting: false,
     enableHiding: false,
     enablePinning: true,
@@ -27,8 +33,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'itemName',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Item name" />,
-    meta: 'Item Name',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('ITEM_NAME')} />,
+    meta: 'ITEM_NAME',
     enablePinning: true,
     accessorFn: (row) => `${row.itemName || ''}`.trim(),
     size: 160,
@@ -52,8 +58,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'category',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Category" />,
-    meta: 'Category',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('CATEGORY')} />,
+    meta: 'CATEGORY',
     accessorFn: (row) => `${row.category || ''}`.trim(),
     cell: ({ row }) => (
       <div className="flex items-center w-[180px]">
@@ -66,8 +72,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'supplier',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Supplier" />,
-    meta: 'Supplier',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('SUPPLIER')} />,
+    meta: 'SUPPLIER',
     accessorFn: (row) => `${row.supplier || ''}`.trim(),
     cell: ({ row }) => {
       return (
@@ -83,8 +89,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
   {
     id: 'itemLoc',
     accessorFn: (row) => `${row.itemLoc || ''}`.trim(),
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Item location" />,
-    meta: 'Item location',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('ITEM_LOCATION')} />,
+    meta: 'ITEM_LOCATION',
     size: 180,
     cell: ({ row }) => {
       return (
@@ -99,8 +105,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'stock',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Stock" />,
-    meta: 'Stock',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('STOCK')} />,
+    meta: 'STOCK',
     accessorFn: (row) => `${row.stock ?? 0}`.trim(),
     size: 100,
     cell: ({ row }) => {
@@ -133,8 +139,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'lastupdated',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Last updated" />,
-    meta: 'Last updated',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('LAST_UPDATED')} />,
+    meta: 'LAST_UPDATED',
     size: 180,
     accessorFn: (row) => (row.lastupdated ? format(new Date(row.lastupdated), 'yyyy-MM-dd') : ''),
     cell: ({ row }) => {
@@ -190,8 +196,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'price',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
-    meta: 'Price',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('PRICE')} />,
+    meta: 'PRICE',
     size: 100,
     accessorFn: (row) => `${row.price || ''}`.trim(),
     cell: ({ row }) => {
@@ -207,8 +213,8 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
    */
   {
     id: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-    meta: 'Status',
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
+    meta: 'STATUS',
     size: 100,
     accessorFn: (row) => `${row.status || ''}`.trim(),
     cell: ({ row }) => {
@@ -218,7 +224,7 @@ export const createAdvanceTableColumns = (): ColumnDef<InventoryData>[] => [
       return (
         <div className="flex items-center">
           <span className={`px-2 py-1 rounded-md truncate text-${statusColors[status]}`}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {t(status.toUpperCase())}
           </span>
         </div>
       );

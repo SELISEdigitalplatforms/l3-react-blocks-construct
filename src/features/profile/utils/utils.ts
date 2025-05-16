@@ -1,26 +1,42 @@
 import { z } from 'zod';
 
-export const createUserFormValidationSchema = z.object({
-  firstName: z.string().min(1, "First name can't be empty"),
-  lastName: z.string().min(1, "Last name can't be empty"),
-  email: z.string().email(),
+// Function to get validation schemas with translations
+export const getValidationSchemas = (t: (key: string) => string) => ({
+  createUserFormValidationSchema: z.object({
+    firstName: z.string().min(1, { message: t('FIRST_NAME_CANT_EMPTY') }),
+    lastName: z.string().min(1, { message: t('LAST_NAME_CANT_EMPTY') }),
+    email: z.string().email({ message: t('INVALID_EMAIL_FORMAT') }),
+  }),
+
+  profileFormValidationSchema: z.object({
+    firstName: z.string().min(1, { message: t('FIRST_NAME_CANT_EMPTY') }),
+    lastName: z.string().min(1, { message: t('LAST_NAME_CANT_EMPTY') }),
+    // email: z.string().email(),
+  }),
+
+  changePasswordFormValidationSchema: z.object({
+    oldPassword: z.string().min(1, { message: t('CURRENT_PASSWORD_CANT_EMPTY') }),
+    newPassword: z.string().min(8, { message: t('PASSWORD_MUST_EIGHT_CHARACTER_LONG') }),
+    confirmNewPassword: z.string().min(8, { message: t('PASSWORD_MUST_EIGHT_CHARACTER_LONG') }),
+  }),
 });
 
-export type CreateUserFormType = typeof profileFormDefaultvalue;
+// Form Types
+export type CreateUserFormType = z.infer<
+  ReturnType<typeof getValidationSchemas>['createUserFormValidationSchema']
+>;
+export type ProfileFormType = z.infer<
+  ReturnType<typeof getValidationSchemas>['profileFormValidationSchema']
+>;
+export type changePasswordFormType = z.infer<
+  ReturnType<typeof getValidationSchemas>['changePasswordFormValidationSchema']
+>;
 
 export const createUserFormDefaultvalue = {
   firstName: '',
   lastName: '',
   email: '',
 };
-
-export const profileFormValidationSchema = z.object({
-  firstName: z.string().min(1, "First name can't be empty"),
-  lastName: z.string().min(1, "Last name can't be empty"),
-  // email: z.string().email(),
-});
-
-export type ProfileFormType = typeof profileFormDefaultvalue;
 
 export const profileFormDefaultvalue = {
   itemId: '',
@@ -29,16 +45,8 @@ export const profileFormDefaultvalue = {
   email: '',
 };
 
-export const changePasswordFormValidationSchema = z.object({
-  oldPassword: z.string().min(1, "Current password can't be empty"),
-  newPassword: z.string().min(8, 'Password must be at least 8 character long'),
-  confirmNewPassword: z.string().min(8, 'Password must be at least 8 character long'),
-});
-
-export type changePasswordFormType = z.infer<typeof changePasswordFormValidationSchema>;
-
-export const changePasswordFormDefaultValue: changePasswordFormType = {
+export const changePasswordFormDefaultValue = {
   oldPassword: '',
   newPassword: '',
   confirmNewPassword: '',
-};
+} as const;

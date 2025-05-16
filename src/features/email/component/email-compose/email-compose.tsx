@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useToast } from 'hooks/use-toast';
 import { EmailComposeHeader } from './email-compose-header';
 import { EmailInput } from '../email-ui/email-input';
 import EmailTextEditor from '../email-ui/email-text-editor';
 import { TEmail, TFormData, TFormProps, TIsComposing } from '../../types/email.types';
-import { ArrowLeft } from 'lucide-react';
-import { useToast } from 'hooks/use-toast';
 import { EmailTagInput } from '../email-ui/email-tag-input';
 
 /**
@@ -58,6 +59,7 @@ export function EmailCompose({
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [toTags, setToTags] = useState<string[]>([]);
   const [ccTags, setCcTags] = useState<string[]>([]);
@@ -162,8 +164,8 @@ export function EmailCompose({
     if (toTags.length === 0 || !emailData.subject.trim()) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'All fields are required.',
+        title: t('ERROR'),
+        description: t('ALL_FIELDS_REQUIRED'),
       });
       return;
     }
@@ -172,8 +174,8 @@ export function EmailCompose({
     onClose();
     toast({
       variant: 'success',
-      title: 'Success',
-      description: 'Your email has been sent.',
+      title: t('SUCCESS'),
+      description: t('YOUR_EMAIL_BEEN_SENT'),
     });
   };
 
@@ -208,7 +210,12 @@ export function EmailCompose({
         />
         <div className="flex flex-col px-4 pt-4 gap-4 flex-1 overflow-auto">
           <div className="relative">
-            <EmailTagInput value={toTags} type="email" onChange={setToTags} placeholder="To" />
+            <EmailTagInput
+              value={toTags}
+              type="email"
+              onChange={setToTags}
+              placeholder={t('MAIL_TO')}
+            />
             <p
               className="absolute right-12 bottom-2 -translate-y-1/2   cursor-pointer text-primary-400 hover:underline "
               onClick={() => setShowCc(!showCc)}
@@ -233,7 +240,7 @@ export function EmailCompose({
             value={formData.subject}
             onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
             type="text"
-            placeholder="Subject"
+            placeholder={t('SUBJECT')}
           />
 
           <div className="flex flex-col flex-1">
@@ -242,8 +249,8 @@ export function EmailCompose({
               onChange={handleContentChange}
               onSubmit={handleSendEmail}
               onCancel={onClose}
-              submitName="Send"
-              cancelButton="Discard"
+              submitName={t('SEND')}
+              cancelButton={t('DISCARD')}
               formData={formData}
               setFormData={
                 setFormData as React.Dispatch<React.SetStateAction<TFormProps | TFormData>>
@@ -266,7 +273,12 @@ export function EmailCompose({
         />
         <div className="flex flex-col p-4 gap-4 flex-1 overflow-auto">
           <div className="relative">
-            <EmailTagInput type="email" value={toTags} onChange={setToTags} placeholder="To" />
+            <EmailTagInput
+              type="email"
+              value={toTags}
+              onChange={setToTags}
+              placeholder={t('MAIL_TO')}
+            />
             <p
               className="absolute right-12 bottom-2 -translate-y-1/2   cursor-pointer text-primary-400 hover:underline "
               onClick={() => setShowCc(!showCc)}
@@ -289,7 +301,7 @@ export function EmailCompose({
           )}
           <EmailInput
             type="text"
-            placeholder="Subject"
+            placeholder={t('SUBJECT')}
             value={formData.subject}
             onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
           />
@@ -300,8 +312,8 @@ export function EmailCompose({
               onChange={handleContentChange}
               onSubmit={handleSendEmail}
               onCancel={onClose}
-              submitName="Send"
-              cancelButton="Discard"
+              submitName={t('SEND')}
+              cancelButton={t('DISCARD')}
               setFormData={
                 setFormData as React.Dispatch<React.SetStateAction<TFormProps | TFormData>>
               }

@@ -11,12 +11,14 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'components/ui/collapsible';
 import { Icon, IconName } from '../menu-icon/menu-icon';
 import { SidebarMenuItemProps } from 'models/sidebar';
+import { useTranslation } from 'react-i18next';
 
 export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
   item,
   showText,
   onClick,
 }) => {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const hasChildren = Array.isArray(item.children) && item.children.length > 0;
   const [isOpen, setIsOpen] = useState(false);
@@ -116,7 +118,7 @@ export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
           <span
             className={`ml-3 truncate ${!showText && 'hidden'} ${isActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
           >
-            {item.name}
+            {t(item.name)}
           </span>
         </Link>
       </SidebarMenuButton>

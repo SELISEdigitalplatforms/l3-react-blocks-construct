@@ -1,23 +1,25 @@
+import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import notFound from 'assets/images/not_found.svg';
 import { Button } from 'components/ui/button';
-import { ArrowRight } from 'lucide-react';
 
 // testing from own branch
 
 export default function NotFound() {
+  const { t } = useTranslation();
   return (
     <div className="flex justify-center items-center w-full">
       <div className="flex flex-col gap-12">
-        <img src={notFound} alt=''/>
+        <img src={notFound} />
         <div className="flex flex-col items-center">
           <h1 className="text-high-emphasis font-bold text-[32px] leading-[48px]">
-            We couldn’t find what you were looking for.
+            {t('COULDNT_FIND_WHAT_YOU_LOOKING_FOR')}
           </h1>
           <p className="mt-3 mb-6 text-medium-emphasis font-semibold text-2xl">
-            The page may have been moved or no longer exists.
+            {t('PAGE_MAY_MOVED_NO_LONGER_EXISTS')}
           </p>
-          <Button className='font-bold text-sm'>
-            Take me back
+          <Button className="font-bold text-sm">
+            {t('TAKE_ME_BACK')}
             <ArrowRight />
           </Button>
         </div>

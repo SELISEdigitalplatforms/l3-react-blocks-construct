@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar, ChevronDown, ChevronUp, Link, Trash, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import {
   DialogContent,
@@ -71,6 +72,7 @@ interface EventDetailsProps {
  */
 export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<EventDetailsProps>) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [showToggleButton, setShowToggleButton] = useState(false);
@@ -118,8 +120,8 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
     setShowRecurringDeleteDialog(false);
     toast({
       variant: 'success',
-      title: 'Event Deleted Successfully',
-      description: `The event titled "${event.title}" has been successfully deleted.`,
+      title: t('EVENT_DELETED_SUCCESSFULLY'),
+      description: `${t('THE_EVENT_TITLED')} "${event.title}" ${t('HAS_BEEN_SUCCESSFULLY_DELETED')}.`,
     });
   };
 
@@ -136,7 +138,7 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
               <Calendar className="w-5 h-5 text-medium-emphasis" />
               <p className="font-semibold text-base text-high-emphasis">
                 {event?.allDay
-                  ? `${format(event.start, 'dd.MM.yyyy')}, Whole Day`
+                  ? `${format(event.start, 'dd.MM.yyyy')}, ${t('WHOLE_DAY')}`
                   : `${format(event.start, 'dd.MM.yyyy, HH:mm')} - ${format(event.end, 'HH:mm')}`}
               </p>
             </div>
@@ -149,8 +151,8 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
                   onClick={() => {
                     toast({
                       variant: 'success',
-                      title: 'Zoom link clicked',
-                      description: 'Opening Zoom. Please note this is a placeholder link.',
+                      title: t('ZOOM_LINK_CLICKED'),
+                      description: t('OPENING_ZOOM_PLACEHOLDER_LINK'),
                     });
                   }}
                   className="text-base font-normal underline text-primary leading-6 break-all hover:text-primary-800 cursor-pointer w-[90%]"
@@ -158,7 +160,9 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
                   {event.resource?.meetingLink}
                 </a>
               ) : (
-                <span className="text-base leading-6 text-low-emphasis">No meeting link</span>
+                <span className="text-base leading-6 text-low-emphasis">
+                  {t('NO_MEETING_LINK')}
+                </span>
               )}
             </div>
             {members.length > 0 && (
@@ -166,18 +170,18 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
                 <Users className="w-5 h-5 text-medium-emphasis" />
                 <div className="flex flex-col gap-1">
                   <p className="font-semibold text-base text-high-emphasis">
-                    {members.length} invited
+                    {members.length} {t('INVITED')}
                   </p>
                   <p className="font-normal text-xs text-medium-emphasis">
-                    Accepted {acceptedCount}, Didn’t respond {noResponseCount}, & Declined{' '}
-                    {`${declinedCount}`}
+                    {t('ACCEPTED')} {acceptedCount}, {t('DIDNT_RESPOND')} {noResponseCount}, &
+                    {t('DECLINED')} {`${declinedCount}`}
                   </p>
                 </div>
               </div>
             )}
             {event.resource?.description && (
               <div className="flex flex-col items-start gap-3">
-                <p className="font-semibold text-base text-high-emphasis">Description</p>
+                <p className="font-semibold text-base text-high-emphasis">{t('DESCRIPTION')}</p>
                 <div className="flex-1" style={{ minHeight: '60px' }}>
                   <p
                     ref={descriptionRef}
@@ -204,7 +208,7 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
                       ) : (
                         <ChevronDown className="w-4 h-4 mr-1" />
                       )}
-                      {isExpanded ? 'Show less' : 'Show more'}
+                      {isExpanded ? t('SHOW_LESS') : t('SHOW_MORE')}
                     </Button>
                   )}
                 </div>
@@ -216,7 +220,7 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
               <Trash className="w-5 h-4 text-destructive" />
             </Button>
             <Button variant="outline" onClick={onNext}>
-              Edit
+              {t('EDIT')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -224,12 +228,12 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
       <ConfirmationModal
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        title="Delete Event"
+        title={t('DELETE_EVENT')}
         description={
           <>
-            Are you sure you want to delete the event:{' '}
-            <span className="font-semibold text-high-emphasis">{event.title}</span>? This action
-            cannot be undone.
+            {t('ARE_YOU_SURE_WANT_DELETE_EVENT')}{' '}
+            <span className="font-semibold text-high-emphasis">{event.title}</span>?{' '}
+            {t('THIS_ACTION_CANNOT_UNDONE')}
           </>
         }
         onConfirm={handleDeleteConfirm}

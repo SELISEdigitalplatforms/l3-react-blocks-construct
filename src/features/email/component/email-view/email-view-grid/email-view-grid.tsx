@@ -1,10 +1,5 @@
-import { EmailViewProps, TReply } from 'features/email/types/email.types';
-import empty_email from 'assets/images/empty_email.svg';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ChevronDown,
   ChevronUp,
@@ -22,6 +17,13 @@ import {
   TriangleAlert,
   X,
 } from 'lucide-react';
+import { EmailViewProps, TReply } from 'features/email/types/email.types';
+import empty_email from 'assets/images/empty_email.svg';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
 import { Checkbox } from 'components/ui/checkbox';
 import { Label } from 'components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from 'components/ui/tooltip';
@@ -31,7 +33,6 @@ import EmailActionsPanel from '../email-actions-panel';
 import EmailTextEditor from '../../email-ui/email-text-editor';
 import { EmailCompose } from '../../email-compose/email-compose';
 import { htmlToPlainText } from 'features/email/services/email';
-import React, { useState } from 'react';
 import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
@@ -138,6 +139,7 @@ export function EmailViewGrid({
   setFormData,
 }: EmailViewProps) {
   const [, setReplyData] = useState<TReply | null>(null);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -147,7 +149,7 @@ export function EmailViewGrid({
         {!selectedEmail && (
           <div className="flex h-full w-full flex-col gap-6 items-center justify-center p-8 text-center">
             <img src={empty_email} alt="emailSentIcon" />
-            <h3 className="text-xl font-medium">Select a mail to read</h3>
+            <h3 className="text-xl font-medium">{t('SELECT_MAIL_TO_READ')}</h3>
           </div>
         )}
         {selectedEmail && (
@@ -234,7 +236,7 @@ export function EmailViewGrid({
                           side="top"
                           align="center"
                         >
-                          <p>Mark as unread</p>
+                          <p>{t('MARK_AS_UNREAD')}</p>
                         </TooltipContent>
                       </Tooltip>
                     )}
@@ -255,7 +257,7 @@ export function EmailViewGrid({
                           side="top"
                           align="center"
                         >
-                          <p>Spam</p>
+                          <p>{t('SPAM')}</p>
                         </TooltipContent>
                       </Tooltip>
                     )}
@@ -276,28 +278,28 @@ export function EmailViewGrid({
                           side="top"
                           align="center"
                         >
-                          <p>Trash</p>
+                          <p>{t('TRASH')}</p>
                         </TooltipContent>
                       </Tooltip>
                     )}
                     {(category === 'trash' || category === 'spam') && (
                       <>
                         <EmailTooltipConfirmAction
-                          tooltipLabel={`Restore item`}
-                          confirmTitle="Restore item"
-                          confirmDescription={`Are you sure you want to restore selected item?`}
+                          tooltipLabel={`${t('RESTORE_ITEM')}`}
+                          confirmTitle={`${t('RESTORE_ITEM')}`}
+                          confirmDescription={`${t('CONFIRM_RESTORE_SELECTED_ITEM')}`}
                           onConfirm={() => restoreEmailsToCategory([selectedEmail.id])}
-                          toastDescription={`Mail restored`}
+                          toastDescription={t('MAIL_RESTORED')}
                         >
                           <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
                         </EmailTooltipConfirmAction>
 
                         <EmailTooltipConfirmAction
-                          tooltipLabel={`Delete item permanently`}
-                          confirmTitle="Delete mail Permanently"
-                          confirmDescription={`Are you sure you want to permanently delete selected item? This action cannot be undone.`}
+                          tooltipLabel={t('DELETE_ITEM_PERMANENTLY')}
+                          confirmTitle={t('DELETE_ITEM_PERMANENTLY')}
+                          confirmDescription={`${t('CONFIRM_PERMANENTLY_DELETE_SELECTED_ITEM')}`}
                           onConfirm={() => deleteEmailsPermanently([selectedEmail.id])}
-                          toastDescription={`Mail deleted permanently`}
+                          toastDescription={t('MAIL_DELETED_PERMANENTLY')}
                         >
                           <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
                         </EmailTooltipConfirmAction>
@@ -339,7 +341,7 @@ export function EmailViewGrid({
                     />
                   </div>
 
-                  <div className=" mb-6 text-sm px-4">
+                  <div className="mb-6 text-sm px-4">
                     <div
                       dangerouslySetInnerHTML={{
                         __html: selectedEmail?.content || selectedEmail?.preview,
@@ -361,8 +363,8 @@ export function EmailViewGrid({
                           <EmailTextEditor
                             value={content}
                             onChange={handleContentChange}
-                            submitName="Send"
-                            cancelButton="Discard"
+                            submitName={t('SEND')}
+                            cancelButton={t('DISCARD')}
                             showIcons={true}
                             onSubmit={() =>
                               handleSendEmail(
@@ -386,7 +388,7 @@ export function EmailViewGrid({
                         <div className="flex justify-between">
                           <div className="flex gap-2 items-center text-medium-emphasis text-sm">
                             <Paperclip className="w-4 h-4" />
-                            <p>{`${(selectedEmail?.images?.length ?? 0) + (selectedEmail?.attachments?.length ?? 0)} attachments`}</p>
+                            <p>{`${(selectedEmail?.images?.length ?? 0) + (selectedEmail?.attachments?.length ?? 0)} ${t('ATTACHMENTS')}`}</p>
                             {!isReplyVisible && (
                               <ChevronDown
                                 className="h-4 w-4 cursor-pointer"
@@ -403,7 +405,7 @@ export function EmailViewGrid({
                           <div>
                             <Button variant={'link'}>
                               <Download className="h-4 w-4" />
-                              Download All
+                              {t('DOWNLOAD_ALL')}
                             </Button>
                           </div>
                         </div>
@@ -500,7 +502,7 @@ export function EmailViewGrid({
                                 <div className="flex justify-between">
                                   <div className="flex gap-2 items-center text-medium-emphasis text-sm">
                                     <Paperclip className="w-4 h-4" />
-                                    <p>{`${(item?.images?.length ?? 0) + (item?.attachments?.length ?? 0)} attachments`}</p>
+                                    <p>{`${(item?.images?.length ?? 0) + (item?.attachments?.length ?? 0)} ${t('ATTACHMENTS')}`}</p>
                                     {!isReplyVisible && (
                                       <ChevronDown
                                         className="h-4 w-4 cursor-pointer"
@@ -517,7 +519,7 @@ export function EmailViewGrid({
                                   <div>
                                     <Button variant={'link'}>
                                       <Download className="h-4 w-4" />
-                                      Download All
+                                      {t('DOWNLOAD_ALL')}
                                     </Button>
                                   </div>
                                 </div>
@@ -570,8 +572,8 @@ export function EmailViewGrid({
                                   <EmailTextEditor
                                     value={content}
                                     onChange={handleContentChange}
-                                    submitName="Send"
-                                    cancelButton="Discard"
+                                    submitName={t('SEND')}
+                                    cancelButton={t('DISCARD')}
                                     showIcons={true}
                                     formData={formData}
                                     setFormData={setFormData}
@@ -609,7 +611,7 @@ export function EmailViewGrid({
                   }}
                 >
                   <Reply className="h-4 w-4" />
-                  Reply
+                  {t('REPLY')}
                 </Button>
                 <Button
                   variant="outline"
@@ -619,11 +621,11 @@ export function EmailViewGrid({
                   }}
                 >
                   <ReplyAll className="h-4 w-4" />
-                  Reply All
+                  {t('REPLY_ALL')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => handleComposeEmailForward()}>
                   <Forward className="h-4 w-4" />
-                  Forward
+                  {t('FORWARD')}
                 </Button>
               </div>
             )}
@@ -645,8 +647,8 @@ export function EmailViewGrid({
                       <EmailTextEditor
                         value={content}
                         onChange={handleContentChange}
-                        submitName="Send"
-                        cancelButton="Discard"
+                        submitName={t('SEND')}
+                        cancelButton={t('DISCARD')}
                         showIcons={true}
                         onSubmit={() =>
                           handleSendEmail(

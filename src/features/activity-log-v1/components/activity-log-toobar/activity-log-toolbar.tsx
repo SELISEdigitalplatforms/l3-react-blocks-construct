@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { DateRange } from 'react-day-picker';
+import { Check, PlusCircle, Search } from 'lucide-react';
+import { debounce } from 'lodash';
+import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
-import { Check, PlusCircle, Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { debounce } from 'lodash';
-import { DateRange } from 'react-day-picker';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import {
@@ -14,7 +16,6 @@ import {
   CommandItem,
   CommandList,
 } from 'components/ui/command';
-import { cn } from 'lib/utils';
 
 /**
  * ActivityLogToolbar Component
@@ -61,12 +62,12 @@ type Module = {
 };
 
 const availableModules: Module[] = [
-  { id: 'task_manager', label: 'Task Manager' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'mail', label: 'Email' },
+  { id: 'task_manager', label: 'TASK_MANAGER' },
+  { id: 'calendar', label: 'CALENDAR' },
+  { id: 'mail', label: 'MAIL' },
   { id: 'iam', label: 'IAM' },
-  { id: 'inventory', label: 'Inventory' },
-  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'inventory', label: 'INVENTORY' },
+  { id: 'dashboard', label: 'DASHBOARD' },
 ];
 
 export function ActivityLogToolbar({
@@ -75,6 +76,7 @@ export function ActivityLogToolbar({
   onCategoryChange,
   selectedCategory,
 }: ActivityLogToolbarProps) {
+  const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -124,7 +126,7 @@ export function ActivityLogToolbar({
       <div className="relative  w-full sm:w-64">
         <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
         <Input
-          placeholder="Search by description..."
+          placeholder={t('SEARCH_BY_DESCRIPTION')}
           className="h-8 w-full rounded-lg bg-background pl-8"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
@@ -134,7 +136,7 @@ export function ActivityLogToolbar({
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="h-8 border-dashed hidden sm:inline-flex">
             <PlusCircle />
-            Date
+            {t('DATE')}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-0 w-auto">
@@ -148,7 +150,7 @@ export function ActivityLogToolbar({
           />
           <div className="p-2 border-t">
             <Button variant="ghost" onClick={clearDateRange} className="w-full" size="sm">
-              Clear filter
+              {t('CLEAR_FILTER')}
             </Button>
           </div>
         </PopoverContent>
@@ -157,14 +159,14 @@ export function ActivityLogToolbar({
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="h-8 border-dashed hidden sm:inline-flex">
             <PlusCircle />
-            Module
+            {t('MODULE')}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="sm:max-w-[200px] p-0">
           <Command>
-            <CommandInput placeholder="Enter module name" />
+            <CommandInput placeholder={t('ENTER_MODULE_NAME')} />
             <CommandList>
-              <CommandEmpty>No modules found.</CommandEmpty>
+              <CommandEmpty>{t('NO_MODULES_FOUND')}</CommandEmpty>
               <CommandGroup>
                 {availableModules.map((module) => {
                   const isSelected = selectedCategory.includes(module.id);
@@ -182,7 +184,7 @@ export function ActivityLogToolbar({
                       >
                         <Check className="h-3 w-3" />
                       </div>
-                      <span>{module.label}</span>
+                      <span>{t(module.label)}</span>
                     </CommandItem>
                   );
                 })}
@@ -195,7 +197,7 @@ export function ActivityLogToolbar({
                     onClick={handleClearModules}
                     className="w-full justify-center text-center"
                   >
-                    Clear all
+                    {t('CLEAR_ALL')}
                   </Button>
                 </div>
               )}

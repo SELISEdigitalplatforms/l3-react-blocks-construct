@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { Button } from 'components/ui/button';
 import { Plus, Upload, Download, Trash2, File, ImageIcon, ChevronDown } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +14,6 @@ import {
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
 import { Attachment } from '../../contexts/task-context';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * AttachmentsSection Component
@@ -49,12 +50,10 @@ interface AttachmentsSectionProps {
   readonly setAttachments: React.Dispatch<React.SetStateAction<Attachment[]>>;
 }
 
-export function AttachmentsSection({
-  attachments,
-  setAttachments,
-}:  AttachmentsSectionProps) {
+export function AttachmentsSection({ attachments, setAttachments }: AttachmentsSectionProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const { t } = useTranslation();
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -125,7 +124,7 @@ export function AttachmentsSection({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <Label className="text-high-emphasis text-base font-semibold">Attachments</Label>
+        <Label className="text-high-emphasis text-base font-semibold">{t('ATTACHMENTS')}</Label>
         {attachments.length > 0 && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -135,12 +134,12 @@ export function AttachmentsSection({
                 className="h-8 text-sm flex items-center gap-1 text-green-600"
               >
                 <Plus className="h-4 w-4" />
-                Add
+                {t('ADD')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] md:max-w-[672px]">
               <DialogHeader>
-                <DialogTitle>Upload Attachments</DialogTitle>
+                <DialogTitle>{t('UPLOAD_ATTACHMENTS')}</DialogTitle>
               </DialogHeader>
               <div
                 {...getRootProps()}
@@ -154,14 +153,12 @@ export function AttachmentsSection({
                 <div className="flex flex-col items-center gap-2">
                   <Upload className="h-10 w-10 text-gray-400" />
                   {isDragActive ? (
-                    <p>Drop the files here...</p>
+                    <p>{t('DROP_FILES_HERE')}</p>
                   ) : (
                     <>
-                      <p className="text-sm font-medium">
-                        Drag & drop files here, or click to select files
-                      </p>
+                      <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
                       <p className="text-xs text-gray-500">
-                        Upload any file type. Max file size: 10MB.
+                        {t('UPLOAD_ANY_FILE_TYPE_MAX_SIZE')}: 10MB
                       </p>
                     </>
                   )}
@@ -180,14 +177,19 @@ export function AttachmentsSection({
           <Input {...getInputProps()} />
           <div className="flex flex-col items-center gap-2">
             <Upload className="h-10 w-10 text-gray-400" />
-            <p className="text-sm font-medium">Drag & drop files here, or click to select files</p>
-            <p className="text-xs text-gray-500">PDF, DOCX, JPG, PNG | Max size: 25MB per file</p>
+            <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
+            <p className="text-xs text-gray-500">
+              PDF, DOCX, JPG, PNG | {t('MAX_SIZE')}: 25MB {t('PER_FILE')}
+            </p>
           </div>
         </div>
       ) : (
         <div>
           {(showMore ? attachmentRows : attachmentRows.slice(0, 2)).map((row, rowIndex) => (
-            <div key={`${row.length}-${rowIndex}`} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+            <div
+              key={`${row.length}-${rowIndex}`}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2"
+            >
               {row.map((attachment) => (
                 <div key={attachment.id} className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-3">
@@ -224,7 +226,7 @@ export function AttachmentsSection({
               <ChevronDown
                 className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`}
               />
-              {showMore ? 'Show Less' : 'Show More'}
+              {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
             </Button>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { TEmail } from '../../types/email.types';
 import {
   DropdownMenu,
@@ -38,6 +39,8 @@ interface EmailViewResponseTypeProps {
 }
 
 const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseTypeProps>) => {
+  const { t } = useTranslation();
+
   function formatDateTime(dateString: string) {
     const formattedDate = format(parseISO(dateString), 'EEE, dd.MM.yyyy, HH:mm');
     return formattedDate;
@@ -61,8 +64,9 @@ const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseType
             <p className="text-high-emphasis line-clamp-1">{selectedEmail.sender}</p>
             <div className="flex gap-1">
               <div className="text-sm text-medium-emphasis">
-                to <span className="text-high-emphasis font-semibold">me</span> and{' '}
-                <span className="text-high-emphasis font-semibold">2 others</span>
+                {t('MAIL_TO')}{' '}
+                <span className="text-high-emphasis font-semibold">{t('MAIL_ME')}</span> {t('AND')}{' '}
+                <span className="text-high-emphasis font-semibold">2 {t('OTHERS')}</span>
               </div>
 
               <DropdownMenu>
@@ -73,15 +77,17 @@ const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseType
                   <div className="py-2 ps-2 pe-4">
                     <div className="flex  text-sm gap-2">
                       <div className="flex gap-4">
-                        <p className="w-10 h-[22px] text-right text-low-emphasis">from: </p>
+                        <p className="w-10 h-[22px] text-right text-low-emphasis">{t('FROM')}: </p>
                         <p className="text-high-emphasis">{selectedEmail.sender}</p>
                       </div>
                       <p className="text-medium-emphasis">{`<${selectedEmail.email}>`}</p>
                     </div>
                     <div className="flex  text-sm gap-2">
                       <div className="flex gap-4">
-                        <p className="w-10 h-[22px] text-right text-low-emphasis">to: </p>
-                        <p className="text-high-emphasis">Me</p>
+                        <p className="w-10 h-[22px] text-right text-low-emphasis">
+                          {t('MAIL_TO')}:{' '}
+                        </p>
+                        <p className="text-high-emphasis">{t('MAIL_ME')}</p>
                       </div>
                       <p className="text-medium-emphasis">{`<demo@blocks.construct>`}</p>
                     </div>
@@ -94,13 +100,13 @@ const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseType
                     </div>
                     <div className="flex  text-sm gap-2">
                       <div className="flex gap-4">
-                        <p className="w-10 h-[22px] text-right text-low-emphasis">date: </p>
+                        <p className="w-10 h-[22px] text-right text-low-emphasis">{t('DATE')}: </p>
                         <p className="text-high-emphasis">{`${formatDateTime(selectedEmail.date)}`}</p>
                       </div>
                     </div>
                     <div className="flex  text-sm gap-2">
                       <div className="flex gap-4">
-                        <p className="w-10 h-[22px] text-right text-low-emphasis">subject: </p>
+                        <p className="w-10 h-[22px] text-right text-low-emphasis">{t('SUBJECT')}: </p>
                         <p className="text-high-emphasis">{selectedEmail.subject}</p>
                       </div>
                     </div>

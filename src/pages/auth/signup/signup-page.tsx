@@ -22,7 +22,9 @@ export function SignupPage() {
       <div>
         <h2 className="text-2xl font-bold text-high-emphasis">{t('SIGN_UP_ACCESS_OPEN_SOURCE')}</h2>
         <div className="flex items-center gap-1 mt-4">
-          <span className="text-sm font-normal text-medium-emphasis">{t('ALREADY_HAVE_ACCOUNT')}</span>
+          <span className="text-sm font-normal text-medium-emphasis">
+            {t('ALREADY_HAVE_ACCOUNT')}
+          </span>
           <Link
             to={'/login'}
             className="text-sm font-bold text-primary hover:text-primary-600 hover:underline"

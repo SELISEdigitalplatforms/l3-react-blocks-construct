@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Table } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 import { DataTableFacetedFilter } from 'components/blocks/data-table/data-table-faceted-filter';
 import { DateRangeFilter } from 'components/blocks/data-table/data-table-date-filter';
-import { mfaEnabled, statuses } from './iam-table-filter-data';
+import { getMfaEnabledOptions, getStatusOptions } from './iam-table-filter-data';
 import { DateRange } from 'react-day-picker';
 
 /**
@@ -56,6 +57,7 @@ export function FilterControls<TData>({
   onDateRangeCreateChange = () => {},
   onDateRangeLastLoginChange = () => {},
 }: Readonly<FilterControlsProps<TData>>) {
+  const { t } = useTranslation();
   const getFilterColumn = (columnId: string) => {
     return table.getAllFlatColumns().find((col) => col.id === columnId);
   };
@@ -73,13 +75,13 @@ export function FilterControls<TData>({
     <div className={containerClass}>
       {activeColumn && (
         <div className={isMobile ? 'w-full' : undefined}>
-          <DataTableFacetedFilter column={activeColumn} title="Status" options={statuses} />
+          <DataTableFacetedFilter column={activeColumn} title={t('STATUS')} options={getStatusOptions(t)} />
         </div>
       )}
 
       {mfaEnabledColumn && (
         <div className={isMobile ? 'w-full' : undefined}>
-          <DataTableFacetedFilter column={mfaEnabledColumn} title="MFA" options={mfaEnabled} />
+          <DataTableFacetedFilter column={mfaEnabledColumn} title={t('MFA')} options={getMfaEnabledOptions(t)} />
         </div>
       )}
 
@@ -87,7 +89,7 @@ export function FilterControls<TData>({
         <div className={isMobile ? 'w-full' : undefined}>
           <DateRangeFilter
             column={createdDateColumn}
-            title="Joined On"
+            title={t('JOINED_ON')}
             date={dateRangeCreate}
             onDateChange={onDateRangeCreateChange}
           />
@@ -98,7 +100,7 @@ export function FilterControls<TData>({
         <div className={isMobile ? 'w-full' : undefined}>
           <DateRangeFilter
             column={lastLoggedInTimeColumn}
-            title="Last Login"
+            title={t('LAST_LOGIN')}
             date={dateRangeLastLogin}
             onDateChange={onDateRangeLastLoginChange}
           />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Search, ListFilter, Plus, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { SlotInfo } from 'react-big-calendar';
 import { DateRange } from 'react-day-picker';
 import { Button } from 'components/ui/button';
@@ -60,17 +61,18 @@ interface BigCalendarHeaderProps {
  */
 
 export const BigCalendarHeader = ({
-  title = 'Calendar',
+  title = 'CALENDAR',
   onAddEvent,
   selectedSlot,
   onEventSubmit,
   onDialogClose,
-  searchPlaceholder = 'Search',
+  searchPlaceholder = 'SEARCH',
   onSearchChange,
   onApplyFilters,
 }: Readonly<BigCalendarHeaderProps>) => {
   const [openSheet, setOpenSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (openSheet || openSettingsSheet) {
@@ -87,12 +89,12 @@ export const BigCalendarHeader = ({
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <h1 className="text-2xl font-bold leading-9">{title}</h1>
-        <div className="flex items-center gap-2 sm:justify-end">
+        <h1 className="text-2xl font-bold leading-9">{t(title)}</h1>
+        <div className="flex items-center min-w-[82%] gap-2 sm:justify-end">
           <div className="relative w-full sm:w-[45%]">
             <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
             <Input
-              placeholder={searchPlaceholder}
+              placeholder={t(searchPlaceholder)}
               className="h-8 w-full rounded-lg bg-background pl-8"
               onChange={onSearchChange}
             />
@@ -104,7 +106,7 @@ export const BigCalendarHeader = ({
             onClick={() => setOpenSheet(true)}
           >
             <ListFilter className="w-5 h-5" />
-            <span className="sr-only sm:not-sr-only">Filters</span>
+            <span className="sr-only sm:not-sr-only">{t('FILTERS')}</span>
           </Button>
           <Button
             variant="outline"
@@ -113,11 +115,11 @@ export const BigCalendarHeader = ({
             onClick={() => setOpenSettingsSheet(true)}
           >
             <Settings className="w-5 h-5" />
-            <span className="sr-only sm:not-sr-only">Settings</span>
+            <span className="sr-only sm:not-sr-only">{t('SETTINGS')}</span>
           </Button>
           <Button size="sm" onClick={onAddEvent} className="text-sm font-bold sm:min-w-[116px]">
             <Plus className="w-5 h-5" />
-            <span className="sr-only sm:not-sr-only">Add Event</span>
+            <span className="sr-only sm:not-sr-only">{t('ADD_EVENT')}</span>
           </Button>
         </div>
       </div>

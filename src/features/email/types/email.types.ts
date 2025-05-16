@@ -34,7 +34,7 @@ interface TTags {
 export interface TEmailData {
   inbox: TEmail[];
   sent: TEmail[];
-  drafts: TEmail[];
+  draft: TEmail[];
   starred: TEmail[];
   trash: TEmail[];
   spam: TEmail[];

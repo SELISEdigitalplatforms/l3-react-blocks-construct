@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TriangleAlert } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * ErrorAlert Component
@@ -40,10 +41,11 @@ interface ErrorAlertProps {
 
 const ErrorAlert: React.FC<ErrorAlertProps> = ({
   isError,
-  title = 'Error',
-  message = 'An error occurred.',
+  title = 'ERROR',
+  message = 'AN_ERROR_OCCURRED.',
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isError) {
@@ -62,9 +64,9 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({
     <div className="rounded-lg bg-red-50 border border-red-400 p-4 mb-2 transition-all duration-1000 ease-in-out opacity-100">
       <div className="flex items-center gap-1">
         <TriangleAlert className="text-error w-4 h-4" />
-        <h1 className="text-error text-sm font-semibold">{title}</h1>
+        <h1 className="text-error text-sm font-semibold">{t(title)}</h1>
       </div>
-      <p className="text-error text-xs font-normal">{message}</p>
+      <p className="text-error text-xs font-normal">{t(message)}</p>
     </div>
   );
 };

@@ -1,10 +1,11 @@
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlignJustify, Columns3, ListFilter, Plus, Search } from 'lucide-react';
+import { useIsMobile } from 'hooks/use-mobile';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { useIsMobile } from 'hooks/use-mobile';
 import { useTaskContext } from '../../contexts/task-context';
-import { useEffect, useState } from 'react';
 import { TaskManagerFilterSheet } from '../task-manager-filters-sheet/task-manager-filters-sheet';
 
 /**
@@ -42,9 +43,9 @@ import { TaskManagerFilterSheet } from '../task-manager-filters-sheet/task-manag
 // testing from own branch
 
 interface TaskManagerToolbarProps {
-  readonly onOpen: () => void;
-  readonly viewMode?: string;
-  readonly handleViewMode: (view: string) => void;
+  onOpen: () => void;
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
 }
 
 export default function TaskManagerToolbar({
@@ -53,6 +54,7 @@ export default function TaskManagerToolbar({
   handleViewMode,
 }: TaskManagerToolbarProps) {
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   const { searchQuery, setSearchQuery } = useTaskContext();
 
@@ -79,11 +81,13 @@ export default function TaskManagerToolbar({
     return (
       <div className="flex flex-col gap-3 w-full">
         <div className="flex justify-between w-full">
-          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">Task Manager</h3>
+          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
+            {t('TASK_MANAGER')}
+          </h3>
 
           <Button onClick={handleTaskModalOpen} size="sm" className="h-8">
             <Plus className="h-4 w-4" />
-            Add Item
+            {t('ADD_ITEM')}
           </Button>
         </div>
 
@@ -91,7 +95,7 @@ export default function TaskManagerToolbar({
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
             <Input
-              placeholder={`Search`}
+              placeholder={t('SEARCH')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 w-full rounded-lg bg-background pl-8"
@@ -138,31 +142,27 @@ export default function TaskManagerToolbar({
   return (
     <div className="flex justify-between items-center">
       <div>
-        <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">Task Manager</h3>
+        <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
+          {t('TASK_MANAGER')}
+        </h3>
       </div>
       <div className="flex gap-2">
         <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
           <Input
-            placeholder={`Search`}
+            placeholder={t('SEARCH')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-8 w-full rounded-lg bg-background pl-8"
           />
           {searchQuery && (
-            <button
+            <span
               onClick={() => setSearchQuery('')}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  setSearchQuery('');
-                }
-              }}
               className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
               aria-label="Clear search"
-              tabIndex={0}
             >
               ✕
-            </button>
+            </span>
           )}
         </div>
         <Button onClick={() => setOpenSheet(true)} variant="outline" size="sm" className="h-8 px-3">
@@ -180,7 +180,7 @@ export default function TaskManagerToolbar({
         </Tabs>
         <Button onClick={handleTaskModalOpen} size="sm" className="h-8 text-sm font-bold">
           <Plus />
-          Add Item
+          {t('ADD_ITEM')}
         </Button>
       </div>
       <TaskManagerFilterSheet open={openSheet} onOpenChange={setOpenSheet} />

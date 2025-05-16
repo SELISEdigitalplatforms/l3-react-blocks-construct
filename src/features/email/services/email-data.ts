@@ -320,7 +320,7 @@ export const emailData: TEmailData = {
   ],
   starred: [],
   sent: [],
-  drafts: [],
+  draft: [],
   spam: [],
   trash: [],
 

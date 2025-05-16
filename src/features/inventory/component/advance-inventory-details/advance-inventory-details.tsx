@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 import { Separator } from 'components/ui/separator';
@@ -56,6 +57,7 @@ export function AdvanceInventoryDetails() {
   const [thumbnail, setThumbnail] = useState(images);
   const [editedFields, setEditedFields] = useState({});
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { itemId } = useParams();
   const initialInventory = inventoryData.find((item) => item.itemId === itemId);
@@ -101,7 +103,7 @@ export function AdvanceInventoryDetails() {
       if (!editable) {
         return (
           <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>
-            {value}
+            {t(String(value).toUpperCase())}
           </span>
         );
       }
@@ -118,7 +120,7 @@ export function AdvanceInventoryDetails() {
             <SelectContent>
               {options.map((option) => (
                 <SelectItem key={option} value={option}>
-                  {option}
+                  {field === 'status' ? t(option.toUpperCase()) : option}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -128,7 +130,7 @@ export function AdvanceInventoryDetails() {
 
       return (
         <Input
-          placeholder={`Enter ${label.toLowerCase()}`}
+          placeholder={`${t('ENTER')} ${label.toLowerCase()}`}
           defaultValue={value}
           onChange={(e) => handleFieldChange(field, e.target.value)}
         />
@@ -181,27 +183,27 @@ export function AdvanceInventoryDetails() {
         >
           <ChevronLeft />
         </Button>
-        <h3 className="text-2xl font-bold tracking-tight">Inventory</h3>
+        <h3 className="text-2xl font-bold tracking-tight">{t('INVENTORY')}</h3>
       </div>
       <div className="flex flex-col gap-4 w-full">
         <Card className="w-full border-none rounded-[4px] shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>General info</CardTitle>
+              <CardTitle>{t('GENERAL_INFO')}</CardTitle>
               {!editDetails ? (
                 <Button size="sm" variant="ghost" onClick={handleEditDetails}>
                   <Pen className="w-3 h-3 text-primary" />
                   <span className="text-primary text-sm font-bold sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Edit
+                    {t('EDIT')}
                   </span>
                 </Button>
               ) : (
                 <div className="flex items-center gap-4">
                   <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                    Cancel
+                    {t('CANCEL')}
                   </Button>
                   <Button size="sm" onClick={handleUpdateDetails}>
-                    Update
+                    {t('UPDATE')}
                   </Button>
                 </div>
               )}
@@ -256,28 +258,33 @@ export function AdvanceInventoryDetails() {
               </div>
               {selectedInventory ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
-                  {renderField('Item Name', 'itemName', selectedInventory.itemName, editDetails)}
+                  {renderField(t('ITEM_NAME'), 'itemName', selectedInventory.itemName, editDetails)}
                   {renderField(
-                    'Category',
+                    t('CATEGORY'),
                     'category',
                     selectedInventory.category,
                     editDetails,
                     true,
                     categoryOptions
                   )}
-                  {renderField('Supplier', 'supplier', selectedInventory.supplier, editDetails)}
+                  {renderField(t('SUPPLIER'), 'supplier', selectedInventory.supplier, editDetails)}
                   {renderField(
-                    'Item location',
+                    t('ITEM_LOCATION'),
                     'itemLoc',
                     selectedInventory.itemLoc,
                     editDetails,
                     true,
                     locationOptions
                   )}
-                  {renderField('Price(CHF)', 'price', selectedInventory.price, editDetails)}
-                  {renderField('Stock', 'stock', selectedInventory.stock ?? 0, editDetails)}
                   {renderField(
-                    'Status',
+                    `${t('PRICE')} (CHF)`,
+                    'price',
+                    selectedInventory.price,
+                    editDetails
+                  )}
+                  {renderField(t('STOCK'), 'stock', selectedInventory.stock ?? 0, editDetails)}
+                  {renderField(
+                    t('STATUS'),
                     'status',
                     selectedInventory.status,
                     editDetails,
@@ -286,39 +293,39 @@ export function AdvanceInventoryDetails() {
                   )}
                 </div>
               ) : (
-                <p>Item not found</p>
+                <p>{t('ITEM_NOT_FOUND')}</p>
               )}
             </div>
           </CardContent>
         </Card>
         <Card className="w-full border-none rounded-[4px] shadow-sm">
           <CardHeader>
-            <CardTitle>Additional info</CardTitle>
+            <CardTitle>{t('ADDITIONAL_INFO')}</CardTitle>
             <Separator className="mt-4" />
           </CardHeader>
           <CardContent className="flex flex-col md:flex-row w-full gap-10 !pt-0">
             <div className="flex flex-col gap-4 w-full md:w-[50%]">
               <div className="flex items-center gap-2 justify-between">
-                <span>Eligible for warranty</span>
+                <span>{t('ELIGIBLE_FOR_WARRANTY')}</span>
                 <Switch checked={warranty} onCheckedChange={setWarranty} />
               </div>
               <div className="flex items-center gap-2 justify-between">
-                <span>Eligible for replacement</span>
+                <span>{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
                 <Switch checked={replacement} onCheckedChange={setReplacement} />
               </div>
               <div className="flex items-center gap-2 justify-between">
-                <span>Discount</span>
+                <span>{t('DISCOUNT')}</span>
                 <Switch checked={discount} onCheckedChange={setDiscount} />
               </div>
             </div>
             <div className="flex flex-col w-full md:w-[50%]">
-              <span className="mb-2">Tags</span>
+              <span className="mb-2">{t('TAGS')}</span>
               <div className="w-full border rounded-lg">
                 <div className="relative w-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-medium-emphasis w-4 h-4" />
                   <Input
                     className="w-full pl-10 border-none shadow-none outline-none focus-visible:ring-0"
-                    placeholder="Enter tag name"
+                    placeholder={t('ENTER_TAG_NAME')}
                     value={searchTags}
                     onChange={(e) => setSearchTags(e.target.value)}
                   />
@@ -335,7 +342,7 @@ export function AdvanceInventoryDetails() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-low-emphasis">No tags found</p>
+                    <p className="text-low-emphasis">{t('NO_TAGS_FOUND')}</p>
                   )}
                 </div>
               </div>

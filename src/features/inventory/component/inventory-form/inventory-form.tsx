@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
 import {
@@ -109,7 +110,8 @@ interface InventoryItem {
 }
 
 export function InventoryForm() {
-  const steps = ['General info', 'Additional info'];
+  const { t } = useTranslation();
+  const steps = [t('GENERAL_INFO'), t('ADDITIONAL_INFO')];
   const [currentStep, setCurrentStep] = useState(0);
   const [inventory, setInventory] = useState<InventoryData[]>(inventoryData);
 
@@ -207,7 +209,9 @@ export function InventoryForm() {
         >
           <ChevronLeft />
         </Button>
-        <h3 className={`text-2xl font-bold tracking-tight ${inventory ? 'mb-0' : ''}`}>Add item</h3>
+        <h3 className={`text-2xl font-bold tracking-tight ${inventory ? 'mb-0' : ''}`}>
+          {t('ADD_ITEM')}
+        </h3>
       </div>
 
       <div className="container mx-auto py-6">
@@ -235,7 +239,7 @@ export function InventoryForm() {
                     variant="outline"
                     onClick={() => navigate(-1)}
                   >
-                    Cancel
+                    {t('CANCEL')}
                   </Button>
                   <Button
                     type="button"
@@ -243,7 +247,7 @@ export function InventoryForm() {
                     className="bg-primary h-10 font-bold"
                     disabled={!isGeneralInfoValid()}
                   >
-                    Next
+                    {t('NEXT')}
                   </Button>
                 </div>
               </CardContent>
@@ -273,7 +277,7 @@ export function InventoryForm() {
                     variant="outline"
                     onClick={() => navigate(-1)}
                   >
-                    Cancel
+                    {t('CANCEL')}
                   </Button>
                   <div className="flex gap-4">
                     <Button
@@ -282,10 +286,10 @@ export function InventoryForm() {
                       variant="outline"
                       onClick={goToPreviousStep}
                     >
-                      Previous
+                      {t('PREVIOUS')}
                     </Button>
                     <Button type="submit" className="h-10 bg-primary font-bold">
-                      Finish
+                      {t('FINISH')}
                     </Button>
                   </div>
                 </div>

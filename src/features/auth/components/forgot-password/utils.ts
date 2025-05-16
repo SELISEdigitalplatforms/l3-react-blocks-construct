@@ -20,8 +20,8 @@ import { z } from 'zod';
  * Validates that:
  * - Email field is a string and not empty
  */
-export const forgotPasswordFormValidationSchema = z.object({
-  email: z.string().min(1, "email name can't be empty"),
+export const getForgotPasswordFormValidationSchema = (t: (key: string) => string) => z.object({
+  email: z.string().min(1, { message: t('EMAIL_NAME_CANT_EMPTY') }),
 });
 
 /**
@@ -29,7 +29,7 @@ export const forgotPasswordFormValidationSchema = z.object({
  * Inferred from the Zod validation schema
  */
 
-export type forgotPasswordFormType = z.infer<typeof forgotPasswordFormValidationSchema>;
+export type forgotPasswordFormType = z.infer<ReturnType<typeof getForgotPasswordFormValidationSchema>>;
 
 /**
  * Default values for the forgot password form

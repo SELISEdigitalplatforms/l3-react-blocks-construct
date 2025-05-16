@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   QueryKey,
   useMutation,
@@ -70,6 +71,7 @@ export const useGlobalQuery = <
   const { logout } = useAuthStore();
   const navigate = useNavigate();
   const currentPath = location.pathname;
+  const { t } = useTranslation();
 
   const queryResult = useQuery(option);
   const isPublicRoute = publicRoutes.includes(currentPath);
@@ -84,8 +86,8 @@ export const useGlobalQuery = <
 
         toast({
           variant: 'success',
-          title: 'Success',
-          description: 'Logging out due to session expiration',
+          title: t('SUCCESS'),
+          description: t('LOGGING_OUT_SESSION_EXPIRATION'),
           duration: 2000,
         });
 
@@ -101,7 +103,7 @@ export const useGlobalQuery = <
         });
       }
     }
-  }, [queryResult.error, logout, isPublicRoute, navigate, toast]);
+  }, [queryResult.error, logout, isPublicRoute, navigate, toast, t]);
 
   return queryResult;
 };
@@ -147,6 +149,7 @@ export const useGlobalMutation = <
   const { logout } = useAuthStore();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   return useMutation({
     ...option,
@@ -158,8 +161,8 @@ export const useGlobalMutation = <
 
         toast({
           variant: 'success',
-          title: 'Success',
-          description: 'Logging out due to session expiration',
+          title: t('SUCCESS'),
+          description: t('LOGGING_OUT_SESSION_EXPIRATION'),
           duration: 2000,
         });
 

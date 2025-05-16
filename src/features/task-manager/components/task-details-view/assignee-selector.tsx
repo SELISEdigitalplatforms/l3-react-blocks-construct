@@ -1,3 +1,5 @@
+import { Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import {
@@ -9,7 +11,6 @@ import {
   CommandList,
 } from 'components/ui/command';
 import { Checkbox } from 'components/ui/checkbox';
-import { Plus } from 'lucide-react';
 
 /**
  * AssigneeSelector Component
@@ -59,6 +60,7 @@ export function AssigneeSelector({
   selectedAssignees,
   onChange,
 }: AssigneeSelectorProps) {
+  const { t } = useTranslation();
   const handleAssigneeToggle = (assignee: Assignee) => {
     if (selectedAssignees.some((a) => a.id === assignee.id)) {
       onChange(selectedAssignees.filter((a) => a.id !== assignee.id));
@@ -93,9 +95,9 @@ export function AssigneeSelector({
           </PopoverTrigger>
           <PopoverContent className="sm:max-w-[200px] p-0">
             <Command>
-              <CommandInput placeholder="Search members" />
+              <CommandInput placeholder={t('SEARCH_MEMBERS')} />
               <CommandList>
-                <CommandEmpty>No members found.</CommandEmpty>
+                <CommandEmpty>{t('NO_MEMBERS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableAssignees.map((assignee) => {
                     const isSelected = selectedAssignees.some((a) => a.id === assignee.id);

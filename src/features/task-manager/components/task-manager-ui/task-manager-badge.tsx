@@ -81,7 +81,7 @@ export const TaskManagerBadge: React.FC<TaskManagerBadgeProps> = ({
     borderStyle = 'border';
   }
 
-  const classStyle = `  text-xs font-normal rounded  ${bgColor} ${textColor} ${borderStyle} ${borderColor} ${className}`;
+  const classStyle = `text-xs font-normal rounded  ${bgColor} ${textColor} ${borderStyle} ${borderColor} ${className}`;
 
   return (
     <span className={classStyle} onClick={onClick}>

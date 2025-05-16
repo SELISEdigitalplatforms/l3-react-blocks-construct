@@ -7,7 +7,7 @@ describe('Storage Component', () => {
   test('renders the Storage heading', () => {
     render(<Storage />);
 
-    const headingElement = screen.getByText('Storage');
+    const headingElement = screen.getByText('STORAGE');
     expect(headingElement).toBeInTheDocument();
 
     expect(headingElement).toHaveClass('text-2xl');

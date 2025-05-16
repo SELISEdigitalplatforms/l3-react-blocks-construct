@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card } from 'components/ui/card';
 import ActivityLogGroup from '../activity-log-group/activity-log-group';
 import type { ActivityGroup } from '../../services/activity-log.types';
@@ -33,6 +34,7 @@ import { useInfiniteScroll } from 'features/activity-log-v1/hooks/use-infinite-s
  */
 
 const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) => {
+  const { t } = useTranslation();
   const { visibleCount, containerRef } = useInfiniteScroll(activities.length);
 
   const visibleActivities = activities.slice(0, visibleCount);
@@ -42,7 +44,7 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
       {visibleActivities.length === 0 ? (
         <div className="flex h-full w-full flex-col gap-6 items-center justify-center p-8 text-center">
           <img src={no_activity} alt="" className="h-[160px] w-[240px]" />
-          <h3 className="text-xl font-medium">We couldn’t find anything matching your search.</h3>
+          <h3 className="text-xl font-medium">{t('COULDNT_FIND_ANYTHING_MATCHING')}</h3>
         </div>
       ) : (
         <Card className="w-full border-none rounded-[8px] shadow-sm">

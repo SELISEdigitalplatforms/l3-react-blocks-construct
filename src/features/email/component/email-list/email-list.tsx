@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { Paperclip, Star, SquarePen } from 'lucide-react';
+import { parseISO, format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
 import { TEmail } from '../../types/email.types';
-import { useState } from 'react';
 import { Checkbox } from 'components/ui/checkbox';
-import { parseISO, format } from 'date-fns';
 import { Label } from 'components/ui/label';
 import CustomPaginationEmail from 'components/blocks/custom-pagination-email/custom-pagination-email';
 import { Button } from 'components/ui/button';
@@ -76,6 +77,7 @@ export function EmailList({
   handleComposeEmail,
   handleEmailSelection,
 }: Readonly<EmailListProps>) {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -125,7 +127,7 @@ export function EmailList({
               onCheckedChange={(checked) => handleSelectAllChange(!!checked)}
             />
 
-            <Label className="text-sm font-medium ">Select All</Label>
+            <Label className="text-sm font-medium ">{t('SELECT_ALL')}</Label>
           </div>
           <TabsList className="grid grid-cols-2 rounded-md min-w-[124px] text-sm p-1 bg-surface">
             <TabsTrigger
@@ -133,14 +135,14 @@ export function EmailList({
               value="all"
               onClick={() => setFilter('all')}
             >
-              All
+              {t('ALL')}
             </TabsTrigger>
             <TabsTrigger
               className="[&[data-state=active]]:bg-white rounded"
               value="unread"
               onClick={() => setFilter('unread')}
             >
-              Unread
+              {t('UNREAD')}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -218,7 +220,7 @@ export function EmailList({
             </div>
           ) : (
             <div className="flex items-center justify-center h-full text-medium-emphasis">
-              No data found
+              {t('NO_DATA_FOUND')}
             </div>
           )}
         </TabsContent>
@@ -248,14 +250,14 @@ export function EmailList({
                   value="all"
                   onClick={() => setFilter('all')}
                 >
-                  All
+                  {t('ALL')}
                 </TabsTrigger>
                 <TabsTrigger
                   className="[&[data-state=active]]:bg-white rounded"
                   value="unread"
                   onClick={() => setFilter('unread')}
                 >
-                  Unread
+                  {t('UNREAD')}
                 </TabsTrigger>
               </TabsList>
             )}
@@ -267,7 +269,7 @@ export function EmailList({
                   onCheckedChange={(checked) => handleSelectAllChange(!!checked)}
                 />
 
-                <Label className="text-sm font-medium ">Select All</Label>
+                <Label className="text-sm font-medium ">{t('SELECT_ALL')}</Label>
               </div>
             )}
           </div>
@@ -353,7 +355,7 @@ export function EmailList({
               </div>
             ) : (
               <div className="flex items-center justify-center h-full text-medium-emphasis">
-                No data found
+                {t('NO_DATA_FOUND')}
               </div>
             )}
           </TabsContent>

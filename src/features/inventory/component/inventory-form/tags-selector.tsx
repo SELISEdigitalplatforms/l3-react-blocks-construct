@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Checkbox } from 'components/ui/checkbox';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
@@ -39,17 +40,18 @@ interface TagsSelectorProps {
 }
 
 export function TagsSelector({ tags, selectedTags, handleTagToggle }: TagsSelectorProps) {
+  const { t } = useTranslation();
   const [searchTags, setSearchTags] = React.useState('');
   const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(searchTags.toLowerCase()));
 
   return (
     <div className="flex flex-col w-full mt-4">
-      <Label className="mb-2 text-high-emphasis font-semibold h-6">Tags</Label>
+      <Label className="mb-2 text-high-emphasis font-semibold h-6">{t('TAGS')}</Label>
       <div className="relative w-full mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
         <Input
           className="w-full pl-10"
-          placeholder="Enter tag name"
+          placeholder={t('ENTER_TAG_NAME')}
           value={searchTags}
           onChange={(e) => setSearchTags(e.target.value)}
         />
@@ -69,7 +71,7 @@ export function TagsSelector({ tags, selectedTags, handleTagToggle }: TagsSelect
             </div>
           ))
         ) : (
-          <p className="text-gray-500">No tags found</p>
+          <p className="text-gray-500">{t('NO_TAGS_FOUND')}</p>
         )}
       </div>
     </div>

@@ -46,14 +46,14 @@ describe('Dashboard Component', () => {
 
   test('renders the dashboard title', async () => {
     await waitFor(() => {
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('DASHBOARD')).toBeInTheDocument();
     });
   });
 
   test('renders the Sync and Export buttons', async () => {
     await waitFor(() => {
-      expect(screen.getByText('Sync')).toBeInTheDocument();
-      expect(screen.getByText('Export')).toBeInTheDocument();
+      expect(screen.getByText('SYNC')).toBeInTheDocument();
+      expect(screen.getByText('EXPORT')).toBeInTheDocument();
     });
   });
 

@@ -2,18 +2,18 @@ export const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const WEEK_DAYS_RRULE = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
-export const CALENDER_PERIOD = ['Day', 'Week', 'Month', 'Year'];
+export const CALENDER_PERIOD = ['DAY', 'WEEK', 'MONTH', 'YEAR'];
 
 export const ZOOM_MEETING_LINK = 'zoommtg://zoom.us/join?confno=&uname=test%link';
 
 export const WEEK_DAYS_SELECT = [
-  { value: '1', label: 'Monday' },
-  { value: '2', label: 'Tuesday' },
-  { value: '3', label: 'Wednesday' },
-  { value: '4', label: 'Thursday' },
-  { value: '5', label: 'Friday' },
-  { value: '6', label: 'Saturday' },
-  { value: '0', label: 'Sunday' },
+  { value: '1', label: 'MONDAY' },
+  { value: '2', label: 'TUESDAY' },
+  { value: '3', label: 'WEDNESDAY' },
+  { value: '4', label: 'THURSDAY' },
+  { value: '5', label: 'FRIDAY' },
+  { value: '6', label: 'SATURDAY' },
+  { value: '0', label: 'SUNDAY' },
 ];
 
 export const TIME_SCALES_SELECT = [

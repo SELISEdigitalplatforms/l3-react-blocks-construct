@@ -89,11 +89,11 @@ describe('DashboardSystemOverview Component', () => {
   });
 
   test('renders the card title "System usage overview"', () => {
-    expect(screen.getByTestId('card-title')).toHaveTextContent('System usage overview');
+    expect(screen.getByTestId('card-title')).toHaveTextContent('SYSTEM_USAGE_OVERVIEW');
   });
 
   test('renders the select with default placeholder "Today"', () => {
-    expect(screen.getByTestId('select-value')).toHaveTextContent('Today');
+    expect(screen.getByTestId('select-value')).toHaveTextContent('TODAY');
   });
 
   test('renders all days of the week in the select dropdown', () => {

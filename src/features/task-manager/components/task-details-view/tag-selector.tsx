@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check, Plus } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
@@ -59,6 +60,7 @@ interface TagsSelectorProps {
 }
 
 export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProps) {
+  const { t } = useTranslation();
   const [selectedValues, setSelectedValues] = React.useState<Set<string>>(new Set(selectedTags));
 
   React.useEffect(() => {
@@ -85,7 +87,7 @@ export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProp
 
   return (
     <div>
-      <Label className="text-high-emphasis text-base font-semibold">Tags</Label>
+      <Label className="text-high-emphasis text-base font-semibold">{t('TAGS')}</Label>
       <div className="flex flex-wrap gap-2 mt-2">
         {Array.from(selectedValues).map((tagId) => {
           const tag = availableTags.find((t) => t.id === tagId);
@@ -106,9 +108,9 @@ export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProp
           </PopoverTrigger>
           <PopoverContent className="sm:max-w-[200px] p-0">
             <Command>
-              <CommandInput placeholder="Enter tag name" />
+              <CommandInput placeholder={t('ENTER_TAG_NAME')} />
               <CommandList>
-                <CommandEmpty>No tags found.</CommandEmpty>
+                <CommandEmpty>{t('NO_TAGS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableTags.map((tag) => {
                     const isSelected = selectedValues.has(tag.id);
@@ -139,7 +141,7 @@ export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProp
                       onClick={handleClear}
                       className="w-full justify-center text-center"
                     >
-                      Clear all
+                      {t('CLEAR_ALL')}
                     </Button>
                   </div>
                 )}

@@ -14,6 +14,7 @@ import { Button } from 'components/ui/button';
 import { Dialog, DialogTrigger } from 'components/ui/dialog';
 import { AddUser } from 'features/iam/components/add-profile/add-profile';
 import { UserDetails } from 'features/iam';
+import { useTranslation } from 'react-i18next';
 
 interface PaginationState {
   pageIndex: number;
@@ -49,6 +50,7 @@ const IamTablePage: React.FC = () => {
   const { mutateAsync: resetPassword } = useForgotPassword();
   const { mutateAsync: resendActivation } = useResendActivation();
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   const [filters, setFilters] = useState({
     email: '',
@@ -177,11 +179,12 @@ const IamTablePage: React.FC = () => {
     onViewDetails: handleViewDetails,
     onResetPassword: handleResetPassword,
     onResendActivation: handleResendActivation,
+    t,
   });
 
   // Show error message if data fetching fails
   if (error) {
-    return <div className="p-4 text-error">Error loading users: {error.error?.message}</div>;
+    return <div className="p-4 text-error">{t('ERROR_LOADING_USERS')}</div>;
   }
 
   /**
@@ -206,13 +209,13 @@ const IamTablePage: React.FC = () => {
     <div className="flex flex-col h-full w-full">
       <div className="h-full flex-col flex w-full gap-6 md:gap-8">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold tracking-tight">Identity Access Management</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t('IDENTITY_ACCESS_MANAGEMENT')}</h2>
 
           <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
             <DialogTrigger asChild>
               <Button variant="default" className="flex items-center">
                 <Plus size={20} />
-                Add User
+                {t('ADD_USER')}
               </Button>
             </DialogTrigger>
 
@@ -249,16 +252,16 @@ const IamTablePage: React.FC = () => {
       <ConfirmationModal
         open={isResetPasswordModalOpen}
         onOpenChange={setIsResetPasswordModalOpen}
-        title="Reset password for this user?"
-        description="A password reset email will be sent."
+        title={t('RESET_PASSWORD_FOR_USER')}
+        description={t('PASSWORD_RESET_SENT_EMAIL')}
         onConfirm={handleConfirmResetPassword}
       />
 
       <ConfirmationModal
         open={isResendActivationModalOpen}
         onOpenChange={setIsResendActivationModalOpen}
-        title="Activate this user?"
-        description="User activation will be restored."
+        title={t('ACTIVATE_THIS_USER')}
+        description={t('USER_ACTIVATION_RESTORED')}
         onConfirm={handleConfirmActivation}
       />
     </div>

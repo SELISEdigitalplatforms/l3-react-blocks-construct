@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,14 +73,15 @@ export const TaskManagerDropdownMenu = ({
 }: TaskDropdownMenuProps) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleConfirmDelete = () => {
     onDelete();
     setShowConfirm(false);
     toast({
       variant: 'success',
-      title: 'Success',
-      description: 'Task has been deleted.',
+      title: t('SUCCESS'),
+      description: t('TASK_HAS_BEEN_DELETED'),
     });
   };
 
@@ -94,12 +96,12 @@ export const TaskManagerDropdownMenu = ({
             {task.isCompleted ? (
               <>
                 <CircleCheckBig className="h-5 w-5 text-primary-400" />
-                <p className="font-normal text-high-emphasis">Mark as Complete</p>
+                <p className="font-normal text-high-emphasis">{t('MARK_AS_COMPLETE')}</p>
               </>
             ) : (
               <>
                 <CircleDashed className="h-5 w-5 text-medium-emphasis" />
-                <p className="font-normal text-high-emphasis">Reopen Task</p>
+                <p className="font-normal text-high-emphasis">{t('REOPEN_TASK')}</p>
               </>
             )}
           </DropdownMenuItem>
@@ -107,7 +109,7 @@ export const TaskManagerDropdownMenu = ({
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="flex p-3 gap-2.5">
               <MoveHorizontal className="h-5 w-5 text-medium-emphasis" />
-              <p className="font-normal text-high-emphasis flex-1">Move to list</p>
+              <p className="font-normal text-high-emphasis flex-1">{t('MOVE_TO_LIST')}</p>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
@@ -137,7 +139,7 @@ export const TaskManagerDropdownMenu = ({
             }}
           >
             <Trash2 className="h-5 w-5" />
-            <p className="font-normal">Delete</p>
+            <p className="font-normal">{t('DELETE')}</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -145,8 +147,8 @@ export const TaskManagerDropdownMenu = ({
       <ConfirmationModal
         open={showConfirm}
         onOpenChange={setShowConfirm}
-        title="Are you sure?"
-        description="This will permanently delete the task. This action cannot be undone."
+        title={t('ARE_YOU_SURE')}
+        description={t('THIS_WILL_PERMANENTLY_DELETE_THE_TASK')}
         onConfirm={handleConfirmDelete}
       />
     </>

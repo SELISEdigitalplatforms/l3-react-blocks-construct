@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent } from 'components/ui/menubar';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -53,6 +54,7 @@ export const EventParticipant = ({
   editMembers,
 }: Readonly<EventParticipantProps>) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useTranslation();
   const allMembers = useMemo(() => {
     const uniqueMap = new Map<string, Member>();
     [...(editMembers ?? []), ...members].forEach((m) => uniqueMap.set(m.id, m));
@@ -92,13 +94,13 @@ export const EventParticipant = ({
           </MenubarTrigger>
           <MenubarContent className="flex flex-col gap-6 py-2 px-3">
             <div className="flex flex-col gap-2">
-              <p className="font-semibold text-base text-high-emphasis">Members</p>
+              <p className="font-semibold text-base text-high-emphasis">{t('MEMBERS')}</p>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                 <Input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search members"
+                  placeholder={t('SEARCH_MEMBERS')}
                   className="h-10 w-full rounded-lg bg-surface border-none pl-8"
                 />
               </div>

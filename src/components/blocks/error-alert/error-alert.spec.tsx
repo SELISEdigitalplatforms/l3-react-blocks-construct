@@ -5,6 +5,25 @@ jest.mock('lucide-react', () => ({
   TriangleAlert: jest.fn(() => <svg data-testid="triangle-alert-icon" />),
 }));
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      switch (key) {
+        case 'ERROR':
+          return 'Error';
+        case 'AN_ERROR_OCCURRED.':
+          return 'An error occurred.';
+        case 'Custom Error':
+          return 'Custom Error';
+        case 'This is a custom error message.':
+          return 'This is a custom error message.';
+        default:
+          return key;
+      }
+    },
+  }),
+}));
+
 describe('ErrorAlert Component', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -39,6 +58,7 @@ describe('ErrorAlert Component', () => {
 
     expect(screen.getByText('Error')).toBeInTheDocument();
     expect(screen.getByText('An error occurred.')).toBeInTheDocument();
+    expect(screen.getByTestId('triangle-alert-icon')).toBeInTheDocument();
   });
 
   it('should use custom props when provided', () => {

@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { Column, Header, Table } from '@tanstack/react-table';
 import { RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { TableRow, TableHead } from 'components/ui/table';
 import { Input } from 'components/ui/input';
@@ -44,6 +45,7 @@ interface AdvanceTableFilterToolbarProps<TData> {
 export function AdvanceTableFilterToolbar<TData>({
   table,
 }: Readonly<AdvanceTableFilterToolbarProps<TData>>) {
+  const { t } = useTranslation();
   const clearLastUpdatedFilterDropdownRef = useRef<{ clearFilter: VoidFunction }>(null);
   const clearStockFilterDropdownRef = useRef<{ clearFilter: VoidFunction }>(null);
 
@@ -65,65 +67,70 @@ export function AdvanceTableFilterToolbar<TData>({
     clearStockFilterDropdownRef.current?.clearFilter();
   };
 
-  const renderColumnFilter = useCallback((header: Header<TData, unknown>) => {
-    const { column } = header;
+  const renderColumnFilter = useCallback(
+    (header: Header<TData, unknown>) => {
+      const { column } = header;
 
-    if (!column.getCanFilter()) return null;
+      if (!column.getCanFilter()) return null;
 
-    if (selectFilterColumns.has(column.id)) {
+      if (selectFilterColumns.has(column.id)) {
+        return (
+          <Select
+            onValueChange={(value) => column.setFilterValue(value)}
+            value={(column.getFilterValue() as string) || ''}
+          >
+            <SelectTrigger className="rounded-[6px]">
+              <SelectValue placeholder={t('SELECT')} />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from(column.getFacetedUniqueValues().keys()).length === 0 ? (
+                <div className="p-2 text-sm text-center text-low-emphasis">
+                  {t('NO_DATA_FOUND')}
+                </div>
+              ) : (
+                Array.from(column.getFacetedUniqueValues().keys()).map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {column.id === 'status' ? t(option.toUpperCase()) : option}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        );
+      }
+
+      if (column.id === 'stock') {
+        return (
+          <StockFilterDropdown
+            ref={clearStockFilterDropdownRef}
+            setFilterValue={(value) => column.setFilterValue(value)}
+          />
+        );
+      }
+
+      if (column.id === 'lastupdated') {
+        return (
+          <LastUpdatedFilterDropdown
+            ref={clearLastUpdatedFilterDropdownRef}
+            setFilterValue={(value) => column.setFilterValue(value)}
+          />
+        );
+      }
+
       return (
-        <Select
-          onValueChange={(value) => column.setFilterValue(value)}
+        <Input
+          placeholder={t('SEARCH')}
           value={(column.getFilterValue() as string) || ''}
-        >
-          <SelectTrigger className="rounded-[6px]">
-            <SelectValue placeholder="Select" />
-          </SelectTrigger>
-          <SelectContent>
-            {Array.from(column.getFacetedUniqueValues().keys()).length === 0 ? (
-              <div className="p-2 text-sm text-center text-low-emphasis">No data found</div>
-            ) : (
-              Array.from(column.getFacetedUniqueValues().keys()).map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
-      );
-    }
-
-    if (column.id === 'stock') {
-      return (
-        <StockFilterDropdown
-          ref={clearStockFilterDropdownRef}
-          setFilterValue={(value) => column.setFilterValue(value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            column.setFilterValue(value || undefined);
+          }}
+          className="rounded-[6px] h-10"
         />
       );
-    }
-
-    if (column.id === 'lastupdated') {
-      return (
-        <LastUpdatedFilterDropdown
-          ref={clearLastUpdatedFilterDropdownRef}
-          setFilterValue={(value) => column.setFilterValue(value)}
-        />
-      );
-    }
-
-    return (
-      <Input
-        placeholder="Search"
-        value={(column.getFilterValue() as string) || ''}
-        onChange={(e) => {
-          const value = e.target.value;
-          column.setFilterValue(value || undefined);
-        }}
-        className="rounded-[6px] h-10"
-      />
-    );
-  }, []);
+    },
+    [t]
+  );
 
   return (
     <TableRow className="border-b hover:bg-transparent">

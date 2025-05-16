@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import UIOtpInput from 'components/core/otp-input/otp-input';
 import { useSigninMutation } from 'features/auth/hooks/use-auth';
@@ -12,6 +13,7 @@ import { useResendOtp } from 'features/profile/hooks/use-mfa';
 
 export function VerifyOtpKey() {
   const { login } = useAuthStore();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [otpError, setOtpError] = useState('');
@@ -63,8 +65,8 @@ export function VerifyOtpKey() {
           onSuccess: () => {
             toast({
               variant: 'success',
-              title: 'Success',
-              description: 'You are successfully logged in',
+              title: t('SUCCESS'),
+              description: t('LOGIN_SUCCESSFULLY'),
             });
           },
         }
@@ -73,9 +75,9 @@ export function VerifyOtpKey() {
       login(res.access_token, res.refresh_token);
       navigate('/');
     } catch {
-      setOtpError('Mfa code is not valid');
+      setOtpError(t('MFA_CODE_IS_NOT_VALID'));
     }
-  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, toast]);
+  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, toast, t]);
 
   useEffect(() => {
     const requiredLength = mfaType === UserMfaType.AUTHENTICATOR_APP ? 6 : 5;
@@ -93,11 +95,13 @@ export function VerifyOtpKey() {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-high-emphasis">Verifying key</h1>
+        <h1 className="text-2xl font-bold text-high-emphasis">{t('VERIFYING_KEY')}</h1>
         <p className="text-sm font-normal text-medium-emphasis">
           {mfaType === UserMfaType.AUTHENTICATOR_APP
-            ? 'Please enter the verification code from your authenticator app'
-            : `Please enter the verification key sent to your email (${maskEmail(userEmail ?? '')})`}
+            ? t('ENTER_VERIFICATION_CODE_AUTH_APP')
+            : t('ENTER_VERIFICATION_KEY_SENT_EMAIL', {
+                email: maskEmail(userEmail ?? ''),
+              })}
         </p>
       </div>
       <div className="flex flex-col gap-1">
@@ -121,7 +125,7 @@ export function VerifyOtpKey() {
             isPending || otpValue.length !== (mfaType === UserMfaType.AUTHENTICATOR_APP ? 6 : 5)
           }
         >
-          {isPending ? 'Verifying...' : 'Verify'}
+          {isPending ? `${t('VERIFYING')}...` : t('VERIFY')}
         </Button>
         {mfaType === UserMfaType.EMAIL_VERIFICATION && (
           <Button
@@ -131,7 +135,7 @@ export function VerifyOtpKey() {
             disabled={isResendDisabled}
             onClick={handleResendOTP}
           >
-            {isResendDisabled ? `Resend Key (in ${formattedTime})` : 'Resend Key'}
+            {isResendDisabled ? t('RESEND_KEY_IN', { time: formattedTime }) : t('RESEND_KEY')}
           </Button>
         )}
       </div>

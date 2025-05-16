@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useToast } from 'hooks/use-toast';
 import { Button } from 'components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from 'components/ui/form';
@@ -76,6 +77,7 @@ interface AddEventProps {
  */
 export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventProps>) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState<Date | undefined>(start);
   const [endDate, setEndDate] = useState<Date | undefined>(end);
   const [startTime, setStartTime] = useState(() => format(start, 'HH:mm'));
@@ -99,7 +101,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
 
   const recurrenceText = useMemo(() => {
     if (recurringEvents.length === 0) {
-      return `Occurs on ${WEEK_DAYS[startDate?.getDay() || new Date().getDay()]}`;
+      return `${t('OCCURS_ON')} ${WEEK_DAYS[startDate?.getDay() || new Date().getDay()]}`;
     }
 
     const uniqueDays = Array.from(
@@ -110,10 +112,10 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
         })
       )
     );
-    if (uniqueDays.length === 1) return `Occurs on ${uniqueDays[0]}`;
+    if (uniqueDays.length === 1) return `${t('OCCURS_ON')} ${uniqueDays[0]}`;
     const last = uniqueDays.splice(uniqueDays.length - 1, 1)[0];
-    return `Occurs on ${uniqueDays.join(', ')} and ${last}`;
-  }, [recurringEvents, startDate]);
+    return `${t('OCCURS_ON')} ${uniqueDays.join(', ')} and ${last}`;
+  }, [recurringEvents, startDate, t]);
 
   useLayoutEffect(() => {
     const update = () => {
@@ -162,8 +164,8 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
     if (fullEnd < fullStart) {
       toast({
         variant: 'destructive',
-        title: 'Error Selecting time slot',
-        description: 'End time cannot be before start time.',
+        title: t('ERROR_SELECTING_TIME_SLOT'),
+        description: t('END_TIME_CANNOT_BEFORE_START_TIME'),
       });
       return;
     }
@@ -412,11 +414,9 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
 
   return (
     <>
-      <DialogContent
-        className="w-full sm:max-w-[720px] max-h-[96vh] overflow-y-auto"
-      >
+      <DialogContent className="w-full sm:max-w-[720px] max-h-[96vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Event</DialogTitle>
+          <DialogTitle>{t('ADD_EVENT')}</DialogTitle>
           <DialogDescription />
         </DialogHeader>
         <Form {...form}>
@@ -426,9 +426,9 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-normal text-sm">Title*</FormLabel>
+                  <FormLabel className="font-normal text-sm">{t('TITLE')}*</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter event title" {...field} />
+                    <Input placeholder={t('ENTER_EVENT_TITLE')} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -438,9 +438,9 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               name="meetingLink"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-normal text-sm">Meeting Link</FormLabel>
+                  <FormLabel className="font-normal text-sm">{t('MEETING_LINK')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your meeting link" {...field} />
+                    <Input placeholder={t('ENTER_YOUR_MEETING_LINK')} {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -450,7 +450,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               name="members"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-normal text-sm">Participants</FormLabel>
+                  <FormLabel className="font-normal text-sm">{t('PARTICIPANTS')}</FormLabel>
                   <EventParticipant selected={field.value ?? []} onChange={field.onChange} />
                 </FormItem>
               )}
@@ -459,7 +459,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               <div className="flex gap-4 w-full sm:w-[60%]">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-[6px]">
-                    <Label className="font-normal text-sm">Start date</Label>
+                    <Label className="font-normal text-sm">{t('START_DATE')}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <div className="relative">
@@ -478,7 +478,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
                   </div>
                   {!isAllDay && (
                     <div className="flex flex-col gap-[6px]">
-                      <Label className="font-normal text-sm">Start time</Label>
+                      <Label className="font-normal text-sm">{t('START_TIME')}</Label>
                       <Popover
                         modal={true}
                         open={isStartTimeOpen}
@@ -528,7 +528,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
                     </div>
                   )}
                   <div className="flex flex-col gap-[6px]">
-                    <Label className="font-normal text-sm">End date</Label>
+                    <Label className="font-normal text-sm">{t('END_DATE')}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <div className="relative">
@@ -547,7 +547,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
                   </div>
                   {!isAllDay && (
                     <div className="flex flex-col gap-[6px]">
-                      <Label className="font-normal text-sm">End time</Label>
+                      <Label className="font-normal text-sm">{t('END_TIME')}</Label>
                       <Popover
                         modal={true}
                         open={isEndTimeOpen}
@@ -604,7 +604,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
                   render={({ field }) => (
                     <div className="flex items-center gap-4">
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      <Label>All day</Label>
+                      <Label>{t('ALL_DAY')}</Label>
                     </div>
                   )}
                 />
@@ -614,7 +614,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
                   render={({ field }) => (
                     <div className="flex items-center gap-4">
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      <Label>Recurring Event</Label>
+                      <Label>{t('RECURRING_EVENT')}</Label>
                     </div>
                   )}
                 />
@@ -635,7 +635,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               name="description"
               render={({ field, fieldState }) => (
                 <div className="flex flex-col gap-1">
-                  <p className="font-semibold text-base text-high-emphasis">Description</p>
+                  <p className="font-semibold text-base text-high-emphasis">{t('DESCRIPTION')}</p>
                   <div className="flex flex-col flex-1">
                     <CustomTextEditor
                       value={field.value}
@@ -650,7 +650,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
               )}
             />
             <div className="flex flex-col gap-1">
-              <p className="font-semibold text-base text-high-emphasis">Colors</p>
+              <p className="font-semibold text-base text-high-emphasis">{t('COLORS')}</p>
               <ColorPickerTool
                 selectedColor={selectedColor}
                 onColorChange={(color) => setSelectedColor(color)}
@@ -658,9 +658,9 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
             </div>
             <div className="flex justify-end w-full gap-4 !mt-6">
               <Button variant="outline" type="button" onClick={handleCancel}>
-                Discard
+                {t('DISCARD')}
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">{t('SAVE')}</Button>
             </div>
           </form>
         </Form>

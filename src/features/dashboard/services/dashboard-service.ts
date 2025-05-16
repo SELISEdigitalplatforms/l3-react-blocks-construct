@@ -1,28 +1,28 @@
 import { ChartConfig } from 'components/ui/chart';
 
 export const daysOfWeek = [
-  { value: 'monday', label: 'Monday' },
-  { value: 'tuesday', label: 'Tuesday' },
-  { value: 'wednesday', label: 'Wednesday' },
-  { value: 'thursday', label: 'Thursday' },
-  { value: 'friday', label: 'Friday' },
-  { value: 'saturday', label: 'Saturday' },
-  { value: 'sunday', label: 'Sunday' },
+  { value: 'monday', label: 'MONDAY' },
+  { value: 'tuesday', label: 'TUESDAY' },
+  { value: 'wednesday', label: 'WEDNESDAY' },
+  { value: 'thursday', label: 'THURSDAY' },
+  { value: 'friday', label: 'FRIDAY' },
+  { value: 'saturday', label: 'SATURDAY' },
+  { value: 'sunday', label: 'SUNDAY' },
 ];
 
 export const monthsOfYear = [
-  { value: 'january', label: 'January' },
-  { value: 'february', label: 'February' },
-  { value: 'march', label: 'March' },
-  { value: 'april', label: 'April' },
-  { value: 'may', label: 'May' },
-  { value: 'june', label: 'June' },
-  { value: 'july', label: 'July' },
-  { value: 'august', label: 'August' },
-  { value: 'september', label: 'September' },
-  { value: 'october', label: 'October' },
-  { value: 'november', label: 'November' },
-  { value: 'december', label: 'December' },
+  { value: 'january', label: 'JANUARY' },
+  { value: 'february', label: 'FEBRUARY' },
+  { value: 'march', label: 'MARCH' },
+  { value: 'april', label: 'APRIL' },
+  { value: 'may', label: 'MAY' },
+  { value: 'june', label: 'JUNE' },
+  { value: 'july', label: 'JULY' },
+  { value: 'august', label: 'AUGUST' },
+  { value: 'september', label: 'SEPTEMBER' },
+  { value: 'october', label: 'OCTOBER' },
+  { value: 'november', label: 'NOVEMBER' },
+  { value: 'december', label: 'DECEMBER' },
 ];
 
 export const chartData = [
@@ -37,7 +37,7 @@ export const chartData = [
 
 export const chartConfig = {
   noOfActions: {
-    label: 'Number of actions: ',
+    label: 'NUMBER_OF_ACTION',
     color: 'hsl(var(--secondary-500))',
   },
 } satisfies ChartConfig;
@@ -50,14 +50,14 @@ export const pieChartData = [
 ];
 export const pieChartConfig = {
   users: {
-    label: 'Users',
+    label: 'USERS',
   },
   windows: {
-    label: 'Windows',
+    label: 'WINDOWS',
     color: 'hsl(var(--purple-800))',
   },
   mac: {
-    label: 'Mac',
+    label: 'MAC',
     color: 'hsl(var(--purple-500))',
   },
   ios: {
@@ -65,28 +65,28 @@ export const pieChartConfig = {
     color: 'hsl(var(--purple-200))',
   },
   android: {
-    label: 'Android',
+    label: 'ANDROID',
     color: 'hsl(var(--purple-50))',
   },
 } satisfies ChartConfig;
 
 export const statsData = [
   {
-    title: 'API calls',
+    title: 'API_CALLS',
     value: '12,345',
     max: '25,000',
     percentage: 58.9,
     strokeColor: 'hsl(var(--warning))',
   },
   {
-    title: 'Bandwidth',
+    title: 'BANDWIDTH',
     value: '200 MB',
-    max: 'Unlimited',
+    max: 'UNLIMITED',
     percentage: 100,
     strokeColor: 'hsl(var(--pink-500))',
   },
   {
-    title: 'Concurrent Users',
+    title: 'CONCURRENT_USERS',
     value: '324',
     max: '1,000',
     percentage: 30.9,

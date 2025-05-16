@@ -24,7 +24,7 @@ describe('menuItems', () => {
     expect(dashboardItem).toBeDefined();
     expect(dashboardItem).toEqual({
       id: 'dashboard',
-      name: 'Dashboard',
+      name: 'DASHBOARD',
       path: '/dashboard',
       icon: 'LayoutDashboard',
     });

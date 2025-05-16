@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog } from 'components/ui/dialog';
 import { Button } from 'components/ui/button';
 import { IamData } from '../../services/user-service';
-import { useState } from 'react';
 import { EditIamProfileDetails } from 'features/profile/component/modals/edit-iam-profile-details/edit-iam-profile-details';
 
 /**
@@ -37,6 +38,7 @@ interface ExpandedUserDetailsProps {
 
 const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onResetPassword }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -72,17 +74,17 @@ const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onReset
     <div className="p-4 space-y-4">
       <div className="space-y-3">
         <div>
-          <h3 className="text-sm font-medium text-medium-emphasis">Email</h3>
+          <h3 className="text-sm font-medium text-medium-emphasis">{t('EMAIL')}</h3>
           <p className="text-sm text-high-emphasis">{user.email}</p>
         </div>
 
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-medium-emphasis">Mobile no.</h3>
+            <h3 className="text-sm font-medium text-medium-emphasis">{t('MOBILE_NO')}</h3>
             <p className="text-sm text-high-emphasis">{user.phoneNumber ?? '-'}</p>
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-medium-emphasis">Role(s)</h3>
+            <h3 className="text-sm font-medium text-medium-emphasis">{t('IAM_ROLES')}</h3>
             <p className="text-sm text-high-emphasis first-letter:uppercase">
               {user.roles && user.roles.length > 0 ? user.roles.join(', ') : '-'}
             </p>
@@ -91,7 +93,7 @@ const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onReset
 
         <div className="flex justify-between gap-4">
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-medium-emphasis">Joined on</h3>
+            <h3 className="text-sm font-medium text-medium-emphasis">{t('JOINED_ON')}</h3>
             <p className="text-sm text-high-emphasis">
               {new Date(user.createdDate).toLocaleString('en-GB', {
                 day: '2-digit',
@@ -103,7 +105,7 @@ const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onReset
             </p>
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-medium-emphasis">Last log in</h3>
+            <h3 className="text-sm font-medium text-medium-emphasis">{t('LAST_LOGIN')}</h3>
             <div className="text-sm text-high-emphasis">
               {user.lastLoggedInTime && new Date(user.lastLoggedInTime).getFullYear() !== 1 ? (
                 formatLastLoginTime(user.lastLoggedInTime)
@@ -116,21 +118,23 @@ const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onReset
 
         <div className="flex space-x-4">
           <div className="flex-1">
-            <h3 className="text-sm  text-medium-emphasis">Status</h3>
+            <h3 className="text-sm  text-medium-emphasis">{t('STATUS')}</h3>
             <h3 className={user.active ? 'text-success ' : 'text-error'}>
-              {user.active ? 'Active' : 'Deactivated'}
+              {user.active ? t('ACTIVE') : t('DEACTIVATED')}
             </h3>
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-medium-emphasis">MFA</h3>
-            <p className="text-sm text-high-emphasis">{user.mfaEnabled ? 'Enabled' : 'Disabled'}</p>
+            <h3 className="text-sm font-medium text-medium-emphasis">{t('MFA')}</h3>
+            <p className="text-sm text-high-emphasis">
+              {user.mfaEnabled ? t('ENABLED') : t('DISABLED')}
+            </p>
           </div>
         </div>
       </div>
 
       <div className="flex w-full flex-col gap-2">
         <Button size="sm" className="w-full" onClick={handleEditClick}>
-          Edit
+          {t('EDIT')}
         </Button>
         <div className="flex w-full flex-row gap-4">
           <Button
@@ -139,7 +143,7 @@ const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onReset
             className="w-full"
             onClick={() => onResetPassword(user)}
           >
-            {user?.active ? 'Reset Password' : 'Resend Activation Link'}
+            {user?.active ? t('RESET_PASSWORD') : t('RESEND_ACTIVATION_LINK')}
           </Button>
           {user?.active && (
             <Button
@@ -148,7 +152,7 @@ const ExpandedUserDetails: React.FC<ExpandedUserDetailsProps> = ({ user, onReset
               className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
               onClick={() => {}}
             >
-              Deactivate User
+              {t('DEACTIVATE_USER')}
             </Button>
           )}
         </div>

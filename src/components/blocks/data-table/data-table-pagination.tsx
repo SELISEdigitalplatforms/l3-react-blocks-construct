@@ -1,6 +1,6 @@
 import { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import {
   Select,
@@ -44,6 +44,7 @@ export function DataTablePagination<TData>({
   showSelectedRowContent = true,
 }: Readonly<DataTablePaginationProps<TData>>) {
   const totalRows = table.getFilteredRowModel().rows.length;
+  const { t } = useTranslation();
   const pageSizes = Array.from(
     { length: Math.min(5, Math.ceil(totalRows / 10)) },
     (_, i) => (i + 1) * 10
@@ -53,13 +54,13 @@ export function DataTablePagination<TData>({
     <div className="flex w-full items-center justify-between px-2">
       {showSelectedRowContent ? (
         <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} {t('DATA_TABLE_OF')}{' '}
+          {table.getFilteredRowModel().rows.length} {t('ROWS_SELECTED')}
         </div>
       ) : null}
       <div className={`flex  items-center ${!showSelectedRowContent && 'w-full justify-end'}`}>
         <div className="flex items-center space-x-2">
-          <p className="hidden sm:flex text-sm font-medium">Rows per page</p>
+          <p className="hidden sm:flex text-sm font-medium">{t('ROWS_PER_PAGE')}</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -84,7 +85,8 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          {t('PAGE')} {table.getState().pagination.pageIndex + 1} {t('DATA_TABLE_OF')}{' '}
+          {table.getPageCount()}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -99,7 +101,7 @@ export function DataTablePagination<TData>({
             }}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">Go to first page</span>
+            <span className="sr-only">{t('GO_TO_FIRST_PAGE')}</span>
             <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -115,7 +117,7 @@ export function DataTablePagination<TData>({
             }}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">Go to previous page</span>
+            <span className="sr-only">{t('GO_TO_PREVIOUS_PAGE')}</span>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -131,7 +133,7 @@ export function DataTablePagination<TData>({
             }}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">Go to next page</span>
+            <span className="sr-only">{t('GO_TO_NEXT_PAGE')}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
@@ -147,7 +149,7 @@ export function DataTablePagination<TData>({
             }}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">Go to last page</span>
+            <span className="sr-only">{t('GO_TO_LAST_PAGE')}</span>
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '@tanstack/react-table';
 import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
@@ -7,15 +8,16 @@ import { createAdvanceTableColumns } from 'features/inventory/component/advance-
 import { InventoryData, inventoryData } from 'features/inventory/services/inventory-service';
 import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
 import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
+
 interface PaginationState {
   pageIndex: number;
   pageSize: number;
   totalCount: number;
 }
 
-const columns = createAdvanceTableColumns();
-
 export function Inventory() {
+  const { t } = useTranslation();
+  const columns = createAdvanceTableColumns({ t });
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<InventoryData[]>([]);
   const [paginationState, setPaginationState] = useState<PaginationState>({
@@ -53,7 +55,7 @@ export function Inventory() {
     <AdvancedTableColumnsToolbar
       disabledColumns={['itemName', 'stock', 'price', 'status']}
       table={table}
-      title="Inventory"
+      title="INVENTORY"
     />
   );
 

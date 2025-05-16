@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar, Check, ChevronDown, ChevronUp, Link, Users, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import {
   DialogContent,
@@ -48,6 +49,7 @@ export function EventInvitation({
   onRespond,
 }: Readonly<EventInvitationProps>) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [showToggleButton, setShowToggleButton] = useState(false);
@@ -78,11 +80,14 @@ export function EventInvitation({
     setResponseStatus(status);
     toast({
       variant: 'success',
-      title: `Invitation ${status === MEMBER_STATUS.ACCEPTED ? 'Accepted' : 'Declined'}`,
+      title: `${t('INVITATION')} ${status === MEMBER_STATUS.ACCEPTED ? t('ACCEPTED') : t('DECLINED')}`,
       description: (
         <>
-          You have successfully {status === MEMBER_STATUS.ACCEPTED ? 'accepted' : 'declined'} the
-          invitation for{' '}
+          {t('YOU_HAVE_SUCCESSFULLY')}{' '}
+          {status === MEMBER_STATUS.ACCEPTED
+            ? t('ACCEPTED').toLowerCase()
+            : t('DECLINED').toLowerCase()}{' '}
+          {t('THE_INVITATION_FOR')}{' '}
           <span className="text-primary-700 text-sm font-semibold">{event.title}</span>.
         </>
       ),
@@ -106,7 +111,7 @@ export function EventInvitation({
               <Calendar className="w-5 h-5 text-medium-emphasis" />
               <p className="font-semibold text-base text-high-emphasis">
                 {event?.allDay
-                  ? `${format(event.start, 'dd.MM.yyyy')}, Whole Day`
+                  ? `${format(event.start, 'dd.MM.yyyy')}, ${t('WHOLE_DAY')}`
                   : `${format(event.start, 'dd.MM.yyyy, HH:mm')} - ${format(event.end, 'HH:mm')}`}
               </p>
             </div>
@@ -119,8 +124,8 @@ export function EventInvitation({
                   onClick={() => {
                     toast({
                       variant: 'success',
-                      title: 'Zoom link clicked',
-                      description: 'Opening Zoom. Please note this is a placeholder link.',
+                      title: t('ZOOM_LINK_CLICKED'),
+                      description: t('OPENING_ZOOM_PLACEHOLDER_LINK'),
                     });
                   }}
                   className="text-base font-normal underline text-primary leading-6 break-all hover:text-primary-800 cursor-pointer w-[90%]"
@@ -128,7 +133,9 @@ export function EventInvitation({
                   {event.resource?.meetingLink}
                 </a>
               ) : (
-                <span className="text-base leading-6 text-low-emphasis">No meeting link</span>
+                <span className="text-base leading-6 text-low-emphasis">
+                  {t('NO_MEETING_LINK')}
+                </span>
               )}
             </div>
             {members.length > 0 && (
@@ -139,15 +146,15 @@ export function EventInvitation({
                     {members.length} invited
                   </p>
                   <p className="font-normal text-xs text-medium-emphasis">
-                    Accepted {acceptedCount}, Didn’t respond {noResponseCount}, & Declined{' '}
-                    {`${declinedCount}`}
+                    {t('ACCEPTED')} {acceptedCount}, {t('DIDNT_RESPOND')} {noResponseCount}, &{' '}
+                    {t('DECLINED')} {`${declinedCount}`}
                   </p>
                 </div>
               </div>
             )}
             {event.resource?.description && (
               <div className="flex flex-col items-start gap-3">
-                <p className="font-semibold text-base text-high-emphasis">Description</p>
+                <p className="font-semibold text-base text-high-emphasis">{t('DESCRIPTION')}</p>
                 <div className="flex-1" style={{ minHeight: '60px' }}>
                   <p
                     ref={descriptionRef}
@@ -174,7 +181,7 @@ export function EventInvitation({
                       ) : (
                         <ChevronDown className="w-4 h-4 mr-1" />
                       )}
-                      {isExpanded ? 'Show less' : 'Show more'}
+                      {isExpanded ? t('SHOW_LESS') : t('SHOW_MORE')}
                     </Button>
                   )}
                 </div>
@@ -190,7 +197,7 @@ export function EventInvitation({
                   onClick={() => handleRespond(MEMBER_STATUS.DECLINED)}
                 >
                   <X className="w-4 h-4 mr-1" />
-                  Decline
+                  {t('DECLINE')}
                 </Button>
                 <Button
                   onClick={() => {
@@ -198,7 +205,7 @@ export function EventInvitation({
                   }}
                 >
                   <Check className="w-4 h-4 mr-1" />
-                  Accept
+                  {t('ACCEPT')}
                 </Button>
               </>
             ) : (
@@ -206,14 +213,14 @@ export function EventInvitation({
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
                   <p className="text-base font-semibold text-high-emphasis">
-                    {responseStatus === MEMBER_STATUS.ACCEPTED ? 'Accepted' : 'Declined'}
+                    {responseStatus === MEMBER_STATUS.ACCEPTED ? t('ACCEPTED') : t('DECLINED')}
                   </p>
                 </div>
                 <Button
                   variant="outline"
                   onClick={() => setResponseStatus(MEMBER_STATUS.NORESPONSE)}
                 >
-                  Change
+                  {t('CHANGE')}
                 </Button>
               </div>
             )}

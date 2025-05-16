@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,6 +59,7 @@ export function UpdateRecurringEvent({
   eventTitle,
   onConfirm,
 }: Readonly<UpdateRecurringEventProps>) {
+  const { t } = useTranslation();
   const [updateOption, setUpdateOption] = useState<UpdateOption>('this');
 
   const handleConfirm = () => {
@@ -69,10 +71,12 @@ export function UpdateRecurringEvent({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-md z-[100]">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-xl font-bold">Update recurring event?</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl font-bold">
+            {t('UPDATE_RECURRING_EVENT')}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            <span className="font-semibold text-high-emphasis">{eventTitle}</span> is a recurring
-            event. How would you like to update it?
+            <span className="font-semibold text-high-emphasis">{eventTitle}</span>{' '}
+            {t('RECURRING_EVENT_LIKE_UPDATE_IT')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex flex-col w-full gap-3">
@@ -85,14 +89,14 @@ export function UpdateRecurringEvent({
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="this" id="status-this" />
                 <Label htmlFor="status-this" className="cursor-pointer">
-                  This event only
+                  {t('THIS_EVENT_ONLY')}
                 </Label>
               </div>
               <div className="flex items-center gap-2 w-full">
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="thisAndFollowing" id="status-following" />
                   <Label htmlFor="status-following" className="cursor-pointer">
-                    This and following events
+                    {t('THIS_AND_FOLLOWING_EVENTS')}
                   </Label>
                 </div>
               </div>
@@ -100,7 +104,7 @@ export function UpdateRecurringEvent({
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="all" id="status-all" />
                   <Label htmlFor="status-all" className="cursor-pointer">
-                    All events in the series
+                    {t('ALL_EVENTS_SERIES')}
                   </Label>
                 </div>
               </div>
@@ -108,9 +112,9 @@ export function UpdateRecurringEvent({
           </div>
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel className="rounded-[6px]">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="rounded-[6px]">{t('CANCEL')}</AlertDialogCancel>
           <AlertDialogAction className="bg-primary rounded-[6px]" onClick={handleConfirm}>
-            Update
+            {t('UPDATE')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

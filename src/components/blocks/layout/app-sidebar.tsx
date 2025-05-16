@@ -7,6 +7,7 @@ import { useTheme } from 'components/core/theme-provider';
 import { LogoSection } from '../sidebar/logo-section';
 import { MenuSection } from '../sidebar/menu-section';
 import { getSidebarStyle } from 'utils/sidebar-utils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * AppSidebar Component
@@ -49,6 +50,7 @@ import { getSidebarStyle } from 'utils/sidebar-utils';
 export function AppSidebar(): JSX.Element | null {
   const { theme } = useTheme();
   const { pathname } = useLocation();
+  const { t } = useTranslation();
   const { setOpenMobile, open, isMobile, openMobile } = useSidebar();
 
   const integratedMenuItems = menuItems.filter((item) => item.isIntegrated === true);
@@ -83,7 +85,7 @@ export function AppSidebar(): JSX.Element | null {
 
       <SidebarContent className="text-base ml-4 mr-2 my-3 text-high-emphasis font-normal">
         <MenuSection
-          title="Cloud Integrated"
+          title={t('CLOUD_INTEGRATED')}
           items={integratedMenuItems}
           showText={open || isMobile}
           pathname={pathname}
@@ -93,7 +95,7 @@ export function AppSidebar(): JSX.Element | null {
         />
 
         <MenuSection
-          title="Design only"
+          title={t('DESIGN_ONLY')}
           items={designOnlyMenuItems}
           showText={open || isMobile}
           pathname={pathname}

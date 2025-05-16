@@ -94,8 +94,14 @@ export function TaskCard({ task, index, handleTaskClick }: ITaskCardProps) {
       >
         <div className="flex justify-between items-start">
           <div className="flex gap-2 flex-grow mr-2">
-            <div className="mt-0.5 flex-shrink-0" onClick={handleInteractiveElementClick}>
-              <button onClick={() => toggleTaskCompletion(!task.isCompleted)}>
+            <div className="mt-0.5 flex-shrink-0">
+              <button
+                onClick={(e) => {
+                  toggleTaskCompletion(!task.isCompleted);
+                  handleInteractiveElementClick(e);
+                }}
+                aria-label={task.isCompleted ? 'Mark task as incomplete' : 'Mark task as complete'}
+              >
                 <StatusCircle isCompleted={task.isCompleted} />
               </button>
             </div>
@@ -125,22 +131,22 @@ export function TaskCard({ task, index, handleTaskClick }: ITaskCardProps) {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          {/* {task.priority && (
-            <span onClick={handleInteractiveElementClick}>
-              <PriorityBadge priority={task.priority} />
-            </span>
-          )}
-          {task.tags && task.tags.length > 0 && (
-            <span onClick={handleInteractiveElementClick}>
-              <TagBadges tags={task.tags} />
-            </span>
-          )} */}
           {task.priority && (
-            <span onClick={handleInteractiveElementClick}>
+            <button
+              onClick={handleInteractiveElementClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleInteractiveElementClick(e);
+                }
+              }}
+              tabIndex={0}
+              role="button"
+              aria-label="Task priority action"
+            >
               <TaskManagerBadge className="px-2 py-0.5" priority={task.priority as TPriority}>
                 {task.priority}
               </TaskManagerBadge>
-            </span>
+            </button>
           )}
 
           {task.tags &&

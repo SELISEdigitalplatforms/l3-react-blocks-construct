@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   accountActivation,
   forgotPassword,
@@ -45,6 +46,7 @@ import { ErrorResponse, useCustomToast } from './use-custom-toast/use-custom-toa
  */
 
 export const useSigninMutation = <T extends 'password' | 'mfa_code'>() => {
+  const { t } = useTranslation();
   const [errorDetails, setErrorDetails] = useState({
     title: '',
     message: '',
@@ -73,10 +75,8 @@ export const useSigninMutation = <T extends 'password' | 'mfa_code'>() => {
             errorObj?.response?.data?.error?.error === 'invalid_username_password'));
 
       setErrorDetails({
-        title: isInvalidCredentials ? 'Invalid Credentials' : 'Something went wrong',
-        message: isInvalidCredentials
-          ? 'Your email or password is not valid.'
-          : 'Please try again.',
+        title: t(isInvalidCredentials ? 'INVALID_CREDENTIALS' : 'SOMETHING_WENT_WRONG'),
+        message: t(isInvalidCredentials ? 'EMAIL_PASSWORD_NOT_VALID' : 'PLEASE_TRY_AGAIN'),
       });
     },
   });
@@ -95,6 +95,7 @@ export const useSignoutMutation = () => {
 };
 
 export const useAccountActivation = () => {
+  const { t } = useTranslation();
   const { showSuccessToast, showErrorToast } = useCustomToast();
   return useGlobalMutation({
     mutationKey: ['accountActivation'],
@@ -102,7 +103,7 @@ export const useAccountActivation = () => {
 
     onSuccess: () => {
       showSuccessToast({
-        description: 'You are sucessfully acctivated your account',
+        description: t('ACCOUNT_ACTIVATED_SUCCESSFULLY'),
       });
     },
     onError: ({ error }: ErrorResponse) => {
@@ -112,13 +113,14 @@ export const useAccountActivation = () => {
 };
 
 export const useForgotPassword = () => {
+  const { t } = useTranslation();
   const { showSuccessToast, showErrorToast } = useCustomToast();
   return useGlobalMutation({
     mutationKey: ['forgotPassword'],
     mutationFn: forgotPassword,
     onSuccess: () => {
       showSuccessToast({
-        description: 'A link has been sent your email',
+        description: t('RESET_PASSWORD_LINK_SENT_EMAIL'),
       });
     },
     onError: ({ error }: ErrorResponse) => {
@@ -128,13 +130,14 @@ export const useForgotPassword = () => {
 };
 
 export const useResetPassword = () => {
+  const { t } = useTranslation();
   const { showSuccessToast, showErrorToast } = useCustomToast();
   return useGlobalMutation({
     mutationKey: ['resetPassword'],
     mutationFn: resetPassword,
     onSuccess: () => {
       showSuccessToast({
-        description: 'You have successfully set your password',
+        description: t('SUCCESSFULLY_SET_PASSWORD'),
       });
     },
     onError: ({ error }: ErrorResponse) => {
@@ -144,6 +147,7 @@ export const useResetPassword = () => {
 };
 
 export const useResendActivation = () => {
+  const { t } = useTranslation();
   const { showSuccessToast, showErrorToast } = useCustomToast();
 
   return useGlobalMutation({
@@ -151,7 +155,7 @@ export const useResendActivation = () => {
     mutationFn: resendActivation,
     onSuccess: () => {
       showSuccessToast({
-        description: 'A link has been sent your email',
+        description: t('RESET_PASSWORD_LINK_SENT_EMAIL'),
       });
     },
     onError: ({ error }: ErrorResponse) => {

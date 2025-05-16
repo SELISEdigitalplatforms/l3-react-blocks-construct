@@ -1,22 +1,25 @@
-import { Button } from 'components/ui/button';
 import { RefreshCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Button } from 'components/ui/button';
 import temporaryUnavailable from 'assets/images/unavailable.svg';
 
 // testing from own branch
 export default function ServiceUnavailable() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex justify-center items-center w-full">
       <div className="flex flex-col gap-12">
-        <img src={temporaryUnavailable} alt="" />
+        <img src={temporaryUnavailable} alt=''/>
         <div className="flex flex-col items-center">
           <h1 className="text-high-emphasis font-bold text-[32px] leading-[48px]">
-            This page is temporarily unavailable.
+            {t('PAGE_TEMPORARILY_UNAVAILABLE')}
           </h1>
           <p className="mt-3 mb-6 text-medium-emphasis font-semibold text-2xl">
-            Scheduled maintenance is in progress. Everything will be back to normal soon.
+            {t('SCHEDULED_MAINTENANCE_IN_PROGRESS')}
           </p>
           <Button className="font-bold text-sm">
-            Reload Page
+            {t('RELOAD_PAGE')}
             <RefreshCcw />
           </Button>
         </div>

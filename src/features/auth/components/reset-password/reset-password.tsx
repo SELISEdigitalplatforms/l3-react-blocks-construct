@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { BasePasswordForm } from '../../../../components/blocks/base-password-form/base-password-form';
 import { useResetPassword } from '../../hooks/use-auth';
-import { resetPasswordFormDefaultValue, resetPasswordFormValidationSchema } from './utils';
+import { resetPasswordFormDefaultValue, getResetPasswordFormValidationSchema } from './utils';
 
 /**
  * ResetPasswordForm Component
@@ -29,6 +30,7 @@ import { resetPasswordFormDefaultValue, resetPasswordFormValidationSchema } from
  */
 
 export const ResetpasswordForm = ({ code }: { code: string }) => {
+  const { t } = useTranslation();
   const { isPending, mutateAsync } = useResetPassword();
 
   const handleSubmit = async (password: string, code: string) => {
@@ -39,7 +41,7 @@ export const ResetpasswordForm = ({ code }: { code: string }) => {
     <BasePasswordForm
       code={code}
       onSubmit={handleSubmit}
-      validationSchema={resetPasswordFormValidationSchema}
+      validationSchema={getResetPasswordFormValidationSchema(t)}
       defaultValues={resetPasswordFormDefaultValue}
       isPending={isPending}
     />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { useTranslation } from 'react-i18next';
 import {
   Sheet,
   SheetContent,
@@ -57,13 +58,14 @@ export const CalendarFilterSheet = ({
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [openPopover, setOpenPopover] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>({ from: new Date(), to: new Date() });
+  const { t } = useTranslation();
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
       <SheetContent className="flex flex-col h-screen sm:h-[calc(100dvh-48px)] justify-between w-full sm:min-w-[450px] md:min-w-[450px] lg:min-w-[450px] sm:fixed sm:top-[57px]">
         <div className="flex flex-col">
           <SheetHeader>
-            <SheetTitle className="!text-left">Filters</SheetTitle>
+            <SheetTitle className="!text-left">{t('FILTERS')}</SheetTitle>
             <SheetDescription />
           </SheetHeader>
           <div className="flex flex-col gap-6 mt-6">
@@ -71,7 +73,7 @@ export const CalendarFilterSheet = ({
               <PopoverTrigger asChild>
                 <div className="relative w-full">
                   <Input
-                    placeholder="Date range"
+                    placeholder={t('DATE_RANGE')}
                     className="pl-8 cursor-pointer border-dashed"
                     readOnly
                     value={
@@ -99,7 +101,7 @@ export const CalendarFilterSheet = ({
               </PopoverContent>
             </Popover>
             <div className="flex flex-col gap-1">
-              <p className="font-semibold text-base text-high-emphasis">Colors</p>
+              <p className="font-semibold text-base text-high-emphasis">{t('COLORS')}</p>
               <ColorPickerTool selectedColor={selectedColor} onColorChange={setSelectedColor} />
             </div>
           </div>
@@ -117,7 +119,7 @@ export const CalendarFilterSheet = ({
               });
             }}
           >
-            Reset
+            {t('RESET')}
           </Button>
           <Button
             className="w-full sm:w-1/2"
@@ -128,7 +130,7 @@ export const CalendarFilterSheet = ({
               });
             }}
           >
-            Apply
+            {t('APPLY')}
           </Button>
         </div>
       </SheetContent>

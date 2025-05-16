@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import {
@@ -38,6 +39,7 @@ interface AddColumnDialogProps {
 }
 
 export function AddColumnDialog({ onAddColumn }: Readonly<AddColumnDialogProps>) {
+  const { t } = useTranslation();
   const [newColumnTitle, setNewColumnTitle] = useState<string>('');
 
   const handleAddColumn = () => {
@@ -52,16 +54,16 @@ export function AddColumnDialog({ onAddColumn }: Readonly<AddColumnDialogProps>)
       <DialogTrigger asChild>
         <Button variant="secondary" className="flex items-center bg-white hover:bg-white w-80">
           <Plus className="h-4 w-4" />
-          Add List
+          {t('ADD_LIST')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New List</DialogTitle>
+          <DialogTitle>{t('ADD_NEW_LIST')}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
-            placeholder="List title"
+            placeholder={t('LIST_TITLE')}
             value={newColumnTitle}
             onChange={(e) => setNewColumnTitle(e.target.value)}
             className="col-span-3"
@@ -70,11 +72,11 @@ export function AddColumnDialog({ onAddColumn }: Readonly<AddColumnDialogProps>)
         <div className="flex justify-end">
           <DialogClose asChild>
             <Button type="button" variant="outline" className="mr-2">
-              Cancel
+              {t('CANCEL')}
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button onClick={handleAddColumn}>Add List</Button>
+            <Button onClick={handleAddColumn}>{t('ADD_LIST')}</Button>
           </DialogClose>
         </div>
       </DialogContent>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, CartesianGrid, Bar, XAxis, YAxis } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import {
   Select,
@@ -34,24 +35,25 @@ const chartData: DataPoint[] = [
 
 const chartConfig = {
   revenue: {
-    label: 'Revenue',
+    label: 'REVENUE',
     color: 'hsl(var(--secondary-600))',
   },
   expenses: {
-    label: 'Expenses',
+    label: 'EXPENSES',
     color: 'hsl(var(--burgundy-100))',
   },
 };
 
 const timePeriods = [
-  { value: 'this-year', label: 'This year' },
-  { value: 'last-year', label: 'Last year' },
-  { value: 'last-6-months', label: 'Last 6 months' },
-  { value: 'last-3-months', label: 'Last 3 months' },
+  { value: 'this-year', label: 'THIS_YEAR' },
+  { value: 'last-year', label: 'LAST_YEAR' },
+  { value: 'last-6-months', label: 'LAST_SIX_MONTHS' },
+  { value: 'last-3-months', label: 'LAST_THREE_MONTHS' },
 ];
 
 export default function FinanceRevenueExpenseGraph() {
   const [hoveredKey, setHoveredKey] = React.useState<keyof typeof chartConfig | null>(null);
+  const { t } = useTranslation();
 
   return (
     <Card className="w-full md:w-[55%] border-none rounded-[8px] shadow-sm">
@@ -59,21 +61,21 @@ export default function FinanceRevenueExpenseGraph() {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-2xl font-semibold text-high-emphasis">
-              Revenue & expense trend
+              {t('REVENUE_EXPENSE_TREND')}
             </CardTitle>
             <CardDescription className="text-medium-emphasis mt-1">
-              Compare total revenue and expenses across your selected time period.
+              {t('COMPARE_TOTAL_REVENUE_EXPENSES_ACROSS')}
             </CardDescription>
           </div>
           <Select defaultValue="this-year">
             <SelectTrigger className="w-[105px] h-[28px] px-2 py-1">
-              <SelectValue placeholder="This year" />
+              <SelectValue placeholder={t('THIS_YEAR')} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {timePeriods.map((period) => (
                   <SelectItem key={period.value} value={period.value}>
-                    {period.label}
+                    {t(period.label)}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -103,7 +105,7 @@ export default function FinanceRevenueExpenseGraph() {
               axisLine={false}
               stroke="hsl(var(--medium-emphasis))"
               label={{
-                value: 'Amount (CHF)',
+                value: `${t('AMOUNT')} (CHF)`,
                 angle: -90,
                 position: 'insideLeft',
                 style: {
@@ -129,7 +131,7 @@ export default function FinanceRevenueExpenseGraph() {
                 return (
                   <div className="rounded-md bg-neutral-700 p-3 shadow-lg">
                     <p className="text-sm text-white mb-2">
-                      {seriesLabel} ({label}):
+                      {t(seriesLabel)} ({label}):
                     </p>
                     <div className="flex items-center">
                       <span
@@ -172,7 +174,7 @@ export default function FinanceRevenueExpenseGraph() {
           {Object.entries(chartConfig).map(([key, config]) => (
             <div key={key} className="flex items-center gap-2">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: config.color }} />
-              <span className="text-sm text-medium-emphasis">{config.label}</span>
+              <span className="text-sm text-medium-emphasis">{t(config.label)}</span>
             </div>
           ))}
         </div>

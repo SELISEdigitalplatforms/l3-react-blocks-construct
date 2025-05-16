@@ -9,6 +9,7 @@ import { Separator } from 'components/ui/separator';
 import usePopoverWidth from 'hooks/use-popover-width';
 import { Calendar } from 'components/ui/calendar';
 import { DateRange } from 'react-day-picker';
+import { useTranslation } from 'react-i18next';
 
 /**
  * DateRangeFilter Component
@@ -48,6 +49,7 @@ export function DateRangeFilter<TData, TValue>({
   date,
   onDateChange,
 }: Readonly<DateRangeFilterProps<TData, TValue>>) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [buttonRef] = usePopoverWidth();
   const [open, setOpen] = React.useState(false);
@@ -152,7 +154,7 @@ export function DateRangeFilter<TData, TValue>({
           />
           <div className="p-2 border-t">
             <Button variant="ghost" onClick={clearFilter} className="w-full" size="sm">
-              Clear filter
+              {t('CLEAR_FILTER')}
             </Button>
           </div>
         </button>

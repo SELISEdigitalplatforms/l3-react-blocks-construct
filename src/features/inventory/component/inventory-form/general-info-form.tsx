@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Input } from 'components/ui/input';
 import { Label } from 'components/ui/label';
 import {
@@ -80,27 +81,29 @@ export function GeneralInfoForm({
   categoryOptions,
   locationOptions,
 }: GeneralInfoFormProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="itemName">Item name</Label>
+          <Label htmlFor="itemName">{t('ITEM_NAME')}</Label>
           <Input
             id="itemName"
             value={formData.itemName}
             onChange={(e) => handleInputChange('itemName', e.target.value)}
-            placeholder="Enter item name"
+            placeholder={t('ENTER_ITEM_NAME')}
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category">{t('CATEGORY')}</Label>
           <Select
             value={formData.category}
             onValueChange={(value) => handleInputChange('category', value)}
           >
             <SelectTrigger id="category">
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t('SELECT_CATEGORY')} />
             </SelectTrigger>
             <SelectContent>
               {categoryOptions.map((option) => (
@@ -113,23 +116,23 @@ export function GeneralInfoForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="supplier">Supplier</Label>
+          <Label htmlFor="supplier">{t('SUPPLIER')}</Label>
           <Input
             id="supplier"
             value={formData.supplier}
             onChange={(e) => handleInputChange('supplier', e.target.value)}
-            placeholder="Enter supplier"
+            placeholder={t('ENTER_SUPPLIER')}
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="itemLoc">Item location</Label>
+          <Label htmlFor="itemLoc">{t('ITEM_LOCATION')}</Label>
           <Select
             value={formData.itemLoc}
             onValueChange={(value) => handleInputChange('itemLoc', value)}
           >
             <SelectTrigger id="itemLoc">
-              <SelectValue placeholder="Select location" />
+              <SelectValue placeholder={t('SELECT_LOCATION')} />
             </SelectTrigger>
             <SelectContent>
               {locationOptions.map((option) => (
@@ -142,7 +145,7 @@ export function GeneralInfoForm({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label htmlFor="price">Price (CHF)</Label>
+          <Label htmlFor="price">{`${t('PRICE')} (CHF)`}</Label>
           <Input
             id="price"
             value={formData.price}
@@ -150,12 +153,12 @@ export function GeneralInfoForm({
               const numericValue = e.target.value.replace(/[^0-9.]/g, '');
               handleInputChange('price', numericValue);
             }}
-            placeholder="Enter price"
+            placeholder={t('ENTER_PRICE')}
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Status</Label>
+          <Label>{t('STATUS')}</Label>
           <RadioGroup
             value={formData.status}
             onValueChange={(value) => handleInputChange('status', value)}
@@ -164,14 +167,14 @@ export function GeneralInfoForm({
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="active" id="status-active" />
               <Label htmlFor="status-active" className="cursor-pointer">
-                Active
+                {t('ACTIVE')}
               </Label>
             </div>
 
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="discontinued" id="status-discontinued" />
               <Label htmlFor="status-discontinued" className="cursor-pointer">
-                Discontinued
+                {t('DISCONTINUED')}
               </Label>
             </div>
           </RadioGroup>

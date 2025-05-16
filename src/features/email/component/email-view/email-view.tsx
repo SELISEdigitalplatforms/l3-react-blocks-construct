@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { format, parseISO } from 'date-fns';
 import {
   TActiveAction,
   TEmail,
@@ -12,7 +13,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { EmailViewGrid } from './email-view-grid/email-view-grid';
 import { EmailViewMobile } from './email-view-mobile/email-view-mobile';
-import { format, parseISO } from 'date-fns';
 
 /**
  * EmailView Component
@@ -296,7 +296,6 @@ export function EmailView({
       attachments: [],
     });
   };
-
 
   return (
     <>

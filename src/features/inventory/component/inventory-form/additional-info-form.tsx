@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Switch } from 'components/ui/switch';
 import { TagsSelector } from './tags-selector';
 
@@ -67,11 +68,13 @@ export function AdditionalInfoForm({
   tags,
   handleTagToggle,
 }: AdditionalInfoFormProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-high-emphasis font-semibold h-6">Settings</h1>
+      <h1 className="text-high-emphasis font-semibold h-6">{t('SETTINGS')}</h1>
       <div className="flex items-center justify-between">
-        <span className="text-high-emphasis">Eligible for warranty</span>
+        <span className="text-high-emphasis">{t('ELIGIBLE_FOR_WARRANTY')}</span>
         <Switch
           checked={formData.warranty}
           onCheckedChange={(checked) => handleInputChange('warranty', checked)}
@@ -79,7 +82,7 @@ export function AdditionalInfoForm({
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-high-emphasis">Eligible for replacement</span>
+        <span className="text-high-emphasis">{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
         <Switch
           checked={formData.replacement}
           onCheckedChange={(checked) => handleInputChange('replacement', checked)}
@@ -87,7 +90,7 @@ export function AdditionalInfoForm({
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-high-emphasis">Discount</span>
+        <span className="text-high-emphasis">{t('DISCOUNT')}</span>
         <Switch
           checked={formData.discount}
           onCheckedChange={(checked) => handleInputChange('discount', checked)}

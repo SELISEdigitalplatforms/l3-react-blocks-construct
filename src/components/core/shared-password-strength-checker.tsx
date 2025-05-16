@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePasswordStrength } from 'features/auth/hooks/use-password-strength/use-password-strength';
 
 /**
@@ -49,6 +50,7 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
   confirmPassword,
   onRequirementsMet,
 }) => {
+  const { t } = useTranslation();
   const { strength, checks, getStrengthColor, requirements } = usePasswordStrength(password);
   const [passwordsMatch, setPasswordsMatch] = useState(false);
 
@@ -60,7 +62,9 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
 
   return (
     <div className="w-full mx-auto px-6 py-4 rounded-lg shadow-sm border border-primary-50">
-      <h2 className="text-sm font-semibold text-high-emphasis mb-2">Password Requirements</h2>
+      <h2 className="text-sm font-semibold text-high-emphasis mb-2">
+        {t('PASSWORD_REQUIREMENTS')}
+      </h2>
       <div className="h-1 w-full bg-primary-50 rounded mb-2">
         <div
           className={`h-1 rounded-full transition-all duration-300 ${getStrengthColor()}`}
@@ -69,7 +73,7 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
       </div>
 
       <p className="text-medium-emphasis mb-2 text-xs">
-        Your password must meet these requirements:
+        {t('PASSWORD_MUST_MEET_THESE_REQUIREMENTS')}:
       </p>
 
       <ul className="space-y-1 text-medium-emphasis text-xs">
@@ -89,7 +93,7 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
           ) : (
             <X className="w-4 h-4 text-red-500" />
           )}
-          Passwords match
+          {t('PASSWORDS_MATCH')}
         </li>
       </ul>
     </div>

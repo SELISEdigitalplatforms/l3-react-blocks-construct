@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { parse } from 'date-fns';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
-import { parse } from 'date-fns';
 
 /**
  * EditableComment Component
@@ -57,6 +58,7 @@ export function EditableComment({
   const [comment, setComment] = useState(initialComment);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -132,7 +134,7 @@ export function EditableComment({
               className="h-6 p-0 text-xs font-semibold text-primary"
               onClick={() => setIsEditing(true)}
             >
-              Edit
+              {t('EDIT')}
             </Button>
             <Button
               variant="ghost"
@@ -140,7 +142,7 @@ export function EditableComment({
               className="h-6 p-0 text-xs font-semibold text-primary"
               onClick={onDelete}
             >
-              Delete
+              {t('DELETE')}
             </Button>
           </div>
         )}

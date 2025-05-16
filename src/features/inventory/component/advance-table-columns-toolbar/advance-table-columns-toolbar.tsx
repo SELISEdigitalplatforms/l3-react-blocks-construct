@@ -1,9 +1,10 @@
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Papa from 'papaparse';
 import { Download, Plus } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
-import Papa from 'papaparse';
 import { AdvanceTableViewOptions } from '../advance-table-view-options/advance-table-view-options';
 import { Button } from 'components/ui/button';
-import { Link } from 'react-router-dom';
 
 /**
  * A toolbar component for managing table columns, displaying selected row information,
@@ -45,10 +46,11 @@ interface AdvancedTableColumnsToolbarProps<TData> {
 
 export function AdvancedTableColumnsToolbar<TData>({
   table,
-  title,
+  title = 'INVENTORY',
   disabledColumns,
   columnVisibility,
 }: Readonly<AdvancedTableColumnsToolbarProps<TData>>) {
+  const { t } = useTranslation();
   const selectedRows = table.getSelectedRowModel().rows;
   const selectedLength = selectedRows.length;
 
@@ -76,17 +78,18 @@ export function AdvancedTableColumnsToolbar<TData>({
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center text-base text-high-emphasis">
-        <h3 className="text-2xl font-bold tracking-tight">{title}</h3>
+        <h3 className="text-2xl font-bold tracking-tight">{t(title)}</h3>
       </div>
       <div className="flex items-center gap-4">
         {selectedLength ? (
           <div className="flex items-center gap-4">
             <p className="text-medium-emphasis text-sm font-normal">
-              {selectedLength} item{selectedLength > 1 ? '(s)' : ''} selected
+              {selectedLength} {t('ITEM')}
+              {selectedLength > 1 ? '(s)' : ''} {t('SELECTED')}
             </p>
             <Button size="sm" className="text-sm font-bold" onClick={exportCSV}>
               <Download />
-              Export CSV
+              {t('EXPORT_CSV')}
             </Button>
           </div>
         ) : (
@@ -99,7 +102,7 @@ export function AdvancedTableColumnsToolbar<TData>({
         <Link to="/inventory/add">
           <Button size="sm" className="text-sm font-bold">
             <Plus />
-            Add Item
+            {t('ADD_ITEM')}
           </Button>
         </Link>
       </div>

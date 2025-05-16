@@ -19,6 +19,6 @@ import {
  * @module setPasswordForm
  */
 
-export const setPasswordFormValidationSchema = createPasswordValidationSchema();
+export const getSetPasswordFormValidationSchema = (t: (key: string) => string) => createPasswordValidationSchema(t);
 export type setPasswordFormType = PasswordFormType;
 export const setPasswordFormDefaultValue = passwordFormDefaultValues;

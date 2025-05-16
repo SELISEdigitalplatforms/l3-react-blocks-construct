@@ -3,13 +3,13 @@ import { MenuItem } from '../models/sidebar';
 export const menuItems: MenuItem[] = [
   {
     id: 'dashboard',
-    name: 'Dashboard',
+    name: 'DASHBOARD',
     path: '/dashboard',
     icon: 'LayoutDashboard',
   },
   {
     id: 'finance',
-    name: 'Finance',
+    name: 'FINANCE',
     path: '/finance',
     icon: 'ChartNoAxesCombined',
   },
@@ -22,50 +22,50 @@ export const menuItems: MenuItem[] = [
   },
   {
     id: 'inventory',
-    name: 'Inventory',
+    name: 'INVENTORY',
     path: '/inventory',
     icon: 'Store',
   },
   {
     id: 'mail',
-    name: 'Mail',
+    name: 'MAIL',
     path: '/mail/inbox',
     icon: 'Inbox',
   },
   {
     id: 'calendar',
-    name: 'Calendar',
+    name: 'CALENDAR',
     path: '/calendar',
     icon: 'Calendar',
   },
   {
     id: 'activity-log',
-    name: 'Activity log',
+    name: 'ACTIVITY_LOG',
     path: '/activity-log',
     icon: 'FileClock',
   },
   {
     id: 'timeline',
-    name: 'Timeline',
+    name: 'TIMELINE',
     path: '/timeline',
     icon: 'History',
   },
   {
     id: 'task-manager',
-    name: 'Task Manager',
+    name: 'TASK_MANAGER',
     path: '/task-manager',
     icon: 'Presentation',
   },
   {
-    id:'404',
-    name: 'Error 404',
+    id: '404',
+    name: 'ERROR_404',
     path: '/404',
-    icon: 'SearchX'
+    icon: 'SearchX',
   },
   {
-    id:'503',
-    name: 'Error 503',
+    id: '503',
+    name: 'ERROR_503',
     path: '/503',
-    icon: 'TriangleAlert'
-  }
+    icon: 'TriangleAlert',
+  },
 ];

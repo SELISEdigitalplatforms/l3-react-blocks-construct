@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Row } from '@tanstack/react-table';
 import { MoreVertical } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import {
   DropdownMenu,
@@ -55,6 +56,7 @@ export function DataTableRowActions({
   onResetPassword,
   onResendActivation,
 }: Readonly<DataTableRowActionsProps>) {
+  const { t } = useTranslation();
   const user = row.original;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -83,26 +85,26 @@ export function DataTableRowActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={(e) => handleItemClick(onViewDetails, e)}>
-            View details
+            {t('VIEW_DETAILS')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleEditClick}>Edit profile</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEditClick}>{t('EDIT_PROFILE')}</DropdownMenuItem>
           {user.active ? (
             <>
               <DropdownMenuItem onClick={(e) => handleItemClick(onResetPassword, e)}>
-                Reset password
+                {t('RESET_PASSWORD')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) => e.stopPropagation()}
                 disabled
                 className="text-error cursor-not-allowed opacity-50"
               >
-                Deactivate user
+                {t('DEACTIVATE_USER')}
               </DropdownMenuItem>
             </>
           ) : (
             onResendActivation && (
               <DropdownMenuItem onClick={(e) => handleItemClick(onResendActivation, e)}>
-                Resend activation link
+                {t('RESEND_ACTIVATION_LINK')}
               </DropdownMenuItem>
             )
           )}

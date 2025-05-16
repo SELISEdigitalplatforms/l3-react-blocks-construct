@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipTrigger, TooltipContent } from 'components/ui/tooltip';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
@@ -56,6 +57,7 @@ const TooltipConfirmAction: React.FC<TooltipConfirmActionProps> = ({
 }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -72,7 +74,7 @@ const TooltipConfirmAction: React.FC<TooltipConfirmActionProps> = ({
     if (toastDescription) {
       toast({
         variant: 'success',
-        title: 'Success',
+        title: t('SUCCESS'),
         description: toastDescription,
       });
     }

@@ -41,13 +41,11 @@ export interface Tag {
   label: string;
 }
 
-export type AttachmentType = 'pdf' | 'image' | 'other';
-
 export interface Attachment {
   id: string;
   name: string;
   size: string;
-  type: AttachmentType;
+  type: 'pdf' | 'image' | 'other';
 }
 
 export interface Comment {
@@ -210,7 +208,7 @@ const initialTasks: TaskDetails[] = [
         id: '1',
         author: 'Sara Kim',
         timestamp: '21.03.2025, 10:30',
-        text: 'Started working on the visual drafts.',
+        text: 'Started working on the visual draft.',
       },
       {
         id: '2',
@@ -504,7 +502,12 @@ interface TaskContextType {
   reorderTasks: (sourceIndex: number, destinationIndex: number, status?: string) => void;
 
   addComment: (taskId: string, author: string, text: string) => void;
-  addAttachment: (taskId: string, name: string, size: string, type: AttachmentType) => void;
+  addAttachment: (
+    taskId: string,
+    name: string,
+    size: string,
+    type: 'pdf' | 'image' | 'other'
+  ) => void;
   addAssignee: (taskId: string, name: string, avatar: string) => void;
   addTag: (taskId: string, label: string) => void;
 
@@ -526,7 +529,7 @@ interface TaskProviderProps {
 }
 
 export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
-  const [originalTasks, setOriginalTasks] = useState<TaskDetails[]>(initialTasks);
+  const [originalTasks, setOrginalTasks] = useState<TaskDetails[]>(initialTasks);
   const [taskDetails, setTaskDetails] = useState<TaskDetails[]>(initialTasks);
   const [nextTaskId, setNextTaskId] = useState<number>(
     Math.max(...initialTasks.map((task) => parseInt(task.id))) + 1
@@ -648,7 +651,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
       if (!newColumnTasks.find((col) => col.title === status)) {
         newColumnTasks.push({
           id: (newColumnTasks.length + 1).toString(),
-          title: status ?? 'Unknown',
+          title: status || 'Unknown',
           tasks: listTasks.filter((task) => task.status === status),
         });
       }
@@ -662,21 +665,21 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     const id = nextTaskId.toString();
     const newTask: TaskDetails = {
       id,
-      title: task.title ?? 'New Task',
-      mark: task.mark ?? false,
-      section: task.section ?? 'To Do',
-      priority: task.priority ?? '',
-      dueDate: task.dueDate ?? null,
-      assignees: task.assignees ?? [],
-      description: task.description ?? '',
-      tags: task.tags ?? [],
-      attachments: task.attachments ?? [],
-      comments: task.comments ?? [],
-      isCompleted: task.isCompleted ?? false,
+      title: task.title || 'New Task',
+      mark: task.mark || false,
+      section: task.section || 'To Do',
+      priority: task.priority || '',
+      dueDate: task.dueDate || null,
+      assignees: task.assignees || [],
+      description: task.description || '',
+      tags: task.tags || [],
+      attachments: task.attachments || [],
+      comments: task.comments || [],
+      isCompleted: task.isCompleted || false,
     };
 
     setTaskDetails((prev) => [newTask, ...prev]);
-    setOriginalTasks((prev) => [newTask, ...prev]);
+    setOrginalTasks((prev) => [newTask, ...prev]);
     setNextTaskId((prev) => prev + 1);
     return id;
   };
@@ -685,14 +688,14 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     setTaskDetails((prev) =>
       prev.map((task) => (task.id === taskId ? { ...task, ...updates } : task))
     );
-    setOriginalTasks((prev) =>
+    setOrginalTasks((prev) =>
       prev.map((task) => (task.id === taskId ? { ...task, ...updates } : task))
     );
   };
 
   const deleteTask = (taskId: string): void => {
     setTaskDetails((prev) => prev.filter((task) => task.id !== taskId));
-    setOriginalTasks((prev) => prev.filter((task) => task.id !== taskId));
+    setOrginalTasks((prev) => prev.filter((task) => task.id !== taskId));
   };
 
   const updateTaskStatus = (taskId: string, isCompleted: boolean): void => {
@@ -700,7 +703,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
       prev.map((task) => (task.id === taskId ? { ...task, isCompleted } : task))
     );
 
-    setOriginalTasks((prev) =>
+    setOrginalTasks((prev) =>
       prev.map((task) => (task.id === taskId ? { ...task, isCompleted } : task))
     );
   };
@@ -709,7 +712,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     setTaskDetails((prev) =>
       prev.map((task) => (task.id === taskId ? { ...task, section: newStatus } : task))
     );
-    setOriginalTasks((prev) =>
+    setOrginalTasks((prev) =>
       prev.map((task) => (task.id === taskId ? { ...task, section: newStatus } : task))
     );
   };
@@ -732,20 +735,24 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
   };
 
   const updateColumn = (columnId: string, title: string): void => {
-    const oldColumn = columnTasks.find((col) => col.id === columnId);
-    if (!oldColumn) return;
-
-    const oldTitle = oldColumn.title;
-
-    setColumnTasks((prevColumns) =>
-      prevColumns.map((col) => (col.id === columnId ? { ...col, title } : col))
+    setColumnTasks((prev) =>
+      prev.map((column) => (column.id === columnId ? { ...column, title } : column))
     );
 
-    const updateTaskSection = (tasks: any[]) =>
-      tasks.map((task) => (task.section === oldTitle ? { ...task, section: title } : task));
-
-    setTaskDetails((prevTasks) => updateTaskSection(prevTasks));
-    setOriginalTasks((prevTasks) => updateTaskSection(prevTasks));
+    setTaskDetails((prev) =>
+      prev.map((task) =>
+        task.section === columnTasks.find((col) => col.id === columnId)?.title
+          ? { ...task, section: title }
+          : task
+      )
+    );
+    setOrginalTasks((prev) =>
+      prev.map((task) =>
+        task.section === columnTasks.find((col) => col.id === columnId)?.title
+          ? { ...task, section: title }
+          : task
+      )
+    );
   };
 
   const deleteColumn = (columnId: string): void => {
@@ -755,7 +762,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
 
     if (columnTitle) {
       setTaskDetails((prev) => prev.filter((task) => task.section !== columnTitle));
-      setOriginalTasks((prev) => prev.filter((task) => task.section !== columnTitle));
+      setOrginalTasks((prev) => prev.filter((task) => task.section !== columnTitle));
     }
   };
 
@@ -798,7 +805,7 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
     taskId: string,
     name: string,
     size: string,
-    type: AttachmentType
+    type: 'pdf' | 'image' | 'other'
   ): void => {
     setTaskDetails((prev) =>
       prev.map((task) => {
@@ -857,65 +864,59 @@ export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
   };
 
   const removeComment = (taskId: string, commentId: string): void => {
-    const removeCommentFromTask = (task: any) => {
-      if (task.id !== taskId) return task;
-
-      const updatedComments = task.comments.filter((comment: any) => comment.id !== commentId);
-
-      return {
-        ...task,
-        comments: updatedComments,
-      };
-    };
-
-    setTaskDetails((prevTasks) => prevTasks.map(removeCommentFromTask));
+    setTaskDetails((prev) =>
+      prev.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            comments: task.comments.filter((comment) => comment.id !== commentId),
+          };
+        }
+        return task;
+      })
+    );
   };
 
   const removeAttachment = (taskId: string, attachmentId: string): void => {
-    const removeAttachmentFromTask = (task: any) => {
-      if (task.id !== taskId) return task;
-
-      const updatedAttachments = task.attachments.filter(
-        (attachment: any) => attachment.id !== attachmentId
-      );
-
-      return {
-        ...task,
-        attachments: updatedAttachments,
-      };
-    };
-
-    setTaskDetails((prevTasks) => prevTasks.map(removeAttachmentFromTask));
+    setTaskDetails((prev) =>
+      prev.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            attachments: task.attachments.filter((attachment) => attachment.id !== attachmentId),
+          };
+        }
+        return task;
+      })
+    );
   };
 
   const removeAssignee = (taskId: string, assigneeId: string): void => {
-    const removeAssigneeFromTask = (task: any) => {
-      if (task.id !== taskId) return task;
-
-      const updatedAssignees = task.assignees.filter((assignee: any) => assignee.id !== assigneeId);
-
-      return {
-        ...task,
-        assignees: updatedAssignees,
-      };
-    };
-
-    setTaskDetails((prevTasks) => prevTasks.map(removeAssigneeFromTask));
+    setTaskDetails((prev) =>
+      prev.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            assignees: task.assignees.filter((assignee) => assignee.id !== assigneeId),
+          };
+        }
+        return task;
+      })
+    );
   };
 
   const removeTag = (taskId: string, tagId: string): void => {
-    const removeTagFromTask = (task: any) => {
-      if (task.id !== taskId) return task;
-
-      const updatedTags = task.tags.filter((tag: any) => tag.id !== tagId);
-
-      return {
-        ...task,
-        tags: updatedTags,
-      };
-    };
-
-    setTaskDetails((prevTasks) => prevTasks.map(removeTagFromTask));
+    setTaskDetails((prev) =>
+      prev.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            tags: task.tags.filter((tag) => tag.id !== tagId),
+          };
+        }
+        return task;
+      })
+    );
   };
 
   const priorities = Array.from(new Set(originalTasks.map((task) => task.priority))).filter(

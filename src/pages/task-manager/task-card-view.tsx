@@ -52,8 +52,8 @@ import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 // testing from own branch
 
 interface TaskCardViewProps {
-  readonly isNewTaskModalOpen?: boolean;
-  readonly setNewTaskModalOpen: (isOpen: boolean) => void;
+  isNewTaskModalOpen?: boolean;
+  setNewTaskModalOpen: (isOpen: boolean) => void;
 }
 
 export function TaskCardView({ isNewTaskModalOpen, setNewTaskModalOpen }: TaskCardViewProps) {

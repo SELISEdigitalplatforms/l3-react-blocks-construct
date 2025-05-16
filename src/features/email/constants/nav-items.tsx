@@ -1,49 +1,78 @@
 import { Mail, Star, Send, AlertTriangle, Trash2, File } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-export const getNavItems = (emails: any, location: any, navigate: any, setSelectedEmail: any) => {
-  return [
+type NavItem = {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  count: number;
+  isActive?: boolean;
+  onClick?: () => void;
+};
+
+type EmailCounts = {
+  inbox?: any[];
+  starred?: any[];
+  sent?: any[];
+  draft?: any[];
+  spam?: any[];
+  trash?: any[];
+};
+
+export const useNavItems = (
+  emails: EmailCounts,
+  location: { pathname: string },
+  navigate: (path: string) => void,
+  setSelectedEmail: (email: any) => void
+): NavItem[] => {
+  const { t } = useTranslation();
+
+  const items: NavItem[] = [
     {
       icon: <Mail className="h-4 w-4" />,
-      label: 'Inbox',
+      label: t('INBOX'),
       href: '/mail/inbox',
       count: emails['inbox']?.length ?? 0,
     },
     {
       icon: <Star className="h-4 w-4" />,
-      label: 'Starred',
+      label: t('STARRED'),
       href: '/mail/starred',
       count: emails['starred']?.length ?? 0,
     },
 
     {
       icon: <Send className="h-4 w-4" />,
-      label: 'Sent',
+      label: t('SENT'),
       href: '/mail/sent',
       count: emails['sent']?.length ?? 0,
     },
     {
       icon: <File className="h-4 w-4" />,
-      label: 'Draft',
-      href: '/mail/drafts',
-      count: emails['drafts']?.length ?? 0,
+      label: t('DRAFT'),
+      href: '/mail/draft',
+      count: emails['draft']?.length ?? 0,
     },
     {
       icon: <AlertTriangle className="h-4 w-4" />,
-      label: 'Spam',
+      label: t('SPAM'),
       href: '/mail/spam',
       count: emails['spam']?.length ?? 0,
     },
     {
       icon: <Trash2 className="h-4 w-4" />,
-      label: 'Trash',
+      label: t('TRASH'),
       href: '/mail/trash',
       count: emails['trash']?.length ?? 0,
     },
-  ].map((item) => ({
+  ];
+
+  return items.map((item) => ({
     ...item,
     isActive: location.pathname === item.href || location.pathname.startsWith(`${item.href}/`),
     onClick: () => {
-      navigate(item.href), setSelectedEmail(null);
+      navigate(item.href);
+      setSelectedEmail(null);
     },
   }));
 };

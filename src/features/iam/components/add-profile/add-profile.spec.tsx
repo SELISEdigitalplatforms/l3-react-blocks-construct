@@ -48,23 +48,21 @@ describe('AddUser Component', () => {
   test('renders AddUser component correctly', () => {
     renderWithDialog();
 
-    expect(screen.getByText('Add user')).toBeInTheDocument();
-    expect(
-      screen.getByText("Please enter the user's email address to send an invitation.")
-    ).toBeInTheDocument();
+    expect(screen.getByText('ADD_USER')).toBeInTheDocument();
+    expect(screen.getByText('ADD_USER_DESCRIPTION')).toBeInTheDocument();
 
-    expect(screen.getByText('First Name*')).toBeInTheDocument();
-    expect(screen.getByText('Last Name*')).toBeInTheDocument();
-    expect(screen.getByText('Email')).toBeInTheDocument();
+    expect(screen.getByText('FIRST_NAME*')).toBeInTheDocument();
+    expect(screen.getByText('LAST_NAME*')).toBeInTheDocument();
+    expect(screen.getByText('EMAIL')).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Invite User' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'CANCEL' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'INVITE_USER' })).toBeInTheDocument();
   });
 
   test('calls onClose when Cancel button is clicked', () => {
     renderWithDialog();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'CANCEL' }));
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });

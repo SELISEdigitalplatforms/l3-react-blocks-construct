@@ -1,12 +1,13 @@
-import { Button } from 'components/ui/button';
-import { cn } from 'lib/utils';
-import { SquarePen } from 'lucide-react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { SquarePen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { cn } from 'lib/utils';
+import { Button } from 'components/ui/button';
 import { TEmail, TEmailData } from '../../types/email.types';
 import EmailTextEditor from '../email-ui/email-text-editor';
-import { getNavItems } from '../../constants/nav-items';
-import { getLabelItems } from '../../constants/label-items';
+import { useNavItems } from '../../constants/nav-items';
+import { useLabelItems } from '../../constants/label-items';
 
 /**
  * NavItem Component
@@ -38,12 +39,12 @@ import { getLabelItems } from '../../constants/label-items';
  */
 
 interface NavItemProps {
-  icon: JSX.Element;
+  icon: React.ReactNode;
   label: string;
   count?: number;
   isActive?: boolean;
   href: string;
-  onClick: () => void;
+  onClick?: () => void;
   isCollapsedEmailSidebar?: boolean;
 }
 
@@ -78,7 +79,6 @@ function NavItem({ icon, label, count, isActive, isCollapsedEmailSidebar, onClic
     </Button>
   );
 }
-
 
 /**
  * EmailSidebar Component
@@ -125,20 +125,14 @@ export function EmailSidebar({
   const navigate = useNavigate();
   const [isEditModalOpen] = useState(false);
   const [content, setContent] = useState('');
+  const { t } = useTranslation();
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
   };
 
-  const navItems = useMemo(
-    () => getNavItems(emails, location, navigate, setSelectedEmail),
-    [emails, location, navigate, setSelectedEmail]
-  );
-
-  const labelItems = useMemo(
-    () => getLabelItems(location, navigate, setSelectedEmail),
-    [location, navigate, setSelectedEmail]
-  );
+  const navItems = useNavItems(emails, location, navigate, setSelectedEmail);
+  const labelItems = useLabelItems(location, navigate, setSelectedEmail);
 
   return (
     <>
@@ -156,7 +150,7 @@ export function EmailSidebar({
         <div className="flex items-center justify-between px-2 py-4">
           <Button className="flex items-center gap-2 w-full" onClick={handleComposeEmail}>
             <SquarePen size={20} />
-            {!isCollapsedEmailSidebar && <span className="text-base">Compose</span>}
+            {!isCollapsedEmailSidebar && <span className="text-base">{t('COMPOSE')}</span>}
           </Button>
         </div>
 
@@ -168,7 +162,7 @@ export function EmailSidebar({
           {!isCollapsedEmailSidebar && (
             <>
               <h2 className="px-4 py-2 text-[10px] font-semibold uppercase text-medium-emphasis">
-                Labels
+                {t('LABELS')}
               </h2>
               {labelItems.map((item, index) => (
                 <NavItem key={index} {...item} isCollapsedEmailSidebar={isCollapsedEmailSidebar} />
@@ -182,8 +176,8 @@ export function EmailSidebar({
         <EmailTextEditor
           value={content}
           onChange={handleContentChange}
-          submitName="Send"
-          cancelButton="Discard"
+          submitName={t('SEND')}
+          cancelButton={t('DISCARD')}
           showIcons={true}
         />
       )}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Breadcrumb,
   BreadcrumbLink,
@@ -52,6 +53,7 @@ type DynamicBreadcrumbProps = {
 
 const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }) => {
   const location = useLocation();
+  const { t } = useTranslation();
   const pathSegments = location.pathname.split('/').filter((segment) => segment);
 
   const dynamicBreadcrumbs: DynamicBreadcrumbSegment[] = pathSegments.map((_, index) => {
@@ -83,8 +85,10 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
 
           const displayLabel =
             isDynamicSegment && parentTitle
-              ? `${parentTitle} > ${breadcrumb.label.replace(/[[\]]/g, '')}`
-              : title || breadcrumb.label;
+              ? `${t(parentTitle)} > ${t(breadcrumb.label.replace(/[[\]]/g, ''))}`
+              : title
+                ? t(title)
+                : t(breadcrumb.label);
 
           return (
             <React.Fragment key={breadcrumb.href}>

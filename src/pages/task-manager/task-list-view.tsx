@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import {
   DndContext,
   closestCorners,
@@ -17,7 +19,6 @@ import {
   StatusCircle,
   TableHeader,
 } from 'features/task-manager/components/list-view';
-import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
 import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
@@ -50,11 +51,12 @@ import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
 // testing from own branch
 
 export function TaskListView() {
+  const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, getFilteredTasks } = useListTasks();
   const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
   const [activeTask, setActiveTask] = useState<ITask | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
-  const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
+  const [isTaskDetailsModalOpen, setTaskDetailsModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -136,7 +138,7 @@ export function TaskListView() {
 
   const handleTaskClick = (id: string) => {
     setSelectedTaskId(id);
-    setIsTaskDetailsModalOpen(true);
+    setTaskDetailsModalOpen(true);
   };
 
   return (
@@ -145,7 +147,6 @@ export function TaskListView() {
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className="min-w-max">
             <TableHeader />
-
             <DndContext
               sensors={sensors}
               collisionDetection={closestCorners}
@@ -162,7 +163,7 @@ export function TaskListView() {
                     <SortableTaskItem handleTaskClick={handleTaskClick} key={task.id} task={task} />
                   ))
                 ) : (
-                  <div className="text-center p-8 text-gray-500">No tasks to display</div>
+                  <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
                 )}
               </SortableContext>
 
@@ -182,9 +183,9 @@ export function TaskListView() {
           </div>
         </div>
       </div>
-      <Dialog open={isTaskDetailsModalOpen} onOpenChange={setIsTaskDetailsModalOpen}>
+      <Dialog open={isTaskDetailsModalOpen} onOpenChange={setTaskDetailsModalOpen}>
         {isTaskDetailsModalOpen && (
-          <TaskDetailsView taskId={selectedTaskId} onClose={() => setIsTaskDetailsModalOpen(false)} />
+          <TaskDetailsView taskId={selectedTaskId} onClose={() => setTaskDetailsModalOpen(false)} />
         )}
       </Dialog>
     </div>

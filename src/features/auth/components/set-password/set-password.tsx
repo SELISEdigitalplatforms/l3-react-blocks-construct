@@ -1,7 +1,8 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BasePasswordForm } from 'components/blocks/base-password-form/base-password-form';
 import { useAccountActivation } from '../../hooks/use-auth';
-import { setPasswordFormDefaultValue, setPasswordFormValidationSchema } from './utils';
-import { useState } from 'react';
+import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from './utils';
 
 /**
  * SetPasswordForm Component
@@ -31,6 +32,7 @@ import { useState } from 'react';
  */
 
 export const SetpasswordForm = ({ code }: { code: string }) => {
+  const { t } = useTranslation();
   const { isPending, mutateAsync } = useAccountActivation();
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
 
@@ -57,7 +59,7 @@ export const SetpasswordForm = ({ code }: { code: string }) => {
     <BasePasswordForm
       code={code}
       onSubmit={handleSubmit}
-      validationSchema={setPasswordFormValidationSchema}
+      validationSchema={getSetPasswordFormValidationSchema(t)}
       defaultValues={setPasswordFormDefaultValue}
       isPending={isPending}
       isCaptchaValid={isCaptchaValid}

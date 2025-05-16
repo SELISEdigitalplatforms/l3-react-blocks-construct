@@ -1,5 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { CalendarClock, CalendarIcon, Trash, ChevronDown } from 'lucide-react';
@@ -91,6 +92,7 @@ export function EditEvent({
   onDelete,
 }: Readonly<EditEventProps>) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [initialEventData] = useState<CalendarEvent>(() => {
     if (typeof window !== 'undefined') {
       const saved = window.localStorage.getItem('tempEditEvent');
@@ -227,8 +229,8 @@ export function EditEvent({
 
     const evts = recurringEvents.length > 0 ? recurringEvents : initialEventData.events || [];
     const targetDate = evts.length > 0 ? new Date(evts[0].start) : startDate;
-    return `Occurs on ${WEEK_DAYS[targetDate.getDay()]}`;
-  }, [form, recurringEvents, initialEventData.events, startDate]);
+    return `${t('OCCURS_ON')} ${WEEK_DAYS[targetDate.getDay()]}`;
+  }, [form, recurringEvents, initialEventData.events, startDate, t]);
 
   const handleClose = () => {
     window.localStorage.removeItem('tempEditEvent');
@@ -346,8 +348,8 @@ export function EditEvent({
       if (!startDateTime || !endDateTime) {
         toast({
           variant: 'destructive',
-          title: 'Invalid Date/Time',
-          description: 'Please select valid start and end times.',
+          title: t('INVALID_DATE_TIME'),
+          description: t('PLEASE_SELECT_VALID_START_END_TIMES'),
         });
         return;
       }
@@ -399,8 +401,8 @@ export function EditEvent({
       console.error('Error submitting form:', error);
       toast({
         variant: 'destructive',
-        title: 'Error Saving Event',
-        description: 'There was an error saving your event. Please try again.',
+        title: t('ERROR_SAVING_EVENT'),
+        description: t('ERROR_SAVING_YOUR_EVENT'),
       });
     }
   };
@@ -419,8 +421,8 @@ export function EditEvent({
     setShowDeleteDialog(false);
     toast({
       variant: 'success',
-      title: 'Event Deleted Successfully',
-      description: 'The event has been removed from your calendar.',
+      title: t('EVENT_DELETED_SUCCESSFULLY'),
+      description: t('EVENT_REMOVED_FROM_YOUR_CALENDAR'),
     });
   };
 
@@ -478,7 +480,7 @@ export function EditEvent({
       <Dialog open={true} onOpenChange={handleClose}>
         <DialogContent className="w-full sm:max-w-[720px] max-h-[96vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Event</DialogTitle>
+            <DialogTitle>{t('EDIT_EVENT')}</DialogTitle>
             <DialogDescription />
           </DialogHeader>
           <Form {...form}>
@@ -488,9 +490,9 @@ export function EditEvent({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-normal text-sm">Title*</FormLabel>
+                    <FormLabel className="font-normal text-sm">{t('TITLE')}*</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter event title" {...field} />
+                      <Input placeholder={t('ENTER_EVENT_TITLE')} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -500,9 +502,9 @@ export function EditEvent({
                 name="meetingLink"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-normal text-sm">Meeting Link</FormLabel>
+                    <FormLabel className="font-normal text-sm">{t('MEETING_LINK')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your meeting link" {...field} />
+                      <Input placeholder={t('ENTER_YOUR_MEETING_LINK')} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -512,7 +514,7 @@ export function EditEvent({
                 name="members"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-normal text-sm">Participants</FormLabel>
+                    <FormLabel className="font-normal text-sm">{t('PARTICIPANTS')}</FormLabel>
                     <EventParticipant
                       selected={field.value ?? []}
                       editMembers={initialEventData.resource?.members}
@@ -525,7 +527,7 @@ export function EditEvent({
                 <div className="flex gap-4 w-full sm:w-[60%]">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-[6px]">
-                      <Label className="font-normal text-sm">Start date</Label>
+                      <Label className="font-normal text-sm">{t('START_DATE')}</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <div className="relative">
@@ -548,7 +550,7 @@ export function EditEvent({
                     </div>
                     {!isAllDay && (
                       <div className="flex flex-col gap-[6px]">
-                        <Label className="font-normal text-sm">Start time</Label>
+                        <Label className="font-normal text-sm">{t('START_TIME')}</Label>
                         <Popover
                           modal={true}
                           open={isStartTimeOpen}
@@ -599,7 +601,7 @@ export function EditEvent({
                       </div>
                     )}
                     <div className="flex flex-col gap-[6px]">
-                      <Label className="font-normal text-sm">End date</Label>
+                      <Label className="font-normal text-sm">{t('END_DATE')}</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <div className="relative">
@@ -622,7 +624,7 @@ export function EditEvent({
                     </div>
                     {!isAllDay && (
                       <div className="flex flex-col gap-[6px]">
-                        <Label className="font-normal text-sm">End time</Label>
+                        <Label className="font-normal text-sm">{t('END_TIME')}</Label>
                         <Popover
                           modal={true}
                           open={isEndTimeOpen}
@@ -681,7 +683,7 @@ export function EditEvent({
                     render={({ field }) => (
                       <div className="flex items-center gap-4">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        <Label>All day</Label>
+                        <Label>{t('ALL_DAY')}</Label>
                       </div>
                     )}
                   />
@@ -712,7 +714,7 @@ export function EditEvent({
                             }
                           }}
                         />
-                        <Label>Recurring Event</Label>
+                        <Label>{t('RECURRING_EVENT')}</Label>
                       </div>
                     )}
                   />
@@ -765,7 +767,7 @@ export function EditEvent({
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <p className="font-semibold text-base text-high-emphasis">Description</p>
+                <p className="font-semibold text-base text-high-emphasis">{t('DESCRIPTION')}</p>
                 <div className="flex flex-col flex-1">
                   <CustomTextEditor
                     value={editorContent}
@@ -779,7 +781,7 @@ export function EditEvent({
                 name="color"
                 render={({ field }) => (
                   <div className="flex flex-col gap-1">
-                    <p className="font-semibold text-base text-high-emphasis">Colors</p>
+                    <p className="font-semibold text-base text-high-emphasis">{t('COLORS')}</p>
                     <ColorPickerTool selectedColor={field.value} onColorChange={field.onChange} />
                   </div>
                 )}
@@ -790,9 +792,9 @@ export function EditEvent({
                 </Button>
                 <div className="flex gap-4">
                   <Button variant="outline" type="button" onClick={handleClose}>
-                    Discard
+                    {t('DISCARD')}
                   </Button>
-                  <Button type="submit">Save</Button>
+                  <Button type="submit">{t('SAVE')}</Button>
                 </div>
               </div>
             </form>
@@ -802,12 +804,12 @@ export function EditEvent({
       <ConfirmationModal
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        title="Delete Event"
+        title={t('DELETE_EVENT')}
         description={
           <>
-            Are you sure you want to delete the event:{' '}
-            <span className="font-semibold text-high-emphasis">{initialEventData.title}</span>? This
-            action cannot be undone.
+            {t('ARE_YOU_SURE_WANT_DELETE_EVENT')}{' '}
+            <span className="font-semibold text-high-emphasis">{initialEventData.title}</span>?{' '}
+            {t('THIS_ACTION_CANNOT_UNDONE')}
           </>
         }
         onConfirm={handleDeleteConfirm}

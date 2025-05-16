@@ -1,4 +1,5 @@
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Trash, Plus } from 'lucide-react';
 
@@ -36,8 +37,14 @@ interface ImageUploaderProps {
   readonly maxImages?: number;
 }
 
-export function ImageUploader({ images, onAddImages, onDeleteImage, maxImages = 5 }: ImageUploaderProps) {
+export function ImageUploader({
+  images,
+  onAddImages,
+  onDeleteImage,
+  maxImages = 5,
+}: ImageUploaderProps) {
   const inputId = 'image-upload-input';
+  const { t } = useTranslation();
 
   const onDrop = (acceptedFiles: File[]) => {
     const remainingSlots = maxImages - images.length;
@@ -56,15 +63,21 @@ export function ImageUploader({ images, onAddImages, onDeleteImage, maxImages = 
 
   return (
     <div className="flex flex-col gap-2 w-full mt-4">
-      <label htmlFor={inputId} className="text-base font-semibold">Image upload</label>
+      <label htmlFor={inputId} className="text-base font-semibold">
+        {t('IMAGE_UPLOAD')}
+      </label>
       <div className="text-xs text-gray-500 mb-2">
-        *.jpg *.jpeg files up to 200KB, minimum size 400x400px, with a maximum of {maxImages} uploads.
+        {t('FILE_FORMAT_AND_SIZE')}, {t('WITH_MAXIMUM_OF')}: {maxImages} {t('UPLOADS')}
       </div>
       <div className="flex w-full items-center gap-4">
         {images.map((img) => (
           <div key={img} className="relative">
-            <Button onClick={() => onDeleteImage(img)} variant="ghost" size="icon"
-              className="absolute -top-2 -right-2 text-red-500 bg-white rounded-full w-6 h-6 border">
+            <Button
+              onClick={() => onDeleteImage(img)}
+              variant="ghost"
+              size="icon"
+              className="absolute -top-2 -right-2 text-red-500 bg-white rounded-full w-6 h-6 border"
+            >
               <Trash className="w-4 h-4" />
             </Button>
             <div className="border rounded-md w-32 h-12 overflow-hidden">
@@ -73,7 +86,10 @@ export function ImageUploader({ images, onAddImages, onDeleteImage, maxImages = 
           </div>
         ))}
         {images.length < maxImages && (
-          <div {...getRootProps()} className="border border-dashed rounded-md w-32 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer">
+          <div
+            {...getRootProps()}
+            className="border border-dashed rounded-md w-32 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+          >
             <input id={inputId} {...getInputProps()} />
             <Plus className="text-gray-500" />
           </div>

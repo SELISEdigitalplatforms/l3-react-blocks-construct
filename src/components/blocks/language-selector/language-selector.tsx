@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useLanguageContext } from '../../../i18n/language-context';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useLanguageContext } from '../../../i18n/language-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,7 @@ import {
  */
 
 function LanguageSelector() {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { currentLanguage, setLanguage, availableLanguages, isLoading } = useLanguageContext();
 
@@ -53,9 +55,9 @@ function LanguageSelector() {
 
       <DropdownMenuContent align="end">
         {isLoading ? (
-          <DropdownMenuItem disabled>Loading languages...</DropdownMenuItem>
+          <DropdownMenuItem disabled>{t('LOADING_LANGUAGES')}...</DropdownMenuItem>
         ) : !availableLanguages || availableLanguages.length === 0 ? (
-          <DropdownMenuItem disabled>Please login first to access the languages</DropdownMenuItem>
+          <DropdownMenuItem disabled>{t('PLEASE_LOGIN_FIRST_ACCESS_LANGUAGES')}</DropdownMenuItem>
         ) : availableLanguages && availableLanguages.length > 0 ? (
           availableLanguages.map((lang, i) => (
             <div key={lang.itemId}>
@@ -69,7 +71,7 @@ function LanguageSelector() {
             </div>
           ))
         ) : (
-          <DropdownMenuItem disabled>No languages available</DropdownMenuItem>
+          <DropdownMenuItem disabled>{t('NO_LANGUAGES_AVAILABLE')}</DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

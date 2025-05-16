@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import {
@@ -57,6 +58,7 @@ interface AddTaskDialogProps {
 export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<AddTaskDialogProps>) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [selectedColumnId, setSelectedColumnId] = useState(activeColumn ?? '1');
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (activeColumn) {
@@ -75,17 +77,17 @@ export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<Add
     <Dialog>
       <DialogTrigger id="add-task-dialog-trigger" asChild>
         <Button variant="ghost" className="hidden">
-          Add Task
+          {t('ADD_TASK')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Task</DialogTitle>
+          <DialogTitle>{t('ADD_NEW_TASK')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Input
-              placeholder="Task title"
+              placeholder={t('TASK_TITLE')}
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               className="w-full"
@@ -95,7 +97,7 @@ export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<Add
           <div className="space-y-2">
             <Select value={selectedColumnId} onValueChange={(value) => setSelectedColumnId(value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select column" />
+                <SelectValue placeholder={t('SELECT_COLUMN')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -111,10 +113,10 @@ export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<Add
         </div>
         <div className="flex gap-2 justify-end">
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">{t('CANCEL')}</Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button onClick={handleAddTask}>Add Task</Button>
+            <Button onClick={handleAddTask}>{t('ADD_TASK')}</Button>
           </DialogClose>
         </div>
       </DialogContent>

@@ -18,6 +18,6 @@ import {
  * @module resetPasswordForm
  */
 
-export const resetPasswordFormValidationSchema = createPasswordValidationSchema();
+export const getResetPasswordFormValidationSchema = (t: (key: string) => string) => createPasswordValidationSchema(t);
 export type resetPasswordFormType = PasswordFormType;
 export const resetPasswordFormDefaultValue = passwordFormDefaultValues;

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
-import { signupFormDefaultValue, signupFormType, signupFormValidationSchema } from './utils';
+import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema } from './utils';
 import { UCheckbox } from 'components/core/uCheckbox';
 import { Captcha } from 'features/captcha';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,7 @@ export const SignupForm = () => {
 
   const form = useForm<signupFormType>({
     defaultValues: signupFormDefaultValue,
-    resolver: zodResolver(signupFormValidationSchema),
+    resolver: zodResolver(getSignupFormValidationSchema(t)),
   });
 
   const handleCaptchaVerify = (token: SetStateAction<string>) => {

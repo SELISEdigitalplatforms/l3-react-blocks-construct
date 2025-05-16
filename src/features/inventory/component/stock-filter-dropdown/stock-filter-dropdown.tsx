@@ -1,4 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Input } from 'components/ui/input';
 import { Updater } from '@tanstack/react-table';
 import {
@@ -39,6 +40,7 @@ const StockFilterDropdown = forwardRef<
   { clearFilter: VoidFunction },
   Readonly<StockFilterDropdownProps>
 >(({ setFilterValue }, ref) => {
+  const { t } = useTranslation();
   const [openStockDropdown, setOpenStockDropdown] = useState(false);
   const [stockAmount, setStockAmount] = useState('0');
   const [stockFilter, setStockFilter] = useState('');
@@ -105,15 +107,15 @@ const StockFilterDropdown = forwardRef<
           ))}
         </RadioGroup>
         <div className="flex flex-col gap-1">
-          <Label className="text-sm font-normal">Amount</Label>
+          <Label className="text-sm font-normal">{t('AMOUNT')}</Label>
           <Input
             value={stockAmount}
             onChange={handleAmountChange}
-            placeholder="Enter stock amount"
+            placeholder={t('ENTER_STOCK_AMOUNT')}
           />
         </div>
         <Button variant="ghost" className="w-full" size="sm" onClick={handleClearFilter}>
-          Clear filter
+          {t('CLEAR_FILTER')}
         </Button>
       </DropdownMenuContent>
     </DropdownMenu>

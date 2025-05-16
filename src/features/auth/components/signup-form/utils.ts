@@ -14,11 +14,11 @@ import { z } from 'zod';
  * @module signupForm
  */
 
-export const signupFormValidationSchema = z.object({
-  username: z.string().min(1, "user name can't be empty"),
+export const getSignupFormValidationSchema = (t: (key: string) => string) => z.object({
+  username: z.string().min(1, { message: t('USER_NAME_CANT_EMPTY') }),
 });
 
-export type signupFormType = z.infer<typeof signupFormValidationSchema>;
+export type signupFormType = z.infer<ReturnType<typeof getSignupFormValidationSchema>>;
 
 export const signupFormDefaultValue: signupFormType = {
   username: '',

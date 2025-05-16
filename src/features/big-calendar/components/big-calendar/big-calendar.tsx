@@ -10,6 +10,8 @@ import {
   SlotPropGetter,
   SlotInfo,
 } from 'react-big-calendar';
+import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { EventInteractionArgs } from 'react-big-calendar/lib/addons/dragAndDrop';
@@ -23,7 +25,6 @@ import { CalendarEvent } from '../../types/calendar-event.types';
 import { getTextColorClassFromBg } from '../../utils/date-utils';
 import { useCalendarSettings } from '../../contexts/calendar-settings.context';
 import './big-calendar.css';
-import { format } from 'date-fns';
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -81,6 +82,7 @@ export function BigCalendar({
   const [view, setView] = useState<View>(Views.MONTH);
   const { settings } = useCalendarSettings();
   const calendarRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if ((view === Views.DAY || view === Views.WEEK) && calendarRef.current) {
@@ -190,7 +192,7 @@ export function BigCalendar({
           } as any
         }
         messages={{
-          noEventsInRange: 'No scheduled events for this time period.',
+          noEventsInRange: t('NO_SCHEDULED_EVENTS_TIME_PERIOD'),
           showMore: (count: number, remainingEvents: object[]) => (
             <ShowMorePopup count={count} remainingEvents={remainingEvents as CalendarEvent[]} />
           ),

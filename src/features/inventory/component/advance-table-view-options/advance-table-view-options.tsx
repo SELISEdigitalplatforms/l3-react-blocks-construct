@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Table } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 import { Settings2 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import {
@@ -51,6 +52,7 @@ export function AdvanceTableViewOptions<TData>({
   disabledColumns = [],
   columnVisibility = {},
 }: Readonly<AdvanceTableViewOptionsProps<TData>>) {
+  const { t } = useTranslation();
   const [allChecked, setAllChecked] = useState(
     table.getAllColumns().every((column) => column.getIsVisible() || !column.getCanHide())
   );
@@ -78,7 +80,7 @@ export function AdvanceTableViewOptions<TData>({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="ml-auto h-8 text-sm font-bold">
           <Settings2 />
-          Columns
+          {t('COLUMNS')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[180px] p-2">
@@ -88,7 +90,7 @@ export function AdvanceTableViewOptions<TData>({
             checked={allChecked}
             onCheckedChange={handleToggleAll}
           />
-          <Label className="text-base font-normal text-high-emphasis">Select all</Label>
+          <Label className="text-base font-normal text-high-emphasis">{t('SELECT_ALL')}</Label>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
@@ -109,7 +111,7 @@ export function AdvanceTableViewOptions<TData>({
                 <Label
                   className={`text-base font-normal text-high-emphasis ${isDisabled && 'text-low-emphasis'}`}
                 >
-                  {(column.columnDef.meta as string) || column.id}
+                  {t((column.columnDef.meta as string).toUpperCase())}
                 </Label>
               </div>
             );

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   forgotPasswordFormDefaultValue,
   forgotPasswordFormType,
-  forgotPasswordFormValidationSchema,
+  getForgotPasswordFormValidationSchema,
 } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
@@ -46,12 +46,12 @@ import { useTranslation } from 'react-i18next';
 
 export const ForgotpasswordForm = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const form = useForm<forgotPasswordFormType>({
     defaultValues: forgotPasswordFormDefaultValue,
-    resolver: zodResolver(forgotPasswordFormValidationSchema),
+    resolver: zodResolver(getForgotPasswordFormValidationSchema(t)),
   });
   const { isPending, mutateAsync } = useForgotPassword();
-  const { t } = useTranslation();
 
   const captchaRef = useRef<CaptchaRef>(null);
 

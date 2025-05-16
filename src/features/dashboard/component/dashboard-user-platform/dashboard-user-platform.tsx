@@ -10,14 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from 'components/ui/chart';
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip } from 'components/ui/chart';
 import { monthsOfYear, pieChartConfig, pieChartData } from '../../services/dashboard-service';
+import { useTranslation } from 'react-i18next';
 
 /**
  * DashboardUserPlatform component displays a pie chart of users by platform and provides a selection
@@ -33,6 +28,8 @@ import { monthsOfYear, pieChartConfig, pieChartData } from '../../services/dashb
  */
 
 export const DashboardUserPlatform = () => {
+  const { t } = useTranslation();
+
   const totalUsers = useMemo(() => {
     return pieChartData.reduce((acc, curr) => acc + curr.users, 0);
   }, []);
@@ -42,7 +39,7 @@ export const DashboardUserPlatform = () => {
       return (
         <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
           <tspan x={viewBox.cx} y={(viewBox.cy ?? 0) + 24} className="fill-muted-foreground">
-            Total
+            {t('TOTAL')}
           </tspan>
           <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-3xl font-bold">
             {totalUsers.toLocaleString()}
@@ -53,20 +50,31 @@ export const DashboardUserPlatform = () => {
     return null;
   };
 
+  const translatedConfig = useMemo(() => {
+    return {
+      ...pieChartConfig,
+      users: { ...pieChartConfig.users, label: t(pieChartConfig.users.label) },
+      windows: { ...pieChartConfig.windows, label: t(pieChartConfig.windows.label) },
+      mac: { ...pieChartConfig.mac, label: t(pieChartConfig.mac.label) },
+      ios: { ...pieChartConfig.ios, label: t(pieChartConfig.ios.label) },
+      android: { ...pieChartConfig.android, label: t(pieChartConfig.android.label) },
+    };
+  }, [t]);
+
   return (
     <Card className="w-full md:w-[40%] border-none rounded-[8px] shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl text-high-emphasis">Users by platform</CardTitle>
+          <CardTitle className="text-xl text-high-emphasis">{t('USER_BY_PLATFORM')}</CardTitle>
           <Select>
             <SelectTrigger className="w-[120px] h-[28px] px-2 py-1">
-              <SelectValue placeholder="This month" />
+              <SelectValue placeholder={t('THIS_MONTH')} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {monthsOfYear.map((month) => (
                   <SelectItem key={month.value} value={month.value}>
-                    {month.label}
+                    {t(month.label)}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -76,9 +84,25 @@ export const DashboardUserPlatform = () => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <ChartContainer config={pieChartConfig} className="mx-auto aspect-square max-h-[250px]">
+        <ChartContainer config={translatedConfig} className="mx-auto aspect-square max-h-[250px]">
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              cursor={false}
+              content={({ payload }) => {
+                if (payload && payload[0]) {
+                  const data = payload[0].payload;
+                  return (
+                    <div className="flex flex-col gap-1 bg-white p-2 shadow-md rounded-[4px]">
+                      <p className="text-sm text-high-emphasis">{t(data.devices.toUpperCase())}:</p>
+                      <p className="text-sm font-semibold text-medium-emphasis">
+                        {data.users.toLocaleString()} {t('USERS')}
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
             <ChartLegend content={<ChartLegendContent />} />
             <Pie
               data={pieChartData}

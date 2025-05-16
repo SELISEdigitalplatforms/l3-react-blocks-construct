@@ -1,8 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { SetStateAction, useState } from 'react';
-
-import { signinFormDefaultValue, signinFormType, signinFormValidationSchema } from './utils';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { signinFormDefaultValue, signinFormType, getSigninFormValidationSchema } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
 import { Input } from 'components/ui/input';
@@ -14,7 +14,6 @@ import { useToast } from 'hooks/use-toast';
 import { useSigninMutation } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
 import { SignInResponse } from '../../services/auth.service';
-import { useTranslation } from 'react-i18next';
 
 /**
  * SigninForm Component
@@ -50,20 +49,20 @@ import { useTranslation } from 'react-i18next';
 
 export const SigninForm = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { login } = useAuthStore();
   const { toast } = useToast();
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
   const googleSiteKey = process.env.REACT_APP_GOOGLE_SITE_KEY ?? '';
-  const { t } = useTranslation();
 
   // Check if captcha is enabled (site key is not empty)
   const captchaEnabled = googleSiteKey !== '';
 
   const form = useForm({
     defaultValues: signinFormDefaultValue,
-    resolver: zodResolver(signinFormValidationSchema),
+    resolver: zodResolver(getSigninFormValidationSchema(t)),
   });
 
   const { isPending, mutateAsync, isError, errorDetails } = useSigninMutation();

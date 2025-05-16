@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import clsx from 'clsx';
 import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from 'react-i18next';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -133,6 +134,7 @@ export function AdvanceDataTable<TData, TValue>({
   const [expanded, setExpanded] = useState({});
   const { isMobile } = useSidebar();
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(columnPinningConfig);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setColumnPinning(() => ({
@@ -203,7 +205,7 @@ export function AdvanceDataTable<TData, TValue>({
   const renderErrorRow = (error: Error | null) => (
     <TableRow>
       <TableCell colSpan={columns.length} className="h-24 text-center text-error">
-        {error ? `Error loading data: ${error.message}` : 'Unknown error occurred.'}
+        {error ? `${t('ERROR_LOADING_DATA')} ${error.message}` : `${t('UNKNOWN_ERROR_OCCURRED')}`}
       </TableCell>
     </TableRow>
   );
@@ -211,7 +213,7 @@ export function AdvanceDataTable<TData, TValue>({
   const renderNoResultFound = () => (
     <TableRow>
       <TableCell colSpan={columns.length} className="h-24 text-center">
-        No results found.
+        {t('NO_RESULTS_FOUND')}
       </TableCell>
     </TableRow>
   );

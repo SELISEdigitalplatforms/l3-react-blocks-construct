@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Sheet,
   SheetContent,
@@ -54,6 +55,7 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { mutateAsync: resetPassword } = useForgotPassword();
   const { mutateAsync: resendActivation } = useResendActivation();
+  const { t } = useTranslation();
 
   const handleConfirmResetPassword = async () => {
     if (!selectedUser) return;
@@ -135,7 +137,7 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                     <span
                       className={`text-sm ${selectedUser?.active ? 'text-success' : 'text-error'}`}
                     >
-                      {selectedUser?.active ? 'Active' : 'Inactive'}
+                      {selectedUser?.active ? t('ACTIVE') : t('INACTIVE')}
                     </span>
                   </div>
                 </div>
@@ -145,7 +147,9 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
             {selectedUser && (
               <div className="space-y-6">
                 <div className="flex items-center space-x-4">
-                  <div className="text-base font-thin text-medium-emphasis w-24">Role(s)</div>
+                  <div className="text-base font-thin text-medium-emphasis w-24">
+                    {t('IAM_ROLES')}
+                  </div>
                   <div className="flex items-start gap-2">
                     <User className="w-5 h-5 text-high-emphasis mt-0.5" />
                     <div className="text-base font-normal text-high-emphasis first-letter:uppercase">
@@ -157,7 +161,9 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="text-base font-thin text-medium-emphasis w-24">Mobile no.</div>
+                  <div className="text-base font-thin text-medium-emphasis w-24">
+                    {t('MOBILE_NO')}
+                  </div>
                   <div className="flex items-center gap-2">
                     <Phone className="w-5 h-5 text-high-emphasis" />
                     <div className="text-base font-normal text-high-emphasis">
@@ -167,7 +173,7 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="text-base font-thin text-medium-emphasis w-24">Email</div>
+                  <div className="text-base font-thin text-medium-emphasis w-24">{t('EMAIL')}</div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <Mail className="w-5 h-5 text-high-emphasis shrink-0" />
@@ -179,7 +185,9 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="text-base font-thin text-medium-emphasis w-24">Joined on</div>
+                  <div className="text-base font-thin text-medium-emphasis w-24">
+                    {t('JOINED_ON')}
+                  </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-high-emphasis" />
                     <div className="text-base font-normal text-high-emphasis">
@@ -189,7 +197,9 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="text-base font-thin text-medium-emphasis w-24">Last log in</div>
+                  <div className="text-base font-thin text-medium-emphasis w-24">
+                    {t('LAST_LOGIN')}
+                  </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-high-emphasis" />
                     <div className="text-base font-normal text-high-emphasis">
@@ -199,11 +209,11 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="text-base font-thin text-medium-emphasis w-24">MFA</div>
+                  <div className="text-base font-thin text-medium-emphasis w-24">{t('MFA')}</div>
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-high-emphasis" />
                     <div className="text-base font-normal text-high-emphasis">
-                      {selectedUser.mfaEnabled ? 'Enabled' : 'Disabled'}
+                      {selectedUser.mfaEnabled ? t('ENABLED') : t('DISABLED')}
                     </div>
                   </div>
                 </div>
@@ -213,12 +223,12 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
 
           <div className="flex w-full flex-col gap-2">
             <Button size="default" className="w-full h-9" onClick={handleEditClick}>
-              Edit
+              {t('EDIT')}
             </Button>
 
             <div className="flex w-full flex-col sm:flex-row gap-4">
               <Button variant="outline" className="w-full" onClick={() => handleButtonClick()}>
-                {selectedUser?.active ? 'Reset Password' : 'Resend Activation Link'}
+                {selectedUser?.active ? t('RESET_PASSWORD') : t('RESEND_ACTIVATION_LINK')}
               </Button>
               {selectedUser?.active && (
                 <Button
@@ -226,7 +236,7 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
                   className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
                   onClick={() => {}}
                 >
-                  Deactivate User
+                  {t('DEACTIVATE_USER')}
                 </Button>
               )}
             </div>
@@ -237,15 +247,15 @@ export const UserDetails = ({ open, onOpenChange, selectedUser }: UserDetailsShe
       <ConfirmationModal
         open={isResetPasswordModalOpen}
         onOpenChange={setIsResetPasswordModalOpen}
-        title="Reset password for this user?"
-        description={`Resetting the password for ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email}) will send a password reset email to the user. Are you sure you want to proceed?`}
+        title={t('RESET_PASSWORD_FOR_USER')}
+        description={`${t('RESETTING_PASSWORD_FOR')} ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email}) ${t('WILL_SEND_PASSWORD_RESET_EMAIL')}`}
         onConfirm={handleConfirmResetPassword}
       />
       <ConfirmationModal
         open={isResendActivationModalOpen}
         onOpenChange={setIsResendActivationModalOpen}
-        title="Activate this user?"
-        description={`Activating the user ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email}) will restore their access. Are you sure you want to proceed?`}
+        title={t('ACTIVATE_THIS_USER')}
+        description={`${t('ACTIVATING_THE_USER')} ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email}) ${t('WILL_RESTORE_THEIR_ACCESS')}`}
         onConfirm={handleConfirmActivation}
       />
 

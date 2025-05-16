@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import {
   Select,
@@ -48,10 +49,10 @@ const chartData = [
 
 // Time period options
 const timePeriods = [
-  { value: 'this-year', label: 'This year' },
-  { value: 'last-year', label: 'Last year' },
-  { value: 'last-6-months', label: 'Last 6 months' },
-  { value: 'last-3-months', label: 'Last 3 months' },
+  { value: 'this-year', label: 'THIS_YEAR' },
+  { value: 'last-year', label: 'LAST_YEAR' },
+  { value: 'last-6-months', label: 'LAST_SIX_MONTHS' },
+  { value: 'last-3-months', label: 'LAST_THREE_MONTHS' },
 ];
 
 interface TooltipProps {
@@ -72,27 +73,29 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
 };
 
 export default function FinanceProfitOverviewGraph() {
+  const { t } = useTranslation();
+
   return (
     <Card className="w-full md:w-[45%] border-none rounded-[8px] shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-2xl font-semibold text-high-emphasis">
-              Profit overview
+              {t('PROFIT_OVERVIEW')}
             </CardTitle>
             <CardDescription className="text-medium-emphasis mt-1">
-              Monitor your profit trends for better financial insight.
+              {t('MONITOR_YOUR_PROFIT_TRENDS')}
             </CardDescription>
           </div>
           <Select defaultValue="this-year">
             <SelectTrigger className="w-[105px] h-[28px] px-2 py-1">
-              <SelectValue placeholder="This year" />
+              <SelectValue placeholder={t('THIS_YEAR')} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {timePeriods.map((period) => (
                   <SelectItem key={period.value} value={period.value}>
-                    {period.label}
+                    {t(period.label)}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -128,7 +131,7 @@ export default function FinanceProfitOverviewGraph() {
               axisLine={false}
               stroke="hsl(var(--medium-emphasis))"
               label={{
-                value: 'Amount (CHF)',
+                value: `${t('AMOUNT')} (CHF)`,
                 angle: -90,
                 position: 'insideLeft',
                 style: {
