@@ -1,7 +1,3 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { PlusCircle } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
 import {
   Sheet,
   SheetContent,
@@ -19,9 +15,12 @@ import {
   CommandList,
 } from 'components/ui/command';
 import { Checkbox } from 'components/ui/checkbox';
+import { useState } from 'react';
 import { Label } from 'components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import { PlusCircle } from 'lucide-react';
 import { Calendar } from 'components/ui/calendar';
+import { DateRange } from 'react-day-picker';
 import { useTaskContext } from '../../contexts/task-context';
 import { Badge } from 'components/ui/badge';
 
@@ -65,7 +64,6 @@ export const TaskManagerFilterSheet = ({
   open,
   onOpenChange,
 }: Readonly<TaskManagerFiltersSheetProps>) => {
-  const { t } = useTranslation();
   const { assignees, tags, priorities, statuses, updateFilter, resetFilters } = useTaskContext();
 
   const [selectedDueDate, setSelectedDueDate] = useState<DateRange | null>(null);
@@ -100,12 +98,82 @@ export const TaskManagerFilterSheet = ({
     onOpenChange(false);
   };
 
+  const renderPriorityItem = (priority: string) => {
+    const isSelected = selectedPriorities.includes(priority);
+    const togglePriority = () => {
+      setSelectedPriorities((prev) =>
+        isSelected ? prev.filter((p) => p !== priority) : [...prev, priority]
+      );
+    };
+
+    return (
+      <CommandItem key={priority} onSelect={togglePriority} className="flex items-center gap-2">
+        <Checkbox checked={isSelected} />
+        <span>{priority}</span>
+      </CommandItem>
+    );
+  };
+
+  const renderStatusItem = (status: string) => {
+    const isSelected = selectedStatuses.includes(status);
+
+    const toggleStatus = () => {
+      setSelectedStatuses((prev) =>
+        isSelected ? prev.filter((s) => s !== status) : [...prev, status]
+      );
+    };
+
+    return (
+      <CommandItem key={status} onSelect={toggleStatus} className="flex items-center gap-2">
+        <Checkbox checked={isSelected} />
+        <span>{status}</span>
+      </CommandItem>
+    );
+  };
+
+  const renderAssigneeItem = (assignee: { id: string; name: string }) => {
+    const isSelected = selectedAssignees.includes(assignee.id);
+
+    const toggleAssignee = () => {
+      setSelectedAssignees((prev) =>
+        isSelected ? prev.filter((a) => a !== assignee.id) : [...prev, assignee.id]
+      );
+    };
+
+    return (
+      <CommandItem key={assignee.id} onSelect={toggleAssignee} className="flex items-center gap-2">
+        <Checkbox checked={isSelected} />
+        <div className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center text-sm border-2 border-white">
+          {assignee.name[0]}
+        </div>
+        <span>{assignee.name}</span>
+      </CommandItem>
+    );
+  };
+
+  const renderTagItem = (tag: { id: string; label: string }) => {
+    const isSelected = selectedTags.includes(tag.id);
+
+    const toggleTag = () => {
+      setSelectedTags((prev) =>
+        isSelected ? prev.filter((t) => t !== tag.id) : [...prev, tag.id]
+      );
+    };
+
+    return (
+      <CommandItem key={tag.id} onSelect={toggleTag} className="flex items-center gap-2">
+        <Checkbox checked={isSelected} />
+        <span>{tag.label}</span>
+      </CommandItem>
+    );
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange} modal={false}>
       <SheetContent className="flex flex-col h-screen sm:h-[calc(100dvh-48px)] justify-between w-full sm:min-w-[450px] md:min-w-[450px] lg:min-w-[450px] sm:fixed sm:top-[57px]">
         <div className="flex-1 overflow-y-auto">
           <SheetHeader>
-            <SheetTitle className="!text-left">{t('FILTERS')}</SheetTitle>
+            <SheetTitle className="!text-left">Filters</SheetTitle>
             <SheetDescription />
           </SheetHeader>
           <div className="flex flex-col gap-6 mt-6">
@@ -114,7 +182,7 @@ export const TaskManagerFilterSheet = ({
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 border-dashed justify-start">
                   <PlusCircle />
-                  {t('DUE_DATE')}
+                  Due Date
                   {selectedDueDate?.from && selectedDueDate?.to && (
                     <Badge className="ml-2 bg-surface">
                       {' '}
@@ -140,7 +208,7 @@ export const TaskManagerFilterSheet = ({
                     className="w-full"
                     size="sm"
                   >
-                    {t('CLEAR_FILTER')}
+                    Clear filter
                   </Button>
                 </div>
               </PopoverContent>
@@ -151,32 +219,15 @@ export const TaskManagerFilterSheet = ({
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 border-dashed justify-start">
                   <PlusCircle />
-                  {t('PRIORITY')}
+                  Priority
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="sm:max-w-[200px] p-0">
                 <Command>
-                  <CommandInput placeholder={t('SEARCH_PRIORITIES')} />
+                  <CommandInput placeholder="Search priorities" />
                   <CommandList>
-                    <CommandEmpty>{t('NO_PRIORITIES_FOUND')}</CommandEmpty>
-                    <CommandGroup>
-                      {priorities.map((priority) => (
-                        <CommandItem
-                          key={priority}
-                          onSelect={() =>
-                            setSelectedPriorities((prev) =>
-                              prev.includes(priority)
-                                ? prev.filter((p) => p !== priority)
-                                : [...prev, priority]
-                            )
-                          }
-                          className="flex items-center gap-2"
-                        >
-                          <Checkbox checked={selectedPriorities.includes(priority)} />
-                          <span>{priority}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
+                    <CommandEmpty>No priorities found.</CommandEmpty>
+                    <CommandGroup>{priorities.map(renderPriorityItem)}</CommandGroup>
                   </CommandList>
                 </Command>
               </PopoverContent>
@@ -187,32 +238,15 @@ export const TaskManagerFilterSheet = ({
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 border-dashed justify-start">
                   <PlusCircle />
-                  {t('STATUS')}
+                  Status
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="sm:max-w-[200px] p-0">
                 <Command>
-                  <CommandInput placeholder={t('SEARCH_STATUSES')} />
+                  <CommandInput placeholder="Search statuses" />
                   <CommandList>
-                    <CommandEmpty>{t('NO_STATUSES_FOUND')}</CommandEmpty>
-                    <CommandGroup>
-                      {statuses.map((status) => (
-                        <CommandItem
-                          key={status}
-                          onSelect={() =>
-                            setSelectedStatuses((prev) =>
-                              prev.includes(status)
-                                ? prev.filter((s) => s !== status)
-                                : [...prev, status]
-                            )
-                          }
-                          className="flex items-center gap-2"
-                        >
-                          <Checkbox checked={selectedStatuses.includes(status)} />
-                          <span>{status}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
+                    <CommandEmpty>No statuses found.</CommandEmpty>
+                    <CommandGroup>{statuses.map(renderStatusItem)}</CommandGroup>
                   </CommandList>
                 </Command>
               </PopoverContent>
@@ -220,33 +254,13 @@ export const TaskManagerFilterSheet = ({
 
             {/* Assignee Filter */}
             <div>
-              <Label>{t('ASSIGNEE')}</Label>
+              <Label>Assignee</Label>
               <div className="border rounded-lg max-h-52 overflow-y-auto">
                 <Command>
-                  <CommandInput placeholder={t('SEARCH_ASSIGNEES')} />
+                  <CommandInput placeholder="Search assignees" />
                   <CommandList>
-                    <CommandEmpty>{t('NO_ASSIGNEES_FOUND')}</CommandEmpty>
-                    <CommandGroup>
-                      {assignees.map((assignee) => (
-                        <CommandItem
-                          key={assignee.id}
-                          onSelect={() =>
-                            setSelectedAssignees((prev) =>
-                              prev.includes(assignee.id)
-                                ? prev.filter((a) => a !== assignee.id)
-                                : [...prev, assignee.id]
-                            )
-                          }
-                          className="flex items-center gap-2"
-                        >
-                          <Checkbox checked={selectedAssignees.includes(assignee.id)} />
-                          <div className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center text-sm border-2 border-white">
-                            {assignee.name[0]}
-                          </div>
-                          <span>{assignee.name}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
+                    <CommandEmpty>No assignees found.</CommandEmpty>
+                    <CommandGroup>{assignees.map(renderAssigneeItem)}</CommandGroup>
                   </CommandList>
                 </Command>
               </div>
@@ -254,30 +268,13 @@ export const TaskManagerFilterSheet = ({
 
             {/* Tags Filter */}
             <div>
-              <Label>{t('TAGS')}</Label>
+              <Label>Tags</Label>
               <div className="border rounded-lg max-h-44 overflow-y-auto">
                 <Command>
-                  <CommandInput placeholder={t('SEARCH_TAGS')} />
+                  <CommandInput placeholder="Search tags" />
                   <CommandList>
-                    <CommandEmpty>{t('NO_TAGS_FOUND')}</CommandEmpty>
-                    <CommandGroup>
-                      {tags.map((tag) => (
-                        <CommandItem
-                          key={tag.id}
-                          onSelect={() =>
-                            setSelectedTags((prev) =>
-                              prev.includes(tag.id)
-                                ? prev.filter((t) => t !== tag.id)
-                                : [...prev, tag.id]
-                            )
-                          }
-                          className="flex items-center gap-2"
-                        >
-                          <Checkbox checked={selectedTags.includes(tag.id)} />
-                          <span>{tag.label}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
+                    <CommandEmpty>No tags found.</CommandEmpty>
+                    <CommandGroup>{tags.map(renderTagItem)}</CommandGroup>
                   </CommandList>
                 </Command>
               </div>
@@ -287,10 +284,10 @@ export const TaskManagerFilterSheet = ({
 
         <div className="flex w-full flex-col sm:flex-row gap-4">
           <Button variant="outline" className="w-full sm:w-1/2" onClick={resetAllFilters}>
-            {t('RESET')}
+            Reset
           </Button>
           <Button className="w-full sm:w-1/2" onClick={applyFilters}>
-            {t('APPLY')}
+            Apply
           </Button>
         </div>
       </SheetContent>

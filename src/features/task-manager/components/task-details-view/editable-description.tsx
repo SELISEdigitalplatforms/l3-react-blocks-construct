@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { ChevronDown, PenLine } from 'lucide-react';
 import { Label } from 'components/ui/label';
@@ -58,7 +57,6 @@ export function EditableDescription({
   const [isHovering, setIsHovering] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
-  const { t } = useTranslation();
 
   const [forceRender, setForceRender] = useState(0);
 
@@ -158,7 +156,7 @@ export function EditableDescription({
             <ChevronDown
               className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`}
             />
-            {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
+            {showMore ? 'Show Less' : 'Show More'}
           </Button>
         )}
       </div>
@@ -183,7 +181,7 @@ export function EditableDescription({
   // Extract the editor content rendering into a separate function
   const renderEditorContent = () => {
     if (!isMounted || !editorComponent) {
-      return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;
+      return <div className="border rounded-md p-4">Loading editor...</div>;
     }
 
     const EditorComponent = editorComponent;
@@ -203,7 +201,7 @@ export function EditableDescription({
               className="text-sm font-semibold border"
               onClick={handleCancel}
             >
-              {t('CANCEL')}
+              Cancel
             </Button>
             <Button
               variant="default"
@@ -211,7 +209,7 @@ export function EditableDescription({
               className="text-sm font-semibold ml-2"
               onClick={handleSave}
             >
-              {t('SAVE')}
+              Save
             </Button>
           </div>
         </div>
@@ -221,18 +219,18 @@ export function EditableDescription({
 
   return (
     <section className="relative" key={`editor-container-${forceRender}`}>
-      <div
+      <header
         className="flex items-center gap-1 h-9"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        <Label className="text-high-emphasis text-base font-semibold">{t('DESCRIPTION')}</Label>
+        <Label className="text-high-emphasis text-base font-semibold">Description</Label>
         {isHovering && !isEditing && (
-          <Button onClick={() => setIsEditing(true)} aria-label={t('EDIT_DESCRIPTION')} variant="ghost">
+          <Button onClick={() => setIsEditing(true)} aria-label="Edit description" variant="ghost">
             <PenLine className="h-4 w-4 text-primary" />
           </Button>
         )}
-      </div>
+      </header>
 
       {isEditing ? renderEditorContent() : <div className="text-sm">{renderContent()}</div>}
     </section>

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import TaskManagerToolbar from 'features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
 import TaskListView from './task-list-view';
 import TaskCardView from './task-card-view';
-import { TasksProvider } from 'features/task-manager/hooks/use-task-context';
 import { TaskProvider } from 'features/task-manager/contexts/task-context';
 
 /**
@@ -30,10 +29,10 @@ import { TaskProvider } from 'features/task-manager/contexts/task-context';
 export default function TaskManager() {
   const [viewMode, setViewMode] = useState('board');
 
-  const [isNewTaskModalOpen, setNewTaskModalOpen] = useState(false);
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
 
   const onOpen = () => {
-    setNewTaskModalOpen(true);
+    setIsNewTaskModalOpen(true);
   };
 
   const handleViewMode = (view: string) => {
@@ -42,9 +41,8 @@ export default function TaskManager() {
 
   return (
     <TaskProvider>
-      <TasksProvider>
         <div className="flex w-full flex-col">
-          <div className="mb-4 whitespace-nowrap md:mb-8">
+          <div className="mb-4  whitespace-nowrap md:mb-8">
             <TaskManagerToolbar
               viewMode={viewMode}
               handleViewMode={handleViewMode}
@@ -55,12 +53,11 @@ export default function TaskManager() {
           {viewMode === 'board' && (
             <TaskCardView
               isNewTaskModalOpen={isNewTaskModalOpen}
-              setNewTaskModalOpen={setNewTaskModalOpen}
+              setNewTaskModalOpen={setIsNewTaskModalOpen}
             />
           )}
           {viewMode === 'list' && <TaskListView />}
         </div>
-      </TasksProvider>
     </TaskProvider>
   );
 }

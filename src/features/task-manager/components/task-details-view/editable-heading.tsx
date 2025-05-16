@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { PenLine } from 'lucide-react';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
@@ -68,7 +67,6 @@ export function EditableHeading({
   const [isEditing, setIsEditing] = useState(isNewTaskModalOpen);
   const [isHovering, setIsHovering] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -118,18 +116,18 @@ export function EditableHeading({
   };
 
   return (
-    <div
-      className={`relative ${className}`}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-      role="region"
-      tabIndex={-1}
+    <section
+    className={`relative ${className}`}
+    onMouseEnter={() => setIsHovering(true)}
+    onMouseLeave={() => setIsHovering(false)}
+    aria-label="Editable heading section"
+    tabIndex={-1}
     >
       {isEditing ? (
         <Input
           ref={inputRef}
           type="text"
-          placeholder={t('ADD_A_TITLE')}
+          placeholder="Add a title"
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
@@ -147,6 +145,6 @@ export function EditableHeading({
           )}
         </div>
       )}
-    </div>
+    </section>
   );
 }
