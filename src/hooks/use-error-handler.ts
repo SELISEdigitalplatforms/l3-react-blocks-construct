@@ -14,92 +14,72 @@ export interface ErrorResponse {
 }
 
 interface ErrorHandlerOptions {
-  /** Custom error messages mapping */
   messageMap?: Record<string, string>;
-  /** Default message to show when no specific error is found */
   defaultMessage?: string;
-  /** Toast duration in milliseconds */
   duration?: number;
-  /** Whether to translate error messages */
   translate?: boolean;
-  /** Custom toast variant */
   variant?: 'default' | 'destructive' | 'success';
+  title?: string;
 }
 
 export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
   const { toast } = useToast();
   const { t } = useTranslation();
 
-  const parseJsonSafely = (value: string) => {
-    try {
-      return JSON.parse(value);
-    } catch {
-      return null;
-    }
-  };
-
-  const extractMessage = (value: any): string | null => {
+  const getMessage = (value: any): string | null => {
     if (!value) return null;
     if (typeof value === 'string') return value;
     return value.Message || value.message || value.error || null;
   };
 
-  const getErrorDetails = (error: unknown): ErrorResponse => {
-    // Handle Error instances
+  const normalizeError = (error: unknown): ErrorResponse => {
     if (error instanceof Error) {
-      const parsed = parseJsonSafely(error.message);
-      return {
-        error_description: parsed?.error_description,
-        message: extractMessage(parsed) || error.message,
-      };
+      try {
+        const parsed = JSON.parse(error.message);
+        return {
+          error_description: parsed?.error_description,
+          message: getMessage(parsed) || error.message,
+        };
+      } catch {
+        return { message: error.message };
+      }
     }
 
-    // Handle string errors
-    if (typeof error === 'string') {
-      const parsed = parseJsonSafely(error);
-      return {
-        error_description: parsed?.error_description,
-        message: extractMessage(parsed) || error,
-      };
-    }
+    if (typeof error === 'string') return { message: error };
 
-    // Handle object errors
     if (typeof error === 'object' && error !== null) {
       const err = error as any;
       const responseData = err.response?.data;
 
-      return {
-        error: err.error,
-        error_description: extractMessage(parseJsonSafely(err.error_description)) || undefined,
-        message: extractMessage(responseData) || extractMessage(err) || t('UNKNOWN_ERROR_OCCURRED'),
-      };
+      try {
+        return {
+          error: err.error,
+          error_description: getMessage(JSON.parse(err.error_description || '')) || undefined,
+          message: getMessage(responseData) || getMessage(err) || t('UNKNOWN_ERROR_OCCURRED'),
+        };
+      } catch {
+        return {
+          error: err.error,
+          message: getMessage(responseData) || getMessage(err) || t('UNKNOWN_ERROR_OCCURRED'),
+        };
+      }
     }
 
     return { message: t('UNKNOWN_ERROR_OCCURRED') };
   };
 
-  const getErrorMessage = (
-    error: ErrorResponse,
-    messageMap: Record<string, string> = {}
-  ): string => {
-    // Check for error code mapping
+  const getErrorMessage = (error: ErrorResponse, messageMap: Record<string, string> = {}): string => {
     if (error.error?.code && messageMap[`code_${error.error.code}`]) {
       return messageMap[`code_${error.error.code}`];
     }
 
-    // Handle error details
     if (error.error?.details) {
       const messages = Object.entries(error.error.details)
-        .map(([key, value]) => {
-          if (messageMap[key]) return messageMap[key];
-          return Array.isArray(value) ? value.join(', ') : value;
-        })
+        .map(([key, value]) => messageMap[key] || (Array.isArray(value) ? value.join(', ') : value))
         .filter(Boolean);
-
       if (messages.length) return messages.join('. ');
     }
 
-    // Return the first available message
     return (
       error.error_description ||
       error.message ||
@@ -110,25 +90,29 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
   };
 
   const handleError = (error: unknown, options: ErrorHandlerOptions = {}) => {
-    const {
-      messageMap = {},
-      duration = 5000,
-      translate = true,
-      variant = 'destructive',
-    } = { ...defaultOptions, ...options };
+    const { messageMap = {}, duration = 3000, variant = 'destructive', title = 'ERROR', translate = true } = {
+      ...defaultOptions,
+      ...options,
+    };
 
-    const errorDetails = getErrorDetails(error);
-    let message = getErrorMessage(errorDetails, messageMap);
-    message = translate ? t(message) : message;
+    const finalTitle = translate ? t(title) : title;
+    let finalMessage: string;
+
+    if (typeof error === 'string' && translate) {
+      finalMessage = t(error);
+    } else {
+      const errorDetails = normalizeError(error);
+      finalMessage = translate ? t(getErrorMessage(errorDetails, messageMap)) : getErrorMessage(errorDetails, messageMap);
+    }
 
     toast({
-      title: translate ? t('ERROR') : 'Error',
-      description: message,
+      title: finalTitle,
+      description: finalMessage,
       duration,
       variant,
     });
 
-    return message;
+    return finalMessage;
   };
 
   return { handleError, getErrorMessage };

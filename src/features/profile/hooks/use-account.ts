@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
+import { useErrorHandler } from 'hooks/use-error-handler';
 import { useGlobalMutation, useGlobalQuery } from 'state/query-client/hooks';
 import {
   changePassword,
@@ -45,6 +46,7 @@ export const useGetAccount = () => {
 export const useCreateAccount = (options?: { onSuccess?: () => void }) => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['createAccount'],
@@ -59,10 +61,8 @@ export const useCreateAccount = (options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.();
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: error?.error?.message ?? t('USER_CREATION_FAILED'),
+      handleError(error, {
+        defaultMessage: t('USER_CREATION_FAILED'),
       });
     },
   });
@@ -89,6 +89,7 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['updateAccount'],
@@ -104,10 +105,8 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.();
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: error?.error?.message ?? t('PROFILE_UPDATED_FAILED_PLEASE_CHECK'),
+      handleError(error, {
+        defaultMessage: t('PROFILE_UPDATED_FAILED_PLEASE_CHECK'),
       });
     },
   });
@@ -125,6 +124,7 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
 export const useChangePassword = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['changePassword'],
@@ -136,11 +136,9 @@ export const useChangePassword = () => {
         description: t('PASSWORD_SUCCESSFULLY_UPDATED'),
       });
     },
-    onError: () => {
-      toast({
-        variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: t('PLEASE_CHECK_YOUR_PASSWORD'),
+    onError: (error) => {
+      handleError(error, {
+        defaultMessage: t('PLEASE_CHECK_YOUR_PASSWORD'),
       });
     },
   });
@@ -157,7 +155,7 @@ export const ACCOUNT_QUERY_KEY = ['account'];
  * const { data, error, isLoading } = useAccountQuery();
  */
 export const useAccountQuery = () => {
-  return useQuery({
+  return useGlobalQuery({
     queryKey: ACCOUNT_QUERY_KEY,
     queryFn: getAccount,
   });

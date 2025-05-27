@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   UseMutationOptions,
   UseQueryOptions,
@@ -10,22 +11,52 @@ import {
 import { useAuthStore } from '../store/auth';
 import { useErrorHandler, ErrorResponse } from '../../hooks/use-error-handler';
 
+// Helper to process API errors consistently
+const processApiError = (err: any): ErrorResponse => {
+  const errorInfo = {
+    error: err.error?.error || err.response?.data?.error || 'UNKNOWN_ERROR',
+    message: err.error?.message || err.response?.data?.message,
+    details: err.error?.details || err.response?.data?.details,
+  };
+
+  const apiError: ErrorResponse = {
+    error: errorInfo,
+    error_description:
+      err.error_description || err.message || err.response?.data?.error_description,
+  };
+
+  if (errorInfo.error === 'invalid_refresh_token') {
+    apiError.error = {
+      error: 'invalid_refresh_token',
+      message: 'LOGGING_OUT_SESSION_EXPIRATION',
+    };
+    apiError.error_description = 'LOGGING_OUT_SESSION_EXPIRATION';
+  }
+
+  return apiError;
+};
+
+// Helper to handle session expiration
+const handleSessionExpiration = (
+  logout: () => void,
+  navigate: (path: string) => void,
+  handleError: (error: any, options?: any) => void,
+  duration = 3000
+) => {
+  setTimeout(() => {
+    logout();
+    navigate('/login');
+    handleError('LOGGING_OUT_SESSION_EXPIRATION', {
+      variant: 'destructive',
+      duration,
+      title: 'SESSION_EXPIRED',
+    });
+  }, 1500);
+};
+
 type ToastVariant = 'default' | 'destructive';
 
 type ApiError = ErrorResponse;
-
-const createOverlay = () => {
-  const overlay = document.createElement('div');
-  overlay.style.position = 'fixed';
-  overlay.style.top = '0';
-  overlay.style.left = '0';
-  overlay.style.width = '100%';
-  overlay.style.height = '100%';
-  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-  overlay.style.zIndex = '40';
-  overlay.id = 'session-expired-overlay';
-  return overlay;
-};
 
 /**
  * A wrapper around React Query's useQuery that adds global error handling
@@ -51,6 +82,7 @@ export const useGlobalQuery = <
   options: GlobalQueryOptions<TQueryFnData, TError, TData, TQueryKey>
 ) => {
   const { handleError } = useErrorHandler();
+  const { t } = useTranslation();
   const { logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,46 +99,14 @@ export const useGlobalQuery = <
     if (queryResult.error && !hasHandledError.current) {
       hasHandledError.current = true;
       const err = queryResult.error as any;
-      const apiError = {
-        error_description:
-          err.error_description || err.message || err.response?.data?.error_description,
-        error: {
-          error: err.error?.error || err.response?.data?.error,
-          message: err.error?.message || err.response?.data?.message,
-          details: err.error?.details || err.response?.data?.details,
-        },
-      };
+      const apiError = processApiError(err);
 
-      if (apiError.error.error === 'invalid_refresh_token' && !isPublicRoute) {
-        if (!document.getElementById('session-expired-overlay')) {
-          const overlay = createOverlay();
-          document.body.appendChild(overlay);
-
-          setTimeout(() => {
-            logout();
-            navigate('/login');
-            const existingOverlay = document.getElementById('session-expired-overlay');
-            if (existingOverlay?.parentNode) {
-              existingOverlay.parentNode.removeChild(existingOverlay);
-            }
-
-            // Show the toast after redirecting
-            handleError(
-              {
-                error: {
-                  error: 'invalid_refresh_token',
-                  message: 'SESSION_EXPIRED_LOGGING_OUT',
-                },
-              },
-              {
-                variant: 'destructive',
-                duration: 3000,
-              }
-            );
-          }, 1500);
-        }
+      if (apiError.error?.error === 'invalid_refresh_token' && !isPublicRoute) {
+        handleSessionExpiration(logout, navigate, handleError);
       } else {
-        handleError(apiError);
+        handleError(apiError, {
+          variant: 'destructive',
+        });
       }
 
       // Call the original onError if it exists
@@ -119,7 +119,7 @@ export const useGlobalQuery = <
     if (!queryResult.error) {
       hasHandledError.current = false;
     }
-  }, [queryResult.error, isPublicRoute, handleError, logout, navigate, options]);
+  }, [queryResult.error, isPublicRoute, handleError, logout, navigate, options, t]);
 
   return queryResult;
 };
@@ -164,50 +164,21 @@ export const useGlobalMutation = <
 ) => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
-  const { handleError } = useErrorHandler({
-    defaultMessage: 'OPERATION_FAILED',
-  });
+  const { handleError } = useErrorHandler();
 
   return useMutation({
     ...option,
-    onError: (error, variables, context) => {
-      // Try to extract error from different possible formats
-      const err = error as any;
-      const apiError = {
-        error_description:
-          err.error_description || err.message || err.response?.data?.error_description,
-        error: {
-          error: err.error?.error || err.response?.data?.error,
-          message: err.error?.message || err.response?.data?.message,
-          details: err.error?.details || err.response?.data?.details,
-        },
-      };
+    onError: (errorData, variables, context) => {
+      const err = errorData as any;
+      const apiError = processApiError(err);
 
-      // Handle session expiration
-      if (apiError.error.error === 'invalid_refresh_token') {
-        setTimeout(() => {
-          logout();
-          navigate('/login');
-
-          // Show the toast after redirecting
-          handleError(
-            {
-              error: {
-                error: 'invalid_refresh_token',
-                message: 'SESSION_EXPIRED_LOGGING_OUT',
-              },
-            },
-            {
-              variant: 'destructive',
-              duration: 3000,
-            }
-          );
-        }, 1500);
+      if (apiError.error?.error === 'invalid_refresh_token') {
+        handleSessionExpiration(logout, navigate, handleError);
         return;
       }
 
       // Handle validation errors
-      if (apiError.error.error === 'validation_failed' && apiError.error.details) {
+      if (apiError.error?.error === 'validation_failed' && apiError.error?.details) {
         handleError(apiError, {
           variant: 'destructive',
         });
@@ -215,7 +186,7 @@ export const useGlobalMutation = <
       }
 
       // Handle specific error messages
-      if (apiError.error_description || apiError.error.message) {
+      if (apiError.error_description || apiError.error?.message) {
         handleError(apiError, {
           variant: 'destructive',
         });
@@ -228,7 +199,7 @@ export const useGlobalMutation = <
       });
 
       // Call the original onError if provided
-      option.onError?.(error, variables, context);
+      option.onError?.(errorData, variables, context);
     },
   });
 };

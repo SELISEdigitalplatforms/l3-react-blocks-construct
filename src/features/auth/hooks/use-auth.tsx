@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   accountActivation,
   forgotPassword,
@@ -13,7 +13,7 @@ import {
   SignInResponse,
   MFASigninResponse,
 } from '../services/auth.service';
-import { useGlobalMutation } from '../../../state/query-client/hooks';
+import { useGlobalMutation, useGlobalQuery } from '../../../state/query-client/hooks';
 import { ErrorResponse } from '../../../hooks/use-error-handler';
 import { getLoginOption } from '../services/sso.service';
 
@@ -128,7 +128,7 @@ export const useLogoutAllMutation = () => {
 };
 
 export const useGetLoginOptions = () => {
-  return useQuery({
+  return useGlobalQuery({
     queryKey: ['getLoginOptions'],
     queryFn: getLoginOption,
   });
