@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   accountActivation,
   forgotPassword,
@@ -12,9 +13,8 @@ import {
   SignInResponse,
   MFASigninResponse,
 } from '../services/auth.service';
-import { useGlobalMutation } from 'state/query-client/hooks';
-import { ErrorResponse } from 'hooks/use-error-handler';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
+import { useGlobalMutation } from '../../../state/query-client/hooks';
+import { ErrorResponse } from '../../../hooks/use-error-handler';
 import { getLoginOption } from '../services/sso.service';
 
 /**
@@ -50,16 +50,19 @@ import { getLoginOption } from '../services/sso.service';
 
 export const useSigninMutation = <T extends 'password' | 'mfa_code' | 'social'>() => {
   const queryClient = useQueryClient();
-  return useGlobalMutation<SignInResponse | MFASigninResponse, ErrorResponse, PasswordSigninPayload | MFASigninPayload | SSoSigninPayload>({
+  return useGlobalMutation<
+    SignInResponse | MFASigninResponse,
+    ErrorResponse,
+    PasswordSigninPayload | MFASigninPayload | SSoSigninPayload
+  >({
     mutationKey: ['signin'],
     mutationFn: async (payload) => signin<T>(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['getLanguages'] });
     },
     onError: (error) => {
-      // Let the global error handler handle it
       throw error;
-    }
+    },
   });
 };
 
@@ -74,7 +77,11 @@ export const useSignoutMutation = () => {
 };
 
 export const useAccountActivation = () => {
-  return useGlobalMutation<unknown, ErrorResponse, { password: string; code: string; captchaCode: string }>({
+  return useGlobalMutation<
+    unknown,
+    ErrorResponse,
+    { password: string; code: string; captchaCode: string }
+  >({
     mutationKey: ['accountActivation'],
     mutationFn: accountActivation,
     onError: (error) => {

@@ -53,10 +53,11 @@ export function Dashboard() {
             </div>
             <DashboardSystemOverview />
           </div>
-          {!data?.mfaEnabled &&
-            !data?.isMfaVerified &&
-            data?.email !== 'demo.construct@seliseblocks.com' && (
-              <Dialog open={!data?.mfaEnabled}>
+          {data &&
+            !data.mfaEnabled &&
+            !data.isMfaVerified &&
+            data.email !== 'demo.construct@seliseblocks.com' && (
+              <Dialog open={!data.mfaEnabled}>
                 <EnableMfa />
               </Dialog>
             )}

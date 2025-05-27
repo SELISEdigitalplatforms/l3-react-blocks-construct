@@ -30,60 +30,49 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
   const { toast } = useToast();
   const { t } = useTranslation();
 
+  const parseJsonSafely = (value: string) => {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  };
+
+  const extractMessage = (value: any): string | null => {
+    if (!value) return null;
+    if (typeof value === 'string') return value;
+    return value.Message || value.message || value.error || null;
+  };
+
   const getErrorDetails = (error: unknown): ErrorResponse => {
+    // Handle Error instances
     if (error instanceof Error) {
-      try {
-        const parsedMessage = JSON.parse(error.message);
-        if (parsedMessage.error_description) {
-          return { error_description: parsedMessage.error_description };
-        }
-        return { message: parsedMessage.message || error.message };
-      } catch {
-        return { message: error.message };
-      }
+      const parsed = parseJsonSafely(error.message);
+      return {
+        error_description: parsed?.error_description,
+        message: extractMessage(parsed) || error.message,
+      };
     }
 
+    // Handle string errors
     if (typeof error === 'string') {
-      try {
-        const parsedError = JSON.parse(error);
-        if (parsedError.error_description) {
-          return { error_description: parsedError.error_description };
-        }
-        return { message: error };
-      } catch {
-        return { message: error };
-      }
+      const parsed = parseJsonSafely(error);
+      return {
+        error_description: parsed?.error_description,
+        message: extractMessage(parsed) || error,
+      };
     }
 
+    // Handle object errors
     if (typeof error === 'object' && error !== null) {
       const err = error as any;
+      const responseData = err.response?.data;
 
-      if (err.error_description) {
-        return { error_description: err.error_description };
-      }
-
-      if (err.response?.data) {
-        const data = err.response.data;
-        try {
-          const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-          if (parsed.error_description) {
-            return { error_description: parsed.error_description };
-          }
-        } catch {
-          return { message: String(data) };
-        }
-      }
-
-      if (err.message) {
-        try {
-          const parsed = JSON.parse(err.message);
-          if (parsed.error_description) {
-            return { error_description: parsed.error_description };
-          }
-        } catch {
-          return { message: err.message };
-        }
-      }
+      return {
+        error: err.error,
+        error_description: extractMessage(parseJsonSafely(err.error_description)) || undefined,
+        message: extractMessage(responseData) || extractMessage(err) || t('UNKNOWN_ERROR_OCCURRED'),
+      };
     }
 
     return { message: t('UNKNOWN_ERROR_OCCURRED') };
@@ -93,42 +82,31 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     error: ErrorResponse,
     messageMap: Record<string, string> = {}
   ): string => {
+    // Check for error code mapping
     if (error.error?.code && messageMap[`code_${error.error.code}`]) {
       return messageMap[`code_${error.error.code}`];
     }
 
+    // Handle error details
     if (error.error?.details) {
-      const messages: string[] = [];
-      for (const [key, value] of Object.entries(error.error.details)) {
-        if (messageMap[key]) {
-          messages.push(messageMap[key]);
-        } else if (typeof value === 'string') {
-          messages.push(value);
-        } else if (Array.isArray(value)) {
-          messages.push(value.join(', '));
-        }
-      }
+      const messages = Object.entries(error.error.details)
+        .map(([key, value]) => {
+          if (messageMap[key]) return messageMap[key];
+          return Array.isArray(value) ? value.join(', ') : value;
+        })
+        .filter(Boolean);
+
       if (messages.length) return messages.join('. ');
     }
 
-    if (error.error_description) {
-      return error.error_description;
-    }
-
-    if (error.message) {
-      return error.message;
-    }
-
-    if (error.error) {
-      if (typeof error.error === 'string') {
-        return error.error;
-      }
-      if (typeof error.error === 'object') {
-        return error.error.message || error.error.error || JSON.stringify(error.error);
-      }
-    }
-
-    return defaultOptions.defaultMessage || t('SOMETHING_WENT_WRONG');
+    // Return the first available message
+    return (
+      error.error_description ||
+      error.message ||
+      (typeof error.error === 'string' ? error.error : error.error?.message) ||
+      defaultOptions.defaultMessage ||
+      t('SOMETHING_WENT_WRONG')
+    );
   };
 
   const handleError = (error: unknown, options: ErrorHandlerOptions = {}) => {
@@ -141,10 +119,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
 
     const errorDetails = getErrorDetails(error);
     let message = getErrorMessage(errorDetails, messageMap);
-
-    if (translate) {
-      message = t(message);
-    }
+    message = translate ? t(message) : message;
 
     toast({
       title: translate ? t('ERROR') : 'Error',
@@ -156,8 +131,5 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     return message;
   };
 
-  return {
-    handleError,
-    getErrorMessage,
-  };
+  return { handleError, getErrorMessage };
 };
