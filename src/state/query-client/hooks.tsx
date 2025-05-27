@@ -1,12 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
   UseMutationOptions,
   UseQueryOptions,
   useMutation,
   useQuery,
-  QueryKey
+  QueryKey,
 } from '@tanstack/react-query';
 import { useAuthStore } from '../store/auth';
 import { useErrorHandler, ErrorResponse } from '../../hooks/use-error-handler';
@@ -33,63 +32,94 @@ const createOverlay = () => {
  */
 const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password'];
 
+type GlobalQueryOptions<TQueryFnData, TError, TData, TQueryKey extends QueryKey> = Omit<
+  UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  'onError'
+> & {
+  messageMap?: Record<string, string>;
+  variant?: ToastVariant;
+  duration?: number;
+  onError?: (error: TError) => void;
+};
+
 export const useGlobalQuery = <
   TQueryFnData = unknown,
   TError = ErrorResponse,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
+  TQueryKey extends QueryKey = QueryKey,
 >(
-  options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> & {
-    messageMap?: Record<string, string>;
-    variant?: ToastVariant;
-    duration?: number;
-  }
+  options: GlobalQueryOptions<TQueryFnData, TError, TData, TQueryKey>
 ) => {
   const { handleError } = useErrorHandler();
   const { logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation();
   const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+
+  const hasHandledError = useRef(false);
 
   const queryResult = useQuery<TQueryFnData, TError, TData, TQueryKey>({
     ...options,
+    retry: false,
   });
 
-  if (queryResult.error) {
-    handleError(queryResult.error);
-  }
-
   useEffect(() => {
-    if (queryResult.error) {
-      const errorMessage = (queryResult.error as ApiError).error?.error;
+    if (queryResult.error && !hasHandledError.current) {
+      hasHandledError.current = true;
+      const err = queryResult.error as any;
+      const apiError = {
+        error_description:
+          err.error_description || err.message || err.response?.data?.error_description,
+        error: {
+          error: err.error?.error || err.response?.data?.error,
+          message: err.error?.message || err.response?.data?.message,
+          details: err.error?.details || err.response?.data?.details,
+        },
+      };
 
-      if (errorMessage === 'invalid_refresh_token' && !isPublicRoute) {
-        const overlay = createOverlay();
-        document.body.appendChild(overlay);
+      if (apiError.error.error === 'invalid_refresh_token' && !isPublicRoute) {
+        if (!document.getElementById('session-expired-overlay')) {
+          const overlay = createOverlay();
+          document.body.appendChild(overlay);
 
-        handleError(queryResult.error, {
-          messageMap: {
-            invalid_refresh_token: 'LOGGING_OUT_SESSION_EXPIRATION',
-          },
-          variant: 'success',
-          duration: 2000,
-        });
+          setTimeout(() => {
+            logout();
+            navigate('/login');
+            const existingOverlay = document.getElementById('session-expired-overlay');
+            if (existingOverlay?.parentNode) {
+              existingOverlay.parentNode.removeChild(existingOverlay);
+            }
 
-        new Promise((resolve) => setTimeout(resolve, 1500)).then(() => {
-          logout();
-          navigate('/login');
-
-          const existingOverlay = document.getElementById('session-expired-overlay');
-          if (existingOverlay?.parentNode) {
-            existingOverlay.parentNode.removeChild(existingOverlay);
-          }
-        });
+            // Show the toast after redirecting
+            handleError(
+              {
+                error: {
+                  error: 'invalid_refresh_token',
+                  message: 'SESSION_EXPIRED_LOGGING_OUT',
+                },
+              },
+              {
+                variant: 'destructive',
+                duration: 3000,
+              }
+            );
+          }, 1500);
+        }
       } else {
-        handleError(queryResult.error);
+        handleError(apiError);
+      }
+
+      // Call the original onError if it exists
+      if (options.onError) {
+        options.onError(queryResult.error);
       }
     }
-  }, [queryResult.error, logout, isPublicRoute, navigate, t, handleError]);
+
+    // Reset the flag when the error changes
+    if (!queryResult.error) {
+      hasHandledError.current = false;
+    }
+  }, [queryResult.error, isPublicRoute, handleError, logout, navigate, options]);
 
   return queryResult;
 };
@@ -144,27 +174,34 @@ export const useGlobalMutation = <
       // Try to extract error from different possible formats
       const err = error as any;
       const apiError = {
-        error_description: err.error_description || err.message || (err.response?.data?.error_description),
+        error_description:
+          err.error_description || err.message || err.response?.data?.error_description,
         error: {
           error: err.error?.error || err.response?.data?.error,
           message: err.error?.message || err.response?.data?.message,
           details: err.error?.details || err.response?.data?.details,
-        }
+        },
       };
 
       // Handle session expiration
       if (apiError.error.error === 'invalid_refresh_token') {
-        handleError(apiError, {
-          messageMap: {
-            invalid_refresh_token: 'SESSION_EXPIRED_LOGGING_OUT',
-          },
-          variant: 'destructive',
-          duration: 3000,
-        });
-
         setTimeout(() => {
           logout();
           navigate('/login');
+
+          // Show the toast after redirecting
+          handleError(
+            {
+              error: {
+                error: 'invalid_refresh_token',
+                message: 'SESSION_EXPIRED_LOGGING_OUT',
+              },
+            },
+            {
+              variant: 'destructive',
+              duration: 3000,
+            }
+          );
         }, 1500);
         return;
       }

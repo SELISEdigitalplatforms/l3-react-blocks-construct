@@ -142,7 +142,6 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     const errorDetails = getErrorDetails(error);
     let message = getErrorMessage(errorDetails, messageMap);
 
-    // Translate if enabled
     if (translate) {
       message = t(message);
     }
