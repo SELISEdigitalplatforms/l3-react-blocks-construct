@@ -68,7 +68,10 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     return { message: t('UNKNOWN_ERROR_OCCURRED') };
   };
 
-  const getErrorMessage = (error: ErrorResponse, messageMap: Record<string, string> = {}): string => {
+  const getErrorMessage = (
+    error: ErrorResponse,
+    messageMap: Record<string, string> = {}
+  ): string => {
     if (error.error?.code && messageMap[`code_${error.error.code}`]) {
       return messageMap[`code_${error.error.code}`];
     }
@@ -90,7 +93,13 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
   };
 
   const handleError = (error: unknown, options: ErrorHandlerOptions = {}) => {
-    const { messageMap = {}, duration = 3000, variant = 'destructive', title = 'ERROR', translate = true } = {
+    const {
+      messageMap = {},
+      duration = 3000,
+      variant = 'destructive',
+      title = t('ERROR'),
+      translate = true,
+    } = {
       ...defaultOptions,
       ...options,
     };
@@ -102,7 +111,9 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
       finalMessage = t(error);
     } else {
       const errorDetails = normalizeError(error);
-      finalMessage = translate ? t(getErrorMessage(errorDetails, messageMap)) : getErrorMessage(errorDetails, messageMap);
+      finalMessage = translate
+        ? t(getErrorMessage(errorDetails, messageMap))
+        : getErrorMessage(errorDetails, messageMap);
     }
 
     toast({
