@@ -59,6 +59,7 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
   const { mutate: verifyOTP, isPending: verifyOtpPending } = useVerifyOTP();
   const { mutate: resendOtp } = useResendOtp();
   const lastVerifiedOtpRef = useRef<string>('');
+  const initialOtpGeneratedRef = useRef(false);
   const [newMfaId, setNewMfaId] = useState<string | null>(null);
   const { t } = useTranslation();
 
@@ -107,13 +108,16 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
   });
 
   useEffect(() => {
-    if (!userInfo) return;
+    if (!userInfo || initialOtpGeneratedRef.current) return;
 
     generateOTP(
       { userId: userInfo.itemId, mfaType: 2 },
       {
         onSuccess: (data) => {
-          if (data?.isSuccess) setMfaId(data.mfaId);
+          if (data?.isSuccess) {
+            setMfaId(data.mfaId);
+            initialOtpGeneratedRef.current = true;
+          }
         },
         onError: () => {
           toast({
@@ -124,7 +128,7 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
         },
       }
     );
-  }, [userInfo, generateOTP, toast, t]);
+  }, [userInfo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onVerify = useCallback(() => {
     if (!mfaId) {
