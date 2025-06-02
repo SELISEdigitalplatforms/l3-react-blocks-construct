@@ -102,11 +102,6 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
       } else {
         login(res.access_token, res.refresh_token);
         navigate('/');
-        toast({
-          variant: 'success',
-          title: t('SUCCESS'),
-          description: t('LOGIN_SUCCESSFULLY'),
-        });
       }
     } catch (_error) {
       if (captchaEnabled) {

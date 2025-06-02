@@ -8,8 +8,7 @@ If you believe you have found a security vulnerability, please report it to us a
 
 Instead, please follow these steps:
 
-
-1. Email us at [blocks@selisegroup.com](blocks@selisegroup.com) with details of the vulnerability.
+1. Email us at [blocks@selisegroup.com](mailto:blocks@selisegroup.com) with details of the vulnerability.
 2. Include a thorough description of the issue, including any relevant information on the environment in which the vulnerability was discovered.
 3. Allow some time for us to review and respond to your report.
 4. We will acknowledge receipt of your report and work with you to understand and validate the issue.
