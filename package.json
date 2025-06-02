@@ -5,6 +5,7 @@
   "scripts": {
     "build-and-deploy": "bash deploy.sh",
     "start": "react-scripts start",
+    "start:host": "HOST=construct.seliseblocks.com react-scripts start",
     "build": "react-scripts build",
     "set-env": "node set-env.js",
     "build:dev": "BUILD_ENV=dev npm run set-env && react-scripts build",
