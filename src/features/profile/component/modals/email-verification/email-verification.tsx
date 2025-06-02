@@ -147,7 +147,7 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
         if (res?.isSuccess && res?.isValid) {
           onNext();
         } else {
-          setOtpError(t('INVALID_OTP'));
+          setOtpError(t('INVALID_OTP_PLEASE_TRY_AGAIN'));
         }
       },
       onError: () => {
