@@ -64,6 +64,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             onClose={closeAllModals}
             onNext={() => setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION)}
+            mfaId={mfaId}
           />
         );
       case MfaDialogState.EMAIL_VERIFICATION:

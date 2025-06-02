@@ -204,7 +204,7 @@ export const ManageTwoFactorAuthentication: React.FC<
                 onClick={handleDownloadRecoveryCodes}
               >
                 <Download className="w-4 h-4" />
-                <span className="text-sm font-bold">{t('DOWNLOAD_RECOVERY_CODES')}</span>
+                <span className="text-sm font-bold">{t('DOWNLOAD_RECOVERY_CODE')}</span>
               </Button>
             )}
           </div>

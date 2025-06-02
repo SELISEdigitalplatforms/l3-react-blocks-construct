@@ -52,6 +52,33 @@ export const TwoFactorAuthenticationSetup: React.FC<
   const isEmailVerificationEnabled =
     mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(2);
 
+  const handleAuthenticatorAppClick = () => {
+    if (!isAuthenticatorAppEnabled || !userInfo) return;
+
+    if (userInfo?.isMfaVerified && userInfo?.mfaEnabled && userInfo?.userMfaType === 1) {
+      setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION);
+    } else {
+      generateOTP(
+        { userId: userInfo.itemId, mfaType: 1 },
+        {
+          onSuccess: (data) => {
+            if (data?.isSuccess && data?.mfaId) {
+              setMfaId(data.mfaId);
+              setCurrentDialog(MfaDialogState.AUTHENTICATOR_APP_SETUP);
+            }
+          },
+          onError: () => {
+            toast({
+              variant: 'destructive',
+              title: t('FAILED_TO_GENERATE_OTP'),
+              description: t('PLEASE_TRY_AGAIN_LATER'),
+            });
+          },
+        }
+      );
+    }
+  };
+
   const handleEmailVerificationClick = () => {
     if (!isEmailVerificationEnabled || !userInfo) return;
 
@@ -95,6 +122,14 @@ export const TwoFactorAuthenticationSetup: React.FC<
               </div>
               <Skeleton className="w-[20px] h-[20px]" />
             </div>
+          ) : isGeneratingOTP ? (
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-[40px] h-[40px] rounded-md" />
+                <Skeleton className="w-[119px] h-[20px]" />
+              </div>
+              <Skeleton className="w-[20px] h-[20px]" />
+            </div>
           ) : (
             <button
               type="button"
@@ -103,19 +138,7 @@ export const TwoFactorAuthenticationSetup: React.FC<
               w-full flex items-center justify-between p-4
               ${isAuthenticatorAppEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
             `}
-              onClick={() => {
-                if (isAuthenticatorAppEnabled) {
-                  if (
-                    userInfo?.isMfaVerified &&
-                    userInfo?.mfaEnabled &&
-                    userInfo?.userMfaType === 1
-                  ) {
-                    setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION);
-                  } else {
-                    setCurrentDialog(MfaDialogState.AUTHENTICATOR_APP_SETUP);
-                  }
-                }
-              }}
+              onClick={handleAuthenticatorAppClick}
             >
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-surface rounded-md">
