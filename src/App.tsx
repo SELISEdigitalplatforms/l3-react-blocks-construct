@@ -36,6 +36,7 @@ import { CalendarPage } from './pages/calendar/calendar';
 import ServiceUnavailable from './pages/error/service-unavailable/service-unavailable';
 import NotFound from './pages/error/not-found/not-found';
 import Finance from './pages/finance/finance';
+import { Invoices } from './pages/invoices/invoices';
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,7 @@ function AppContent() {
                 <Route path="/services/storage" element={<Storage />} />
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
+                <Route path="/invoices" element={<Invoices />} />
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/503" element={<ServiceUnavailable />} />
                 <Route path="/404" element={<NotFound />} />
