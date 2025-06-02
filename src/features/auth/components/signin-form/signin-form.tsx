@@ -10,7 +10,6 @@ import { Button } from 'components/ui/button';
 import { UPasswordInput } from 'components/core/u-password-input';
 import { Captcha } from 'features/captcha';
 import { useAuthStore } from 'state/store/auth';
-import { useToast } from 'hooks/use-toast';
 import { useSigninMutation } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
 import { SignInResponse } from '../../services/auth.service';
@@ -60,7 +59,6 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { login } = useAuthStore();
-  const { toast } = useToast();
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
@@ -123,13 +121,8 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
       const res = await mutateAsync({ grantType: 'social', code, state });
       login(res.access_token, res.refresh_token);
       navigate('/');
-      toast({
-        variant: 'success',
-        title: t('SUCCESS'),
-        description: t('LOGIN_SUCCESSFULLY'),
-      });
     },
-    [login, mutateAsync, navigate, t, toast]
+    [login, mutateAsync, navigate]
   );
 
   useEffect(() => {
