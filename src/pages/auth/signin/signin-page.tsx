@@ -31,6 +31,7 @@ export function SigninPage() {
       <div className="w-full invisible h-0">
         <div className="rounded-lg bg-success-background border border-success p-4">
           <p className="text-xs font-normal text-success-high-emphasis">
+            Log in to explore the complete Demo and Documentation. Use the credentials:{' '}
             <span className="font-semibold">demo.construct@seliseblocks.com</span> with password:{' '}
             <span className="font-semibold">H%FE*FYi5oTQ!VyT6TkEy</span>
           </p>

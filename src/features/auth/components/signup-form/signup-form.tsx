@@ -1,4 +1,4 @@
-import { SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
@@ -6,26 +6,21 @@ import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema } from './utils';
 import { UCheckbox } from 'components/core/uCheckbox';
-import { Captcha } from 'features/captcha';
 import { useTranslation } from 'react-i18next';
 
 /**
  * SignupForm Component
  *
- * A user registration form component that collects username (email) and verifies user interaction via CAPTCHA
- * before allowing form submission. It ensures basic validation using a Zod schema and integrates reCAPTCHA for
- * bot protection.
+ * A user registration form component that collects username (email) and handles user registration.
+ * It ensures basic validation using a Zod schema for secure form submission.
  *
  * Features:
  * - Username (email) field with validation
  * - Form validation using Zod and React Hook Form
- * - Google reCAPTCHA integration for bot prevention
- * - CAPTCHA required for enabling form submission
  * - Terms of Service and Privacy Policy acknowledgement checkbox
- * - Submit button disabled until CAPTCHA is verified
  * - Loading state handling during async submission
  *
- * @returns {JSX.Element} The rendered signup form with validation and CAPTCHA security
+ * @returns {JSX.Element} The rendered signup form with validation
  *
  * @example
  * // Basic usage
@@ -42,9 +37,7 @@ import { useTranslation } from 'react-i18next';
  */
 
 export const SignupForm = () => {
-  const [captchaToken, setCaptchaToken] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const googleSiteKey = process.env.REACT_APP_GOOGLE_SITE_KEY ?? '';
   const { t } = useTranslation();
 
   const form = useForm<signupFormType>({
@@ -52,25 +45,11 @@ export const SignupForm = () => {
     resolver: zodResolver(getSignupFormValidationSchema(t)),
   });
 
-  const handleCaptchaVerify = (token: SetStateAction<string>) => {
-    setCaptchaToken(token);
-  };
-
-  const handleCaptchaExpired = () => {
-    setCaptchaToken('');
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onSubmitHandler = async (values: signupFormType) => {
-    if (!captchaToken) {
-      // Show error or alert that captcha is required
-      return;
-    }
-
+  const onSubmitHandler = async () => {
     setIsSubmitting(true);
     try {
-      // Include captcha token with the sign-up request
-      // await signupMutation({ ...values, captchaToken });
+      // Handle sign-up request
+      // await signupMutation(values);
       // Handle successful signup
     } catch (error) {
       // Handle error
@@ -96,17 +75,6 @@ export const SignupForm = () => {
           )}
         />
 
-        <div className="my-2">
-          <Captcha
-            type="reCaptcha"
-            siteKey={googleSiteKey}
-            theme="light"
-            onVerify={handleCaptchaVerify}
-            onExpired={handleCaptchaExpired}
-            size="normal"
-          />
-        </div>
-
         <div className="flex justify-between items-center">
           <UCheckbox
             label={
@@ -128,12 +96,7 @@ export const SignupForm = () => {
         </div>
 
         <div className="flex gap-10 mt-2">
-          <Button
-            className="flex-1 font-extrabold"
-            size="lg"
-            type="submit"
-            disabled={isSubmitting || !captchaToken}
-          >
+          <Button className="flex-1 font-extrabold" size="lg" type="submit" disabled={isSubmitting}>
             {t('SIGN_UP')}
           </Button>
         </div>

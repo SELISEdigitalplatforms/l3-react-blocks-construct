@@ -1,4 +1,4 @@
-import { ChevronDown, Forward, Reply, ReplyAll, Trash2 } from 'lucide-react';
+import { ChevronDown, Forward, PictureInPicture2, Reply, ReplyAll } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
@@ -111,7 +111,7 @@ const EmailActionsReplyPanel = ({
     },
     {
       type: 'popOutReply',
-      icon: Trash2,
+      icon: PictureInPicture2,
       labelKey: 'POP_OUT_REPLY',
       onClick: () => handleComposeEmailForward({} as TReply),
     },

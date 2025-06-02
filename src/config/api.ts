@@ -6,12 +6,12 @@ interface IAPIConfig {
   };
 }
 
-if (!process.env.REACT_APP_PUBLIC_BACKEND_URL || !process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY) {
+if (!process.env.REACT_APP_PUBLIC_BLOCKS_API_URL || !process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY) {
   throw new Error('Required environment variables are not defined');
 }
 
 const API_CONFIG: IAPIConfig = {
-  baseUrl: process.env.REACT_APP_PUBLIC_BACKEND_URL,
+  baseUrl: process.env.REACT_APP_PUBLIC_BLOCKS_API_URL,
   blocksKey: process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY,
   auth: {
     token: '/authentication/v1/OAuth/Token',

@@ -9,10 +9,31 @@ type SSOSigninCardProps = {
     provider: SSO_PROVIDERS;
     isAvailable: boolean;
   };
+  showText?: boolean;
+  totalProviders?: number;
 };
 
-const SSOSigninCard = ({ providerConfig }: SSOSigninCardProps) => {
+const SSOSigninCard = ({
+  providerConfig,
+  showText = false,
+  totalProviders = 1,
+}: SSOSigninCardProps) => {
   const ssoService = new SSOservice();
+
+  const getButtonWidth = () => {
+    if (showText) return 'w-full';
+
+    switch (totalProviders) {
+      case 2:
+        return 'w-1/2';
+      case 3:
+        return 'w-1/3';
+      case 4:
+        return 'w-1/4';
+      default:
+        return 'w-full';
+    }
+  };
 
   const onClickHandler = async (e: React.MouseEvent) => {
     try {
@@ -58,7 +79,7 @@ const SSOSigninCard = ({ providerConfig }: SSOSigninCardProps) => {
   return (
     <Button
       variant="outline"
-      className="w-[25%] h-12"
+      className={`${getButtonWidth()} h-12`}
       onClick={onClickHandler}
       disabled={!providerConfig.isAvailable}
       data-state={providerConfig.isAvailable ? 'enabled' : 'disabled'}
@@ -68,8 +89,9 @@ const SSOSigninCard = ({ providerConfig }: SSOSigninCardProps) => {
         width={20}
         height={20}
         alt={`${providerConfig.label} logo`}
-        className={!providerConfig.isAvailable ? 'opacity-50' : ''}
+        className={`${!providerConfig.isAvailable ? 'opacity-50' : ''} ${showText ? 'mr-2 font-bold' : ''}`}
       />
+      {showText && `Log in with ${providerConfig.label}`}
     </Button>
   );
 };

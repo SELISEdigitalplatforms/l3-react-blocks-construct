@@ -547,7 +547,9 @@ export function Email() {
 
         `}
           >
-            <h2 className="text-2xl font-bold tracking-tight">{t('MAIL')}</h2>
+            <h2 className="text-2xl font-bold tracking-tight">
+              {!isCollapsedEmailSidebar && t('MAIL')}
+            </h2>
           </div>
           <div className="hidden md:flex border-l justify-between w-full px-4 py-3">
             <div className="flex items-center gap-4">

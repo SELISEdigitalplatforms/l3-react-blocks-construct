@@ -101,7 +101,7 @@ export const EmailTagInput = ({
         ))}
         <input
           type={type}
-          className="flex-1 bg-transparent outline-none text-sm min-w-[150px]"
+          className="flex-1 bg-transparent outline-none text-sm min-w-[150px] capitalize"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}

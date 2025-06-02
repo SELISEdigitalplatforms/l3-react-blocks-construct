@@ -37,7 +37,7 @@ export const SetpasswordForm = ({ code }: { code: string }) => {
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
 
   // Check if captcha is enabled
-  const captchaEnabled = (process.env.REACT_APP_GOOGLE_SITE_KEY ?? '') !== '';
+  const captchaEnabled = (process.env.REACT_APP_CAPTCHA_SITE_KEY ?? '') !== '';
 
   const handleSubmit = async (password: string, code: string, captchaToken?: string) => {
     if (captchaEnabled && !captchaToken) {

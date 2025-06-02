@@ -1,4 +1,4 @@
-import { Star, Reply, EllipsisVertical, ReplyAll, Forward, Trash2 } from 'lucide-react';
+import { Star, Reply, EllipsisVertical, ReplyAll, Forward, PictureInPicture2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipTrigger, TooltipContent } from 'components/ui/tooltip';
 import { EmailSingleActionsProps } from '../../types/email.types';
@@ -184,7 +184,7 @@ const EmailSingleActions = ({
               className="flex p-3 gap-2 hover:bg-surface "
               onClick={handleComposeEmailForward}
             >
-              <Trash2 className="h-5 w-5 text-medium-emphasis" />
+              <PictureInPicture2 className="h-5 w-5 text-medium-emphasis" />
               <p className="text-high-emphasis font-normal">{t('POP_OUT_REPLY')}</p>
             </DropdownMenuItem>
           </DropdownMenuContent>

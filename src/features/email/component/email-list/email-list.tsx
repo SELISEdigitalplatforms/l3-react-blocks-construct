@@ -134,6 +134,7 @@ export function EmailList({
             <Checkbox
               id="select-all"
               checked={isAllChecked}
+              className="border-medium-emphasis data-[state=checked]:border-none border-2 rounded-[2px]"
               onCheckedChange={(checked) => handleSelectAllChange(!!checked)}
             />
 
@@ -174,6 +175,7 @@ export function EmailList({
                   <div className="flex flex-row gap-2">
                     <div className="flex space-x-2 pt-1">
                       <Checkbox
+                        className="border-medium-emphasis data-[state=checked]:border-none border-2 rounded-[2px]"
                         checked={checkedEmailIds?.includes(email?.id)}
                         onClick={(e) => e.stopPropagation()}
                         onCheckedChange={(checked) => handleSingleEmailCheck(email.id, !!checked)}
@@ -278,6 +280,7 @@ export function EmailList({
                 <Checkbox
                   id="select-all"
                   checked={isAllChecked}
+                  className="border-medium-emphasis data-[state=checked]:border-none border-2 rounded-[2px]"
                   onCheckedChange={(checked) => handleSelectAllChange(!!checked)}
                 />
 
@@ -302,6 +305,7 @@ export function EmailList({
                           <Checkbox
                             onClick={(e) => e.stopPropagation()}
                             checked={checkedEmailIds?.includes(email.id)}
+                            className="border-medium-emphasis data-[state=checked]:border-none border-2 rounded-[2px]"
                             onCheckedChange={(checked) =>
                               handleSingleEmailCheck(email.id, !!checked)
                             }
