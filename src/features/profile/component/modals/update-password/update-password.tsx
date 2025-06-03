@@ -50,11 +50,10 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
       return;
     }
 
-    // Check if old and new passwords are the same
     if (values.oldPassword === values.newPassword) {
       form.setError('newPassword', {
         type: 'manual',
-        message: t('NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT'),
+        message: 'New password must be different from current password',
       });
       return;
     }
@@ -84,9 +83,6 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
   const password = form.watch('newPassword');
   const confirmPassword = form.watch('confirmNewPassword');
   const oldPassword = form.watch('oldPassword');
-
-  // Check if old and new passwords are the same (only when both have values)
-  const isSamePassword = oldPassword && password && oldPassword === password;
 
   const onModalClose = () => {
     setUpdatePasswordSuccessModalOpen(false);
@@ -150,14 +146,11 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                     </FormItem>
                   )}
                 />
-                {isSamePassword && (
-                  <div className="text-sm text-error bg-red-50 border border-red-200 rounded-md p-3">
-                    {t('NEW_PASSWORD_MUST_BE_DIFFERENT_FROM_CURRENT')}
-                  </div>
-                )}
+
                 <SharedPasswordStrengthChecker
                   password={password}
                   confirmPassword={confirmPassword}
+                  excludePassword={oldPassword}
                   onRequirementsMet={setPasswordRequirementsMet}
                 />
               </div>
@@ -167,10 +160,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                     {t('CANCEL')}
                   </Button>
                 </DialogTrigger>
-                <Button
-                  type="submit"
-                  disabled={isPending || !passwordRequirementsMet || !!isSamePassword}
-                >
+                <Button type="submit" disabled={isPending || !passwordRequirementsMet}>
                   {t('CHANGE')}
                 </Button>
               </DialogFooter>
