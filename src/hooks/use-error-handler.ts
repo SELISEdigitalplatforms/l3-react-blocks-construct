@@ -167,7 +167,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
       messageMap = {},
       duration = 3000,
       variant = 'destructive',
-      title = t('ERROR'),
+      title = t('SOMETHING_WENT_WRONG'),
       translate = true,
     } = {
       ...defaultOptions,
@@ -190,7 +190,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
       // Override title with default "Error" for backend errors
       if (isBackendError) {
         toast({
-          title: t('ERROR'),
+          title: t('SOMETHING_WENT_WRONG'),
           description: finalMessage,
           duration,
           variant,
