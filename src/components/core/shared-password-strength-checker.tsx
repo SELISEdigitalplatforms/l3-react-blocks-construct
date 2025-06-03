@@ -59,7 +59,7 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
   excludePasswordLabel,
 }) => {
   const { t } = useTranslation();
-  const { strength, checks, getStrengthColor, requirements } = usePasswordStrength(password);
+  const { checks, requirements } = usePasswordStrength(password);
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [isDifferentFromExcluded, setIsDifferentFromExcluded] = useState(true);
 
@@ -85,6 +85,34 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
     onRequirementsMet,
   ]);
 
+  const getAdjustedStrength = () => {
+    const basicRequirements = Object.values(checks).filter(Boolean).length;
+    let totalRequirements = Object.keys(checks).length;
+    let metRequirements = basicRequirements;
+
+    totalRequirements += 1;
+    if (passwordsMatch) {
+      metRequirements += 1;
+    }
+
+    if (excludePassword) {
+      totalRequirements += 1;
+      if (isDifferentFromExcluded) {
+        metRequirements += 1;
+      }
+    }
+
+    return (metRequirements / totalRequirements) * 100;
+  };
+
+  const getAdjustedStrengthColor = () => {
+    const adjustedStrength = getAdjustedStrength();
+    if (adjustedStrength <= 25) return 'bg-red-500';
+    if (adjustedStrength <= 50) return 'bg-orange-500';
+    if (adjustedStrength <= 75) return 'bg-yellow-500';
+    return 'bg-green-600';
+  };
+
   return (
     <div className="w-full mx-auto px-6 py-4 rounded-lg shadow-sm border border-primary-50">
       <h2 className="text-sm font-semibold text-high-emphasis mb-2">
@@ -92,8 +120,8 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
       </h2>
       <div className="h-1 w-full bg-primary-50 rounded mb-2">
         <div
-          className={`h-1 rounded-full transition-all duration-300 ${getStrengthColor()}`}
-          style={{ width: `${strength}%` }}
+          className={`h-1 rounded-full transition-all duration-300 ${getAdjustedStrengthColor()}`}
+          style={{ width: `${getAdjustedStrength()}%` }}
         />
       </div>
 
