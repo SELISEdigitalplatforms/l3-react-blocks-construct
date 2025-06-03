@@ -48,6 +48,7 @@ interface EditEventProps {
   onNext: () => void;
   onUpdate: (event: CalendarEvent, updateOption?: CalendarUpdateOption) => void;
   onDelete: (eventId: string, deleteOption?: DeleteOption) => void;
+  onRestore?: () => boolean;
 }
 
 const useEventDataInitialization = (event: CalendarEvent) => {
@@ -341,6 +342,7 @@ export function EditEvent({
   onNext,
   onUpdate,
   onDelete,
+  onRestore,
 }: Readonly<EditEventProps>) {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -499,6 +501,13 @@ export function EditEvent({
     }
   };
 
+  // Handle undo delete action
+  const handleUndoDelete = () => {
+    if (onRestore) {
+      onRestore();
+    }
+  };
+
   const handleDeleteConfirm = () => {
     onDelete(initialEventData.eventId ?? '', 'this');
     onClose();
@@ -507,6 +516,11 @@ export function EditEvent({
       variant: 'success',
       title: t('EVENT_DELETED'),
       description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
+      action: onRestore ? (
+        <Button variant="link" size="sm" onClick={handleUndoDelete}>
+          {t('UNDO')}
+        </Button>
+      ) : undefined,
     });
   };
 
@@ -514,6 +528,16 @@ export function EditEvent({
     onDelete(initialEventData.eventId ?? '', deleteOption);
     onClose();
     setShowRecurringDeleteDialog(false);
+    toast({
+      variant: 'success',
+      title: t('EVENT_DELETED'),
+      description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
+      action: onRestore ? (
+        <Button variant="link" size="sm" onClick={handleUndoDelete}>
+          {t('UNDO')}
+        </Button>
+      ) : undefined,
+    });
   };
 
   const startRef = useRef<HTMLDivElement>(null);
