@@ -53,7 +53,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
     if (values.oldPassword === values.newPassword) {
       form.setError('newPassword', {
         type: 'manual',
-        message: 'New password must be different from current password',
+        message: "New password shouldn't match current password",
       });
       return;
     }

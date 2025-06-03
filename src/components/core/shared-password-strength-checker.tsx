@@ -148,7 +148,7 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
             ) : (
               <X className="w-4 h-4 text-red-500" />
             )}
-            {excludePasswordLabel ?? 'New password must be different from current password'}
+            {excludePasswordLabel ?? "New password shouldn't match current password"}
           </li>
         )}
 
