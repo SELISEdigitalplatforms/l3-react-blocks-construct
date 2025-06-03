@@ -58,15 +58,16 @@ export const useCreateAccount = (options?: { onSuccess?: () => void }) => {
     onSuccess: () => {
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('USER_HAS_BEEN_ADDED_SUCCESSFULLY'),
+        title: t('USER_ADDED'),
+        description: t('USER_HAS_ADDED_SUCCESSFULLY'),
       });
 
       options?.onSuccess?.();
     },
     onError: (error) => {
       handleError(error, {
-        defaultMessage: t('USER_CREATION_FAILED'),
+        title: t('UNABLE_ADD_USER'),
+        defaultMessage: t('ERROR_OCCURRED_WHILE_ADDING_USER'),
       });
     },
   });
@@ -102,15 +103,16 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
       queryClient.invalidateQueries({ queryKey: ['getAccount'] });
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('PROFILE_SUCCESSFULLY_UPDATED'),
+        title: t('PROFILE_UPDATED'),
+        description: t('PROFILE_HAS_UPDATED_SUCCESSFULLY'),
       });
 
       options?.onSuccess?.();
     },
     onError: (error) => {
       handleError(error, {
-        defaultMessage: t('PROFILE_UPDATED_FAILED_PLEASE_CHECK'),
+        title: t('UPDATE_FAILED'),
+        defaultMessage: t('ERROR_OCCURRED_WHILE_UPDATING_PROFILE'),
       });
     },
   });
@@ -136,13 +138,14 @@ export const useChangePassword = () => {
     onSuccess: () => {
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('PASSWORD_SUCCESSFULLY_UPDATED'),
+        title: t('PASSWORD_UPDATED'),
+        description: t('PASSWORD_HAS_UPDATED_SUCCESSFULLY'),
       });
     },
     onError: (error) => {
       handleError(error, {
-        defaultMessage: t('PLEASE_CHECK_YOUR_PASSWORD'),
+        title: t('UPDATE_FAILED'),
+        defaultMessage: t('PLEASE_CHECK_PASSWORD_TRY_AGAIN'),
       });
     },
   });

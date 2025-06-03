@@ -179,7 +179,7 @@ export const useDisableUserMfa = () => {
       queryClient.invalidateQueries({ queryKey: ['getAccount'] });
       toast({
         variant: 'success',
-        title: t('MFA_DISABLED_SUCCESSFULLY'),
+        title: t('MFA_DISABLED'),
         description: t('MULTI_FACTOR_AUTH_DISABLED_SUCCESSFULLY'),
       });
     },

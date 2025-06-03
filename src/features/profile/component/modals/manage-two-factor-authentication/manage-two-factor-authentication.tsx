@@ -83,7 +83,7 @@ export const ManageTwoFactorAuthentication: React.FC<
     toast({
       variant: 'success',
       title: t('RECOVERY_CODES_DOWNLOADED'),
-      description: t('YOUR_RECOVERY_CODES_DOWNLOADED'),
+      description: t('RECOVERY_CODES_DOWNLOADED_SUCCESSFULLY'),
     });
   };
 
@@ -97,8 +97,8 @@ export const ManageTwoFactorAuthentication: React.FC<
     } catch {
       toast({
         variant: 'destructive',
-        title: t('LOGOUT_ERROR'),
-        description: t('SOMETHING_WRONG_LOGOUT'),
+        title: t('UNEXPECTED_ERROR'),
+        description: t('LOGGED_OUT_YOUR_SECURITY'),
       });
     }
   };
@@ -126,8 +126,8 @@ export const ManageTwoFactorAuthentication: React.FC<
       onError: (error: { error?: { message?: string } }) => {
         toast({
           variant: 'destructive',
-          title: 'Failed to Disable MFA',
-          description: error?.error?.message ?? t('ERROR_OCCURRED_WHILE_DISABLING_MFA'),
+          title: t('FAILED_TO_DISABLE_MFA'),
+          description: error?.error?.message ?? t('ERROR_OCCURED_DISABLING_MULTI_FACTOR'),
         });
         setIsDisabling(false);
       },

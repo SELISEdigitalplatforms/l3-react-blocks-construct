@@ -28,9 +28,9 @@ const processApiError = (err: any): ErrorResponse => {
   if (errorInfo.error === 'invalid_refresh_token') {
     apiError.error = {
       error: 'invalid_refresh_token',
-      message: 'LOGGING_OUT_SESSION_EXPIRATION',
+      message: 'LOGGED_OUT_DUE_SESSION_EXPIRATION',
     };
-    apiError.error_description = 'LOGGING_OUT_SESSION_EXPIRATION';
+    apiError.error_description = 'LOGGED_OUT_DUE_SESSION_EXPIRATION';
   }
 
   return apiError;
@@ -46,10 +46,10 @@ const handleSessionExpiration = (
   setTimeout(() => {
     logout();
     navigate('/login');
-    handleError('LOGGING_OUT_SESSION_EXPIRATION', {
+    handleError('LOGGED_OUT_DUE_SESSION_EXPIRATION', {
       variant: 'destructive',
       duration,
-      title: 'SESSION_EXPIRED',
+      title: 'LOGGED_OUT',
     });
   }, 1500);
 };

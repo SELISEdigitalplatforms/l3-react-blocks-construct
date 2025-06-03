@@ -72,8 +72,8 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
       onError: () => {
         toast({
           variant: 'destructive',
-          title: t('ERROR'),
-          description: t('FAILED_GENERATE_QR_CODE'),
+          title: t('FAILED_GENERATE_QR_CODE'),
+          description: t('SYSTEM_FAILED_GENERATE_QRCODE'),
         });
       },
     });
@@ -84,7 +84,7 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
       toast({
         variant: 'destructive',
         title: t('SETUP_NOT_COMPLETE'),
-        description: t('PLEASE_GENERATE_QR_CODE'),
+        description: t('MFA_SETUP_NOT_COMPELE'),
       });
       return;
     }

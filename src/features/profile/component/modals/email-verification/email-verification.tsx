@@ -88,7 +88,7 @@ export const EmailVerification: React.FC<Readonly<EmailVerificationProps>> = ({
       toast({
         variant: 'destructive',
         title: t('SETUP_INCOMPLETE'),
-        description: t('PLEASE_GENERATE_QR_CODE_FIRST'),
+        description: t('PLEASE_GENERATE_QR_CODE_BEFORE_PROCEEDING'),
       });
       return;
     }
