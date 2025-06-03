@@ -25,7 +25,9 @@ import type { ToastActionElement, ToastProps } from '../components/ui/toast';
  */
 
 const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+// 5 seconds for regular toasts, 10 seconds for toasts with undo actions
+const TOAST_REMOVE_DELAY = 5000;
+const TOAST_REMOVE_DELAY_WITH_ACTION = 10000;
 
 type ToasterToast = ToastProps & {
   id: string;
@@ -74,18 +76,19 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-const addToRemoveQueue = (toastId: string) => {
+const addToRemoveQueue = (toastId: string, hasAction: boolean = false) => {
   if (toastTimeouts.has(toastId)) {
     return;
   }
 
+  const delay = hasAction ? TOAST_REMOVE_DELAY_WITH_ACTION : TOAST_REMOVE_DELAY;
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
     dispatch({
       type: 'REMOVE_TOAST',
       toastId: toastId,
     });
-  }, TOAST_REMOVE_DELAY);
+  }, delay);
 
   toastTimeouts.set(toastId, timeout);
 };
@@ -156,6 +159,7 @@ type Toast = Omit<ToasterToast, 'id'>;
 
 function toast({ ...props }: Toast) {
   const id = genId();
+  const hasAction = Boolean(props.action);
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -164,6 +168,7 @@ function toast({ ...props }: Toast) {
     });
   const dismiss = () => dispatch({ type: 'DISMISS_TOAST', toastId: id });
 
+  // Add toast with consideration for action presence
   dispatch({
     type: 'ADD_TOAST',
     toast: {
@@ -171,7 +176,11 @@ function toast({ ...props }: Toast) {
       id,
       open: true,
       onOpenChange: (open) => {
-        if (!open) dismiss();
+        if (!open) {
+          dismiss();
+          // Add to remove queue when toast is closed
+          addToRemoveQueue(id, hasAction);
+        }
       },
     },
   });
