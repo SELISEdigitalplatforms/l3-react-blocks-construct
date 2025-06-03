@@ -63,7 +63,7 @@ export function EventDetails({
   onDelete,
   onRestore,
 }: Readonly<EventDetailsProps>) {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
@@ -109,6 +109,7 @@ export function EventDetails({
   const handleUndoDelete = () => {
     if (onRestore) {
       onRestore();
+      dismiss();
     }
   };
 

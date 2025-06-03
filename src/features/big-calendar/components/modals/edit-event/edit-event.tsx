@@ -344,7 +344,7 @@ export function EditEvent({
   onDelete,
   onRestore,
 }: Readonly<EditEventProps>) {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const { t } = useTranslation();
 
   const [initialEventData] = useEventDataInitialization(event);
@@ -505,6 +505,7 @@ export function EditEvent({
   const handleUndoDelete = () => {
     if (onRestore) {
       onRestore();
+      dismiss();
     }
   };
 
