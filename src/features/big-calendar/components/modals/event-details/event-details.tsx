@@ -12,8 +12,6 @@ import {
   Dialog,
 } from 'components/ui/dialog';
 import { useToast } from 'hooks/use-toast';
-import { ToastAction } from 'components/ui/toast';
-import { deletedEventStorage } from '../../../services/deletedEventStorage';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { CalendarEvent } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';
@@ -117,99 +115,14 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   };
 
   const handleDeleteConfirm = () => {
-    const eventId = event.eventId ?? '';
-    try {
-      // Store the event before deletion
-      deletedEventStorage.storeDeletedEvent(event);
-      onDelete(eventId);
-      closeDialogsAndParent();
-
-      toast({
-        variant: 'success',
-        title: t('EVENT_DELETED'),
-        description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
-        action: (
-          <ToastAction
-            altText={t('UNDO')}
-            onClick={() => {
-              const storedEvent = deletedEventStorage.getDeletedEvent(eventId);
-              if (storedEvent) {
-                onNext(); // Reopen the edit dialog
-                deletedEventStorage.removeDeletedEvent(eventId);
-                toast({
-                  variant: 'success',
-                  title: t('EVENT_RESTORED'),
-                  description: t('EVENT_SUCCESSFULLY_RESTORED'),
-                });
-              }
-            }}
-          >
-            {t('UNDO')}
-          </ToastAction>
-        ),
-      });
-    } catch (error) {
-      console.error('Failed to handle event deletion:', error);
-      toast({
-        variant: 'destructive',
-        title: t('ERROR'),
-        description: t('FAILED_TO_DELETE_EVENT'),
-      });
-    }
+    onDelete(event.eventId ?? '');
+    closeDialogsAndParent();
   };
 
   const handleRecurringDeleteConfirm = (deleteOption: DeleteOption) => {
-    const eventId = event.eventId ?? '';
-    try {
-      // Store the event and related events before deletion
-      deletedEventStorage.storeDeletedEvent(
-        event,
-        deleteOption,
-        deleteOption === 'all' ? event.events : undefined
-      );
-
-      onDelete(eventId, deleteOption);
-      closeDialogsAndParent();
-
-      toast({
-        variant: 'success',
-        title: t('EVENT_DELETED'),
-        description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
-        action: (
-          <ToastAction
-            altText={t('UNDO')}
-            onClick={() => {
-              const storedData = deletedEventStorage.getDeletedEvent(eventId);
-              if (storedData) {
-                if (storedData.deleteOption === 'all' && storedData.relatedEvents) {
-                  // Restore all events in the series
-                  storedData.relatedEvents.forEach(evt => {
-                    onNext(); // Reopen the edit dialog for each event
-                  });
-                } else {
-                  onNext(); // Reopen the edit dialog
-                }
-                deletedEventStorage.removeDeletedEvent(eventId);
-                toast({
-                  variant: 'success',
-                  title: t('EVENT_RESTORED'),
-                  description: t('EVENT_SUCCESSFULLY_RESTORED'),
-                });
-              }
-            }}
-          >
-            {t('UNDO')}
-          </ToastAction>
-        ),
-      });
-    } catch (error) {
-      console.error('Failed to handle recurring event deletion:', error);
-      toast({
-        variant: 'destructive',
-        title: t('ERROR'),
-        description: t('FAILED_TO_DELETE_EVENT'),
-      });
-    }
+    onDelete(event.eventId ?? '', deleteOption);
+    closeDialogsAndParent();
+    showDeletionSuccessToast();
   };
 
   const handleMeetingLinkClick = () => {
