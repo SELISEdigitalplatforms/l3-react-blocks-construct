@@ -4,7 +4,7 @@ export const WEEK_DAYS_RRULE = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
 export const CALENDER_PERIOD = ['DAY', 'WEEK', 'MONTH', 'YEAR'];
 
-export const ZOOM_MEETING_LINK = 'zoommtg://zoom.us/join?confno=&uname=test%link';
+export const ZOOM_MEETING_LINK = 'https:zoommtg://zoom.us/join?confno=&uname=test%link';
 
 export const WEEK_DAYS_SELECT = [
   { value: '1', label: 'MONDAY' },

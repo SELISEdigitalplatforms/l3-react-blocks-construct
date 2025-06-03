@@ -463,7 +463,7 @@ export function EditEvent({
         toast({
           variant: 'destructive',
           title: t('INVALID_DATE_TIME'),
-          description: t('PLEASE_SELECT_VALID_START_END_TIMES'),
+          description: t('PLEASE_SELECT_VALID_DATE_TIMES'),
         });
         return;
       }
@@ -485,8 +485,8 @@ export function EditEvent({
       console.error('Error submitting form:', error);
       toast({
         variant: 'destructive',
-        title: t('ERROR_SAVING_EVENT'),
-        description: t('ERROR_SAVING_YOUR_EVENT'),
+        title: t('EVENT_NOT_SAVED'),
+        description: t('COULDNT_SAVE_YOUR_EVENT'),
       });
     }
   };
@@ -505,8 +505,8 @@ export function EditEvent({
     setShowDeleteDialog(false);
     toast({
       variant: 'success',
-      title: t('EVENT_DELETED_SUCCESSFULLY'),
-      description: t('EVENT_REMOVED_FROM_YOUR_CALENDAR'),
+      title: t('EVENT_DELETED'),
+      description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
     });
   };
 

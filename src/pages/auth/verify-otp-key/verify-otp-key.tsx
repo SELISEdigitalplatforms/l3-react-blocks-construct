@@ -65,8 +65,8 @@ export function VerifyOtpKey() {
           onSuccess: () => {
             toast({
               variant: 'success',
-              title: t('SUCCESS'),
-              description: t('LOGIN_SUCCESSFULLY'),
+              title: t('LOGIN_SUCCESSFULLY'),
+              description: t('YOU_LOGGED_IN_SUCCESSFULLY'),
             });
           },
         }

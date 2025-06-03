@@ -83,7 +83,7 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
     if (!mfaId) {
       toast({
         variant: 'destructive',
-        title: t('SETUP_INCOMPLETE'),
+        title: t('SETUP_NOT_COMPLETE'),
         description: t('PLEASE_GENERATE_QR_CODE'),
       });
       return;

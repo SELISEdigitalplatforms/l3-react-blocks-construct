@@ -88,8 +88,8 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   const showDeletionSuccessToast = () => {
     toast({
       variant: 'success',
-      title: t('EVENT_DELETED_SUCCESSFULLY'),
-      description: `${t('THE_EVENT_TITLED')} "${event.title}" ${t('HAS_BEEN_SUCCESSFULLY_DELETED')}.`,
+      title: t('EVENT_DELETED'),
+      description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
     });
   };
 
@@ -128,8 +128,8 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   const handleMeetingLinkClick = () => {
     toast({
       variant: 'success',
-      title: t('ZOOM_LINK_CLICKED'),
-      description: t('OPENING_ZOOM_PLACEHOLDER_LINK'),
+      title: t('OPENING_MEETING_LINK'),
+      description: t('REDIRECTING_MEETING_LINK'),
     });
   };
 
