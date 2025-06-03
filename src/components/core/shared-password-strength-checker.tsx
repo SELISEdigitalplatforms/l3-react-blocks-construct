@@ -66,8 +66,8 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
   useEffect(() => {
     setPasswordsMatch(password === confirmPassword && password !== '');
 
-    if (excludePassword) {
-      setIsDifferentFromExcluded(password !== excludePassword || password === '');
+    if (excludePassword && password !== '') {
+      setIsDifferentFromExcluded(password !== excludePassword);
     } else {
       setIsDifferentFromExcluded(true);
     }
@@ -95,14 +95,14 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
       metRequirements += 1;
     }
 
-    if (excludePassword) {
+    if (excludePassword && password !== '') {
       totalRequirements += 1;
       if (isDifferentFromExcluded) {
         metRequirements += 1;
       }
     }
 
-    return (metRequirements / totalRequirements) * 100;
+    return totalRequirements > 0 ? (metRequirements / totalRequirements) * 100 : 0;
   };
 
   const getAdjustedStrengthColor = () => {
@@ -141,7 +141,7 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
           </li>
         ))}
 
-        {excludePassword && (
+        {excludePassword && password !== '' && (
           <li className="flex items-center gap-2">
             {isDifferentFromExcluded ? (
               <Check className="w-4 h-4 text-success" />
