@@ -327,11 +327,7 @@ export function EmailViewMobile({
                 </div>
 
                 <div className=" mb-6 text-sm px-4">
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: selectedEmail?.content ?? selectedEmail?.preview,
-                    }}
-                  />
+                  <div>{htmlToPlainText(selectedEmail?.content ?? selectedEmail?.preview)}</div>
 
                   {isReplySingleAction && isReplySingleAction.isReplyEditor && (
                     <div className=" px-4 flex flex-col gap-6">
@@ -467,12 +463,9 @@ export function EmailViewMobile({
                           }}
                           aria-expanded={isExpanded}
                         >
-                          <div
-                            className="text-sm "
-                            dangerouslySetInnerHTML={{
-                              __html: isExpanded ? item.reply : htmlToPlainText(item.reply),
-                            }}
-                          />
+                          <div className="text-sm">
+                            {isExpanded ? htmlToPlainText(item.reply) : htmlToPlainText(item.reply)}
+                          </div>
                           <div
                             className={`text-sm text-medium-emphasis  px-2`}
                             dangerouslySetInnerHTML={{
