@@ -481,11 +481,7 @@ export function EmailViewGrid({
         </div>
 
         <div className="mb-6 text-sm px-4">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: selectedEmail?.content ?? selectedEmail?.preview,
-            }}
-          />
+          <div>{htmlToPlainText(selectedEmail?.content ?? selectedEmail?.preview)}</div>
         </div>
 
         {/* Reply Editor for Main Email */}
@@ -549,18 +545,12 @@ export function EmailViewGrid({
                     onClick={() => toggleExpand(index)}
                     aria-expanded={isExpanded}
                   >
-                    <div
-                      className="text-sm"
-                      dangerouslySetInnerHTML={{
-                        __html: isExpanded ? item.reply : htmlToPlainText(item.reply),
-                      }}
-                    />
-                    <div
-                      className="text-sm text-medium-emphasis px-2"
-                      dangerouslySetInnerHTML={{
-                        __html: item.prevData,
-                      }}
-                    />
+                    <div className="text-sm">
+                      {isExpanded ? htmlToPlainText(item.reply) : htmlToPlainText(item.reply)}
+                    </div>
+                    <div className="text-sm text-medium-emphasis px-2">
+                      {htmlToPlainText(item.prevData)}
+                    </div>
                   </button>
 
                   {/* Attachments for Reply */}
