@@ -12,7 +12,6 @@ import { Skeleton } from 'components/ui/skeleton';
 export const ProfileCard: React.FC<{
   userInfo: any;
   isLoading: boolean;
-  isFetching: boolean;
   formatDate: (dateString: string | undefined) => string;
   onEditClick: () => void;
   isEditProfileModalOpen: boolean;
@@ -21,7 +20,6 @@ export const ProfileCard: React.FC<{
 }> = ({
   userInfo,
   isLoading,
-  isFetching,
   formatDate,
   onEditClick,
   isEditProfileModalOpen,
@@ -40,7 +38,7 @@ export const ProfileCard: React.FC<{
         <div className="flex justify-between">
           <div className="flex items-center">
             <div className="relative w-16 h-16 rounded-full border overflow-hidden border-white shadow-sm">
-              {isLoading || isFetching ? (
+              {isLoading ? (
                 <Skeleton className="w-16 h-16 rounded-full" />
               ) : (
                 <img
@@ -56,7 +54,7 @@ export const ProfileCard: React.FC<{
               )}
             </div>
             <div className="flex flex-col gap-1 ml-3 sm:ml-9">
-              {isLoading || isFetching ? (
+              {isLoading ? (
                 <>
                   <Skeleton className="w-40 h-5" />
                   <Skeleton className="w-48 h-4 mt-1" />
@@ -83,7 +81,7 @@ export const ProfileCard: React.FC<{
         </div>
         <Separator orientation="horizontal" />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {isLoading || isFetching ? (
+          {isLoading ? (
             Array.from({ length: 3 }).map(() => (
               <div key={uuidv4()}>
                 <Skeleton className="h-3 w-20 mb-1" />

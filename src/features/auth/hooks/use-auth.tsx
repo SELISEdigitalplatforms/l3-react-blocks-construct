@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   accountActivation,
   forgotPassword,
@@ -11,10 +10,11 @@ import {
   PasswordSigninPayload,
   MFASigninPayload,
   SSoSigninPayload,
+  SignInResponse,
+  MFASigninResponse,
 } from '../services/auth.service';
-import { useGlobalMutation } from 'state/query-client/hooks';
-import { ErrorResponse, useCustomToast } from './use-custom-toast/use-custom-toast';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useGlobalMutation, useGlobalQuery } from '../../../state/query-client/hooks';
+import { ErrorResponse } from '../../../hooks/use-error-handler';
 import { getLoginOption } from '../services/sso.service';
 
 /**
@@ -49,145 +49,87 @@ import { getLoginOption } from '../services/sso.service';
  */
 
 export const useSigninMutation = <T extends 'password' | 'mfa_code' | 'social'>() => {
-  const { t } = useTranslation();
-  const [errorDetails, setErrorDetails] = useState({
-    title: '',
-    message: '',
-  });
-
   const queryClient = useQueryClient();
-
-  const mutation = useGlobalMutation({
+  return useGlobalMutation<
+    SignInResponse | MFASigninResponse,
+    ErrorResponse,
+    PasswordSigninPayload | MFASigninPayload | SSoSigninPayload
+  >({
     mutationKey: ['signin'],
-    mutationFn: async (payload: PasswordSigninPayload | MFASigninPayload | SSoSigninPayload) =>
-      signin<T>(payload),
+    mutationFn: async (payload) => signin<T>(payload),
     onSuccess: () => {
-      setErrorDetails({ title: '', message: '' });
       queryClient.invalidateQueries({ queryKey: ['getLanguages'] });
     },
-    onError: (error: any) => {
-      let errorObj = error;
-      try {
-        if (typeof error === 'string') {
-          errorObj = JSON.parse(error);
-        }
-      } catch (e) {
-        console.error('Error parsing error response:', e);
-      }
-
-      const isInvalidCredentials = (errorObj: any) => {
-        return (
-          (errorObj?.status === 400 && errorObj?.error?.error === 'invalid_username_password') ||
-          (errorObj?.response?.status === 400 &&
-            errorObj?.response?.data?.error === 'invalid_username_password') ||
-          (errorObj?.response?.status === 400 &&
-            errorObj?.response?.data?.error === 'invalid_grant')
-        );
-      };
-
-      if (isInvalidCredentials(errorObj)) {
-        setErrorDetails({
-          title: t('INVALID_CREDENTIALS'),
-          message: t('EMAIL_PASSWORD_NOT_VALID'),
-        });
-      } else {
-        setErrorDetails({
-          title: t('SOMETHING_WENT_WRONG'),
-          message: t('PLEASE_TRY_AGAIN'),
-        });
-      }
+    onError: (error) => {
+      throw error;
     },
   });
-
-  return {
-    ...mutation,
-    errorDetails,
-  };
 };
 
 export const useSignoutMutation = () => {
   return useGlobalMutation({
     mutationKey: ['signout'],
     mutationFn: signout,
+    onError: (error) => {
+      throw error;
+    },
   });
 };
 
 export const useAccountActivation = () => {
-  const { t } = useTranslation();
-  const { showSuccessToast, showErrorToast } = useCustomToast();
-  return useGlobalMutation({
+  return useGlobalMutation<
+    unknown,
+    ErrorResponse,
+    { password: string; code: string; captchaCode: string }
+  >({
     mutationKey: ['accountActivation'],
     mutationFn: accountActivation,
-
-    onSuccess: () => {
-      showSuccessToast({
-        description: t('ACCOUNT_ACTIVATED_SUCCESSFULLY'),
-      });
-    },
-    onError: ({ error }: ErrorResponse) => {
-      showErrorToast(error);
+    onError: (error) => {
+      throw error;
     },
   });
 };
 
 export const useForgotPassword = () => {
-  const { t } = useTranslation();
-  const { showSuccessToast, showErrorToast } = useCustomToast();
-  return useGlobalMutation({
+  return useGlobalMutation<unknown, ErrorResponse, { email: string; captchaCode?: string }>({
     mutationKey: ['forgotPassword'],
     mutationFn: forgotPassword,
-    onSuccess: () => {
-      showSuccessToast({
-        description: t('RESET_PASSWORD_LINK_SENT_EMAIL'),
-      });
-    },
-    onError: ({ error }: ErrorResponse) => {
-      showErrorToast(error);
+    onError: (error) => {
+      throw error;
     },
   });
 };
 
 export const useResetPassword = () => {
-  const { t } = useTranslation();
-  const { showSuccessToast, showErrorToast } = useCustomToast();
-  return useGlobalMutation({
+  return useGlobalMutation<unknown, ErrorResponse, { code: string; password: string }>({
     mutationKey: ['resetPassword'],
     mutationFn: resetPassword,
-    onSuccess: () => {
-      showSuccessToast({
-        description: t('SUCCESSFULLY_SET_PASSWORD'),
-      });
-    },
-    onError: ({ error }: ErrorResponse) => {
-      showErrorToast(error);
+    onError: (error) => {
+      throw error;
     },
   });
 };
 
 export const useResendActivation = () => {
-  const { t } = useTranslation();
-  const { showSuccessToast, showErrorToast } = useCustomToast();
-
-  return useGlobalMutation({
+  return useGlobalMutation<unknown, ErrorResponse, { userId: string }>({
     mutationKey: ['resendActivation'],
     mutationFn: resendActivation,
-    onSuccess: () => {
-      showSuccessToast({
-        description: t('RESET_PASSWORD_LINK_SENT_EMAIL'),
-      });
-    },
-    onError: ({ error }: ErrorResponse) => {
-      showErrorToast(error);
+    onError: (error) => {
+      throw error;
     },
   });
 };
 
 export const useLogoutAllMutation = () => {
-  return useGlobalMutation({
+  return useGlobalMutation<unknown, ErrorResponse>({
     mutationKey: ['logoutAll'],
     mutationFn: logoutAll,
   });
 };
 
-export const useGetLoginOptions = () =>
-  useQuery({ queryKey: ['loginOption'], queryFn: () => getLoginOption() });
+export const useGetLoginOptions = () => {
+  return useGlobalQuery({
+    queryKey: ['getLoginOptions'],
+    queryFn: getLoginOption,
+  });
+};

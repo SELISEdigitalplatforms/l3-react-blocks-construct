@@ -231,10 +231,15 @@ export function EmailView({
         return item;
       });
 
-      setEmails((prev) => ({
-        ...prev,
-        [currentCategory]: updatedCategory,
-      }));
+      setEmails((prev) => {
+        if (Object.hasOwn(prev, currentCategory)) {
+          return {
+            ...prev,
+            [currentCategory]: updatedCategory,
+          };
+        }
+        return prev;
+      });
 
       setSelectedEmail({
         ...email,

@@ -67,6 +67,14 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
+  const parseFullName = (fullName: string) => {
+    const names = fullName.trim().split(' ');
+    return {
+      firstName: names[0] || '',
+      lastName: names.slice(1).join(' ') || '',
+    };
+  };
+
   const { mutate: updateAccount, isPending } = useUpdateAccount({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACCOUNT_QUERY_KEY });
@@ -117,7 +125,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
   }, [watchedValues, userInfo]);
 
   const onSubmit = async (data: FormData) => {
-    const [firstName, lastName] = data.fullName.split(' ');
+    const { firstName, lastName } = parseFullName(data.fullName);
     let profileImageUrl = '';
 
     if (typeof data.profileImageUrl === 'object') {

@@ -30,7 +30,7 @@ export const DevicesTable = () => {
   const PAGE_SIZE = 10;
   const { t } = useTranslation();
 
-  const { data: sessions, isLoading, isFetching } = useGetSessions(page, PAGE_SIZE);
+  const { data: sessions, isLoading } = useGetSessions(page, PAGE_SIZE);
   const columns = useDeviceTableColumns();
 
   const parseMongoSession = (sessionStr: string) => {
@@ -83,7 +83,7 @@ export const DevicesTable = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         const first = entries[0];
-        if (first.isIntersecting && hasMore && !isLoading && !isFetching) {
+        if (first.isIntersecting && hasMore && !isLoading) {
           setPage((prevPage) => prevPage + 1);
         }
       },
@@ -100,7 +100,7 @@ export const DevicesTable = () => {
         observer.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, isLoading, isFetching]);
+  }, [hasMore, isLoading]);
 
   const table = useReactTable({
     data: deviceSessions,
@@ -109,7 +109,7 @@ export const DevicesTable = () => {
   });
 
   const renderTableContent = () => {
-    if (isLoading || isFetching) {
+    if (isLoading) {
       return (
         <div className="flex items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />

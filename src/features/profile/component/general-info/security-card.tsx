@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ShieldCheck, Lock } from 'lucide-react';
 import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
 import { TwoFactorAuthenticationSetup } from '../modals/two-factor-authentication-setup/two-factor-authentication-setup';
@@ -14,7 +15,6 @@ import { UpdatePassword } from '../modals/update-password/update-password';
 export const SecurityCard: React.FC<{
   userInfo: any;
   isLoading: boolean;
-  isFetching: boolean;
   isDemoAccount: boolean;
   t: (key: string) => string;
   currentDialog: MfaDialogState;
@@ -26,7 +26,6 @@ export const SecurityCard: React.FC<{
 }> = ({
   userInfo,
   isLoading,
-  isFetching,
   isDemoAccount,
   t,
   currentDialog,
@@ -36,6 +35,7 @@ export const SecurityCard: React.FC<{
   isChangePasswordModalOpen,
   setIsChangePasswordModalOpen,
 }) => {
+  const [mfaId, setMfaId] = useState<string>('');
   const mfaButtonText = userInfo?.mfaEnabled || userInfo?.isMfaVerified ? t('MANAGE') : t('ENABLE');
 
   const getTooltipText = () => {
@@ -53,6 +53,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             setCurrentDialog={setCurrentDialog}
             onClose={closeAllModals}
+            setMfaId={setMfaId}
           />
         );
       case MfaDialogState.AUTHENTICATOR_APP_SETUP:
@@ -61,6 +62,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             onClose={closeAllModals}
             onNext={() => setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION)}
+            mfaId={mfaId}
           />
         );
       case MfaDialogState.EMAIL_VERIFICATION:
@@ -69,6 +71,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             onClose={closeAllModals}
             onNext={() => setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION)}
+            mfaId={mfaId}
           />
         );
       case MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION:
@@ -105,7 +108,7 @@ export const SecurityCard: React.FC<{
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
-                {isLoading || isFetching ? (
+                {isLoading ? (
                   <Skeleton className="w-[102px] h-8" />
                 ) : (
                   <Button

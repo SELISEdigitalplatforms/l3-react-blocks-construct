@@ -57,8 +57,8 @@ export const UpdatePasswordSuccess: React.FC<UpdatePasswordSuccessProps> = ({ on
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: t('LOGOUT_ERROR'),
-        description: t('SOMETHING_WENT_WRONG_LOGOUT'),
+        title: t('UNEXPECTED_ERROR'),
+        description: t('LOGGED_OUT_YOUR_SECURITY'),
       });
     }
   };
