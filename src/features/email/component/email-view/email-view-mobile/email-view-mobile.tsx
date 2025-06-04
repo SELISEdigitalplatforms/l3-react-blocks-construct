@@ -37,6 +37,7 @@ import { htmlToPlainText } from 'features/email/services/email';
 import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
+import { sanitizeHTML } from 'utils/sanitizer';
 
 /**
  * EmailViewMobile Component
@@ -329,7 +330,7 @@ export function EmailViewMobile({
                 <div className=" mb-6 text-sm px-4">
                   <div
                     dangerouslySetInnerHTML={{
-                      __html: selectedEmail?.content ?? selectedEmail?.preview,
+                      __html: sanitizeHTML(selectedEmail?.content ?? selectedEmail?.preview),
                     }}
                   />
 
@@ -470,13 +471,15 @@ export function EmailViewMobile({
                           <div
                             className="text-sm "
                             dangerouslySetInnerHTML={{
-                              __html: isExpanded ? item.reply : htmlToPlainText(item.reply),
+                              __html: isExpanded
+                                ? sanitizeHTML(item.reply)
+                                : htmlToPlainText(item.reply),
                             }}
                           />
                           <div
                             className={`text-sm text-medium-emphasis  px-2`}
                             dangerouslySetInnerHTML={{
-                              __html: item.prevData,
+                              __html: sanitizeHTML(item.prevData),
                             }}
                           />
                         </button>
