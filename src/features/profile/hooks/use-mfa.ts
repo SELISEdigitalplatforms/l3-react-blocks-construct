@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useGlobalMutation } from 'state/query-client/hooks';
 import {
   generateOTP,
@@ -9,9 +10,9 @@ import {
   getMfaTemplate,
   disableUserMfa,
 } from '../services/mfa.services';
-import { useToast } from 'hooks/use-toast';
+import { useErrorHandler } from 'hooks/use-error-handler';
 import { SetUpTotp, GenerateOTPPayload } from '../types/mfa.types';
-import { useTranslation } from 'react-i18next';
+import { useToast } from 'hooks/use-toast';
 
 /**
  * Custom hook to generate a One-Time Password (OTP) for a given user.
@@ -26,9 +27,16 @@ import { useTranslation } from 'react-i18next';
  * mutate({ userId: 'user-id-123', mfaType: 1 }); // Triggers OTP generation for the given user ID and MFA type
  */
 export const useGenerateOTP = () => {
+  const { handleError } = useErrorHandler();
+
   return useGlobalMutation({
     mutationKey: ['generateOTP'],
     mutationFn: (payload: GenerateOTPPayload) => generateOTP(payload),
+    onError: (error) => {
+      handleError(error, {
+        variant: 'destructive',
+      });
+    },
   });
 };
 
@@ -46,12 +54,18 @@ export const useGenerateOTP = () => {
  */
 export const useVerifyOTP = () => {
   const queryClient = useQueryClient();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['verifyOTP'],
     mutationFn: verifyOTP,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['getAccount'] });
+    },
+    onError: (error) => {
+      handleError(error, {
+        variant: 'destructive',
+      });
     },
   });
 };
@@ -69,9 +83,17 @@ export const useVerifyOTP = () => {
  * mutate({ userId: 'user-123', userMfaType: 2 });
  */
 export const useGetSetUpTotp = () => {
-  return useMutation({
+  const { handleError } = useErrorHandler();
+
+  return useGlobalMutation({
+    mutationKey: ['getSetUpTotp'],
     mutationFn: (queryParams: SetUpTotp) =>
       getSetUpTotp({ queryKey: ['getSetUpTotp', queryParams] }),
+    onError: (error) => {
+      handleError(error, {
+        variant: 'destructive',
+      });
+    },
   });
 };
 
@@ -89,24 +111,14 @@ export const useGetSetUpTotp = () => {
  * mutate(); // Trigger the OTP resend process
  */
 export const useResendOtp = () => {
-  const { toast } = useToast();
-  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['resendOtp'],
     mutationFn: resendOtp,
-    onSuccess: () => {
-      toast({
-        variant: 'success',
-        title: t('OTP_RESENT_SUCCESSFULLY'),
-        description: t('NEW_OTP_HAS_BEEN_SENT_EMAIL'),
-      });
-    },
     onError: (error) => {
-      toast({
+      handleError(error, {
         variant: 'destructive',
-        title: t('FAILED_TO_RESEND_OTP'),
-        description: error?.error?.message ?? t('ERROR_OCCURRED_RESENDING_OTP'),
       });
     },
   });
@@ -156,6 +168,7 @@ export const useGetMfaTemplate = () => {
  */
 export const useDisableUserMfa = () => {
   const queryClient = useQueryClient();
+  const { handleError } = useErrorHandler();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -166,15 +179,13 @@ export const useDisableUserMfa = () => {
       queryClient.invalidateQueries({ queryKey: ['getAccount'] });
       toast({
         variant: 'success',
-        title: t('MFA_DISABLED_SUCCESSFULLY'),
+        title: t('MFA_DISABLED'),
         description: t('MULTI_FACTOR_AUTH_DISABLED_SUCCESSFULLY'),
       });
     },
     onError: (error) => {
-      toast({
+      handleError(error, {
         variant: 'destructive',
-        title: t('FAILED_TO_DISABLE_MFA'),
-        description: error?.error?.message ?? t('ERROR_OCCURRED_WHILE_DISABLING_MFA'),
       });
     },
   });

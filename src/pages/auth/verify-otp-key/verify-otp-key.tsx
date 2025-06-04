@@ -122,7 +122,7 @@ export function VerifyOtpKey() {
             disabled={isResendDisabled}
             onClick={handleResendOTP}
           >
-            {isResendDisabled ? t('RESEND_KEY_IN', { time: formattedTime }) : t('RESEND_KEY')}
+            {isResendDisabled ? `${t('RESEND_KEY_IN')} ${formattedTime}` : `${t('RESEND_KEY')}`}
           </Button>
         )}
       </div>

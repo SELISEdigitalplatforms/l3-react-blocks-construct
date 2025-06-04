@@ -80,8 +80,8 @@ export const TaskManagerDropdownMenu = ({
     setShowConfirm(false);
     toast({
       variant: 'success',
-      title: t('SUCCESS'),
-      description: t('TASK_HAS_BEEN_DELETED'),
+      title: t('TASK_REMOVED'),
+      description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
     });
   };
 
