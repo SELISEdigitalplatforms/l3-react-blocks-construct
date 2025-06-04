@@ -106,6 +106,121 @@ export const TwoFactorAuthenticationSetup: React.FC<
     }
   };
 
+  const renderAuthenticatorAppContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-[40px] h-[40px]" />
+            <Skeleton className="w-[119px] h-[20px]" />
+          </div>
+          <Skeleton className="w-[20px] h-[20px]" />
+        </div>
+      );
+    }
+
+    if (!isAuthenticatorAppEnabled) {
+      return (
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-surface rounded-md">
+              <Smartphone className="text-secondary" size={24} />
+            </div>
+            <h3 className="text-sm font-semibold text-high-emphasis">{t('AUTHENTICATOR_APP')}</h3>
+          </div>
+          <ChevronRight className="text-primary" size={20} />
+        </div>
+      );
+    }
+
+    if (isGeneratingOTP) {
+      return (
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-[40px] h-[40px] rounded-md" />
+            <Skeleton className="w-[119px] h-[20px]" />
+          </div>
+          <Skeleton className="w-[20px] h-[20px]" />
+        </div>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        disabled={!isAuthenticatorAppEnabled}
+        className={`
+        w-full flex items-center justify-between p-4
+        ${isAuthenticatorAppEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
+      `}
+        onClick={handleAuthenticatorAppClick}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-surface rounded-md">
+            <Smartphone className="text-secondary" size={24} />
+          </div>
+          <h3 className="text-sm font-semibold text-high-emphasis">{t('AUTHENTICATOR_APP')}</h3>
+        </div>
+        <ChevronRight className="text-primary" size={20} />
+      </button>
+    );
+  };
+
+  const renderEmailVerificationContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-[40px] h-[40px]" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="w-[119px] h-[18px]" />
+              <Skeleton className="w-[119px] h-[10px]" />
+            </div>
+          </div>
+          <Skeleton className="w-[20px] h-[20px]" />
+        </div>
+      );
+    }
+
+    if (isGeneratingOTP) {
+      return (
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-[40px] h-[40px] rounded-md" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="w-[119px] h-[18px]" />
+              <Skeleton className="w-[119px] h-[10px]" />
+            </div>
+          </div>
+          <Skeleton className="w-[20px] h-[20px]" />
+        </div>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        disabled={!isEmailVerificationEnabled}
+        className={`
+        w-full flex items-center justify-between p-4
+        ${isEmailVerificationEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
+      `}
+        onClick={handleEmailVerificationClick}
+      >
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-surface rounded-md">
+            <Mail className="text-secondary" size={24} />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-high-emphasis">{t('EMAIL_VERIFICATION')}</h3>
+            <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
+          </div>
+        </div>
+        <ChevronRight className="text-primary" size={20} />
+      </button>
+    );
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent hideClose className="rounded-md sm:max-w-[432px] overflow-y-auto max-h-screen">
@@ -114,90 +229,9 @@ export const TwoFactorAuthenticationSetup: React.FC<
           <DialogDescription>{t('ADD_EXTRA_LAYER_SECURITY')}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col w-full">
-          {isLoading ? (
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <Skeleton className="w-[40px] h-[40px]" />
-                <Skeleton className="w-[119px] h-[20px]" />
-              </div>
-              <Skeleton className="w-[20px] h-[20px]" />
-            </div>
-          ) : isGeneratingOTP ? (
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <Skeleton className="w-[40px] h-[40px] rounded-md" />
-                <Skeleton className="w-[119px] h-[20px]" />
-              </div>
-              <Skeleton className="w-[20px] h-[20px]" />
-            </div>
-          ) : (
-            <button
-              type="button"
-              disabled={!isAuthenticatorAppEnabled}
-              className={`
-              w-full flex items-center justify-between p-4
-              ${isAuthenticatorAppEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
-            `}
-              onClick={handleAuthenticatorAppClick}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-surface rounded-md">
-                  <Smartphone className="text-secondary" size={24} />
-                </div>
-                <h3 className="text-sm font-semibold text-high-emphasis">
-                  {t('AUTHENTICATOR_APP')}
-                </h3>
-              </div>
-              <ChevronRight className="text-primary" size={20} />
-            </button>
-          )}
+          {renderAuthenticatorAppContent()}
           <Separator />
-          {isLoading ? (
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <Skeleton className="w-[40px] h-[40px]" />
-                <div className="flex flex-col gap-1">
-                  <Skeleton className="w-[119px] h-[18px]" />
-                  <Skeleton className="w-[119px] h-[10px]" />
-                </div>
-              </div>
-              <Skeleton className="w-[20px] h-[20px]" />
-            </div>
-          ) : isGeneratingOTP ? (
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <Skeleton className="w-[40px] h-[40px] rounded-md" />
-                <div className="flex flex-col gap-1">
-                  <Skeleton className="w-[119px] h-[18px]" />
-                  <Skeleton className="w-[119px] h-[10px]" />
-                </div>
-              </div>
-              <Skeleton className="w-[20px] h-[20px]" />
-            </div>
-          ) : (
-            <button
-              type="button"
-              disabled={!isEmailVerificationEnabled}
-              className={`
-              w-full flex items-center justify-between p-4
-              ${isEmailVerificationEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
-            `}
-              onClick={handleEmailVerificationClick}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-surface rounded-md">
-                  <Mail className="text-secondary" size={24} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-high-emphasis">
-                    {t('EMAIL_VERIFICATION')}
-                  </h3>
-                  <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
-                </div>
-              </div>
-              <ChevronRight className="text-primary" size={20} />
-            </button>
-          )}
+          {renderEmailVerificationContent()}
         </div>
 
         <DialogFooter className="mt-5 flex justify-end">
