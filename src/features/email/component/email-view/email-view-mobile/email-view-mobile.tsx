@@ -466,12 +466,9 @@ export function EmailViewMobile({
                           <div className="text-sm">
                             {isExpanded ? htmlToPlainText(item.reply) : htmlToPlainText(item.reply)}
                           </div>
-                          <div
-                            className={`text-sm text-medium-emphasis  px-2`}
-                            dangerouslySetInnerHTML={{
-                              __html: item.prevData,
-                            }}
-                          />
+                          <div className={`text-sm text-medium-emphasis  px-2`}>
+                            {htmlToPlainText(item.prevData)}
+                          </div>
                         </button>
 
                         {((item?.images?.length ?? 0) > 0 ||
