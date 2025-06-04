@@ -1,119 +1,83 @@
 import { useTranslation } from 'react-i18next';
-import { ChartNoAxesCombined, CreditCard, FileText, TrendingUp, Wallet } from 'lucide-react';
+import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'components/ui/select';
-
-const monthsOfYear = [
-  { value: 'january', label: 'JANUARY' },
-  { value: 'february', label: 'FEBRUARY' },
-  { value: 'march', label: 'MARCH' },
-  { value: 'april', label: 'APRIL' },
-  { value: 'may', label: 'MAY' },
-  { value: 'june', label: 'JUNE' },
-  { value: 'july', label: 'JULY' },
-  { value: 'august', label: 'AUGUST' },
-  { value: 'september', label: 'SEPTEMBER' },
-  { value: 'october', label: 'OCTOBER' },
-  { value: 'november', label: 'NOVEMBER' },
-  { value: 'december', label: 'DECEMBER' },
-];
+import { Separator } from 'components/ui/separator';
 
 export function InvoicesOverview() {
   const { t } = useTranslation();
 
   return (
     <Card className="w-full border-none rounded-[8px] shadow-sm">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl text-high-emphasis">{t('OVERVIEW')}</CardTitle>
-          <Select>
-            <SelectTrigger className="w-[120px] h-[28px] px-2 py-1">
-              <SelectValue placeholder={t('THIS_MONTH')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {monthsOfYear.map((month) => (
-                  <SelectItem key={month.value} value={month.value}>
-                    {t(month.label)}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+      <CardHeader className="!pb-0">
+        <CardTitle className="text-xl text-high-emphasis">{t('OVERVIEW')}</CardTitle>
         <CardDescription />
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-4 rounded-lg px-3 py-2">
-            <div className="flex h-14 w-14 items-center justify-center">
-              <ChartNoAxesCombined className="h-7 w-7 text-primary" />
+      <CardContent className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-2 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary-50">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-medium-emphasis">
+                {t('TOTAL_INVOICES')}
+              </span>
             </div>
             <div>
-              <h3 className="text-sm font-normal text-high-emphasis">{t('NET_PROFIT')}</h3>
-              <h1 className="text-[32px] font-semibold text-high-emphasis">{t('CHF')} 44,450.00</h1>
-              <div className="flex gap-1 items-center">
-                <TrendingUp className="h-4 w-4 text-success" />
-                <span className="text-sm text-success font-semibold">+8%</span>
-                <span className="text-sm text-medium-emphasis">{t('FROM_LAST_MONTH')}</span>
-              </div>
+              <h3 className="text-2xl font-semibold text-high-emphasis">120</h3>
+              <p className="text-base font-medium text-high-emphasis">CHF 82,564.00</p>
             </div>
           </div>
-          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-4 rounded-lg px-3 py-2">
-            <div className="flex h-14 w-14 bg-surface rounded-[4px] items-center justify-center">
-              <Wallet className="h-7 w-7 text-secondary" />
+          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-2 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-success-background">
+                <CheckCircle className="h-5 w-5 text-success" />
+              </div>
+              <span className="text-sm font-medium text-medium-emphasis">{t('PAID')}</span>
             </div>
             <div>
-              <h3 className="text-sm font-normal text-high-emphasis">{t('TOTAL_REVENUE')}</h3>
-              <h1 className="text-[32px] font-semibold text-high-emphasis">
-                {t('CHF')} 142,300.00
-              </h1>
-              <div className="flex gap-1 items-center">
-                <TrendingUp className="h-4 w-4 text-success" />
-                <span className="text-sm text-success font-semibold">+10.2%</span>
-                <span className="text-sm text-medium-emphasis">{t('FROM_LAST_MONTH')}</span>
-              </div>
+              <h3 className="text-2xl font-semibold text-high-emphasis">73</h3>
+              <p className="text-base font-medium text-high-emphasis">CHF 35,200.00</p>
             </div>
           </div>
-          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-4 rounded-lg px-3 py-2">
-            <div className="flex h-14 w-14 bg-surface rounded-[4px] items-center justify-center">
-              <CreditCard className="h-7 w-7 text-rose-500" />
+          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-2 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-warning-background">
+                <Clock className="h-5 w-5 text-warning" />
+              </div>
+              <span className="text-sm font-medium text-medium-emphasis">{t('PENDING')}</span>
             </div>
             <div>
-              <h3 className="text-sm font-normal text-high-emphasis">{t('TOTAL_EXPENSES')}</h3>
-              <h1 className="text-[32px] font-semibold text-high-emphasis">{t('CHF')} 97,850.00</h1>
-              <div className="flex gap-1 items-center">
-                <TrendingUp className="h-4 w-4 text-error" />
-                <span className="text-sm text-error font-semibold">+2.5%</span>
-                <span className="text-sm text-medium-emphasis">{t('FROM_LAST_MONTH')}</span>
-              </div>
+              <h3 className="text-2xl font-semibold text-high-emphasis">47</h3>
+              <p className="text-base font-medium text-high-emphasis">CHF 27,450.00</p>
             </div>
           </div>
-          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-4 rounded-lg px-3 py-2">
-            <div className="flex h-14 w-14 bg-surface rounded-[4px] items-center justify-center">
-              <FileText className="h-7 w-7 text-purple-500" />
+          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-2 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-error-background">
+                <AlertCircle className="h-5 w-5 text-error" />
+              </div>
+              <span className="text-sm font-medium text-medium-emphasis">{t('OVERDUE')}</span>
             </div>
             <div>
-              <h3 className="text-sm font-normal text-high-emphasis">
-                {t('OUTSTANDING_INVOICES')}
-              </h3>
-              <h1 className="text-[32px] font-semibold text-high-emphasis">{t('CHF')} 11,200.00</h1>
-              <div className="flex gap-1 items-center">
-                <span className="text-sm text-error font-semibold">2</span>
-                <span className="text-sm text-medium-emphasis">{t('OVERDUE')}</span>
-                <span className="text-sm text-warning font-semibold">3</span>
-                <span className="text-sm text-medium-emphasis">{t('PENDING')}</span>
+              <h3 className="text-2xl font-semibold text-high-emphasis">4</h3>
+              <p className="text-base font-medium text-high-emphasis">CHF 9,914.00</p>
+            </div>
+          </div>
+          <div className="flex flex-col hover:bg-primary-50 cursor-pointer gap-2 rounded-lg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-surface">
+                <FileEdit className="h-5 w-5 text-medium-emphasis" />
               </div>
+              <span className="text-sm font-medium text-medium-emphasis">{t('DRAFT')}</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-semibold text-high-emphasis">3</h3>
+              <p className="text-base font-medium text-high-emphasis">CHF 10,000.00</p>
             </div>
           </div>
         </div>
+        <Separator />
       </CardContent>
     </Card>
   );
