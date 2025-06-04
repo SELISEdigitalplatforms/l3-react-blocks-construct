@@ -490,16 +490,17 @@ export function Email() {
 
   const handleEmailSelection = (email: TEmail) => {
     setSelectedEmail(email);
-    setEmails((prev) => ({
-      ...prev,
-      ...(category
-        ? {
-            [category]: prev[category]?.map((e) =>
-              e.id === email.id ? { ...e, isRead: true } : e
-            ),
-          }
-        : {}),
-    }));
+
+    setEmails((prev) => {
+      if (category && Object.prototype.hasOwnProperty.call(prev, category)) {
+        return {
+          ...prev,
+          [category]: prev[category]?.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)),
+        };
+      }
+      return prev;
+    });
+
     onSetActiveActionFalse();
     setIsReplyVisible(false);
     setCheckedEmailIds([]);
