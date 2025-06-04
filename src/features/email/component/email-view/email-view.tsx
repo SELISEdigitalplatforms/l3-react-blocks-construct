@@ -232,7 +232,7 @@ export function EmailView({
       });
 
       setEmails((prev) => {
-        if (Object.prototype.hasOwnProperty.call(prev, currentCategory)) {
+        if (Object.hasOwn(prev, currentCategory)) {
           return {
             ...prev,
             [currentCategory]: updatedCategory,

@@ -80,8 +80,7 @@ export const sanitizeHTML = (html) => {
     RETURN_DOM: false,
 
     ALLOWED_URI_REGEXP:
-      /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.:]|$))/i,
-
+      /^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp:|[^a-z]|[a-z+.-]+(?:[^a-z+.:]|$))/i,
     FORBID_ATTR: ['onerror', 'onload', 'onclick'],
   });
 };

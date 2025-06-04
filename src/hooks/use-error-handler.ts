@@ -155,9 +155,9 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
 
     // Finally fallback to other error messages
     return (
-      error.message ||
-      (typeof error.error === 'string' ? error.error : error.error?.message) ||
-      defaultOptions.defaultMessage ||
+      error.message ??
+      (typeof error.error === 'string' ? error.error : error.error?.message) ??
+      defaultOptions.defaultMessage ??
       t('SOMETHING_WENT_WRONG')
     );
   };
@@ -182,7 +182,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     } else {
       const errorDetails = normalizeError(error);
       // For backend errors (when error has error_description or error object), use default "Error" title
-      const isBackendError = errorDetails.error_description || errorDetails.error;
+      const isBackendError = errorDetails.error_description ?? errorDetails.error;
       finalMessage = translate
         ? t(getErrorMessage(errorDetails, messageMap))
         : getErrorMessage(errorDetails, messageMap);
