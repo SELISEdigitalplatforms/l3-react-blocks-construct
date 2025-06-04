@@ -40,8 +40,8 @@ export const EnableMfa = () => {
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: t('LOGOUT_ERROR'),
-        description: t('SOMETHING_WRONG_LOGOUT'),
+        title: t('UNEXPECTED_ERROR'),
+        description: t('LOGGED_OUT_YOUR_SECURITY'),
       });
     }
   };
@@ -64,7 +64,7 @@ export const EnableMfa = () => {
           {t('LOGOUT')}
         </Button>
         <Button onClick={() => navigate('/profile')} className="min-w-[118px]">
-         {t('GO_TO_PROFILE')}
+          {t('GO_TO_PROFILE')}
         </Button>
       </DialogFooter>
     </DialogContent>

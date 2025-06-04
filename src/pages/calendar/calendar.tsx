@@ -34,6 +34,7 @@ export function CalendarPage() {
     deleteEvent: handleDelete,
     updateEvent: handleEventUpdate,
     filterEvents: onFilterEvents,
+    restoreEvent,
   } = useCalendarEvents();
 
   const {
@@ -93,6 +94,7 @@ export function CalendarPage() {
               onClose={closeAllModals}
               onNext={navigateToEditEvent}
               onDelete={handleDelete}
+              onRestore={restoreEvent}
             />
           ))}
 
@@ -103,6 +105,7 @@ export function CalendarPage() {
             onClose={closeAllModals}
             onUpdate={handleEventUpdate}
             onNext={navigateToRecurrence}
+            onRestore={restoreEvent}
           />
         )}
 
@@ -125,9 +128,12 @@ export function CalendarPage() {
             title={t('WANT_TO_RESCHEDULE_THIS_EVENT')}
             description={
               <div>
-                <p>{t('NEW_DATE')}: {format(tempEvent.start, 'yyyy-MM-dd')}</p>
                 <p>
-                  {t('NEW_TIME')}: {format(tempEvent.start, 'HH:mm')} - {format(tempEvent.end, 'HH:mm')}
+                  {t('NEW_DATE')}: {format(tempEvent.start, 'yyyy-MM-dd')}
+                </p>
+                <p>
+                  {t('NEW_TIME')}: {format(tempEvent.start, 'HH:mm')} -{' '}
+                  {format(tempEvent.end, 'HH:mm')}
                 </p>
               </div>
             }

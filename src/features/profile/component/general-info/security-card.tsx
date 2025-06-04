@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ShieldCheck, Lock } from 'lucide-react';
 import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
 import { TwoFactorAuthenticationSetup } from '../modals/two-factor-authentication-setup/two-factor-authentication-setup';
@@ -34,6 +35,7 @@ export const SecurityCard: React.FC<{
   isChangePasswordModalOpen,
   setIsChangePasswordModalOpen,
 }) => {
+  const [mfaId, setMfaId] = useState<string>('');
   const mfaButtonText = userInfo?.mfaEnabled || userInfo?.isMfaVerified ? t('MANAGE') : t('ENABLE');
 
   const getTooltipText = () => {
@@ -51,6 +53,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             setCurrentDialog={setCurrentDialog}
             onClose={closeAllModals}
+            setMfaId={setMfaId}
           />
         );
       case MfaDialogState.AUTHENTICATOR_APP_SETUP:
@@ -59,6 +62,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             onClose={closeAllModals}
             onNext={() => setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION)}
+            mfaId={mfaId}
           />
         );
       case MfaDialogState.EMAIL_VERIFICATION:
@@ -67,6 +71,7 @@ export const SecurityCard: React.FC<{
             userInfo={userInfo}
             onClose={closeAllModals}
             onNext={() => setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION)}
+            mfaId={mfaId}
           />
         );
       case MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION:
