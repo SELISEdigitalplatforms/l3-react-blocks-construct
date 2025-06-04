@@ -105,8 +105,8 @@ export function ColumnMenu({
     setOpen(false);
     toast({
       variant: 'success',
-      title: t('DELETED'),
-      description: t('COLUMN_DELETED_SUCCESSFULLY'),
+      title: t('COLUMN_DELETED'),
+      description: t('COLUMN_HAS_DELETED_SUCCESSFULLY'),
     });
   };
 

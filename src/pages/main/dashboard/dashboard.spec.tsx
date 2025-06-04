@@ -64,7 +64,6 @@ jest.mock('features/profile/hooks/use-account', () => ({
   useGetAccount: jest.fn(() => ({
     data: { mfaEnabled: false },
     isLoading: false,
-    isFetching: false,
   })),
 }));
 

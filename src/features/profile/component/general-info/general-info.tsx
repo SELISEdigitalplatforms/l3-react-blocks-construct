@@ -15,7 +15,7 @@ import { SecurityCard } from './security-card';
  */
 
 export const GeneralInfo = () => {
-  const { data: userInfo, isLoading, isFetching } = useGetAccount();
+  const { data: userInfo, isLoading } = useGetAccount();
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [currentDialog, setCurrentDialog] = useState(MfaDialogState.NONE);
@@ -61,7 +61,6 @@ export const GeneralInfo = () => {
       <ProfileCard
         userInfo={userInfo}
         isLoading={isLoading}
-        isFetching={isFetching}
         formatDate={formatDate}
         onEditClick={() => setIsEditProfileModalOpen(true)}
         isEditProfileModalOpen={isEditProfileModalOpen}
@@ -72,7 +71,6 @@ export const GeneralInfo = () => {
       <SecurityCard
         userInfo={userInfo}
         isLoading={isLoading}
-        isFetching={isFetching}
         isDemoAccount={isDemoAccount}
         t={t}
         currentDialog={currentDialog}

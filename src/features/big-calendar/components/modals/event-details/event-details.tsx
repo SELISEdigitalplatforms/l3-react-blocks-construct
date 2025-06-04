@@ -24,6 +24,7 @@ interface EventDetailsProps {
   onClose: () => void;
   onNext: () => void;
   onDelete: (eventId: string, deleteOption?: DeleteOption) => void;
+  onRestore?: () => boolean;
 }
 
 // Extracted constants to avoid duplication
@@ -55,8 +56,14 @@ const TEXT_LOW_EMPHASIS = 'text-low-emphasis';
  * @param {EventDetailsProps} props - The props for configuring the event details dialog.
  * @returns {JSX.Element} The rendered JSX element for the event details dialog.
  */
-export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<EventDetailsProps>) {
-  const { toast } = useToast();
+export function EventDetails({
+  event,
+  onClose,
+  onNext,
+  onDelete,
+  onRestore,
+}: Readonly<EventDetailsProps>) {
+  const { toast, dismiss } = useToast();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
@@ -88,9 +95,22 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   const showDeletionSuccessToast = () => {
     toast({
       variant: 'success',
-      title: t('EVENT_DELETED_SUCCESSFULLY'),
-      description: `${t('THE_EVENT_TITLED')} "${event.title}" ${t('HAS_BEEN_SUCCESSFULLY_DELETED')}.`,
+      title: t('EVENT_DELETED'),
+      description: t('EVENT_SUCCESSFULLY_REMOVE_CALENDAR'),
+      action: onRestore ? (
+        <Button variant="link" size="sm" onClick={handleUndoDelete}>
+          {t('UNDO')}
+        </Button>
+      ) : undefined,
     });
+  };
+
+  // Handle undo delete action
+  const handleUndoDelete = () => {
+    if (onRestore) {
+      onRestore();
+      dismiss();
+    }
   };
 
   useEffect(() => {
@@ -117,6 +137,7 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   const handleDeleteConfirm = () => {
     onDelete(event.eventId ?? '');
     closeDialogsAndParent();
+    showDeletionSuccessToast();
   };
 
   const handleRecurringDeleteConfirm = (deleteOption: DeleteOption) => {
@@ -128,8 +149,8 @@ export function EventDetails({ event, onClose, onNext, onDelete }: Readonly<Even
   const handleMeetingLinkClick = () => {
     toast({
       variant: 'success',
-      title: t('ZOOM_LINK_CLICKED'),
-      description: t('OPENING_ZOOM_PLACEHOLDER_LINK'),
+      title: t('OPENING_MEETING_LINK'),
+      description: t('REDIRECTING_MEETING_LINK'),
     });
   };
 
