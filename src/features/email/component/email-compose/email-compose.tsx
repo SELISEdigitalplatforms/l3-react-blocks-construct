@@ -162,8 +162,8 @@ export function EmailCompose({
     if (toTags.length === 0 || !emailData.subject.trim()) {
       toast({
         variant: 'destructive',
-        title: t('ERROR'),
-        description: t('ALL_FIELDS_REQUIRED'),
+        title: t('NO_RECIPIENT'),
+        description: t('PLEASE_SPECIFY_ONE_RECIPIENT'),
       });
       return;
     }
@@ -172,8 +172,8 @@ export function EmailCompose({
     onClose();
     toast({
       variant: 'success',
-      title: t('SUCCESS'),
-      description: t('YOUR_EMAIL_BEEN_SENT'),
+      title: t('EMAIL_SENT'),
+      description: t('EMAIL_SENT_SUCCESSFULLY'),
     });
   };
 

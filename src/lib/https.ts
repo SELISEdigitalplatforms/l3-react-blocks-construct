@@ -1,5 +1,6 @@
 import { useAuthStore } from 'state/store/auth';
 import { getRefreshToken } from 'features/auth/services/auth.service';
+import API_CONFIG, { isLocalhost } from 'config/api';
 
 /**
  * HTTP Client Module
@@ -47,9 +48,9 @@ import { getRefreshToken } from 'features/auth/services/auth.service';
  * }
  *
  * @note Requires environment variables:
- * - REACT_APP_PUBLIC_BACKEND_URL: Base URL for API requests
+ * - REACT_APP_PUBLIC_BLOCKS_API_URL: Base URL for API requests
  * - REACT_APP_PUBLIC_X_BLOCKS_KEY: API key for authentication
- * - REACT_APP_COOKIE_ENABLED: Flag to control token storage method
+ *
  */
 
 interface Https {
@@ -81,8 +82,9 @@ export class HttpError extends Error {
   }
 }
 
-const BASE_URL = process.env.REACT_APP_PUBLIC_BACKEND_URL?.replace(/\/$/, '');
-const BLOCKS_KEY = process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY ?? '';
+const BASE_URL = API_CONFIG.baseUrl?.replace(/\/$/, '');
+const BLOCKS_KEY = API_CONFIG.blocksKey ?? '';
+const localHostChecker = isLocalhost();
 
 export const clients: Https = {
   async get<T>(url: string, headers: HeadersInit = {}): Promise<T> {
@@ -108,9 +110,13 @@ export const clients: Https = {
 
     const config: RequestInit = {
       method,
-      credentials: 'include',
       headers: requestHeaders,
+      referrerPolicy: 'no-referrer',
     };
+
+    if (!localHostChecker) {
+      config.credentials = 'include';
+    }
 
     if (body) {
       config.body = body;
@@ -138,8 +144,7 @@ export const clients: Https = {
   },
 
   createHeaders(headers: any): Headers {
-    const authToken =
-      process.env.REACT_APP_COOKIE_ENABLED === 'false' ? useAuthStore.getState().accessToken : null;
+    const authToken = localHostChecker ? useAuthStore.getState().accessToken : null;
 
     const baseHeaders = {
       'Content-Type': 'application/json',
@@ -150,10 +155,11 @@ export const clients: Https = {
     const headerEntries =
       headers instanceof Headers ? Object.fromEntries(headers.entries()) : headers;
 
-    return new Headers({
+    const newHeader = new Headers({
       ...baseHeaders,
       ...headerEntries,
     });
+    return newHeader;
   },
 
   async handleAuthError<T>(

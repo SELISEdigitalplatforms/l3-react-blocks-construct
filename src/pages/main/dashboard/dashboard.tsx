@@ -7,12 +7,10 @@ import {
 } from 'features/dashboard';
 import { Button } from 'components/ui/button';
 import { useGetAccount } from 'features/profile/hooks/use-account';
-import { Dialog } from 'components/ui/dialog';
-import { EnableMfa } from 'features/profile';
 import { useTranslation } from 'react-i18next';
 
 export function Dashboard() {
-  const { data, isLoading } = useGetAccount();
+  const { isLoading } = useGetAccount();
   const { t } = useTranslation();
 
   return (
@@ -53,13 +51,6 @@ export function Dashboard() {
             </div>
             <DashboardSystemOverview />
           </div>
-          {!data?.mfaEnabled &&
-            !data?.isMfaVerified &&
-            data?.email !== 'demo.construct@seliseblocks.com' && (
-              <Dialog open={!data?.mfaEnabled}>
-                <EnableMfa />
-              </Dialog>
-            )}
         </div>
       )}
     </>

@@ -60,7 +60,7 @@ class SessionsService {
   static async getSessions({
     page = 0,
     pageSize = 10,
-    projectkey = process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY ?? '',
+    projectkey = API_CONFIG.blocksKey ?? '',
     filter,
   }: FetchSessionsParams): Promise<IDeviceSessionResponse> {
     const queryParams = new URLSearchParams({

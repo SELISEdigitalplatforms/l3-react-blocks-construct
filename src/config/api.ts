@@ -6,12 +6,26 @@ interface IAPIConfig {
   };
 }
 
-if (!process.env.REACT_APP_PUBLIC_BACKEND_URL || !process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY) {
+const getBaseUrl = (): string => {
+  return isLocalhost()
+    ? (process.env.REACT_APP_PUBLIC_BLOCKS_API_URL ?? '')
+    : (process.env.REACT_APP_PUBLIC_API_URL ?? '');
+};
+
+export const isLocalhost = (): boolean => {
+  return (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '0.0.0.0'
+  );
+};
+
+if (!getBaseUrl() || !process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY) {
   throw new Error('Required environment variables are not defined');
 }
 
 const API_CONFIG: IAPIConfig = {
-  baseUrl: process.env.REACT_APP_PUBLIC_BACKEND_URL,
+  baseUrl: getBaseUrl(),
   blocksKey: process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY,
   auth: {
     token: '/authentication/v1/OAuth/Token',

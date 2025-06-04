@@ -23,28 +23,6 @@ import { UpdatePasswordSuccess } from '../update-password-success/update-passwor
 import { SharedPasswordStrengthChecker } from 'components/core/shared-password-strength-checker';
 import { useTranslation } from 'react-i18next';
 
-/**
- * Component to allow users to update their password.
- * It includes form validation, password strength checking, and feedback on successful or failed password change.
- *
- * @component
- *
- * @param {Object} props - The component props.
- * @param {Function} props.onClose - The function to call when the modal/dialog should be closed.
- * @param {boolean} [props.open] - Optional flag to control the open state of the dialog.
- * @param {Function} [props.onOpenChange] - Optional function to be called when the open state of the dialog changes.
- *
- * @returns {JSX.Element} - The rendered component.
- *
- * @example
- * // Example usage
- * <UpdatePassword
- *   open={isDialogOpen}
- *   onClose={() => setDialogOpen(false)}
- *   onOpenChange={setDialogOpen}
- * />
- */
-
 type UpdatePasswordProps = {
   onClose: () => void;
   open?: boolean;
@@ -68,6 +46,14 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
       form.setError('confirmNewPassword', {
         type: 'manual',
         message: t('PASSWORDS_DO_NOT_MATCH'),
+      });
+      return;
+    }
+
+    if (values.oldPassword === values.newPassword) {
+      form.setError('newPassword', {
+        type: 'manual',
+        message: "New password shouldn't match current password",
       });
       return;
     }
@@ -96,6 +82,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
 
   const password = form.watch('newPassword');
   const confirmPassword = form.watch('confirmNewPassword');
+  const oldPassword = form.watch('oldPassword');
 
   const onModalClose = () => {
     setUpdatePasswordSuccessModalOpen(false);
@@ -159,9 +146,11 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                     </FormItem>
                   )}
                 />
+
                 <SharedPasswordStrengthChecker
                   password={password}
                   confirmPassword={confirmPassword}
+                  excludePassword={oldPassword}
                   onRequirementsMet={setPasswordRequirementsMet}
                 />
               </div>

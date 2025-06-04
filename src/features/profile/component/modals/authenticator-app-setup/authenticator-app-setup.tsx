@@ -12,7 +12,7 @@ import { Button } from 'components/ui/button';
 import UIOtpInput from 'components/core/otp-input/otp-input';
 import { useToast } from 'hooks/use-toast';
 import { User } from 'types/user.type';
-import { useGenerateOTP, useGetSetUpTotp, useVerifyOTP } from '../../../hooks/use-mfa';
+import { useGetSetUpTotp, useVerifyOTP } from '../../../hooks/use-mfa';
 import QRCodeDummyImage from 'assets/images/image_off_placeholder.webp';
 import { SetUpTotp, VerifyOTP } from '../../../types/mfa.types';
 import API_CONFIG from '../../../../../config/api';
@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
  * @param {User} [props.userInfo] - The user data, which contains information for setting up MFA (optional).
  * @param {Function} props.onClose - The function to close the dialog.
  * @param {Function} props.onNext - The function to be called when the setup is successful and the next step should be triggered.
+ * @param {string} props.mfaId - The ID of the MFA to be set up.
  *
  * @returns {JSX.Element} The rendered component.
  */
@@ -33,12 +34,14 @@ type AuthenticatorAppSetupProps = {
   userInfo?: User;
   onClose: () => void;
   onNext: () => void;
+  mfaId: string;
 };
 
 export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps>> = ({
   userInfo,
   onClose,
   onNext,
+  mfaId,
 }) => {
   const { toast } = useToast();
   const [otpValue, setOtpValue] = useState<string>('');
@@ -46,26 +49,10 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
   const [isImageError, setIsImageError] = useState<boolean>(false);
   const [qrCodeUri, setQrCodeUri] = useState<string>('');
   const [manualQrCode, setManualQrCode] = useState<string>('');
-  const [mfaId, setMfaId] = useState('');
   const lastVerifiedOtpRef = useRef<string>('');
   const { mutate: setUpTotp, isPending: setUpTotpPending } = useGetSetUpTotp();
   const { mutate: verifyOTP, isPending: verifyOtpPending } = useVerifyOTP();
-  const { mutate: generateOTP } = useGenerateOTP();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (!userInfo) return;
-    generateOTP(
-      { userId: userInfo.itemId, mfaType: 1 },
-      {
-        onSuccess: (res) => {
-          if (res?.isSuccess) {
-            setMfaId(res?.mfaId);
-          }
-        },
-      }
-    );
-  }, [generateOTP, userInfo]);
 
   useEffect(() => {
     if (!userInfo) return;
@@ -85,8 +72,8 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
       onError: () => {
         toast({
           variant: 'destructive',
-          title: t('ERROR'),
-          description: t('FAILED_GENERATE_QR_CODE'),
+          title: t('FAILED_GENERATE_QR_CODE'),
+          description: t('SYSTEM_FAILED_GENERATE_QRCODE'),
         });
       },
     });
@@ -96,8 +83,8 @@ export const AuthenticatorAppSetup: React.FC<Readonly<AuthenticatorAppSetupProps
     if (!mfaId) {
       toast({
         variant: 'destructive',
-        title: t('SETUP_INCOMPLETE'),
-        description: t('PLEASE_GENERATE_QR_CODE'),
+        title: t('SETUP_NOT_COMPLETE'),
+        description: t('MFA_SETUP_NOT_COMPELE'),
       });
       return;
     }

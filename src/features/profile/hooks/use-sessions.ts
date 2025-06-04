@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
 import { useGetAccount } from './use-account';
+import { useGlobalQuery } from 'state/query-client/hooks';
 import API_CONFIG from '../../../config/api';
 import SessionsService, { IDeviceSessionResponse } from '../services/device.service';
 
@@ -20,7 +20,7 @@ import SessionsService, { IDeviceSessionResponse } from '../services/device.serv
 export const useGetSessions = (page = 0, pageSize = 10) => {
   const { data: account } = useGetAccount();
 
-  return useQuery<IDeviceSessionResponse>({
+  return useGlobalQuery<IDeviceSessionResponse>({
     queryKey: ['sessions', account?.itemId, page, pageSize],
     queryFn: async () => {
       const response = await SessionsService.getSessions({
@@ -51,7 +51,7 @@ export const useGetSessions = (page = 0, pageSize = 10) => {
 export const useGetActiveDeviceSessions = () => {
   const { data: account } = useGetAccount();
 
-  return useQuery({
+  return useGlobalQuery({
     queryKey: ['activeSessions', account?.itemId],
     queryFn: () => SessionsService.getActiveDeviceSessions(account?.itemId ?? ''),
     enabled: !!account?.itemId,

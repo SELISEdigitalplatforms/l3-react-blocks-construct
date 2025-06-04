@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
+import { useErrorHandler } from 'hooks/use-error-handler';
 import { useGlobalMutation, useGlobalQuery } from 'state/query-client/hooks';
 import {
   changePassword,
@@ -22,6 +23,10 @@ export const useGetAccount = () => {
   return useGlobalQuery({
     queryKey: ['getAccount'],
     queryFn: getAccount,
+    staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep unused data in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if data exists
   });
 };
 
@@ -45,6 +50,7 @@ export const useGetAccount = () => {
 export const useCreateAccount = (options?: { onSuccess?: () => void }) => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['createAccount'],
@@ -52,17 +58,16 @@ export const useCreateAccount = (options?: { onSuccess?: () => void }) => {
     onSuccess: () => {
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('USER_HAS_BEEN_ADDED_SUCCESSFULLY'),
+        title: t('USER_ADDED'),
+        description: t('USER_HAS_ADDED_SUCCESSFULLY'),
       });
 
       options?.onSuccess?.();
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: error?.error?.message ?? t('USER_CREATION_FAILED'),
+      handleError(error, {
+        title: t('UNABLE_ADD_USER'),
+        defaultMessage: t('ERROR_OCCURRED_WHILE_ADDING_USER'),
       });
     },
   });
@@ -89,6 +94,7 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['updateAccount'],
@@ -97,17 +103,16 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
       queryClient.invalidateQueries({ queryKey: ['getAccount'] });
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('PROFILE_SUCCESSFULLY_UPDATED'),
+        title: t('PROFILE_UPDATED'),
+        description: t('PROFILE_HAS_UPDATED_SUCCESSFULLY'),
       });
 
       options?.onSuccess?.();
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: error?.error?.message ?? t('PROFILE_UPDATED_FAILED_PLEASE_CHECK'),
+      handleError(error, {
+        title: t('UPDATE_FAILED'),
+        defaultMessage: t('ERROR_OCCURRED_WHILE_UPDATING_PROFILE'),
       });
     },
   });
@@ -125,6 +130,7 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
 export const useChangePassword = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationKey: ['changePassword'],
@@ -132,15 +138,14 @@ export const useChangePassword = () => {
     onSuccess: () => {
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('PASSWORD_SUCCESSFULLY_UPDATED'),
+        title: t('PASSWORD_UPDATED'),
+        description: t('PASSWORD_HAS_UPDATED_SUCCESSFULLY'),
       });
     },
-    onError: () => {
-      toast({
-        variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: t('PLEASE_CHECK_YOUR_PASSWORD'),
+    onError: (error) => {
+      handleError(error, {
+        title: t('UPDATE_FAILED'),
+        defaultMessage: t('PLEASE_CHECK_PASSWORD_TRY_AGAIN'),
       });
     },
   });
@@ -157,7 +162,7 @@ export const ACCOUNT_QUERY_KEY = ['account'];
  * const { data, error, isLoading } = useAccountQuery();
  */
 export const useAccountQuery = () => {
-  return useQuery({
+  return useGlobalQuery({
     queryKey: ACCOUNT_QUERY_KEY,
     queryFn: getAccount,
   });
