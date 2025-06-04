@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Separator } from 'components/ui/separator';
+import InvoiceTable from '../invoice-table/invoice-table';
 
 export function InvoicesOverview() {
   const { t } = useTranslation();
@@ -78,6 +79,7 @@ export function InvoicesOverview() {
           </div>
         </div>
         <Separator />
+        <InvoiceTable />
       </CardContent>
     </Card>
   );
