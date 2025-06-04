@@ -36,6 +36,7 @@ import { htmlToPlainText } from 'features/email/services/email';
 import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
+import { sanitizeHTML } from 'utils/sanitizer';
 
 interface AttachmentDisplayProps {
   attachments?: string[];
@@ -481,7 +482,11 @@ export function EmailViewGrid({
         </div>
 
         <div className="mb-6 text-sm px-4">
-          <div>{htmlToPlainText(selectedEmail?.content ?? selectedEmail?.preview)}</div>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHTML(selectedEmail?.content ?? selectedEmail?.preview),
+            }}
+          />
         </div>
 
         {/* Reply Editor for Main Email */}
@@ -545,12 +550,18 @@ export function EmailViewGrid({
                     onClick={() => toggleExpand(index)}
                     aria-expanded={isExpanded}
                   >
-                    <div className="text-sm">
-                      {isExpanded ? htmlToPlainText(item.reply) : htmlToPlainText(item.reply)}
-                    </div>
-                    <div className="text-sm text-medium-emphasis px-2">
-                      {htmlToPlainText(item.prevData)}
-                    </div>
+                    <div
+                      className="text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: isExpanded ? sanitizeHTML(item.reply) : htmlToPlainText(item.reply),
+                      }}
+                    />
+                    <div
+                      className="text-sm text-medium-emphasis px-2"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHTML(item.prevData),
+                      }}
+                    />
                   </button>
 
                   {/* Attachments for Reply */}

@@ -37,6 +37,7 @@ import { htmlToPlainText } from 'features/email/services/email';
 import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
+import { sanitizeHTML } from 'utils/sanitizer';
 
 /**
  * EmailViewMobile Component
@@ -327,7 +328,11 @@ export function EmailViewMobile({
                 </div>
 
                 <div className=" mb-6 text-sm px-4">
-                  <div>{htmlToPlainText(selectedEmail?.content ?? selectedEmail?.preview)}</div>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTML(selectedEmail?.content ?? selectedEmail?.preview),
+                    }}
+                  />
 
                   {isReplySingleAction && isReplySingleAction.isReplyEditor && (
                     <div className=" px-4 flex flex-col gap-6">
@@ -463,12 +468,20 @@ export function EmailViewMobile({
                           }}
                           aria-expanded={isExpanded}
                         >
-                          <div className="text-sm">
-                            {isExpanded ? htmlToPlainText(item.reply) : htmlToPlainText(item.reply)}
-                          </div>
-                          <div className={`text-sm text-medium-emphasis  px-2`}>
-                            {htmlToPlainText(item.prevData)}
-                          </div>
+                          <div
+                            className="text-sm "
+                            dangerouslySetInnerHTML={{
+                              __html: isExpanded
+                                ? sanitizeHTML(item.reply)
+                                : htmlToPlainText(item.reply),
+                            }}
+                          />
+                          <div
+                            className={`text-sm text-medium-emphasis  px-2`}
+                            dangerouslySetInnerHTML={{
+                              __html: sanitizeHTML(item.prevData),
+                            }}
+                          />
                         </button>
 
                         {((item?.images?.length ?? 0) > 0 ||
