@@ -47,7 +47,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
       return {
         error: parsedDescription.error || err.error,
         error_description: parsedDescription.error_description,
-        message: parsedDescription.message || err.message,
+        message: parsedDescription.message ?? err.message,
       };
     }
 
