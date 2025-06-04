@@ -492,7 +492,7 @@ export function Email() {
     setSelectedEmail(email);
 
     setEmails((prev) => {
-      if (category && Object.prototype.hasOwnProperty.call(prev, category)) {
+      if (category && Object.hasOwn(prev, category)) {
         return {
           ...prev,
           [category]: prev[category]?.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)),
