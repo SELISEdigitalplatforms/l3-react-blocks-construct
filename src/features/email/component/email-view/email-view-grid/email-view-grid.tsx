@@ -109,7 +109,6 @@ const AttachmentDisplay: React.FC<AttachmentDisplayProps & { t: any }> = ({
   );
 };
 
-// Extracted component for action buttons
 const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
   selectedEmail,
   category,

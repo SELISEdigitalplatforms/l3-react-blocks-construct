@@ -5,7 +5,6 @@ import { Button } from 'components/ui/button';
 import UIOtpInput from 'components/core/otp-input/otp-input';
 import { useSigninMutation } from 'features/auth/hooks/use-auth';
 import { useAuthStore } from 'state/store/auth';
-import { useToast } from 'hooks/use-toast';
 import { MFASigninResponse } from 'features/auth/services/auth.service';
 import { UserMfaType } from 'features/profile/enums/user-mfa-type-enum';
 import useResendOTPTime from 'hooks/use-resend-otp';
@@ -15,7 +14,6 @@ export function VerifyOtpKey() {
   const { login } = useAuthStore();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [otpError, setOtpError] = useState('');
   const [otpValue, setOtpValue] = useState('');
   const { mutateAsync, isPending } = useSigninMutation();
@@ -54,30 +52,19 @@ export function VerifyOtpKey() {
 
   const onVerify = useCallback(async () => {
     try {
-      const res = (await mutateAsync(
-        {
-          grantType: 'mfa_code',
-          code: otpValue,
-          mfaId: newMfaId ?? mfaId ?? '',
-          mfaType: mfaType,
-        },
-        {
-          onSuccess: () => {
-            toast({
-              variant: 'success',
-              title: t('LOGIN_SUCCESSFULLY'),
-              description: t('YOU_LOGGED_IN_SUCCESSFULLY'),
-            });
-          },
-        }
-      )) as MFASigninResponse;
+      const res = (await mutateAsync({
+        grantType: 'mfa_code',
+        code: otpValue,
+        mfaId: newMfaId ?? mfaId ?? '',
+        mfaType: mfaType,
+      })) as MFASigninResponse;
 
       login(res.access_token, res.refresh_token);
       navigate('/');
     } catch {
       setOtpError(t('MFA_CODE_IS_NOT_VALID'));
     }
-  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, toast, t]);
+  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, t]);
 
   useEffect(() => {
     const requiredLength = mfaType === UserMfaType.AUTHENTICATOR_APP ? 6 : 5;

@@ -70,6 +70,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Remove invisible CSS classes
+        run: |
+          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/pages/auth/signin/signin-page.tsx
+
       - name: Build and push image to ACR
         run: |
           az acr build \

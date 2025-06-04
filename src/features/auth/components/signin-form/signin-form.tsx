@@ -11,7 +11,6 @@ import { UPasswordInput } from 'components/core/u-password-input';
 import { Captcha } from 'features/captcha';
 import { useAuthStore } from 'state/store/auth';
 import { useErrorHandler } from 'hooks/use-error-handler';
-import { useToast } from 'hooks/use-toast';
 import { useSigninMutation } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
 import { SignInResponse } from '../../services/auth.service';
@@ -62,7 +61,6 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const { t } = useTranslation();
   const { login } = useAuthStore();
   const { handleError } = useErrorHandler();
-  const { toast } = useToast();
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
@@ -104,11 +102,6 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
       } else {
         login(res.access_token, res.refresh_token);
         navigate('/');
-        toast({
-          variant: 'success',
-          title: t('LOGIN_SUCCESSFULLY'),
-          description: t('YOU_LOGGED_IN_SUCCESSFULLY'),
-        });
       }
     } catch (error) {
       if (captchaEnabled) {
@@ -132,16 +125,11 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
         const res = await mutateAsync({ grantType: 'social', code, state });
         login(res.access_token, res.refresh_token);
         navigate('/');
-        toast({
-          variant: 'success',
-          title: t('LOGIN_SUCCESSFULLY'),
-          description: t('YOU_LOGGED_IN_SUCCESSFULLY'),
-        });
       } catch (error) {
         handleError(error);
       }
     },
-    [login, mutateAsync, navigate, t, handleError, toast]
+    [login, mutateAsync, navigate, handleError]
   );
 
   useEffect(() => {

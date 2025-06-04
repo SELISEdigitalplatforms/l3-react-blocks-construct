@@ -15,7 +15,6 @@ import { UpdatePassword } from '../modals/update-password/update-password';
 export const SecurityCard: React.FC<{
   userInfo: any;
   isLoading: boolean;
-  isFetching: boolean;
   isDemoAccount: boolean;
   t: (key: string) => string;
   currentDialog: MfaDialogState;
@@ -27,7 +26,6 @@ export const SecurityCard: React.FC<{
 }> = ({
   userInfo,
   isLoading,
-  isFetching,
   isDemoAccount,
   t,
   currentDialog,
@@ -110,7 +108,7 @@ export const SecurityCard: React.FC<{
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
-                {isLoading || isFetching ? (
+                {isLoading ? (
                   <Skeleton className="w-[102px] h-8" />
                 ) : (
                   <Button
