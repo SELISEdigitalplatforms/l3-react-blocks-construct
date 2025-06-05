@@ -1,9 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { DateRange } from 'react-day-picker';
-import { Badge } from 'components/ui/badge';
 import { format, startOfDay, isAfter, isBefore, isSameDay } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import { Invoice, statusColors } from '../../data/invoice-data';
+import { Invoice, InvoiceStatus, statusColors } from '../../data/invoice-data';
 
 interface ColumnFactoryProps {
   t: (key: string) => string;
@@ -117,17 +116,15 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
     filterFn: (row, id, value: string[] | undefined) => {
       if (!value?.length) return true;
-      const status = row.getValue(id);
-      return value.includes(status as string);
+      const status = row.getValue(id) as InvoiceStatus;
+      return value.includes(status);
     },
     cell: ({ row }) => {
       const status = row.original.status;
       const color = statusColors[status];
       return (
         <div className="flex items-center">
-          <Badge variant="outline" className={`text-${color}`}>
-            {status}
-          </Badge>
+          <span className={`font-semibold text-${color}`}>{status}</span>
         </div>
       );
     },

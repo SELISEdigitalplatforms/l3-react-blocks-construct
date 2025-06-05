@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Invoice } from '../../data/invoice-data';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import {
   ColumnDef,
@@ -166,6 +167,40 @@ function InvoicesOverviewTable<TData>({
     ));
   };
 
+  const calculateStats = (data: TData[]) => {
+    const invoices = data as Invoice[];
+    return {
+      total: {
+        count: invoices.length,
+        amount: invoices.reduce((sum, invoice) => sum + invoice.amount, 0),
+      },
+      paid: {
+        count: invoices.filter((invoice) => invoice.status === 'Paid').length,
+        amount: invoices
+          .filter((invoice) => invoice.status === 'Paid')
+          .reduce((sum, invoice) => sum + invoice.amount, 0),
+      },
+      pending: {
+        count: invoices.filter((invoice) => invoice.status === 'Pending').length,
+        amount: invoices
+          .filter((invoice) => invoice.status === 'Pending')
+          .reduce((sum, invoice) => sum + invoice.amount, 0),
+      },
+      overdue: {
+        count: invoices.filter((invoice) => invoice.status === 'Overdue').length,
+        amount: invoices
+          .filter((invoice) => invoice.status === 'Overdue')
+          .reduce((sum, invoice) => sum + invoice.amount, 0),
+      },
+      draft: {
+        count: invoices.filter((invoice) => invoice.status === 'Draft').length,
+        amount: invoices
+          .filter((invoice) => invoice.status === 'Draft')
+          .reduce((sum, invoice) => sum + invoice.amount, 0),
+      },
+    };
+  };
+
   const renderTableBody = () => {
     if (isLoading) {
       return renderLoadingState();
@@ -216,8 +251,12 @@ function InvoicesOverviewTable<TData>({
                 </span>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold text-high-emphasis">120</h3>
-                <p className="text-base font-medium text-high-emphasis">CHF 82,564.00</p>
+                <h3 className="text-2xl font-semibold text-high-emphasis">
+                  {calculateStats(data).total.count}
+                </h3>
+                <p className="text-base font-medium text-high-emphasis">
+                  CHF {calculateStats(data).total.amount.toFixed(2)}
+                </p>
               </div>
             </div>
             <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
@@ -230,8 +269,12 @@ function InvoicesOverviewTable<TData>({
                 </span>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold text-high-emphasis">73</h3>
-                <p className="text-base font-medium text-high-emphasis">CHF 35,200.00</p>
+                <h3 className="text-2xl font-semibold text-high-emphasis">
+                  {calculateStats(data).paid.count}
+                </h3>
+                <p className="text-base font-medium text-high-emphasis">
+                  CHF {calculateStats(data).paid.amount.toFixed(2)}
+                </p>
               </div>
             </div>
             <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
@@ -244,8 +287,12 @@ function InvoicesOverviewTable<TData>({
                 </span>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold text-high-emphasis">47</h3>
-                <p className="text-base font-medium text-high-emphasis">CHF 27,450.00</p>
+                <h3 className="text-2xl font-semibold text-high-emphasis">
+                  {calculateStats(data).pending.count}
+                </h3>
+                <p className="text-base font-medium text-high-emphasis">
+                  CHF {calculateStats(data).pending.amount.toFixed(2)}
+                </p>
               </div>
             </div>
             <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
@@ -258,8 +305,12 @@ function InvoicesOverviewTable<TData>({
                 </span>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold text-high-emphasis">4</h3>
-                <p className="text-base font-medium text-high-emphasis">CHF 9,914.00</p>
+                <h3 className="text-2xl font-semibold text-high-emphasis">
+                  {calculateStats(data).overdue.count}
+                </h3>
+                <p className="text-base font-medium text-high-emphasis">
+                  CHF {calculateStats(data).overdue.amount.toFixed(2)}
+                </p>
               </div>
             </div>
             <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
@@ -272,8 +323,12 @@ function InvoicesOverviewTable<TData>({
                 </span>
               </div>
               <div>
-                <h3 className="text-2xl font-semibold text-high-emphasis">3</h3>
-                <p className="text-base font-medium text-high-emphasis">CHF 10,000.00</p>
+                <h3 className="text-2xl font-semibold text-high-emphasis">
+                  {calculateStats(data).draft.count}
+                </h3>
+                <p className="text-base font-medium text-high-emphasis">
+                  CHF {calculateStats(data).draft.amount.toFixed(2)}
+                </p>
               </div>
             </div>
           </div>

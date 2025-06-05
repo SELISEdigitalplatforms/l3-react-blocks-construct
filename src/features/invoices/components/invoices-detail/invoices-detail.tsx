@@ -2,95 +2,243 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
+import { ArrowLeft, Download } from 'lucide-react';
+import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
+import { Separator } from 'components/ui/separator';
+import logo from 'assets/images/construct_logo.svg';
+import { Badge } from 'components/ui/badge';
+import { Invoice, statusColors, InvoiceStatus } from '../../data/invoice-data';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'components/ui/select';
+import { useToast } from 'hooks/use-toast';
 
-export function InvoicesDetail() {
+interface InvoicesDetailProps {
+  invoice: Invoice;
+  onBack: () => void;
+}
+
+export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadPDF = async () => {
-    const element = invoiceRef.current;
-    if (!element) return;
+    try {
+      const element = invoiceRef.current;
+      if (!element) return;
 
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-    });
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+      });
 
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save('invoice.pdf');
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`invoice-${invoice.id}.pdf`);
+
+      toast({
+        variant: 'success',
+        title: t('INVOICE_DOWNLOADED'),
+        description: t('DOWNLOADED_INVOICE_SUCCESSFULLY'),
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: t('SOMETHING_WENT_WRONG'),
+        description: t('SOMETHING_WENT_WRONG_DOWNLOADING_INVOICE'),
+      });
+    }
   };
 
   return (
-    <div className="bg-muted min-h-screen p-8 flex flex-col items-center">
-      <Card className="w-full max-w-2xl" ref={invoiceRef}>
-        <CardHeader>
-          <CardTitle className="text-xl text-high-emphasis">{t('OVERVIEW')}</CardTitle>
-          <CardDescription />
-        </CardHeader>
-        <CardContent className="p-6 text-black">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl font-bold">Your Company</h2>
-              <p className="text-sm">123 Dzong Road</p>
-              <p className="text-sm">Thimphu, Bhutan</p>
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex sm:flex-row flex-col gap-2 sm:gap-0 sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-semibold">{invoice.id}</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <p className="text-high-emphasis">{t('STATUS')}:</p>
+            <Select defaultValue={invoice.status}>
+              <SelectTrigger className="w-[120px] h-9">
+                <SelectValue placeholder={t('SELECT_STATUS')} />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(InvoiceStatus).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {t(status.toUpperCase())}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Separator orientation="vertical" className="h-5 mx-1 sm:mx-3" />
+          <Button variant="outline" onClick={handleDownloadPDF}>
+            <Download className="h-4 w-4 mr-2" />
+            {t('DOWNLOAD')}
+          </Button>
+        </div>
+      </div>
+      <Card className="w-full border-none rounded-lg shadow-sm" ref={invoiceRef}>
+        <CardContent className="flex flex-col !p-[24px] sm:!py-[56px] sm:!px-[70px] gap-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between">
+            <div className="w-[220px] h-[80px]">
+              <img src={logo} alt="logo" className="w-full h-full object-cover" />
             </div>
-            <div className="text-right">
-              <h1 className="text-2xl font-bold">INVOICE</h1>
-              <p className="text-sm">#INV-00123</p>
-              <p className="text-sm">Date: 2025-06-02</p>
+            <div className="flex flex-col border-l-none sm:border-l sm:border-medium-emphasis pl-4">
+              <h2 className="font-semibold text-high-emphasis">Blocks Construct</h2>
+              <p className="text-medium-emphasis">demo.construct@seliseblocks.com</p>
+              <p className="text-medium-emphasis">+41757442538</p>
             </div>
           </div>
-
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold">Bill To:</h3>
-            <p className="text-sm">John Doe</p>
-            <p className="text-sm">456 Client Street</p>
-            <p className="text-sm">Punakha, Bhutan</p>
+          <Separator />
+          <div className="flex flex-col sm:flex-row w-full sm:justify-between">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-medium-emphasis">{t('INVOICE_DETAILS')}</h1>
+              <div className="flex items-center gap-2">
+                <p className="font-bold text-high-emphasis">{invoice.id}</p>
+                <Badge
+                  className={`rounded-[4px] px-2 py-[2px] text-xs bg-surface hover:bg-surface text-${statusColors[invoice.status]}`}
+                >
+                  {invoice.status}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-medium-emphasis">{t('DATE_ISSUED')}:</p>
+                <p className="text-sm text-high-emphasis">
+                  {new Date(invoice.dateIssued).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-medium-emphasis">{t('DUE_DATE')}:</p>
+                <p className="text-sm text-high-emphasis">
+                  {new Date(invoice.dueDate).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-base font-medium text-medium-emphasis mb-2">{t('BILLED_TO')}</h3>
+              <p className="text-base font-bold">{invoice.customerName}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-medium-emphasis">{t('BILLING_ADDRESS')}:</p>
+                <p className="text-sm text-high-emphasis">
+                  Via della Posta 15, 6600 Locarno, Switzerland
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-medium-emphasis">{t('EMAIL')}:</p>
+                <p className="text-sm text-high-emphasis">email@email.com</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-medium-emphasis">{t('PHONE_NO')}:</p>
+                <p className="text-sm text-high-emphasis">151515151</p>
+              </div>
+            </div>
+          </div>
+          <Separator />
+          <div className="flex flex-col w-full gap-6">
+            <h3 className="text-xl font-medium text-medium-emphasis">{t('ORDER_DETAILS')}</h3>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-medium-emphasis bg-surface hover:bg-surface">
+                  <TableHead className="text-high-emphasis font-semibold">
+                    {t('ITEM_NAME')}
+                  </TableHead>
+                  <TableHead className="text-high-emphasis font-semibold">
+                    {t('CATEGORY')}
+                  </TableHead>
+                  <TableHead className="text-high-emphasis font-semibold">
+                    {t('QUANTITY')}
+                  </TableHead>
+                  <TableHead className="text-high-emphasis font-semibold">
+                    {t('UNIT_PRICE')}
+                  </TableHead>
+                  <TableHead className="text-high-emphasis font-semibold">{t('AMOUNT')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <div>
+                      <p className="font-semibold text-high-emphasis">Monitor</p>
+                      <p className="text-sm text-medium-emphasis">
+                        Includes setup assistance and extended warranty coverage for 2 years.
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-semibold text-high-emphasis">Electronics</TableCell>
+                  <TableCell className="text-high-emphasis">2</TableCell>
+                  <TableCell className="text-high-emphasis">CHF 200.00</TableCell>
+                  <TableCell className="text-high-emphasis">CHF 400.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-semibold text-high-emphasis">Monitor Arm</TableCell>
+                  <TableCell className="text-high-emphasis">Accessories</TableCell>
+                  <TableCell className="text-high-emphasis">2</TableCell>
+                  <TableCell className="text-high-emphasis">CHF 20.00</TableCell>
+                  <TableCell className="text-high-emphasis">CHF 80.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-semibold text-high-emphasis">Wireless Mouse</TableCell>
+                  <TableCell className="text-high-emphasis">Electronics</TableCell>
+                  <TableCell className="text-high-emphasis">1</TableCell>
+                  <TableCell className="text-high-emphasis">CHF 20.00</TableCell>
+                  <TableCell className="text-high-emphasis">CHF 20.00</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </div>
 
-          <table className="w-full text-sm border border-gray-300 mb-6">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border px-2 py-1 text-left">Item</th>
-                <th className="border px-2 py-1 text-right">Qty</th>
-                <th className="border px-2 py-1 text-right">Rate</th>
-                <th className="border px-2 py-1 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border px-2 py-1">Web Development</td>
-                <td className="border px-2 py-1 text-right">1</td>
-                <td className="border px-2 py-1 text-right">$1000</td>
-                <td className="border px-2 py-1 text-right">$1000</td>
-              </tr>
-              <tr>
-                <td className="border px-2 py-1">Hosting (1 year)</td>
-                <td className="border px-2 py-1 text-right">1</td>
-                <td className="border px-2 py-1 text-right">$120</td>
-                <td className="border px-2 py-1 text-right">$120</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className="text-right">
-            <p className="text-sm">Subtotal: $1120</p>
-            <p className="text-sm">Tax (10%): $112</p>
-            <p className="text-lg font-bold">Total: $1232</p>
+          <div className="flex flex-col-reverse sm:flex-row w-full items-end sm:justify-between">
+            <div className="flex flex-col gap-2">
+              <h3 className="font-medium text-medium-emphasis">{t('NOTE')}</h3>
+              <p className="text-sm text-medium-emphasis">
+                All items will be delivered within 3-5 business days. Basic installation support is
+                included.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4 w-full sm:w-[25%]">
+              <div className="flex justify-between">
+                <span className="text-sm text-medium-emphasis">{t('SUBTOTAL')}</span>
+                <span className="text-sm font-semibold text-high-emphasis">CHF 500.00</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-medium-emphasis">{t('TAXES')} (7.5%)</span>
+                <span className="text-sm font-semibold text-high-emphasis">CHF 37.50</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
+                <span className="text-sm font-semibold text-secondary">- CHF 50.00</span>
+              </div>
+              <div className="flex justify-between border-t border-border pt-4">
+                <span className="font-semibold text-high-emphasis">{t('TOTAL_AMOUNT')}</span>
+                <span className="text-xl font-bold text-high-emphasis">
+                  CHF {invoice.amount.toFixed(2)}
+                </span>
+              </div>
+            </div>
           </div>
+          <Separator />
+          <p className="text-sm text-medium-emphasis">
+            Please make sure that payments are within the stated due date. Thank you for your
+            business.
+          </p>
         </CardContent>
       </Card>
-
-      <Button onClick={handleDownloadPDF} className="mt-6">
-        Download Invoice as PDF
-      </Button>
     </div>
   );
 }

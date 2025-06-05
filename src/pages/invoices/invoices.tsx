@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   InvoicesOverviewTable,
@@ -14,19 +15,20 @@ interface PaginationState {
   totalCount: number;
 }
 
-export function Invoices() {
+export function InvoicesPage() {
   const { t } = useTranslation();
   const columns = createInvoiceTableColumns({ t });
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<Invoice[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setData(invoiceData);
       setIsLoading(false);
-      setPaginationState(prev => ({
+      setPaginationState((prev) => ({
         ...prev,
-        totalCount: invoiceData.length
+        totalCount: invoiceData.length,
       }));
     }, 500);
 
@@ -53,6 +55,10 @@ export function Invoices() {
     []
   );
 
+  const handleInvoicesDetail = (data: Invoice) => {
+    navigate(`/invoices/${data.id}`);
+  };
+
   return (
     <div className="flex w-full gap-5 flex-col">
       <InvoicesHeaderToolbar />
@@ -60,14 +66,15 @@ export function Invoices() {
         data={data}
         columns={columns}
         isLoading={isLoading}
+        onRowClick={handleInvoicesDetail}
         toolbar={(table) => <InvoicesFilterToolbar table={table} />}
         pagination={{
-          pageIndex: paginationState.pageIndex, // Current page index
-          pageSize: paginationState.pageSize, // Number of rows per page
-          totalCount: paginationState.totalCount, // Total number of records
+          pageIndex: paginationState.pageIndex,
+          pageSize: paginationState.pageSize,
+          totalCount: paginationState.totalCount,
         }}
-        onPaginationChange={handlePaginationChange} // Handles page and page size changes
-        manualPagination={false} // Using client-side pagination
+        onPaginationChange={handlePaginationChange}
+        manualPagination={false}
       />
     </div>
   );
