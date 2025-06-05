@@ -1,16 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  FileText,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  FileEdit,
-  ChevronDown,
-  ChevronRight,
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
-import { Separator } from 'components/ui/separator';
+import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -26,7 +16,8 @@ import {
   useReactTable,
   Table as TableInstance,
 } from '@tanstack/react-table';
-import { useIsMobile } from 'hooks/use-mobile';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
+import { Separator } from 'components/ui/separator';
 import { TableRow, TableCell, TableHeader, TableHead, Table, TableBody } from 'components/ui/table';
 import { Skeleton } from 'components/ui/skeleton';
 import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
@@ -51,10 +42,6 @@ export interface InvoicesOverviewTableProps<TData> {
   };
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
   manualPagination?: boolean;
-  expandedContent?: (data: TData) => React.ReactNode;
-  mobileColumns?: string[];
-  mobileProperties?: string[];
-  expandable?: boolean;
 }
 function InvoicesOverviewTable<TData>({
   columns,
@@ -66,13 +53,7 @@ function InvoicesOverviewTable<TData>({
   pagination,
   onPaginationChange,
   manualPagination = false,
-  expandedContent,
-  mobileColumns = [],
-  mobileProperties = [],
-  expandable = true,
 }: Readonly<InvoicesOverviewTableProps<TData>>) {
-  const isMobile = useIsMobile();
-  const [expandedRows, setExpandedRows] = React.useState(new Set<string>());
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -80,54 +61,32 @@ function InvoicesOverviewTable<TData>({
   const { default: uuidv4 } = require('utils/uuid');
   const { t } = useTranslation();
 
-  const visibleColumns = React.useMemo(() => {
-    if (!isMobile) return columns;
-
-    return columns.filter((col) => {
-      const columnId = (col.id ?? '').toString();
-      return [...mobileColumns, ...mobileProperties].includes(columnId) || columnId === 'actions';
-    });
-  }, [columns, isMobile, mobileColumns, mobileProperties]);
-
   const handleCellClick = (row: RowType): void => {
-    const handleRowExpand = () => {
-      if (expandable) {
-        toggleRow(String(row.id));
-      }
-    };
-
-    const handleRowSelect = () => {
-      if (onRowClick) {
-        onRowClick(row.original);
-      }
-    };
-
-    if (isMobile) {
-      handleRowExpand();
-    } else {
-      handleRowSelect();
+    if (onRowClick) {
+      onRowClick(row.original);
     }
   };
 
   const table = useReactTable({
-    data: error ? [] : data, // If there's an error, fallback to an empty array
-    columns: columns, // Column definitions for the table
+    data: error ? [] : data,
+    columns: columns,
+    pageCount: Math.ceil((error ? 0 : data.length) / pagination.pageSize),
 
     state: {
-      sorting, // Stores sorting state
-      columnVisibility, // Stores visibility state for columns
-      columnFilters, // Stores active column filters
+      sorting,
+      columnVisibility,
+      columnFilters,
       pagination: {
-        pageIndex: pagination.pageIndex, // Current page index
-        pageSize: pagination.pageSize, // Number of items per page
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
       },
     },
 
-    manualPagination, // Enables server-side pagination
-    pageCount: Math.ceil(pagination.totalCount / pagination.pageSize), // Calculates the total number of pages
+    manualPagination,
+    enableSorting: !isLoading,
+    enableColumnFilters: !isLoading,
 
     onPaginationChange: (updater) => {
-      // Handles pagination changes
       if (typeof updater === 'function') {
         const newPagination = updater({
           pageIndex: pagination.pageIndex,
@@ -151,74 +110,10 @@ function InvoicesOverviewTable<TData>({
     getFacetedUniqueValues: getFacetedUniqueValues(), // Gets unique values for filtering UI (e.g., dropdown filters)
   });
 
-  // Function to toggle row expansion
-  const toggleRow = (rowId: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(rowId)) {
-        next.delete(rowId);
-      } else {
-        next.add(rowId);
-      }
-      return next;
-    });
-  };
-
-  const getExpandedColumns = () => {
-    return columns.filter((col) => {
-      const columnId = (col.id ?? '').toString();
-      const visibleColumnIds = [...mobileColumns, ...mobileProperties];
-      return (
-        !visibleColumnIds.includes(columnId) && columnId !== 'actions' && columnId !== 'expand'
-      );
-    });
-  };
-
-  const getDummyRow = (rowData: TData) => {
-    return (
-      table.getRowModel().rows.find((row) => row.original === rowData) ||
-      table.getPrePaginationRowModel().rows.find((row) => row.original === rowData)
-    );
-  };
-
-  const generateExpandedContent = (rowData: TData) => {
-    if (expandedContent) {
-      return expandedContent(rowData);
-    }
-
-    const expandedColumns = getExpandedColumns();
-    const dummyRow = getDummyRow(rowData);
-
-    if (!dummyRow) return null;
-
-    return (
-      <div className="p-4 bg-gray-50 space-y-4">
-        {expandedColumns.map((col) => {
-          const columnId = (col.id ?? '').toString();
-          const cell = dummyRow.getAllCells().find((cell) => cell.column.id === columnId);
-
-          if (!cell) return null;
-
-          return (
-            <div key={columnId} className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-high-emphasis">
-                {typeof col.header === 'string' ? col.header : col.id}
-              </span>
-              <span className="text-sm">
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
   const renderLoadingState = () => {
     return Array.from({ length: pagination.pageSize }).map(() => (
       <TableRow key={`skeleton-row-${uuidv4()}`}>
-        {isMobile && expandable && <TableCell className="w-8" />}
-        {(isMobile ? visibleColumns : columns).map(() => (
+        {columns.map(() => (
           <TableCell key={`skeleton-cell-${uuidv4()}`}>
             <Skeleton className="h-4 w-3/4" />
           </TableCell>
@@ -230,12 +125,7 @@ function InvoicesOverviewTable<TData>({
   const renderErrorState = () => {
     return (
       <TableRow>
-        <TableCell
-          colSpan={
-            (isMobile ? visibleColumns.length : columns.length) + (isMobile && expandable ? 1 : 0)
-          }
-          className="h-24 text-center text-error"
-        >
+        <TableCell colSpan={columns.length} className="h-24 text-center text-error">
           {t('ERROR_LOADING_DATA')} {error?.message}
         </TableCell>
       </TableRow>
@@ -245,43 +135,11 @@ function InvoicesOverviewTable<TData>({
   const renderEmptyState = () => {
     return (
       <TableRow>
-        <TableCell
-          colSpan={
-            (isMobile ? visibleColumns.length : columns.length) + (isMobile && expandable ? 1 : 0)
-          }
-          className="h-24 text-center"
-        >
+        <TableCell colSpan={columns.length} className="h-24 text-center">
           {t('NO_RESULTS_FOUND')}
         </TableCell>
       </TableRow>
     );
-  };
-
-  const renderExpandButton = (row: any) => {
-    if (!isMobile || !expandable) {
-      return null;
-    }
-
-    return (
-      <TableCell className="w-8" onClick={() => toggleRow(row.id)}>
-        {expandedRows.has(row.id) ? (
-          <ChevronDown className="h-4 w-4" />
-        ) : (
-          <ChevronRight className="h-4 w-4" />
-        )}
-      </TableCell>
-    );
-  };
-
-  const getVisibleCells = (row: any) => {
-    if (!isMobile) {
-      return row.getVisibleCells();
-    }
-
-    return row.getVisibleCells().filter((cell: any) => {
-      const columnId = cell.column.id;
-      return [...mobileColumns, ...mobileProperties].includes(columnId) || columnId === 'actions';
-    });
   };
 
   const renderTableCell = (cell: any, row: any) => (
@@ -294,20 +152,6 @@ function InvoicesOverviewTable<TData>({
     </TableCell>
   );
 
-  const renderExpandedRow = (row: any) => {
-    if (!isMobile || !expandable || !expandedRows.has(row.id)) {
-      return null;
-    }
-
-    return (
-      <TableRow>
-        <TableCell colSpan={visibleColumns.length + 1} className="p-0">
-          {generateExpandedContent(row.original)}
-        </TableCell>
-      </TableRow>
-    );
-  };
-
   const renderTableRows = () => {
     const rows = table.getRowModel().rows;
 
@@ -316,13 +160,9 @@ function InvoicesOverviewTable<TData>({
     }
 
     return rows.map((row) => (
-      <React.Fragment key={row.id}>
-        <TableRow className="cursor-pointer">
-          {renderExpandButton(row)}
-          {getVisibleCells(row).map((cell: any) => renderTableCell(cell, row))}
-        </TableRow>
-        {renderExpandedRow(row)}
-      </React.Fragment>
+      <TableRow key={row.id} className="cursor-pointer">
+        {row.getVisibleCells().map((cell: any) => renderTableCell(cell, row))}
+      </TableRow>
     ));
   };
 
@@ -339,10 +179,6 @@ function InvoicesOverviewTable<TData>({
   };
 
   const renderTableHeader = () => {
-    if (isMobile) {
-      return null;
-    }
-
     return (
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (

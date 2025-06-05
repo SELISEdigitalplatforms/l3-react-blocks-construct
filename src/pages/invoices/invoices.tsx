@@ -24,6 +24,10 @@ export function Invoices() {
     const timer = setTimeout(() => {
       setData(invoiceData);
       setIsLoading(false);
+      setPaginationState(prev => ({
+        ...prev,
+        totalCount: invoiceData.length
+      }));
     }, 500);
 
     return () => clearTimeout(timer);
@@ -63,7 +67,7 @@ export function Invoices() {
           totalCount: paginationState.totalCount, // Total number of records
         }}
         onPaginationChange={handlePaginationChange} // Handles page and page size changes
-        manualPagination={true} // Enables server-side pagination instead of client-side
+        manualPagination={false} // Using client-side pagination
       />
     </div>
   );
