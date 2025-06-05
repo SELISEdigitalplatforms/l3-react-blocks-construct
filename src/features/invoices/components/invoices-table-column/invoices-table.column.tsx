@@ -1,6 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { DateRange } from 'react-day-picker';
 import { Badge } from 'components/ui/badge';
-import { CustomtDateFormat } from 'lib/custom-date-formatter';
+import { format, startOfDay, isAfter, isBefore, isSameDay } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { Invoice, statusColors } from '../../data/invoice-data';
 
@@ -8,14 +9,19 @@ interface ColumnFactoryProps {
   t: (key: string) => string;
 }
 
-const compareValues = (a: any, b: any) => {
-  if (a < b) {
-    return -1;
-  }
-  if (a > b) {
-    return 1;
-  }
-  return 0;
+const formatDateOnly = (date: Date) => {
+  return format(date, 'dd/MM/yyyy');
+};
+
+const isWithinRange = (date: Date, from: Date, to: Date) => {
+  const normalizedDate = startOfDay(date);
+  const normalizedFrom = startOfDay(from);
+  const normalizedTo = startOfDay(to);
+
+  return (
+    (isSameDay(normalizedDate, normalizedFrom) || isAfter(normalizedDate, normalizedFrom)) &&
+    (isSameDay(normalizedDate, normalizedTo) || isBefore(normalizedDate, normalizedTo))
+  );
 };
 
 export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<Invoice, any>[] => [
@@ -49,18 +55,25 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
     id: 'dateIssued',
     accessorFn: (row) => row.dateIssued,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('DATE_ISSUED')} />,
+    filterFn: (row, id, filterValue: DateRange | undefined) => {
+      if (!filterValue?.from) return true;
+      const date = new Date(row.original.dateIssued);
+      const from = new Date(filterValue.from);
+      const to = filterValue.to ? new Date(filterValue.to) : from;
+      return isWithinRange(date, from, to);
+    },
     cell: ({ row }) => {
       const date = new Date(row.original.dateIssued);
       return (
         <div className="flex items-center">
-          <span>{CustomtDateFormat(date)}</span>
+          <span>{formatDateOnly(date)}</span>
         </div>
       );
     },
     sortingFn: (rowA, rowB) => {
-      const a = new Date(rowA.original.dateIssued).getTime();
-      const b = new Date(rowB.original.dateIssued).getTime();
-      return compareValues(a, b);
+      const a = new Date(rowA.original.dateIssued);
+      const b = new Date(rowB.original.dateIssued);
+      return a.getTime() - b.getTime();
     },
   },
   {
@@ -77,24 +90,36 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
     id: 'dueDate',
     accessorFn: (row) => row.dueDate,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('DUE_DATE')} />,
+    filterFn: (row, id, filterValue: DateRange | undefined) => {
+      if (!filterValue?.from) return true;
+      const date = new Date(row.original.dueDate);
+      const from = new Date(filterValue.from);
+      const to = filterValue.to ? new Date(filterValue.to) : from;
+      return isWithinRange(date, from, to);
+    },
     cell: ({ row }) => {
       const date = new Date(row.original.dueDate);
       return (
         <div className="flex items-center">
-          <span>{CustomtDateFormat(date)}</span>
+          <span>{formatDateOnly(date)}</span>
         </div>
       );
     },
     sortingFn: (rowA, rowB) => {
-      const a = new Date(rowA.original.dueDate).getTime();
-      const b = new Date(rowB.original.dueDate).getTime();
-      return compareValues(a, b);
+      const a = new Date(rowA.original.dueDate);
+      const b = new Date(rowB.original.dueDate);
+      return a.getTime() - b.getTime();
     },
   },
   {
     id: 'status',
     accessorFn: (row) => row.status,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
+    filterFn: (row, id, value: string[] | undefined) => {
+      if (!value?.length) return true;
+      const status = row.getValue(id);
+      return value.includes(status as string);
+    },
     cell: ({ row }) => {
       const status = row.original.status;
       const color = statusColors[status];
@@ -105,11 +130,6 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
           </Badge>
         </div>
       );
-    },
-    filterFn: (row, id, value: string[]) => {
-      if (value.length === 0) return true;
-      const cellValue = row.getValue(id);
-      return value.includes(String(cellValue));
     },
   },
 ];

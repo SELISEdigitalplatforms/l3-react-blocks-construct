@@ -99,17 +99,15 @@ export function DateRangeFilter<TData, TValue>({
           ref={buttonRef}
           variant={hasActiveFilter ? 'default' : 'outline'}
           size="sm"
-          className={`h-8 ${!hasActiveFilter && 'border-dashed'} w-full`}
+          className={`h-8 px-2 ${!hasActiveFilter && 'border-dashed'} whitespace-nowrap`}
         >
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              <span>{title}</span>
-            </div>
+          <div className="flex items-center gap-2">
+            <CalendarIcon className="h-4 w-4" />
+            <span>{title}</span>
             {localDateRange?.from && (
               <>
-                <Separator orientation="vertical" className="hidden h-4 sm:mx-2 sm:block" />
-                <span className="truncate ml-2">
+                <Separator orientation="vertical" className="h-4" />
+                <span className="truncate">
                   {formatDate(localDateRange.from, true)}
                   {localDateRange.to && (
                     <>
@@ -134,13 +132,7 @@ export function DateRangeFilter<TData, TValue>({
           background: 'white',
         }}
       >
-        <button
-          className="flex flex-col"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          type="button"
-        >
+        <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>
           <Calendar
             initialFocus
             mode="range"
@@ -157,7 +149,7 @@ export function DateRangeFilter<TData, TValue>({
               {t('CLEAR_FILTER')}
             </Button>
           </div>
-        </button>
+        </div>
       </PopoverContent>
     </Popover>
   );
