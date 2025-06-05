@@ -1,11 +1,43 @@
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Separator } from 'components/ui/separator';
-import { InvoiceTable } from 'features/invoices';
+import InvoicesDataTable from '../invoices-data-table/invoices-data-table';
+import { invoiceData } from '../../data/invoice-data';
+import { createInvoicesTableColumns } from '../invoices-table-column/invoices-table-column';
+import { Table as TableInstance, ColumnFiltersState } from '@tanstack/react-table';
+import { Invoice } from '../../data/invoice-data'; // Assuming correct path
 
-function InvoicesOverview({ onTableReady }: { onTableReady?: (table: any, columns: any[]) => void } = {}) {
+interface InvoicesOverviewProps {
+  onColumnFiltersChange: (filters: ColumnFiltersState) => void;
+  onTableInstanceReady: (table: TableInstance<Invoice>) => void;
+}
+
+function InvoicesOverview({
+  onTableInstanceReady,
+  onColumnFiltersChange,
+}: Readonly<InvoicesOverviewProps>) {
   const { t } = useTranslation();
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const handlePaginationChange = (newPagination: { pageIndex: number; pageSize: number }) => {
+    setPagination(newPagination);
+  };
+
+  const columns = useMemo(() => createInvoicesTableColumns({ t }), [t]);
+
+  const handleTableReady = (table: TableInstance<Invoice>) => {
+    onTableInstanceReady(table);
+    // Subscribe to column filters changes
+    const initialFilters = table.getState().columnFilters;
+    // Use useEffect for subscription in the parent component
+    onColumnFiltersChange(initialFilters);
+  };
 
   return (
     <Card className="w-full border-none rounded-[8px] shadow-sm">
@@ -87,11 +119,21 @@ function InvoicesOverview({ onTableReady }: { onTableReady?: (table: any, column
           </div>
         </div>
         <Separator />
-        <InvoiceTable onTableReady={onTableReady} />
+        <InvoicesDataTable
+          columns={columns}
+          data={invoiceData}
+          pagination={{
+            pageIndex: pagination.pageIndex,
+            pageSize: pagination.pageSize,
+            totalCount: invoiceData.length,
+          }}
+          onPaginationChange={handlePaginationChange}
+          manualPagination={false}
+          onTableInstanceReady={handleTableReady}
+        />
       </CardContent>
     </Card>
   );
 }
 
-// Using named export to match imports in other files
 export { InvoicesOverview };

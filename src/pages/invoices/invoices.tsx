@@ -1,23 +1,25 @@
-import { useState } from 'react';
-import { InvoicesOverview, InvoicesHeaderToolbar, InvoicesTableToolbar } from 'features/invoices';
-import { Table, ColumnDef } from '@tanstack/react-table';
+import { InvoicesOverview, InvoicesHeaderToolbar } from 'features/invoices';
+import { ColumnFiltersState, Table as TableInstance } from '@tanstack/react-table';
+import type { Invoice } from 'features/invoices/data/invoice-data';
 
 export function Invoices() {
-  const [tableInstance, setTableInstance] = useState<Table<any> | null>(null);
-  const [tableColumns, setTableColumns] = useState<ColumnDef<any>[]>([]);
+  const handleColumnFiltersChange = (filters: ColumnFiltersState) => {
+    // No-op since we're not using filtering
+    void filters;
+  };
 
-  const handleTableReady = (table: Table<any>, columns: ColumnDef<any>[]) => {
-    setTableInstance(table);
-    setTableColumns(columns);
+  const handleTableInstanceReady = (table: TableInstance<Invoice>) => {
+    // No-op since we're not using filtering
+    void table;
   };
 
   return (
     <div className="flex w-full gap-5 flex-col">
       <InvoicesHeaderToolbar />
-      {tableInstance && (
-        <InvoicesTableToolbar table={tableInstance} columns={tableColumns} />
-      )}
-      <InvoicesOverview onTableReady={handleTableReady} />
+      <InvoicesOverview 
+        onColumnFiltersChange={handleColumnFiltersChange}
+        onTableInstanceReady={handleTableInstanceReady}
+      />
     </div>
   );
 }
