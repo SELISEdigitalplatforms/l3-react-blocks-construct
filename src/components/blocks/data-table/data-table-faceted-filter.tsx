@@ -45,6 +45,7 @@ import { Separator } from 'components//ui/separator';
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   title?: string;
+  className?: string;
   options: {
     label: string;
     value: string;
@@ -55,6 +56,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
 export function DataTableFacetedFilter<TData, TValue>({
   column,
   title,
+  className,
   options,
 }: Readonly<DataTableFacetedFilterProps<TData, TValue>>) {
   const { t } = useTranslation();
@@ -64,7 +66,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button variant="outline" size="sm" className={cn("h-8 border-dashed", className)}>
           <PlusCircle />
           {title}
           {selectedValues?.size > 0 && (

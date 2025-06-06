@@ -19,7 +19,8 @@ export interface MenuItem {
     | 'Calendar'
     | 'SearchX'
     | 'TriangleAlert'
-    | 'ChartNoAxesCombined';
+    | 'ChartNoAxesCombined'
+    | 'ReceiptText';
   children?: MenuItem[];
 }
 
