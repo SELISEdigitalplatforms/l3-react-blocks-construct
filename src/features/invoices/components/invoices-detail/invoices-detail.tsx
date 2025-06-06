@@ -136,16 +136,16 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('BILLING_ADDRESS')}:</p>
                 <p className="text-sm text-high-emphasis">
-                  Via della Posta 15, 6600 Locarno, Switzerland
+                  {invoice.billingInfo.address}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('EMAIL')}:</p>
-                <p className="text-sm text-high-emphasis">email@email.com</p>
+                <p className="text-sm text-high-emphasis">{invoice.billingInfo.email}</p>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('PHONE_NO')}:</p>
-                <p className="text-sm text-high-emphasis">151515151</p>
+                <p className="text-sm text-high-emphasis">{invoice.billingInfo.phone}</p>
               </div>
             </div>
           </div>
@@ -171,34 +171,22 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <div>
-                      <p className="font-semibold text-high-emphasis">Monitor</p>
-                      <p className="text-sm text-medium-emphasis">
-                        Includes setup assistance and extended warranty coverage for 2 years.
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-semibold text-high-emphasis">Electronics</TableCell>
-                  <TableCell className="text-high-emphasis">2</TableCell>
-                  <TableCell className="text-high-emphasis">CHF 200.00</TableCell>
-                  <TableCell className="text-high-emphasis">CHF 400.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-semibold text-high-emphasis">Monitor Arm</TableCell>
-                  <TableCell className="text-high-emphasis">Accessories</TableCell>
-                  <TableCell className="text-high-emphasis">2</TableCell>
-                  <TableCell className="text-high-emphasis">CHF 20.00</TableCell>
-                  <TableCell className="text-high-emphasis">CHF 80.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-semibold text-high-emphasis">Wireless Mouse</TableCell>
-                  <TableCell className="text-high-emphasis">Electronics</TableCell>
-                  <TableCell className="text-high-emphasis">1</TableCell>
-                  <TableCell className="text-high-emphasis">CHF 20.00</TableCell>
-                  <TableCell className="text-high-emphasis">CHF 20.00</TableCell>
-                </TableRow>
+                {invoice.orderDetails.items.map((item) => (
+                  <TableRow key={item.name}>
+                    <TableCell>
+                      <div>
+                        <p className="font-semibold text-high-emphasis">{item.name}</p>
+                        {item.description && (
+                          <p className="text-sm text-medium-emphasis">{item.description}</p>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-semibold text-high-emphasis">{item.category}</TableCell>
+                    <TableCell className="text-high-emphasis">{item.quantity}</TableCell>
+                    <TableCell className="text-high-emphasis">CHF {item.unitPrice.toFixed(2)}</TableCell>
+                    <TableCell className="text-high-emphasis">CHF {item.amount.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
@@ -207,23 +195,24 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
             <div className="flex flex-col gap-2">
               <h3 className="font-medium text-medium-emphasis">{t('NOTE')}</h3>
               <p className="text-sm text-medium-emphasis">
-                All items will be delivered within 3-5 business days. Basic installation support is
-                included.
+                {invoice.orderDetails.note || t('NO_NOTE_AVAILABLE')}
               </p>
             </div>
             <div className="flex flex-col gap-4 w-full sm:w-[25%]">
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('SUBTOTAL')}</span>
-                <span className="text-sm font-semibold text-high-emphasis">CHF 500.00</span>
+                <span className="text-sm font-semibold text-high-emphasis">CHF {invoice.orderDetails.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-medium-emphasis">{t('TAXES')} (7.5%)</span>
-                <span className="text-sm font-semibold text-high-emphasis">CHF 37.50</span>
+                <span className="text-sm text-medium-emphasis">{t('TAXES')} ({invoice.orderDetails.taxRate}%)</span>
+                <span className="text-sm font-semibold text-high-emphasis">CHF {invoice.orderDetails.taxes.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
-                <span className="text-sm font-semibold text-secondary">- CHF 50.00</span>
-              </div>
+              {invoice.orderDetails.discount && (
+                <div className="flex justify-between">
+                  <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
+                  <span className="text-sm font-semibold text-secondary">- CHF {invoice.orderDetails.discount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between border-t border-border pt-4">
                 <span className="font-semibold text-high-emphasis">{t('TOTAL_AMOUNT')}</span>
                 <span className="text-xl font-bold text-high-emphasis">
