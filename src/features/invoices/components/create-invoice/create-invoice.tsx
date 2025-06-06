@@ -1,96 +1,203 @@
-import { useRef } from 'react';
+import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ChevronLeft, CalendarIcon, MoreVertical, Plus } from 'lucide-react';
+import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { Label } from 'components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import { Calendar } from 'components/ui/calendar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'components/ui/select';
+import { Separator } from 'components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
 
 export function CreateInvoice() {
   const { t } = useTranslation();
-  const invoiceRef = useRef<HTMLDivElement>(null);
-
-  const handleDownloadPDF = async () => {
-    const element = invoiceRef.current;
-    if (!element) return;
-
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save('invoice.pdf');
-  };
+  const navigate = useNavigate();
+  const [date, setDate] = React.useState<Date>();
 
   return (
-    <div className="bg-muted min-h-screen p-8 flex flex-col items-center">
-      <Card className="w-full max-w-2xl" ref={invoiceRef}>
-        <CardHeader>
-          <CardTitle className="text-xl text-high-emphasis">{t('OVERVIEW')}</CardTitle>
-          <CardDescription />
-        </CardHeader>
-        <CardContent className="p-6 text-black">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl font-bold">Your Company</h2>
-              <p className="text-sm">123 Dzong Road</p>
-              <p className="text-sm">Thimphu, Bhutan</p>
+    <div className="flex flex-col w-full gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="bg-card hover:bg-card/60 rounded-full"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-xl font-semibold">{t('CREATE_NEW_INVOICE')}</h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <Button variant="outline">{t('PREVIEW')}</Button>
+          <Button variant="outline">{t('SAVE_AS_DRAFT')}</Button>
+          <Button>{t('SAVE_AND_SEND')}</Button>
+        </div>
+      </div>
+
+      <Card className="w-full border-none rounded-[8px] shadow-sm">
+        <CardContent className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">{t('GENERAL_INFO')}</h2>
+          <Separator />
+          <div className="grid grid-cols-3 gap-6">
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">{t('CUSTOMER_NAME')}</Label>
+              <Input placeholder={`${t('WRITE_HERE')}...`} />
             </div>
-            <div className="text-right">
-              <h1 className="text-2xl font-bold">INVOICE</h1>
-              <p className="text-sm">#INV-00123</p>
-              <p className="text-sm">Date: 2025-06-02</p>
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">{t('EMAIL')}</Label>
+              <Input placeholder={`${t('WRITE_HERE')}...`} />
             </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold">Bill To:</h3>
-            <p className="text-sm">John Doe</p>
-            <p className="text-sm">456 Client Street</p>
-            <p className="text-sm">Punakha, Bhutan</p>
-          </div>
-
-          <table className="w-full text-sm border border-gray-300 mb-6">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border px-2 py-1 text-left">Item</th>
-                <th className="border px-2 py-1 text-right">Qty</th>
-                <th className="border px-2 py-1 text-right">Rate</th>
-                <th className="border px-2 py-1 text-right">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="border px-2 py-1">Web Development</td>
-                <td className="border px-2 py-1 text-right">1</td>
-                <td className="border px-2 py-1 text-right">$1000</td>
-                <td className="border px-2 py-1 text-right">$1000</td>
-              </tr>
-              <tr>
-                <td className="border px-2 py-1">Hosting (1 year)</td>
-                <td className="border px-2 py-1 text-right">1</td>
-                <td className="border px-2 py-1 text-right">$120</td>
-                <td className="border px-2 py-1 text-right">$120</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className="text-right">
-            <p className="text-sm">Subtotal: $1120</p>
-            <p className="text-sm">Tax (10%): $112</p>
-            <p className="text-lg font-bold">Total: $1232</p>
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">{t('PHONE_NUMBER')}</Label>
+              <Input placeholder={`${t('WRITE_HERE')}...`} />
+            </div>
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">{t('BILLING_ADDRESS')}</Label>
+              <Input placeholder={`${t('WRITE_HERE')}...`} />
+            </div>
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">{t('DUE_DATE')}</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, 'PPP') : <span>{t('SELECT')}</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">{t('CURRENCY')}</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('SELECT')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="chf">CHF</SelectItem>
+                  <SelectItem value="usd">USD</SelectItem>
+                  <SelectItem value="eur">EUR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
+      <Card className="w-full border-none rounded-[8px] shadow-sm">
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-lg font-semibold">{t('ITEM_DETAILS')}</h2>
+            <Separator />
+            <Table>
+              <TableHeader>
+                <TableRow className="border-medium-emphasis bg-surface hover:bg-surface">
+                  <TableHead>{t('ITEM_NAME')}</TableHead>
+                  <TableHead>{t('CATEGORY')}</TableHead>
+                  <TableHead>{t('QUANTITY')}</TableHead>
+                  <TableHead>{t('UNIT_PRICE')}</TableHead>
+                  <TableHead>{t('AMOUNT')}</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>c
+                <TableRow>
+                  <TableCell>
+                    <Input placeholder={`${t('WRITE_HERE')}...`} />
+                  </TableCell>
+                  <TableCell>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('SELECT')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="service">Service</SelectItem>
+                        <SelectItem value="product">Product</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Input type="number" defaultValue="0" className="w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="relative w-32">
+                      <span className="absolute left-3 top-2.5">CHF</span>
+                      <Input className="pl-12" defaultValue="0.00" />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="relative w-32">
+                      <span className="absolute left-3 top-2.5">CHF</span>
+                      <Input className="pl-12" defaultValue="00.00" readOnly />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+            <div className="flex border-t border-border border-dashed py-4">
+              <Button variant="outline" className="gap-1">
+                <Plus className="h-4 w-4 text-primary hover:text-primary" />{' '}
+                <span className="text-primary hover:text-primary">{t('ADD_ITEM')}</span>
+              </Button>
+            </div>
+          </div>
 
-      <Button onClick={handleDownloadPDF} className="mt-6">
-        Download Invoice as PDF
-      </Button>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-[6px]">
+              <Label className="text-high-emphasis text-sm">
+                {t('GENERAL_NOTE')} ({t('OPTIONAL')})
+              </Label>
+              <Input placeholder={`${t('WRITE_HERE')}...`} />
+            </div>
+            <div className="flex justify-end gap-8">
+              <div className="flex flex-col gap-[6px] text-right min-w-[200px]">
+                <div className="flex justify-between">
+                  <span className="text-sm">{t('SUBTOTAL')}</span>
+                  <span className="text-sm">CHF 00.00</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">{t('TAXES')}</span>
+                  <div className="relative w-20">
+                    <Input className="text-right pr-6" defaultValue="0.00" />
+                    <span className="absolute right-2 top-2.5">%</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">{t('DISCOUNT')}</span>
+                  <div className="flex items-center gap-2">
+                    <span>-</span>
+                    <div className="relative w-20">
+                      <span className="absolute left-2 top-2.5">CHF</span>
+                      <Input className="text-right pl-10" defaultValue="0.00" />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-between font-semibold pt-2 border-t">
+                  <span className="text-sm">{t('TOTAL_AMOUNT')}</span>
+                  <span className="text-sm">CHF 0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

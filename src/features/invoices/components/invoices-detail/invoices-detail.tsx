@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -21,12 +22,13 @@ import { useToast } from 'hooks/use-toast';
 
 interface InvoicesDetailProps {
   invoice: Invoice;
-  onBack: () => void;
 }
 
-export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
+export function InvoicesDetail({ invoice }: InvoicesDetailProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadPDF = async () => {
@@ -65,7 +67,12 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
     <div className="flex w-full flex-col gap-4">
       <div className="flex sm:flex-row flex-col gap-2 sm:gap-0 sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="bg-card hover:bg-card/60 rounded-full"
+            onClick={() => navigate(-1)}
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-2xl font-semibold">{invoice.id}</h1>
@@ -135,9 +142,7 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
               <p className="text-base font-bold">{invoice.customerName}</p>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('BILLING_ADDRESS')}:</p>
-                <p className="text-sm text-high-emphasis">
-                  {invoice.billingInfo.address}
-                </p>
+                <p className="text-sm text-high-emphasis">{invoice.billingInfo.address}</p>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('EMAIL')}:</p>
@@ -181,10 +186,16 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-semibold text-high-emphasis">{item.category}</TableCell>
+                    <TableCell className="font-semibold text-high-emphasis">
+                      {item.category}
+                    </TableCell>
                     <TableCell className="text-high-emphasis">{item.quantity}</TableCell>
-                    <TableCell className="text-high-emphasis">CHF {item.unitPrice.toFixed(2)}</TableCell>
-                    <TableCell className="text-high-emphasis">CHF {item.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-high-emphasis">
+                      CHF {item.unitPrice.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-high-emphasis">
+                      CHF {item.amount.toFixed(2)}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -201,16 +212,24 @@ export function InvoicesDetail({ invoice, onBack }: InvoicesDetailProps) {
             <div className="flex flex-col gap-4 w-full sm:w-[25%]">
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('SUBTOTAL')}</span>
-                <span className="text-sm font-semibold text-high-emphasis">CHF {invoice.orderDetails.subtotal.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-high-emphasis">
+                  CHF {invoice.orderDetails.subtotal.toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-medium-emphasis">{t('TAXES')} ({invoice.orderDetails.taxRate}%)</span>
-                <span className="text-sm font-semibold text-high-emphasis">CHF {invoice.orderDetails.taxes.toFixed(2)}</span>
+                <span className="text-sm text-medium-emphasis">
+                  {t('TAXES')} ({invoice.orderDetails.taxRate}%)
+                </span>
+                <span className="text-sm font-semibold text-high-emphasis">
+                  CHF {invoice.orderDetails.taxes.toFixed(2)}
+                </span>
               </div>
               {invoice.orderDetails.discount && (
                 <div className="flex justify-between">
                   <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
-                  <span className="text-sm font-semibold text-secondary">- CHF {invoice.orderDetails.discount.toFixed(2)}</span>
+                  <span className="text-sm font-semibold text-secondary">
+                    - CHF {invoice.orderDetails.discount.toFixed(2)}
+                  </span>
                 </div>
               )}
               <div className="flex justify-between border-t border-border pt-4">

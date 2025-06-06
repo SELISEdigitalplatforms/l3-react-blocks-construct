@@ -17,7 +17,7 @@ export function InvoicesHeaderToolbar({
       <div className="flex items-center text-base text-high-emphasis">
         <h3 className="text-2xl font-bold tracking-tight">{t(title)}</h3>
       </div>
-      <Link to="/invoices/add">
+      <Link to="/invoices/create-invoice">
         <Button size="sm" className="text-sm font-bold">
           <Plus />
           {t('NEW_INVOICE')}

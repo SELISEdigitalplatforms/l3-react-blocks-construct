@@ -56,6 +56,7 @@ function InvoicesOverviewTable<TData>({
   manualPagination = false,
 }: Readonly<InvoicesOverviewTableProps<TData>>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [activeStatus, setActiveStatus] = React.useState<string | null>(null);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -241,7 +242,14 @@ function InvoicesOverviewTable<TData>({
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-            <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStatus(null);
+                setColumnFilters(columnFilters.filter((filter) => filter.id !== 'status'));
+              }}
+              className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${!activeStatus ? 'bg-primary-50' : ''}`}
+            >
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary-50">
                   <FileText className="h-5 w-5 text-primary" />
@@ -258,8 +266,18 @@ function InvoicesOverviewTable<TData>({
                   CHF {calculateStats(data).total.amount.toFixed(2)}
                 </p>
               </div>
-            </div>
-            <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStatus('Paid');
+                setColumnFilters([
+                  ...columnFilters.filter((filter) => filter.id !== 'status'),
+                  { id: 'status', value: 'Paid' },
+                ]);
+              }}
+              className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Paid' ? 'bg-primary-50' : ''}`}
+            >
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-success-background">
                   <CheckCircle className="h-5 w-5 text-success" />
@@ -276,8 +294,18 @@ function InvoicesOverviewTable<TData>({
                   CHF {calculateStats(data).paid.amount.toFixed(2)}
                 </p>
               </div>
-            </div>
-            <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStatus('Pending');
+                setColumnFilters([
+                  ...columnFilters.filter((filter) => filter.id !== 'status'),
+                  { id: 'status', value: 'Pending' },
+                ]);
+              }}
+              className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Pending' ? 'bg-primary-50' : ''}`}
+            >
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-warning-background">
                   <Clock className="h-5 w-5 text-warning" />
@@ -294,8 +322,18 @@ function InvoicesOverviewTable<TData>({
                   CHF {calculateStats(data).pending.amount.toFixed(2)}
                 </p>
               </div>
-            </div>
-            <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStatus('Overdue');
+                setColumnFilters([
+                  ...columnFilters.filter((filter) => filter.id !== 'status'),
+                  { id: 'status', value: 'Overdue' },
+                ]);
+              }}
+              className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Overdue' ? 'bg-primary-50' : ''}`}
+            >
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-error-background">
                   <AlertCircle className="h-5 w-5 text-error" />
@@ -312,8 +350,18 @@ function InvoicesOverviewTable<TData>({
                   CHF {calculateStats(data).overdue.amount.toFixed(2)}
                 </p>
               </div>
-            </div>
-            <div className="flex flex-col hover:bg-primary-50 hover:rounded-[4px] cursor-pointer gap-2 px-4 py-3">
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStatus('Draft');
+                setColumnFilters([
+                  ...columnFilters.filter((filter) => filter.id !== 'status'),
+                  { id: 'status', value: 'Draft' },
+                ]);
+              }}
+              className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Draft' ? 'bg-primary-50' : ''}`}
+            >
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-surface">
                   <FileEdit className="h-5 w-5 text-medium-emphasis" />
@@ -330,7 +378,7 @@ function InvoicesOverviewTable<TData>({
                   CHF {calculateStats(data).draft.amount.toFixed(2)}
                 </p>
               </div>
-            </div>
+            </button>
           </div>
           <Separator />
           <div>
