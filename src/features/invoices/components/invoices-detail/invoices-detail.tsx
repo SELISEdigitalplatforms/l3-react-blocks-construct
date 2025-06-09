@@ -1,9 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, Pencil, Send } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from 'components/ui/select';
 import { useToast } from 'hooks/use-toast';
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 
 interface InvoicesDetailProps {
   invoice: Invoice;
@@ -29,8 +30,18 @@ export function InvoicesDetail({ invoice, isPreview = false }: InvoicesDetailPro
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [showSendDialog, setShowSendDialog] = useState(false);
 
   const invoiceRef = useRef<HTMLDivElement>(null);
+
+  const handleSendInvoice = () => {
+    setShowSendDialog(false);
+    toast({
+      variant: 'success',
+      title: t('INVOICE_SENT'),
+      description: t('INVOICE_SENT_SUCCESSFULLY'),
+    });
+  };
 
   const handleDownloadPDF = async () => {
     try {
@@ -97,10 +108,24 @@ export function InvoicesDetail({ invoice, isPreview = false }: InvoicesDetailPro
                 </Select>
               </div>
               <Separator orientation="vertical" className="h-5 mx-1 sm:mx-3" />
-              <Button variant="outline" onClick={handleDownloadPDF}>
-                <Download className="h-4 w-4 mr-2" />
-                {t('DOWNLOAD')}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={handleDownloadPDF}>
+                  <Download className="h-4 w-4 mr-1" />
+                  {t('DOWNLOAD')}
+                </Button>
+                <Button variant="outline" onClick={() => navigate(`/invoices/edit/${invoice.id}`)}>
+                  <Pencil className="h-4 w-4 mr-1" />
+                  {t('EDIT')}
+                </Button>
+                <Button
+                  variant="default"
+                  className="bg-primary"
+                  onClick={() => setShowSendDialog(true)}
+                >
+                  <Send className="h-4 w-4 mr-1" />
+                  {t('SEND')}
+                </Button>
+              </div>
             </div>
           </>
         ) : (
@@ -254,6 +279,13 @@ export function InvoicesDetail({ invoice, isPreview = false }: InvoicesDetailPro
           </p>
         </CardContent>
       </Card>
+      <ConfirmationModal
+        open={showSendDialog}
+        onOpenChange={setShowSendDialog}
+        title={t('SEND_INVOICE')}
+        description={t('SAVE_INVOICE_SEND_CUSTOMER_EMAIL')}
+        onConfirm={handleSendInvoice}
+      />
     </div>
   );
 }
