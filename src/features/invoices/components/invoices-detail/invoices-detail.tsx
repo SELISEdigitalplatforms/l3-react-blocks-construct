@@ -22,9 +22,10 @@ import { useToast } from 'hooks/use-toast';
 
 interface InvoicesDetailProps {
   invoice: Invoice;
+  isPreview?: boolean;
 }
 
-export function InvoicesDetail({ invoice }: InvoicesDetailProps) {
+export function InvoicesDetail({ invoice, isPreview = false }: InvoicesDetailProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -66,39 +67,45 @@ export function InvoicesDetail({ invoice }: InvoicesDetailProps) {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex sm:flex-row flex-col gap-2 sm:gap-0 sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="bg-card hover:bg-card/60 rounded-full"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+        {!isPreview ? (
+          <>
+            <div className="flex items-center gap-2">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="bg-card hover:bg-card/60 rounded-full"
+                onClick={() => navigate(-1)}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h1 className="text-2xl font-semibold">{invoice.id}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <p className="text-high-emphasis">{t('STATUS')}:</p>
+                <Select defaultValue={invoice.status}>
+                  <SelectTrigger className="w-[120px] h-9">
+                    <SelectValue placeholder={t('SELECT_STATUS')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(InvoiceStatus).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {t(status.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Separator orientation="vertical" className="h-5 mx-1 sm:mx-3" />
+              <Button variant="outline" onClick={handleDownloadPDF}>
+                <Download className="h-4 w-4 mr-2" />
+                {t('DOWNLOAD')}
+              </Button>
+            </div>
+          </>
+        ) : (
           <h1 className="text-2xl font-semibold">{invoice.id}</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2">
-            <p className="text-high-emphasis">{t('STATUS')}:</p>
-            <Select defaultValue={invoice.status}>
-              <SelectTrigger className="w-[120px] h-9">
-                <SelectValue placeholder={t('SELECT_STATUS')} />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(InvoiceStatus).map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {t(status.toUpperCase())}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Separator orientation="vertical" className="h-5 mx-1 sm:mx-3" />
-          <Button variant="outline" onClick={handleDownloadPDF}>
-            <Download className="h-4 w-4 mr-2" />
-            {t('DOWNLOAD')}
-          </Button>
-        </div>
+        )}
       </div>
       <Card className="w-full border-none rounded-lg shadow-sm" ref={invoiceRef}>
         <CardContent className="flex flex-col !p-[24px] sm:!py-[56px] sm:!px-[70px] gap-6">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,6 +43,7 @@ export function CreateInvoice() {
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [action, setAction] = useState<'draft' | 'send'>('send');
+  const [showPreview, setShowPreview] = useState(false);
   const [invoiceId] = useState(generateInvoiceId());
 
   const form = useForm<InvoiceFormValues>({
@@ -152,7 +154,7 @@ export function CreateInvoice() {
               <h1 className="text-xl font-semibold">{t('CREATE_NEW_INVOICE')}</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" onClick={() => setShowPreview(true)}>
                 {t('PREVIEW')}
               </Button>
               <Button type="submit" variant="outline" onClick={() => setAction('draft')}>
@@ -317,6 +319,12 @@ export function CreateInvoice() {
           </Card>
         </form>
       </Form>
+      <InvoicePreview
+        open={showPreview}
+        onOpenChange={setShowPreview}
+        invoice={showPreview ? createInvoiceFromForm(invoiceId, form.getValues(), items, 'draft') : null}
+      />
+
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent>
           <DialogHeader>
