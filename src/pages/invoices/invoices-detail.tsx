@@ -1,13 +1,14 @@
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { InvoicesDetail } from 'features/invoices';
-import { invoiceData, Invoice } from 'features/invoices/data/invoice-data';
+import { useInvoice } from 'features/invoices/store/invoice-store';
 
 export function InvoiceDetailsPage() {
   const { invoiceId } = useParams();
   const { t } = useTranslation();
+  const { getInvoice } = useInvoice();
 
-  const invoice = invoiceData.find((inv: Invoice) => inv.id === invoiceId);
+  const invoice = invoiceId ? getInvoice(invoiceId) : undefined;
 
   if (!invoice) {
     return <div className="p-8">{t('INVOICE_DETAIL_NOT_FOUND')}</div>;

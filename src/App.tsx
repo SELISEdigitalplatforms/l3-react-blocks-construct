@@ -39,6 +39,7 @@ import Finance from './pages/finance/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice } from './features/invoices/components/create-invoice/create-invoice';
+import { InvoiceLayout } from './pages/invoices/invoice-layout';
 
 const queryClient = new QueryClient();
 
@@ -96,15 +97,17 @@ function AppContent() {
                 <Route path="/mail" element={<Email />} />
                 <Route path="/mail/:category" element={<Email />} />
                 <Route path="/mail/:category/:emailId" element={<Email />} />
-                <Route path="/m ail/:category/:labels/:emailId" element={<Email />} />
+                <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
                 <Route path="/help" element={<Help />} />
                 <Route path="/identity-management" element={<TaskPage />} />
                 <Route path="/services/storage" element={<Storage />} />
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
-                <Route path="/invoices" element={<InvoicesPage />} />
-                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
+                <Route element={<InvoiceLayout />}>
+                  <Route path="/invoices" element={<InvoicesPage />} />
+                  <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                  <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
+                </Route>
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/503" element={<ServiceUnavailable />} />
                 <Route path="/404" element={<NotFound />} />

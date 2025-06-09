@@ -191,10 +191,10 @@ export function InvoicesDetail({ invoice }: InvoicesDetailProps) {
                     </TableCell>
                     <TableCell className="text-high-emphasis">{item.quantity}</TableCell>
                     <TableCell className="text-high-emphasis">
-                      CHF {item.unitPrice.toFixed(2)}
+                      {invoice.currency} {item.unitPrice.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-high-emphasis">
-                      CHF {item.amount.toFixed(2)}
+                      {invoice.currency} {item.amount.toFixed(2)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -213,7 +213,7 @@ export function InvoicesDetail({ invoice }: InvoicesDetailProps) {
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('SUBTOTAL')}</span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  CHF {invoice.orderDetails.subtotal.toFixed(2)}
+                  {invoice.currency} {invoice.orderDetails.subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -221,21 +221,21 @@ export function InvoicesDetail({ invoice }: InvoicesDetailProps) {
                   {t('TAXES')} ({invoice.orderDetails.taxRate}%)
                 </span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  CHF {invoice.orderDetails.taxes.toFixed(2)}
+                  {invoice.currency} {invoice.orderDetails.taxes.toFixed(2)}
                 </span>
               </div>
               {invoice.orderDetails.discount && (
                 <div className="flex justify-between">
                   <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
                   <span className="text-sm font-semibold text-secondary">
-                    - CHF {invoice.orderDetails.discount.toFixed(2)}
+                    - {invoice.currency} {invoice.orderDetails.discount.toFixed(2)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between border-t border-border pt-4">
                 <span className="font-semibold text-high-emphasis">{t('TOTAL_AMOUNT')}</span>
                 <span className="text-xl font-bold text-high-emphasis">
-                  CHF {invoice.amount.toFixed(2)}
+                  {invoice.currency} {invoice.amount.toFixed(2)}
                 </span>
               </div>
             </div>

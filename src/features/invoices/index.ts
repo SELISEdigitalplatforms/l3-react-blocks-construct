@@ -5,3 +5,5 @@ export { InvoicesFilterToolbar } from './components/invoices-filter-toolbar/invo
 export { InvoicesFilterControls } from './components/invoices-filter-controls/invoices-filter-controls';
 export { InvoicesOverviewTable } from './components/invoices-overview-table/invoices-overview-table';
 export { CreateInvoice } from './components/create-invoice/create-invoice';
+export { InvoiceItemsTable } from './components/invoice-items-table/invoice-items-table';
+export { invoiceFormSchema } from './schemas/invoice-form-schema';
