@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ChevronLeft, CalendarIcon, MoreVertical, Plus } from 'lucide-react';
+import { ChevronLeft, CalendarIcon, MoreVertical, Plus, Trash, NotebookPen } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -16,13 +16,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
 import { Separator } from 'components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
+import { Textarea } from 'components/ui/textarea';
+import UIPhoneInput from 'components/core/phone-input/phone-input';
+
+interface InvoiceItem {
+  id: string;
+  name: string;
+  category: string;
+  quantity: number;
+  price: number;
+  total: number;
+  showNote: boolean;
+  note?: string;
+}
 
 export function CreateInvoice() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [date, setDate] = React.useState<Date>();
+  const [items, setItems] = React.useState<InvoiceItem[]>([
+    {
+      id: '1',
+      name: '',
+      category: '',
+      quantity: 0,
+      price: 0,
+      total: 0,
+      showNote: false,
+    },
+  ]);
 
   return (
     <div className="flex flex-col w-full gap-4">
@@ -52,27 +82,32 @@ export function CreateInvoice() {
           <div className="grid grid-cols-3 gap-6">
             <div className="flex flex-col gap-[6px]">
               <Label className="text-high-emphasis text-sm">{t('CUSTOMER_NAME')}</Label>
-              <Input placeholder={`${t('WRITE_HERE')}...`} />
+              <Input placeholder={`${t('ENTER_CUSTOMER_NAME')}...`} />
             </div>
             <div className="flex flex-col gap-[6px]">
               <Label className="text-high-emphasis text-sm">{t('EMAIL')}</Label>
-              <Input placeholder={`${t('WRITE_HERE')}...`} />
+              <Input placeholder={`${t('ENTER_EMAIL_ADDRESS')}...`} />
             </div>
             <div className="flex flex-col gap-[6px]">
               <Label className="text-high-emphasis text-sm">{t('PHONE_NUMBER')}</Label>
-              <Input placeholder={`${t('WRITE_HERE')}...`} />
+              <UIPhoneInput
+                placeholder={t('ENTER_YOUR_MOBILE_NUMBER')}
+                defaultCountry="CH"
+                countryCallingCodeEditable={false}
+                international
+              />
             </div>
             <div className="flex flex-col gap-[6px]">
               <Label className="text-high-emphasis text-sm">{t('BILLING_ADDRESS')}</Label>
-              <Input placeholder={`${t('WRITE_HERE')}...`} />
+              <Input placeholder={`${t('ENTER_BILLING_ADDRESS')}...`} />
             </div>
             <div className="flex flex-col gap-[6px]">
               <Label className="text-high-emphasis text-sm">{t('DUE_DATE')}</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, 'PPP') : <span>{t('SELECT')}</span>}
+                  <Button variant="outline" className="w-full h-[44px] justify-between font-normal">
+                    {date ? format(date, 'PPP') : <span>{t('SELECT_DUE_DATE')}</span>}
+                    <CalendarIcon className="ml-2 h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -112,87 +147,208 @@ export function CreateInvoice() {
                   <TableHead />
                 </TableRow>
               </TableHeader>
-              <TableBody>c
-                <TableRow>
-                  <TableCell>
-                    <Input placeholder={`${t('WRITE_HERE')}...`} />
-                  </TableCell>
-                  <TableCell>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t('SELECT')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="service">Service</SelectItem>
-                        <SelectItem value="product">Product</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Input type="number" defaultValue="0" className="w-20" />
-                  </TableCell>
-                  <TableCell>
-                    <div className="relative w-32">
-                      <span className="absolute left-3 top-2.5">CHF</span>
-                      <Input className="pl-12" defaultValue="0.00" />
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="relative w-32">
-                      <span className="absolute left-3 top-2.5">CHF</span>
-                      <Input className="pl-12" defaultValue="00.00" readOnly />
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
+              <TableBody>
+                {items.map((item) => (
+                  <React.Fragment key={item.id}>
+                    <TableRow className="hover:bg-transparent">
+                      <TableCell>
+                        <Input
+                          placeholder={`${t('ENTER_ITEM_NAME')}...`}
+                          value={item.name}
+                          onChange={(e) => {
+                            setItems(
+                              items.map((i) =>
+                                i.id === item.id ? { ...i, name: e.target.value } : i
+                              )
+                            );
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Select
+                          value={item.category}
+                          onValueChange={(value) => {
+                            setItems(
+                              items.map((i) => (i.id === item.id ? { ...i, category: value } : i))
+                            );
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('SELECT_CATEGORY')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="service">Service</SelectItem>
+                            <SelectItem value="product">Product</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          className="w-20"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const quantity = parseInt(e.target.value) || 0;
+                            setItems(
+                              items.map((i) =>
+                                i.id === item.id ? { ...i, quantity, total: quantity * i.price } : i
+                              )
+                            );
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="relative w-32">
+                          <span className="absolute left-3 top-[12px]">CHF</span>
+                          <Input
+                            className="pl-12"
+                            value={item.price.toFixed(2)}
+                            onChange={(e) => {
+                              const price = parseFloat(e.target.value) || 0;
+                              setItems(
+                                items.map((i) =>
+                                  i.id === item.id ? { ...i, price, total: i.quantity * price } : i
+                                )
+                              );
+                            }}
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="relative w-32">
+                          <span className="absolute left-3 top-[12px]">CHF</span>
+                          <Input className="pl-12" value={item.total.toFixed(2)} readOnly />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {item.showNote ? (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setItems(
+                                    items.map((i) =>
+                                      i.id === item.id ? { ...i, showNote: false } : i
+                                    )
+                                  );
+                                }}
+                              >
+                                <Trash className="h-4 w-4 mr-2" />
+                                <span>{t('REMOVE_NOTE')}</span>
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setItems(
+                                    items.map((i) =>
+                                      i.id === item.id ? { ...i, showNote: true } : i
+                                    )
+                                  );
+                                }}
+                              >
+                                <NotebookPen className="h-4 w-4 mr-2" />
+                                <span>{t('ADD_NOTE')}</span>
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setItems(items.filter((i) => i.id !== item.id));
+                              }}
+                            >
+                              <Trash className="h-4 w-4 mr-2" />
+                              <span>{t('REMOVE_ITEM')}</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                    {item.showNote && (
+                      <TableRow className="hover:bg-transparent">
+                        <TableCell colSpan={6}>
+                          <div className="flex flex-col gap-[6px] w-[60%]">
+                            <Label className="text-high-emphasis text-sm">
+                              {t('NOTE')}{' '}
+                              <span className="text-low-emphasis">({t('OPTIONAL')})</span>
+                            </Label>
+                            <Textarea
+                              placeholder={`${t('WRITE_HERE')}...`}
+                              className="min-h-[100px]"
+                              value={item.note}
+                              onChange={(e) => {
+                                setItems(
+                                  items.map((i) =>
+                                    i.id === item.id ? { ...i, note: e.target.value } : i
+                                  )
+                                );
+                              }}
+                            />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                ))}
               </TableBody>
             </Table>
             <div className="flex border-t border-border border-dashed py-4">
-              <Button variant="outline" className="gap-1">
+              <Button
+                variant="outline"
+                className="gap-1"
+                onClick={() => {
+                  setItems([
+                    ...items,
+                    {
+                      id: Math.random().toString(),
+                      name: '',
+                      category: '',
+                      quantity: 0,
+                      price: 0,
+                      total: 0,
+                      showNote: false,
+                    },
+                  ]);
+                }}
+              >
                 <Plus className="h-4 w-4 text-primary hover:text-primary" />{' '}
                 <span className="text-primary hover:text-primary">{t('ADD_ITEM')}</span>
               </Button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-[6px]">
+          <div className="flex w-full justify-between gap-6">
+            <div className="flex flex-col gap-[6px] w-[40%]">
               <Label className="text-high-emphasis text-sm">
-                {t('GENERAL_NOTE')} ({t('OPTIONAL')})
+                {t('GENERAL_NOTE')} <span className="text-low-emphasis">({t('OPTIONAL')})</span>
               </Label>
-              <Input placeholder={`${t('WRITE_HERE')}...`} />
+              <Textarea placeholder={`${t('WRITE_HERE')}...`} />
             </div>
-            <div className="flex justify-end gap-8">
-              <div className="flex flex-col gap-[6px] text-right min-w-[200px]">
-                <div className="flex justify-between">
-                  <span className="text-sm">{t('SUBTOTAL')}</span>
-                  <span className="text-sm">CHF 00.00</span>
+            <div className="flex flex-col gap-4 w-[40%]">
+              <div className="flex justify-between">
+                <span className="text-sm">{t('SUBTOTAL')}</span>
+                <span className="text-sm">CHF 500.00</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">{t('TAXES')}</span>
+                <div className="relative w-40">
+                  <Input className="text-right" defaultValue="0.00%" readOnly />
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">{t('TAXES')}</span>
-                  <div className="relative w-20">
-                    <Input className="text-right pr-6" defaultValue="0.00" />
-                    <span className="absolute right-2 top-2.5">%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">{t('DISCOUNT')}</span>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-40">
+                    <Input className="text-right" defaultValue="- CHF 0.00" readOnly />
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">{t('DISCOUNT')}</span>
-                  <div className="flex items-center gap-2">
-                    <span>-</span>
-                    <div className="relative w-20">
-                      <span className="absolute left-2 top-2.5">CHF</span>
-                      <Input className="text-right pl-10" defaultValue="0.00" />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-between font-semibold pt-2 border-t">
-                  <span className="text-sm">{t('TOTAL_AMOUNT')}</span>
-                  <span className="text-sm">CHF 0.00</span>
-                </div>
+              </div>
+              <div className="flex justify-between font-semibold pt-2 border-t">
+                <span className="text-sm">{t('TOTAL_AMOUNT')}</span>
+                <span className="text-sm">CHF 0.00</span>
               </div>
             </div>
           </div>
