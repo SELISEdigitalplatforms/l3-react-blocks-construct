@@ -38,8 +38,8 @@ import NotFound from './pages/error/not-found/not-found';
 import Finance from './pages/finance/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
-import { CreateInvoice } from './features/invoices/components/create-invoice/create-invoice';
 import { InvoiceLayout } from './pages/invoices/invoice-layout';
+import { CreateInvoice, EditInvoice } from './features/invoices';
 
 const queryClient = new QueryClient();
 
@@ -106,6 +106,7 @@ function AppContent() {
                 <Route element={<InvoiceLayout />}>
                   <Route path="/invoices" element={<InvoicesPage />} />
                   <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                  <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
                   <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 </Route>
                 <Route path="/calendar" element={<CalendarPage />} />

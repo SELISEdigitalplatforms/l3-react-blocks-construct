@@ -4,6 +4,7 @@ import { Invoice, invoiceData } from '../data/invoice-data';
 interface InvoiceContextType {
   invoices: Invoice[];
   addInvoice: (invoice: Invoice) => void;
+  updateInvoice: (invoice: Invoice) => void;
   getInvoice: (id: string) => Invoice | undefined;
 }
 
@@ -16,12 +17,16 @@ export function InvoiceProvider({ children }: { children: React.ReactNode }) {
     setInvoices((prev) => [...prev, invoice]);
   };
 
+  const updateInvoice = (invoice: Invoice) => {
+    setInvoices((prev) => prev.map((inv) => (inv.id === invoice.id ? invoice : inv)));
+  };
+
   const getInvoice = (id: string) => {
     return invoices.find((inv) => inv.id === id);
   };
 
   return (
-    <InvoiceContext.Provider value={{ invoices, addInvoice, getInvoice }}>
+    <InvoiceContext.Provider value={{ invoices, addInvoice, updateInvoice, getInvoice }}>
       {children}
     </InvoiceContext.Provider>
   );

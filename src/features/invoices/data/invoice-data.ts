@@ -17,6 +17,13 @@ export interface OrderItem {
   amount: number;
 }
 
+export const Categories = [
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'furniture', label: 'Furniture' },
+  { value: 'accessories', label: 'Accessories' },
+  { value: 'apparel', label: 'Apparel' },
+];
+
 export interface OrderDetails {
   items: OrderItem[];
   subtotal: number;
@@ -66,7 +73,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Via della Posta 15, 6600 Locarno, Switzerland',
       email: 'email@email.com',
-      phone: '151515151',
+      phone: '+41151515151',
     },
     orderDetails: {
       items: [
@@ -113,7 +120,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Bahnhofstrasse 25, 8001 Zürich, Switzerland',
       email: 'adrian.mueller@email.com',
-      phone: '152525252',
+      phone: '+41152525252',
     },
     orderDetails: {
       items: [
@@ -143,7 +150,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Rue du Rhône 68, 1204 Geneva, Switzerland',
       email: 'sophie.meier@email.com',
-      phone: '153535353',
+      phone: '+41153535353',
     },
     orderDetails: {
       items: [
@@ -173,7 +180,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Marktplatz 10, 4001 Basel, Switzerland',
       email: 'emma.weber@email.com',
-      phone: '154545454',
+      phone: '+41154545454',
     },
     orderDetails: {
       items: [
@@ -203,7 +210,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Bundesplatz 3, 3011 Bern, Switzerland',
       email: 'julian.schmid@email.com',
-      phone: '155555555',
+      phone: '+41155555555',
     },
     orderDetails: {
       items: [
@@ -234,7 +241,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'St. Gallerstrasse 42, 9000 St. Gallen, Switzerland',
       email: 'elena.baumann@email.com',
-      phone: '156565656',
+      phone: '+41156565656',
     },
     orderDetails: {
       items: [
@@ -264,7 +271,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Pilatusstrasse 15, 6003 Lucerne, Switzerland',
       email: 'noah.huber@email.com',
-      phone: '157575757',
+      phone: '+41157575757',
     },
     orderDetails: {
       items: [
@@ -294,7 +301,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Bahnhofplatz 5, 8400 Winterthur, Switzerland',
       email: 'mia.fischer@email.com',
-      phone: '158585858',
+      phone: '+41158585858',
     },
     orderDetails: {
       items: [
@@ -325,7 +332,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Seestrasse 89, 2502 Biel, Switzerland',
       email: 'felix.schneider@email.com',
-      phone: '159595959',
+      phone: '+41159595959',
     },
     orderDetails: {
       items: [
@@ -356,7 +363,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Schaffhauserstrasse 30, 8200 Schaffhausen, Switzerland',
       email: 'laura.zimmermann@email.com',
-      phone: '151010101',
+      phone: '+41151010101',
     },
     orderDetails: {
       items: [
@@ -386,7 +393,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Centralstrasse 12, 6300 Zug, Switzerland',
       email: 'david.hoffmann@email.com',
-      phone: '151111111',
+      phone: '+41151111111',
     },
     orderDetails: {
       items: [
@@ -417,7 +424,7 @@ export const invoiceData: Invoice[] = [
     billingInfo: {
       address: 'Hauptstrasse 55, 5000 Aarau, Switzerland',
       email: 'sarah.wagner@email.com',
-      phone: '151212121',
+      phone: '+41151212121',
     },
     orderDetails: {
       items: [

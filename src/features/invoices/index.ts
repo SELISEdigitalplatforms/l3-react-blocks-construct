@@ -7,3 +7,4 @@ export { InvoicesOverviewTable } from './components/invoices-overview-table/invo
 export { CreateInvoice } from './components/create-invoice/create-invoice';
 export { InvoiceItemsTable } from './components/invoice-items-table/invoice-items-table';
 export { invoiceFormSchema } from './schemas/invoice-form-schema';
+export { EditInvoice } from './components/edit-invoice/edit-invoice';

@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { Categories } from '../../data/invoice-data';
 import { useTranslation } from 'react-i18next';
 import { Control } from 'react-hook-form';
 import { MoreVertical, NotebookPen, Plus, Trash } from 'lucide-react';
@@ -85,8 +86,11 @@ export function InvoiceItemsTable({
                       <SelectValue placeholder={t('SELECT_CATEGORY')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="service">Service</SelectItem>
-                      <SelectItem value="product">Product</SelectItem>
+                      {Categories.map((category) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </TableCell>
