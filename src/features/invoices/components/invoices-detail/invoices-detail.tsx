@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { ArrowLeft, Download, Pencil, Send } from 'lucide-react';
+import { ChevronLeft, Download, Pencil, Send } from 'lucide-react';
 import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
@@ -87,7 +87,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 className="bg-card hover:bg-card/60 rounded-full"
                 onClick={() => navigate(-1)}
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5" />
               </Button>
               <h1 className="text-2xl font-semibold">{invoice.id}</h1>
             </div>
