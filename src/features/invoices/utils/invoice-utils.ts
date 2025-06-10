@@ -1,10 +1,11 @@
+import { v4 as uuidv4 } from 'uuid';
+
 import { InvoiceItem } from '../schemas/invoice-form-schema';
 import { Invoice, InvoiceStatus } from '../data/invoice-data';
 
-export function generateInvoiceId() {
-  const randomNum = Math.floor(10000 + Math.random() * 90000);
-  return `INV-${randomNum}`;
-}
+export const generateInvoiceId = (): string => {
+  return `INV-${uuidv4().substring(0, 5).replace(/-/g, '').toUpperCase()}`;
+};
 
 export function calculateInvoiceTotals(items: InvoiceItem[], taxRate: number, discount: number) {
   const subtotal = items.reduce((acc, item) => acc + item.total, 0);
