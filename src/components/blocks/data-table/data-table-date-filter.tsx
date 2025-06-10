@@ -132,7 +132,11 @@ export function DateRangeFilter<TData, TValue>({
           background: 'white',
         }}
       >
-        <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className="flex flex-col w-full text-left border-0 bg-transparent p-0"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Calendar
             initialFocus
             mode="range"
@@ -149,7 +153,7 @@ export function DateRangeFilter<TData, TValue>({
               {t('CLEAR_FILTER')}
             </Button>
           </div>
-        </div>
+        </button>
       </PopoverContent>
     </Popover>
   );

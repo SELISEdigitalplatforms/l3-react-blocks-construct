@@ -80,13 +80,13 @@ export function EditInvoice() {
     shouldUseNativeValidation: false,
     mode: 'onSubmit',
     defaultValues: {
-      customerName: invoice?.customerName || '',
-      email: invoice?.billingInfo?.email || '',
-      phoneNumber: formatPhoneToE164(invoice?.billingInfo?.phone || ''),
-      billingAddress: invoice?.billingInfo?.address || '',
-      currency: invoice?.currency?.toLowerCase() || '',
+      customerName: invoice?.customerName ?? '',
+      email: invoice?.billingInfo?.email ?? '',
+      phoneNumber: formatPhoneToE164(invoice?.billingInfo?.phone ?? ''),
+      billingAddress: invoice?.billingInfo?.address ?? '',
+      currency: invoice?.currency?.toLowerCase() ?? '',
       dueDate: invoice?.dueDate ? new Date(invoice.dueDate) : undefined,
-      generalNote: invoice?.orderDetails?.note || '',
+      generalNote: invoice?.orderDetails?.note ?? '',
     },
   });
 
@@ -123,7 +123,7 @@ export function EditInvoice() {
     values.phoneNumber = formatPhoneToE164(values.phoneNumber);
     if (!invoiceId) return;
     const updatedInvoice = createInvoiceFromForm(invoiceId, values, items, action);
-    updateInvoice(updatedInvoice);
+    updateInvoice(invoiceId, updatedInvoice);
     setShowConfirmModal(false);
 
     // Show toast notification based on action

@@ -26,7 +26,7 @@ interface InvoicesDetailProps {
   isPreview?: boolean;
 }
 
-export function InvoicesDetail({ invoice, isPreview = false }: InvoicesDetailProps) {
+export function InvoicesDetail({ invoice, isPreview = false }: Readonly<InvoicesDetailProps>) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -238,7 +238,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: InvoicesDetailPro
             <div className="flex flex-col gap-2">
               <h3 className="font-medium text-medium-emphasis">{t('NOTE')}</h3>
               <p className="text-sm text-medium-emphasis">
-                {invoice.orderDetails.note || t('NO_NOTE_AVAILABLE')}
+                {invoice.orderDetails.note ?? t('NO_NOTE_AVAILABLE')}
               </p>
             </div>
             <div className="flex flex-col gap-4 w-full sm:w-[25%]">

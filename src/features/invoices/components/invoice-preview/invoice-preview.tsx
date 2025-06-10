@@ -14,7 +14,7 @@ interface InvoicePreviewProps {
   invoice: Invoice | null;
 }
 
-export function InvoicePreview({ open, onOpenChange, invoice }: InvoicePreviewProps) {
+export function InvoicePreview({ open, onOpenChange, invoice }: Readonly<InvoicePreviewProps>) {
   if (!invoice) return null;
 
   return (

@@ -7,29 +7,33 @@ import { ColumnDef } from '@tanstack/react-table';
 // we'll create a mock component for testing
 const MockInvoicesOverviewTable = jest.fn((props: any) => {
   // Simulate the component's rendering behavior
-  const { 
-    data, 
-    isLoading, 
-    error, 
-    toolbar, 
-    onRowClick,
-    onPaginationChange 
-  } = props;
-  
+  const { data, isLoading, error, toolbar, onRowClick, onPaginationChange } = props;
+
   // Calculate stats like the real component does
   const calculateStats = (invoiceData: any[]) => ({
-    total: { count: invoiceData.length, amount: invoiceData.reduce((sum: number, inv: any) => sum + inv.amount, 0) },
-    paid: { 
-      count: invoiceData.filter((inv: any) => inv.status === 'Paid').length,
-      amount: invoiceData.filter((inv: any) => inv.status === 'Paid').reduce((sum: number, inv: any) => sum + inv.amount, 0)
+    total: {
+      count: invoiceData.length,
+      amount: invoiceData.reduce((sum: number, inv: any) => sum + inv.amount, 0),
     },
-    pending: { count: invoiceData.filter((inv: any) => inv.status === 'Pending').length, amount: 0 },
-    overdue: { count: invoiceData.filter((inv: any) => inv.status === 'Overdue').length, amount: 0 },
+    paid: {
+      count: invoiceData.filter((inv: any) => inv.status === 'Paid').length,
+      amount: invoiceData
+        .filter((inv: any) => inv.status === 'Paid')
+        .reduce((sum: number, inv: any) => sum + inv.amount, 0),
+    },
+    pending: {
+      count: invoiceData.filter((inv: any) => inv.status === 'Pending').length,
+      amount: 0,
+    },
+    overdue: {
+      count: invoiceData.filter((inv: any) => inv.status === 'Overdue').length,
+      amount: 0,
+    },
     draft: { count: invoiceData.filter((inv: any) => inv.status === 'Draft').length, amount: 0 },
   });
-  
+
   const stats = calculateStats(data);
-  
+
   return (
     <div className="flex flex-col w-full gap-5">
       {toolbar ? toolbar({} as any) : null}
@@ -40,8 +44,20 @@ const MockInvoicesOverviewTable = jest.fn((props: any) => {
         </div>
         <div data-testid="card-content">
           <div className="grid grid-cols-5 gap-6">
-            <button data-testid="filter-total" data-total-count={stats.total.count} data-total-amount={stats.total.amount.toFixed(2)}>TOTAL_INVOICES {stats.total.count} CHF {stats.total.amount.toFixed(2)}</button>
-            <button data-testid="filter-paid" data-paid-count={stats.paid.count} data-paid-amount={stats.paid.amount.toFixed(2)}>PAID {stats.paid.count} CHF {stats.paid.amount.toFixed(2)}</button>
+            <button
+              data-testid="filter-total"
+              data-total-count={stats.total.count}
+              data-total-amount={stats.total.amount.toFixed(2)}
+            >
+              TOTAL_INVOICES {stats.total.count} CHF {stats.total.amount.toFixed(2)}
+            </button>
+            <button
+              data-testid="filter-paid"
+              data-paid-count={stats.paid.count}
+              data-paid-amount={stats.paid.amount.toFixed(2)}
+            >
+              PAID {stats.paid.count} CHF {stats.paid.amount.toFixed(2)}
+            </button>
             <button data-testid="filter-pending">PENDING</button>
             <button data-testid="filter-overdue">OVERDUE</button>
             <button data-testid="filter-draft">DRAFT</button>
@@ -52,55 +68,76 @@ const MockInvoicesOverviewTable = jest.fn((props: any) => {
               <table data-testid="table">
                 <thead data-testid="table-header">
                   <tr data-testid="table-row">
-                    {props.columns.map((col: any, i: number) => (
-                      <th key={i} data-testid="table-head">{col.header}</th>
+                    {props.columns.map((col: any) => (
+                      <th key={col.accessorKey || col.header} data-testid="table-head">
+                        {col.header}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody data-testid="table-body">
-                  {isLoading && (
+                  {isLoading &&
                     Array.from({ length: 3 }).map((_, i) => (
-                      <tr key={`loading-${i}`} data-testid="table-row">
-                        {Array.from({ length: props.columns.length }).map((_, j) => (
-                          <td key={`loading-cell-${j}`} data-testid="table-cell">
-                            <div data-testid="skeleton" className="h-4 w-3/4" />
-                          </td>
-                        ))}
+                      <tr key={`loading-row-${i}`} data-testid="table-row">
+                        {Array.from({ length: props.columns.length }).map((_, j) => {
+                          const column = props.columns[j];
+                          return (
+                            <td
+                              key={`loading-cell-${column?.accessorKey ?? column?.header ?? j}`}
+                              data-testid="table-cell"
+                            >
+                              <div data-testid="skeleton" className="h-4 w-3/4" />
+                            </td>
+                          );
+                        })}
                       </tr>
-                    ))
-                  )}
+                    ))}
                   {error && (
                     <tr data-testid="table-row">
-                      <td data-testid="table-cell" data-error="true" colSpan={props.columns.length}>ERROR_LOADING_DATA {error.message}</td>
+                      <td data-testid="table-cell" data-error="true" colSpan={props.columns.length}>
+                        ERROR_LOADING_DATA {error.message}
+                      </td>
                     </tr>
                   )}
                   {!isLoading && !error && data.length === 0 && (
                     <tr data-testid="table-row">
-                      <td data-testid="table-cell" data-empty="true" colSpan={props.columns.length}>NO_RESULTS_FOUND</td>
+                      <td data-testid="table-cell" data-empty="true" colSpan={props.columns.length}>
+                        NO_RESULTS_FOUND
+                      </td>
                     </tr>
                   )}
-                  {!isLoading && !error && data.length > 0 && data.map((row: any, i: number) => (
-                    <tr key={`row-${i}`} data-testid="table-row" className="cursor-pointer">
-                      {props.columns.map((col: any, j: number) => (
-                        <td 
-                          key={`cell-${i}-${j}`} 
-                          data-testid="table-cell" 
-                          onClick={() => onRowClick && onRowClick(row)}
-                        >
-                          {row[col.accessorKey]}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {!isLoading &&
+                    !error &&
+                    data.length > 0 &&
+                    data.map((row: any) => (
+                      <tr
+                        key={`row-${row.id || row.invoiceId || row.uuid || JSON.stringify(row)}`}
+                        data-testid="table-row"
+                        className="cursor-pointer"
+                      >
+                        {props.columns.map((col: any) => (
+                          <td
+                            key={`cell-${row.id || row.invoiceId || row.uuid || JSON.stringify(row)}-${col.accessorKey || col.header}`}
+                            data-testid="table-cell"
+                            onClick={() => onRowClick && onRowClick(row)}
+                          >
+                            {row[col.accessorKey]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
               <div data-testid="scroll-bar" data-orientation="horizontal" />
             </div>
           </div>
-          <div 
-            data-testid="data-table-pagination" 
+          <button
+            type="button"
+            data-testid="data-table-pagination"
             data-show-selected={false}
             onClick={() => onPaginationChange?.({ pageIndex: 1, pageSize: 10 })}
+            className="w-full border-0 bg-transparent p-0"
+            aria-label="Change page"
           />
         </div>
       </div>
@@ -110,7 +147,7 @@ const MockInvoicesOverviewTable = jest.fn((props: any) => {
 
 // Mock the actual component
 jest.mock('./invoices-overview-table', () => ({
-  InvoicesOverviewTable: (props: any) => MockInvoicesOverviewTable(props)
+  InvoicesOverviewTable: (props: any) => MockInvoicesOverviewTable(props),
 }));
 
 // Import the mocked component after mocking
@@ -164,9 +201,14 @@ jest.mock('components/ui/table', () => ({
   TableHead: ({ children }: { children: React.ReactNode }) => (
     <th data-testid="table-head">{children}</th>
   ),
-  TableCell: ({ children, className, onClick, colSpan }: { 
-    children: React.ReactNode; 
-    className?: string; 
+  TableCell: ({
+    children,
+    className,
+    onClick,
+    colSpan,
+  }: {
+    children: React.ReactNode;
+    className?: string;
     onClick?: () => void;
     colSpan?: number;
   }) => (
@@ -194,20 +236,23 @@ jest.mock('components/ui/scroll-area', () => ({
 }));
 
 jest.mock('components/blocks/data-table/data-table-pagination', () => ({
-  DataTablePagination: ({ 
-    showSelectedRowContent, 
+  DataTablePagination: ({
+    showSelectedRowContent,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    table, 
-    onPaginationChange 
-  }: { 
-    showSelectedRowContent: boolean; 
-    table: any; 
+    table,
+    onPaginationChange,
+  }: {
+    showSelectedRowContent: boolean;
+    table: any;
     onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
   }) => (
-    <div 
-      data-testid="data-table-pagination" 
+    <button
+      type="button"
+      data-testid="data-table-pagination"
       data-show-selected={showSelectedRowContent}
       onClick={() => onPaginationChange?.({ pageIndex: 1, pageSize: 10 })}
+      className="w-full border-0 bg-transparent p-0"
+      aria-label="Change page"
     />
   ),
 }));
@@ -266,7 +311,7 @@ describe('InvoicesOverviewTable', () => {
   ];
 
   // Sample columns for testing
-  const mockColumns: ColumnDef<typeof mockInvoices[0], any>[] = [
+  const mockColumns: ColumnDef<(typeof mockInvoices)[0], any>[] = [
     {
       accessorKey: 'id',
       header: 'Invoice ID',
@@ -313,7 +358,7 @@ describe('InvoicesOverviewTable', () => {
 
   test('renders the table with correct structure', () => {
     renderTable();
-    
+
     expect(screen.getByTestId('card')).toBeInTheDocument();
     expect(screen.getByTestId('card-header')).toBeInTheDocument();
     expect(screen.getByTestId('card-title')).toBeInTheDocument();
@@ -328,7 +373,7 @@ describe('InvoicesOverviewTable', () => {
     // When isLoading is true, the component will render skeleton rows
     // We don't need to test the exact number, just that skeletons are rendered
     renderTable({ isLoading: true, pagination: { ...mockPagination, pageSize: 2 } });
-    
+
     // Should render skeletons for loading state
     const skeletons = screen.getAllByTestId('skeleton');
     expect(skeletons.length).toBeGreaterThan(0);
@@ -336,7 +381,7 @@ describe('InvoicesOverviewTable', () => {
 
   test('renders error state when error is provided', () => {
     renderTable({ error: new Error('Test error') });
-    
+
     // Use data attributes to verify error state
     const errorCell = screen.getByTestId('table-cell');
     expect(errorCell).toHaveAttribute('data-error', 'true');
@@ -346,7 +391,7 @@ describe('InvoicesOverviewTable', () => {
 
   test('renders empty state when no data is provided', () => {
     renderTable({ data: [] });
-    
+
     // Use data attributes to verify empty state
     const emptyCell = screen.getByTestId('table-cell');
     expect(emptyCell).toHaveAttribute('data-empty', 'true');
@@ -356,36 +401,36 @@ describe('InvoicesOverviewTable', () => {
   test('calls onRowClick when a row is clicked', async () => {
     // We need to mock flexRender to simulate the table rendering
     renderTable();
-    
+
     // Find all table cells and simulate a click on one
     const tableCells = screen.getAllByTestId('table-cell');
     fireEvent.click(tableCells[0]);
-    
+
     // Check if onRowClick was called
     expect(mockOnRowClick).toHaveBeenCalled();
   });
 
   test('calls onPaginationChange when pagination changes', () => {
     renderTable();
-    
+
     // Find the pagination component and simulate a click
     const pagination = screen.getByTestId('data-table-pagination');
     fireEvent.click(pagination);
-    
+
     // Check if onPaginationChange was called with the correct arguments
     expect(mockOnPaginationChange).toHaveBeenCalledWith({ pageIndex: 1, pageSize: 10 });
   });
 
   test('renders status filter buttons', () => {
     renderTable();
-    
+
     // Check if all status filter buttons are rendered using data-testid instead of text content
     expect(screen.getByTestId('filter-total')).toBeInTheDocument();
     expect(screen.getByTestId('filter-paid')).toBeInTheDocument();
     expect(screen.getByTestId('filter-pending')).toBeInTheDocument();
     expect(screen.getByTestId('filter-overdue')).toBeInTheDocument();
     expect(screen.getByTestId('filter-draft')).toBeInTheDocument();
-    
+
     // Verify the text content using partial matching
     expect(screen.getByText((content) => content.includes('TOTAL_INVOICES'))).toBeInTheDocument();
     expect(screen.getByText((content) => content.includes('PAID'))).toBeInTheDocument();
@@ -395,21 +440,23 @@ describe('InvoicesOverviewTable', () => {
   });
 
   test('renders toolbar when provided', () => {
-    const mockToolbar = jest.fn().mockReturnValue(<div data-testid="custom-toolbar">Custom Toolbar</div>);
+    const mockToolbar = jest
+      .fn()
+      .mockReturnValue(<div data-testid="custom-toolbar">Custom Toolbar</div>);
     renderTable({ toolbar: mockToolbar });
-    
+
     expect(screen.getByTestId('custom-toolbar')).toBeInTheDocument();
     expect(mockToolbar).toHaveBeenCalled();
   });
 
   test('calculates stats correctly', () => {
     renderTable();
-    
+
     // Check if the stats are calculated and displayed correctly using data attributes
     const totalButton = screen.getByTestId('filter-total');
     expect(totalButton).toHaveAttribute('data-total-count', '4');
     expect(totalButton).toHaveAttribute('data-total-amount', '10000.00');
-    
+
     // Individual status counts
     const paidButton = screen.getByTestId('filter-paid');
     expect(paidButton).toHaveAttribute('data-paid-count', '1');

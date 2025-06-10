@@ -50,7 +50,7 @@ export function InvoiceItemsTable({
   discount,
   totalAmount,
   currency,
-}: InvoiceItemsTableProps) {
+}: Readonly<InvoiceItemsTableProps>) {
   const { t } = useTranslation();
 
   return (
@@ -199,7 +199,9 @@ export function InvoiceItemsTable({
           <div className="flex flex-col gap-4  w-[40%]">
             <div className="flex justify-between">
               <span className="text-sm">{t('SUBTOTAL')}</span>
-              <span className="text-sm font-medium">{currency} {subtotal.toFixed(2)}</span>
+              <span className="text-sm font-medium">
+                {currency} {subtotal.toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('TAXES')}</span>
@@ -210,12 +212,18 @@ export function InvoiceItemsTable({
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('DISCOUNT')}</span>
               <div className="w-40">
-                <Input className="text-right" value={`- ${currency} ${discount.toFixed(2)}`} readOnly />
+                <Input
+                  className="text-right"
+                  value={`- ${currency} ${discount.toFixed(2)}`}
+                  readOnly
+                />
               </div>
             </div>
             <div className="flex justify-between font-semibold pt-2 border-t">
               <span className="text-sm">{t('TOTAL_AMOUNT')}</span>
-              <span className="text-sm">{currency} {totalAmount.toFixed(2)}</span>
+              <span className="text-sm">
+                {currency} {totalAmount.toFixed(2)}
+              </span>
             </div>
           </div>
         </div>
