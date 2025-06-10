@@ -32,6 +32,7 @@ export function InvoiceProvider({ children }: Readonly<{ children: React.ReactNo
       updateInvoice,
       getInvoice,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [invoices]
   );
 
