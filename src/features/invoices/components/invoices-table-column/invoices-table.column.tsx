@@ -114,10 +114,10 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
     id: 'status',
     accessorFn: (row) => row.status,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
-    filterFn: (row, id, value: string[] | undefined) => {
+    filterFn: (row, id, value: InvoiceStatus[] | undefined) => {
       if (!value?.length) return true;
-      const status = row.getValue(id) as InvoiceStatus;
-      return value.includes(status);
+      const status = row.getValue(id);
+      return value.includes(status as InvoiceStatus);
     },
     cell: ({ row }) => {
       const status = row.original.status;

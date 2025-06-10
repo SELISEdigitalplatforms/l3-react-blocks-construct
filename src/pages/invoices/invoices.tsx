@@ -8,11 +8,16 @@ import {
   InvoicesFilterToolbar,
 } from 'features/invoices';
 import { Invoice, invoiceData } from 'features/invoices/data/invoice-data';
+import { Table } from '@tanstack/react-table';
 
 interface PaginationState {
   pageIndex: number;
   pageSize: number;
   totalCount: number;
+}
+
+function InvoicesTableToolbar(table: Table<Invoice>) {
+  return <InvoicesFilterToolbar table={table} />;
 }
 
 export function InvoicesPage() {
@@ -67,7 +72,7 @@ export function InvoicesPage() {
         columns={columns}
         isLoading={isLoading}
         onRowClick={handleInvoicesDetail}
-        toolbar={(table) => <InvoicesFilterToolbar table={table} />}
+        toolbar={InvoicesTableToolbar}
         pagination={{
           pageIndex: paginationState.pageIndex,
           pageSize: paginationState.pageSize,
