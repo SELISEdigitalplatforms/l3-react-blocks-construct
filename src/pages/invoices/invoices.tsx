@@ -16,7 +16,7 @@ interface PaginationState {
   totalCount: number;
 }
 
-function InvoicesTableToolbar(table: Table<Invoice>) {
+function InvoicesTableToolbar(table: Readonly<Table<Invoice>>) {
   return <InvoicesFilterToolbar table={table} />;
 }
 
