@@ -78,7 +78,7 @@ const MockInvoicesOverviewTable = jest.fn((props: any) => {
                 <tbody data-testid="table-body">
                   {isLoading &&
                     Array.from({ length: 3 }).map((_, i) => (
-                      <tr key={`loading-row-${Date.now()}-${i}`} data-testid="table-row">
+                      <tr key={`loading-skeleton-row-${i}`} data-testid="table-row">
                         {Array.from({ length: props.columns.length }).map((_, j) => {
                           const column = props.columns[j];
                           const cellKey = column?.accessorKey ?? column?.header ?? j;
