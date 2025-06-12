@@ -1,0 +1,76 @@
+import { ChatContact, UserProfile } from '../types/chat.types';
+
+export const mockUserProfile: UserProfile = {
+  name: 'Block Smith',
+  avatarSrc: 'https://github.com/shadcn.png',
+  avatarFallback: 'BS',
+  isOnline: true,
+};
+
+export const mockChatContacts: ChatContact[] = [
+  {
+    id: '1',
+    avatarSrc: 'https://i.pravatar.cc/150?img=1',
+    avatarFallback: 'AM',
+    name: 'Adrian Müller',
+    lastMessage: "Hi, let's have a meeting tomorrow t...",
+    date: '26.12.2024',
+    isOnline: true,
+  },
+  {
+    id: '2',
+    avatarSrc: 'https://i.pravatar.cc/150?img=2',
+    avatarFallback: 'AG',
+    name: 'Aaron Green',
+    lastMessage: 'The aroma of freshly brewed coffe...',
+    date: '26.12.2024',
+    isOnline: true,
+  },
+  {
+    id: '3',
+    avatarSrc: '',
+    avatarFallback: 'RT',
+    name: 'The Rotund Tableur',
+    lastMessage: 'Not sure if you guys caught onto it...',
+    date: '26.12.2024',
+    isOnline: false,
+  },
+  {
+    id: '4',
+    avatarSrc: '',
+    avatarFallback: 'LF',
+    name: 'Luca Fischer',
+    lastMessage: 'The introduction to the fact that the...',
+    date: '26.12.2024',
+    isOnline: false,
+    isUnread: true,
+  },
+  {
+    id: '5',
+    avatarSrc: 'https://i.pravatar.cc/150?img=3',
+    avatarFallback: 'SP',
+    name: 'Sarah Pavan',
+    lastMessage: 'Sarah again with the correcting "I...',
+    date: '26.12.2024',
+    isOnline: true,
+  },
+  {
+    id: '6',
+    avatarSrc: '',
+    avatarFallback: 'NH',
+    name: 'Noah Huber',
+    lastMessage: 'I think i need a compilation video o...',
+    date: '26.12.2024',
+    isOnline: false,
+    isUnread: true,
+  },
+  {
+    id: '7',
+    avatarSrc: '',
+    avatarFallback: 'W',
+    name: 'Watchparty',
+    lastMessage: 'Excellent storytelling again. Their a...',
+    date: '26.12.2024',
+    isOnline: false,
+  },
+];
