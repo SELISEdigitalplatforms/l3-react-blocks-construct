@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
-import { cn } from 'lib/utils';
+import { BellOff, Users } from 'lucide-react';
 import { ChatContact } from '../../types/chat.types';
+import { format } from 'date-fns';
 
 export const ChatContactItem = ({
   avatarSrc,
@@ -10,41 +10,47 @@ export const ChatContactItem = ({
   date,
   isOnline = false,
   isUnread = false,
-}: ChatContact) => {
+  isGroup = false,
+  isMuted = false,
+}: Readonly<ChatContact>) => {
   return (
-    <div
-      className={cn(
-        'flex items-center px-4 py-3 border-b border-gray-100 cursor-pointer',
-        'hover:bg-gray-50 transition-colors duration-150 bg-white'
-      )}
-      tabIndex={0}
-      aria-label={`Chat with ${name}`}
-    >
-      <div className="relative flex-shrink-0 mr-3">
-        <Avatar className="w-10 h-10">
-          <AvatarImage src={avatarSrc} alt={name} />
-          <AvatarFallback className="text-xs font-medium text-medium-emphasis bg-surface">
-            {avatarFallback}
-          </AvatarFallback>
-        </Avatar>
+    <div className="flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white">
+      <div className="relative mr-3">
+        <div
+          className={`relative w-10 h-10 rounded-full flex items-center justify-center ${isGroup ? 'bg-secondary-50' : 'bg-neutral-100'}`}
+        >
+          {avatarSrc ? (
+            <img src={avatarSrc} alt={name} className="w-full h-full rounded-full object-cover" />
+          ) : isGroup ? (
+            <Users className="w-5 h-5 text-secondary" />
+          ) : isMuted ? (
+            <BellOff className="w-5 h-5 text-low-emphasis" />
+          ) : (
+            <span className="text-xs font-medium text-medium-emphasis">{avatarFallback}</span>
+          )}
+        </div>
         {isOnline && (
-          <span className="absolute bottom-0 right-0 block w-2.5 h-2.5 bg-success rounded-full ring-2 ring-white" />
+          <div className="absolute bottom-0 right-0 block w-2.5 h-2.5 bg-success rounded-full ring-2 ring-white" />
         )}
       </div>
-      <div className="flex flex-col w-full">
-        <div className="flex items-center justify-between">
+      <div className="flex flex-col w-[85%]">
+        <div className="flex items-center justify-between w-full">
           <p
             className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-high-emphasis truncate`}
           >
             {name}
           </p>
-          <span className="text-xs text-medium-emphasis whitespace-nowrap">{date}</span>
+          <span className="text-xs text-medium-emphasis whitespace-nowrap">
+            {format(new Date(date), 'dd.MM.yyyy')}
+          </span>
         </div>
-        <p
-          className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-medium-emphasis truncate max-w-[220px]`}
-        >
-          {lastMessage}
-        </p>
+        <div className="w-[60%] overflow-hidden">
+          <p
+            className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-medium-emphasis truncate`}
+          >
+            {lastMessage}
+          </p>
+        </div>
       </div>
     </div>
   );

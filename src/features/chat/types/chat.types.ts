@@ -5,9 +5,11 @@ export interface ChatContact {
   name: string;
   email: string;
   lastMessage?: string;
-  date?: string;
+  date: string;
   isOnline?: boolean;
   isUnread?: boolean;
+  isGroup?: boolean;
+  isMuted?: boolean;
 }
 
 export interface UserProfile {

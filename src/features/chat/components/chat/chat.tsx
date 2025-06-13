@@ -10,9 +10,9 @@ export const Chat = () => {
   const [showChatSearch, setShowChatSearch] = useState(false);
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="hidden md:block w-full border-b border-border">
-        <div className="flex bg-white ">
+    <div className="flex flex-col w-full h-screen max-h-screen">
+      <div className="hidden md:block w-full border-b border-border flex-shrink-0">
+        <div className="flex bg-white">
           <div className="p-4 transition-all duration-300 md:min-w-[399px]">
             <h2 className="text-2xl font-bold tracking-tight">{t('CHAT')}</h2>
           </div>
@@ -21,7 +21,7 @@ export const Chat = () => {
           </div>
         </div>
       </div>
-      <div className="flex w-full h-full bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="flex flex-1 min-h-0 w-full bg-white rounded-lg shadow-sm overflow-hidden">
         <ChatSidebar
           onEditClick={() => setShowChatSearch(true)}
           isSearchActive={showChatSearch}
