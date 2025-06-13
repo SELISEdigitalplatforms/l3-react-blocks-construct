@@ -22,7 +22,11 @@ export const Chat = () => {
         </div>
       </div>
       <div className="flex w-full h-full bg-white rounded-lg shadow-sm overflow-hidden">
-        <ChatSidebar onEditClick={() => setShowChatSearch(true)} />
+        <ChatSidebar
+          onEditClick={() => setShowChatSearch(true)}
+          isSearchActive={showChatSearch}
+          onDiscardClick={() => setShowChatSearch(false)}
+        />
         <div className="flex flex-col w-full h-full">
           {showChatSearch && <ChatSearch onClose={() => setShowChatSearch(false)} />}
           <ChatStateContent
