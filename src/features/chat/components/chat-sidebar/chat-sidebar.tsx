@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Input } from 'components/ui/input';
 import { ChatContactItem } from '../chat-contact-item/chat-contact-item';
 import { mockChatContacts, mockUserProfile } from '../../data/chat.data';
+import { Button } from 'components/ui/button';
 
 export const ChatSidebar = () => {
   const { t } = useTranslation();
@@ -25,12 +26,9 @@ export const ChatSidebar = () => {
             </div>
           </div>
         </div>
-        <button
-          className="p-1.5 text-medium-emphasis rounded-full hover:bg-gray-100 hover:text-gray-500"
-          aria-label="Edit profile"
-        >
+        <Button variant="ghost" size="icon" className="rounded-full">
           <Edit className="w-5 h-5" />
-        </button>
+        </Button>
       </div>
 
       <div className="p-3">

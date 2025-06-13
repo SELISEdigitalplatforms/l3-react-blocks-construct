@@ -1,10 +1,11 @@
 export interface ChatContact {
-  id?: string;
+  id: string;
   avatarSrc: string;
   avatarFallback: string;
   name: string;
-  lastMessage: string;
-  date: string;
+  email: string;
+  lastMessage?: string;
+  date?: string;
   isOnline?: boolean;
   isUnread?: boolean;
 }
