@@ -6,8 +6,13 @@ import { ChatContactItem } from '../chat-contact-item/chat-contact-item';
 import { mockChatContacts, mockUserProfile } from '../../data/chat.data';
 import { Button } from 'components/ui/button';
 
-export const ChatSidebar = () => {
+interface ChatSidebarProps {
+  onEditClick: () => void;
+}
+
+export const ChatSidebar = ({ onEditClick }: ChatSidebarProps) => {
   const { t } = useTranslation();
+
   return (
     <div className="w-[400px] min-w-[400px] border-r border-border bg-white flex flex-col">
       <div className="flex items-center justify-between p-4">
@@ -26,7 +31,12 @@ export const ChatSidebar = () => {
             </div>
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="rounded-full">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="rounded-full"
+          onClick={onEditClick}
+        >
           <Edit className="w-5 h-5" />
         </Button>
       </div>

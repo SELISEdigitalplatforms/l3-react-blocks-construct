@@ -1,13 +1,17 @@
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Input } from 'components/ui/input';
-import { useState, useRef, useEffect } from 'react';
 import { Label } from 'components/ui/label';
 import { mockChatContacts } from '../../data/chat.data';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { ScrollArea } from 'components/ui/scroll-area';
 
-export const ChatSearch = () => {
+interface ChatSearchProps {
+  onClose?: () => void;
+}
+
+export const ChatSearch = ({ onClose }: ChatSearchProps) => {
   const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -110,6 +114,15 @@ export const ChatSearch = () => {
             />
           </div>
         </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="mr-2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
       {isDropdownOpen && (
