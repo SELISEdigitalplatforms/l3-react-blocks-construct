@@ -10,20 +10,45 @@ import {
 } from 'components/ui/dropdown-menu';
 import { ChatContact } from '../../types/chat.types';
 
+interface ChatContactItemProps extends ChatContact {
+  onClick?: (contact: ChatContact) => void;
+}
+
 export const ChatContactItem = ({
+  id,
   avatarSrc,
   avatarFallback,
   name,
+  email,
   lastMessage,
   date,
   isOnline = false,
   isUnread = false,
   isGroup = false,
   isMuted = false,
-}: Readonly<ChatContact>) => {
+  onClick,
+}: Readonly<ChatContactItemProps>) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { t } = useTranslation();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick({
+        id,
+        avatarSrc,
+        avatarFallback,
+        name,
+        email: email || '',
+        lastMessage,
+        date,
+        isOnline,
+        isUnread,
+        isGroup,
+        isMuted,
+      });
+    }
+  };
 
   const showIcon = isHovered || isDropdownOpen;
 
@@ -32,6 +57,7 @@ export const ChatContactItem = ({
       className="relative flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white last:border-b-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
     >
       <div className="relative mr-3 flex-shrink-0">
         <div
@@ -79,11 +105,11 @@ export const ChatContactItem = ({
         <DropdownMenu open={isDropdownOpen} onOpenChange={(open) => setIsDropdownOpen(open)}>
           <DropdownMenuTrigger asChild>
             <div
-              className={`cursor-pointer transition-opacity duration-200 p-2 ${
+              className={`cursor-pointer transition-opacity duration-200 pt-3 px-2 ${
                 showIcon ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
-              <EllipsisVertical className="w-4 h-4 text-medium-emphasis" />
+              <EllipsisVertical className="w-4 h-4 text-medium-emphasis hover:text-high-emphasis" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-40" align="end">

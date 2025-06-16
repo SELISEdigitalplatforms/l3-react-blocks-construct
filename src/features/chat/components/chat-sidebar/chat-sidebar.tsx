@@ -12,17 +12,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
+import { ChatContact } from '../../types/chat.types';
 
 interface ChatSidebarProps {
   onEditClick: () => void;
   isSearchActive?: boolean;
   onDiscardClick?: () => void;
+  onContactSelect?: (contact: ChatContact) => void;
 }
 
 export const ChatSidebar = ({
   onEditClick,
   isSearchActive = false,
   onDiscardClick,
+  onContactSelect,
 }: Readonly<ChatSidebarProps>) => {
   const { t } = useTranslation();
 
@@ -103,7 +106,7 @@ export const ChatSidebar = ({
         </div>
         <div className="flex-1 overflow-y-auto">
           {mockChatContacts.map((contact) => (
-            <ChatContactItem key={contact.id} {...contact} />
+            <ChatContactItem key={contact.id} {...contact} onClick={onContactSelect} />
           ))}
           <div className="h-16" />
         </div>

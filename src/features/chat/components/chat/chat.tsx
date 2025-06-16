@@ -4,10 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { ChatStateContent } from '../chat-state-content/chat-state-content';
 import { ChatSidebar } from '../chat-sidebar/chat-sidebar';
 import { ChatSearch } from '../chat-search/chat-search';
+import { ChatUsers } from '../chat-users/chat-users';
+import { ChatContact } from '../../types/chat.types';
 
 export const Chat = () => {
   const { t } = useTranslation();
   const [showChatSearch, setShowChatSearch] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<ChatContact | null>(null);
 
   return (
     <div className="flex flex-col h-full">
@@ -26,13 +29,22 @@ export const Chat = () => {
           onEditClick={() => setShowChatSearch(true)}
           isSearchActive={showChatSearch}
           onDiscardClick={() => setShowChatSearch(false)}
+          onContactSelect={(contact) => {
+            setSelectedContact(contact);
+            setShowChatSearch(false);
+          }}
         />
         <div className="flex flex-col flex-1">
-          {showChatSearch && <ChatSearch onClose={() => setShowChatSearch(false)} />}
-          <ChatStateContent
-            isSearchActive={showChatSearch}
-            onStartNewConversation={() => setShowChatSearch(true)}
-          />
+          {showChatSearch ? (
+            <ChatSearch onClose={() => setShowChatSearch(false)} onSelectContact={setSelectedContact} />
+          ) : selectedContact ? (
+            <ChatUsers contact={selectedContact} />
+          ) : (
+            <ChatStateContent
+              isSearchActive={false}
+              onStartNewConversation={() => setShowChatSearch(true)}
+            />
+          )}
         </div>
       </div>
     </div>

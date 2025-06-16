@@ -3,3 +3,4 @@ export { ChatContactItem } from './components/chat-contact-item/chat-contact-ite
 export { ChatSidebar } from './components/chat-sidebar/chat-sidebar';
 export { ChatStateContent } from './components/chat-state-content/chat-state-content';
 export { ChatSearch } from './components/chat-search/chat-search';
+export { ChatUsers } from './components/chat-users/chat-users';

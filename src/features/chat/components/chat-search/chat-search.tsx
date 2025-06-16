@@ -7,11 +7,14 @@ import { mockChatContacts } from '../../data/chat.data';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { ScrollArea } from 'components/ui/scroll-area';
 
+import { ChatContact } from '../../types/chat.types';
+
 interface ChatSearchProps {
   onClose?: () => void;
+  onSelectContact?: (contact: ChatContact) => void;
 }
 
-export const ChatSearch = ({ onClose }: ChatSearchProps) => {
+export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
   const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -136,6 +139,9 @@ export const ChatSearch = ({ onClose }: ChatSearchProps) => {
                   e.preventDefault();
                   e.stopPropagation();
                   handleSelectUser(contact);
+                  if (onSelectContact) {
+                    onSelectContact(contact);
+                  }
                 }}
               >
                 <Avatar className="h-8 w-8 mr-2">
