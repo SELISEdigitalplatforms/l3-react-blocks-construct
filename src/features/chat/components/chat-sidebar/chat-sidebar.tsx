@@ -1,5 +1,5 @@
 import { Search, Edit, User, EllipsisVertical, Trash2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Input } from 'components/ui/input';
@@ -28,6 +28,7 @@ export const ChatSidebar = ({
   onContactSelect,
 }: Readonly<ChatSidebarProps>) => {
   const { t } = useTranslation();
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
 
   useEffect(() => {
     // Save the current overflow value
@@ -41,6 +42,13 @@ export const ChatSidebar = ({
     };
   }, []);
 
+  const handleContactSelect = (contact: ChatContact) => {
+    setSelectedContactId(contact.id);
+    if (onContactSelect) {
+      onContactSelect(contact);
+    }
+  };
+
   return (
     <div className="w-[400px] min-w-[400px] border-r border-border bg-white flex flex-col">
       <div className="flex items-center justify-between p-4 flex-shrink-0">
@@ -53,10 +61,10 @@ export const ChatSidebar = ({
             <p className="text-sm font-medium text-high-emphasis">{mockUserProfile.name}</p>
             <div className="flex items-center gap-1">
               <div
-                className={`w-2 h-2 rounded-full ${mockUserProfile.isOnline ? 'bg-success' : 'bg-low-emphasis'}`}
+                className={`w-2 h-2 rounded-full ${mockUserProfile.status.isOnline ? 'bg-success' : 'bg-low-emphasis'}`}
               />
               <span className="text-xs text-medium-emphasis">
-                {mockUserProfile.isOnline ? t('ONLINE') : t('OFFLINE')}
+                {mockUserProfile.status.isOnline ? t('ONLINE') : t('OFFLINE')}
               </span>
             </div>
           </div>
@@ -106,7 +114,12 @@ export const ChatSidebar = ({
         </div>
         <div className="flex-1 overflow-y-auto">
           {mockChatContacts.map((contact) => (
-            <ChatContactItem key={contact.id} {...contact} onClick={onContactSelect} />
+            <ChatContactItem
+              key={contact.id}
+              {...contact}
+              onClick={handleContactSelect}
+              isSelected={contact.id === selectedContactId}
+            />
           ))}
           <div className="h-16" />
         </div>

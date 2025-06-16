@@ -1,54 +1,209 @@
-import { EllipsisVertical, Info, Phone, Video } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import {
+  BellOff,
+  EllipsisVertical,
+  Info,
+  Mic,
+  Paperclip,
+  Phone,
+  Send,
+  Smile,
+  Trash,
+  Video,
+} from 'lucide-react';
 import { Separator } from 'components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
-import { ChatContact } from '../../types/chat.types';
+import { Button } from 'components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
+import { Input } from 'components/ui/input';
+import { ChatContact, Message } from '../../types/chat.types';
+import { cn } from 'lib/utils';
+import { useState, useEffect } from 'react';
 
 interface ChatUsersProps {
   contact: ChatContact;
 }
 
 export const ChatUsers = ({ contact }: ChatUsersProps) => {
+  const { t } = useTranslation();
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>(contact.messages || []);
+
+  useEffect(() => {
+    setMessages(contact.messages || []);
+  }, [contact]);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    const newMessage: Message = {
+      id: `MSG-${Date.now()}`,
+      sender: 'me',
+      content: message,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages([...messages, newMessage]);
+    setMessage('');
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
-    <div className="flex flex-col w-full h-full bg-white">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+    <div className="flex flex-col h-full bg-white">
+      {/* Header */}
+      <div className="flex-none flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
           <div className="relative">
             <Avatar className="w-12 h-12 bg-neutral-100">
               <AvatarImage src={contact.avatarSrc} alt={contact.name} />
               <AvatarFallback className="text-primary">{contact.avatarFallback}</AvatarFallback>
             </Avatar>
-            {contact.isOnline && (
+            {contact.status?.isOnline && (
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-white" />
             )}
           </div>
           <h3 className="font-bold text-high-emphasis">{contact.name}</h3>
         </div>
-        <div className="flex items-center gap-4">
-          <Video className="w-5 h-5 text-medium-emphasis cursor-pointer" />
-          <Phone className="w-5 h-5 text-medium-emphasis cursor-pointer" />
-          <Info className="w-5 h-5 text-medium-emphasis cursor-pointer" />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+          >
+            <Video className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+          >
+            <Phone className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+          >
+            <Info className="w-5 h-5" />
+          </Button>
           <Separator orientation="vertical" className="h-5" />
-          <EllipsisVertical className="w-5 h-5 text-medium-emphasis cursor-pointer" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+              >
+                <EllipsisVertical className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="min-w-40" align="end">
+              <DropdownMenuItem>
+                <BellOff className="w-4 h-4 mr-2 text-medium-emphasis" />
+                <span>{t('MUTE_NOTIFICATIONS')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Trash className="w-4 h-4 mr-2 text-medium-emphasis" />
+                <span>{t('DELETE')}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-      <div className="flex-1 p-4 overflow-y-auto">
-        <div className="flex flex-col space-y-4">
-          <div className="text-center text-sm text-medium-emphasis py-4">
+
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="text-center py-4">
+          <p className="text-sm text-medium-emphasis">
             Start of your conversation with {contact.name}
-          </div>
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={cn('flex', msg.sender === 'me' ? 'justify-end' : 'justify-start')}
+            >
+              <div
+                className={cn(
+                  'max-w-[70%] rounded-2xl px-4 py-2',
+                  msg.sender === 'me'
+                    ? 'bg-primary text-primary-foreground rounded-br-none'
+                    : 'bg-muted rounded-bl-none'
+                )}
+              >
+                <p>{msg.content}</p>
+                <p
+                  className={cn(
+                    'text-xs mt-1',
+                    msg.sender === 'me' ? 'text-primary-foreground/70' : 'text-muted-foreground',
+                    'text-right'
+                  )}
+                >
+                  {formatTimestamp(msg.timestamp)}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
+
+      {/* Input Form */}
+      <div className="flex-none border-t border-border p-4 bg-white">
+        <form
+          onSubmit={handleSendMessage}
+          className="flex items-center gap-2 w-full max-w-full overflow-hidden"
+        >
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+          >
+            <Paperclip className="w-5 h-5" />
+          </Button>
+
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 p-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="min-w-0 flex-1"
           />
-          <button className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
-            Send
-          </button>
-        </div>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+          >
+            <Smile className="w-5 h-5" />
+          </Button>
+
+          {message ? (
+            <Button type="submit" size="icon" className="bg-primary hover:bg-primary/90">
+              <Send className="w-5 h-5 text-white" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-medium-emphasis rounded-full hover:text-high-emphasis"
+            >
+              <Mic className="w-5 h-5" />
+            </Button>
+          )}
+        </form>
       </div>
     </div>
   );

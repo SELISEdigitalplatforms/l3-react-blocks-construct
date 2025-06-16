@@ -1,20 +1,33 @@
 export interface ChatContact {
   id: string;
-  avatarSrc: string;
-  avatarFallback: string;
   name: string;
   email: string;
+  phoneNo?: string;
+  avatarSrc: string;
+  avatarFallback: string;
   lastMessage?: string;
   date: string;
+  status?: ChatStatus;
+  messages?: Message[];
+}
+
+export interface ChatStatus {
   isOnline?: boolean;
   isUnread?: boolean;
   isGroup?: boolean;
   isMuted?: boolean;
 }
 
+export interface Message {
+  id: string;
+  sender: 'me' | 'other';
+  content: string;
+  timestamp: string;
+}
+
 export interface UserProfile {
   name: string;
   avatarSrc: string;
   avatarFallback: string;
-  isOnline: boolean;
+  status: ChatStatus;
 }

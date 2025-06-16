@@ -9,9 +9,11 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 import { ChatContact } from '../../types/chat.types';
+import { cn } from 'lib/utils';
 
 interface ChatContactItemProps extends ChatContact {
   onClick?: (contact: ChatContact) => void;
+  isSelected?: boolean;
 }
 
 export const ChatContactItem = ({
@@ -22,11 +24,10 @@ export const ChatContactItem = ({
   email,
   lastMessage,
   date,
-  isOnline = false,
-  isUnread = false,
-  isGroup = false,
-  isMuted = false,
+  status,
+  messages,
   onClick,
+  isSelected = false,
 }: Readonly<ChatContactItemProps>) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -39,13 +40,11 @@ export const ChatContactItem = ({
         avatarSrc,
         avatarFallback,
         name,
-        email: email || '',
+        email: email ?? '',
         lastMessage,
         date,
-        isOnline,
-        isUnread,
-        isGroup,
-        isMuted,
+        status,
+        messages,
       });
     }
   };
@@ -53,27 +52,34 @@ export const ChatContactItem = ({
   const showIcon = isHovered || isDropdownOpen;
 
   return (
-    <div
-      className="relative flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white last:border-b-0"
+    <button
+      type="button"
+      className={cn(
+        'relative flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white last:border-b-0 text-left',
+        isSelected && 'bg-primary-50 hover:bg-primary-50'
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleClick}
     >
       <div className="relative mr-3 flex-shrink-0">
         <div
-          className={`relative w-10 h-10 rounded-full flex items-center justify-center ${isGroup ? 'bg-secondary-50' : 'bg-neutral-100'}`}
+          className={cn(
+            'relative w-10 h-10 rounded-full flex items-center justify-center',
+            status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
+          )}
         >
           {avatarSrc ? (
             <img src={avatarSrc} alt={name} className="w-full h-full rounded-full object-cover" />
-          ) : isGroup ? (
+          ) : status?.isGroup ? (
             <Users className="w-5 h-5 text-secondary" />
-          ) : isMuted ? (
+          ) : status?.isMuted ? (
             <BellOff className="w-5 h-5 text-low-emphasis" />
           ) : (
             <span className="text-xs font-medium text-medium-emphasis">{avatarFallback}</span>
           )}
         </div>
-        {isOnline && (
+        {status?.isOnline && (
           <div className="absolute bottom-0 right-0 block w-2.5 h-2.5 bg-success rounded-full ring-2 ring-white" />
         )}
       </div>
@@ -81,7 +87,10 @@ export const ChatContactItem = ({
       <div className="flex flex-col min-w-0 flex-1">
         <div className="flex items-center justify-between w-full">
           <p
-            className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-high-emphasis truncate`}
+            className={cn(
+              'text-sm text-high-emphasis truncate',
+              status?.isUnread ? 'font-bold' : 'font-medium'
+            )}
           >
             {name}
           </p>
@@ -94,7 +103,10 @@ export const ChatContactItem = ({
         </div>
         <div className="w-full overflow-hidden">
           <p
-            className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-medium-emphasis truncate`}
+            className={cn(
+              'text-sm text-medium-emphasis truncate',
+              status?.isUnread ? 'font-bold' : 'font-medium'
+            )}
           >
             {lastMessage}
           </p>
@@ -105,9 +117,10 @@ export const ChatContactItem = ({
         <DropdownMenu open={isDropdownOpen} onOpenChange={(open) => setIsDropdownOpen(open)}>
           <DropdownMenuTrigger asChild>
             <div
-              className={`cursor-pointer transition-opacity duration-200 pt-3 px-2 ${
+              className={cn(
+                'cursor-pointer transition-opacity duration-200 pt-3 px-2',
                 showIcon ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}
+              )}
             >
               <EllipsisVertical className="w-4 h-4 text-medium-emphasis hover:text-high-emphasis" />
             </div>
@@ -128,6 +141,6 @@ export const ChatContactItem = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </button>
   );
 };

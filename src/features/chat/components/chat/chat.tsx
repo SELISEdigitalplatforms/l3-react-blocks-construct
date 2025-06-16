@@ -34,9 +34,12 @@ export const Chat = () => {
             setShowChatSearch(false);
           }}
         />
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col w-full">
           {showChatSearch ? (
-            <ChatSearch onClose={() => setShowChatSearch(false)} onSelectContact={setSelectedContact} />
+            <ChatSearch
+              onClose={() => setShowChatSearch(false)}
+              onSelectContact={setSelectedContact}
+            />
           ) : selectedContact ? (
             <ChatUsers contact={selectedContact} />
           ) : (
