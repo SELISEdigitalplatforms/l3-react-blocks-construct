@@ -1,4 +1,5 @@
 import { Search, Edit, User, EllipsisVertical, Trash2 } from 'lucide-react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Input } from 'components/ui/input';
@@ -25,8 +26,20 @@ export const ChatSidebar = ({
 }: Readonly<ChatSidebarProps>) => {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    // Save the current overflow value
+    const originalStyle = window.getComputedStyle(document.body).overflow;
+    // Disable body scroll when sidebar mounts
+    document.body.style.overflow = 'hidden';
+
+    // Re-enable body scroll when component unmounts
+    return () => {
+      document.body.style.overflow = originalStyle;
+    };
+  }, []);
+
   return (
-    <div className="w-[400px] min-w-[400px] border-r border-border bg-white flex flex-col h-full">
+    <div className="w-[400px] min-w-[400px] border-r border-border bg-white flex flex-col">
       <div className="flex items-center justify-between p-4 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Avatar>
@@ -50,8 +63,8 @@ export const ChatSidebar = ({
         </Button>
       </div>
 
-      <div className="flex flex-col h-full w-full overflow-hidden">
-        <div className="shrink-0">
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex-shrink-0">
           <div className="p-4">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -88,12 +101,11 @@ export const ChatSidebar = ({
             </div>
           )}
         </div>
-        <div className="flex-1 overflow-y-auto scroll-smooth overscroll-contain">
-          <div className="flex flex-col w-full">
-            {mockChatContacts.map((contact) => (
-              <ChatContactItem key={contact.id} {...contact} />
-            ))}
-          </div>
+        <div className="flex-1 overflow-y-auto">
+          {mockChatContacts.map((contact) => (
+            <ChatContactItem key={contact.id} {...contact} />
+          ))}
+          <div className="h-16" />
         </div>
       </div>
     </div>

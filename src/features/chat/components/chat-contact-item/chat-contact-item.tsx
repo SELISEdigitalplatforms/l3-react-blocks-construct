@@ -14,8 +14,8 @@ export const ChatContactItem = ({
   isMuted = false,
 }: Readonly<ChatContact>) => {
   return (
-    <div className="flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white">
-      <div className="relative mr-3">
+    <div className="flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white last:border-b-0">
+      <div className="relative mr-3 flex-shrink-0">
         <div
           className={`relative w-10 h-10 rounded-full flex items-center justify-center ${isGroup ? 'bg-secondary-50' : 'bg-neutral-100'}`}
         >
@@ -33,18 +33,18 @@ export const ChatContactItem = ({
           <div className="absolute bottom-0 right-0 block w-2.5 h-2.5 bg-success rounded-full ring-2 ring-white" />
         )}
       </div>
-      <div className="flex flex-col w-[85%]">
+      <div className="flex flex-col min-w-0 flex-1">
         <div className="flex items-center justify-between w-full">
           <p
             className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-high-emphasis truncate`}
           >
             {name}
           </p>
-          <span className="text-xs text-medium-emphasis whitespace-nowrap">
+          <span className="text-xs text-medium-emphasis whitespace-nowrap ml-2 flex-shrink-0">
             {format(new Date(date), 'dd.MM.yyyy')}
           </span>
         </div>
-        <div className="w-[60%] overflow-hidden">
+        <div className="w-full overflow-hidden">
           <p
             className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'} text-medium-emphasis truncate`}
           >
