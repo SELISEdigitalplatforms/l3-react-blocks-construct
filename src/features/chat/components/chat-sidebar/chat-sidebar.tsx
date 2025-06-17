@@ -19,7 +19,12 @@ interface ChatSidebarProps {
   onEditClick: () => void;
   isSearchActive?: boolean;
   onDiscardClick?: () => void;
-  onContactSelect?: (contact: ChatContact) => void;
+  onContactSelect: (contact: ChatContact) => void;
+  selectedContactId?: string | null;
+  onMarkAsUnread?: (contactId: string) => void;
+  onMarkAsRead?: (contactId: string) => void;
+  onMuteToggle?: (contactId: string) => void;
+  onDeleteContact?: (contactId: string) => void;
 }
 
 export const ChatSidebar = ({
@@ -28,9 +33,14 @@ export const ChatSidebar = ({
   isSearchActive = false,
   onDiscardClick,
   onContactSelect,
+  selectedContactId,
+  onMarkAsUnread,
+  onMarkAsRead,
+  onMuteToggle,
+  onDeleteContact,
 }: Readonly<ChatSidebarProps>) => {
   const { t } = useTranslation();
-  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const originalStyle = window.getComputedStyle(document.body).overflow;
@@ -40,11 +50,14 @@ export const ChatSidebar = ({
     };
   }, []);
 
-  const handleContactSelect = (contact: ChatContact) => {
-    setSelectedContactId(contact.id);
-    if (onContactSelect) {
-      onContactSelect(contact);
-    }
+  const filteredContacts = contacts.filter(
+    (contact) =>
+      contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (contact.email && contact.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const handleContactClick = (contact: ChatContact) => {
+    onContactSelect(contact);
   };
 
   return (
@@ -83,6 +96,8 @@ export const ChatSidebar = ({
                 type="text"
                 className="w-full py-2 pl-10 pr-3 text-sm bg-gray-100 border-0 rounded-md focus:ring-2 focus:ring-primary focus:bg-white"
                 placeholder={t('SEARCH')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
@@ -111,14 +126,33 @@ export const ChatSidebar = ({
           )}
         </div>
         <div className="flex-1 overflow-y-auto">
-          {contacts.map((contact) => (
-            <ChatContactItem
-              key={contact.id}
-              {...contact}
-              onClick={handleContactSelect}
-              isSelected={contact.id === selectedContactId}
-            />
-          ))}
+          {filteredContacts.length > 0 ? (
+            filteredContacts.map((contact) => (
+              <ChatContactItem
+                key={contact.id}
+                id={contact.id}
+                name={contact.name}
+                email={contact.email}
+                phoneNo={contact.phoneNo}
+                avatarSrc={contact.avatarSrc}
+                avatarFallback={contact.avatarFallback}
+                date={contact.date}
+                status={contact.status}
+                messages={contact.messages}
+                members={contact.members}
+                onClick={handleContactClick}
+                isSelected={contact.id === selectedContactId}
+                onMarkAsUnread={onMarkAsUnread}
+                onMarkAsRead={onMarkAsRead}
+                onMuteToggle={onMuteToggle}
+                onDeleteContact={onDeleteContact}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center p-4 text-center text-medium-emphasis">
+              <p>{t('NOTHING_FOUND')}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -27,16 +27,28 @@ import {
   AccordionTrigger,
 } from 'components/ui/accordion';
 import { ChatContact } from '../../types/chat.types';
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { useToast } from 'hooks/use-toast';
 
 interface ChatProfileProps {
   contact: ChatContact;
   onGroupNameUpdate?: (newName: string) => void;
+  onMuteToggle?: (contactId: string) => void;
+  onDeleteMember?: (contactId: string, memberId: string) => void;
 }
 
-export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfileProps>) {
+export function ChatProfile({
+  contact,
+  onGroupNameUpdate,
+  onMuteToggle,
+  onDeleteMember,
+}: Readonly<ChatProfileProps>) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [isEditGroupNameOpen, setIsEditGroupNameOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const handleSaveGroupName = async (newName: string) => {
     if (newName === contact.name) {
@@ -99,6 +111,22 @@ export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfile
     }
   };
 
+  const handleDeleteMember = (memberId: string, memberName: string) => {
+    setMemberToDelete({ id: memberId, name: memberName });
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (memberToDelete && onDeleteMember) {
+      onDeleteMember(contact.id, memberToDelete.id);
+      toast({
+        variant: 'success',
+        title: t('USER_REMOVED'),
+        description: t('REMOVED_USER_GROUP_SUCCESSFULLY'),
+      });
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col border-l border-border bg-white">
       <EditGroupName
@@ -115,7 +143,9 @@ export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfile
             contact.status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
           )}
         >
-          {contact.avatarSrc ? (
+          {contact.status?.isMuted ? (
+            <BellOff className="w-8 h-8 text-low-emphasis" />
+          ) : contact.avatarSrc ? (
             <img
               src={contact.avatarSrc}
               alt={contact.name}
@@ -123,8 +153,6 @@ export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfile
             />
           ) : contact.status?.isGroup ? (
             <Users className="w-8 h-8 text-secondary" />
-          ) : contact.status?.isMuted ? (
-            <BellOff className="w-8 h-8 text-low-emphasis" />
           ) : (
             <span className="text-2xl font-medium text-medium-emphasis">
               {contact.avatarFallback}
@@ -149,9 +177,19 @@ export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfile
             <CircleUser className="w-5 h-5 text-medium-emphasis" />
             <span className="text-xs text-medium-emphasis">{t('PROFILE')}</span>
           </Button>
-          <Button variant="ghost" className="flex flex-col items-center gap-0 py-3">
-            <Bell className="w-5 h-5 text-medium-emphasis" />
-            <span className="text-xs text-medium-emphasis">{t('MUTE')}</span>
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-0 py-3"
+            onClick={() => onMuteToggle?.(contact.id)}
+          >
+            {contact.status?.isMuted ? (
+              <Bell className="w-5 h-5 text-medium-emphasis" />
+            ) : (
+              <BellOff className="w-5 h-5 text-medium-emphasis" />
+            )}
+            <span className="text-xs text-medium-emphasis">
+              {contact.status?.isMuted ? t('UNMUTE') : t('MUTE')}
+            </span>
           </Button>
         </div>
       </div>
@@ -188,7 +226,12 @@ export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfile
                         </div>
                       </div>
                       {!member?.isMe && (
-                        <Button variant="ghost" size="icon" className="rounded-full">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full"
+                          onClick={() => handleDeleteMember(member.id, member.name)}
+                        >
                           <Trash className="w-5 h-5 text-medium-emphasis" />
                         </Button>
                       )}
@@ -245,6 +288,16 @@ export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfile
           </AccordionItem>
         </Accordion>
       </ScrollArea>
+
+      <ConfirmationModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        title={t('REMOVE_MEMBER')}
+        description={t('REMOVE_USER_FROM_GROUP')}
+        onConfirm={handleConfirmDelete}
+        confirmText={t('YES')}
+        cancelText={t('LABEL_NO')}
+      />
     </div>
   );
 }

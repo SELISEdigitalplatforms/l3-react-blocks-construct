@@ -10,6 +10,7 @@ import {
   Trash,
   Users,
   Video,
+  Bell,
 } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Separator } from 'components/ui/separator';
@@ -28,11 +29,17 @@ import { ChatContact, Message } from '../../types/chat.types';
 interface ChatUsersProps {
   contact: ChatContact;
   onContactNameUpdate?: (contactId: string, newName: string) => void;
+  onMuteToggle?: (contactId: string) => void;
+  onDeleteContact?: (contactId: string) => void;
+  onDeleteMember?: (contactId: string, memberId: string) => void;
 }
 
 export const ChatUsers = ({
   contact: initialContact,
   onContactNameUpdate,
+  onMuteToggle,
+  onDeleteContact,
+  onDeleteMember,
 }: Readonly<ChatUsersProps>) => {
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
@@ -47,12 +54,12 @@ export const ChatUsers = ({
 
     try {
       if (onContactNameUpdate) {
-        onContactNameUpdate(contact.id, newName);
+        await onContactNameUpdate(contact.id, newName);
+        setContact((prev) => ({
+          ...prev,
+          name: newName,
+        }));
       }
-      setContact((prev) => ({
-        ...prev,
-        name: newName,
-      }));
     } catch (error) {
       console.error('Failed to update contact name:', error);
     }
@@ -109,16 +116,16 @@ export const ChatUsers = ({
                   contact.status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
                 )}
               >
-                {contact.avatarSrc ? (
+                {contact.status?.isMuted ? (
+                  <BellOff className="w-5 h-5 text-low-emphasis" />
+                ) : contact.status?.isGroup ? (
+                  <Users className="w-5 h-5 text-secondary" />
+                ) : contact.avatarSrc ? (
                   <img
                     src={contact.avatarSrc}
                     alt={contact.name}
                     className="w-full h-full rounded-full object-cover"
                   />
-                ) : contact.status?.isGroup ? (
-                  <Users className="w-5 h-5 text-secondary" />
-                ) : contact.status?.isMuted ? (
-                  <BellOff className="w-5 h-5 text-low-emphasis" />
                 ) : (
                   <span className="text-xs font-medium text-medium-emphasis">
                     {contact.avatarFallback}
@@ -161,11 +168,17 @@ export const ChatUsers = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="min-w-40" align="end">
-                <DropdownMenuItem>
-                  <BellOff className="w-4 h-4 mr-2 text-medium-emphasis" />
-                  <span>{t('MUTE_NOTIFICATIONS')}</span>
+                <DropdownMenuItem onClick={() => onMuteToggle?.(contact.id)}>
+                  {contact.status?.isMuted ? (
+                    <Bell className="w-4 h-4 mr-2 text-medium-emphasis" />
+                  ) : (
+                    <BellOff className="w-4 h-4 mr-2 text-medium-emphasis" />
+                  )}
+                  <span>
+                    {contact.status?.isMuted ? t('UNMUTE_NOTIFICATIONS') : t('MUTE_NOTIFICATIONS')}
+                  </span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDeleteContact?.(contact.id)}>
                   <Trash className="w-4 h-4 mr-2 text-medium-emphasis" />
                   <span>{t('DELETE')}</span>
                 </DropdownMenuItem>
@@ -316,6 +329,8 @@ export const ChatUsers = ({
           <ChatProfile
             contact={contact}
             onGroupNameUpdate={contact.status?.isGroup ? handleGroupNameUpdate : undefined}
+            onMuteToggle={onMuteToggle}
+            onDeleteMember={onDeleteMember}
           />
         </div>
       )}
