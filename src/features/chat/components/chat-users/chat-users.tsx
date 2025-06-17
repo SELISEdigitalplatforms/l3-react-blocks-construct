@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
+import { ForwardMessage } from '../modals/forward-message/forward-message';
 import { ChatProfile } from '../chat-profile/chat-profile';
 import { ChatInput } from '../chat-input/chat-input';
 import { ChatContact, Message } from '../../types/chat.types';
@@ -47,6 +48,8 @@ export const ChatUsers = ({
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState(initialContact);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [isForwardModalOpen, setIsForwardModalOpen] = useState(false);
+  const [forwardMessage, setForwardMessage] = useState<Message | null>(null);
 
   useEffect(() => {
     setContact(initialContact);
@@ -137,6 +140,19 @@ export const ChatUsers = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleOpenForwardModal = (msg: Message) => {
+    setForwardMessage(msg);
+    setIsForwardModalOpen(true);
+  };
+  const handleCloseForwardModal = () => {
+    setIsForwardModalOpen(false);
+    setForwardMessage(null);
+  };
+  const handleForward = () => {
+    setIsForwardModalOpen(false);
+    setForwardMessage(null);
   };
 
   return (
@@ -256,7 +272,7 @@ export const ChatUsers = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-40" align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleOpenForwardModal(msg)}>
                             <Reply className="w-4 h-4 mr-2" />
                             {t('FORWARD')}
                           </DropdownMenuItem>
@@ -266,7 +282,12 @@ export const ChatUsers = ({
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 p-0.5 rounded-full"
+                        onClick={() => handleOpenForwardModal(msg)}
+                      >
                         <Reply className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
@@ -291,7 +312,7 @@ export const ChatUsers = ({
                                   className="max-w-full max-h-64 rounded-lg border border-border"
                                 />
                               ) : (
-                                <div className="flex items-center gap-4 w-full w-full">
+                                <div className="flex items-center gap-4 w-full">
                                   <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
                                     <FileText className="w-6 h-6 text-secondary" />
                                   </div>
@@ -357,7 +378,7 @@ export const ChatUsers = ({
                                   className="max-w-full max-h-64 rounded-lg border border-border"
                                 />
                               ) : (
-                                <div className="flex items-center gap-4 w-full w-full">
+                                <div className="flex items-center gap-4 w-full">
                                   <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
                                     <FileText className="w-6 h-6 text-secondary" />
                                   </div>
@@ -402,7 +423,12 @@ export const ChatUsers = ({
                       <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
                         <Smile className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 p-0.5 rounded-full"
+                        onClick={() => handleOpenForwardModal(msg)}
+                      >
                         <Reply className="w-4 h-4" />
                       </Button>
                       <DropdownMenu
@@ -419,7 +445,7 @@ export const ChatUsers = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-40" align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleOpenForwardModal(msg)}>
                             <Reply className="w-4 h-4 mr-2" />
                             {t('FORWARD')}
                           </DropdownMenuItem>
@@ -456,6 +482,20 @@ export const ChatUsers = ({
           />
         </div>
       )}
+      <ForwardMessage
+        open={isForwardModalOpen}
+        onOpenChange={(open) => (open ? setIsForwardModalOpen(true) : handleCloseForwardModal())}
+        message={
+          forwardMessage
+            ? {
+                ...forwardMessage,
+                senderName: contact.name,
+                avatarSrc: contact.avatarSrc,
+              }
+            : null
+        }
+        onForward={handleForward}
+      />
     </div>
   );
 };
