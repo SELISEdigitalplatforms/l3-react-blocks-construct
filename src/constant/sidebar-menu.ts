@@ -41,11 +41,18 @@ export const menuItems: MenuItem[] = [
   createMenuItem('timeline', 'TIMELINE', '/timeline', 'History'),
   createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation'),
   createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText'),
-  createMenuItemWithChildren('file-manager', 'FILE_MANAGER', '/file-manager', 'Folder', [
-    createMenuItem('my-files', 'MY_FILES', '/file-manager/my-files'),
-    createMenuItem('shared-files', 'SHARED_WITH_ME', '/file-manager/shared-files'),
-    createMenuItem('trash', 'TRASH', '/file-manager/trash'),
-  ]),
+  createMenuItemWithChildren(
+    'file-manager',
+    'FILE_MANAGER',
+    '/file-manager',
+    'Folder',
+
+    [
+      createMenuItem('my-files', 'MY_FILES', '/file-manager/my-files'),
+      createMenuItem('shared-files', 'SHARED_WITH_ME', '/file-manager/shared-files'),
+      createMenuItem('trash', 'TRASH', '/file-manager/trash'),
+    ]
+  ),
   createMenuItem('404', 'ERROR_404', '/404', 'SearchX'),
   createMenuItem('503', 'ERROR_503', '/503', 'TriangleAlert'),
 ];

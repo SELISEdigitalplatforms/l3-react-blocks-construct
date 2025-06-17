@@ -19,6 +19,8 @@ export const routeModuleMap: Record<string, string[]> = {
   '/timeline': ['common', 'timeline'],
   '/task-manager': ['common', 'task-manager'],
   '/invoices': ['common', 'invoices'],
+  '/file-manager': ['common', 'file-manager'],
+  '/file-manager/my-files': ['common', 'file-manager'],
   '/profile': ['common', 'profile', 'mfa'],
   '/404': ['common', 'error'],
   '/503': ['common', 'error'],
