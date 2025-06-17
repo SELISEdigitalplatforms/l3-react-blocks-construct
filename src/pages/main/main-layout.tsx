@@ -22,7 +22,7 @@ export default function MainLayout() {
   const marginClass = getMarginClass();
 
   return (
-    <div className="flex w-full h-screen relative">
+    <div className="flex w-full min-h-screen relative">
       <div className="absolute left-0 top-0 h-full">
         <AppSidebar />
       </div>

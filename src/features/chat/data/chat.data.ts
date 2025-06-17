@@ -28,7 +28,7 @@ export const mockChatContacts: ChatContact[] = [
         sender: 'other',
         content:
           'Hi there! I was reviewing the project updates. Do you have time for a quick call tomorrow?',
-        timestamp: '2024-12-24T10:00:00.000Z', // 2 days ago
+        timestamp: '2024-12-24T10:00:00.000Z',
       },
       {
         id: 'MSG-1283240',
@@ -48,6 +48,25 @@ export const mockChatContacts: ChatContact[] = [
         sender: 'me',
         content: "Looking forward to it. I'll prepare some mockups to share during our call.",
         timestamp: '2024-12-24T11:15:00.000Z',
+      },
+      {
+        id: 'MSG-1283243',
+        sender: 'other',
+        content:
+          'Thanks! Please include the mobile views too, as we’ll prioritize them for the MVP.',
+        timestamp: '2024-12-24T11:18:00.000Z',
+      },
+      {
+        id: 'MSG-1283244',
+        sender: 'me',
+        content: 'Got it! I’ll include both mobile and tablet layouts. Anything else to prepare?',
+        timestamp: '2024-12-24T11:22:00.000Z',
+      },
+      {
+        id: 'MSG-1283245',
+        sender: 'other',
+        content: "That's all for now. I'll see you at 2 PM tomorrow. Thanks again!",
+        timestamp: '2024-12-24T11:25:00.000Z',
       },
     ],
   },

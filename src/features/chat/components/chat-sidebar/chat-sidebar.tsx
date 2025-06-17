@@ -50,8 +50,8 @@ export const ChatSidebar = ({
   };
 
   return (
-    <div className="w-[400px] min-w-[400px] border-r border-border bg-white flex flex-col">
-      <div className="flex items-center justify-between p-4 flex-shrink-0">
+    <div className="w-[326px] min-w-[326px] border-r border-border bg-white flex flex-col">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <Avatar>
             <AvatarImage src={mockUserProfile.avatarSrc} alt="sidebar avatar" />
@@ -83,7 +83,7 @@ export const ChatSidebar = ({
               </div>
               <Input
                 type="text"
-                className="w-full py-2 pl-10 pr-3 text-sm bg-gray-100 border-0 rounded-md focus:ring-2 focus:ring-blue-500 focus:bg-white"
+                className="w-full py-2 pl-10 pr-3 text-sm bg-gray-100 border-0 rounded-md focus:ring-2 focus:ring-primary focus:bg-white"
                 placeholder={t('SEARCH')}
               />
             </div>
@@ -121,7 +121,6 @@ export const ChatSidebar = ({
               isSelected={contact.id === selectedContactId}
             />
           ))}
-          <div className="h-16" />
         </div>
       </div>
     </div>

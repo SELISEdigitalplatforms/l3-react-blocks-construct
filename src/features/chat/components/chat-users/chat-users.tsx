@@ -59,11 +59,10 @@ export const ChatUsers = ({ contact }: ChatUsersProps) => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Header */}
       <div className="flex-none flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <Avatar className="w-12 h-12 bg-neutral-100">
+            <Avatar className="w-10 h-10 bg-neutral-100">
               <AvatarImage src={contact.avatarSrc} alt={contact.name} />
               <AvatarFallback className="text-primary">{contact.avatarFallback}</AvatarFallback>
             </Avatar>
