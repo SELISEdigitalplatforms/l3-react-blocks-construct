@@ -1,16 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  BellOff,
-  EllipsisVertical,
-  Info,
-  Mic,
-  Paperclip,
-  Phone,
-  Send,
-  Smile,
-  Trash,
-  Video,
-} from 'lucide-react';
+import { BellOff, EllipsisVertical, Info, Phone, Reply, Smile, Trash, Video } from 'lucide-react';
+import { ChatInput } from '../chat-input/chat-input';
 import { Separator } from 'components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Button } from 'components/ui/button';
@@ -23,16 +14,16 @@ import {
 import { Input } from 'components/ui/input';
 import { ChatContact, Message } from '../../types/chat.types';
 import { cn } from 'lib/utils';
-import { useState, useEffect } from 'react';
 
 interface ChatUsersProps {
   contact: ChatContact;
 }
 
-export const ChatUsers = ({ contact }: ChatUsersProps) => {
+export const ChatUsers = ({ contact }: Readonly<ChatUsersProps>) => {
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>(contact.messages || []);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
     setMessages(contact.messages || []);
@@ -59,7 +50,7 @@ export const ChatUsers = ({ contact }: ChatUsersProps) => {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <div className="flex-none flex items-center justify-between px-6 py-4 border-b border-border">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
           <div className="relative">
             <Avatar className="w-10 h-10 bg-neutral-100">
@@ -119,89 +110,140 @@ export const ChatUsers = ({ contact }: ChatUsersProps) => {
         </div>
       </div>
 
-      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="text-center py-4">
-          <p className="text-sm text-medium-emphasis">
+          <p className="text-sm text-low-emphasis">
             Start of your conversation with {contact.name}
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={cn('flex', msg.sender === 'me' ? 'justify-end' : 'justify-start')}
-            >
-              <div
-                className={cn(
-                  'max-w-[70%] rounded-2xl px-4 py-2',
-                  msg.sender === 'me'
-                    ? 'bg-primary text-primary-foreground rounded-br-none'
-                    : 'bg-muted rounded-bl-none'
-                )}
-              >
-                <p>{msg.content}</p>
-                <p
-                  className={cn(
-                    'text-xs mt-1',
-                    msg.sender === 'me' ? 'text-primary-foreground/70' : 'text-muted-foreground',
-                    'text-right'
-                  )}
-                >
-                  {formatTimestamp(msg.timestamp)}
-                </p>
+        <div className="flex flex-col gap-3 w-full">
+          {messages.map((msg) =>
+            msg.sender === 'me' ? (
+              <div key={msg.id} className="group flex w-full justify-end">
+                <div className="flex w-[70%] gap-2 justify-end">
+                  <div
+                    className={cn(
+                      'flex items-center gap-1 transition-opacity duration-200',
+                      openDropdownId === msg.id
+                        ? 'opacity-100'
+                        : 'opacity-0 group-hover:opacity-100'
+                    )}
+                  >
+                    <DropdownMenu
+                      open={openDropdownId === msg.id}
+                      onOpenChange={(open) => setOpenDropdownId(open ? msg.id : null)}
+                    >
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                          <EllipsisVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40" align="end">
+                        <DropdownMenuItem>
+                          <Reply className="w-4 h-4 mr-2" />
+                          {t('FORWARD')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Trash className="w-4 h-4 mr-2" />
+                          {t('DELETE')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                      <Reply className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                      <Smile className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex justify-end">
+                      <p className="text-xs text-low-emphasis">{formatTimestamp(msg.timestamp)}</p>
+                    </div>
+                    <div className="relative group">
+                      <div className="rounded-xl px-4 py-2 bg-primary-50 rounded-tr-[2px]">
+                        <p className="text-sm text-high-emphasis">{msg.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ) : (
+              <div key={msg.id} className="group flex w-full justify-start">
+                <div className="relative mr-3">
+                  <Avatar className="w-6 h-6 bg-neutral-100">
+                    <AvatarImage src={contact.avatarSrc} alt={contact.name} />
+                    <AvatarFallback className="text-primary">
+                      {contact.avatarFallback}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="flex w-[70%] gap-2 justify-start">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-low-emphasis">{contact.name}</p>
+                      <p className="text-xs text-low-emphasis">{formatTimestamp(msg.timestamp)}</p>
+                    </div>
+                    <div className="relative group">
+                      <div className="rounded-xl px-4 py-2 bg-surface rounded-tl-[2px]">
+                        <p className="text-sm text-high-emphasis">{msg.content}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={cn(
+                      'flex items-center gap-1 transition-opacity duration-200',
+                      openDropdownId === msg.id
+                        ? 'opacity-100'
+                        : 'opacity-0 group-hover:opacity-100'
+                    )}
+                  >
+                    <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                      <Smile className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                      <Reply className="w-4 h-4" />
+                    </Button>
+                    <DropdownMenu
+                      open={openDropdownId === msg.id}
+                      onOpenChange={(open) => setOpenDropdownId(open ? msg.id : null)}
+                    >
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+                          <EllipsisVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40" align="end">
+                        <DropdownMenuItem>
+                          <Reply className="w-4 h-4 mr-2" />
+                          {t('FORWARD')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Trash className="w-4 h-4 mr-2" />
+                          {t('DELETE')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
         </div>
       </div>
-
-      {/* Input Form */}
-      <div className="flex-none border-t border-border p-4 bg-white">
+      <div className="flex-none border-t border-border px-4 py-3 bg-white">
         <form
           onSubmit={handleSendMessage}
           className="flex items-center gap-2 w-full max-w-full overflow-hidden"
         >
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-          >
-            <Paperclip className="w-5 h-5" />
-          </Button>
-
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="min-w-0 flex-1"
+            placeholder={`${t('TYPE_MESSAGE')}...`}
+            className="border-0 rounded-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 w-full min-w-[100px] shadow-none"
           />
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-          >
-            <Smile className="w-5 h-5" />
-          </Button>
-
-          {message ? (
-            <Button type="submit" size="icon" className="bg-primary hover:bg-primary/90">
-              <Send className="w-5 h-5 text-white" />
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-            >
-              <Mic className="w-5 h-5" />
-            </Button>
-          )}
+          <ChatInput />
         </form>
       </div>
     </div>

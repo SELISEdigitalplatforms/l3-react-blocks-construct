@@ -17,7 +17,6 @@ export const mockChatContacts: ChatContact[] = [
     phoneNo: '+43 123 456 7890',
     avatarSrc: 'https://i.pravatar.cc/150?img=1',
     avatarFallback: 'AM',
-    lastMessage: "Hi, let's have a meeting tomorrow to discuss the project updates.",
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: true,
@@ -77,7 +76,6 @@ export const mockChatContacts: ChatContact[] = [
     phoneNo: '+43 148 492 023',
     avatarSrc: 'https://i.pravatar.cc/150?img=2',
     avatarFallback: 'AG',
-    lastMessage: 'The aroma of freshly brewed coffee filled the room.',
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: true,
@@ -110,8 +108,6 @@ export const mockChatContacts: ChatContact[] = [
     phoneNo: '+44 574 393 3930',
     avatarSrc: '',
     avatarFallback: 'RT',
-    lastMessage:
-      'Not sure if you guys caught onto it during the meeting, but we need to revise the timeline.',
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: false,
@@ -145,8 +141,6 @@ export const mockChatContacts: ChatContact[] = [
     name: 'Luca Fischer',
     email: 'luca.fischer@example.com',
     phoneNo: '+49 170 123 4567',
-    lastMessage:
-      'The introduction to the fact that the project is behind schedule was handled very well.',
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: false,
@@ -183,8 +177,6 @@ export const mockChatContacts: ChatContact[] = [
     name: 'Sarah Pavan',
     email: 'sarah.pavan@example.com',
     phoneNo: '+1 555 123 4567',
-    lastMessage:
-      'Sarah again with the correcting "I think we should consider a different approach" comment.',
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: true,
@@ -217,7 +209,6 @@ export const mockChatContacts: ChatContact[] = [
     name: 'Blocks Team',
     email: 'blocks.team@example.com',
     phoneNo: '+1 800 555 1234',
-    lastMessage: 'I think I need a compilation video of all the best moments from our meetings.',
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: false,
@@ -259,8 +250,6 @@ export const mockChatContacts: ChatContact[] = [
     name: 'Watchparty',
     email: 'watchparty@example.com',
     phoneNo: '+44 20 7123 4567',
-    lastMessage:
-      'Excellent storytelling again. Their ability to engage the audience is remarkable.',
     date: '2024-12-26T00:00:00.000Z',
     status: {
       isOnline: false,
@@ -294,7 +283,6 @@ export const mockChatContacts: ChatContact[] = [
     name: 'Taylor Morgan',
     email: 'taylor.morgan@example.com',
     phoneNo: '+1 415 555 6789',
-    lastMessage: "I've reviewed the design mockups and have some feedback on the color scheme.",
     date: '2024-12-27T11:45:00.000Z',
     status: {
       isOnline: true,
@@ -334,7 +322,6 @@ export const mockChatContacts: ChatContact[] = [
     name: 'Development Team',
     email: 'dev-team@example.com',
     phoneNo: '+1 650 555 4321',
-    lastMessage: 'The latest build has been deployed to the staging environment for testing.',
     date: '2024-12-27T15:30:00.000Z',
     status: {
       isOnline: true,

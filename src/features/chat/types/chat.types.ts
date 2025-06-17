@@ -5,7 +5,6 @@ export interface ChatContact {
   phoneNo?: string;
   avatarSrc: string;
   avatarFallback: string;
-  lastMessage?: string;
   date: string;
   status?: ChatStatus;
   messages?: Message[];

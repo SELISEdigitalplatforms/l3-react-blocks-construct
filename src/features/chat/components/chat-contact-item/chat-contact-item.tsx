@@ -22,7 +22,6 @@ export const ChatContactItem = ({
   avatarFallback,
   name,
   email,
-  lastMessage,
   date,
   status,
   messages,
@@ -41,7 +40,6 @@ export const ChatContactItem = ({
         avatarFallback,
         name,
         email: email ?? '',
-        lastMessage,
         date,
         status,
         messages,
@@ -108,7 +106,7 @@ export const ChatContactItem = ({
               status?.isUnread ? 'font-bold' : 'font-medium'
             )}
           >
-            {lastMessage}
+            {messages && messages.length > 0 ? messages[messages.length - 1].content : ''}
           </p>
         </div>
       </div>

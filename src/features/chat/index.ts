@@ -5,3 +5,4 @@ export { ChatStateContent } from './components/chat-state-content/chat-state-con
 export { ChatSearch } from './components/chat-search/chat-search';
 export { ChatUsers } from './components/chat-users/chat-users';
 export { ChatHeader } from './components/chat-header/chat-header';
+export { ChatInput } from './components/chat-input/chat-input';
