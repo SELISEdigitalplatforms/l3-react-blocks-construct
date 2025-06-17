@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Input } from 'components/ui/input';
 import { ChatContactItem } from '../chat-contact-item/chat-contact-item';
-import { mockChatContacts, mockUserProfile } from '../../data/chat.data';
+import { mockUserProfile } from '../../data/chat.data';
 import { Button } from 'components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import {
 import { ChatContact } from '../../types/chat.types';
 
 interface ChatSidebarProps {
+  contacts: ChatContact[];
   onEditClick: () => void;
   isSearchActive?: boolean;
   onDiscardClick?: () => void;
@@ -22,6 +23,7 @@ interface ChatSidebarProps {
 }
 
 export const ChatSidebar = ({
+  contacts,
   onEditClick,
   isSearchActive = false,
   onDiscardClick,
@@ -31,12 +33,8 @@ export const ChatSidebar = ({
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Save the current overflow value
     const originalStyle = window.getComputedStyle(document.body).overflow;
-    // Disable body scroll when sidebar mounts
     document.body.style.overflow = 'hidden';
-
-    // Re-enable body scroll when component unmounts
     return () => {
       document.body.style.overflow = originalStyle;
     };
@@ -113,7 +111,7 @@ export const ChatSidebar = ({
           )}
         </div>
         <div className="flex-1 overflow-y-auto">
-          {mockChatContacts.map((contact) => (
+          {contacts.map((contact) => (
             <ChatContactItem
               key={contact.id}
               {...contact}

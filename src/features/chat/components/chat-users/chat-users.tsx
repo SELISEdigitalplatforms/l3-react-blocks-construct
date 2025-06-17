@@ -27,11 +27,36 @@ import { ChatContact, Message } from '../../types/chat.types';
 
 interface ChatUsersProps {
   contact: ChatContact;
+  onContactNameUpdate?: (contactId: string, newName: string) => void;
 }
 
-export const ChatUsers = ({ contact }: Readonly<ChatUsersProps>) => {
+export const ChatUsers = ({
+  contact: initialContact,
+  onContactNameUpdate,
+}: Readonly<ChatUsersProps>) => {
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
+  const [contact, setContact] = useState(initialContact);
+
+  useEffect(() => {
+    setContact(initialContact);
+  }, [initialContact]);
+
+  const handleGroupNameUpdate = async (newName: string) => {
+    if (newName === contact.name) return;
+
+    try {
+      if (onContactNameUpdate) {
+        onContactNameUpdate(contact.id, newName);
+      }
+      setContact((prev) => ({
+        ...prev,
+        name: newName,
+      }));
+    } catch (error) {
+      console.error('Failed to update contact name:', error);
+    }
+  };
   const [messages, setMessages] = useState<Message[]>(contact.messages || []);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(true);
@@ -288,7 +313,10 @@ export const ChatUsers = ({ contact }: Readonly<ChatUsersProps>) => {
       </div>
       {isProfileOpen && (
         <div className="w-[40%]">
-          <ChatProfile contact={contact} />
+          <ChatProfile
+            contact={contact}
+            onGroupNameUpdate={contact.status?.isGroup ? handleGroupNameUpdate : undefined}
+          />
         </div>
       )}
     </div>

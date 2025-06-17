@@ -1,5 +1,7 @@
 import { cn } from 'lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
+import { useState } from 'react';
+import { EditGroupName } from '../modals/edit-group-name/edit-group-name';
 import { useTranslation } from 'react-i18next';
 import {
   Phone,
@@ -28,10 +30,36 @@ import { ChatContact } from '../../types/chat.types';
 
 interface ChatProfileProps {
   contact: ChatContact;
+  onGroupNameUpdate?: (newName: string) => void;
 }
 
-export const ChatProfile = ({ contact }: Readonly<ChatProfileProps>) => {
+export function ChatProfile({ contact, onGroupNameUpdate }: Readonly<ChatProfileProps>) {
   const { t } = useTranslation();
+  const [isEditGroupNameOpen, setIsEditGroupNameOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveGroupName = async (newName: string) => {
+    if (newName === contact.name) {
+      setIsEditGroupNameOpen(false);
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      if (onGroupNameUpdate) {
+        onGroupNameUpdate(newName);
+      }
+
+      setIsEditGroupNameOpen(false);
+    } catch (error) {
+      console.error('Failed to update group name:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const getAttachmentBackgroundColor = (type: string): string => {
     switch (type) {
@@ -73,6 +101,13 @@ export const ChatProfile = ({ contact }: Readonly<ChatProfileProps>) => {
 
   return (
     <div className="flex h-full w-full flex-col border-l border-border bg-white">
+      <EditGroupName
+        isOpen={isEditGroupNameOpen}
+        currentName={contact.name}
+        onClose={() => setIsEditGroupNameOpen(false)}
+        onSave={handleSaveGroupName}
+        isLoading={isSaving}
+      />
       <div className="flex flex-col items-center border-b border-border py-5 px-3 gap-3">
         <div
           className={cn(
@@ -99,7 +134,12 @@ export const ChatProfile = ({ contact }: Readonly<ChatProfileProps>) => {
         <div className="flex items-center gap-2">
           <h3 className="font-bold text-lg text-high-emphasis">{contact.name}</h3>
           {contact?.status?.isGroup && (
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => setIsEditGroupNameOpen(true)}
+            >
               <Pen className="w-4 h-4 text-primary" />
             </Button>
           )}
@@ -207,4 +247,4 @@ export const ChatProfile = ({ contact }: Readonly<ChatProfileProps>) => {
       </ScrollArea>
     </div>
   );
-};
+}
