@@ -1,6 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BellOff, EllipsisVertical, Info, Phone, Reply, Smile, Trash, Video } from 'lucide-react';
+import {
+  BellOff,
+  EllipsisVertical,
+  Info,
+  Phone,
+  Reply,
+  Smile,
+  Trash,
+  Users,
+  Video,
+} from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Separator } from 'components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
@@ -68,15 +78,40 @@ export const ChatUsers = ({ contact }: Readonly<ChatUsersProps>) => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Avatar className="w-10 h-10 bg-neutral-100">
-                <AvatarImage src={contact.avatarSrc} alt={contact.name} />
-                <AvatarFallback className="text-primary">{contact.avatarFallback}</AvatarFallback>
-              </Avatar>
+              <div
+                className={cn(
+                  'relative w-10 h-10 rounded-full flex items-center justify-center',
+                  contact.status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
+                )}
+              >
+                {contact.avatarSrc ? (
+                  <img
+                    src={contact.avatarSrc}
+                    alt={contact.name}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : contact.status?.isGroup ? (
+                  <Users className="w-5 h-5 text-secondary" />
+                ) : contact.status?.isMuted ? (
+                  <BellOff className="w-5 h-5 text-low-emphasis" />
+                ) : (
+                  <span className="text-xs font-medium text-medium-emphasis">
+                    {contact.avatarFallback}
+                  </span>
+                )}
+              </div>
               {contact.status?.isOnline && (
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-white" />
               )}
             </div>
-            <h3 className="font-bold text-high-emphasis">{contact.name}</h3>
+            <div className="flex flex-col gap-1">
+              <h3 className="font-bold text-high-emphasis">{contact.name}</h3>
+              {contact.status?.isGroup && (
+                <p className="text-xs text-medium-emphasis">
+                  {contact?.members?.length} {t('MEMBERS')}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="rounded-full">
@@ -253,7 +288,7 @@ export const ChatUsers = ({ contact }: Readonly<ChatUsersProps>) => {
       </div>
       {isProfileOpen && (
         <div className="w-[40%]">
-          <ChatProfile />
+          <ChatProfile contact={contact} />
         </div>
       )}
     </div>

@@ -1,6 +1,22 @@
+import { cn } from 'lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
+import { useTranslation } from 'react-i18next';
+import {
+  Phone,
+  Mail,
+  Bell,
+  BellOff,
+  Download,
+  FileText,
+  Image,
+  Music,
+  Users,
+  Video,
+  CircleUser,
+  Pen,
+  Trash,
+} from 'lucide-react';
 import { Button } from 'components/ui/button';
-import { Phone, Mail, User, Bell, Download, FileText, Image, Music, Video } from 'lucide-react';
 import { ScrollArea } from 'components/ui/scroll-area';
 import {
   Accordion,
@@ -8,22 +24,37 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from 'components/ui/accordion';
+import { ChatContact } from '../../types/chat.types';
 
-export const ChatProfile = () => {
-  const profile = {
-    name: 'Adrian Müller',
-    avatarSrc: '/assets/images/avatar.png',
-    avatarFallback: 'AM',
-    phone: '+41 75 744 2538',
-    email: 'luca.meier@gmail.com',
-    attachments: [
-      { id: '1', name: 'acceptance criteria final.pdf', size: '600.00 KB', type: 'pdf' },
-      { id: '2', name: 'Sunset_View_Image.jpg', size: '600.00 KB', type: 'image' },
-      { id: '3', name: 'acceptance criteria preview vers...', size: '600.00 KB', type: 'pdf' },
-      { id: '4', name: 'Discussion.mp3', size: '600.00 KB', type: 'audio' },
-      { id: '5', name: 'meeting_notes.mp4', size: '500.00 MB', type: 'video' },
-    ],
+interface ChatProfileProps {
+  contact: ChatContact;
+}
+
+export const ChatProfile = ({ contact }: Readonly<ChatProfileProps>) => {
+  const { t } = useTranslation();
+
+  const getAttachmentBackgroundColor = (type: string): string => {
+    switch (type) {
+      case 'pdf':
+        return 'bg-blue-50';
+      case 'image':
+        return 'bg-red-50';
+      case 'audio':
+        return 'bg-purple-50';
+      case 'video':
+        return 'bg-green-50';
+      default:
+        return 'bg-surface';
+    }
   };
+
+  const attachments = [
+    { id: '1', name: 'acceptance criteria final.pdf', size: '600.00 KB', type: 'pdf' },
+    { id: '2', name: 'Sunset_View_Image.jpg', size: '600.00 KB', type: 'image' },
+    { id: '3', name: 'acceptance criteria preview vers...', size: '600.00 KB', type: 'pdf' },
+    { id: '4', name: 'discussion.mp3', size: '600.00 KB', type: 'audio' },
+    { id: '5', name: 'meeting_notes.mp4', size: '500.00 MB', type: 'video' },
+  ];
 
   const getFileIcon = (type: string) => {
     switch (type) {
@@ -43,19 +74,44 @@ export const ChatProfile = () => {
   return (
     <div className="flex h-full w-full flex-col border-l border-border bg-white">
       <div className="flex flex-col items-center border-b border-border py-5 px-3 gap-3">
-        <Avatar className="w-20 h-20 bg-neutral-100">
-          <AvatarImage src={profile.avatarSrc} alt={profile.name} />
-          <AvatarFallback className="text-primary text-xl">{profile.avatarFallback}</AvatarFallback>
-        </Avatar>
-        <h3 className="font-bold text-lg text-high-emphasis">{profile.name}</h3>
+        <div
+          className={cn(
+            'relative w-20 h-20 rounded-full flex items-center justify-center',
+            contact.status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
+          )}
+        >
+          {contact.avatarSrc ? (
+            <img
+              src={contact.avatarSrc}
+              alt={contact.name}
+              className="w-full h-full rounded-full object-cover"
+            />
+          ) : contact.status?.isGroup ? (
+            <Users className="w-8 h-8 text-secondary" />
+          ) : contact.status?.isMuted ? (
+            <BellOff className="w-8 h-8 text-low-emphasis" />
+          ) : (
+            <span className="text-2xl font-medium text-medium-emphasis">
+              {contact.avatarFallback}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <h3 className="font-bold text-lg text-high-emphasis">{contact.name}</h3>
+          {contact?.status?.isGroup && (
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Pen className="w-4 h-4 text-primary" />
+            </Button>
+          )}
+        </div>
         <div className="flex gap-3">
           <Button variant="ghost" className="flex flex-col items-center gap-0 py-3">
-            <User className="w-5 h-5 text-medium-emphasis" />
-            <span className="text-xs text-medium-emphasis">Profile</span>
+            <CircleUser className="w-5 h-5 text-medium-emphasis" />
+            <span className="text-xs text-medium-emphasis">{t('PROFILE')}</span>
           </Button>
           <Button variant="ghost" className="flex flex-col items-center gap-0 py-3">
             <Bell className="w-5 h-5 text-medium-emphasis" />
-            <span className="text-xs text-medium-emphasis">Mute</span>
+            <span className="text-xs text-medium-emphasis">{t('MUTE')}</span>
           </Button>
         </div>
       </div>
@@ -63,35 +119,73 @@ export const ChatProfile = () => {
       <ScrollArea className="flex-1 overflow-y-auto">
         <Accordion
           type="multiple"
-          defaultValue={['general-info', 'attachments']}
+          defaultValue={['general-info', 'members', 'attachments']}
           className="w-full"
         >
-          <AccordionItem value="general-info" className="border-b border-border">
-            <AccordionTrigger className="px-3 py-4 font-semibold text-high-emphasis bg-surface hover:no-underline">
-              General info
-            </AccordionTrigger>
-            <AccordionContent className="py-4 px-3">
-              <div className="flex items-center gap-4 mb-4">
-                <Phone className="w-4 h-4 text-medium-emphasis" />
-                <span className="text-sm text-high-emphasis">{profile.phone}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <Mail className="w-4 h-4 text-medium-emphasis" />
-                <span className="text-sm text-high-emphasis">{profile.email}</span>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
+          {contact?.status?.isGroup ? (
+            <AccordionItem value="members" className="border-b border-border">
+              <AccordionTrigger className="px-3 py-4 font-semibold text-high-emphasis bg-surface hover:no-underline">
+                {t('MEMBERS')} ({contact?.members?.length})
+              </AccordionTrigger>
+              <AccordionContent className="py-4 px-3">
+                <div className="flex flex-col gap-3">
+                  {contact?.members?.map((member) => (
+                    <div key={member.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-10 h-10 border-[2px] border-surface">
+                          <AvatarImage src={member.avatarSrc} alt={member.name} />
+                          <AvatarFallback className="text-primary text-xl">
+                            {member.avatarFallback}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-high-emphasis">{member.name}</span>
+                          {!member?.isMe ? (
+                            <span className="text-xs text-medium-emphasis">{member.email}</span>
+                          ) : (
+                            <span className="text-xs text-medium-emphasis">{t('LABEL_ME')}</span>
+                          )}
+                        </div>
+                      </div>
+                      {!member?.isMe && (
+                        <Button variant="ghost" size="icon" className="rounded-full">
+                          <Trash className="w-5 h-5 text-medium-emphasis" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ) : (
+            <AccordionItem value="general-info" className="border-b border-border">
+              <AccordionTrigger className="px-3 py-4 font-semibold text-high-emphasis bg-surface hover:no-underline">
+                {t('GENERAL_INFO')}
+              </AccordionTrigger>
+              <AccordionContent className="py-4 px-3">
+                <div className="flex items-center gap-4 mb-4">
+                  <Phone className="w-4 h-4 text-medium-emphasis" />
+                  <span className="text-sm text-high-emphasis">{contact?.phoneNo}</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Mail className="w-4 h-4 text-medium-emphasis" />
+                  <span className="text-sm text-high-emphasis">{contact.email}</span>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
           <AccordionItem value="attachments" className="border-b border-border">
             <AccordionTrigger className="px-3 py-4 font-semibold text-high-emphasis bg-surface hover:no-underline">
-              Attachments
+              {t('ATTACHMENTS')}
             </AccordionTrigger>
             <AccordionContent className="py-4 px-3">
               <div className="flex flex-col gap-3">
-                {profile.attachments.map((attachment) => (
+                {attachments.map((attachment) => (
                   <div key={attachment.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface">
+                      <div
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg ${getAttachmentBackgroundColor(attachment.type)}`}
+                      >
                         {getFileIcon(attachment.type)}
                       </div>
                       <div className="flex flex-col">

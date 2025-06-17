@@ -215,6 +215,37 @@ export const mockChatContacts: ChatContact[] = [
       isUnread: true,
       isGroup: true,
     },
+    members: [
+      {
+        id: 'USR-1282912',
+        name: 'Adrian Müller',
+        email: 'adrian.mueller@example.com',
+        avatarSrc: 'https://i.pravatar.cc/150?img=1',
+        avatarFallback: 'AM',
+      },
+      {
+        id: 'USR-1282913',
+        name: 'Aaron Green',
+        email: 'aaron.green@example.com',
+        avatarSrc: 'https://i.pravatar.cc/150?img=2',
+        avatarFallback: 'AG',
+      },
+      {
+        id: 'USR-1282914',
+        name: 'Luca Fischer',
+        email: 'luca.fischer@example.com',
+        avatarSrc: 'https://i.pravatar.cc/150?img=3',
+        avatarFallback: 'LF',
+      },
+      {
+        id: 'USR-12829540',
+        name: 'Block Smith',
+        avatarSrc: 'https://github.com/shadcn.png',
+        avatarFallback: 'BS',
+        isMe: true,
+        email: 'block.smith@example.com',
+      },
+    ],
     messages: [
       {
         id: 'MSG-1283255',

@@ -8,6 +8,16 @@ export interface ChatContact {
   date: string;
   status?: ChatStatus;
   messages?: Message[];
+  members?: GroupMember[];
+}
+
+export interface GroupMember {
+  id: string;
+  name: string;
+  email: string;
+  isMe?: boolean;
+  avatarSrc: string;
+  avatarFallback: string;
 }
 
 export interface ChatStatus {
