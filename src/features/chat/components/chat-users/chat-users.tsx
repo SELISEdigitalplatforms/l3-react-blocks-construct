@@ -70,6 +70,10 @@ export const ChatUsers = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== messageId));
+  };
+
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -225,7 +229,7 @@ export const ChatUsers = ({
                             <Reply className="w-4 h-4 mr-2" />
                             {t('FORWARD')}
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteMessage(msg.id)}>
                             <Trash className="w-4 h-4 mr-2" />
                             {t('DELETE')}
                           </DropdownMenuItem>
@@ -308,7 +312,7 @@ export const ChatUsers = ({
                             <Reply className="w-4 h-4 mr-2" />
                             {t('FORWARD')}
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteMessage(msg.id)}>
                             <Trash className="w-4 h-4 mr-2" />
                             {t('DELETE')}
                           </DropdownMenuItem>
