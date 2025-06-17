@@ -262,15 +262,17 @@ export const createFileTableColumns = ({
   {
     id: 'actions',
     cell: ({ row }) => (
-      <FileTableRowActions
-        row={row}
-        onViewDetails={onViewDetails}
-        onDownload={onDownload}
-        onShare={onShare}
-        onDelete={onDelete}
-        onMove={onMove}
-        onRename={onRename}
-      />
+      <div onClick={(e) => e.stopPropagation()} className="flex justify-end">
+        <FileTableRowActions
+          row={row}
+          onViewDetails={onViewDetails}
+          onDownload={onDownload}
+          onShare={onShare}
+          onDelete={onDelete}
+          onMove={onMove}
+          onRename={onRename}
+        />
+      </div>
     ),
   },
 ];

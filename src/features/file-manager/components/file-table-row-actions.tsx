@@ -87,8 +87,7 @@ export function FileTableRowActions({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleItemClick = (action: (file: IFileData) => void) => {
-    setIsDropdownOpen(false); // Close dropdown first
-    // Use setTimeout to ensure dropdown closes before action
+    setIsDropdownOpen(false);
     setTimeout(() => {
       action(file);
     }, 0);
@@ -97,13 +96,18 @@ export function FileTableRowActions({
   const handleDropdownTriggerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    setIsDropdownOpen((prev) => !prev);
   };
 
   const handleDropdownOpenChange = (open: boolean) => {
     setIsDropdownOpen(open);
   };
 
-  // Make all options available for all file types
+  const handleDropdownContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const canDownload = onDownload !== undefined;
   const canDelete = onDelete !== undefined;
   const canShare = onShare !== undefined;
@@ -116,12 +120,22 @@ export function FileTableRowActions({
     <>
       <DropdownMenu open={isDropdownOpen} onOpenChange={handleDropdownOpenChange}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0" onClick={handleDropdownTriggerClick}>
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0"
+            onClick={handleDropdownTriggerClick}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
             <span className="sr-only">Open menu</span>
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent
+          align="end"
+          className="w-48"
+          onClick={handleDropdownContentClick}
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
           {/* Open */}
           {canOpen && (
             <DropdownMenuItem onClick={() => handleItemClick(onOpen)}>
