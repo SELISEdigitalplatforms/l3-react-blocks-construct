@@ -32,6 +32,12 @@ export interface Message {
   sender: 'me' | 'other';
   content: string;
   timestamp: string;
+  attachment?: {
+    name: string;
+    type: string;
+    size: number;
+    url: string;
+  };
 }
 
 export interface UserProfile {

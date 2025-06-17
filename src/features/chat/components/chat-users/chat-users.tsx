@@ -11,6 +11,8 @@ import {
   Users,
   Video,
   Bell,
+  FileText,
+  Download,
 } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Separator } from 'components/ui/separator';
@@ -44,6 +46,7 @@ export const ChatUsers = ({
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [contact, setContact] = useState(initialContact);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   useEffect(() => {
     setContact(initialContact);
@@ -91,21 +94,49 @@ export const ChatUsers = ({
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() && selectedFiles.length === 0) return;
 
     const newMessage: Message = {
       id: `MSG-${Date.now()}`,
       sender: 'me',
       content: message,
       timestamp: new Date().toISOString(),
+      ...(selectedFiles.length > 0 && {
+        attachment: {
+          name: selectedFiles[0].name,
+          type: selectedFiles[0].type,
+          size: selectedFiles[0].size,
+          url: URL.createObjectURL(selectedFiles[0]),
+        },
+      }),
     };
 
     setMessages([...messages, newMessage]);
     setMessage('');
+    setSelectedFiles([]);
+  };
+
+  const handleFileUpload = (files: File[]) => {
+    setSelectedFiles(files);
   };
 
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatFileSize = (size: number) => {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(2)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const handleDownload = (file: { url: string; name: string }) => {
+    const link = document.createElement('a');
+    link.href = file.url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -251,6 +282,46 @@ export const ChatUsers = ({
                       <div className="relative group">
                         <div className="rounded-xl px-4 py-2 bg-primary-50 rounded-tr-[2px]">
                           <p className="text-sm text-high-emphasis">{msg.content}</p>
+                          {msg.attachment && (
+                            <div className="mt-2">
+                              {msg.attachment.type.startsWith('image/') ? (
+                                <img
+                                  src={msg.attachment.url}
+                                  alt={msg.attachment.name}
+                                  className="max-w-full max-h-64 rounded-lg border border-border"
+                                />
+                              ) : (
+                                <div className="flex items-center gap-4 w-full w-full">
+                                  <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
+                                    <FileText className="w-6 h-6 text-secondary" />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <div className="text-sm text-medium-emphasis truncate">
+                                      {msg.attachment.name}
+                                    </div>
+                                    <div className="text-xs text-low-emphasis">
+                                      {formatFileSize(msg.attachment.size)}
+                                    </div>
+                                  </div>
+                                  {msg.attachment &&
+                                    (() => {
+                                      const { url, name } = msg.attachment;
+                                      return (
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="rounded-full"
+                                          onClick={() => handleDownload({ url, name })}
+                                          aria-label="Download"
+                                        >
+                                          <Download className="w-5 h-5 text-medium-emphasis" />
+                                        </Button>
+                                      );
+                                    })()}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -277,6 +348,46 @@ export const ChatUsers = ({
                       <div className="relative group">
                         <div className="rounded-xl px-4 py-2 bg-surface rounded-tl-[2px]">
                           <p className="text-sm text-high-emphasis">{msg.content}</p>
+                          {msg.attachment && (
+                            <div className="mt-2">
+                              {msg.attachment.type.startsWith('image/') ? (
+                                <img
+                                  src={msg.attachment.url}
+                                  alt={msg.attachment.name}
+                                  className="max-w-full max-h-64 rounded-lg border border-border"
+                                />
+                              ) : (
+                                <div className="flex items-center gap-4 w-full w-full">
+                                  <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
+                                    <FileText className="w-6 h-6 text-secondary" />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <div className="text-sm text-medium-emphasis truncate">
+                                      {msg.attachment.name}
+                                    </div>
+                                    <div className="text-xs text-low-emphasis">
+                                      {formatFileSize(msg.attachment.size)}
+                                    </div>
+                                  </div>
+                                  {msg.attachment &&
+                                    (() => {
+                                      const { url, name } = msg.attachment;
+                                      return (
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="rounded-full"
+                                          onClick={() => handleDownload({ url, name })}
+                                          aria-label="Download"
+                                        >
+                                          <Download className="w-5 h-5 text-medium-emphasis" />
+                                        </Button>
+                                      );
+                                    })()}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -326,7 +437,14 @@ export const ChatUsers = ({
             <div ref={messagesEndRef} />
           </div>
         </div>
-        <ChatInput value={message} onChange={setMessage} onSubmit={handleSendMessage} />
+        <ChatInput
+          value={message}
+          onChange={setMessage}
+          onSubmit={handleSendMessage}
+          onFileUpload={handleFileUpload}
+          selectedFiles={selectedFiles}
+          onRemoveFile={(index) => setSelectedFiles((prev) => prev.filter((_, i) => i !== index))}
+        />
       </div>
       {isProfileOpen && (
         <div className="w-[40%]">
