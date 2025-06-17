@@ -1,59 +1,74 @@
-import { Image, Paperclip, Send, Smile } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
+import { Image, Paperclip, Send, Smile } from 'lucide-react';
 import { Separator } from 'components/ui/separator';
 
 interface ChatInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
   onImageClick?: () => void;
   onAttachmentClick?: () => void;
   onEmojiClick?: () => void;
-  onSendClick?: () => void;
 }
 
-export function ChatInput({
+export const ChatInput = ({
+  value,
+  onChange,
+  onSubmit,
   onImageClick,
   onAttachmentClick,
   onEmojiClick,
-  onSendClick,
-}: Readonly<ChatInputProps>) {
+}: Readonly<ChatInputProps>) => {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-        onClick={onImageClick}
+    <div className="flex-none border-t border-border px-4 py-3 bg-white">
+      <form
+        onSubmit={onSubmit}
+        className="flex items-center gap-2 w-full max-w-full overflow-hidden"
       >
-        <Image className="w-5 h-5" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-        onClick={onAttachmentClick}
-      >
-        <Paperclip className="w-5 h-5" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-        onClick={onEmojiClick}
-      >
-        <Smile className="w-5 h-5" />
-      </Button>
-      <Separator orientation="vertical" className="h-5" />
-      <Button
-        type="submit"
-        variant="ghost"
-        size="icon"
-        className="text-medium-emphasis rounded-full hover:text-high-emphasis"
-        onClick={onSendClick}
-      >
-        <Send className="w-5 h-5" />
-      </Button>
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={`${t('TYPE_MESSAGE')}...`}
+          className="border-0 rounded-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 w-full min-w-[100px] shadow-none"
+        />
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={onImageClick}
+          >
+            <Image className="w-5 h-5 text-medium-emphasis" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={onAttachmentClick}
+          >
+            <Paperclip className="w-5 h-5 text-medium-emphasis" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={onEmojiClick}
+          >
+            <Smile className="w-5 h-5 text-medium-emphasis" />
+          </Button>
+          <Separator orientation="vertical" className="h-5" />
+          <Button type="submit" variant="ghost" size="icon" className="rounded-full">
+            <Send className="w-5 h-5 text-medium-emphasis" />
+          </Button>
+        </div>
+      </form>
     </div>
   );
-}
+};
