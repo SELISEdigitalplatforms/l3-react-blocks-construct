@@ -49,6 +49,7 @@ export function ForwardMessage({
             placeholder={t('ENTER_NAME_EMAIL_GROUP')}
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
+            className="bg-surface"
           />
           <div className="flex flex-col gap-2">
             <Label className="block text-sm font-medium mb-1">{t('MESSAGE')}</Label>
