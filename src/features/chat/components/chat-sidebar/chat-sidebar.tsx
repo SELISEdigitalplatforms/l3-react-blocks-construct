@@ -18,6 +18,7 @@ interface ChatSidebarProps {
   contacts: ChatContact[];
   onEditClick: () => void;
   isSearchActive?: boolean;
+  isCollapsed?: boolean;
   onDiscardClick?: () => void;
   onContactSelect: (contact: ChatContact) => void;
   selectedContactId?: string | null;
@@ -31,6 +32,7 @@ export const ChatSidebar = ({
   contacts,
   onEditClick,
   isSearchActive = false,
+  isCollapsed = false,
   onDiscardClick,
   onContactSelect,
   selectedContactId,
@@ -61,49 +63,60 @@ export const ChatSidebar = ({
   };
 
   return (
-    <div className="w-[326px] min-w-[326px] border-r border-border bg-white flex flex-col">
-      <div className="p-4 border-b border-border">
-        <h2 className="text-2xl font-bold">{t('CHAT')}</h2>
-      </div>
+    <div
+      className={`${isCollapsed ? 'w-20 min-w-[80px]' : 'w-[326px] min-w-[326px]'} border-r border-border bg-white flex flex-col transition-all duration-200 ease-in-out`}
+    >
+      {!isCollapsed && (
+        <div className="p-4 border-b border-border">
+          <h2 className="text-2xl font-bold">{t('CHAT')}</h2>
+        </div>
+      )}
+
       <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isCollapsed && 'border-b border-border pb-2'}`}>
           <Avatar>
             <AvatarImage src={mockUserProfile.avatarSrc} alt="sidebar avatar" />
             <AvatarFallback>{mockUserProfile.avatarFallback}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col">
-            <p className="text-sm font-medium text-high-emphasis">{mockUserProfile.name}</p>
-            <div className="flex items-center gap-1">
-              <div
-                className={`w-2 h-2 rounded-full ${mockUserProfile.status.isOnline ? 'bg-success' : 'bg-low-emphasis'}`}
-              />
-              <span className="text-xs text-medium-emphasis">
-                {mockUserProfile.status.isOnline ? t('ONLINE') : t('OFFLINE')}
-              </span>
+          {!isCollapsed && (
+            <div className="flex flex-col">
+              <p className="text-sm font-medium text-high-emphasis">{mockUserProfile.name}</p>
+              <div className="flex items-center gap-1">
+                <div
+                  className={`w-2 h-2 rounded-full ${mockUserProfile.status.isOnline ? 'bg-success' : 'bg-low-emphasis'}`}
+                />
+                <span className="text-xs text-medium-emphasis">
+                  {mockUserProfile.status.isOnline ? t('ONLINE') : t('OFFLINE')}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
-        <Button variant="ghost" size="icon" className="rounded-full" onClick={onEditClick}>
-          <Edit className="w-5 h-5" />
-        </Button>
+        {!isCollapsed && (
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={onEditClick}>
+            <Edit className="w-5 h-5" />
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col flex-1 min-h-0">
         <div className="flex-shrink-0">
-          <div className="p-4">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="w-4 h-4 text-medium-emphasis" />
+          {!isCollapsed && (
+            <div className="p-4">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <Search className="w-4 h-4 text-medium-emphasis" />
+                </div>
+                <Input
+                  type="text"
+                  className="w-full py-2 pl-10 pr-3 text-sm bg-gray-100 border-0 rounded-md focus:ring-2 focus:ring-primary focus:bg-white"
+                  placeholder={t('SEARCH')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-              <Input
-                type="text"
-                className="w-full py-2 pl-10 pr-3 text-sm bg-gray-100 border-0 rounded-md focus:ring-2 focus:ring-primary focus:bg-white"
-                placeholder={t('SEARCH')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
             </div>
-          </div>
+          )}
           {isSearchActive && (
             <div className="flex items-center justify-between w-full p-4 bg-primary-50">
               <div className="flex items-center gap-2">
@@ -145,6 +158,7 @@ export const ChatSidebar = ({
                 members={contact.members}
                 onClick={handleContactClick}
                 isSelected={contact.id === selectedContactId}
+                isCollapsed={isCollapsed}
                 onMarkAsUnread={onMarkAsUnread}
                 onMarkAsRead={onMarkAsRead}
                 onMuteToggle={onMuteToggle}

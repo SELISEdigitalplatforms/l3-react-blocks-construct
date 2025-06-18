@@ -6,13 +6,17 @@ import { ChatSidebar } from '../chat-sidebar/chat-sidebar';
 import { ChatSearch } from '../chat-search/chat-search';
 import { ChatUsers } from '../chat-users/chat-users';
 import { ChatContact } from '../../types/chat.types';
-// import { ChatHeader } from '../chat-header/chat-header';
 import { mockChatContacts } from '../../data/chat.data';
 
 export const Chat = () => {
   const [showChatSearch, setShowChatSearch] = useState(false);
   const [selectedContact, setSelectedContact] = useState<ChatContact | null>(null);
   const [contacts, setContacts] = useState<ChatContact[]>(mockChatContacts);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
 
   const handleContactNameUpdate = (contactId: string, newName: string) => {
     setContacts((prevContacts) =>
@@ -110,9 +114,9 @@ export const Chat = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* <ChatHeader /> */}
       <div className="flex h-[calc(100dvh-57px)] w-full bg-white rounded-lg shadow-sm">
         <ChatSidebar
+          isCollapsed={isSidebarCollapsed}
           contacts={contacts}
           selectedContactId={selectedContact?.id}
           onEditClick={() => setShowChatSearch(true)}
@@ -134,9 +138,19 @@ export const Chat = () => {
           className={`flex flex-col w-full ${!selectedContact ? 'h-full' : 'h-[calc(100dvh-118px)]'}`}
         >
           <div className="flex items-center w-full min-h-[65px] px-4 border-b border-border">
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full"
+              onClick={toggleSidebar}
+            >
               <Menu className="w-6 h-6 text-medium-emphasis cursor-pointer" />
             </Button>
+            {selectedContact && (
+              <h2 className="text-lg font-semibold ml-4">
+                {selectedContact.name}
+              </h2>
+            )}
           </div>
           <div className="flex flex-col w-full h-full">
             {showChatSearch ? (

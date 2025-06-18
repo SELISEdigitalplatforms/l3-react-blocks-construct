@@ -12,10 +12,11 @@ import { ChatContact } from '../../types/chat.types';
 import { cn } from 'lib/utils';
 
 interface ChatContactItemProps extends ChatContact {
-  isSelected?: boolean;
   onClick?: (contact: ChatContact) => void;
-  onMarkAsUnread?: (contactId: string) => void;
+  isSelected?: boolean;
+  isCollapsed?: boolean;
   onMarkAsRead?: (contactId: string) => void;
+  onMarkAsUnread?: (contactId: string) => void;
   onMuteToggle?: (contactId: string) => void;
   onDeleteContact?: (contactId: string) => void;
   className?: string;
@@ -35,6 +36,7 @@ export const ChatContactItem = ({
   messages,
   onClick,
   isSelected = false,
+  isCollapsed = false,
   onMarkAsUnread,
   onMarkAsRead,
   onMuteToggle,
@@ -64,41 +66,130 @@ export const ChatContactItem = ({
 
   const showIcon = (isHovered || isDropdownOpen) && showIconProp;
 
+  const renderAvatar = () => (
+    <div className="relative">
+      <div
+        className={cn(
+          'w-10 h-10 rounded-full flex items-center justify-center',
+          status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
+        )}
+      >
+        {status?.isMuted ? (
+          <BellOff className="w-5 h-5 text-low-emphasis" />
+        ) : status?.isGroup ? (
+          <Users className="w-5 h-5 text-secondary" />
+        ) : avatarSrc ? (
+          <img src={avatarSrc} alt={name} className="w-full h-full rounded-full object-cover" />
+        ) : (
+          <span className="text-xs font-medium text-medium-emphasis">{avatarFallback}</span>
+        )}
+      </div>
+      {status?.isOnline && (
+        <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-white" />
+      )}
+    </div>
+  );
+
+  const renderDropdown = () => (
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+      <DropdownMenuTrigger asChild>
+        <div
+          className={cn(
+            'cursor-pointer transition-opacity duration-200 p-1 rounded-full hover:bg-neutral-100',
+            showIcon ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+            isCollapsed ? 'absolute right-1 top-1' : ''
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <EllipsisVertical className="w-4 h-4 text-medium-emphasis hover:text-high-emphasis" />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="min-w-40" align="end">
+        {status?.isUnread ? (
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onMarkAsRead?.(id);
+            }}
+          >
+            <Mail className="w-5 h-5 mr-1 text-medium-emphasis" />
+            {t('MARK_AS_READ')}
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onMarkAsUnread?.(id);
+            }}
+          >
+            <MailOpen className="w-5 h-5 mr-1 text-medium-emphasis" />
+            {t('MARK_AS_UNREAD')}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onMuteToggle?.(id);
+          }}
+          disabled={!onMuteToggle}
+        >
+          <BellOff className="w-5 h-5 mr-1 text-medium-emphasis" />
+          {status?.isMuted ? t('UNMUTE_NOTIFICATIONS') : t('MUTE_NOTIFICATIONS')}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteContact?.(id);
+          }}
+          disabled={!onDeleteContact}
+        >
+          <Trash className="w-5 h-5 mr-1 text-medium-emphasis" />
+          {t('DELETE')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  if (isCollapsed) {
+    return (
+      <div
+        className={cn(
+          'group relative flex flex-col items-center w-full p-3 text-center hover:bg-gray-50 transition-colors',
+          isSelected && 'bg-primary-50',
+          className
+        )}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <button
+          type="button"
+          className="w-full h-full absolute inset-0"
+          onClick={handleClick}
+          aria-label={`Open chat with ${name}`}
+        />
+        <div className="relative mb-1">{renderAvatar()}</div>
+        <span className="text-xs font-medium text-high-emphasis truncate w-full">{name}</span>
+      </div>
+    );
+  }
+
   return (
-    <button
-      type="button"
+    <div
       className={cn(
-        'relative flex w-full items-center px-4 py-3 border-b border-border cursor-pointer hover:bg-neutral-50 bg-white last:border-b-0 text-left',
-        isSelected && 'bg-primary-50 hover:bg-primary-50',
+        'group relative flex items-center w-full p-4 text-left hover:bg-gray-50 transition-colors',
+        isSelected && 'bg-primary-50',
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
     >
-      <div className="relative mr-3 flex-shrink-0">
-        <div
-          className={cn(
-            'relative w-10 h-10 rounded-full flex items-center justify-center',
-            status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
-          )}
-        >
-          {status?.isMuted ? (
-            <div>
-              <BellOff className="w-5 h-5 text-low-emphasis" />
-            </div>
-          ) : status?.isGroup ? (
-            <Users className="w-5 h-5 text-secondary" />
-          ) : avatarSrc ? (
-            <img src={avatarSrc} alt={name} className="w-full h-full rounded-full object-cover" />
-          ) : (
-            <span className="text-xs font-medium text-medium-emphasis">{avatarFallback}</span>
-          )}
-        </div>
-        {status?.isOnline && (
-          <div className="absolute bottom-0 right-0 block w-2.5 h-2.5 bg-success rounded-full ring-2 ring-white" />
-        )}
-      </div>
+      <button
+        type="button"
+        className="absolute inset-0 w-full h-full"
+        onClick={handleClick}
+        aria-label={`Open chat with ${name}`}
+      />
+      <div className="relative mr-3 flex-shrink-0">{renderAvatar()}</div>
 
       <div className="flex flex-col min-w-0 flex-1">
         <div className="flex items-center justify-between w-full">
@@ -134,63 +225,7 @@ export const ChatContactItem = ({
         </div>
       </div>
 
-      <div className="absolute right-4 top-0 h-full flex items-center">
-        <DropdownMenu open={isDropdownOpen} onOpenChange={(open) => setIsDropdownOpen(open)}>
-          <DropdownMenuTrigger asChild>
-            <div
-              className={cn(
-                'cursor-pointer transition-opacity duration-200 p-1 rounded-full hover:bg-neutral-100 mb-[20px]',
-                showIcon ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              )}
-            >
-              <EllipsisVertical className="w-4 h-4 text-medium-emphasis hover:text-high-emphasis" />
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-40" align="end">
-            {status?.isUnread ? (
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMarkAsRead?.(id);
-                }}
-              >
-                <Mail className="w-5 h-5 mr-1 text-medium-emphasis" />
-                {t('MARK_AS_READ')}
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMarkAsUnread?.(id);
-                }}
-              >
-                <MailOpen className="w-5 h-5 mr-1 text-medium-emphasis" />
-                {t('MARK_AS_UNREAD')}
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onMuteToggle?.(id);
-              }}
-              disabled={!onMuteToggle}
-            >
-              <BellOff className="w-5 h-5 mr-1 text-medium-emphasis" />
-              {status?.isMuted ? t('UNMUTE_NOTIFICATIONS') : t('MUTE_NOTIFICATIONS')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteContact?.(id);
-              }}
-              disabled={!onDeleteContact}
-            >
-              <Trash className="w-5 h-5 mr-1 text-medium-emphasis" />
-              {t('DELETE')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </button>
+      <div className="absolute right-4 bottom-4 h-full flex items-center">{renderDropdown()}</div>
+    </div>
   );
 };
