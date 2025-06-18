@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { Menu } from 'lucide-react';
+import { Button } from 'components/ui/button';
 import { ChatStateContent } from '../chat-state-content/chat-state-content';
 import { ChatSidebar } from '../chat-sidebar/chat-sidebar';
 import { ChatSearch } from '../chat-search/chat-search';
 import { ChatUsers } from '../chat-users/chat-users';
 import { ChatContact } from '../../types/chat.types';
-import { ChatHeader } from '../chat-header/chat-header';
+// import { ChatHeader } from '../chat-header/chat-header';
 import { mockChatContacts } from '../../data/chat.data';
 
 export const Chat = () => {
@@ -108,8 +110,8 @@ export const Chat = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <ChatHeader />
-      <div className="flex h-[calc(100dvh-124px)] w-full bg-white rounded-lg shadow-sm">
+      {/* <ChatHeader /> */}
+      <div className="flex h-[calc(100dvh-57px)] w-full bg-white rounded-lg shadow-sm">
         <ChatSidebar
           contacts={contacts}
           selectedContactId={selectedContact?.id}
@@ -128,26 +130,35 @@ export const Chat = () => {
           onMuteToggle={handleMuteToggle}
           onDeleteContact={handleDeleteContact}
         />
-        <div className="flex flex-col w-full">
-          {showChatSearch ? (
-            <ChatSearch
-              onClose={() => setShowChatSearch(false)}
-              onSelectContact={setSelectedContact}
-            />
-          ) : selectedContact ? (
-            <ChatUsers
-              contact={selectedContact}
-              onContactNameUpdate={handleContactNameUpdate}
-              onMuteToggle={handleMuteToggle}
-              onDeleteContact={handleDeleteContact}
-              onDeleteMember={handleDeleteMember}
-            />
-          ) : (
-            <ChatStateContent
-              isSearchActive={false}
-              onStartNewConversation={() => setShowChatSearch(true)}
-            />
-          )}
+        <div
+          className={`flex flex-col w-full ${!selectedContact ? 'h-full' : 'h-[calc(100dvh-118px)]'}`}
+        >
+          <div className="flex items-center w-full min-h-[65px] px-4 border-b border-border">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Menu className="w-6 h-6 text-medium-emphasis cursor-pointer" />
+            </Button>
+          </div>
+          <div className="flex flex-col w-full h-full">
+            {showChatSearch ? (
+              <ChatSearch
+                onClose={() => setShowChatSearch(false)}
+                onSelectContact={setSelectedContact}
+              />
+            ) : selectedContact ? (
+              <ChatUsers
+                contact={selectedContact}
+                onContactNameUpdate={handleContactNameUpdate}
+                onMuteToggle={handleMuteToggle}
+                onDeleteContact={handleDeleteContact}
+                onDeleteMember={handleDeleteMember}
+              />
+            ) : (
+              <ChatStateContent
+                isSearchActive={false}
+                onStartNewConversation={() => setShowChatSearch(true)}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

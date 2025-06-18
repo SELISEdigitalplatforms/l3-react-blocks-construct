@@ -62,6 +62,9 @@ export const ChatSidebar = ({
 
   return (
     <div className="w-[326px] min-w-[326px] border-r border-border bg-white flex flex-col">
+      <div className="p-4 border-b border-border">
+        <h2 className="text-2xl font-bold">{t('CHAT')}</h2>
+      </div>
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <Avatar>
