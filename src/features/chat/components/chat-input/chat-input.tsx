@@ -105,10 +105,11 @@ export const ChatInput = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-4 w-4 p-0"
+                className="h-4 w-4 p-0 rounded-full"
                 onClick={() => onRemoveFile(index)}
+                aria-label={`remove file ${file.name}`}
               >
-                <X className="h-3 w-3" />
+                <X className="w-3 h-3" aria-hidden="true" />
               </Button>
             </div>
           ))}
@@ -118,6 +119,7 @@ export const ChatInput = ({
       <form
         onSubmit={onSubmit}
         className="flex items-center gap-2 w-full max-w-full overflow-hidden"
+        data-testid="chat-form"
       >
         <Input
           value={value}
@@ -136,8 +138,9 @@ export const ChatInput = ({
                 size="icon"
                 className="rounded-full"
                 onClick={handleImageClick}
+                aria-label="upload image"
               >
-                <Image className="w-5 h-5 text-medium-emphasis" />
+                <Image className="w-5 h-5 text-medium-emphasis" aria-hidden="true" />
               </Button>
 
               <input {...getAttachmentInputProps()} ref={attachmentInputRef} hidden />
@@ -147,8 +150,9 @@ export const ChatInput = ({
                 size="icon"
                 className="rounded-full"
                 onClick={handleAttachmentClick}
+                aria-label="attach file"
               >
-                <Paperclip className="w-5 h-5 text-medium-emphasis" />
+                <Paperclip className="w-5 h-5 text-medium-emphasis" aria-hidden="true" />
               </Button>
 
               <Button
@@ -157,15 +161,22 @@ export const ChatInput = ({
                 size="icon"
                 className="rounded-full"
                 onClick={onEmojiClick}
+                aria-label="open emoji picker"
               >
-                <Smile className="w-5 h-5 text-medium-emphasis" />
+                <Smile className="w-5 h-5 text-medium-emphasis" aria-hidden="true" />
               </Button>
             </>
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" className="rounded-full">
-                  <CirclePlus className="w-5 h-5 text-medium-emphasis" />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="more options"
+                >
+                  <CirclePlus className="w-5 h-5 text-medium-emphasis" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="min-w-40" align="end">
@@ -185,8 +196,14 @@ export const ChatInput = ({
             </DropdownMenu>
           )}
           <Separator orientation="vertical" className="h-5" />
-          <Button type="submit" variant="ghost" size="icon" className="rounded-full">
-            <Send className="w-5 h-5 text-medium-emphasis" />
+          <Button 
+            type="submit" 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full"
+            aria-label="send message"
+          >
+            <Send className="w-5 h-5 text-medium-emphasis" aria-hidden="true" />
           </Button>
         </div>
 

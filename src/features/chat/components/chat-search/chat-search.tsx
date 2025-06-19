@@ -66,7 +66,9 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
         className={`relative flex items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 ${isFocused ? 'border-primary' : 'border-muted'}`}
         onClick={() => inputRef.current?.focus()}
       >
-        <Label className="text-medium-emphasis mr-2">To:</Label>
+        <Label className="text-medium-emphasis mr-2" htmlFor="chat-search-to">
+          To:
+        </Label>
         <div className="flex items-center flex-wrap gap-2 flex-1">
           {selectedUsers.map((user) => (
             <div
@@ -94,6 +96,7 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
           <div className="flex-1">
             <Input
               ref={inputRef}
+              id="chat-search-to"
               className="border-0 rounded-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0 w-full min-w-[100px] shadow-none"
               placeholder={selectedUsers.length === 0 ? t('ENTER_NAME_EMAIL_GROUP') : ''}
               value={searchValue}

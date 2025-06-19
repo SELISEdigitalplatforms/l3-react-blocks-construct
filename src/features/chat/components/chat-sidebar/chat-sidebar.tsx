@@ -95,7 +95,13 @@ export const ChatSidebar = ({
           )}
         </div>
         {!isCollapsed && (
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={onEditClick}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={onEditClick}
+            data-testid="edit-btn"
+          >
             <Edit className="w-5 h-5" />
           </Button>
         )}
@@ -134,7 +140,7 @@ export const ChatSidebar = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-40" align="end">
-                  <DropdownMenuItem onClick={onDiscardClick}>
+                  <DropdownMenuItem onClick={onDiscardClick} data-testid="discard-btn">
                     <Trash2 className="w-4 h-4 mr-2" />
                     {t('DISCARD')}
                   </DropdownMenuItem>

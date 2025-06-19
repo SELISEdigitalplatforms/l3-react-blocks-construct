@@ -235,7 +235,10 @@ export const ChatUsers = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="min-w-40" align="end">
-                <DropdownMenuItem onClick={() => onMuteToggle?.(contact.id)}>
+                <DropdownMenuItem
+                  onClick={() => onMuteToggle?.(contact.id)}
+                  data-testid="header-mute-btn"
+                >
                   {contact.status?.isMuted ? (
                     <Bell className="w-4 h-4 mr-2 text-medium-emphasis" />
                   ) : (
@@ -245,7 +248,10 @@ export const ChatUsers = ({
                     {contact.status?.isMuted ? t('UNMUTE_NOTIFICATIONS') : t('MUTE_NOTIFICATIONS')}
                   </span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDeleteContact?.(contact.id)}>
+                <DropdownMenuItem
+                  onClick={() => onDeleteContact?.(contact.id)}
+                  data-testid="header-delete-btn"
+                >
                   <Trash className="w-4 h-4 mr-2 text-medium-emphasis" />
                   <span>{t('DELETE')}</span>
                 </DropdownMenuItem>
@@ -288,11 +294,17 @@ export const ChatUsers = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-40" align="end">
-                          <DropdownMenuItem onClick={() => handleOpenForwardModal(msg)}>
+                          <DropdownMenuItem
+                            onClick={() => handleOpenForwardModal(msg)}
+                            data-testid={`msg-${msg.id}-forward-btn`}
+                          >
                             <Reply className="w-4 h-4 mr-2" />
                             {t('FORWARD')}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteMessage(msg.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteMessage(msg.id)}
+                            data-testid={`msg-${msg.id}-delete-btn`}
+                          >
                             <Trash className="w-4 h-4 mr-2" />
                             {t('DELETE')}
                           </DropdownMenuItem>
@@ -461,11 +473,17 @@ export const ChatUsers = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-40" align="end">
-                          <DropdownMenuItem onClick={() => handleOpenForwardModal(msg)}>
+                          <DropdownMenuItem
+                            onClick={() => handleOpenForwardModal(msg)}
+                            data-testid={`msg-${msg.id}-forward-btn`}
+                          >
                             <Reply className="w-4 h-4 mr-2" />
                             {t('FORWARD')}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteMessage(msg.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteMessage(msg.id)}
+                            data-testid={`msg-${msg.id}-delete-btn`}
+                          >
                             <Trash className="w-4 h-4 mr-2" />
                             {t('DELETE')}
                           </DropdownMenuItem>

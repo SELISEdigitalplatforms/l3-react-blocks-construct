@@ -167,6 +167,7 @@ export function ChatProfile({
               size="icon"
               className="rounded-full"
               onClick={() => setIsEditGroupNameOpen(true)}
+              data-testid="edit-group-name-btn"
             >
               <Pen className="w-4 h-4 text-primary" />
             </Button>
@@ -231,6 +232,7 @@ export function ChatProfile({
                           size="icon"
                           className="rounded-full"
                           onClick={() => handleDeleteMember(member.id, member.name)}
+                          data-testid={`delete-member-btn-${member.id}`}
                         >
                           <Trash className="w-5 h-5 text-medium-emphasis" />
                         </Button>
