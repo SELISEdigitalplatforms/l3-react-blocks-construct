@@ -105,7 +105,8 @@ describe('ChatUsers', () => {
   it('toggles profile panel', () => {
     render(<ChatUsers contact={baseContact} />);
     const infoBtn = screen.getAllByRole('button').find((btn) => btn.querySelector('svg'));
-    fireEvent.click(infoBtn!);
+    if (!infoBtn) throw new Error('Info button not found');
+    fireEvent.click(infoBtn);
     expect(screen.getByTestId('chat-profile')).toBeInTheDocument();
   });
 
