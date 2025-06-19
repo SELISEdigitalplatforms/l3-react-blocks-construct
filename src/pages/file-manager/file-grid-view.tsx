@@ -1,171 +1,635 @@
-import { useEffect } from 'react';
-import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { AddColumnDialog } from 'features/task-manager/components/card-view/add-column-dialog';
-import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
-import { AddTaskDialog } from 'features/task-manager/components/card-view/add-task-dialog';
-import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
-import { Dialog } from 'components/ui/dialog';
-import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
-import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
-import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Folder, MoreVertical } from 'lucide-react';
+import { getFileTypeIcon } from 'features/file-manager/utils/file-manager';
 
-/**
- * TaskCardView Component
- *
- * A card-based (Kanban-style) task board for managing tasks within draggable columns.
- * Built using `@dnd-kit/core` for drag-and-drop and internal task management
- * via the `useCardTasks` hook. Supports adaptive drag sensitivity based on device.
- *
- * Features:
- * - Drag-and-drop columns and tasks
- * - Touch & mouse sensor adaptation using `useDeviceCapabilities`
- * - Inline task and column creation
- * - Modal support for task details
- * - External "Add Task" dialog support
- *
- * Props:
- * @param {any} task - (Unused) legacy prop
- * @param {any} taskService - Service for interacting with task details
- * @param {boolean} isNewTaskModalOpen - Controls visibility of the task details modal
- * @param {(isOpen: boolean) => void} setNewTaskModalOpen - Handler to toggle task modal state
- * @param {() => void} [onTaskAdded] - Optional callback triggered after task creation
- *
- * @returns {JSX.Element} A drag-and-drop-enabled Kanban board for tasks
- *
- * @example
- * <TaskCardView
- *   taskService={myTaskService}
- *   isNewTaskModalOpen={isModalOpen}
- *   setNewTaskModalOpen={setModalOpen}
- *   onTaskAdded={() => refreshTasks()}
- * />
- */
-
-interface TaskCardViewProps {
-  isNewTaskModalOpen?: boolean;
-  setNewTaskModalOpen: (isOpen: boolean) => void;
+export interface IFileData {
+  id: string;
+  name: string;
+  lastModified: string;
+  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  size: string;
+  isShared?: boolean;
 }
 
-export function TaskCardView({
-  isNewTaskModalOpen,
-  setNewTaskModalOpen,
-}: Readonly<TaskCardViewProps>) {
-  const { touchEnabled, screenSize } = useDeviceCapabilities();
+export const mockFiles: IFileData[] = [
+  {
+    id: '1',
+    name: 'Meeting Notes',
+    lastModified: '03.02.2025',
+    fileType: 'Folder',
+    size: '21.4 MB',
+  },
+  {
+    id: '2',
+    name: 'Research Data',
+    lastModified: '03.02.2025',
+    fileType: 'Folder',
+    size: '21.4 MB',
+  },
+  {
+    id: '3',
+    name: 'Client Documents',
+    lastModified: '03.02.2025',
+    fileType: 'Folder',
+    size: '21.4 MB',
+    isShared: true,
+  },
+  {
+    id: '4',
+    name: 'Project Files',
+    lastModified: '03.02.2025',
+    fileType: 'Folder',
+    size: '21.4 MB',
+  },
+  {
+    id: '5',
+    name: 'Design Assets',
+    lastModified: '03.02.2025',
+    fileType: 'Folder',
+    size: '21.4 MB',
+    isShared: true,
+  },
+  {
+    id: '6',
+    name: 'Project Documents.doc',
+    lastModified: '03.02.2025',
+    fileType: 'File',
+    size: '21.4 MB',
+  },
+  {
+    id: '7',
+    name: 'Sunset_View_Image.jpg',
+    lastModified: '03.02.2025',
+    fileType: 'Image',
+    size: '21.4 MB',
+  },
+  {
+    id: '8',
+    name: 'Chill Beats Mix.mp3',
+    lastModified: '03.02.2025',
+    fileType: 'Audio',
+    size: '21.4 MB',
+  },
+  {
+    id: '9',
+    name: 'Adventure_Video.mp4',
+    lastModified: '03.02.2025',
+    fileType: 'Video',
+    size: '21.4 MB',
+  },
+  {
+    id: '10',
+    name: 'Requirements.doc',
+    lastModified: '03.02.2025',
+    fileType: 'File',
+    size: '21.4 MB',
+    isShared: true,
+  },
+];
 
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: screenSize === 'tablet' ? 5 : 10,
-    },
-  });
+// Mock Button component
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  variant?: 'default' | 'ghost' | 'outline';
+  size?: 'default' | 'sm' | 'lg';
+  className?: string;
+  asChild?: boolean;
+}
 
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: screenSize === 'mobile' ? 250 : 150,
-      tolerance: screenSize === 'mobile' ? 5 : 3,
-    },
-  });
-
-  const dndSensors = useSensors(touchSensor, mouseSensor);
-
-  const {
-    columns,
-    activeColumn,
-    activeTask,
-    setActiveColumn,
-    addColumn,
-    renameColumn,
-    deleteColumn,
-    addTask,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-  } = useCardTasks();
-
-  useEffect(() => {
-    const handleSetActiveColumn = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      const columnId = customEvent.detail;
-      setActiveColumn(columnId);
-    };
-
-    document.addEventListener('setActiveColumn', handleSetActiveColumn);
-    return () => {
-      document.removeEventListener('setActiveColumn', handleSetActiveColumn);
-    };
-  }, [setActiveColumn]);
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = 'default',
+  size = 'default',
+  className = '',
+  onClick,
+  disabled,
+  ...props
+}) => {
+  const baseClasses =
+    'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background';
+  const variants = {
+    default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    ghost: 'hover:bg-accent hover:text-accent-foreground',
+    outline: 'border border-input hover:bg-accent hover:text-accent-foreground',
+  };
+  const sizes = {
+    default: 'h-10 py-2 px-4',
+    sm: 'h-9 px-3 rounded-md',
+    lg: 'h-11 px-8 rounded-md',
+  };
 
   return (
-    <div className="h-full w-full">
-      <DndContext
-        sensors={dndSensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-        autoScroll={{
-          threshold: {
-            x: 0.2,
-            y: 0.2,
-          },
-        }}
-        measuring={{
-          draggable: {
-            measure: (element) => element.getBoundingClientRect(),
-          },
-        }}
-      >
-        <div
-          className={`flex overflow-x-auto p-4 h-full ${touchEnabled ? 'touch-pan-x' : ''}`}
-          style={{
-            touchAction: touchEnabled ? 'pan-x' : 'auto',
-          }}
-        >
-          <div className="flex space-x-4 min-h-full">
-            {columns.map((column) => (
-              <TaskColumn
-                key={column.id}
-                column={column}
-                tasks={column.tasks || []}
-                setActiveColumn={setActiveColumn}
-                onAddTask={(columnId, content) => addTask(columnId, content)}
-                onRenameColumn={(columnId, newTitle) => renameColumn(columnId, newTitle)}
-                onDeleteColumn={(columnId) => deleteColumn(columnId)}
-              />
-            ))}
-
-            <div className="flex items-start pt-10 px-2">
-              <AddColumnDialog onAddColumn={(title) => addColumn(title)} />
-            </div>
-          </div>
-        </div>
-
-        <DragOverlay>{activeTask && <TaskDragOverlay activeTask={activeTask} />}</DragOverlay>
-      </DndContext>
-
-      <AddTaskDialog
-        activeColumn={activeColumn}
-        columns={columns}
-        onAddTask={(columnId, content) => addTask(columnId, content)}
-      />
-
-      <Dialog open={isNewTaskModalOpen} onOpenChange={setNewTaskModalOpen}>
-        {isNewTaskModalOpen && (
-          <TaskDetailsView
-            onClose={() => setNewTaskModalOpen(false)}
-            isNewTaskModalOpen={isNewTaskModalOpen}
-          />
-        )}
-      </Dialog>
-    </div>
+    <button
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+      {...props}
+    >
+      {children}
+    </button>
   );
+};
+
+// Hook interfaces and implementations
+interface QueryParams {
+  page: number;
+  pageSize: number;
+  filter: {
+    name: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
 }
 
-export default TaskCardView;
+interface QueryResult {
+  data: IFileData[];
+  totalCount: number;
+}
+
+const useMockFilesQuery = (
+  params: QueryParams
+): { data: QueryResult | null; isLoading: boolean; error: null } => {
+  const [data, setData] = useState<QueryResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      try {
+        let filteredData = [...mockFiles];
+
+        if (params.filter.name) {
+          filteredData = filteredData.filter((file) =>
+            file.name.toLowerCase().includes(params.filter.name.toLowerCase())
+          );
+        }
+
+        if (params.filter.fileType) {
+          filteredData = filteredData.filter((file) => file.fileType === params.filter.fileType);
+        }
+
+        const startIndex = params.page * params.pageSize;
+        const endIndex = startIndex + params.pageSize;
+        const paginatedData = filteredData.slice(startIndex, endIndex);
+
+        setData({
+          data: paginatedData,
+          totalCount: filteredData.length,
+        });
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [params.page, params.pageSize, params.filter.name, params.filter.fileType]);
+
+  return { data, isLoading, error: null };
+};
+
+const useTranslation = (): { t: (key: string) => string } => ({
+  t: (key: string) => {
+    const translations: Record<string, string> = {
+      FOLDER: 'Folder(s)',
+      FILE: 'File(s)',
+      OPEN: 'Open',
+      VIEW_DETAILS: 'View Details',
+      DOWNLOAD: 'Download',
+      RENAME: 'Rename',
+      MOVE: 'Move',
+      COPY: 'Copy',
+      SHARE: 'Share',
+      DELETE: 'Delete',
+      NO_FILES_FOUND: 'No files found',
+      NO_FILES_MATCH_CRITERIA: 'No files match your search criteria',
+      NO_FILES_UPLOADED_YET: 'No files uploaded yet',
+      LOADING: 'Loading...',
+      LOAD_MORE: 'Load More',
+      ERROR_LOADING_FILES: 'Error loading files',
+      SHARED: 'Shared',
+    };
+    return translations[key] || key;
+  },
+});
+
+const useIsMobile = (): boolean => {
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+};
+
+// File card component props
+interface FileCardProps {
+  file: IFileData;
+  onViewDetails?: (file: IFileData) => void;
+  onDownload?: (file: IFileData) => void;
+  onShare?: (file: IFileData) => void;
+  onDelete?: (file: IFileData) => void;
+  onMove?: (file: IFileData) => void;
+  onCopy?: (file: IFileData) => void;
+  onOpen?: (file: IFileData) => void;
+  onRename?: (file: IFileData) => void;
+  t: (key: string) => string;
+}
+
+interface FileGridViewProps {
+  onViewDetails?: (file: IFileData) => void;
+  onDownload?: (file: IFileData) => void;
+  onShare?: (file: IFileData) => void;
+  onDelete?: (file: IFileData) => void;
+  onMove?: (file: IFileData) => void;
+  onCopy?: (file: IFileData) => void;
+  onOpen?: (file: IFileData) => void;
+  onRename?: (file: IFileData) => void;
+  searchQuery?: string;
+  filters?: {
+    name: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+}
+
+const getFileTypeInfo = (fileType: string) => {
+  const config: Record<
+    string,
+    { iconColor: string; backgroundColor: string; borderColor: string }
+  > = {
+    Folder: {
+      iconColor: 'text-orange-500',
+      backgroundColor: 'bg-orange-50',
+      borderColor: 'border-orange-100',
+    },
+    File: {
+      iconColor: 'text-teal-500',
+      backgroundColor: 'bg-teal-50',
+      borderColor: 'border-teal-100',
+    },
+    Image: {
+      iconColor: 'text-red-500',
+      backgroundColor: 'bg-red-50',
+      borderColor: 'border-red-100',
+    },
+    Audio: {
+      iconColor: 'text-purple-500',
+      backgroundColor: 'bg-purple-50',
+      borderColor: 'border-purple-100',
+    },
+    Video: {
+      iconColor: 'text-blue-500',
+      backgroundColor: 'bg-blue-50',
+      borderColor: 'border-blue-100',
+    },
+  };
+
+  return config[fileType] || config.File;
+};
+
+const FileCard: React.FC<FileCardProps> = ({
+  file,
+  onViewDetails,
+  onDownload,
+  onShare,
+  onDelete,
+  onMove,
+  onCopy,
+  onOpen,
+  onRename,
+  t,
+}) => {
+  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const IconComponent = getFileTypeIcon(file.fileType);
+  const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (file.fileType === 'Folder') {
+      onOpen?.(file);
+    } else {
+      onViewDetails?.(file);
+    }
+  };
+
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(!showMenu);
+  };
+
+  return (
+    <div
+      className="group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+      onClick={handleCardClick}
+    >
+      {/* Card Content */}
+      <div
+        className={`${file.fileType === 'Folder' ? 'p-3 flex items-center space-x-3' : 'p-6 flex flex-col items-center text-center space-y-4'}`}
+      >
+        {/* File Icon */}
+        <div
+          className={`${file.fileType === 'Folder' ? 'w-8 h-8' : 'w-16 h-16'} flex items-center ${file.fileType === 'Folder' ? `${backgroundColor}` : ''}  justify-center`}
+        >
+          <IconComponent
+            className={`${file.fileType === 'Folder' ? 'w-5 h-5' : 'w-8 h-8'} ${iconColor}`}
+          />
+        </div>
+
+        {/* File Name and Action Button */}
+        <div className={`${file.fileType === 'Folder' ? 'flex-1' : 'w-full'}`}>
+          {file.fileType === 'Folder' ? (
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+                {file.name}
+              </h3>
+              <button
+                className="p-1 rounded-md hover:bg-gray-100 transition-colors ml-2"
+                onClick={handleMenuClick}
+              >
+                <MoreVertical className="h-4 w-4 text-gray-500" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between space-x-2 mt-2">
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${backgroundColor}`}
+                >
+                  <IconComponent className={`w-4 h-4 ${iconColor}`} />
+                </div>
+                <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+                  {file.name}
+                </h3>
+              </div>
+              <button
+                className="p-1 rounded-md hover:bg-gray-100 transition-colors flex-shrink-0"
+                onClick={handleMenuClick}
+              >
+                <MoreVertical className="h-4 w-4 text-gray-500" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dropdown Menu */}
+      {showMenu && (
+        <div className="absolute top-full right-2 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+          <div className="py-1">
+            {file.fileType === 'Folder' ? (
+              <button
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  onOpen?.(file);
+                  setShowMenu(false);
+                }}
+              >
+                {t('OPEN')}
+              </button>
+            ) : (
+              <button
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  onViewDetails?.(file);
+                  setShowMenu(false);
+                }}
+              >
+                {t('VIEW_DETAILS')}
+              </button>
+            )}
+            <button
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => {
+                onDownload?.(file);
+                setShowMenu(false);
+              }}
+            >
+              {t('DOWNLOAD')}
+            </button>
+            <button
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => {
+                onRename?.(file);
+                setShowMenu(false);
+              }}
+            >
+              {t('RENAME')}
+            </button>
+            <button
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => {
+                onMove?.(file);
+                setShowMenu(false);
+              }}
+            >
+              {t('MOVE')}
+            </button>
+            <button
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => {
+                onCopy?.(file);
+                setShowMenu(false);
+              }}
+            >
+              {t('COPY')}
+            </button>
+            <button
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => {
+                onShare?.(file);
+                setShowMenu(false);
+              }}
+            >
+              {t('SHARE')}
+            </button>
+            <button
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              onClick={() => {
+                onDelete?.(file);
+                setShowMenu(false);
+              }}
+            >
+              {t('DELETE')}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const FileGridView: React.FC<FileGridViewProps> = ({
+  onViewDetails,
+  onDownload,
+  onShare,
+  onDelete,
+  onMove,
+  onCopy,
+  onOpen,
+  onRename,
+  searchQuery = '',
+  filters = { name: '', fileType: undefined },
+}) => {
+  const { t } = useTranslation();
+  const isMobile = useIsMobile();
+
+  const [paginationState, setPaginationState] = useState({
+    pageIndex: 0,
+    pageSize: isMobile ? 20 : 50,
+    totalCount: 0,
+  });
+
+  const queryParams = {
+    page: paginationState.pageIndex,
+    pageSize: paginationState.pageSize,
+    filter: {
+      ...filters,
+      name: searchQuery || filters.name,
+    },
+  };
+
+  const { data, isLoading, error } = useMockFilesQuery(queryParams);
+
+  useEffect(() => {
+    if (data?.totalCount !== undefined) {
+      setPaginationState((prev) => ({
+        ...prev,
+        totalCount: data.totalCount,
+      }));
+    }
+  }, [data?.totalCount]);
+
+  useEffect(() => {
+    setPaginationState((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  }, [searchQuery, filters]);
+
+  const handleLoadMore = useCallback(() => {
+    if (data && data.data.length < data.totalCount) {
+      setPaginationState((prev) => ({
+        ...prev,
+        pageIndex: prev.pageIndex + 1,
+      }));
+    }
+  }, [data]);
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">{t('ERROR_LOADING_FILES')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading && !data?.data?.length) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">{t('LOADING')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const files = data?.data || [];
+  const folders = files.filter((file) => file.fileType === 'Folder');
+  const regularFiles = files.filter((file) => file.fileType !== 'Folder');
+
+  return (
+    <div className="">
+      <div className="space-y-8">
+        {/* Folders Section */}
+        {folders.length > 0 && (
+          <div>
+            <h2 className="text-sm font-medium text-gray-600 mb-4  py-2 rounded">{t('FOLDER')}</h2>
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+              {folders.map((file) => (
+                <FileCard
+                  key={file.id}
+                  file={file}
+                  onViewDetails={onViewDetails}
+                  onDownload={onDownload}
+                  onShare={onShare}
+                  onDelete={onDelete}
+                  onMove={onMove}
+                  onCopy={onCopy}
+                  onOpen={onOpen}
+                  onRename={onRename}
+                  t={t}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Files Section */}
+        {regularFiles.length > 0 && (
+          <div>
+            <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+              {regularFiles.map((file) => (
+                <FileCard
+                  key={file.id}
+                  file={file}
+                  onViewDetails={onViewDetails}
+                  onDownload={onDownload}
+                  onShare={onShare}
+                  onDelete={onDelete}
+                  onMove={onMove}
+                  onCopy={onCopy}
+                  onOpen={onOpen}
+                  onRename={onRename}
+                  t={t}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {files.length === 0 && !isLoading && (
+          <div className="flex flex-col items-center justify-center p-12 text-center">
+            <Folder className="h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('NO_FILES_FOUND')}</h3>
+            <p className="text-gray-500 max-w-sm">
+              {searchQuery || filters.name || filters.fileType
+                ? t('NO_FILES_MATCH_CRITERIA')
+                : t('NO_FILES_UPLOADED_YET')}
+            </p>
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {data && data.data.length < data.totalCount && (
+          <div className="flex justify-center pt-6">
+            <Button
+              onClick={handleLoadMore}
+              variant="outline"
+              disabled={isLoading}
+              className="min-w-32"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                  {t('LOADING')}
+                </div>
+              ) : (
+                t('LOAD_MORE')
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default FileGridView;
