@@ -40,6 +40,7 @@ import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { InvoiceLayout } from './pages/invoices/invoice-layout';
 import { CreateInvoice, EditInvoice } from './features/invoices';
+import { ChatPage } from './pages/chat/chat';
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,7 @@ function AppContent() {
                 <Route path="/services/storage" element={<Storage />} />
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
+                <Route path="/chat" element={<ChatPage />} />
                 <Route element={<InvoiceLayout />}>
                   <Route path="/invoices" element={<InvoicesPage />} />
                   <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
