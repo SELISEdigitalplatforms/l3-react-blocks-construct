@@ -90,8 +90,8 @@ describe('ChatSidebar', () => {
     render(
       <ChatSidebar contacts={contacts} onEditClick={jest.fn()} onContactSelect={onContactSelect} />
     );
-    // Click Alice's contact item (button is rendered by ChatContactItem)
-    fireEvent.click(screen.getAllByRole('button')[1]);
+    // Click Alice's contact item using data-testid
+    fireEvent.click(screen.getByTestId('chat-contact-item-btn-1'));
     expect(onContactSelect).toHaveBeenCalled();
   });
 

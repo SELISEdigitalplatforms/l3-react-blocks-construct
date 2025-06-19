@@ -386,7 +386,7 @@ export const ChatUsers = ({
                   <div className="relative mr-3">
                     <Avatar className="w-6 h-6 bg-neutral-100">
                       <AvatarImage src={contact.avatarSrc} alt={contact.name} />
-                      <AvatarFallback className="text-primary">
+                      <AvatarFallback className="text-primary text-[10px] md:text-sm">
                         {contact.avatarFallback}
                       </AvatarFallback>
                     </Avatar>

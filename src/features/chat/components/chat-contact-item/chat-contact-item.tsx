@@ -176,20 +176,18 @@ export const ChatContactItem = ({
   if (isCollapsed) {
     return (
       <button
+        type="button"
         className={cn(
           'group relative flex flex-col items-center w-full p-3 text-center hover:bg-gray-50 transition-colors',
           isSelected && 'bg-primary-50',
           className
         )}
+        onClick={handleClick}
+        aria-label={`Open chat with ${name}`}
+        data-testid={`chat-contact-item-btn-${id}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <button
-          type="button"
-          className="w-full h-full absolute inset-0"
-          onClick={handleClick}
-          aria-label={`Open chat with ${name}`}
-        />
         <div className="relative mb-1">{renderAvatar()}</div>
         <span className="text-xs font-medium text-high-emphasis truncate w-full">{name}</span>
       </button>
@@ -197,23 +195,20 @@ export const ChatContactItem = ({
   }
 
   return (
-    <div
+    <button
+      type="button"
       className={cn(
         'group relative flex items-center w-full p-4 text-left hover:bg-gray-50 transition-colors',
         isSelected && 'bg-primary-50',
         className
       )}
+      onClick={handleClick}
+      aria-label={`Open chat with ${name}`}
+      data-testid={`chat-contact-item-btn-${id}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <button
-        type="button"
-        className="absolute inset-0 w-full h-full"
-        onClick={handleClick}
-        aria-label={`Open chat with ${name}`}
-      />
       <div className="relative mr-3 flex-shrink-0">{renderAvatar()}</div>
-
       <div className="flex flex-col min-w-0 flex-1">
         <div className="flex items-center justify-between w-full">
           <p
@@ -224,7 +219,6 @@ export const ChatContactItem = ({
           >
             {name}
           </p>
-
           <div className="relative h-4 w-16 flex items-center justify-end">
             <span
               className={cn(
@@ -247,8 +241,7 @@ export const ChatContactItem = ({
           </p>
         </div>
       </div>
-
       <div className="absolute right-4 bottom-4 h-full flex items-center">{renderDropdown()}</div>
-    </div>
+    </button>
   );
 };
