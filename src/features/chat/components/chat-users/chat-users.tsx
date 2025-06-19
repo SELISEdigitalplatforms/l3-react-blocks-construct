@@ -39,6 +39,25 @@ interface ChatUsersProps {
   onOpenProfileSheet?: () => void;
 }
 
+const ChatUserAvatar = ({ contact }: { contact: any }) => {
+  if (contact.status?.isMuted) {
+    return <BellOff className="w-5 h-5 text-low-emphasis" />;
+  }
+  if (contact.status?.isGroup) {
+    return <Users className="w-5 h-5 text-secondary" />;
+  }
+  if (contact.avatarSrc) {
+    return (
+      <img
+        src={contact.avatarSrc}
+        alt={contact.name}
+        className="w-full h-full rounded-full object-cover"
+      />
+    );
+  }
+  return <span className="text-xs font-medium text-medium-emphasis">{contact.avatarFallback}</span>;
+};
+
 export const ChatUsers = ({
   contact: initialContact,
   onContactNameUpdate,
@@ -64,7 +83,7 @@ export const ChatUsers = ({
 
     try {
       if (onContactNameUpdate) {
-        await onContactNameUpdate(contact.id, newName);
+        onContactNameUpdate(contact.id, newName);
         setContact((prev) => ({
           ...prev,
           name: newName,
@@ -176,21 +195,7 @@ export const ChatUsers = ({
                   contact.status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
                 )}
               >
-                {contact.status?.isMuted ? (
-                  <BellOff className="w-5 h-5 text-low-emphasis" />
-                ) : contact.status?.isGroup ? (
-                  <Users className="w-5 h-5 text-secondary" />
-                ) : contact.avatarSrc ? (
-                  <img
-                    src={contact.avatarSrc}
-                    alt={contact.name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="text-xs font-medium text-medium-emphasis">
-                    {contact.avatarFallback}
-                  </span>
-                )}
+                <ChatUserAvatar contact={contact} />
               </div>
               {contact.status?.isOnline && (
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-success rounded-full border-2 border-white" />

@@ -62,12 +62,12 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
 
   return (
     <div className="relative" ref={containerRef}>
-      <div
-        className={`relative flex items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 ${isFocused ? 'border-primary' : 'border-muted'}`}
+      <button
+        className={`relative flex w-full items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 ${isFocused ? 'border-primary' : 'border-muted'}`}
         onClick={() => inputRef.current?.focus()}
       >
         <Label className="text-medium-emphasis mr-2" htmlFor="chat-search-to">
-          To:
+          {t('LABEL_TO')}:
         </Label>
         <div className="flex items-center flex-wrap gap-2 flex-1">
           {selectedUsers.map((user) => (
@@ -129,15 +129,15 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
             <X className="h-5 w-5" />
           </button>
         )}
-      </div>
+      </button>
 
       {isDropdownOpen && (
         <div className="suggestions-dropdown absolute z-50 w-full mt-1 bg-popover text-popover-foreground shadow-lg rounded-md border">
           <ScrollArea className="max-h-60 overflow-auto">
             {filteredContacts.map((contact) => (
-              <div
+              <button
                 key={contact.id}
-                className="flex items-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                className="flex w-full items-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -151,11 +151,11 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
                   {contact.avatarSrc && <AvatarImage src={contact.avatarSrc} alt={contact.name} />}
                   <AvatarFallback>{contact.avatarFallback}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">{contact.name}</div>
-                  <div className="text-xs text-muted-foreground truncate">{contact.email}</div>
+                <div className="flex flex-col ml-2">
+                  <p className="text-sm text-left font-medium truncate">{contact.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{contact.email}</p>
                 </div>
-              </div>
+              </button>
             ))}
             {filteredContacts.length === 0 && (
               <div className="p-2 text-low-emphasis text-center">No contacts found</div>

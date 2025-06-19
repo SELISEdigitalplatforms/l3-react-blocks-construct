@@ -116,27 +116,20 @@ export const Chat = () => {
     }
   };
 
+  const removeMemberFromContact = (contact: any, memberId: string) => ({
+    ...contact,
+    members: contact.members?.filter((member: any) => member.id !== memberId) || [],
+  });
+
   const handleDeleteMember = (contactId: string, memberId: string) => {
     setContacts((prevContacts) =>
       prevContacts.map((contact) =>
-        contact.id === contactId
-          ? {
-              ...contact,
-              members: contact.members?.filter((member) => member.id !== memberId) || [],
-            }
-          : contact
+        contact.id === contactId ? removeMemberFromContact(contact, memberId) : contact
       )
     );
 
     if (selectedContact?.id === contactId) {
-      setSelectedContact((prev) =>
-        prev
-          ? {
-              ...prev,
-              members: prev.members?.filter((member) => member.id !== memberId) || [],
-            }
-          : null
-      );
+      setSelectedContact((prev) => (prev ? removeMemberFromContact(prev, memberId) : null));
     }
   };
 

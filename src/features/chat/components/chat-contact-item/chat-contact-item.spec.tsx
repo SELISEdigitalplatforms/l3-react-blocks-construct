@@ -65,9 +65,9 @@ jest.mock('components/ui/dropdown-menu', () => ({
     onClick?: (e: React.MouseEvent) => void;
     [key: string]: any;
   }) => (
-    <div data-testid="dropdown-trigger" onClick={onClick} {...props}>
+    <button type="button" data-testid="dropdown-trigger" onClick={onClick} {...props}>
       {children}
-    </div>
+    </button>
   ),
   DropdownMenuContent: ({
     children,
@@ -91,7 +91,8 @@ jest.mock('components/ui/dropdown-menu', () => ({
     className?: string;
     [key: string]: any;
   }) => (
-    <div
+    <button
+      type="button"
       data-testid="dropdown-menu-item"
       className={className}
       onClick={(e) => {
@@ -102,7 +103,7 @@ jest.mock('components/ui/dropdown-menu', () => ({
       {...props}
     >
       {children}
-    </div>
+    </button>
   ),
 }));
 
@@ -186,7 +187,7 @@ describe('ChatContactItem', () => {
 
     // Test each menu item action by key
     for (const menuItem of menuItems) {
-      const text = menuItem.textContent || '';
+      const text = menuItem.textContent ?? '';
       if (text.includes('MARK_AS_READ')) {
         await userEvent.click(menuItem);
         expect(onMarkAsRead).toHaveBeenCalledWith(baseContact.id);

@@ -79,7 +79,7 @@ export function ForwardMessage({
                   {message?.content && (
                     <div className="text-xs text-high-emphasis">{message.content}</div>
                   )}
-                  {message?.attachment && message.attachment.type.startsWith('image/') && (
+                  {message?.attachment?.type?.startsWith('image/') && (
                     <div className="w-full h-40">
                       <img
                         src={message.attachment.url}

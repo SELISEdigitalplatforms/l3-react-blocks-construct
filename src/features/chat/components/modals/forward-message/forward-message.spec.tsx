@@ -36,12 +36,8 @@ jest.mock('components/ui/textarea', () => ({
 
 jest.mock('components/ui/avatar', () => ({
   Avatar: ({ children }: any) => <div>{children}</div>,
-  AvatarImage: (props: any) => <img {...props} />,
+  AvatarImage: (props: any) => <img {...props} alt="profile" />,
   AvatarFallback: (props: any) => <span {...props} />,
-}));
-
-jest.mock('components/ui/label', () => ({
-  Label: (props: any) => <label {...props} />,
 }));
 
 import { ForwardMessage } from './forward-message';
