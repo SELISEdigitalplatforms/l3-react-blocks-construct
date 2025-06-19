@@ -28,7 +28,7 @@ const TableToolbar = ({
   }) => void;
   columns: any[];
 }) => {
-  return <FileTableToolbar table={table} onSearch={onSearch} columns={columns} />;
+  return <FileTableToolbar onSearch={onSearch} table={table} columns={columns} />;
 };
 
 const FileListView: React.FC = () => {

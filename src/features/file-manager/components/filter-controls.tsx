@@ -3,7 +3,7 @@ import { Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DataTableFacetedFilter } from 'components/blocks/data-table/data-table-faceted-filter';
 import { DateRangeFilter } from 'components/blocks/data-table/data-table-date-filter';
-import { getMfaEnabledOptions, getStatusOptions } from './iam-table-filter-data';
+import { getFileTypeFilters } from './file-manager-filter-data';
 import { DateRange } from 'react-day-picker';
 
 /**
@@ -45,69 +45,50 @@ interface FilterControlsProps<TData> {
   isMobile?: boolean;
   dateRangeCreate?: DateRange;
   dateRangeLastLogin?: DateRange;
+  dateRangeLastModified?: DateRange;
   onDateRangeCreateChange?: (date: DateRange | undefined) => void;
   onDateRangeLastLoginChange?: (date: DateRange | undefined) => void;
+  onDateRangeLastModifiedChange?: (date: DateRange | undefined) => void;
 }
 
 export function FilterControls<TData>({
   table,
   isMobile = false,
-  dateRangeCreate,
-  dateRangeLastLogin,
-  onDateRangeCreateChange = () => {},
-  onDateRangeLastLoginChange = () => {},
+
+  dateRangeLastModified,
+
+  onDateRangeLastModifiedChange = () => {},
 }: Readonly<FilterControlsProps<TData>>) {
   const { t } = useTranslation();
+
   const getFilterColumn = (columnId: string) => {
-    return table.getAllFlatColumns().find((col) => col.id === columnId);
+    return table.getAllFlatColumns().find((col: { id: string }) => col.id === columnId);
   };
 
   const containerClass = isMobile
     ? 'flex flex-col space-y-4'
     : 'flex flex-row flex-wrap items-center gap-1';
 
-  const activeColumn = getFilterColumn('active');
-  const mfaEnabledColumn = getFilterColumn('mfaEnabled');
-  const createdDateColumn = getFilterColumn('createdDate');
-  const lastLoggedInTimeColumn = getFilterColumn('lastLoggedInTime');
+  const fileTypeColumn = getFilterColumn('fileType');
+  const lastModifiedColumn = getFilterColumn('lastModified');
 
   return (
     <div className={containerClass}>
-      {activeColumn && (
-        <div className={isMobile ? 'w-full' : undefined}>
-          <DataTableFacetedFilter column={activeColumn} title={t('STATUS')} options={getStatusOptions(t)} />
-        </div>
+      {fileTypeColumn && (
+        <DataTableFacetedFilter
+          column={fileTypeColumn}
+          title={t('FILE_TYPE')}
+          options={getFileTypeFilters(t)}
+        />
       )}
 
-      {mfaEnabledColumn && (
-        <div className={isMobile ? 'w-full' : undefined}>
-          <DataTableFacetedFilter column={mfaEnabledColumn} title={t('MFA')} options={getMfaEnabledOptions(t)} />
-        </div>
-      )}
-
-      {createdDateColumn && (
-        <div className={isMobile ? 'w-full' : undefined}>
-          <DateRangeFilter
-            column={createdDateColumn}
-            title={t('JOINED_ON')}
-            date={dateRangeCreate}
-            onDateChange={onDateRangeCreateChange}
-          />
-        </div>
-      )}
-
-      {lastLoggedInTimeColumn && (
-        <div className={isMobile ? 'w-full' : undefined}>
-          <DateRangeFilter
-            column={lastLoggedInTimeColumn}
-            title={t('LAST_LOGIN')}
-            date={dateRangeLastLogin}
-            onDateChange={onDateRangeLastLoginChange}
-          />
-        </div>
+      {lastModifiedColumn && (
+        <DateRangeFilter
+          date={dateRangeLastModified}
+          onDateChange={onDateRangeLastModifiedChange}
+          title={'LAST_MODIFIED'}
+        />
       )}
     </div>
   );
 }
-
-export default FilterControls;

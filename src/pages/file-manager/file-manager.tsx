@@ -1,72 +1,8 @@
 /* eslint-disable no-console */
-// import { useState } from 'react';
-// import FileListView from './file-list-view';
-// import FileGridView from './file-grid-view';
-// import { TasksProvider } from 'features/task-manager/hooks/use-task-context';
-// import { TaskProvider } from 'features/task-manager/contexts/task-context';
-// import FileManagerToolbar from 'features/file-manager/components/file-manager-toolbar/file-manager-toolbar';
-
-// /**
-//  * FileManager Component
-//  *
-//  * A central task management component that enables users to view, add, and manage tasks.
-//  * Supports both list and board (card) views, and handles state for view modes and task data.
-//  *
-//  * Features:
-//  * - Board and list view modes for task visualization
-//  * - Integration with `TaskService` for task retrieval
-//  * - New task modal handling
-//  * - Toolbar for user interaction and view toggling
-//  * - Context providers for shared task state and logic
-//  *
-//  * @returns {JSX.Element} The FileManager UI with current tasks rendered in the selected view
-//  *
-//  * @example
-//  * // Usage in a route or page
-//  * <FileManager />
-//  */
-
-// export default function FileManager() {
-//   const [viewMode, setViewMode] = useState('list');
-
-//   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
-
-//   const onOpen = () => {
-//     setIsNewTaskModalOpen(true);
-//   };
-
-//   const handleViewMode = (view: string) => {
-//     setViewMode(view === 'list' ? 'list' : 'grid');
-//   };
-
-//   return (
-//     <TaskProvider>
-//       <TasksProvider>
-//         <div className="flex w-full flex-col">
-//           <div className="mb-4 whitespace-nowrap md:mb-8">
-//             <FileManagerToolbar
-//               viewMode={viewMode}
-//               handleViewMode={handleViewMode}
-//               onOpen={onOpen}
-//             />
-//           </div>
-
-//           {viewMode === 'grid' && (
-//             <FileGridView
-//               isNewTaskModalOpen={isNewTaskModalOpen}
-//               setNewTaskModalOpen={setIsNewTaskModalOpen}
-//             />
-//           )}
-//           {viewMode === 'list' && <FileListView />}
-//         </div>
-//       </TasksProvider>
-//     </TaskProvider>
-//   );
-// }
 
 import React, { useState, useCallback } from 'react';
 import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import FileManagerToolbar from 'features/file-manager/components/file-manager-toolbar/file-manager-toolbar';
+import FileManagerToolbar from 'features/file-manager/components/file-manager-toolbar';
 import FileGridView from './file-grid-view';
 import FileListView from './file-list-view';
 
@@ -100,45 +36,36 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     fileType: undefined,
   });
 
-  // File operation handlers
   const handleViewDetails = useCallback((file: IFileData) => {
     console.log('View details:', file);
-    // Implement view details logic
   }, []);
 
   const handleDownload = useCallback((file: IFileData) => {
     console.log('Download:', file);
-    // Implement download logic
   }, []);
 
   const handleShare = useCallback((file: IFileData) => {
     console.log('Share:', file);
-    // Implement share logic
   }, []);
 
   const handleDelete = useCallback((file: IFileData) => {
     console.log('Delete:', file);
-    // Implement delete logic
   }, []);
 
   const handleMove = useCallback((file: IFileData) => {
     console.log('Move:', file);
-    // Implement move logic
   }, []);
 
   const handleCopy = useCallback((file: IFileData) => {
     console.log('Copy:', file);
-    // Implement copy logic
   }, []);
 
   const handleOpen = useCallback((file: IFileData) => {
     console.log('Open:', file);
-    // Implement open logic (for folders)
   }, []);
 
   const handleRename = useCallback((file: IFileData) => {
     console.log('Rename:', file);
-    // Implement rename logic
   }, []);
 
   const handleViewModeChange = useCallback((mode: string) => {

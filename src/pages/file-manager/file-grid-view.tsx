@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
-import { FileTableRowActions } from 'features/file-manager/components/file-table-row-actions';
+import { FileTableRowActions } from 'features/file-manager/components/file-manager-row-actions';
 
 export const mockFiles: IFileData[] = mockFileData;
 
