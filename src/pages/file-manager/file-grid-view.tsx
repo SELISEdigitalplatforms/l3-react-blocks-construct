@@ -87,10 +87,10 @@ const FileCard: React.FC<FileCardProps> = ({
         className={`${file.fileType === 'Folder' ? 'p-3 flex items-center space-x-3' : 'p-6 flex flex-col items-center text-center space-y-4'}`}
       >
         <div
-          className={`${file.fileType === 'Folder' ? 'w-8 h-8' : 'w-16 h-16'} flex items-center ${file.fileType === 'Folder' ? `${backgroundColor}` : ''}  justify-center`}
+          className={`${file.fileType === 'Folder' ? 'w-8 h-8' : 'w-20 h-20'} flex items-center ${file.fileType === 'Folder' ? `${backgroundColor}` : ''}  justify-center`}
         >
           <IconComponent
-            className={`${file.fileType === 'Folder' ? 'w-5 h-5' : 'w-8 h-8'} ${iconColor}`}
+            className={`${file.fileType === 'Folder' ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor}`}
           />
         </div>
 
@@ -226,7 +226,7 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   const regularFiles = files.filter((file) => file.fileType !== 'Folder');
 
   return (
-    <div className="">
+    <div>
       <div className="space-y-8">
         {folders.length > 0 && (
           <div>
