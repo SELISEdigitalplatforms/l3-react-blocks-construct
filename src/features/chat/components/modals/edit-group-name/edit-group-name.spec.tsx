@@ -30,10 +30,6 @@ jest.mock('components/ui/input', () => ({
   Input: (props: any) => <input {...props} />,
 }));
 
-jest.mock('components/ui/label', () => ({
-  Label: (props: any) => <label {...props} />,
-}));
-
 import { EditGroupName } from './edit-group-name';
 
 describe('EditGroupName', () => {

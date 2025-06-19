@@ -82,31 +82,39 @@ export const ChatInput = ({
     dropdownAttachmentInputRef.current?.click();
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFilesFromInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       onFileUpload?.(Array.from(e.target.files));
     }
   };
 
-  const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      onFileUpload?.(Array.from(e.target.files));
-    }
-  };
+  const handleImageChange = handleFilesFromInput;
+  const handleAttachmentChange = handleFilesFromInput;
 
   return (
     <div className="flex-none border-t border-border px-4 py-3 bg-white">
       {selectedFiles.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
-          {selectedFiles.map((file, index) => (
-            <div key={index} className="flex items-center gap-2 bg-surface px-2 py-1 rounded-md">
+          {selectedFiles.map((file) => (
+            <div
+              key={file.name + file.size + file.lastModified}
+              className="flex items-center gap-2 bg-surface px-2 py-1 rounded-md"
+            >
               <span className="text-sm truncate max-w-[200px]">{file.name}</span>
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
                 className="h-4 w-4 p-0 rounded-full"
-                onClick={() => onRemoveFile(index)}
+                onClick={() => {
+                  const idx = selectedFiles.findIndex(
+                    (f) =>
+                      f.name === file.name &&
+                      f.size === file.size &&
+                      f.lastModified === file.lastModified
+                  );
+                  if (idx !== -1) onRemoveFile(idx);
+                }}
                 aria-label={`remove file ${file.name}`}
               >
                 <X className="w-3 h-3" aria-hidden="true" />
@@ -196,10 +204,10 @@ export const ChatInput = ({
             </DropdownMenu>
           )}
           <Separator orientation="vertical" className="h-5" />
-          <Button 
-            type="submit" 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            type="submit"
+            variant="ghost"
+            size="icon"
             className="rounded-full"
             aria-label="send message"
           >

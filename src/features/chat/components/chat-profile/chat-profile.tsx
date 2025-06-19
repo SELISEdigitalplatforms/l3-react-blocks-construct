@@ -127,6 +127,27 @@ export function ChatProfile({
     }
   };
 
+  const ProfileAvatar = ({ contact }: { contact: any }) => {
+    if (contact.status?.isMuted) {
+      return <BellOff className="w-8 h-8 text-low-emphasis" />;
+    }
+    if (contact.avatarSrc) {
+      return (
+        <img
+          src={contact.avatarSrc}
+          alt={contact.name}
+          className="w-full h-full rounded-full object-cover"
+        />
+      );
+    }
+    if (contact.status?.isGroup) {
+      return <Users className="w-8 h-8 text-secondary" />;
+    }
+    return (
+      <span className="text-2xl font-medium text-medium-emphasis">{contact.avatarFallback}</span>
+    );
+  };
+
   return (
     <div className="flex h-full w-full flex-col border-l border-border bg-white">
       <EditGroupName
@@ -143,21 +164,7 @@ export function ChatProfile({
             contact.status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
           )}
         >
-          {contact.status?.isMuted ? (
-            <BellOff className="w-8 h-8 text-low-emphasis" />
-          ) : contact.avatarSrc ? (
-            <img
-              src={contact.avatarSrc}
-              alt={contact.name}
-              className="w-full h-full rounded-full object-cover"
-            />
-          ) : contact.status?.isGroup ? (
-            <Users className="w-8 h-8 text-secondary" />
-          ) : (
-            <span className="text-2xl font-medium text-medium-emphasis">
-              {contact.avatarFallback}
-            </span>
-          )}
+          <ProfileAvatar contact={contact} />
         </div>
         <div className="flex items-center gap-2">
           <h3 className="font-bold text-lg text-high-emphasis">{contact.name}</h3>

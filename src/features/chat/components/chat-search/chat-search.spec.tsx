@@ -44,7 +44,7 @@ import { ChatSearch } from './chat-search';
 describe('ChatSearch', () => {
   it('renders input and label', () => {
     render(<ChatSearch />);
-    expect(screen.getByLabelText('To:')).toBeInTheDocument();
+    expect(screen.getByLabelText('LABEL_TO:')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('ENTER_NAME_EMAIL_GROUP')).toBeInTheDocument();
   });
 

@@ -55,7 +55,7 @@ export const ChatSidebar = ({
   const filteredContacts = contacts.filter(
     (contact) =>
       contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (contact.email && contact.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleContactClick = (contact: ChatContact) => {
