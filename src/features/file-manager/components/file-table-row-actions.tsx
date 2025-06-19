@@ -3,11 +3,11 @@ import { Row } from '@tanstack/react-table';
 import {
   MoreVertical,
   Download,
-  Users,
+  UserPlus,
   Trash2,
   Info,
-  Edit,
-  FolderOpen,
+  PencilLine,
+  FileInput,
   Copy,
   ExternalLink,
 } from 'lucide-react';
@@ -61,13 +61,13 @@ import { IFileData } from '../hooks/use-mock-files-query';
 interface FileTableRowActionsProps {
   row: Row<IFileData>;
   onViewDetails: (file: IFileData) => void;
-  onDownload: (file: IFileData) => void;
+  onDownload?: (file: IFileData) => void;
   onShare?: (file: IFileData) => void;
   onDelete?: (file: IFileData) => void;
   onCopy?: (file: IFileData) => void;
   onMove?: (file: IFileData) => void;
   onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void; // Added rename function
+  onRename?: (file: IFileData) => void;
 }
 
 export function FileTableRowActions({
@@ -136,7 +136,6 @@ export function FileTableRowActions({
           onClick={handleDropdownContentClick}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
-          {/* Open */}
           {canOpen && (
             <DropdownMenuItem onClick={() => handleItemClick(onOpen)}>
               <ExternalLink className="mr-2 h-4 w-4" />
@@ -144,15 +143,13 @@ export function FileTableRowActions({
             </DropdownMenuItem>
           )}
 
-          {/* Share */}
           {canShare && (
             <DropdownMenuItem onClick={() => handleItemClick(onShare)}>
-              <Users className="mr-2 h-4 w-4" />
+              <UserPlus className="mr-2 h-4 w-4" />
               {t('SHARE')}
             </DropdownMenuItem>
           )}
 
-          {/* Copy */}
           {canCopy && (
             <DropdownMenuItem onClick={() => handleItemClick(onCopy)}>
               <Copy className="mr-2 h-4 w-4" />
@@ -160,29 +157,25 @@ export function FileTableRowActions({
             </DropdownMenuItem>
           )}
 
-          {/* Move */}
           {canMove && (
             <DropdownMenuItem onClick={() => handleItemClick(onMove)}>
-              <FolderOpen className="mr-2 h-4 w-4" />
+              <FileInput className="mr-2 h-4 w-4" />
               {t('MOVE')}
             </DropdownMenuItem>
           )}
 
-          {/* Rename */}
           {canRename && (
             <DropdownMenuItem onClick={() => handleItemClick(onRename)}>
-              <Edit className="mr-2 h-4 w-4" />
+              <PencilLine className="mr-2 h-4 w-4" />
               {t('RENAME')}
             </DropdownMenuItem>
           )}
 
-          {/* View Details */}
           <DropdownMenuItem onClick={() => handleItemClick(onViewDetails)}>
             <Info className="mr-2 h-4 w-4" />
             {t('VIEW_DETAILS')}
           </DropdownMenuItem>
 
-          {/* Download - Now available for all file types */}
           {canDownload && (
             <DropdownMenuItem onClick={() => handleItemClick(onDownload)}>
               <Download className="mr-2 h-4 w-4" />
@@ -190,7 +183,6 @@ export function FileTableRowActions({
             </DropdownMenuItem>
           )}
 
-          {/* Remove/Delete */}
           {canDelete && (
             <DropdownMenuItem
               onClick={() => handleItemClick(onDelete)}

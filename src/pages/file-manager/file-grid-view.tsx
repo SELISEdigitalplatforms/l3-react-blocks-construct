@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Folder, MoreVertical } from 'lucide-react';
+import { Folder } from 'lucide-react';
 import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
 
 import {
@@ -10,6 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
+import { FileTableRowActions } from 'features/file-manager/components/file-table-row-actions';
 
 export const mockFiles: IFileData[] = mockFileData;
 
@@ -49,12 +51,9 @@ const FileCard: React.FC<FileCardProps> = ({
   onShare,
   onDelete,
   onMove,
-  onCopy,
   onOpen,
   onRename,
-  t,
 }) => {
-  const [showMenu, setShowMenu] = useState<boolean>(false);
   const IconComponent = getFileTypeIcon(file.fileType);
   const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
 
@@ -67,21 +66,26 @@ const FileCard: React.FC<FileCardProps> = ({
     }
   };
 
-  const handleMenuClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMenu(!showMenu);
-  };
+  const mockRow = {
+    original: file,
+    id: file.id.toString(),
+    index: 0,
+    getValue: () => {},
+    getVisibleCells: () => [],
+    getAllCells: () => [],
+    getLeftVisibleCells: () => [],
+    getRightVisibleCells: () => [],
+    getCenterVisibleCells: () => [],
+  } as any;
 
   return (
     <div
       className="group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
       onClick={handleCardClick}
     >
-      {/* Card Content */}
       <div
         className={`${file.fileType === 'Folder' ? 'p-3 flex items-center space-x-3' : 'p-6 flex flex-col items-center text-center space-y-4'}`}
       >
-        {/* File Icon */}
         <div
           className={`${file.fileType === 'Folder' ? 'w-8 h-8' : 'w-16 h-16'} flex items-center ${file.fileType === 'Folder' ? `${backgroundColor}` : ''}  justify-center`}
         >
@@ -90,19 +94,23 @@ const FileCard: React.FC<FileCardProps> = ({
           />
         </div>
 
-        {/* File Name and Action Button */}
         <div className={`${file.fileType === 'Folder' ? 'flex-1' : 'w-full'}`}>
           {file.fileType === 'Folder' ? (
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
                 {file.name}
               </h3>
-              <button
-                className="p-1 rounded-md hover:bg-gray-100 transition-colors ml-2"
-                onClick={handleMenuClick}
-              >
-                <MoreVertical className="h-4 w-4 text-gray-500" />
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <FileTableRowActions
+                  row={mockRow}
+                  onViewDetails={onViewDetails || (() => {})}
+                  onDownload={onDownload}
+                  onShare={onShare}
+                  onDelete={onDelete}
+                  onMove={onMove}
+                  onRename={onRename}
+                />
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-between space-x-2 mt-2">
@@ -116,99 +124,21 @@ const FileCard: React.FC<FileCardProps> = ({
                   {file.name}
                 </h3>
               </div>
-              <button
-                className="p-1 rounded-md hover:bg-gray-100 transition-colors flex-shrink-0"
-                onClick={handleMenuClick}
-              >
-                <MoreVertical className="h-4 w-4 text-gray-500" />
-              </button>
+              <div onClick={(e) => e.stopPropagation()}>
+                <FileTableRowActions
+                  row={mockRow}
+                  onViewDetails={onViewDetails || (() => {})}
+                  onDownload={onDownload}
+                  onShare={onShare}
+                  onDelete={onDelete}
+                  onMove={onMove}
+                  onRename={onRename}
+                />
+              </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* Dropdown Menu */}
-      {showMenu && (
-        <div className="absolute top-full right-2 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
-          <div className="py-1">
-            {file.fileType === 'Folder' ? (
-              <button
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={() => {
-                  onOpen?.(file);
-                  setShowMenu(false);
-                }}
-              >
-                {t('OPEN')}
-              </button>
-            ) : (
-              <button
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={() => {
-                  onViewDetails?.(file);
-                  setShowMenu(false);
-                }}
-              >
-                {t('VIEW_DETAILS')}
-              </button>
-            )}
-            <button
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                onDownload?.(file);
-                setShowMenu(false);
-              }}
-            >
-              {t('DOWNLOAD')}
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                onRename?.(file);
-                setShowMenu(false);
-              }}
-            >
-              {t('RENAME')}
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                onMove?.(file);
-                setShowMenu(false);
-              }}
-            >
-              {t('MOVE')}
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                onCopy?.(file);
-                setShowMenu(false);
-              }}
-            >
-              {t('COPY')}
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                onShare?.(file);
-                setShowMenu(false);
-              }}
-            >
-              {t('SHARE')}
-            </button>
-            <button
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-              onClick={() => {
-                onDelete?.(file);
-                setShowMenu(false);
-              }}
-            >
-              {t('DELETE')}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -298,7 +228,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   return (
     <div className="">
       <div className="space-y-8">
-        {/* Folders Section */}
         {folders.length > 0 && (
           <div>
             <h2 className="text-sm font-medium text-gray-600 mb-4  py-2 rounded">{t('FOLDER')}</h2>
@@ -322,7 +251,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
           </div>
         )}
 
-        {/* Files Section */}
         {regularFiles.length > 0 && (
           <div>
             <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
@@ -346,7 +274,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
           </div>
         )}
 
-        {/* Empty State */}
         {files.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <Folder className="h-12 w-12 text-gray-400 mb-4" />
@@ -359,7 +286,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
           </div>
         )}
 
-        {/* Load More Button */}
         {data && data.data.length < data.totalCount && (
           <div className="flex justify-center pt-6">
             <Button
