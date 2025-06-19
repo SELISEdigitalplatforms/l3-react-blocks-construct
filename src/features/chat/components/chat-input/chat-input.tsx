@@ -74,7 +74,6 @@ export const ChatInput = ({
     }, 100);
   };
 
-  // Separate handlers for dropdown menu
   const handleDropdownImageClick = () => {
     dropdownImageInputRef.current?.click();
   };

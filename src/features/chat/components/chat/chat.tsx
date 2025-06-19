@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, ArrowLeft } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { ChatStateContent } from '../chat-state-content/chat-state-content';
 import { ChatSidebar } from '../chat-sidebar/chat-sidebar';
@@ -7,15 +7,44 @@ import { ChatSearch } from '../chat-search/chat-search';
 import { ChatUsers } from '../chat-users/chat-users';
 import { ChatContact } from '../../types/chat.types';
 import { mockChatContacts } from '../../data/chat.data';
+import { useIsMobile } from 'hooks/use-media-query';
+import { Sheet, SheetContent } from 'components/ui/sheet';
+import { ChatProfile } from '../chat-profile/chat-profile';
 
 export const Chat = () => {
   const [showChatSearch, setShowChatSearch] = useState(false);
   const [selectedContact, setSelectedContact] = useState<ChatContact | null>(null);
   const [contacts, setContacts] = useState<ChatContact[]>(mockChatContacts);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showProfileSheet, setShowProfileSheet] = useState(false);
+  const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (isMobile && selectedContact) {
+      setMobileView('chat');
+    } else if (isMobile) {
+      setMobileView('list');
+    }
+  }, [selectedContact, isMobile]);
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+    if (isMobile) {
+      setMobileView(mobileView === 'list' ? 'chat' : 'list');
+    } else {
+      setIsSidebarCollapsed(!isSidebarCollapsed);
+    }
+  };
+
+  const handleContactSelect = (contact: ChatContact) => {
+    if (contact.status?.isUnread) {
+      handleMarkContactAsRead(contact.id);
+    }
+    setSelectedContact(contact);
+    setShowChatSearch(false);
+    if (isMobile) {
+      setMobileView('chat');
+    }
   };
 
   const handleContactNameUpdate = (contactId: string, newName: string) => {
@@ -72,10 +101,9 @@ export const Chat = () => {
     const contact = contacts.find((c) => c.id === contactId);
 
     if (contact) {
-      // Ensure status object exists and toggle isMuted
       const currentIsMuted = contact.status?.isMuted || false;
       updateContactStatus(contactId, {
-        ...contact.status, // Preserve other status properties
+        ...contact.status,
         isMuted: !currentIsMuted,
       });
     }
@@ -112,69 +140,166 @@ export const Chat = () => {
     }
   };
 
+  const handleBackToList = () => {
+    setMobileView('list');
+  };
+
+  const renderContent = () => {
+    if (!isMobile) {
+      return (
+        <>
+          <ChatSidebar
+            isCollapsed={isSidebarCollapsed}
+            contacts={contacts}
+            selectedContactId={selectedContact?.id}
+            onEditClick={() => setShowChatSearch(true)}
+            isSearchActive={showChatSearch}
+            onDiscardClick={() => setShowChatSearch(false)}
+            onContactSelect={handleContactSelect}
+            onMarkAsRead={handleMarkContactAsRead}
+            onMarkAsUnread={handleMarkContactAsUnread}
+            onMuteToggle={handleMuteToggle}
+            onDeleteContact={handleDeleteContact}
+          />
+          <div
+            className={`flex flex-col w-full ${!selectedContact ? 'h-full' : 'h-[calc(100dvh-118px)]'}`}
+          >
+            <ChatHeader
+              selectedContact={selectedContact}
+              onMenuClick={toggleSidebar}
+              showBackButton={false}
+            />
+            <div className="flex flex-col w-full h-full">{renderMainContent()}</div>
+          </div>
+        </>
+      );
+    }
+
+    if (mobileView === 'list') {
+      return (
+        <div className="w-full h-full">
+          <ChatSidebar
+            isCollapsed={false}
+            contacts={contacts}
+            selectedContactId={selectedContact?.id}
+            onEditClick={() => setShowChatSearch(true)}
+            isSearchActive={showChatSearch}
+            onDiscardClick={() => setShowChatSearch(false)}
+            onContactSelect={handleContactSelect}
+            onMarkAsRead={handleMarkContactAsRead}
+            onMarkAsUnread={handleMarkContactAsUnread}
+            onMuteToggle={handleMuteToggle}
+            onDeleteContact={handleDeleteContact}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col w-full h-full">
+        <ChatHeader
+          selectedContact={selectedContact}
+          onMenuClick={handleBackToList}
+          showBackButton={true}
+        />
+        <div className="flex-1 overflow-y-auto">
+          {selectedContact && (
+            <ChatUsers
+              contact={selectedContact}
+              onContactNameUpdate={handleContactNameUpdate}
+              onMuteToggle={handleMuteToggle}
+              onDeleteContact={handleDeleteContact}
+              onDeleteMember={handleDeleteMember}
+              hideProfile={isMobile}
+              onOpenProfileSheet={isMobile ? () => setShowProfileSheet(true) : undefined}
+            />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMainContent = () => {
+    if (showChatSearch) {
+      return (
+        <ChatSearch
+          onClose={() => setShowChatSearch(false)}
+          onSelectContact={handleContactSelect}
+        />
+      );
+    }
+
+    if (selectedContact) {
+      return (
+        <ChatUsers
+          contact={selectedContact}
+          onContactNameUpdate={handleContactNameUpdate}
+          onMuteToggle={handleMuteToggle}
+          onDeleteContact={handleDeleteContact}
+          onDeleteMember={handleDeleteMember}
+          hideProfile={isMobile}
+          onOpenProfileSheet={isMobile ? () => setShowProfileSheet(true) : undefined}
+        />
+      );
+    }
+
+    return (
+      <ChatStateContent
+        isSearchActive={false}
+        onStartNewConversation={() => setShowChatSearch(true)}
+      />
+    );
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex h-[calc(100dvh-57px)] w-full bg-white rounded-lg shadow-sm">
-        <ChatSidebar
-          isCollapsed={isSidebarCollapsed}
-          contacts={contacts}
-          selectedContactId={selectedContact?.id}
-          onEditClick={() => setShowChatSearch(true)}
-          isSearchActive={showChatSearch}
-          onDiscardClick={() => setShowChatSearch(false)}
-          onContactSelect={(contact) => {
-            if (contact.status?.isUnread) {
-              handleMarkContactAsRead(contact.id);
-            }
-            setSelectedContact(contact);
-            setShowChatSearch(false);
-          }}
-          onMarkAsRead={handleMarkContactAsRead}
-          onMarkAsUnread={handleMarkContactAsUnread}
-          onMuteToggle={handleMuteToggle}
-          onDeleteContact={handleDeleteContact}
-        />
-        <div
-          className={`flex flex-col w-full ${!selectedContact ? 'h-full' : 'h-[calc(100dvh-118px)]'}`}
-        >
-          <div className="flex items-center w-full min-h-[65px] px-4 border-b border-border">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full"
-              onClick={toggleSidebar}
-            >
-              <Menu className="w-6 h-6 text-medium-emphasis cursor-pointer" />
-            </Button>
-            {selectedContact && (
-              <h2 className="text-lg font-semibold ml-4">
-                {selectedContact.name}
-              </h2>
-            )}
-          </div>
-          <div className="flex flex-col w-full h-full">
-            {showChatSearch ? (
-              <ChatSearch
-                onClose={() => setShowChatSearch(false)}
-                onSelectContact={setSelectedContact}
-              />
-            ) : selectedContact ? (
-              <ChatUsers
+        {renderContent()}
+
+        {selectedContact && (
+          <Sheet open={showProfileSheet} onOpenChange={setShowProfileSheet}>
+            <SheetContent side="right" className="w-full max-w-md p-0 overflow-y-auto">
+              <ChatProfile
                 contact={selectedContact}
-                onContactNameUpdate={handleContactNameUpdate}
-                onMuteToggle={handleMuteToggle}
-                onDeleteContact={handleDeleteContact}
-                onDeleteMember={handleDeleteMember}
+                onMuteToggle={() => handleMuteToggle(selectedContact.id)}
+                onGroupNameUpdate={(newName) => {
+                  handleContactNameUpdate(selectedContact.id, newName);
+                }}
+                onDeleteMember={(contactId, memberId) => {
+                  handleDeleteMember(contactId, memberId);
+                }}
               />
-            ) : (
-              <ChatStateContent
-                isSearchActive={false}
-                onStartNewConversation={() => setShowChatSearch(true)}
-              />
-            )}
-          </div>
-        </div>
+            </SheetContent>
+          </Sheet>
+        )}
       </div>
     </div>
   );
 };
+
+interface ChatHeaderProps {
+  selectedContact: ChatContact | null;
+  onMenuClick: () => void;
+  onInfoClick: () => void;
+  showBackButton: boolean;
+}
+
+const ChatHeader = ({
+  selectedContact,
+  onMenuClick,
+  showBackButton,
+}: Omit<ChatHeaderProps, 'onInfoClick'>) => (
+  <div className="flex items-center w-full min-h-[65px] px-4 border-b border-border">
+    <Button variant="ghost" size="icon" className="rounded-full" onClick={onMenuClick}>
+      {showBackButton ? (
+        <ArrowLeft className="w-6 h-6 text-medium-emphasis" />
+      ) : (
+        <Menu className="w-6 h-6 text-medium-emphasis" />
+      )}
+    </Button>
+
+    {selectedContact && (
+      <h2 className="lg:hidden text-lg font-semibold ml-3">{selectedContact.name}</h2>
+    )}
+  </div>
+);

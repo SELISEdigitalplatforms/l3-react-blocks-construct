@@ -35,6 +35,8 @@ interface ChatUsersProps {
   onMuteToggle?: (contactId: string) => void;
   onDeleteContact?: (contactId: string) => void;
   onDeleteMember?: (contactId: string, memberId: string) => void;
+  hideProfile?: boolean;
+  onOpenProfileSheet?: () => void;
 }
 
 export const ChatUsers = ({
@@ -43,6 +45,8 @@ export const ChatUsers = ({
   onMuteToggle,
   onDeleteContact,
   onDeleteMember,
+  hideProfile = false,
+  onOpenProfileSheet,
 }: Readonly<ChatUsersProps>) => {
   const { t } = useTranslation();
   const [message, setMessage] = useState('');
@@ -157,7 +161,12 @@ export const ChatUsers = ({
 
   return (
     <div className="flex h-full w-full">
-      <div className={`flex flex-col h-full bg-white ${isProfileOpen ? 'w-[60%]' : 'w-full'}`}>
+      <div
+        className={cn(
+          'flex flex-col h-full bg-white',
+          isProfileOpen ? 'w-full lg:w-[60%]' : 'w-full'
+        )}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -206,10 +215,17 @@ export const ChatUsers = ({
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full"
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="h-8 w-8 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hideProfile && onOpenProfileSheet) {
+                  onOpenProfileSheet();
+                } else {
+                  setIsProfileOpen(!isProfileOpen);
+                }
+              }}
             >
-              <Info className={`w-5 h-5 ${isProfileOpen && 'text-primary'}`} />
+              <Info className="h-5 w-5 text-medium-emphasis" />
             </Button>
             <Separator orientation="vertical" className="h-5" />
             <DropdownMenu>
@@ -472,8 +488,8 @@ export const ChatUsers = ({
           onRemoveFile={(index) => setSelectedFiles((prev) => prev.filter((_, i) => i !== index))}
         />
       </div>
-      {isProfileOpen && (
-        <div className="w-[40%]">
+      {isProfileOpen && !hideProfile && (
+        <div className="hidden lg:flex flex-col w-[40%] h-full">
           <ChatProfile
             contact={contact}
             onGroupNameUpdate={contact.status?.isGroup ? handleGroupNameUpdate : undefined}

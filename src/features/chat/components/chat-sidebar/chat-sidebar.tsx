@@ -62,9 +62,11 @@ export const ChatSidebar = ({
     onContactSelect(contact);
   };
 
+  const isMobile = window.innerWidth < 768;
+
   return (
     <div
-      className={`${isCollapsed ? 'w-20 min-w-[80px]' : 'w-[326px] min-w-[326px]'} border-r border-border bg-white flex flex-col transition-all duration-200 ease-in-out`}
+      className={`${isCollapsed && !isMobile ? 'w-20 min-w-[80px]' : isMobile ? 'w-full' : 'w-[326px] min-w-[326px]'} ${!isMobile && 'border-r border-border'} bg-white flex flex-col transition-all duration-200 ease-in-out h-full`}
     >
       {!isCollapsed && (
         <div className="p-4 border-b border-border">
@@ -99,7 +101,7 @@ export const ChatSidebar = ({
         )}
       </div>
 
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0 h-full">
         <div className="flex-shrink-0">
           {!isCollapsed && (
             <div className="p-4">
@@ -141,7 +143,7 @@ export const ChatSidebar = ({
             </div>
           )}
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto h-[calc(100vh-180px)] md:h-auto">
           {filteredContacts.length > 0 ? (
             filteredContacts.map((contact) => (
               <ChatContactItem
