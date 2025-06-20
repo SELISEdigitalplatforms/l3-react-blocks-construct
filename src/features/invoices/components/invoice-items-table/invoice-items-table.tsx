@@ -154,7 +154,7 @@ export function InvoiceItemsTable({
               {item.showNote && (
                 <TableRow className="hover:bg-transparent">
                   <TableCell colSpan={6}>
-                    <div className="flex flex-col gap-[6px] w-[60%]">
+                    <div className="flex flex-col gap-[6px] w-[40%]">
                       <Label className="text-high-emphasis text-sm">
                         {t('NOTE')} <span className="text-low-emphasis">({t('OPTIONAL')})</span>
                       </Label>

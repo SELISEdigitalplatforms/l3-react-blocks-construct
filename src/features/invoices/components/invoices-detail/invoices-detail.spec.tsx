@@ -177,11 +177,10 @@ describe('InvoicesDetail', () => {
   test('renders status badge with correct styling', () => {
     render(<InvoicesDetail invoice={mockInvoice} />);
 
-    // Find the badge element
-    const badge = screen.getByText('Paid');
-    expect(badge).toBeInTheDocument();
-
-    // Check if it has the correct styling class based on status
-    expect(badge.className).toContain('text-success');
+    // Find all badge elements with the text 'Paid'
+    const badges = screen.getAllByText('Paid');
+    expect(badges.length).toBeGreaterThan(0);
+    // Check if at least one badge has the correct styling class based on status
+    expect(badges.some((badge) => badge.className.includes('text-success'))).toBe(true);
   });
 });

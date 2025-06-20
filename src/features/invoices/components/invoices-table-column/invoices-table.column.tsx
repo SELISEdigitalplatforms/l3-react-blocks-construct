@@ -31,7 +31,7 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
     enableSorting: false,
     cell: ({ row }) => (
       <div className="flex items-center">
-        <span className="max-w-[300px] truncate font-medium">{row.original.id}</span>
+        <span className="min-w-[100px] truncate font-medium">{row.original.id}</span>
       </div>
     ),
   },
@@ -46,7 +46,7 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
           alt={row.original.customerName}
           className="h-8 w-8 rounded-full object-cover"
         />
-        <span className="max-w-[300px] truncate">{row.original.customerName}</span>
+        <span className="min-w-[150px] truncate">{row.original.customerName}</span>
       </div>
     ),
   },
@@ -124,7 +124,7 @@ export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<
       const color = statusColors[status];
       return (
         <div className="flex items-center">
-          <span className={`font-semibold text-${color}`}>{status}</span>
+          <span className={`font-semibold ${color.text}`}>{status}</span>
         </div>
       );
     },
