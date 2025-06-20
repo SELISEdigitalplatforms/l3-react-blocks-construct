@@ -10,14 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'c
 import { Separator } from 'components/ui/separator';
 import logo from 'assets/images/construct_logo.svg';
 import { Badge } from 'components/ui/badge';
-import { Invoice, statusColors, InvoiceStatus } from '../../data/invoice-data';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'components/ui/select';
+import { Invoice, statusColors } from '../../data/invoice-data';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 
@@ -91,23 +84,16 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               </Button>
               <h1 className="text-2xl font-semibold">{invoice.id}</h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-2">
               <div className="flex items-center gap-2">
                 <p className="text-high-emphasis">{t('STATUS')}:</p>
-                <Select defaultValue={invoice.status}>
-                  <SelectTrigger className="w-[120px] h-9">
-                    <SelectValue placeholder={t('SELECT_STATUS')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(InvoiceStatus).map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {t(status.toUpperCase())}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Badge
+                  className={`text-xs rounded-[4px] py-[2px] px-2 ${statusColors[invoice.status].text} ${statusColors[invoice.status].border} ${statusColors[invoice.status].bg} hover:${statusColors[invoice.status].bg}`}
+                >
+                  {invoice.status}
+                </Badge>
               </div>
-              <Separator orientation="vertical" className="h-5 mx-1 sm:mx-3" />
+              <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />
               <div className="flex items-center gap-2">
                 <Button variant="outline" onClick={handleDownloadPDF}>
                   <Download className="h-4 w-4 mr-1" />
@@ -146,12 +132,12 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
           </div>
           <Separator />
           <div className="flex flex-col sm:flex-row w-full sm:justify-between">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[50%]">
               <h1 className="text-medium-emphasis">{t('INVOICE_DETAILS')}</h1>
               <div className="flex items-center gap-2">
                 <p className="font-bold text-high-emphasis">{invoice.id}</p>
                 <Badge
-                  className={`rounded-[4px] px-2 py-[2px] text-xs bg-surface hover:bg-surface text-${statusColors[invoice.status]}`}
+                  className={`text-xs rounded-[4px] py-[2px] px-2 ${statusColors[invoice.status].text} ${statusColors[invoice.status].border} ${statusColors[invoice.status].bg} hover:${statusColors[invoice.status].bg}`}
                 >
                   {invoice.status}
                 </Badge>
@@ -169,7 +155,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-[50%]">
               <h3 className="text-base font-medium text-medium-emphasis mb-2">{t('BILLED_TO')}</h3>
               <p className="text-base font-bold">{invoice.customerName}</p>
               <div className="flex items-center gap-2">
@@ -209,12 +195,12 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               </TableHeader>
               <TableBody>
                 {invoice.orderDetails.items.map((item) => (
-                  <TableRow key={item.name}>
+                  <TableRow key={item.name} className="hover:bg-transparent">
                     <TableCell>
                       <div>
                         <p className="font-semibold text-high-emphasis">{item.name}</p>
                         {item.description && (
-                          <p className="text-sm text-medium-emphasis">{item.description}</p>
+                          <p className="text-sm text-medium-emphasis w-[80%]">{item.description}</p>
                         )}
                       </div>
                     </TableCell>
@@ -236,10 +222,17 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
 
           <div className="flex flex-col-reverse sm:flex-row w-full items-end sm:justify-between">
             <div className="flex flex-col gap-2">
-              <h3 className="font-medium text-medium-emphasis">{t('NOTE')}</h3>
-              <p className="text-sm text-medium-emphasis">
-                {invoice.orderDetails.note ?? t('NO_NOTE_AVAILABLE')}
-              </p>
+              {invoice.orderDetails.note && (
+                <>
+                  <div className="flex items-cnter gap-1">
+                    <h3 className="font-medium text-medium-emphasis">{t('GENERAL_NOTE')}</h3>
+                    <h3 className="text-low-emphasis">({t('OPTIONAL')})</h3>
+                  </div>
+                  <p className="text-sm text-medium-emphasis w-[64%]">
+                    {invoice.orderDetails.note}
+                  </p>
+                </>
+              )}
             </div>
             <div className="flex flex-col gap-4 w-full sm:w-[25%]">
               <div className="flex justify-between">

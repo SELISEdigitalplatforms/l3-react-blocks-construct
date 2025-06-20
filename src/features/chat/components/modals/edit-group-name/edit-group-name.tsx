@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DialogContent,
@@ -30,6 +30,12 @@ export function EditGroupName({
   const { t } = useTranslation();
   const [groupName, setGroupName] = useState(currentName);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setGroupName(currentName);
+    }
+  }, [isOpen, currentName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

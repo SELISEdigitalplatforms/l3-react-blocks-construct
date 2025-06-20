@@ -350,8 +350,8 @@ export const mockChatContacts: ChatContact[] = [
     id: 'USR-1282920',
     avatarSrc: '',
     avatarFallback: 'DJ',
-    name: 'Development Team',
-    email: 'dev-team@example.com',
+    name: 'Dhanvir Johnny',
+    email: 'dhan-johnny@example.com',
     phoneNo: '+1 650 555 4321',
     date: '2024-12-27T15:30:00.000Z',
     status: {
@@ -363,7 +363,7 @@ export const mockChatContacts: ChatContact[] = [
         id: 'MSG-1283266',
         sender: 'other',
         content: 'The latest build has been deployed to the staging environment for testing.',
-        timestamp: '2024-12-27T14:30:00.000Z', // 1 hour ago
+        timestamp: '2024-12-27T14:30:00.000Z',
       },
       {
         id: 'MSG-1283267',

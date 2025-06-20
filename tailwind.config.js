@@ -1,4 +1,4 @@
- /** @type {Config} */ 
+/** @type {Config} */
 /** @typedef {import('tailwindcss').Config} Config */
 
 module.exports = {

@@ -53,11 +53,27 @@ export interface Invoice {
   orderDetails: OrderDetails;
 }
 
-export const statusColors: Record<InvoiceStatus, string> = {
-  [InvoiceStatus.Paid]: 'success',
-  [InvoiceStatus.Pending]: 'warning',
-  [InvoiceStatus.Overdue]: 'error',
-  [InvoiceStatus.Draft]: 'medium-emphasis',
+export const statusColors: Record<InvoiceStatus, { text: string; border: string; bg: string }> = {
+  [InvoiceStatus.Paid]: {
+    text: 'text-success',
+    border: 'border-success',
+    bg: 'bg-success-background',
+  },
+  [InvoiceStatus.Pending]: {
+    text: 'text-warning',
+    border: 'border-warning',
+    bg: 'bg-warning-background',
+  },
+  [InvoiceStatus.Overdue]: {
+    text: 'text-error',
+    border: 'border-error',
+    bg: 'bg-error-background',
+  },
+  [InvoiceStatus.Draft]: {
+    text: 'text-neutral',
+    border: 'border-neutral',
+    bg: 'bg-surface',
+  },
 };
 
 export const invoiceData: Invoice[] = [

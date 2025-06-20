@@ -69,7 +69,7 @@ export const ChatSidebar = ({
       className={`${isCollapsed && !isMobile ? 'w-20 min-w-[80px]' : isMobile ? 'w-full' : 'w-[326px] min-w-[326px]'} ${!isMobile && 'border-r border-border'} bg-white flex flex-col transition-all duration-200 ease-in-out h-full`}
     >
       {!isCollapsed && (
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-border hidden md:flex">
           <h2 className="text-2xl font-bold">{t('CHAT')}</h2>
         </div>
       )}
