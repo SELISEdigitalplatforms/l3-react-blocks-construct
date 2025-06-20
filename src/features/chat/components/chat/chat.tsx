@@ -7,9 +7,20 @@ import { ChatSearch } from '../chat-search/chat-search';
 import { ChatUsers } from '../chat-users/chat-users';
 import { ChatContact } from '../../types/chat.types';
 import { mockChatContacts } from '../../data/chat.data';
-import { useIsMobile } from 'hooks/use-media-query';
 import { Sheet, SheetContent } from 'components/ui/sheet';
 import { ChatProfile } from '../chat-profile/chat-profile';
+import { Dialog, DialogContent, DialogHeader } from 'components/ui/dialog';
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < breakpoint);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < breakpoint);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 export const Chat = () => {
   const [showChatSearch, setShowChatSearch] = useState(false);
@@ -17,7 +28,7 @@ export const Chat = () => {
   const [contacts, setContacts] = useState<ChatContact[]>(mockChatContacts);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showProfileSheet, setShowProfileSheet] = useState(false);
-  const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
+  const [mobileView, setMobileView] = useState<'list' | 'chat' | 'search'>('list');
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -133,8 +144,9 @@ export const Chat = () => {
     }
   };
 
-  const handleBackToList = () => {
-    setMobileView('list');
+  const handleEditClick = () => {
+    setShowChatSearch(true);
+    if (isMobile) setMobileView('search');
   };
 
   const renderContent = () => {
@@ -145,7 +157,7 @@ export const Chat = () => {
             isCollapsed={isSidebarCollapsed}
             contacts={contacts}
             selectedContactId={selectedContact?.id}
-            onEditClick={() => setShowChatSearch(true)}
+            onEditClick={handleEditClick}
             isSearchActive={showChatSearch}
             onDiscardClick={() => setShowChatSearch(false)}
             onContactSelect={handleContactSelect}
@@ -175,7 +187,7 @@ export const Chat = () => {
             isCollapsed={false}
             contacts={contacts}
             selectedContactId={selectedContact?.id}
-            onEditClick={() => setShowChatSearch(true)}
+            onEditClick={handleEditClick}
             isSearchActive={showChatSearch}
             onDiscardClick={() => setShowChatSearch(false)}
             onContactSelect={handleContactSelect}
@@ -192,28 +204,32 @@ export const Chat = () => {
       <div className="flex flex-col w-full h-full">
         <ChatHeader
           selectedContact={selectedContact}
-          onMenuClick={handleBackToList}
+          onMenuClick={() => setMobileView('list')}
           showBackButton={true}
         />
-        <div className="flex-1 overflow-y-auto">
-          {selectedContact && (
-            <ChatUsers
-              contact={selectedContact}
-              onContactNameUpdate={handleContactNameUpdate}
-              onMuteToggle={handleMuteToggle}
-              onDeleteContact={handleDeleteContact}
-              onDeleteMember={handleDeleteMember}
-              hideProfile={isMobile}
-              onOpenProfileSheet={isMobile ? () => setShowProfileSheet(true) : undefined}
-            />
-          )}
-        </div>
+        <div className="flex-1 overflow-y-auto">{renderMainContent()}</div>
       </div>
     );
   };
 
   const renderMainContent = () => {
     if (showChatSearch) {
+      if (isMobile) {
+        return (
+          <Dialog open={showChatSearch} onOpenChange={setShowChatSearch}>
+            <DialogContent hideClose className="p-0 max-w-full w-full h-full">
+              <DialogHeader className="hidden">
+                <DialogTitle />
+                <DialogDescription />
+              </DialogHeader>
+              <ChatSearch
+                onClose={() => setShowChatSearch(false)}
+                onSelectContact={handleContactSelect}
+              />
+            </DialogContent>
+          </Dialog>
+        );
+      }
       return (
         <ChatSearch
           onClose={() => setShowChatSearch(false)}
