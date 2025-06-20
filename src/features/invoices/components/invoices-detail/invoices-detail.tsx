@@ -84,7 +84,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               </Button>
               <h1 className="text-2xl font-semibold">{invoice.id}</h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-2">
               <div className="flex items-center gap-2">
                 <p className="text-high-emphasis">{t('STATUS')}:</p>
                 <Badge
@@ -93,7 +93,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                   {invoice.status}
                 </Badge>
               </div>
-              <Separator orientation="vertical" className="h-5 mx-1 sm:mx-3" />
+              <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />
               <div className="flex items-center gap-2">
                 <Button variant="outline" onClick={handleDownloadPDF}>
                   <Download className="h-4 w-4 mr-1" />
