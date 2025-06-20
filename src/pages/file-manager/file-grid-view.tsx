@@ -314,9 +314,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Folder } from 'lucide-react'; // Adjust imports based on your UI library
-
-import { useReactTable, getCoreRowModel, ColumnDef } from '@tanstack/react-table';
+import { Filter, Folder, X } from 'lucide-react'; // Adjust imports based on your UI library
 import {
   IFileData,
   mockFileData,
@@ -325,9 +323,17 @@ import {
 import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from 'features/file-manager/components/file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
-import { createFileTableColumns } from 'features/file-manager/components/file-table-columns';
-import FileManagerToolbar from 'features/file-manager/components/file-table-toolbar';
+
 import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'components/ui/select';
 
 export const mockFiles: IFileData[] = mockFileData;
 
@@ -365,6 +371,156 @@ interface PaginationState {
   pageSize: number;
   totalCount: number;
 }
+
+// Custom toolbar component for grid view
+const GridToolbar: React.FC<{
+  onSearch: (filters: {
+    name: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  }) => void;
+  filters: { name: string; fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video' };
+  t: (key: string) => string;
+}> = ({ onSearch, filters, t }) => {
+  const [searchInput, setSearchInput] = useState(filters.name);
+  const [fileTypeFilter, setFileTypeFilter] = useState(filters.fileType);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearch({
+        name: searchInput,
+        fileType: fileTypeFilter,
+      });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput, fileTypeFilter, onSearch]);
+
+  const handleReset = () => {
+    setSearchInput('');
+    setFileTypeFilter(undefined);
+    onSearch({ name: '', fileType: undefined });
+  };
+
+  const isFiltered = searchInput || fileTypeFilter;
+  const activeFiltersCount = (searchInput ? 1 : 0) + (fileTypeFilter ? 1 : 0);
+
+  const fileTypeOptions = [
+    { value: 'Folder', label: t('FOLDER') },
+    { value: 'File', label: t('FILE') },
+    { value: 'Image', label: t('IMAGE') },
+    { value: 'Audio', label: t('AUDIO') },
+    { value: 'Video', label: t('VIDEO') },
+  ];
+
+  return (
+    <div className="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+      <div className="flex flex-col w-full gap-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-2">
+          {/* Search Input */}
+          <div className="relative flex-1 sm:w-[300px] min-w-[200px]">
+            <Input
+              placeholder={`${t('SEARCH_BY')} ${t('NAME').toLowerCase()}...`}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="h-8 w-full rounded-lg bg-background"
+            />
+          </div>
+
+          {/* Mobile Filter Button */}
+          {isMobile && (
+            <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 px-3 whitespace-nowrap">
+                  <Filter className="h-2 w-2" />
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-1 rounded-full bg-primary w-5 h-5 text-xs flex items-center justify-center text-primary-foreground">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="w-full">
+                <SheetHeader>
+                  <SheetTitle>{t('FILTERS')}</SheetTitle>
+                </SheetHeader>
+                <div className="py-4 space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">{t('FILE_TYPE')}</label>
+                    <Select
+                      value={fileTypeFilter || undefined}
+                      onValueChange={(value) =>
+                        setFileTypeFilter(
+                          value === 'all'
+                            ? undefined
+                            : (value as 'Folder' | 'File' | 'Image' | 'Audio' | 'Video')
+                        )
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t('ALL_TYPES')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
+                        {fileTypeOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {isFiltered && (
+                  <Button variant="ghost" onClick={handleReset} className="h-8 px-2 w-full">
+                    {t('RESET')}
+                    <X className="ml-2 h-4 w-4" />
+                  </Button>
+                )}
+              </SheetContent>
+            </Sheet>
+          )}
+        </div>
+
+        <div className="flex flex-row gap-1 flex-wrap">
+          {!isMobile && (
+            <Select
+              value={fileTypeFilter || undefined}
+              onValueChange={(value) =>
+                setFileTypeFilter(
+                  value === 'all'
+                    ? undefined
+                    : (value as 'Folder' | 'File' | 'Image' | 'Audio' | 'Video')
+                )
+              }
+            >
+              <SelectTrigger className="h-8 w-[140px]">
+                <SelectValue placeholder={t('FILE_TYPE')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
+                {fileTypeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {isFiltered && (
+            <Button variant="ghost" onClick={handleReset} className="h-8 px-2 lg:px-3">
+              {t('RESET')}
+              <X className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FileCard: React.FC<FileCardProps> = ({
   file,
@@ -480,7 +636,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
-  // Internal filters state for the toolbar
   const [filters, setFilters] = useState<{
     name: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
@@ -495,7 +650,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     totalCount: 0,
   });
 
-  // Combine external searchQuery with internal filters
   const queryParams = {
     page: paginationState.pageIndex,
     pageSize: paginationState.pageSize,
@@ -507,57 +661,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
 
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
 
-  // Create table columns for the toolbar (even though we're not using the table view)
-  const columns = createFileTableColumns({
-    onViewDetails: onViewDetails || (() => {}),
-    onDownload: onDownload || (() => {}),
-    onShare: onShare || (() => {}),
-    onDelete: onDelete || (() => {}),
-    onMove: onMove || (() => {}),
-    onCopy: onCopy || (() => {}),
-    onOpen: onOpen || (() => {}),
-    onRename: onRename || (() => {}),
-    t,
-  });
-
-  // Create a mock table instance for the toolbar
-  const table = useReactTable({
-    data: data?.data || [],
-    columns: columns as ColumnDef<IFileData>[],
-    getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    manualFiltering: true,
-    pageCount: Math.ceil(paginationState.totalCount / paginationState.pageSize),
-    state: {
-      columnFilters: [...(filters.fileType ? [{ id: 'fileType', value: filters.fileType }] : [])],
-    },
-    onColumnFiltersChange: (updater) => {
-      const newColumnFilters =
-        typeof updater === 'function'
-          ? updater([...(filters.fileType ? [{ id: 'fileType', value: filters.fileType }] : [])])
-          : updater;
-
-      const fileTypeFilter = newColumnFilters.find((f) => f.id === 'fileType');
-
-      setFilters((prev) => ({
-        ...prev,
-        fileType: fileTypeFilter?.value as
-          | 'Folder'
-          | 'File'
-          | 'Image'
-          | 'Audio'
-          | 'Video'
-          | undefined,
-      }));
-
-      setPaginationState((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    },
-  });
-
-  // Handle search from toolbar
   const handleSearch = useCallback(
     (newFilters: { name: string; fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video' }) => {
       setFilters(newFilters);
@@ -569,14 +672,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     []
   );
 
-  // Sync column filters when filters change
-  useEffect(() => {
-    const columnFilters = [
-      ...(filters.fileType ? [{ id: 'fileType', value: filters.fileType }] : []),
-    ];
-    table.setColumnFilters(columnFilters);
-  }, [filters.fileType, table]);
-
   useEffect(() => {
     if (data?.totalCount !== undefined) {
       setPaginationState((prev) => ({
@@ -586,14 +681,12 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     }
   }, [data?.totalCount]);
 
-  // Reset pagination when external searchQuery or filters change
   useEffect(() => {
     setPaginationState((prev) => ({
       ...prev,
       pageIndex: 0,
     }));
 
-    // Update internal filters when external props change
     setFilters({
       name: searchQuery || initialFilters.name || '',
       fileType: initialFilters.fileType,
@@ -636,9 +729,9 @@ const FileGridView: React.FC<FileGridViewProps> = ({
 
   return (
     <div className="flex flex-col h-full w-full">
-      {/* Toolbar */}
+      {/* Custom Grid Toolbar */}
       <div className="mb-6">
-        <FileManagerToolbar table={table} onSearch={handleSearch} columns={columns} />
+        <GridToolbar onSearch={handleSearch} filters={filters} t={t} />
       </div>
 
       {/* Grid Content */}
