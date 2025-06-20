@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import FileManagerToolbar from 'features/file-manager/components/file-manager-toolbar';
+import FileManagerHeaderToolbar from 'features/file-manager/components/file-manager-toolbar';
 import FileGridView from './file-grid-view';
 import FileListView from './file-list-view';
 
@@ -21,13 +21,8 @@ interface FileManagerProps {
 }
 
 const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
-  // View mode state
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
-  // Search state
   const [searchQuery, setSearchQuery] = useState<string>('');
-
-  // Filter state
   const [filters, setFilters] = useState<{
     name: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
@@ -74,7 +69,6 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
-    // Update filters to include search query
     setFilters((prev) => ({
       ...prev,
       name: query,
@@ -86,11 +80,9 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
       onCreateFile();
     } else {
       console.log('Create new file/folder');
-      // Implement default create logic
     }
   }, [onCreateFile]);
 
-  // Common props for both views
   const commonViewProps = {
     onViewDetails: handleViewDetails,
     onDownload: handleDownload,
@@ -106,8 +98,7 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   return (
     <div className="flex flex-col h-full w-full space-y-4 p-4 md:p-6">
-      {/* Toolbar */}
-      <FileManagerToolbar
+      <FileManagerHeaderToolbar
         onOpen={handleCreateFile}
         viewMode={viewMode}
         handleViewMode={handleViewModeChange}
@@ -115,7 +106,6 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
         onSearchChange={handleSearchChange}
       />
 
-      {/* Content Area */}
       <div className="flex-1 overflow-hidden">
         {viewMode === 'grid' ? (
           <div className="h-full overflow-y-auto">

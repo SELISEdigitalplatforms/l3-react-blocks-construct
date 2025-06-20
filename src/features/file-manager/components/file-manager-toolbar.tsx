@@ -43,7 +43,7 @@ import { FileManagerFilterSheet } from './file-manager-filters-sheet';
  * />
  */
 
-interface FileManagerToolbarProps {
+interface FileManagerHeaderToolbarProps {
   onOpen: () => void;
   viewMode?: string;
   handleViewMode: (view: string) => void;
@@ -51,13 +51,13 @@ interface FileManagerToolbarProps {
   onSearchChange?: (query: string) => void;
 }
 
-export default function FileManagerToolbar({
+export default function FileManagerHeaderToolbar({
   onOpen,
   viewMode = 'grid',
   handleViewMode,
   searchQuery = '',
   onSearchChange,
-}: Readonly<FileManagerToolbarProps>) {
+}: Readonly<FileManagerHeaderToolbarProps>) {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
 
