@@ -21,7 +21,7 @@ import {
 } from 'components/ui/dropdown-menu';
 
 import { Dialog } from 'components/ui/dialog';
-import { IFileData } from '../hooks/use-mock-files-query';
+import { IFileData } from '../../hooks/use-mock-files-query';
 
 /**
  * Renders the actions for a row in the File Management table.

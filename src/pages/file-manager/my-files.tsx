@@ -17,8 +17,8 @@ import {
   SelectValue,
 } from 'components/ui/select';
 import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import FileGridView from './file-grid-view';
-import FileListView from './file-list-view';
+import FileGridView from '../../features/file-manager/components/my-files/my-files-grid-view';
+import FileListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';

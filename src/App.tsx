@@ -40,7 +40,8 @@ import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { InvoiceLayout } from './pages/invoices/invoice-layout';
 import { CreateInvoice, EditInvoice } from './features/invoices';
-import FileManagerMyFiles from 'pages/file-manager/file-manager-my-files';
+import FileManagerMyFiles from 'pages/file-manager/my-files';
+import SharedWithMe from 'pages/file-manager/shared-with-me';
 
 const queryClient = new QueryClient();
 
@@ -111,6 +112,8 @@ function AppContent() {
                   <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 </Route>
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
+                <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
+
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/503" element={<ServiceUnavailable />} />
                 <Route path="/404" element={<NotFound />} />

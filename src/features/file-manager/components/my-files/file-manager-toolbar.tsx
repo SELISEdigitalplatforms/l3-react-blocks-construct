@@ -5,7 +5,6 @@ import { useIsMobile } from 'hooks/use-mobile';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { FileManagerFilterSheet } from './file-manager-filters-sheet';
 
 /**
  * FileManagerToolbar Component
@@ -165,7 +164,6 @@ export default function FileManagerHeaderToolbar({
             </Tabs>
           </div>
         </div>
-        <FileManagerFilterSheet open={openSheet} onOpenChange={setOpenSheet} />
       </div>
     );
   }
@@ -216,7 +214,6 @@ export default function FileManagerHeaderToolbar({
           {t('ADD_NEW')}
         </Button>
       </div>
-      <FileManagerFilterSheet open={openSheet} onOpenChange={setOpenSheet} />
     </div>
   );
 }

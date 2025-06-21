@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { createFileTableColumns } from 'features/file-manager/components/file-table-columns';
+import { createFileTableColumns } from './my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
-import FileDetailsSheet from 'features/file-manager/components/file-manager-details';
+import FileDetailsSheet from './my-files-details';
 
 interface PaginationState {
   pageIndex: number;
@@ -12,7 +12,7 @@ interface PaginationState {
   totalCount: number;
 }
 
-interface FileListViewProps {
+interface SharedFileListViewProps {
   onViewDetails: (file: IFileData) => void;
   onShare: (file: IFileData) => void;
   onDelete: (file: IFileData) => void;
@@ -26,7 +26,7 @@ interface FileListViewProps {
   };
 }
 
-const FileListView: React.FC<FileListViewProps> = ({
+const SharedFileListView: React.FC<SharedFileListViewProps> = ({
   onViewDetails,
   onShare,
   onDelete,
@@ -168,4 +168,4 @@ const FileListView: React.FC<FileListViewProps> = ({
   );
 };
 
-export default FileListView;
+export default SharedFileListView;

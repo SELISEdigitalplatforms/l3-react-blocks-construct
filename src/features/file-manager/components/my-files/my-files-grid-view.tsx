@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
-import { FileTableRowActions } from 'features/file-manager/components/file-manager-row-actions';
+import { FileTableRowActions } from './my-files-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
-import FileDetailsSheet from 'features/file-manager/components/file-manager-details';
+import FileDetailsSheet from './my-files-details';
 
 interface FileCardProps {
   file: IFileData;

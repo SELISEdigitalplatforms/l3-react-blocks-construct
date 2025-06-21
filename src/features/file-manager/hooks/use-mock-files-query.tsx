@@ -7,30 +7,57 @@ export interface IFileData {
   fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   size: string;
   isShared?: boolean;
+  // New properties for shared files
+  sharedBy?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  sharedDate?: Date;
 }
 
 export const mockFileData: IFileData[] = [
   {
     id: '1',
     name: 'Meeting Notes',
-    lastModified: new Date('2024-02-03'),
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '1',
+      name: 'Luca Meier',
+      avatar: '/avatars/luca-meier.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '2',
     name: 'Research Data',
-    lastModified: new Date('2024-02-03'),
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '2',
+      name: 'Aaron Green',
+      avatar: '/avatars/aaron-green.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '3',
     name: 'Client Documents',
-    lastModified: new Date('2024-02-03'),
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
     isShared: true,
+    sharedBy: {
+      id: '3',
+      name: 'Sarah Pavan',
+      avatar: '/avatars/sarah-pavan.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '4',
@@ -38,6 +65,13 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '1',
+      name: 'Luca Meier',
+      avatar: '/avatars/luca-meier.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '5',
@@ -46,6 +80,12 @@ export const mockFileData: IFileData[] = [
     fileType: 'Folder',
     size: '21.4 MB',
     isShared: true,
+    sharedBy: {
+      id: '4',
+      name: 'Adrian Müller',
+      avatar: '/avatars/adrian-muller.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '6',
@@ -53,13 +93,27 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'File',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '3',
+      name: 'Sarah Pavan',
+      avatar: '/avatars/sarah-pavan.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '7',
-    name: 'Sunset_View_Image.jpg',
+    name: 'Image.jpg',
     lastModified: new Date('2025-02-03'),
     fileType: 'Image',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '4',
+      name: 'Adrian Müller',
+      avatar: '/avatars/adrian-muller.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '8',
@@ -67,6 +121,13 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Audio',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '2',
+      name: 'Aaron Green',
+      avatar: '/avatars/aaron-green.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '9',
@@ -74,6 +135,13 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Video',
     size: '21.4 MB',
+    isShared: true,
+    sharedBy: {
+      id: '1',
+      name: 'Luca Meier',
+      avatar: '/avatars/luca-meier.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '10',
@@ -82,79 +150,82 @@ export const mockFileData: IFileData[] = [
     fileType: 'File',
     size: '21.4 MB',
     isShared: true,
+    sharedBy: {
+      id: '3',
+      name: 'Sarah Pavan',
+      avatar: '/avatars/sarah-pavan.jpg',
+    },
+    sharedDate: new Date('2025-02-03'),
   },
   {
     id: '11',
-    name: 'Adventure_Video.mp4',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Video',
-    size: '21.4 MB',
+    name: 'Marketing Assets',
+    lastModified: new Date('2025-02-01'),
+    fileType: 'Folder',
+    size: '45.2 MB',
+    isShared: true,
+    sharedBy: {
+      id: '4',
+      name: 'Adrian Müller',
+      avatar: '/avatars/adrian-muller.jpg',
+    },
+    sharedDate: new Date('2025-02-01'),
   },
   {
     id: '12',
-    name: 'Research Data',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Folder',
-    size: '21.4 MB',
+    name: 'Budget Spreadsheet.xlsx',
+    lastModified: new Date('2025-01-28'),
+    fileType: 'File',
+    size: '2.1 MB',
+    isShared: true,
+    sharedBy: {
+      id: '2',
+      name: 'Aaron Green',
+      avatar: '/avatars/aaron-green.jpg',
+    },
+    sharedDate: new Date('2025-01-28'),
   },
   {
     id: '13',
-    name: 'Client Documents',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Folder',
-    size: '21.4 MB',
+    name: 'Team Photo.png',
+    lastModified: new Date('2025-01-25'),
+    fileType: 'Image',
+    size: '8.7 MB',
     isShared: true,
+    sharedBy: {
+      id: '1',
+      name: 'Luca Meier',
+      avatar: '/avatars/luca-meier.jpg',
+    },
+    sharedDate: new Date('2025-01-25'),
   },
   {
     id: '14',
-    name: 'Project Files',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Folder',
-    size: '21.4 MB',
+    name: 'Presentation.pptx',
+    lastModified: new Date('2025-01-20'),
+    fileType: 'File',
+    size: '15.3 MB',
+    isShared: true,
+    sharedBy: {
+      id: '3',
+      name: 'Sarah Pavan',
+      avatar: '/avatars/sarah-pavan.jpg',
+    },
+    sharedDate: new Date('2025-01-20'),
   },
   {
     id: '15',
-    name: 'Design Assets',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Folder',
-    size: '21.4 MB',
-    isShared: true,
-  },
-  {
-    id: '16',
-    name: 'Project Documents.doc',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'File',
-    size: '21.4 MB',
-  },
-  {
-    id: '17',
-    name: 'Sunset_View_Image.jpg',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Image',
-    size: '21.4 MB',
-  },
-  {
-    id: '18',
-    name: 'Chill Beats Mix.mp3',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'Audio',
-    size: '21.4 MB',
-  },
-  {
-    id: '19',
-    name: 'Adventure_Video.mp4',
-    lastModified: new Date('2025-02-03'),
+    name: 'Training Video.mp4',
+    lastModified: new Date('2025-01-15'),
     fileType: 'Video',
-    size: '21.4 MB',
-  },
-  {
-    id: '20',
-    name: 'Requirements.doc',
-    lastModified: new Date('2025-02-03'),
-    fileType: 'File',
-    size: '21.4 MB',
+    size: '125.8 MB',
     isShared: true,
+    sharedBy: {
+      id: '4',
+      name: 'Adrian Müller',
+      avatar: '/avatars/adrian-muller.jpg',
+    },
+    sharedDate: new Date('2025-01-15'),
   },
 ];
 
