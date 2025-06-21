@@ -32,6 +32,7 @@ import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
 import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
 import { DateRange, SharedFilters } from 'features/file-manager/types/file-manager.type';
+import { sharedUsers } from 'features/file-manager/utils/file-manager';
 
 const DateRangeFilter: React.FC<{
   date?: DateRange;
@@ -123,14 +124,6 @@ const SharedByFilter: React.FC<{
 }> = ({ value, onValueChange, title }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
-
-  // Mock shared users - in real app, this would come from your API
-  const sharedUsers = [
-    { id: '1', name: 'Luca Meier' },
-    { id: '2', name: 'Aaron Green' },
-    { id: '3', name: 'Sarah Pavan' },
-    { id: '4', name: 'Adrian Müller' },
-  ];
 
   const selectedUser = sharedUsers.find((user) => user.id === value);
 
@@ -610,7 +603,7 @@ interface SharedWithMeProps {
 }
 
 export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<SharedFilters>({
     name: '',

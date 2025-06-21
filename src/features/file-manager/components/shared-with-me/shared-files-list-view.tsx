@@ -1,13 +1,12 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { createFileTableColumns } from '../my-files/my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
 import FileDetailsSheet from '../my-files/my-files-details';
 import { SharedFilesListViewProps } from '../../types/file-manager.type';
+import { SharedFileTableColumns } from './shared-files-table-columns';
 
 interface PaginationState {
   pageIndex: number;
@@ -125,23 +124,16 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     [onDelete]
   );
 
-  const handleOpenWrapper = useCallback(
-    (file: IFileData) => {
-      handleViewDetailsWrapper(file);
-    },
-    [handleViewDetailsWrapper]
-  );
-
   const columns = useMemo(() => {
-    return createFileTableColumns({
+    return SharedFileTableColumns({
       onViewDetails: handleViewDetailsWrapper,
       onDownload: handleDownloadWrapper,
       onShare: handleShareWrapper,
       onDelete: handleDeleteWrapper,
       onMove: onMove,
-      onCopy: onCopy,
-      onOpen: handleOpenWrapper,
       onRename: onRename,
+      onCopy: onCopy,
+      onOpen: handleViewDetailsWrapper,
       t,
     });
   }, [
@@ -149,9 +141,8 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     handleShareWrapper,
     handleDeleteWrapper,
     onMove,
-    onCopy,
-    handleOpenWrapper,
     onRename,
+    onCopy,
     t,
   ]);
 

@@ -5,7 +5,7 @@ import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-c
 import { compareValues } from 'features/iam/services/user-service';
 import { getFileTypeIcon, getFileTypeInfo } from '../../utils/file-manager';
 import { Users } from 'lucide-react';
-import { FileTableRowActions } from '../my-files/my-files-row-actions';
+import { FileTableRowActions } from '../file-manager-row-actions';
 import { DateRange } from 'react-day-picker';
 
 interface ColumnFactoryProps {
@@ -50,27 +50,10 @@ export const SharedFileTableColumns = ({
         </div>
       );
     },
-    // Add name filtering
     filterFn: (row, id, value: string) => {
       if (!value) return true;
       const name = row.original.name.toLowerCase();
       return name.includes(value.toLowerCase());
-    },
-  },
-  {
-    id: 'fileType',
-    accessorFn: (row) => row.fileType,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('FILE_TYPE')} />,
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center">
-          <span className="text-sm">{t(row.original.fileType.toUpperCase())}</span>
-        </div>
-      );
-    },
-    filterFn: (row, id, value: string) => {
-      if (!value) return true;
-      return row.original.fileType === value;
     },
   },
   {
@@ -79,37 +62,69 @@ export const SharedFileTableColumns = ({
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('SHARED_BY')} />,
     cell: ({ row }) => {
       const sharedBy = row.original.sharedBy;
-      if (!sharedBy) return <span className="text-muted-foreground">-</span>;
+      if (!sharedBy) {
+        return (
+          <div className="flex items-center">
+            <span className="text-muted-foreground text-sm">-</span>
+          </div>
+        );
+      }
+
+      const getInitials = (name: string): string => {
+        return name
+          .split(' ')
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase()
+          .substring(0, 2);
+      };
 
       return (
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
             {sharedBy.avatar ? (
               <img
                 src={sharedBy.avatar}
                 alt={sharedBy.name}
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `<span class="text-xs font-medium text-gray-600">${getInitials(sharedBy.name)}</span>`;
+                  }
+                }}
               />
             ) : (
               <span className="text-xs font-medium text-gray-600">
-                {sharedBy.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()}
+                {getInitials(sharedBy.name)}
               </span>
             )}
           </div>
-          <span className="text-sm">{sharedBy.name}</span>
+          <span className="text-sm truncate" title={sharedBy.name}>
+            {sharedBy.name}
+          </span>
         </div>
       );
     },
-    // Fixed filter function for sharedBy
-    filterFn: (row, id, value: string[]) => {
-      if (!value || value.length === 0) return true;
-      const sharedById = row.original.sharedBy?.id;
-      if (!sharedById) return false;
-      return value.includes(sharedById);
+    filterFn: (row, id, value: string | string[]) => {
+      if (!value) return true;
+
+      const sharedBy = row.original.sharedBy;
+      if (!sharedBy) return false;
+
+      if (Array.isArray(value)) {
+        if (value.length === 0) return true;
+        return value.includes(sharedBy.id);
+      } else {
+        return sharedBy.name.toLowerCase().includes(value.toLowerCase()) || sharedBy.id === value;
+      }
+    },
+    sortingFn: (rowA, rowB) => {
+      const nameA = rowA.original.sharedBy?.name || '';
+      const nameB = rowB.original.sharedBy?.name || '';
+      return nameA.localeCompare(nameB);
     },
   },
   {
@@ -122,7 +137,7 @@ export const SharedFileTableColumns = ({
 
       return (
         <div className="flex items-center">
-          <span>{CustomtDateFormat(date)}</span>
+          <span className="text-sm">{CustomtDateFormat(date)}</span>
         </div>
       );
     },
@@ -131,14 +146,12 @@ export const SharedFileTableColumns = ({
       const b = rowB.original.sharedDate?.getTime() || 0;
       return compareValues(a, b);
     },
-    // Fixed date range filtering
     filterFn: (row, id, value: DateRange) => {
       if (!value) return true;
 
       const rowDate = row.original.sharedDate;
       if (!rowDate) return false;
 
-      // Normalize dates for comparison (remove time component)
       const normalizeDate = (date: Date) => {
         const normalized = new Date(date);
         normalized.setHours(0, 0, 0, 0);
@@ -175,13 +188,13 @@ export const SharedFileTableColumns = ({
 
       return (
         <div className="flex items-center">
-          <span>{CustomtDateFormat(date)}</span>
+          <span className="text-sm">{CustomtDateFormat(date)}</span>
         </div>
       );
     },
-    sortingFn: (rowA, rowB) => {
-      const a = rowA.original.lastModified.getTime();
-      const b = rowB.original.lastModified.getTime();
+    sortingFn: (row) => {
+      const a = row.original.lastModified.getTime();
+      const b = row.original.lastModified.getTime();
       return compareValues(a, b);
     },
     filterFn: (row, id, value: DateRange) => {
@@ -190,7 +203,6 @@ export const SharedFileTableColumns = ({
       const rowDate = row.original.lastModified;
       if (!rowDate) return false;
 
-      // Normalize dates for comparison (remove time component)
       const normalizeDate = (date: Date) => {
         const normalized = new Date(date);
         normalized.setHours(0, 0, 0, 0);
@@ -224,7 +236,7 @@ export const SharedFileTableColumns = ({
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('SIZE')} />,
     cell: ({ row }) => (
       <div className="flex items-center">
-        <span className="text-muted-foreground">{row.original.size}</span>
+        <span className="text-muted-foreground text-sm">{row.original.size}</span>
       </div>
     ),
     sortingFn: (rowA, rowB) => {

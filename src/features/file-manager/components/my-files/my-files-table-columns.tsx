@@ -3,7 +3,7 @@ import { CustomtDateFormat } from 'lib/custom-date-formatter';
 import { IFileData } from '../../hooks/use-mock-files-query';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { compareValues } from 'features/iam/services/user-service';
-import { FileTableRowActions } from './my-files-row-actions';
+import { FileTableRowActions } from '../file-manager-row-actions';
 import { getFileTypeIcon, getFileTypeInfo, getFileTypeOptions } from '../../utils/file-manager';
 import { Users } from 'lucide-react';
 

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
-import { FileTableRowActions } from '../my-files/my-files-row-actions';
+import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
 import FileDetailsSheet from '../my-files/my-files-details';
@@ -31,10 +31,20 @@ interface SharedFileGridViewProps {
   onCopy?: (file: IFileData) => void;
   onOpen?: (file: IFileData) => void;
   onRename?: (file: IFileData) => void;
-  filters: {
-    name: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
+  filters: SharedFilters;
+}
+
+interface SharedFilters {
+  name: string;
+  fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  sharedBy?: string;
+  sharedDate?: DateRange;
+  modifiedDate?: DateRange;
+}
+
+interface DateRange {
+  from?: Date;
+  to?: Date;
 }
 
 interface PaginationState {
@@ -163,7 +173,15 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
   const queryParams = {
     page: paginationState.pageIndex,
     pageSize: paginationState.pageSize,
-    filter: filters,
+    filter: {
+      name: filters.name || '',
+      fileType: filters.fileType,
+      sharedBy: filters.sharedBy,
+      sharedDateFrom: filters.sharedDate?.from?.toISOString(),
+      sharedDateTo: filters.sharedDate?.to?.toISOString(),
+      modifiedDateFrom: filters.modifiedDate?.from?.toISOString(),
+      modifiedDateTo: filters.modifiedDate?.to?.toISOString(),
+    },
   };
 
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
@@ -193,7 +211,6 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
     }
   }, [data]);
 
-  // Enhanced handlers to manage details sheet
   const handleViewDetails = useCallback(
     (file: IFileData) => {
       setSelectedFile(file);
@@ -207,6 +224,51 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
     setIsDetailsOpen(false);
     setSelectedFile(null);
   }, []);
+
+  const applyClientSideFilters = useCallback(
+    (files: IFileData[]) => {
+      return files.filter((file) => {
+        if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+          return false;
+        }
+
+        if (filters.fileType && file.fileType !== filters.fileType) {
+          return false;
+        }
+
+        if (filters.sharedBy && file.sharedBy?.id !== filters.sharedBy) {
+          return false;
+        }
+
+        if (filters.sharedDate?.from || filters.sharedDate?.to) {
+          const sharedDate = new Date(file.sharedDate ?? file.sharedDate ?? '');
+
+          if (filters.sharedDate.from && sharedDate < filters.sharedDate.from) {
+            return false;
+          }
+
+          if (filters.sharedDate.to && sharedDate > filters.sharedDate.to) {
+            return false;
+          }
+        }
+
+        if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
+          const modifiedDate = new Date(file.lastModified ?? file.sharedDate ?? '');
+
+          if (filters.modifiedDate.from && modifiedDate < filters.modifiedDate.from) {
+            return false;
+          }
+
+          if (filters.modifiedDate.to && modifiedDate > filters.modifiedDate.to) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    },
+    [filters]
+  );
 
   if (error) {
     return (
@@ -229,9 +291,20 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
     );
   }
 
-  const files = data?.data || [];
-  const folders = files.filter((file) => file.fileType === 'Folder');
-  const regularFiles = files.filter((file) => file.fileType !== 'Folder');
+  const rawFiles = data?.data || [];
+  const filteredFiles = applyClientSideFilters(rawFiles);
+
+  const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
+  const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
+
+  const hasActiveFilters =
+    filters.name ||
+    filters.fileType ||
+    filters.sharedBy ||
+    filters.sharedDate?.from ||
+    filters.sharedDate?.to ||
+    filters.modifiedDate?.from ||
+    filters.modifiedDate?.to;
 
   return (
     <div className="flex h-full w-full">
@@ -240,8 +313,11 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
           <div className="space-y-8">
             {folders.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded flex items-center gap-2">
                   {t('FOLDER')}
+                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                    {folders.length}
+                  </span>
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {folders.map((file) => (
@@ -265,7 +341,12 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
 
             {regularFiles.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded flex items-center gap-2">
+                  {t('FILE')}
+                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                    {regularFiles.length}
+                  </span>
+                </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {regularFiles.map((file) => (
                     <FileCard
@@ -286,19 +367,26 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
               </div>
             )}
 
-            {files.length === 0 && !isLoading && (
+            {filteredFiles.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Folder className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('NO_FILES_FOUND')}</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {hasActiveFilters ? t('NO_FILES_MATCH_CRITERIA') : t('NO_FILES_FOUND')}
+                </h3>
                 <p className="text-gray-500 max-w-sm">
-                  {filters.name || filters.fileType
-                    ? t('NO_FILES_MATCH_CRITERIA')
+                  {hasActiveFilters
+                    ? t('TRY_ADJUSTING_FILTERS_OR_SEARCH_TERMS')
                     : t('NO_FILES_UPLOADED_YET')}
                 </p>
+                {hasActiveFilters && (
+                  <Button variant="outline" className="mt-4" onClick={() => {}}>
+                    {t('CLEAR_ALL_FILTERS')}
+                  </Button>
+                )}
               </div>
             )}
 
-            {data && data.data.length < data.totalCount && (
+            {data && rawFiles.length < data.totalCount && (
               <div className="flex justify-center pt-6">
                 <Button
                   onClick={handleLoadMore}
@@ -312,9 +400,24 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
                       {t('LOADING')}
                     </div>
                   ) : (
-                    t('LOAD_MORE')
+                    <>
+                      {t('LOAD_MORE')}
+                      <span className="ml-2 text-xs bg-gray-100 px-2 py-1 rounded-full">
+                        {rawFiles.length} / {data.totalCount}
+                      </span>
+                    </>
                   )}
                 </Button>
+              </div>
+            )}
+
+            {hasActiveFilters && filteredFiles.length > 0 && (
+              <div className="flex justify-center pt-4">
+                <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+                  {t('SHOWING')} {filteredFiles.length} {t('OF')} {rawFiles.length} {t('FILES')}
+                  {rawFiles.length < (data?.totalCount ?? 0) &&
+                    ` (${data?.totalCount ?? 0} ${t('TOTAL')})`}
+                </div>
               </div>
             )}
           </div>

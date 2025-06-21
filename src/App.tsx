@@ -41,7 +41,7 @@ import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { InvoiceLayout } from './pages/invoices/invoice-layout';
 import { CreateInvoice, EditInvoice } from './features/invoices';
 import FileManagerMyFiles from 'pages/file-manager/my-files';
-import SharedWithMe from 'pages/file-manager/shared-with-me';
+import SharedWithMe from 'pages/file-manager/shared-files';
 
 const queryClient = new QueryClient();
 

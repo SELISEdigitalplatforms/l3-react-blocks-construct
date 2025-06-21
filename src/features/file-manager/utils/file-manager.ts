@@ -1,5 +1,12 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
 
+export const sharedUsers = [
+  { id: '1', name: 'Luca Meier' },
+  { id: '2', name: 'Aaron Green' },
+  { id: '3', name: 'Sarah Pavan' },
+  { id: '4', name: 'Adrian Müller' },
+];
+
 type FileTypeOption = {
   value: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   label: string;
