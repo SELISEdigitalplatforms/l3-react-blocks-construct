@@ -344,10 +344,10 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
             <Tabs value={viewMode} onValueChange={handleViewMode}>
               <TabsList className="border rounded-lg flex h-8">
                 <TabsTrigger value="list" className="px-2">
-                  <AlignJustify className="h-4 w-4" />
+                  <AlignJustify className="h-3 w-3" />
                 </TabsTrigger>
                 <TabsTrigger value="grid" className="px-2">
-                  <LayoutGrid className="h-4 w-4" />
+                  <LayoutGrid className="h-3 w-3" />
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -368,16 +368,16 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <Tabs value={viewMode} onValueChange={handleViewMode}>
-            <TabsList className="border rounded-lg flex h-8">
-              <TabsTrigger value="list" className="px-3">
+            <TabsList className="rounded-lg flex h-10">
+              <TabsTrigger value="list" className="p-2">
                 <AlignJustify className="h-4 w-4" />
               </TabsTrigger>
-              <TabsTrigger value="grid" className="px-3">
+              <TabsTrigger value="grid" className="p-2">
                 <LayoutGrid className="h-4 w-4" />
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button onClick={onOpen} size="sm" className="h-8 text-sm font-bold">
+          <Button onClick={onOpen} size="sm" className="h-10 text-sm font-bold">
             <Plus className="h-4 w-4 mr-1" />
             {t('ADD_NEW')}
           </Button>
