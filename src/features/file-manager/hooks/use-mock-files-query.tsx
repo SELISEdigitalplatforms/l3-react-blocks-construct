@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 export interface IFileData {
   id: string;
   name: string;
-  lastModified: string;
+  lastModified: Date;
   fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   size: string;
   isShared?: boolean;
@@ -13,21 +13,21 @@ export const mockFileData: IFileData[] = [
   {
     id: '1',
     name: 'Meeting Notes',
-    lastModified: '03.02.2024',
+    lastModified: new Date('2024-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
   },
   {
     id: '2',
     name: 'Research Data',
-    lastModified: '03.02.2024',
+    lastModified: new Date('2024-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
   },
   {
     id: '3',
     name: 'Client Documents',
-    lastModified: '03.2.2024',
+    lastModified: new Date('2024-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
     isShared: true,
@@ -35,14 +35,14 @@ export const mockFileData: IFileData[] = [
   {
     id: '4',
     name: 'Project Files',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
   },
   {
     id: '5',
     name: 'Design Assets',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
     isShared: true,
@@ -50,35 +50,35 @@ export const mockFileData: IFileData[] = [
   {
     id: '6',
     name: 'Project Documents.doc',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'File',
     size: '21.4 MB',
   },
   {
     id: '7',
     name: 'Sunset_View_Image.jpg',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Image',
     size: '21.4 MB',
   },
   {
     id: '8',
     name: 'Chill Beats Mix.mp3',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Audio',
     size: '21.4 MB',
   },
   {
     id: '9',
     name: 'Adventure_Video.mp4',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Video',
     size: '21.4 MB',
   },
   {
     id: '10',
     name: 'Requirements.doc',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'File',
     size: '21.4 MB',
     isShared: true,
@@ -86,21 +86,21 @@ export const mockFileData: IFileData[] = [
   {
     id: '11',
     name: 'Adventure_Video.mp4',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Video',
     size: '21.4 MB',
   },
   {
     id: '12',
     name: 'Research Data',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
   },
   {
     id: '13',
     name: 'Client Documents',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
     isShared: true,
@@ -108,14 +108,14 @@ export const mockFileData: IFileData[] = [
   {
     id: '14',
     name: 'Project Files',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
   },
   {
     id: '15',
     name: 'Design Assets',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
     isShared: true,
@@ -123,35 +123,35 @@ export const mockFileData: IFileData[] = [
   {
     id: '16',
     name: 'Project Documents.doc',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'File',
     size: '21.4 MB',
   },
   {
     id: '17',
     name: 'Sunset_View_Image.jpg',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Image',
     size: '21.4 MB',
   },
   {
-    id: '8',
+    id: '18',
     name: 'Chill Beats Mix.mp3',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Audio',
     size: '21.4 MB',
   },
   {
     id: '19',
     name: 'Adventure_Video.mp4',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'Video',
     size: '21.4 MB',
   },
   {
-    id: '10',
+    id: '20',
     name: 'Requirements.doc',
-    lastModified: '03.02.2025',
+    lastModified: new Date('2025-02-03'),
     fileType: 'File',
     size: '21.4 MB',
     isShared: true,

@@ -87,9 +87,7 @@ export const createFileTableColumns = ({
     accessorFn: (row) => row.lastModified,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('LAST_MODIFIED')} />,
     cell: ({ row }) => {
-      const dateStr = row.original.lastModified;
-      const [day, month, year] = dateStr.split('.');
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const date = row.original.lastModified;
 
       return (
         <div className="flex items-center">
@@ -98,21 +96,28 @@ export const createFileTableColumns = ({
       );
     },
     sortingFn: (rowA, rowB) => {
-      const parseDate = (dateStr: string): number => {
-        const [day, month, year] = dateStr.split('.');
-        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).getTime();
-      };
-
-      const a = parseDate(rowA.original.lastModified);
-      const b = parseDate(rowB.original.lastModified);
+      const a = rowA.original.lastModified.getTime();
+      const b = rowB.original.lastModified.getTime();
       return compareValues(a, b);
     },
     filterFn: (row, id, value) => {
-      if (!value?.from || !value?.to) return true;
-      const dateStr = row.getValue(id) as string;
-      const [day, month, year] = dateStr.split('.');
-      const rowDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      return rowDate >= value.from && rowDate <= value.to;
+      if (!value) return true;
+
+      const rowDate = row.original.lastModified;
+
+      if (value.from && !value.to) {
+        return rowDate >= value.from;
+      }
+
+      if (!value.from && value.to) {
+        return rowDate <= value.to;
+      }
+
+      if (value.from && value.to) {
+        return rowDate >= value.from && rowDate <= value.to;
+      }
+
+      return true;
     },
   },
   {

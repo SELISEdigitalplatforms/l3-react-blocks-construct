@@ -3,6 +3,7 @@ import DataTable from '../../components/blocks/data-table/data-table';
 import { useTranslation } from 'react-i18next';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import { createFileTableColumns } from 'features/file-manager/components/file-table-columns';
+import FileDetailsSheet from 'features/file-manager/components/file-manager-details';
 
 interface PaginationState {
   pageIndex: number;
@@ -35,9 +36,11 @@ const FileListView: React.FC<FileListViewProps> = ({
   onRename,
   filters,
 }) => {
-  const [openSheet, setOpenSheet] = useState(false);
-  const [, setSelectedFile] = useState<IFileData | null>(null);
   const { t } = useTranslation();
+
+  // State for the details sheet
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -80,11 +83,20 @@ const FileListView: React.FC<FileListViewProps> = ({
     }));
   }, [filters]);
 
-  const handleViewDetailsWrapper = (file: IFileData) => {
-    setSelectedFile(file);
-    setOpenSheet(true);
-    onViewDetails(file);
-  };
+  // Enhanced handlers to manage details sheet
+  const handleViewDetailsWrapper = useCallback(
+    (file: IFileData) => {
+      setSelectedFile(file);
+      setIsDetailsOpen(true);
+      onViewDetails(file);
+    },
+    [onViewDetails]
+  );
+
+  const handleCloseDetails = useCallback(() => {
+    setIsDetailsOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   const handleDownloadWrapper = () => undefined;
 
@@ -97,18 +109,6 @@ const FileListView: React.FC<FileListViewProps> = ({
     setSelectedFile(file);
     onDelete(file);
   };
-
-  useEffect(() => {
-    if (openSheet) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [openSheet]);
 
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
@@ -127,24 +127,37 @@ const FileListView: React.FC<FileListViewProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-full w-full">
-      <div className="h-full flex-col flex w-full gap-6 md:gap-8">
-        <DataTable
-          data={data?.data || []}
-          columns={columns}
-          onRowClick={handleViewDetailsWrapper}
-          isLoading={isLoading}
-          pagination={{
-            pageIndex: paginationState.pageIndex,
-            pageSize: paginationState.pageSize,
-            totalCount: paginationState.totalCount,
-          }}
-          onPaginationChange={handlePaginationChange}
-          manualPagination={true}
-          mobileColumns={['name']}
-          expandable={true}
-        />
+    <div className="flex h-full w-full rounded-xl">
+      {/* Main content area */}
+      <div
+        className={`flex flex-col h-full transition-all duration-300 ${isDetailsOpen ? 'flex-1' : 'w-full'}`}
+      >
+        <div className="h-full flex-col flex w-full gap-6 md:gap-8">
+          <DataTable
+            data={data?.data || []}
+            columns={columns}
+            onRowClick={handleViewDetailsWrapper}
+            isLoading={isLoading}
+            pagination={{
+              pageIndex: paginationState.pageIndex,
+              pageSize: paginationState.pageSize,
+              totalCount: paginationState.totalCount,
+            }}
+            onPaginationChange={handlePaginationChange}
+            manualPagination={true}
+            mobileColumns={['name']}
+            expandable={true}
+          />
+        </div>
       </div>
+
+      {/* Details Panel */}
+      <FileDetailsSheet
+        isOpen={isDetailsOpen}
+        onClose={handleCloseDetails}
+        file={selectedFile}
+        t={t}
+      />
     </div>
   );
 };

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
@@ -8,6 +7,7 @@ import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/fi
 import { FileTableRowActions } from 'features/file-manager/components/file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
+import FileDetailsSheet from 'features/file-manager/components/file-manager-details';
 
 interface FileCardProps {
   file: IFileData;
@@ -156,6 +156,10 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  // State for the details sheet
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
+
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: isMobile ? 20 : 50,
@@ -179,7 +183,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     }
   }, [data?.totalCount]);
 
-  // Reset pagination when filters change
   useEffect(() => {
     setPaginationState((prev) => ({
       ...prev,
@@ -195,6 +198,21 @@ const FileGridView: React.FC<FileGridViewProps> = ({
       }));
     }
   }, [data]);
+
+  // Enhanced handlers to manage details sheet
+  const handleViewDetails = useCallback(
+    (file: IFileData) => {
+      setSelectedFile(file);
+      setIsDetailsOpen(true);
+      onViewDetails?.(file);
+    },
+    [onViewDetails]
+  );
+
+  const handleCloseDetails = useCallback(() => {
+    setIsDetailsOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   if (error) {
     return (
@@ -222,88 +240,103 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   const regularFiles = files.filter((file) => file.fileType !== 'Folder');
 
   return (
-    <div className="flex flex-col h-full w-full">
-      <div className="flex-1">
-        <div className="space-y-8">
-          {folders.length > 0 && (
-            <div>
-              <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FOLDER')}</h2>
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                {folders.map((file) => (
-                  <FileCard
-                    key={file.id}
-                    file={file}
-                    onViewDetails={onViewDetails}
-                    onDownload={onDownload}
-                    onShare={onShare}
-                    onDelete={onDelete}
-                    onMove={onMove}
-                    onCopy={onCopy}
-                    onOpen={onOpen}
-                    onRename={onRename}
-                    t={t}
-                  />
-                ))}
+    <div className="flex h-full w-full">
+      {/* Main content area */}
+      <div
+        className={`flex flex-col h-full transition-all duration-300 ${isDetailsOpen ? 'flex-1' : 'w-full'}`}
+      >
+        <div className="flex-1">
+          <div className="space-y-8">
+            {folders.length > 0 && (
+              <div>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                  {t('FOLDER')}
+                </h2>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+                  {folders.map((file) => (
+                    <FileCard
+                      key={file.id}
+                      file={file}
+                      onViewDetails={handleViewDetails}
+                      onDownload={onDownload}
+                      onShare={onShare}
+                      onDelete={onDelete}
+                      onMove={onMove}
+                      onCopy={onCopy}
+                      onOpen={onOpen}
+                      onRename={onRename}
+                      t={t}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {regularFiles.length > 0 && (
-            <div>
-              <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                {regularFiles.map((file) => (
-                  <FileCard
-                    key={file.id}
-                    file={file}
-                    onViewDetails={onViewDetails}
-                    onDownload={onDownload}
-                    onShare={onShare}
-                    onDelete={onDelete}
-                    onMove={onMove}
-                    onCopy={onCopy}
-                    onOpen={onOpen}
-                    onRename={onRename}
-                    t={t}
-                  />
-                ))}
+            {regularFiles.length > 0 && (
+              <div>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+                  {regularFiles.map((file) => (
+                    <FileCard
+                      key={file.id}
+                      file={file}
+                      onViewDetails={handleViewDetails}
+                      onDownload={onDownload}
+                      onShare={onShare}
+                      onDelete={onDelete}
+                      onMove={onMove}
+                      onCopy={onCopy}
+                      onOpen={onOpen}
+                      onRename={onRename}
+                      t={t}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {files.length === 0 && !isLoading && (
-            <div className="flex flex-col items-center justify-center p-12 text-center">
-              <Folder className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('NO_FILES_FOUND')}</h3>
-              <p className="text-gray-500 max-w-sm">
-                {filters.name || filters.fileType
-                  ? t('NO_FILES_MATCH_CRITERIA')
-                  : t('NO_FILES_UPLOADED_YET')}
-              </p>
-            </div>
-          )}
+            {files.length === 0 && !isLoading && (
+              <div className="flex flex-col items-center justify-center p-12 text-center">
+                <Folder className="h-12 w-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('NO_FILES_FOUND')}</h3>
+                <p className="text-gray-500 max-w-sm">
+                  {filters.name || filters.fileType
+                    ? t('NO_FILES_MATCH_CRITERIA')
+                    : t('NO_FILES_UPLOADED_YET')}
+                </p>
+              </div>
+            )}
 
-          {data && data.data.length < data.totalCount && (
-            <div className="flex justify-center pt-6">
-              <Button
-                onClick={handleLoadMore}
-                variant="outline"
-                disabled={isLoading}
-                className="min-w-32"
-              >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                    {t('LOADING')}
-                  </div>
-                ) : (
-                  t('LOAD_MORE')
-                )}
-              </Button>
-            </div>
-          )}
+            {data && data.data.length < data.totalCount && (
+              <div className="flex justify-center pt-6">
+                <Button
+                  onClick={handleLoadMore}
+                  variant="outline"
+                  disabled={isLoading}
+                  className="min-w-32"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                      {t('LOADING')}
+                    </div>
+                  ) : (
+                    t('LOAD_MORE')
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Details Panel */}
+      <FileDetailsSheet
+        isOpen={isDetailsOpen}
+        onClose={handleCloseDetails}
+        file={selectedFile}
+        t={t}
+      />
     </div>
   );
 };
