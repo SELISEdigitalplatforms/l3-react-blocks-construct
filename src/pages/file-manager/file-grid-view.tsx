@@ -50,7 +50,6 @@ const FileCard: React.FC<FileCardProps> = ({
   onShare,
   onDelete,
   onMove,
-  onOpen,
   onRename,
 }) => {
   const IconComponent = getFileTypeIcon(file.fileType);
@@ -58,11 +57,7 @@ const FileCard: React.FC<FileCardProps> = ({
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (file.fileType === 'Folder') {
-      onOpen?.(file);
-    } else {
-      onViewDetails?.(file);
-    }
+    onViewDetails?.(file);
   };
 
   const mockRow = {
