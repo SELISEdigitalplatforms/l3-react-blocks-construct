@@ -82,7 +82,6 @@ const FileListView: React.FC<FileListViewProps> = ({
     }));
   }, [filters]);
 
-  // Enhanced handlers to manage details sheet
   const handleViewDetailsWrapper = useCallback(
     (file: IFileData) => {
       setSelectedFile(file);
@@ -129,12 +128,10 @@ const FileListView: React.FC<FileListViewProps> = ({
     return <div className="p-4 text-error">{t('ERROR_LOADING_FILES')}</div>;
   }
 
-  // On mobile, when details are open, hide the main content
   const shouldHideMainContent = isMobile && isDetailsOpen;
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
-      {/* Main content area */}
       {!shouldHideMainContent && (
         <div
           className={`flex flex-col h-full transition-all duration-300 ${
@@ -161,7 +158,6 @@ const FileListView: React.FC<FileListViewProps> = ({
         </div>
       )}
 
-      {/* Details Panel - Full screen on mobile, side panel on desktop */}
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}

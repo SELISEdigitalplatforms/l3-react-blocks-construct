@@ -151,7 +151,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
-  // State for the details sheet
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
 
@@ -236,10 +235,7 @@ const FileGridView: React.FC<FileGridViewProps> = ({
 
   return (
     <div className="flex h-full w-full">
-      {/* Main content area */}
-      <div
-        className={`flex flex-col h-full transition-all duration-300 ${isDetailsOpen ? 'flex-1' : 'w-full'}`}
-      >
+      <div className={`flex flex-col h-full ${isDetailsOpen ? 'flex-1' : 'w-full'}`}>
         <div className="flex-1">
           <div className="space-y-8">
             {folders.length > 0 && (
@@ -325,7 +321,6 @@ const FileGridView: React.FC<FileGridViewProps> = ({
         </div>
       </div>
 
-      {/* Details Panel */}
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}

@@ -442,7 +442,6 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
   );
 };
 
-// Updated FileManager component
 interface FileManagerProps {
   onCreateFile?: () => void;
 }
