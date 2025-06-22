@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import { createFileTableColumns } from './my-files-table-columns';
@@ -12,7 +12,7 @@ interface PaginationState {
   totalCount: number;
 }
 
-interface SharedFileListViewProps {
+interface MyFilesListViewProps {
   onViewDetails: (file: IFileData) => void;
   onShare: (file: IFileData) => void;
   onDelete: (file: IFileData) => void;
@@ -24,9 +24,11 @@ interface SharedFileListViewProps {
     name?: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   };
+  newFiles: IFileData[];
+  newFolders: IFileData[];
 }
 
-const SharedFileListView: React.FC<SharedFileListViewProps> = ({
+const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   onViewDetails,
   onShare,
   onDelete,
@@ -34,6 +36,8 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
   onCopy,
   onRename,
   filters,
+  newFiles,
+  newFolders,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -55,6 +59,25 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
 
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
 
+  const localFiles = useMemo(() => {
+    return [...newFiles, ...newFolders];
+  }, [newFiles, newFolders]);
+
+  const combinedData = useMemo(() => {
+    const serverFiles = data?.data || [];
+    const filteredLocalFiles = localFiles.filter((file) => {
+      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+        return false;
+      }
+      if (filters.fileType && file.fileType !== filters.fileType) {
+        return false;
+      }
+      return true;
+    });
+
+    return [...filteredLocalFiles, ...serverFiles];
+  }, [localFiles, data?.data, filters]);
+
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
       setPaginationState((prev) => ({
@@ -70,10 +93,10 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
     if (data?.totalCount !== undefined) {
       setPaginationState((prev) => ({
         ...prev,
-        totalCount: data.totalCount,
+        totalCount: data.totalCount + localFiles.length,
       }));
     }
-  }, [data?.totalCount]);
+  }, [data?.totalCount, localFiles.length]);
 
   useEffect(() => {
     setPaginationState((prev) => ({
@@ -103,10 +126,13 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
     onShare(file);
   };
 
-  const handleDeleteWrapper = (file: IFileData) => {
-    setSelectedFile(file);
-    onDelete(file);
-  };
+  const handleDeleteWrapper = useCallback(
+    (file: IFileData) => {
+      setSelectedFile(file);
+      onDelete(file);
+    },
+    [onDelete]
+  );
 
   const handleOpenWrapper = (file: IFileData) => {
     handleViewDetailsWrapper(file);
@@ -140,7 +166,7 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
         >
           <div className="h-full flex-col flex w-full gap-6 md:gap-8">
             <DataTable
-              data={data?.data || []}
+              data={combinedData}
               columns={columns}
               onRowClick={handleViewDetailsWrapper}
               isLoading={isLoading}
@@ -168,4 +194,4 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
   );
 };
 
-export default SharedFileListView;
+export default MyFilesListView;
