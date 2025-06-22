@@ -20,6 +20,8 @@ export interface MenuItem {
     | 'SearchX'
     | 'TriangleAlert'
     | 'ChartNoAxesCombined'
+    | 'Folder'
+    | 'ReceiptText'
     | 'ReceiptText'
     | 'MessageSquareText';
   children?: MenuItem[];
