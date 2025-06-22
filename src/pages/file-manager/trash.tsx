@@ -1,14 +1,21 @@
-/* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-console */
-
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from 'hooks/use-mobile';
-import { Search, Plus, PlusCircle, ListFilter, AlignJustify, LayoutGrid, X } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
+import {
+  AlignJustify,
+  LayoutGrid,
+  ListFilter,
+  PlusCircle,
+  Recycle,
+  RotateCcw,
+  Search,
+  X,
+} from 'lucide-react';
+import { Calendar } from 'components/ui/calendar';
+import { IFileTrashData } from 'features/file-manager/utils/file-manager';
+import { useIsMobile } from 'hooks/use-mobile';
 import {
   Select,
   SelectContent,
@@ -16,22 +23,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
-import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import FileGridView from '../../features/file-manager/components/my-files/my-files-grid-view';
-import FileListView from '../../features/file-manager/components/my-files/my-files-list-view';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
-import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
+import { Input } from 'components/ui/input';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
+import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
+import TrashFilesListView from 'features/file-manager/components/trash/trash-files-list-view';
 
 interface DateRange {
   from?: Date;
   to?: Date;
 }
 
-interface FileFilters {
+interface TrashFilters {
   name: string;
   fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  lastModified?: DateRange;
+  deletedBy?: string;
+  trashedDate?: DateRange;
 }
 
 const DateRangeFilter: React.FC<{
@@ -58,9 +65,9 @@ const DateRangeFilter: React.FC<{
   };
 
   const formatDateRange = (range?: DateRange) => {
-    if (!range?.from && !range?.to) return t('LAST_MODIFIED');
+    if (!range?.from && !range?.to) return t(title);
     if (range.from && !range.to) return `From ${range.from.toLocaleDateString()}`;
-    if (!range.from && range.to) return `Until ${range.to.toLocaleDateString()}`;
+    if (!range.from && range.to) return `Until ${range.to?.toLocaleDateString()}`;
     return `${range.from?.toLocaleDateString()} - ${range.to?.toLocaleDateString()}`;
   };
 
@@ -117,24 +124,28 @@ const DateRangeFilter: React.FC<{
   );
 };
 
-interface FileManagerHeaderToolbarProps {
-  onOpen: () => void;
+interface TrashHeaderToolbarProps {
   viewMode?: string;
   handleViewMode: (view: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
-  filters: FileFilters;
-  onFiltersChange: (filters: FileFilters) => void;
+  filters: TrashFilters;
+  onFiltersChange: (filters: TrashFilters) => void;
+  onClearTrash?: () => void;
+  onRestoreSelected?: () => void;
+  selectedItems?: string[];
 }
 
-const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
-  onOpen,
-  viewMode = 'grid',
+const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
+  viewMode = 'list',
   handleViewMode,
   searchQuery = '',
   onSearchChange,
   filters,
   onFiltersChange,
+  onClearTrash,
+  onRestoreSelected,
+  selectedItems = [],
 }) => {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
@@ -166,10 +177,10 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
     });
   };
 
-  const handleDateRangeChange = (dateRange?: DateRange) => {
+  const handleTrashedDateRangeChange = (dateRange?: DateRange) => {
     onFiltersChange({
       ...filters,
-      lastModified: dateRange,
+      trashedDate: dateRange,
     });
   };
 
@@ -178,15 +189,17 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
     onFiltersChange({
       name: '',
       fileType: undefined,
-      lastModified: undefined,
+      deletedBy: undefined,
+      trashedDate: undefined,
     });
   };
 
-  const isFiltered = filters.name || filters.fileType || filters.lastModified;
+  const isFiltered = filters.name || filters.fileType || filters.deletedBy || filters.trashedDate;
   const activeFiltersCount =
     (filters.name ? 1 : 0) +
     (filters.fileType ? 1 : 0) +
-    (filters.lastModified?.from || filters.lastModified?.to ? 1 : 0);
+    (filters.deletedBy ? 1 : 0) +
+    (filters.trashedDate?.from || filters.trashedDate?.to ? 1 : 0);
 
   const fileTypeOptions = [
     { value: 'Folder', label: t('FOLDER') },
@@ -218,14 +231,16 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
       </div>
 
       {isMobile && (
-        <div className="w-full">
-          <label className="text-sm font-medium block mb-2">{t('LAST_MODIFIED')}</label>
-          <DateRangeFilter
-            date={filters.lastModified}
-            onDateChange={handleDateRangeChange}
-            title="LAST_MODIFIED"
-          />
-        </div>
+        <>
+          <div className="w-full">
+            <label className="text-sm font-medium block mb-2">{t('TRASHED_DATE')}</label>
+            <DateRangeFilter
+              date={filters.trashedDate}
+              onDateChange={handleTrashedDateRangeChange}
+              title="TRASHED_DATE"
+            />
+          </div>
+        </>
       )}
     </div>
   );
@@ -235,7 +250,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
 
     if (filters.fileType) {
       activeFilters.push(
-        <Badge key="fileType" variant="secondary" className="h-6  text-foreground">
+        <Badge key="fileType" variant="secondary" className="h-6 text-foreground">
           {t(filters.fileType.toUpperCase())}
           <Button
             variant="ghost"
@@ -249,23 +264,23 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
       );
     }
 
-    if (filters.lastModified?.from || filters.lastModified?.to) {
-      const dateRange = filters.lastModified;
+    if (filters.trashedDate?.from || filters.trashedDate?.to) {
+      const dateRange = filters.trashedDate;
       const label =
         dateRange.from && dateRange.to
-          ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
+          ? `Trashed: ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
           : dateRange.from
-            ? `From ${dateRange.from.toLocaleDateString()}`
-            : `Until ${dateRange.to?.toLocaleDateString()}`;
+            ? `Trashed from ${dateRange.from.toLocaleDateString()}`
+            : `Trashed until ${dateRange.to?.toLocaleDateString()}`;
 
       activeFilters.push(
-        <Badge key="lastModified" variant="secondary" className="h-6">
+        <Badge key="trashedDate" variant="secondary" className="h-6">
           {label}
           <Button
             variant="ghost"
             size="sm"
             className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleDateRangeChange(undefined)}
+            onClick={() => handleTrashedDateRangeChange(undefined)}
           >
             <X className="h-3 w-3" />
           </Button>
@@ -283,13 +298,19 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
     return (
       <div className="flex flex-col gap-3 w-full">
         <div className="flex justify-between w-full">
-          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
-            {t('FILE_MANAGER')}
-          </h3>
-          <Button onClick={onOpen} size="sm" className="h-8">
-            <Plus className="h-4 w-4" />
-            {t('ADD_NEW')}
-          </Button>
+          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">{t('TRASH')}</h3>
+          <div className="flex gap-2">
+            {selectedItems.length > 0 && (
+              <Button size="sm" variant="outline" className="h-8" onClick={onRestoreSelected}>
+                <RotateCcw className="h-4 w-4 mr-1" />
+                {t('RESTORE')}
+              </Button>
+            )}
+            <Button size="sm" variant="outline" className="h-8 bg-white" onClick={onClearTrash}>
+              <Recycle className="h-4 w-4 mr-1" />
+              {t('CLEAR_TRASH')}
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center w-full mt-2">
@@ -364,7 +385,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
     <div className="flex flex-col gap-3">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">{t('MY_FILES')}</h3>
+          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">{t('TRASH')}</h3>
         </div>
         <div className="flex items-center gap-2">
           <Tabs value={viewMode} onValueChange={handleViewMode}>
@@ -377,9 +398,25 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button onClick={onOpen} size="sm" className="h-10 text-sm font-bold">
-            <Plus className="h-4 w-4 mr-1" />
-            {t('ADD_NEW')}
+          {selectedItems.length > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-10 text-sm font-bold"
+              onClick={onRestoreSelected}
+            >
+              <RotateCcw className="h-4 w-4 mr-1" />
+              {t('RESTORE')} ({selectedItems.length})
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-10 text-sm font-bold"
+            onClick={onClearTrash}
+          >
+            <Recycle className="h-4 w-4 mr-1" />
+            {t('CLEAR_TRASH')}
           </Button>
         </div>
       </div>
@@ -407,25 +444,10 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
 
         <div className="flex items-center gap-2">
           <DateRangeFilter
-            date={filters.lastModified}
-            onDateChange={handleDateRangeChange}
-            title="LAST_MODIFIED"
+            date={filters.trashedDate}
+            onDateChange={handleTrashedDateRangeChange}
+            title="TRASHED_DATE"
           />
-
-          <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
-            <SelectTrigger className="h-8 w-[140px]">
-              <PlusCircle className="h-4 w-4 mr-1" />
-              <SelectValue placeholder={t('FILE_TYPE')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
-              {fileTypeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
@@ -442,50 +464,42 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
   );
 };
 
-interface FileManagerProps {
-  onCreateFile?: () => void;
+interface TrashProps {
+  onRestoreFile?: (file: IFileTrashData) => void;
+  onPermanentDelete?: (file: IFileTrashData) => void;
+  onClearTrash?: () => void;
 }
 
-const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
+export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [filters, setFilters] = useState<FileFilters>({
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [filters, setFilters] = useState<TrashFilters>({
     name: '',
     fileType: undefined,
-    lastModified: undefined,
+    deletedBy: undefined,
+    trashedDate: undefined,
   });
 
-  const handleViewDetails = useCallback((file: IFileData) => {
-    console.log('View details:', file);
-  }, []);
+  const handleRestoreFile = useCallback(
+    (file: IFileTrashData) => {
+      console.log('Restore file:', file);
+      onRestoreFile?.(file);
+    },
+    [onRestoreFile]
+  );
 
-  const handleDownload = useCallback((file: IFileData) => {
-    console.log('Download:', file);
-  }, []);
+  const handlePermanentDelete = useCallback(
+    (file: IFileTrashData) => {
+      console.log('Permanently delete:', file);
+      onPermanentDelete?.(file);
+    },
+    [onPermanentDelete]
+  );
 
-  const handleShare = useCallback((file: IFileData) => {
-    console.log('Share:', file);
-  }, []);
-
-  const handleDelete = useCallback((file: IFileData) => {
-    console.log('Delete:', file);
-  }, []);
-
-  const handleMove = useCallback((file: IFileData) => {
-    console.log('Move:', file);
-  }, []);
-
-  const handleCopy = useCallback((file: IFileData) => {
-    console.log('Copy:', file);
-  }, []);
-
-  const handleOpen = useCallback((file: IFileData) => {
-    console.log('Open:', file);
-  }, []);
-
-  const handleRename = useCallback((file: IFileData) => {
-    console.log('Rename:', file);
-  }, []);
+  const handleRestoreSelected = useCallback(() => {
+    console.log('Restore selected items:', selectedItems);
+  }, [selectedItems]);
 
   const handleViewModeChange = useCallback((mode: string) => {
     setViewMode(mode as 'grid' | 'list');
@@ -495,51 +509,42 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     setSearchQuery(query);
   }, []);
 
-  const handleFiltersChange = useCallback((newFilters: FileFilters) => {
+  const handleFiltersChange = useCallback((newFilters: TrashFilters) => {
     setFilters(newFilters);
     setSearchQuery(newFilters.name);
   }, []);
 
-  const handleCreateFile = useCallback(() => {
-    if (onCreateFile) {
-      onCreateFile();
-    } else {
-      console.log('Create new file/folder');
-    }
-  }, [onCreateFile]);
-
   const commonViewProps = {
-    onViewDetails: handleViewDetails,
-    onDownload: handleDownload,
-    onShare: handleShare,
-    onDelete: handleDelete,
-    onMove: handleMove,
-    onCopy: handleCopy,
-    onOpen: handleOpen,
-    onRename: handleRename,
+    onRestore: handleRestoreFile,
+    onDelete: handlePermanentDelete,
+    onPermanentDelete: handlePermanentDelete,
     filters,
+    selectedItems,
+    onSelectionChange: setSelectedItems,
   };
 
   return (
     <div className="flex flex-col h-full w-full space-y-4 p-4 md:p-6">
-      <FileManagerHeaderToolbar
-        onOpen={handleCreateFile}
+      <TrashHeaderToolbar
         viewMode={viewMode}
         handleViewMode={handleViewModeChange}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
         filters={filters}
         onFiltersChange={handleFiltersChange}
+        onClearTrash={onClearTrash}
+        onRestoreSelected={handleRestoreSelected}
+        selectedItems={selectedItems}
       />
 
       <div className="flex-1 overflow-hidden">
         {viewMode === 'grid' ? (
           <div className="h-full overflow-y-auto">
-            <FileGridView {...commonViewProps} />
+            {/* <TrashGridView {...commonViewProps} /> */}
           </div>
         ) : (
           <div className="h-full">
-            <FileListView {...commonViewProps} />
+            <TrashFilesListView {...commonViewProps} />
           </div>
         )}
       </div>
@@ -547,4 +552,4 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   );
 };
 
-export default FileManager;
+export default Trash;

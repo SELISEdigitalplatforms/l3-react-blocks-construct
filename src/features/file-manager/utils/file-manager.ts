@@ -96,3 +96,63 @@ export const getFileTypeInfo = (fileType: string) => {
 
   return config[fileType as keyof typeof config] || config.File;
 };
+
+export interface IFileTrashData {
+  id: string;
+  name: string;
+  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  size: string;
+  trashedDate: Date;
+  isShared?: boolean;
+}
+
+export const trashMockData: IFileTrashData[] = [
+  {
+    id: '1',
+    name: 'Adventure_Video.mp4',
+    fileType: 'Video',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: false,
+  },
+  {
+    id: '2',
+    name: 'Cat.jpg',
+    fileType: 'Image',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: false,
+  },
+  {
+    id: '3',
+    name: 'Design Assets',
+    fileType: 'Folder',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: true,
+  },
+  {
+    id: '4',
+    name: 'Design Assets 2',
+    fileType: 'Folder',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: true,
+  },
+  {
+    id: '5',
+    name: 'Ftoof.jpg',
+    fileType: 'Image',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: false,
+  },
+  {
+    id: '6',
+    name: 'Project Documents.doc',
+    fileType: 'File',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: false,
+  },
+];
