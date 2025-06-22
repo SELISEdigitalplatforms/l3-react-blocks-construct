@@ -5,6 +5,8 @@ import { UProfileMenu } from '../../components/blocks/u-profile-menu';
 import { SidebarTrigger, useSidebar } from 'components/ui/sidebar';
 import LanguageSelector from '../../components/blocks/language-selector/language-selector';
 import { Button } from 'components/ui/button';
+import { useEffect } from 'react';
+import { connect } from 'features/notifications/services/notification';
 
 export default function MainLayout() {
   const { open, isMobile } = useSidebar();
@@ -12,6 +14,26 @@ export default function MainLayout() {
   const segments = pathname?.split('/').filter(Boolean);
   const firstSegment = segments?.[0] ?? undefined;
   const isEmailRoute = firstSegment === 'mail';
+
+  useEffect(() => {
+    const initializeConnection = async () => {
+      try {
+        await connect();
+      } catch (error) {
+        console.error('Failed to connect to notifications:', error);
+        if (
+          typeof error === 'object' &&
+          error !== null &&
+          'status' in error &&
+          (error as any).status === 401
+        ) {
+          console.log('Authentication failed - token may be expired');
+        }
+      }
+    };
+
+    initializeConnection();
+  }, []);
 
   const getMarginClass = () => {
     if (isMobile) return 'ml-0';
