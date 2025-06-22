@@ -21,7 +21,9 @@ export interface MenuItem {
     | 'TriangleAlert'
     | 'ChartNoAxesCombined'
     | 'Folder'
-    | 'ReceiptText';
+    | 'ReceiptText'
+    | 'ReceiptText'
+    | 'MessageSquareText';
   children?: MenuItem[];
 }
 

@@ -12,9 +12,15 @@ interface InvoicePreviewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   invoice: Invoice | null;
+  [key: string]: any;
 }
 
-export function InvoicePreview({ open, onOpenChange, invoice }: Readonly<InvoicePreviewProps>) {
+export function InvoicePreview({
+  open,
+  onOpenChange,
+  invoice,
+  ...props
+}: Readonly<InvoicePreviewProps>) {
   if (!invoice) return null;
 
   return (
@@ -23,7 +29,7 @@ export function InvoicePreview({ open, onOpenChange, invoice }: Readonly<Invoice
         <DialogTitle />
         <DialogDescription />
       </DialogHeader>
-      <DialogContent className="max-w-[1000px] max-h-[90vh] overflow-y-auto p-8">
+      <DialogContent className="max-w-[1000px] max-h-[90vh] overflow-y-auto p-8" {...props}>
         <InvoicesDetail invoice={invoice} isPreview />
       </DialogContent>
     </Dialog>

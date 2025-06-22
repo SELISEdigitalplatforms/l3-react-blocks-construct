@@ -43,6 +43,7 @@ import { CreateInvoice, EditInvoice } from './features/invoices';
 import FileManagerMyFiles from 'pages/file-manager/my-files';
 import SharedWithMe from 'pages/file-manager/shared-files';
 import Trash from 'pages/file-manager/trash';
+import { ChatPage } from './pages/chat/chat';
 
 const queryClient = new QueryClient();
 
@@ -106,6 +107,7 @@ function AppContent() {
                 <Route path="/services/storage" element={<Storage />} />
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
+                <Route path="/chat" element={<ChatPage />} />
                 <Route element={<InvoiceLayout />}>
                   <Route path="/invoices" element={<InvoicesPage />} />
                   <Route path="/invoices/create-invoice" element={<CreateInvoice />} />

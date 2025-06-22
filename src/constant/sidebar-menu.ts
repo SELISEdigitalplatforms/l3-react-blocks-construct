@@ -40,6 +40,7 @@ export const menuItems: MenuItem[] = [
   createMenuItem('activity-log', 'ACTIVITY_LOG', '/activity-log', 'FileClock'),
   createMenuItem('timeline', 'TIMELINE', '/timeline', 'History'),
   createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation'),
+  createMenuItem('chat', 'CHAT', '/chat', 'MessageSquareText'),
   createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText'),
   createMenuItemWithChildren(
     'file-manager',

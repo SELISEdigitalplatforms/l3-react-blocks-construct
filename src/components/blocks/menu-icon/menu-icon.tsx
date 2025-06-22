@@ -18,6 +18,7 @@ import {
   ChartNoAxesCombined,
   ReceiptText,
   Folder,
+  MessageSquareText,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -76,6 +77,7 @@ const iconMap = {
   ChartNoAxesCombined,
   ReceiptText,
   Folder,
+  MessageSquareText,
 } as const;
 
 export type IconName = keyof typeof iconMap;
