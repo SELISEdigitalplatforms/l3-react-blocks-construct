@@ -1,17 +1,8 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { X } from 'lucide-react';
-import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
 import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
-
-interface FileDetailsSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  file: IFileData | null;
-  t: (key: string) => string;
-}
 
 interface SharedUser {
   id: string;
@@ -20,43 +11,23 @@ interface SharedUser {
   avatar?: string;
 }
 
-const getSharedUsers = (file: IFileData | null): SharedUser[] => {
-  if (!file) return [];
+interface IFileDataWithSharing {
+  id: string;
+  name: string;
+  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  size: string;
+  lastModified: string;
+  isShared: boolean;
+  sharedWith?: SharedUser[];
+  sharePermissions?: { [key: string]: string };
+}
 
-  const users: SharedUser[] = [
-    {
-      id: 'owner',
-      name: 'Luca Meier',
-      role: 'Owner',
-      avatar: '/avatars/luca.jpg',
-    },
-  ];
-
-  if (file.isShared) {
-    users.push(
-      {
-        id: '2',
-        name: 'Aaron Green',
-        role: 'Editor',
-        avatar: '/avatars/aaron.jpg',
-      },
-      {
-        id: '3',
-        name: 'Sarah Pavan',
-        role: 'Viewer',
-        avatar: '/avatars/sarah.jpg',
-      },
-      {
-        id: '4',
-        name: 'Michael Chen',
-        role: 'Viewer',
-        avatar: '/avatars/michael.jpg',
-      }
-    );
-  }
-
-  return users;
-};
+interface FileDetailsSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  file: IFileDataWithSharing | null;
+  t: (key: string) => string;
+}
 
 const getFileTypeDisplayName = (fileType: string): string => {
   switch (fileType) {
@@ -75,6 +46,23 @@ const getFileTypeDisplayName = (fileType: string): string => {
   }
 };
 
+const Avatar: React.FC<{ className?: string; children: React.ReactNode }> = ({
+  className = '',
+  children,
+}) => <div className={`rounded-full overflow-hidden ${className}`}>{children}</div>;
+
+const AvatarImage: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
+  if (!src) return null;
+  return <img src={src} alt={alt} className="w-full h-full object-cover" />;
+};
+
+const AvatarFallback: React.FC<{ className?: string; children: React.ReactNode }> = ({
+  className = '',
+  children,
+}) => (
+  <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
+);
+
 const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, file, t }) => {
   const isMobile = useIsMobile();
 
@@ -82,7 +70,8 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
 
   const IconComponent = getFileTypeIcon(file.fileType);
   const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
-  const sharedUsers = getSharedUsers(file);
+
+  const sharedUsers = file.sharedWith || [];
   const creationDate = file.lastModified;
   const fileTypeDisplayName = getFileTypeDisplayName(file.fileType);
 
@@ -146,7 +135,9 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
 
             <div className="space-y-1">
               <label className="text-sm text-gray-600">{t('OWNER') || 'Owner'}</label>
-              <div className="text-sm font-medium text-gray-900">Luca Meier</div>
+              <div className="text-sm font-medium text-gray-900">
+                {sharedUsers.find((user) => user.role === 'Owner')?.name || 'Luca Meier'}
+              </div>
             </div>
 
             <div className="space-y-1">

@@ -3,11 +3,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
+import {
+  getFileTypeIcon,
+  getFileTypeInfo,
+  PaginationState,
+} from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
 import FileDetailsSheet from '../my-files/my-files-details';
+import { DateRange } from '../../types/file-manager.type';
 
 interface FileCardProps {
   file: IFileData;
@@ -40,17 +45,6 @@ interface SharedFilters {
   sharedBy?: string;
   sharedDate?: DateRange;
   modifiedDate?: DateRange;
-}
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
 }
 
 const FileCard: React.FC<FileCardProps> = ({
@@ -427,7 +421,18 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  typeof selectedFile.lastModified === 'string'
+                    ? selectedFile.lastModified
+                    : (selectedFile.lastModified?.toISOString?.() ?? ''),
+                isShared: selectedFile.isShared ?? false,
+              }
+            : null
+        }
         t={t}
       />
     </div>

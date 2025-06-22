@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-// Updated FileGridView component
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
 import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
+import {
+  getFileTypeIcon,
+  getFileTypeInfo,
+  IFileDataWithSharing,
+  SharedUser,
+} from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
@@ -24,27 +28,23 @@ interface FileCardProps {
 }
 
 interface FileGridViewProps {
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onDownload: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onOpen: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
   filters: {
     name: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   };
-  newFiles?: IFileData[];
-  newFolders?: IFileData[];
-  renamedFiles?: Map<string, IFileData>;
-}
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
 }
 
 const FileCard: React.FC<FileCardProps> = ({
@@ -141,6 +141,34 @@ const FileCard: React.FC<FileCardProps> = ({
   );
 };
 
+// Updated FileGridView interface to include sharing props
+
+interface FileGridViewProps {
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onDownload: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onOpen: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
+  filters: {
+    name: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+}
+
+interface PaginationState {
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+}
+
 export const FileGridView: React.FC<FileGridViewProps> = ({
   onViewDetails,
   onDownload,
@@ -154,12 +182,14 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
   newFiles = [],
   newFolders = [],
   renamedFiles = new Map(),
+  fileSharedUsers = {},
+  filePermissions = {},
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -201,7 +231,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
   }, [data]);
 
   const handleViewDetails = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       setIsDetailsOpen(true);
       onViewDetails?.(file);
@@ -237,15 +267,38 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
 
   const existingFiles = data?.data || [];
 
+  // Process server files with renamed versions and sharing data
   const processedServerFiles = existingFiles.map((file) => {
     const renamedVersion = renamedFiles.get(file.id);
-    return renamedVersion || file;
+    const baseFile = renamedVersion || file;
+
+    // Enhance with sharing data from props
+    const enhancedFile: IFileDataWithSharing = {
+      ...baseFile,
+      sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
+      sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
+    };
+
+    return enhancedFile;
   });
 
   const newFileIds = new Set([...newFiles.map((f) => f.id), ...newFolders.map((f) => f.id)]);
   const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
 
-  const allFiles = [...newFolders, ...newFiles, ...filteredServerFiles];
+  // Enhance new files and folders with shared user data
+  const enhancedNewFiles = newFiles.map((file) => ({
+    ...file,
+    sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
+    sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
+  }));
+
+  const enhancedNewFolders = newFolders.map((folder) => ({
+    ...folder,
+    sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
+    sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
+  }));
+
+  const allFiles = [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
 
   const filteredFiles = allFiles.filter((file) => {
     const matchesName =
@@ -354,7 +407,18 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  typeof selectedFile.lastModified === 'string'
+                    ? selectedFile.lastModified
+                    : (selectedFile.lastModified?.toISOString?.() ?? ''),
+                isShared: selectedFile.isShared ?? false,
+              }
+            : null
+        }
         t={t}
       />
     </div>

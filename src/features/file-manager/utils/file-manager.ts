@@ -1,6 +1,24 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
 import { IFileData } from '../hooks/use-mock-files-query';
 
+export interface PaginationState {
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+}
+
+export interface SharedUser {
+  id: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+}
+
+export interface IFileDataWithSharing extends IFileData {
+  sharedWith?: SharedUser[];
+  sharePermissions?: { [key: string]: string };
+}
+
 export const sharedUsers = [
   { id: '1', name: 'Luca Meier' },
   { id: '2', name: 'Aaron Green' },
@@ -8,7 +26,7 @@ export const sharedUsers = [
   { id: '4', name: 'Adrian Müller' },
 ];
 
-type FileTypeOption = {
+export type FileTypeOption = {
   value: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   label: string;
   icon: React.ComponentType<{ className?: string }>;

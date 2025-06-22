@@ -7,12 +7,7 @@ import DataTable from 'components/blocks/data-table/data-table';
 import FileDetailsSheet from '../my-files/my-files-details';
 import { SharedFilesListViewProps } from '../../types/file-manager.type';
 import { SharedFileTableColumns } from './shared-files-table-columns';
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
-}
+import { PaginationState } from '../../utils/file-manager';
 
 const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
   onViewDetails,
@@ -276,7 +271,18 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  selectedFile.lastModified instanceof Date
+                    ? selectedFile.lastModified.toISOString()
+                    : selectedFile.lastModified,
+                isShared: selectedFile.isShared ?? false,
+              }
+            : null
+        }
         t={t}
       />
     </div>

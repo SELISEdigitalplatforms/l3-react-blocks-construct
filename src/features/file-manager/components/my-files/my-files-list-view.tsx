@@ -5,11 +5,24 @@ import { createFileTableColumns } from './my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
 import FileDetailsSheet from './my-files-details';
+import { PaginationState } from '../../utils/file-manager';
 
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
+interface MyFilesListViewProps {
+  onViewDetails: (file: IFileData) => void;
+  onShare: (file: IFileData) => void;
+  onDelete: (file: IFileData) => void;
+  onMove: (file: IFileData) => void;
+  onCopy: (file: IFileData) => void;
+  onOpen: (file: IFileData) => void;
+  onRename: (file: IFileData) => void;
+  onRenameUpdate?: (oldFile: IFileData, newFile: IFileData) => void;
+  filters: {
+    name?: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+  newFiles: IFileData[];
+  newFolders: IFileData[];
+  renamedFiles: Map<string, IFileData>;
 }
 
 interface MyFilesListViewProps {
@@ -27,25 +40,7 @@ interface MyFilesListViewProps {
   };
   newFiles: IFileData[];
   newFolders: IFileData[];
-  renamedFiles: Map<string, IFileData>; // New prop for renamed files
-}
-
-interface MyFilesListViewProps {
-  onViewDetails: (file: IFileData) => void;
-  onShare: (file: IFileData) => void;
-  onDelete: (file: IFileData) => void;
-  onMove: (file: IFileData) => void;
-  onCopy: (file: IFileData) => void;
-  onOpen: (file: IFileData) => void;
-  onRename: (file: IFileData) => void;
-  onRenameUpdate?: (oldFile: IFileData, newFile: IFileData) => void;
-  filters: {
-    name?: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
-  newFiles: IFileData[];
-  newFolders: IFileData[];
-  renamedFiles: Map<string, IFileData>; // New prop for renamed files
+  renamedFiles: Map<string, IFileData>;
 }
 
 const MyFilesListView: React.FC<MyFilesListViewProps> = ({
@@ -233,7 +228,18 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  typeof selectedFile.lastModified === 'string'
+                    ? selectedFile.lastModified
+                    : selectedFile.lastModified.toISOString(),
+                isShared: selectedFile.isShared ?? false,
+              }
+            : null
+        }
         t={t}
       />
     </div>

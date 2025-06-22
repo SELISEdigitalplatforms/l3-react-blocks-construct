@@ -23,7 +23,7 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
-    isShared: true,
+    isShared: false,
     sharedBy: {
       id: '1',
       name: 'Luca Meier',
@@ -37,7 +37,7 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
-    isShared: true,
+    isShared: false,
     sharedBy: {
       id: '2',
       name: 'Aaron Green',
@@ -107,7 +107,7 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Image',
     size: '21.4 MB',
-    isShared: true,
+    isShared: false,
     sharedBy: {
       id: '4',
       name: 'Adrian Müller',
