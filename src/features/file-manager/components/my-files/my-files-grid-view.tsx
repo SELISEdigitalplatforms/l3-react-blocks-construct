@@ -38,6 +38,7 @@ interface FileGridViewProps {
   };
   newFiles?: IFileData[];
   newFolders?: IFileData[];
+  renamedFiles?: Map<string, IFileData>;
 }
 
 interface PaginationState {
@@ -140,8 +141,6 @@ const FileCard: React.FC<FileCardProps> = ({
   );
 };
 
-// Fixed FileGridView - the key issue was in how we combine and filter the files
-
 export const FileGridView: React.FC<FileGridViewProps> = ({
   onViewDetails,
   onDownload,
@@ -154,6 +153,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
   filters,
   newFiles = [],
   newFolders = [],
+  renamedFiles = new Map(),
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -237,15 +237,16 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
 
   const existingFiles = data?.data || [];
 
-  // Combine files with priority to new/renamed files
-  // Filter out any existing files that have been renamed (same ID exists in newFiles/newFolders)
+  const processedServerFiles = existingFiles.map((file) => {
+    const renamedVersion = renamedFiles.get(file.id);
+    return renamedVersion || file;
+  });
+
   const newFileIds = new Set([...newFiles.map((f) => f.id), ...newFolders.map((f) => f.id)]);
-  const filteredExistingFiles = existingFiles.filter((file) => !newFileIds.has(file.id));
+  const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
 
-  // Combine with new/renamed files taking precedence
-  const allFiles = [...newFolders, ...newFiles, ...filteredExistingFiles];
+  const allFiles = [...newFolders, ...newFiles, ...filteredServerFiles];
 
-  // Apply filters to combined files
   const filteredFiles = allFiles.filter((file) => {
     const matchesName =
       !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
@@ -253,7 +254,6 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
     return matchesName && matchesType;
   });
 
-  // Separate folders and regular files
   const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
   const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
 
@@ -271,7 +271,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
                   {folders.map((file) => {
                     return (
                       <FileCard
-                        key={`folder-${file.id}-${file.name}`} // Enhanced key to force re-render on name change
+                        key={`folder-${file.id}-${file.name}`}
                         file={file}
                         onViewDetails={handleViewDetails}
                         onDownload={onDownload}
@@ -298,7 +298,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
                   {regularFiles.map((file) => {
                     return (
                       <FileCard
-                        key={`file-${file.id}-${file.name}`} // Enhanced key to force re-render on name change
+                        key={`file-${file.id}-${file.name}`}
                         file={file}
                         onViewDetails={handleViewDetails}
                         onDownload={onDownload}

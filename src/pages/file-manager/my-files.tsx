@@ -17,13 +17,13 @@ import {
   SelectValue,
 } from 'components/ui/select';
 import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import FileListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 import { FileGridView } from 'features/file-manager/components/my-files/my-files-grid-view';
 import { RenameModal } from 'features/file-manager/components/rename-modal';
+import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 
 interface DateRange {
   from?: Date;
@@ -458,6 +458,8 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   const [newFiles, setNewFiles] = useState<IFileData[]>([]);
   const [newFolders, setNewFolders] = useState<IFileData[]>([]);
+  // Add state to track renamed files from server
+  const [renamedFiles, setRenamedFiles] = useState<Map<string, IFileData>>(new Map());
 
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [fileToRename, setFileToRename] = useState<IFileData | null>(null);
@@ -477,36 +479,64 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
         lastModified: new Date(),
       };
 
-      if (fileToRename.fileType === 'Folder') {
-        setNewFolders((prev) => {
-          const existingIndex = prev.findIndex((folder) => folder.id === fileToRename.id);
-          if (existingIndex >= 0) {
-            return prev.map((folder) => (folder.id === fileToRename.id ? updatedFile : folder));
-          } else {
-            return [...prev, updatedFile];
-          }
-        });
+      // Check if this is a local file (newly created) or a server file
+      const isLocalFile =
+        fileToRename.fileType === 'Folder'
+          ? newFolders.some((folder) => folder.id === fileToRename.id)
+          : newFiles.some((file) => file.id === fileToRename.id);
+
+      if (isLocalFile) {
+        // Handle local files (newly created files/folders)
+        if (fileToRename.fileType === 'Folder') {
+          setNewFolders((prev) =>
+            prev.map((folder) => (folder.id === fileToRename.id ? updatedFile : folder))
+          );
+        } else {
+          setNewFiles((prev) =>
+            prev.map((file) => (file.id === fileToRename.id ? updatedFile : file))
+          );
+        }
       } else {
-        setNewFiles((prev) => {
-          const existingIndex = prev.findIndex((file) => file.id === fileToRename.id);
-          if (existingIndex >= 0) {
-            return prev.map((file) => (file.id === fileToRename.id ? updatedFile : file));
-          } else {
-            return [...prev, updatedFile];
-          }
-        });
+        // Handle server files - add to renamed files map
+        setRenamedFiles((prev) => new Map(prev.set(fileToRename.id, updatedFile)));
       }
 
       setIsRenameModalOpen(false);
       setFileToRename(null);
     },
-    [fileToRename]
+    [fileToRename, newFiles, newFolders]
   );
 
   const handleRenameModalClose = useCallback(() => {
     setIsRenameModalOpen(false);
     setFileToRename(null);
   }, []);
+
+  // Updated handler for rename updates from list view
+  const handleRenameUpdate = useCallback(
+    (oldFile: IFileData, newFile: IFileData) => {
+      // Check if this is a local file or a server file
+      const isLocalFile =
+        oldFile.fileType === 'Folder'
+          ? newFolders.some((folder) => folder.id === oldFile.id)
+          : newFiles.some((file) => file.id === oldFile.id);
+
+      if (isLocalFile) {
+        // Handle local files
+        if (oldFile.fileType === 'Folder') {
+          setNewFolders((prev) =>
+            prev.map((folder) => (folder.id === oldFile.id ? newFile : folder))
+          );
+        } else {
+          setNewFiles((prev) => prev.map((file) => (file.id === oldFile.id ? newFile : file)));
+        }
+      } else {
+        // Handle server files - add to renamed files map
+        setRenamedFiles((prev) => new Map(prev.set(oldFile.id, newFile)));
+      }
+    },
+    [newFiles, newFolders]
+  );
 
   const getFileTypeFromFile = (file: File): 'File' | 'Image' | 'Audio' | 'Video' => {
     const type = file.type;
@@ -553,8 +583,15 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   }, []);
 
   const handleDelete = useCallback((file: IFileData) => {
+    // Remove from local files
     setNewFiles((prev) => prev.filter((f) => f.id !== file.id));
     setNewFolders((prev) => prev.filter((f) => f.id !== file.id));
+    // Remove from renamed files if it exists there
+    setRenamedFiles((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(file.id);
+      return newMap;
+    });
   }, []);
 
   const handleMove = useCallback((file: IFileData) => {
@@ -575,11 +612,20 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
+    setFilters((prev) => ({
+      ...prev,
+      name: query,
+    }));
   }, []);
 
   const handleFiltersChange = useCallback((newFilters: FileFilters) => {
-    setFilters(newFilters);
-    setSearchQuery(newFilters.name);
+    setFilters((prevFilters) => {
+      if (JSON.stringify(prevFilters) === JSON.stringify(newFilters)) {
+        return prevFilters;
+      }
+      return newFilters;
+    });
+    setSearchQuery(newFilters.name || '');
   }, []);
 
   const handleCreateFile = useCallback(() => {
@@ -597,9 +643,11 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     onCopy: handleCopy,
     onOpen: handleOpen,
     onRename: handleRename,
+    onRenameUpdate: handleRenameUpdate,
     filters,
     newFiles,
     newFolders,
+    renamedFiles, // Pass renamed files to child components
   };
 
   return (
@@ -623,7 +671,7 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
           </div>
         ) : (
           <div className="h-full">
-            <FileListView {...commonViewProps} />
+            <MyFilesListView {...commonViewProps} />
           </div>
         )}
       </div>

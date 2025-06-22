@@ -20,12 +20,32 @@ interface MyFilesListViewProps {
   onCopy: (file: IFileData) => void;
   onOpen: (file: IFileData) => void;
   onRename: (file: IFileData) => void;
+  onRenameUpdate?: (oldFile: IFileData, newFile: IFileData) => void;
   filters: {
     name?: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   };
   newFiles: IFileData[];
   newFolders: IFileData[];
+  renamedFiles: Map<string, IFileData>; // New prop for renamed files
+}
+
+interface MyFilesListViewProps {
+  onViewDetails: (file: IFileData) => void;
+  onShare: (file: IFileData) => void;
+  onDelete: (file: IFileData) => void;
+  onMove: (file: IFileData) => void;
+  onCopy: (file: IFileData) => void;
+  onOpen: (file: IFileData) => void;
+  onRename: (file: IFileData) => void;
+  onRenameUpdate?: (oldFile: IFileData, newFile: IFileData) => void;
+  filters: {
+    name?: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+  newFiles: IFileData[];
+  newFolders: IFileData[];
+  renamedFiles: Map<string, IFileData>; // New prop for renamed files
 }
 
 const MyFilesListView: React.FC<MyFilesListViewProps> = ({
@@ -38,6 +58,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   filters,
   newFiles,
   newFolders,
+  renamedFiles,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -65,6 +86,14 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
 
   const combinedData = useMemo(() => {
     const serverFiles = data?.data || [];
+
+    // Apply renames to server files and filter out renamed originals
+    const processedServerFiles = serverFiles.map((file: IFileData) => {
+      const renamedVersion = renamedFiles.get(file.id);
+      return renamedVersion || file;
+    });
+
+    // Filter local files based on search criteria
     const filteredLocalFiles = localFiles.filter((file) => {
       if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
         return false;
@@ -75,8 +104,19 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       return true;
     });
 
-    return [...filteredLocalFiles, ...serverFiles];
-  }, [localFiles, data?.data, filters]);
+    // Filter processed server files based on search criteria
+    const filteredServerFiles = processedServerFiles.filter((file: IFileData) => {
+      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+        return false;
+      }
+      if (filters.fileType && file.fileType !== filters.fileType) {
+        return false;
+      }
+      return true;
+    });
+
+    return [...filteredLocalFiles, ...filteredServerFiles];
+  }, [localFiles, data?.data, filters, renamedFiles]);
 
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
@@ -137,6 +177,13 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     [onDelete]
   );
 
+  const handleRenameWrapper = useCallback(
+    (file: IFileData) => {
+      onRename(file);
+    },
+    [onRename]
+  );
+
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
     onDownload: handleDownloadWrapper,
@@ -145,7 +192,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     onMove: onMove,
     onCopy: onCopy,
     onOpen: handleViewDetailsWrapper,
-    onRename: onRename,
+    onRename: handleRenameWrapper,
     t,
   });
 
