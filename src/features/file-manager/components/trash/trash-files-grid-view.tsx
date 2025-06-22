@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RotateCcw, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { getFileTypeIcon, getFileTypeInfo, IFileTrashData } from '../../utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
-import { formatDate } from 'utils/custom-date';
+import { TrashTableRowActions } from './trash-files-row-actions';
+import TrashDetailsSheet from './trash-files-details';
 
 interface PaginationState {
   pageIndex: number;
@@ -45,7 +46,6 @@ const TrashCard: React.FC<TrashCardProps> = ({
   onRestore,
   onPermanentDelete,
   onViewDetails,
-  t,
 }) => {
   const IconComponent = getFileTypeIcon(file.fileType);
   const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
@@ -55,15 +55,17 @@ const TrashCard: React.FC<TrashCardProps> = ({
     onViewDetails?.(file);
   };
 
-  const handleRestore = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onRestore?.(file);
-  };
-
-  const handlePermanentDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onPermanentDelete?.(file);
-  };
+  const mockRow = {
+    original: file,
+    id: file.id.toString(),
+    index: 0,
+    getValue: () => {},
+    getVisibleCells: () => [],
+    getAllCells: () => [],
+    getLeftVisibleCells: () => [],
+    getRightVisibleCells: () => [],
+    getCenterVisibleCells: () => [],
+  } as any;
 
   return (
     <div
@@ -83,90 +85,42 @@ const TrashCard: React.FC<TrashCardProps> = ({
 
         <div className={`${file.fileType === 'Folder' ? 'flex-1' : 'w-full'}`}>
           {file.fileType === 'Folder' ? (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
                   {file.name}
                 </h3>
-                <div onClick={(e) => e.stopPropagation()} className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-green-50"
-                    onClick={handleRestore}
-                    title={t('RESTORE')}
-                  >
-                    <RotateCcw className="w-3 h-3 text-green-600" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-red-50"
-                    onClick={handlePermanentDelete}
-                    title={t('DELETE')}
-                  >
-                    <Trash2 className="w-3 h-3 text-red-600" />
-                  </Button>
-                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-500">{file.size}</span>
-                {file.isShared && (
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                    {t('SHARED')}
-                  </span>
-                )}
+              <div onClick={(e) => e.stopPropagation()}>
+                <TrashTableRowActions
+                  row={mockRow}
+                  onRestore={onRestore || (() => {})}
+                  onDelete={onPermanentDelete || (() => {})}
+                  onDeleteForever={onPermanentDelete}
+                />
               </div>
-              <p className="text-xs text-gray-500">
-                {t('TRASHED')} {formatDate(file.trashedDate)}
-              </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between space-x-2 mt-2">
-                <div className="flex items-center space-x-2 flex-1 min-w-0">
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${backgroundColor}`}
-                  >
-                    <IconComponent className={`w-4 h-4 ${iconColor}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
-                      {file.name}
-                    </h3>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <span className="text-xs text-gray-500">{file.size}</span>
-                      {file.isShared && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                          {t('SHARED')}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {t('TRASHED')} {formatDate(file.trashedDate)}
-                    </p>
-                  </div>
+            <div className="flex items-center justify-between space-x-2 mt-2">
+              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${backgroundColor}`}
+                >
+                  <IconComponent className={`w-4 h-4 ${iconColor}`} />
                 </div>
-                <div onClick={(e) => e.stopPropagation()} className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-green-50"
-                    onClick={handleRestore}
-                    title={t('RESTORE')}
-                  >
-                    <RotateCcw className="w-3 h-3 text-green-600" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 hover:bg-red-50"
-                    onClick={handlePermanentDelete}
-                    title={t('DELETE')}
-                  >
-                    <Trash2 className="w-3 h-3 text-red-600" />
-                  </Button>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+                    {file.name}
+                  </h3>
                 </div>
+              </div>
+              <div onClick={(e) => e.stopPropagation()}>
+                <TrashTableRowActions
+                  row={mockRow}
+                  onRestore={onRestore || (() => {})}
+                  onDelete={onPermanentDelete || (() => {})}
+                  onDeleteForever={onPermanentDelete}
+                />
               </div>
             </div>
           )}
@@ -186,7 +140,6 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
@@ -248,39 +201,10 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     [onViewDetails]
   );
 
-  //   const handleCloseDetails = useCallback(() => {
-  //     setIsDetailsOpen(false);
-  //     setSelectedFile(null);
-  //   }, []);
-
-  const applyClientSideFilters = useCallback(
-    (files: IFileTrashData[]) => {
-      return files.filter((file) => {
-        if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
-          return false;
-        }
-
-        if (filters.fileType && file.fileType !== filters.fileType) {
-          return false;
-        }
-
-        if (filters.trashedDate?.from || filters.trashedDate?.to) {
-          const trashedDate = new Date(file.trashedDate);
-
-          if (filters.trashedDate.from && trashedDate < filters.trashedDate.from) {
-            return false;
-          }
-
-          if (filters.trashedDate.to && trashedDate > filters.trashedDate.to) {
-            return false;
-          }
-        }
-
-        return true;
-      });
-    },
-    [filters]
-  );
+  const handleCloseDetails = useCallback(() => {
+    setIsDetailsOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   if (error) {
     return (
@@ -303,18 +227,9 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     );
   }
 
-  const rawFiles = data?.data || [];
-  const filteredFiles = applyClientSideFilters(rawFiles);
-
-  const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
-  const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
-
-  const hasActiveFilters =
-    filters.name ||
-    filters.fileType ||
-    filters.deletedBy ||
-    filters.trashedDate?.from ||
-    filters.trashedDate?.to;
+  const files = data?.data || [];
+  const folders = files.filter((file) => file.fileType === 'Folder');
+  const regularFiles = files.filter((file) => file.fileType !== 'Folder');
 
   return (
     <div className="flex h-full w-full">
@@ -323,11 +238,8 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
           <div className="space-y-8">
             {folders.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded flex items-center gap-2">
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
                   {t('FOLDER')}
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                    {folders.length}
-                  </span>
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {folders.map((file) => (
@@ -346,12 +258,7 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
 
             {regularFiles.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded flex items-center gap-2">
-                  {t('FILE')}
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                    {regularFiles.length}
-                  </span>
-                </h2>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {regularFiles.map((file) => (
                     <TrashCard
@@ -367,26 +274,19 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
               </div>
             )}
 
-            {filteredFiles.length === 0 && !isLoading && (
+            {files.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Trash2 className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {hasActiveFilters ? t('NO_FILES_MATCH_CRITERIA') : t('TRASH_EMPTY')}
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('TRASH_EMPTY')}</h3>
                 <p className="text-gray-500 max-w-sm">
-                  {hasActiveFilters
-                    ? t('TRY_ADJUSTING_FILTERS_OR_SEARCH_TERMS')
+                  {filters.name || filters.fileType || filters.deletedBy || filters.trashedDate
+                    ? t('NO_FILES_MATCH_CRITERIA')
                     : t('NO_DELETED_FILES')}
                 </p>
-                {hasActiveFilters && (
-                  <Button variant="outline" className="mt-4" onClick={() => {}}>
-                    {t('CLEAR_ALL_FILTERS')}
-                  </Button>
-                )}
               </div>
             )}
 
-            {data && rawFiles.length < data.totalCount && (
+            {data && data.data.length < data.totalCount && (
               <div className="flex justify-center pt-6">
                 <Button
                   onClick={handleLoadMore}
@@ -400,36 +300,29 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
                       {t('LOADING')}
                     </div>
                   ) : (
-                    <>
-                      {t('LOAD_MORE')}
-                      <span className="ml-2 text-xs bg-gray-100 px-2 py-1 rounded-full">
-                        {rawFiles.length} / {data.totalCount}
-                      </span>
-                    </>
+                    t('LOAD_MORE')
                   )}
                 </Button>
-              </div>
-            )}
-
-            {hasActiveFilters && filteredFiles.length > 0 && (
-              <div className="flex justify-center pt-4">
-                <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
-                  {t('SHOWING')} {filteredFiles.length} {t('OF')} {rawFiles.length} {t('FILES')}
-                  {rawFiles.length < (data?.totalCount ?? 0) &&
-                    ` (${data?.totalCount ?? 0} ${t('TOTAL')})`}
-                </div>
               </div>
             )}
           </div>
         </div>
       </div>
-      {/* 
+
       <TrashDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+              }
+            : null
+        }
         t={t}
-      /> */}
+      />
     </div>
   );
 };

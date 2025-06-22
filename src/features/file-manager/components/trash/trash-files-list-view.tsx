@@ -6,6 +6,7 @@ import DataTable from 'components/blocks/data-table/data-table';
 import { IFileTrashData } from '../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableColumns } from './trash-files-table-columns';
+import TrashDetailsSheet from './trash-files-details';
 
 interface PaginationState {
   pageIndex: number;
@@ -35,7 +36,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [, setSelectedFile] = useState<IFileTrashData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -117,6 +118,11 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     },
     [onDelete]
   );
+
+  const handleCloseDetails = useCallback(() => {
+    setIsDetailsOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   const columns = useMemo(() => {
     return TrashTableColumns({
@@ -214,12 +220,20 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         </div>
       )}
 
-      {/* <FileDetailsSheet
+      <TrashDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+              }
+            : null
+        }
         t={t}
-      /> */}
+      />
     </div>
   );
 };

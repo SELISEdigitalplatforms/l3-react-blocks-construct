@@ -1,4 +1,5 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
+import { IFileData } from '../hooks/use-mock-files-query';
 
 export const sharedUsers = [
   { id: '1', name: 'Luca Meier' },
@@ -156,3 +157,72 @@ export const trashMockData: IFileTrashData[] = [
     isShared: false,
   },
 ];
+
+export const getFileTypeDisplayName = (fileType: string): string => {
+  switch (fileType) {
+    case 'Folder':
+      return 'Folder';
+    case 'File':
+      return 'Document';
+    case 'Image':
+      return 'Image';
+    case 'Audio':
+      return 'Audio File';
+    case 'Video':
+      return 'Video File';
+    default:
+      return 'Unknown';
+  }
+};
+
+export interface FileDetailsSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  file: IFileData | null;
+  t: (key: string) => string;
+}
+
+export interface SharedUser {
+  id: string;
+  name: string;
+  role: 'Viewer' | 'Editor' | 'Owner';
+  avatar?: string;
+}
+
+export const getSharedUsers = (file: IFileData | null): SharedUser[] => {
+  if (!file) return [];
+
+  const users: SharedUser[] = [
+    {
+      id: 'owner',
+      name: 'Luca Meier',
+      role: 'Owner',
+      avatar: '/avatars/luca.jpg',
+    },
+  ];
+
+  if (file.isShared) {
+    users.push(
+      {
+        id: '2',
+        name: 'Aaron Green',
+        role: 'Editor',
+        avatar: '/avatars/aaron.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        role: 'Viewer',
+        avatar: '/avatars/sarah.jpg',
+      },
+      {
+        id: '4',
+        name: 'Michael Chen',
+        role: 'Viewer',
+        avatar: '/avatars/michael.jpg',
+      }
+    );
+  }
+
+  return users;
+};

@@ -1,73 +1,15 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { X } from 'lucide-react';
-import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
+import {
+  FileDetailsSheetProps,
+  getFileTypeDisplayName,
+  getFileTypeIcon,
+  getFileTypeInfo,
+  getSharedUsers,
+} from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
-
-interface FileDetailsSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  file: IFileData | null;
-  t: (key: string) => string;
-}
-
-interface SharedUser {
-  id: string;
-  name: string;
-  role: 'Viewer' | 'Editor' | 'Owner';
-  avatar?: string;
-}
-
-const getSharedUsers = (file: IFileData | null): SharedUser[] => {
-  if (!file) return [];
-
-  const users: SharedUser[] = [
-    {
-      id: 'owner',
-      name: 'Luca Meier',
-      role: 'Owner',
-      avatar: '/avatars/luca.jpg',
-    },
-  ];
-
-  if (file.isShared) {
-    users.push(
-      {
-        id: '2',
-        name: 'Aaron Green',
-        role: 'Editor',
-        avatar: '/avatars/aaron.jpg',
-      },
-      {
-        id: '3',
-        name: 'Sarah Pavan',
-        role: 'Viewer',
-        avatar: '/avatars/sarah.jpg',
-      },
-      {
-        id: '4',
-        name: 'Michael Chen',
-        role: 'Viewer',
-        avatar: '/avatars/michael.jpg',
-      }
-    );
-  }
-
-  return users;
-};
-
-const formatDate = (date: Date): string => {
-  return date
-    .toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    .replace(',', ' at');
-};
+import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
 const getCreationDate = (lastModified: Date): Date => {
   const creationDate = new Date(lastModified);
@@ -76,24 +18,7 @@ const getCreationDate = (lastModified: Date): Date => {
   return creationDate;
 };
 
-const getFileTypeDisplayName = (fileType: string): string => {
-  switch (fileType) {
-    case 'Folder':
-      return 'Folder';
-    case 'File':
-      return 'Document';
-    case 'Image':
-      return 'Image';
-    case 'Audio':
-      return 'Audio File';
-    case 'Video':
-      return 'Video File';
-    default:
-      return 'Unknown';
-  }
-};
-
-const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, file, t }) => {
+const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, file, t }) => {
   const isMobile = useIsMobile();
 
   if (!isOpen || !file) return null;
@@ -172,13 +97,15 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
                 {t('LAST_MODIFIED') || 'Last modified'}
               </label>
               <div className="text-sm font-medium text-gray-900">
-                {formatDate(file.lastModified)}
+                {CustomtDateFormat(file.lastModified)}
               </div>
             </div>
 
             <div className="space-y-1">
               <label className="text-sm text-gray-600">{t('DATE_CREATED') || 'Date created'}</label>
-              <div className="text-sm font-medium text-gray-900">{formatDate(creationDate)}</div>
+              <div className="text-sm font-medium text-gray-900">
+                {CustomtDateFormat(creationDate)}
+              </div>
             </div>
 
             {file.fileType !== 'Folder' && (
@@ -246,4 +173,4 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
   );
 };
 
-export default FileDetailsSheet;
+export default TrashDetailsSheet;
