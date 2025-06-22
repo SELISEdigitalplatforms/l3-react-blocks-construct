@@ -121,10 +121,13 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
 
   const handleDownloadWrapper = () => undefined;
 
-  const handleShareWrapper = (file: IFileData) => {
-    setSelectedFile(file);
-    onShare(file);
-  };
+  const handleShareWrapper = useCallback(
+    (file: IFileData) => {
+      setSelectedFile(file);
+      onShare(file);
+    },
+    [onShare]
+  );
 
   const handleDeleteWrapper = useCallback(
     (file: IFileData) => {
@@ -134,10 +137,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     [onDelete]
   );
 
-  const handleOpenWrapper = (file: IFileData) => {
-    handleViewDetailsWrapper(file);
-  };
-
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
     onDownload: handleDownloadWrapper,
@@ -145,7 +144,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     onDelete: handleDeleteWrapper,
     onMove: onMove,
     onCopy: onCopy,
-    onOpen: handleOpenWrapper,
+    onOpen: handleViewDetailsWrapper,
     onRename: onRename,
     t,
   });

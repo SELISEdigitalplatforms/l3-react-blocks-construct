@@ -5,7 +5,7 @@ import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-c
 import { compareValues } from 'features/iam/services/user-service';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { getFileTypeIcon, getFileTypeInfo, getFileTypeOptions } from '../../utils/file-manager';
-import { Users } from 'lucide-react';
+import { Info, Users } from 'lucide-react';
 
 /**
  * Creates the columns for the File Management table.
@@ -177,8 +177,23 @@ export const createFileTableColumns = ({
   },
   {
     id: 'actions',
+    header: () => (
+      <div className="flex justify-end text-primary">
+        <Info />
+      </div>
+    ),
     cell: ({ row }) => (
-      <div onClick={(e) => e.stopPropagation()} className="flex justify-end">
+      <div
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        className="flex justify-end"
+      >
         <FileTableRowActions
           row={row}
           onViewDetails={onViewDetails}
