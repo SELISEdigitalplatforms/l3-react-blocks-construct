@@ -23,6 +23,7 @@ import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 import { FileGridView } from 'features/file-manager/components/my-files/my-files-grid-view';
+import { RenameModal } from 'features/file-manager/components/rename-modal';
 
 interface DateRange {
   from?: Date;
@@ -458,6 +459,55 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   const [newFiles, setNewFiles] = useState<IFileData[]>([]);
   const [newFolders, setNewFolders] = useState<IFileData[]>([]);
 
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [fileToRename, setFileToRename] = useState<IFileData | null>(null);
+
+  const handleRename = useCallback((file: IFileData) => {
+    setFileToRename(file);
+    setIsRenameModalOpen(true);
+  }, []);
+
+  const handleRenameConfirm = useCallback(
+    (newName: string) => {
+      if (!fileToRename) return;
+
+      const updatedFile = {
+        ...fileToRename,
+        name: newName,
+        lastModified: new Date(),
+      };
+
+      if (fileToRename.fileType === 'Folder') {
+        setNewFolders((prev) => {
+          const existingIndex = prev.findIndex((folder) => folder.id === fileToRename.id);
+          if (existingIndex >= 0) {
+            return prev.map((folder) => (folder.id === fileToRename.id ? updatedFile : folder));
+          } else {
+            return [...prev, updatedFile];
+          }
+        });
+      } else {
+        setNewFiles((prev) => {
+          const existingIndex = prev.findIndex((file) => file.id === fileToRename.id);
+          if (existingIndex >= 0) {
+            return prev.map((file) => (file.id === fileToRename.id ? updatedFile : file));
+          } else {
+            return [...prev, updatedFile];
+          }
+        });
+      }
+
+      setIsRenameModalOpen(false);
+      setFileToRename(null);
+    },
+    [fileToRename]
+  );
+
+  const handleRenameModalClose = useCallback(() => {
+    setIsRenameModalOpen(false);
+    setFileToRename(null);
+  }, []);
+
   const getFileTypeFromFile = (file: File): 'File' | 'Image' | 'Audio' | 'Video' => {
     const type = file.type;
     if (type.startsWith('image/')) return 'Image';
@@ -468,7 +518,7 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   const handleFileUpload = useCallback((files: File[]) => {
     const uploadedFiles: IFileData[] = files.map((file) => ({
-      id: (Date.now() + Math.random()).toString(),
+      id: Date.now().toString(),
       name: file.name,
       fileType: getFileTypeFromFile(file),
       size: file.size.toString(),
@@ -480,7 +530,7 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   const handleFolderCreate = useCallback((folderName: string) => {
     const newFolder: IFileData = {
-      id: (Date.now() + Math.random()).toString(),
+      id: Date.now().toString(),
       name: folderName,
       fileType: 'Folder',
       size: '0',
@@ -517,10 +567,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
 
   const handleOpen = useCallback((file: IFileData) => {
     console.log('Open:', file);
-  }, []);
-
-  const handleRename = useCallback((file: IFileData) => {
-    console.log('Rename:', file);
   }, []);
 
   const handleViewModeChange = useCallback((mode: string) => {
@@ -581,6 +627,13 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
           </div>
         )}
       </div>
+
+      <RenameModal
+        isOpen={isRenameModalOpen}
+        onClose={handleRenameModalClose}
+        onConfirm={handleRenameConfirm}
+        file={fileToRename}
+      />
     </div>
   );
 };

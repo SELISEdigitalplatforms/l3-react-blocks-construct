@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
 import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
+import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
 interface FileDetailsSheetProps {
   isOpen: boolean;
@@ -57,25 +58,6 @@ const getSharedUsers = (file: IFileData | null): SharedUser[] => {
   return users;
 };
 
-const formatDate = (date: Date): string => {
-  return date
-    .toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    .replace(',', ' at');
-};
-
-const getCreationDate = (lastModified: Date): Date => {
-  const creationDate = new Date(lastModified);
-  const hoursBack = Math.floor(Math.random() * 720) + 24;
-  creationDate.setHours(creationDate.getHours() - hoursBack);
-  return creationDate;
-};
-
 const getFileTypeDisplayName = (fileType: string): string => {
   switch (fileType) {
     case 'Folder':
@@ -101,7 +83,7 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
   const IconComponent = getFileTypeIcon(file.fileType);
   const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
   const sharedUsers = getSharedUsers(file);
-  const creationDate = getCreationDate(file.lastModified);
+  const creationDate = file.lastModified;
   const fileTypeDisplayName = getFileTypeDisplayName(file.fileType);
 
   const containerClasses = isMobile
@@ -172,13 +154,15 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
                 {t('LAST_MODIFIED') || 'Last modified'}
               </label>
               <div className="text-sm font-medium text-gray-900">
-                {formatDate(file.lastModified)}
+                {CustomtDateFormat(file.lastModified)}
               </div>
             </div>
 
             <div className="space-y-1">
               <label className="text-sm text-gray-600">{t('DATE_CREATED') || 'Date created'}</label>
-              <div className="text-sm font-medium text-gray-900">{formatDate(creationDate)}</div>
+              <div className="text-sm font-medium text-gray-900">
+                {CustomtDateFormat(creationDate)}
+              </div>
             </div>
 
             {file.fileType !== 'Folder' && (
