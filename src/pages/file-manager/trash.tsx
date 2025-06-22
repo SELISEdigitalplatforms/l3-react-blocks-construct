@@ -28,7 +28,7 @@ import { Input } from 'components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 import TrashFilesListView from 'features/file-manager/components/trash/trash-files-list-view';
-// import TrashGridView from 'features/file-manager/components/trash/trash-files-grid-view';
+import TrashGridView from 'features/file-manager/components/trash/trash-files-grid-view';
 
 interface DateRange {
   from?: Date;
@@ -541,7 +541,7 @@ export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, 
       <div className="flex-1 overflow-hidden">
         {viewMode === 'grid' ? (
           <div className="h-full overflow-y-auto">
-            {/* <TrashGridView {...commonViewProps} /> */}
+            <TrashGridView {...commonViewProps} />
           </div>
         ) : (
           <div className="h-full">
