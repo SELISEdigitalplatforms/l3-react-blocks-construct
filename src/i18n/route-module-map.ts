@@ -20,6 +20,7 @@ export const routeModuleMap: Record<string, string[]> = {
   '/task-manager': ['common', 'task-manager'],
   '/chat': ['common', 'chat'],
   '/invoices': ['common', 'invoices'],
+  '/file-manager': ['common', 'file-manager'],
   '/profile': ['common', 'profile', 'mfa'],
   '/404': ['common', 'error'],
   '/503': ['common', 'error'],
