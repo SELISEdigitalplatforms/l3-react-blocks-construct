@@ -17,12 +17,12 @@ import {
   SelectValue,
 } from 'components/ui/select';
 import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
-import FileGridView from '../../features/file-manager/components/my-files/my-files-grid-view';
 import FileListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
+import { FileGridView } from 'features/file-manager/components/my-files/my-files-grid-view';
 
 interface DateRange {
   from?: Date;
@@ -126,6 +126,8 @@ interface FileManagerHeaderToolbarProps {
   onSearchChange?: (query: string) => void;
   filters: FileFilters;
   onFiltersChange: (filters: FileFilters) => void;
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
 }
 
 const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
@@ -135,6 +137,8 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
   onSearchChange,
   filters,
   onFiltersChange,
+  onFileUpload,
+  onFolderCreate,
 }) => {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
@@ -287,7 +291,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
             {t('FILE_MANAGER')}
           </h3>
 
-          <AddDropdownMenu />
+          <AddDropdownMenu onFileUpload={onFileUpload} onFolderCreate={onFolderCreate} />
         </div>
 
         <div className="flex items-center w-full mt-2">
@@ -376,7 +380,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
             </TabsList>
           </Tabs>
 
-          <AddDropdownMenu />
+          <AddDropdownMenu onFileUpload={onFileUpload} onFolderCreate={onFolderCreate} />
         </div>
       </div>
 
@@ -442,7 +446,7 @@ interface FileManagerProps {
   onCreateFile?: () => void;
 }
 
-const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
+export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<FileFilters>({
@@ -450,6 +454,41 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     fileType: undefined,
     lastModified: undefined,
   });
+
+  const [newFiles, setNewFiles] = useState<IFileData[]>([]);
+  const [newFolders, setNewFolders] = useState<IFileData[]>([]);
+
+  const getFileTypeFromFile = (file: File): 'File' | 'Image' | 'Audio' | 'Video' => {
+    const type = file.type;
+    if (type.startsWith('image/')) return 'Image';
+    if (type.startsWith('audio/')) return 'Audio';
+    if (type.startsWith('video/')) return 'Video';
+    return 'File';
+  };
+
+  const handleFileUpload = useCallback((files: File[]) => {
+    const uploadedFiles: IFileData[] = files.map((file) => ({
+      id: (Date.now() + Math.random()).toString(),
+      name: file.name,
+      fileType: getFileTypeFromFile(file),
+      size: file.size.toString(),
+      lastModified: new Date(),
+    }));
+
+    setNewFiles((prev) => [...prev, ...uploadedFiles]);
+  }, []);
+
+  const handleFolderCreate = useCallback((folderName: string) => {
+    const newFolder: IFileData = {
+      id: (Date.now() + Math.random()).toString(),
+      name: folderName,
+      fileType: 'Folder',
+      size: '0',
+      lastModified: new Date(),
+    };
+
+    setNewFolders((prev) => [...prev, newFolder]);
+  }, []);
 
   const handleViewDetails = useCallback((file: IFileData) => {
     console.log('View details:', file);
@@ -464,7 +503,8 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   }, []);
 
   const handleDelete = useCallback((file: IFileData) => {
-    console.log('Delete:', file);
+    setNewFiles((prev) => prev.filter((f) => f.id !== file.id));
+    setNewFolders((prev) => prev.filter((f) => f.id !== file.id));
   }, []);
 
   const handleMove = useCallback((file: IFileData) => {
@@ -499,8 +539,6 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   const handleCreateFile = useCallback(() => {
     if (onCreateFile) {
       onCreateFile();
-    } else {
-      console.log('Create new file/folder');
     }
   }, [onCreateFile]);
 
@@ -514,6 +552,8 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     onOpen: handleOpen,
     onRename: handleRename,
     filters,
+    newFiles,
+    newFolders,
   };
 
   return (
@@ -526,6 +566,8 @@ const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
         onSearchChange={handleSearchChange}
         filters={filters}
         onFiltersChange={handleFiltersChange}
+        onFileUpload={handleFileUpload}
+        onFolderCreate={handleFolderCreate}
       />
 
       <div className="flex-1 overflow-hidden">

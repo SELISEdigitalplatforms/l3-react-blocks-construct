@@ -13,17 +13,25 @@ import { Input } from 'components/ui/input';
 import { Label } from 'components/ui/label';
 import { useTranslation } from 'react-i18next';
 
-const AddDropdownMenu = () => {
+const AddDropdownMenu = ({
+  onFileUpload,
+  onFolderCreate,
+}: {
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
+}) => {
   const { t } = useTranslation();
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
+
   type UploadedFile = {
     id: number;
     name: string;
     size: string;
     file: File;
   };
+
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [folderName, setFolderName] = useState('');
 
@@ -48,23 +56,19 @@ const AddDropdownMenu = () => {
     processFiles(files);
   };
 
-  const processFiles = useCallback(
-    (files: File[]) => {
-      const newFiles = files.map((file, index) => ({
-        id: Date.now() + index,
-        name: file.name,
-        size: formatFileSize(file.size),
-        file: file,
-      }));
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
-    },
-    [formatFileSize]
-  );
+  const processFiles = useCallback((files: File[]) => {
+    const newFiles = files.map((file, index) => ({
+      id: Date.now() + index,
+      name: file.name,
+      size: formatFileSize(file.size),
+      file: file,
+    }));
+    setUploadedFiles((prev) => [...prev, ...newFiles]);
+  }, []);
 
   const handleDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
-
       const files = Array.from(event.dataTransfer.files);
       processFiles(files);
     },
@@ -84,6 +88,11 @@ const AddDropdownMenu = () => {
   };
 
   const handleUpload = () => {
+    if (uploadedFiles.length > 0 && onFileUpload) {
+      const filesToUpload = uploadedFiles.map((f) => f.file);
+      onFileUpload(filesToUpload);
+    }
+
     setIsUploadModalOpen(false);
     setUploadedFiles([]);
   };
@@ -94,15 +103,23 @@ const AddDropdownMenu = () => {
   };
 
   const handleCreateFolderSubmit = () => {
-    if (folderName.trim()) {
-      setIsCreateFolderModalOpen(false);
-      setFolderName('');
+    if (folderName.trim() && onFolderCreate) {
+      onFolderCreate(folderName.trim());
     }
+
+    setIsCreateFolderModalOpen(false);
+    setFolderName('');
   };
 
   const handleCreateFolderCancel = () => {
     setIsCreateFolderModalOpen(false);
     setFolderName('');
+  };
+
+  const handleFolderNameKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && folderName.trim()) {
+      handleCreateFolderSubmit();
+    }
   };
 
   return (
@@ -134,7 +151,7 @@ const AddDropdownMenu = () => {
 
           <div className="space-y-6">
             <div
-              className={`border-2 border-dashed rounded-lg p-16 text-center transition-colors cursor-pointer`}
+              className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-16 text-center transition-colors cursor-pointer"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -159,27 +176,35 @@ const AddDropdownMenu = () => {
                   multiple
                   className="hidden"
                   onChange={handleFileInput}
-                  accept=".pdf,.docx,.jpg,.jpeg,.png"
+                  accept=".pdf,.docx,.jpg,.jpeg,.png,.txt,.doc,.xlsx,.xls,.pptx,.ppt"
                 />
               </div>
             </div>
 
             {uploadedFiles.length > 0 && (
               <div className="space-y-2 max-h-60 overflow-y-auto">
+                <h4 className="text-sm font-medium text-gray-700">
+                  Selected files ({uploadedFiles.length})
+                </h4>
                 {uploadedFiles.map((file) => (
                   <div
                     key={file.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                      <p className="text-xs text-gray-500">({file.size})</p>
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-gray-500">{file.size}</p>
+                      </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => removeFile(file.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                      title="Remove file"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -188,7 +213,7 @@ const AddDropdownMenu = () => {
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3 pt-4 border-t">
               <Button variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
@@ -197,7 +222,7 @@ const AddDropdownMenu = () => {
                 disabled={uploadedFiles.length === 0}
                 className="bg-teal-600 hover:bg-teal-700"
               >
-                Upload
+                Upload {uploadedFiles.length > 0 && `(${uploadedFiles.length})`}
               </Button>
             </div>
           </div>
@@ -221,9 +246,16 @@ const AddDropdownMenu = () => {
                 type="text"
                 value={folderName}
                 onChange={(e) => setFolderName(e.target.value)}
-                placeholder="Test folder 1"
+                onKeyPress={handleFolderNameKeyPress}
+                placeholder="Enter folder name"
                 className="w-full"
+                autoFocus
               />
+              {folderName.trim() && (
+                <p className="text-xs text-gray-500">
+                  Folder will be created as: &quot;{folderName.trim()}&quot;
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">

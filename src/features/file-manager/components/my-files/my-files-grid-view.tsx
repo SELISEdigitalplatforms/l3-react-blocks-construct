@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+// Updated FileGridView component
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
@@ -35,6 +36,9 @@ interface FileGridViewProps {
     name: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   };
+  // New props for adding files/folders
+  newFiles?: IFileData[];
+  newFolders?: IFileData[];
 }
 
 interface PaginationState {
@@ -137,7 +141,7 @@ const FileCard: React.FC<FileCardProps> = ({
   );
 };
 
-const FileGridView: React.FC<FileGridViewProps> = ({
+export const FileGridView: React.FC<FileGridViewProps> = ({
   onViewDetails,
   onDownload,
   onShare,
@@ -147,6 +151,8 @@ const FileGridView: React.FC<FileGridViewProps> = ({
   onOpen,
   onRename,
   filters,
+  newFiles = [],
+  newFolders = [],
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -229,9 +235,20 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     );
   }
 
-  const files = data?.data || [];
-  const folders = files.filter((file) => file.fileType === 'Folder');
-  const regularFiles = files.filter((file) => file.fileType !== 'Folder');
+  // Combine existing files with new files/folders
+  const existingFiles = data?.data || [];
+  const allFiles = [...newFolders, ...newFiles, ...existingFiles];
+
+  // Apply filters to the combined list
+  const filteredFiles = allFiles.filter((file) => {
+    const matchesName =
+      !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
+    const matchesType = !filters.fileType || file.fileType === filters.fileType;
+    return matchesName && matchesType;
+  });
+
+  const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
+  const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
 
   return (
     <div className="flex h-full w-full">
@@ -286,7 +303,7 @@ const FileGridView: React.FC<FileGridViewProps> = ({
               </div>
             )}
 
-            {files.length === 0 && !isLoading && (
+            {filteredFiles.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Folder className="h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{t('NO_FILES_FOUND')}</h3>
@@ -330,5 +347,3 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     </div>
   );
 };
-
-export default FileGridView;
