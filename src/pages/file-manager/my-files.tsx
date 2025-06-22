@@ -4,7 +4,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
-import { Search, Plus, PlusCircle, ListFilter, AlignJustify, LayoutGrid, X } from 'lucide-react';
+import { Search, PlusCircle, ListFilter, AlignJustify, LayoutGrid, X } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
@@ -22,6 +22,7 @@ import FileListView from '../../features/file-manager/components/my-files/my-fil
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
+import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 
 interface DateRange {
   from?: Date;
@@ -128,7 +129,6 @@ interface FileManagerHeaderToolbarProps {
 }
 
 const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
-  onOpen,
   viewMode = 'grid',
   handleViewMode,
   searchQuery = '',
@@ -286,10 +286,8 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
           <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
             {t('FILE_MANAGER')}
           </h3>
-          <Button onClick={onOpen} size="sm" className="h-8">
-            <Plus className="h-4 w-4" />
-            {t('ADD_NEW')}
-          </Button>
+
+          <AddDropdownMenu />
         </div>
 
         <div className="flex items-center w-full mt-2">
@@ -377,10 +375,8 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button onClick={onOpen} size="sm" className="h-10 text-sm font-bold">
-            <Plus className="h-4 w-4 mr-1" />
-            {t('ADD_NEW')}
-          </Button>
+
+          <AddDropdownMenu />
         </div>
       </div>
 
