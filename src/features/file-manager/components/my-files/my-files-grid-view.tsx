@@ -141,8 +141,6 @@ const FileCard: React.FC<FileCardProps> = ({
   );
 };
 
-// Updated FileGridView interface to include sharing props
-
 interface FileGridViewProps {
   onViewDetails: (file: IFileDataWithSharing) => void;
   onDownload: (file: IFileDataWithSharing) => void;

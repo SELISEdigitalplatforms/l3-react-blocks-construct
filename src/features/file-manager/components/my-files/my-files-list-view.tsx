@@ -63,7 +63,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
 
   const localFiles = useMemo(() => {
-    // Enhance local files with shared user data
     const enhancedNewFiles = newFiles.map((file) => ({
       ...file,
       sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
@@ -82,12 +81,10 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   const combinedData = useMemo(() => {
     const serverFiles = data?.data || [];
 
-    // Apply renames to server files and enhance with sharing data
     const processedServerFiles = serverFiles.map((file: any) => {
       const renamedVersion = renamedFiles.get(file.id);
       const baseFile = renamedVersion || file;
 
-      // Enhance with sharing data
       const enhancedFile: IFileDataWithSharing = {
         ...baseFile,
         sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
@@ -97,7 +94,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       return enhancedFile;
     });
 
-    // Filter local files based on search criteria
     const filteredLocalFiles = localFiles.filter((file) => {
       if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
         return false;
@@ -108,7 +104,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       return true;
     });
 
-    // Filter processed server files based on search criteria
     const filteredServerFiles = processedServerFiles.filter((file: IFileDataWithSharing) => {
       if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
         return false;
@@ -119,7 +114,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       return true;
     });
 
-    // Avoid duplicates between local and server files
     const localFileIds = new Set(filteredLocalFiles.map((f) => f.id));
     const uniqueServerFiles = filteredServerFiles.filter((f) => !localFileIds.has(f.id));
 
@@ -213,7 +207,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     [onCopy]
   );
 
-  // Create columns with updated handlers that work with IFileDataWithSharing
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
     onDownload: handleDownloadWrapper,
@@ -224,7 +217,6 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     onOpen: handleOpenWrapper,
     onRename: handleRenameWrapper,
     t,
-    // Pass shared users data to columns for rendering
   });
 
   if (error) {
