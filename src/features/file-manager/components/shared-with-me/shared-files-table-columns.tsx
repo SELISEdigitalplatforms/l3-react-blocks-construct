@@ -4,7 +4,7 @@ import { IFileData } from '../../hooks/use-mock-files-query';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { compareValues } from 'features/iam/services/user-service';
 import { getFileTypeIcon, getFileTypeInfo } from '../../utils/file-manager';
-import { Users } from 'lucide-react';
+import { Info, Users } from 'lucide-react';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { DateRange } from 'react-day-picker';
 
@@ -265,6 +265,11 @@ export const SharedFileTableColumns = ({
   },
   {
     id: 'actions',
+    header: () => (
+      <div className="flex justify-end text-primary">
+        <Info />
+      </div>
+    ),
     cell: ({ row }) => (
       <div onClick={(e) => e.stopPropagation()} className="flex justify-end">
         <FileTableRowActions

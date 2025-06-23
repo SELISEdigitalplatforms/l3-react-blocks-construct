@@ -195,10 +195,6 @@ export const createFileTableColumns = ({
           e.preventDefault();
           e.stopPropagation();
         }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
         className="flex justify-end"
       >
         <FileTableRowActions

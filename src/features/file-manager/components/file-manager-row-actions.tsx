@@ -7,7 +7,6 @@ import {
   Trash2,
   Info,
   PencilLine,
-  FileInput,
   Copy,
   ExternalLink,
 } from 'lucide-react';
@@ -22,41 +21,6 @@ import {
 
 import { Dialog } from 'components/ui/dialog';
 import { IFileData } from '../hooks/use-mock-files-query';
-
-/**
- * Renders the actions for a row in the File Management table.
- *
- * This component provides a dropdown menu with actions that can be performed on a file or folder,
- * such as viewing details, downloading, sharing, editing properties, copying, moving, or deleting.
- *
- * Features:
- * - Displays a dropdown with context-sensitive actions based on the file type
- * - Allows opening files/folders and editing file properties
- * - Supports download, share, copy, move, and delete operations
- * - Different actions available for folders vs files
- * - Prevents certain actions on shared files based on permissions
- *
- * @param {DataTableRowActionsProps} props - The props for configuring the row actions
- * @param {Row<IFileData>} props.row - The row data for the file, containing file information
- * @param {function} props.onViewDetails - Callback function triggered when the "View Details" action is clicked
- * @param {function} props.onDownload - Callback function triggered when the "Download" action is clicked
- * @param {function} [props.onShare] - Optional callback function triggered when the "Share" action is clicked
- * @param {function} [props.onDelete] - Optional callback function triggered when the "Delete" action is clicked
- * @param {function} [props.onCopy] - Optional callback function triggered when the "Copy" action is clicked
- * @param {function} [props.onMove] - Optional callback function triggered when the "Move" action is clicked
- * @param {function} [props.onOpen] - Optional callback function triggered when the "Open" action is clicked
- *
- * @returns {JSX.Element} - The rendered row actions dropdown and the edit modal if opened
- *
- * @example
- * <DataTableRowActions
- *   row={fileRow}
- *   onViewDetails={(file) => console.log('Viewing details for:', file)}
- *   onDownload={(file) => console.log('Downloading:', file)}
- *   onShare={(file) => console.log('Sharing:', file)}
- *   onDelete={(file) => console.log('Deleting:', file)}
- * />
- */
 
 interface FileTableRowActionsProps {
   row: Row<IFileData>;
@@ -77,7 +41,6 @@ export function FileTableRowActions({
   onShare,
   onDelete,
   onCopy,
-  onMove,
   onOpen,
   onRename,
 }: Readonly<FileTableRowActionsProps>) {
@@ -111,7 +74,6 @@ export function FileTableRowActions({
   const canDownload = onDownload !== undefined;
   const canDelete = onDelete !== undefined;
   const canShare = onShare !== undefined;
-  const canMove = onMove !== undefined;
   const canRename = onRename !== undefined;
   const canCopy = onCopy !== undefined;
   const canOpen = onOpen !== undefined;
@@ -154,13 +116,6 @@ export function FileTableRowActions({
             <DropdownMenuItem onClick={() => handleItemClick(onCopy)}>
               <Copy className="mr-2 h-4 w-4" />
               {t('COPY')}
-            </DropdownMenuItem>
-          )}
-
-          {canMove && (
-            <DropdownMenuItem onClick={() => handleItemClick(onMove)}>
-              <FileInput className="mr-2 h-4 w-4" />
-              {t('MOVE')}
             </DropdownMenuItem>
           )}
 

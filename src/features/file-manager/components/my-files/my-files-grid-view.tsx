@@ -7,6 +7,7 @@ import {
   getFileTypeIcon,
   getFileTypeInfo,
   IFileDataWithSharing,
+  PaginationState,
   SharedUser,
 } from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions';
@@ -159,12 +160,6 @@ interface FileGridViewProps {
   renamedFiles?: Map<string, IFileDataWithSharing>;
   fileSharedUsers?: { [key: string]: SharedUser[] };
   filePermissions?: { [key: string]: { [key: string]: string } };
-}
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
 }
 
 export const FileGridView: React.FC<FileGridViewProps> = ({
