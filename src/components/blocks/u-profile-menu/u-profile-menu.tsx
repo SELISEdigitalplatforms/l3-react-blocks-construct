@@ -78,7 +78,7 @@ export const UProfileMenu = () => {
               <Skeleton className="h-8 w-8 rounded-full" />
             ) : (
               <img
-                src={data?.profileImageUrl ?? DummyProfile}
+                src={data?.profileImageUrl || DummyProfile}
                 alt="profile"
                 loading="lazy"
                 className="w-full h-full object-cover"
