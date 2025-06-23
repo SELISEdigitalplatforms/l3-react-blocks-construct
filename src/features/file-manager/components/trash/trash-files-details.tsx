@@ -45,7 +45,7 @@ const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, f
     <div className={containerClasses}>
       <div className={headerClasses}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">{t('DETAILS') || 'Details'}</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('DETAILS')}</h2>
           <button
             onClick={onClose}
             className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 p-1"
@@ -67,11 +67,11 @@ const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, f
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-base font-medium text-gray-900">{t('PROPERTIES') || 'Properties'}</h3>
+          <h3 className="text-base font-medium text-gray-900">{t('PROPERTIES')}</h3>
 
           <div className="space-y-4">
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">{t('TYPE') || 'Type'}</label>
+              <label className="text-sm text-gray-600">{t('TYPE')}</label>
               <div className="flex items-center gap-3">
                 <div
                   className={`h-6 w-6 rounded flex items-center justify-center ${backgroundColor}`}
@@ -83,26 +83,24 @@ const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, f
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">{t('SIZE') || 'Size'}</label>
+              <label className="text-sm text-gray-600">{t('SIZE')}</label>
               <div className="text-sm font-medium text-gray-900">{file.size}</div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">{t('OWNER') || 'Owner'}</label>
+              <label className="text-sm text-gray-600">{t('OWNER')}</label>
               <div className="text-sm font-medium text-gray-900">Luca Meier</div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">
-                {t('LAST_MODIFIED') || 'Last modified'}
-              </label>
+              <label className="text-sm text-gray-600">{t('LAST_MODIFIED')}</label>
               <div className="text-sm font-medium text-gray-900">
                 {CustomtDateFormat(file.lastModified)}
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">{t('DATE_CREATED') || 'Date created'}</label>
+              <label className="text-sm text-gray-600">{t('DATE_CREATED')}</label>
               <div className="text-sm font-medium text-gray-900">
                 {CustomtDateFormat(creationDate)}
               </div>
@@ -110,21 +108,21 @@ const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, f
 
             {file.fileType !== 'Folder' && (
               <div className="space-y-1">
-                <label className="text-sm text-gray-600">{t('LOCATION') || 'Location'}</label>
+                <label className="text-sm text-gray-600">{t('LOCATION')}</label>
                 <div className="text-sm font-medium text-gray-900">/Documents/</div>
               </div>
             )}
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">{t('SHARING') || 'Sharing'}</label>
+              <label className="text-sm text-gray-600">{t('SHARING')}</label>
               <div className="text-sm font-medium text-gray-900">
                 {file.isShared ? (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                    {t('SHARED') || 'Shared'}
+                    {t('SHARED')}
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
-                    {t('PRIVATE') || 'Private'}
+                    {t('PRIVATE')}
                   </span>
                 )}
               </div>
@@ -135,7 +133,7 @@ const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, f
         {sharedUsers.length > 0 && (
           <div className="space-y-4 border-t border-gray-100 pt-6">
             <h3 className="text-base font-medium text-gray-900">
-              {t('SHARED_WITH') || 'Shared with'} ({sharedUsers.length})
+              {t('SHARED_WITH')} ({sharedUsers.length})
             </h3>
 
             <div className="space-y-3">
