@@ -266,17 +266,17 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
   };
 
   const isFiltered =
-    filters.name ||
-    filters.fileType ||
-    filters.sharedBy ||
-    filters.sharedDate ||
+    filters.name ??
+    filters.fileType ??
+    filters.sharedBy ??
+    filters.sharedDate ??
     filters.modifiedDate;
   const activeFiltersCount =
     (filters.name ? 1 : 0) +
     (filters.fileType ? 1 : 0) +
     (filters.sharedBy ? 1 : 0) +
-    (filters.sharedDate?.from || filters.sharedDate?.to ? 1 : 0) +
-    (filters.modifiedDate?.from || filters.modifiedDate?.to ? 1 : 0);
+    ((filters.sharedDate?.from ?? filters.sharedDate?.to) ? 1 : 0) +
+    ((filters.modifiedDate?.from ?? filters.modifiedDate?.to) ? 1 : 0);
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
@@ -284,7 +284,7 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
         <label className={`text-sm font-medium ${isMobile ? 'block mb-2' : 'sr-only'}`}>
           {t('FILE_TYPE')}
         </label>
-        <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
+        <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
           <SelectTrigger className={`h-8 ${isMobile ? 'w-full' : 'w-[140px]'}`}>
             <SelectValue placeholder={t('FILE_TYPE')} />
           </SelectTrigger>
@@ -571,7 +571,7 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
             title="MODIFIED_DATE"
           />
 
-          <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
+          <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
             <SelectTrigger className="h-8 w-[140px]">
               <PlusCircle className="h-4 w-4 mr-1" />
               <SelectValue placeholder={t('FILE_TYPE')} />

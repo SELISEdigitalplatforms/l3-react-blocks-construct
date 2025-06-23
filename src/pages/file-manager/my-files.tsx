@@ -186,11 +186,11 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
     });
   };
 
-  const isFiltered = filters.name || filters.fileType || filters.lastModified;
+  const isFiltered = filters.name ?? filters.fileType ?? filters.lastModified;
   const activeFiltersCount =
     (filters.name ? 1 : 0) +
     (filters.fileType ? 1 : 0) +
-    (filters.lastModified?.from || filters.lastModified?.to ? 1 : 0);
+    ((filters.lastModified?.from ?? filters.lastModified?.to) ? 1 : 0);
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
@@ -198,7 +198,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
         <label className={`text-sm font-medium ${isMobile ? 'block mb-2' : 'sr-only'}`}>
           {t('FILE_TYPE')}
         </label>
-        <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
+        <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
           <SelectTrigger className={`h-8 ${isMobile ? 'w-full' : 'w-[140px]'}`}>
             <SelectValue placeholder={t('FILE_TYPE')} />
           </SelectTrigger>
@@ -261,7 +261,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
             variant="ghost"
             size="sm"
             className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleDateRangeChange(undefined)}
+            onClick={() => handleDateRangeChange()}
           >
             <X className="h-3 w-3" />
           </Button>
@@ -404,7 +404,7 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
             title="LAST_MODIFIED"
           />
 
-          <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
+          <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
             <SelectTrigger className="h-8 w-[140px]">
               <PlusCircle className="h-4 w-4 mr-1" />
               <SelectValue placeholder={t('FILE_TYPE')} />
