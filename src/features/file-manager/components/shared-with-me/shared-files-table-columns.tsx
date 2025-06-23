@@ -20,6 +20,12 @@ interface ColumnFactoryProps {
   t: (key: string) => string;
 }
 
+const normalizeDate = (date: Date) => {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+};
+
 export const SharedFileTableColumns = ({
   onViewDetails,
   onDownload,
@@ -152,12 +158,6 @@ export const SharedFileTableColumns = ({
       const rowDate = row.original.sharedDate;
       if (!rowDate) return false;
 
-      const normalizeDate = (date: Date) => {
-        const normalized = new Date(date);
-        normalized.setHours(0, 0, 0, 0);
-        return normalized;
-      };
-
       const normalizedRowDate = normalizeDate(rowDate);
 
       if (value.from && !value.to) {
@@ -202,12 +202,6 @@ export const SharedFileTableColumns = ({
 
       const rowDate = row.original.lastModified;
       if (!rowDate) return false;
-
-      const normalizeDate = (date: Date) => {
-        const normalized = new Date(date);
-        normalized.setHours(0, 0, 0, 0);
-        return normalized;
-      };
 
       const normalizedRowDate = normalizeDate(rowDate);
 
@@ -272,7 +266,11 @@ export const SharedFileTableColumns = ({
       </div>
     ),
     cell: ({ row }) => (
-      <div onClick={(e) => e.stopPropagation()} className="flex justify-end">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        className="flex justify-end"
+      >
         <FileTableRowActions
           row={row}
           onViewDetails={onViewDetails}

@@ -24,7 +24,7 @@ interface TrashCardProps {
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;
-  onPermanentDelete?: (file: IFileTrashData) => void;
+  readonly onPermanentDelete?: (file: IFileTrashData) => void;
   onViewDetails?: (file: IFileTrashData) => void;
   filters: {
     name?: string;
@@ -34,7 +34,7 @@ interface TrashGridViewProps {
   };
   deletedItemIds?: Set<string>;
   restoredItemIds?: Set<string>;
-  selectedItems?: string[];
+  readonly selectedItems?: string[];
   readonly onSelectionChange?: (items: string[]) => void;
 }
 
