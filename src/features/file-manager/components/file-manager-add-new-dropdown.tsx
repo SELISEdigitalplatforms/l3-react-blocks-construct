@@ -116,9 +116,9 @@ const AddDropdownMenu = ({
     setFolderName('');
   };
 
-  const handleFolderNameKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && folderName.trim()) {
-      handleCreateFolderSubmit();
+  const handleFolderNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCreateFolder();
     }
   };
 
@@ -247,7 +247,7 @@ const AddDropdownMenu = ({
                 type="text"
                 value={folderName}
                 onChange={(e) => setFolderName(e.target.value)}
-                onKeyPress={handleFolderNameKeyPress}
+                onKeyDown={handleFolderNameKeyDown}
                 placeholder="Enter folder name"
                 className="w-full"
                 autoFocus

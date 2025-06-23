@@ -72,18 +72,14 @@ const FileCard: React.FC<FileCardProps> = ({
   } as any;
 
   return (
-    <div
-      className="group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
-      role="button"
-      tabIndex={0}
-      onClick={handleCardClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleCardClick(e as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>);
-        }
-      }}
-    >
+    <div className="group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer">
+      <button
+        className="absolute inset-0 w-full h-full bg-transparent border-none cursor-pointer"
+        onClick={handleCardClick}
+        aria-label="Select card"
+      >
+        <span className="sr-only">Select this card</span>
+      </button>
       <div
         className={`${file.fileType === 'Folder' ? 'p-3 flex items-center space-x-3' : 'p-6 flex flex-col items-center text-center space-y-4'}`}
       >
