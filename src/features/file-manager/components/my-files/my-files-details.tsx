@@ -1,15 +1,13 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
+import {
+  getFileTypeDisplayName,
+  getFileTypeIcon,
+  getFileTypeInfo,
+  SharedUser,
+} from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
-
-interface SharedUser {
-  id: string;
-  name: string;
-  role: 'Viewer' | 'Editor' | 'Owner';
-  avatar?: string;
-}
 
 interface IFileDataWithSharing {
   id: string;
@@ -28,23 +26,6 @@ interface FileDetailsSheetProps {
   file: IFileDataWithSharing | null;
   t: (key: string) => string;
 }
-
-const getFileTypeDisplayName = (fileType: string): string => {
-  switch (fileType) {
-    case 'Folder':
-      return 'Folder';
-    case 'File':
-      return 'Document';
-    case 'Image':
-      return 'Image';
-    case 'Audio':
-      return 'Audio File';
-    case 'Video':
-      return 'Video File';
-    default:
-      return 'Unknown';
-  }
-};
 
 const Avatar: React.FC<{ className?: string; children: React.ReactNode }> = ({
   className = '',

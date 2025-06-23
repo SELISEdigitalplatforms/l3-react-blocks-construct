@@ -1,46 +1,30 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
+import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import { createFileTableColumns } from './my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
 import FileDetailsSheet from './my-files-details';
-import { PaginationState } from '../../utils/file-manager';
+import { IFileDataWithSharing, PaginationState, SharedUser } from '../../utils/file-manager';
 
 interface MyFilesListViewProps {
-  onViewDetails: (file: IFileData) => void;
-  onShare: (file: IFileData) => void;
-  onDelete: (file: IFileData) => void;
-  onMove: (file: IFileData) => void;
-  onCopy: (file: IFileData) => void;
-  onOpen: (file: IFileData) => void;
-  onRename: (file: IFileData) => void;
-  onRenameUpdate?: (oldFile: IFileData, newFile: IFileData) => void;
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onOpen: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
+  onRenameUpdate?: (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => void;
   filters: {
     name?: string;
     fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   };
-  newFiles: IFileData[];
-  newFolders: IFileData[];
-  renamedFiles: Map<string, IFileData>;
-}
-
-interface MyFilesListViewProps {
-  onViewDetails: (file: IFileData) => void;
-  onShare: (file: IFileData) => void;
-  onDelete: (file: IFileData) => void;
-  onMove: (file: IFileData) => void;
-  onCopy: (file: IFileData) => void;
-  onOpen: (file: IFileData) => void;
-  onRename: (file: IFileData) => void;
-  onRenameUpdate?: (oldFile: IFileData, newFile: IFileData) => void;
-  filters: {
-    name?: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
-  newFiles: IFileData[];
-  newFolders: IFileData[];
-  renamedFiles: Map<string, IFileData>;
+  newFiles: IFileDataWithSharing[];
+  newFolders: IFileDataWithSharing[];
+  renamedFiles: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
 }
 
 const MyFilesListView: React.FC<MyFilesListViewProps> = ({
@@ -49,17 +33,20 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   onDelete,
   onMove,
   onCopy,
+  onOpen,
   onRename,
   filters,
   newFiles,
   newFolders,
   renamedFiles,
+  fileSharedUsers = {},
+  filePermissions = {},
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -76,16 +63,38 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
 
   const localFiles = useMemo(() => {
-    return [...newFiles, ...newFolders];
-  }, [newFiles, newFolders]);
+    // Enhance local files with shared user data
+    const enhancedNewFiles = newFiles.map((file) => ({
+      ...file,
+      sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
+      sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
+    }));
+
+    const enhancedNewFolders = newFolders.map((folder) => ({
+      ...folder,
+      sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
+      sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
+    }));
+
+    return [...enhancedNewFiles, ...enhancedNewFolders];
+  }, [newFiles, newFolders, fileSharedUsers, filePermissions]);
 
   const combinedData = useMemo(() => {
     const serverFiles = data?.data || [];
 
-    // Apply renames to server files and filter out renamed originals
-    const processedServerFiles = serverFiles.map((file: IFileData) => {
+    // Apply renames to server files and enhance with sharing data
+    const processedServerFiles = serverFiles.map((file: any) => {
       const renamedVersion = renamedFiles.get(file.id);
-      return renamedVersion || file;
+      const baseFile = renamedVersion || file;
+
+      // Enhance with sharing data
+      const enhancedFile: IFileDataWithSharing = {
+        ...baseFile,
+        sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
+        sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
+      };
+
+      return enhancedFile;
     });
 
     // Filter local files based on search criteria
@@ -100,7 +109,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     });
 
     // Filter processed server files based on search criteria
-    const filteredServerFiles = processedServerFiles.filter((file: IFileData) => {
+    const filteredServerFiles = processedServerFiles.filter((file: IFileDataWithSharing) => {
       if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
         return false;
       }
@@ -110,8 +119,12 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       return true;
     });
 
-    return [...filteredLocalFiles, ...filteredServerFiles];
-  }, [localFiles, data?.data, filters, renamedFiles]);
+    // Avoid duplicates between local and server files
+    const localFileIds = new Set(filteredLocalFiles.map((f) => f.id));
+    const uniqueServerFiles = filteredServerFiles.filter((f) => !localFileIds.has(f.id));
+
+    return [...filteredLocalFiles, ...uniqueServerFiles];
+  }, [localFiles, data?.data, filters, renamedFiles, fileSharedUsers, filePermissions]);
 
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
@@ -141,7 +154,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   }, [filters]);
 
   const handleViewDetailsWrapper = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       setIsDetailsOpen(true);
       onViewDetails(file);
@@ -157,7 +170,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   const handleDownloadWrapper = () => undefined;
 
   const handleShareWrapper = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       onShare(file);
     },
@@ -165,7 +178,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   );
 
   const handleDeleteWrapper = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       onDelete(file);
     },
@@ -173,22 +186,45 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   );
 
   const handleRenameWrapper = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       onRename(file);
     },
     [onRename]
   );
 
+  const handleOpenWrapper = useCallback(
+    (file: IFileDataWithSharing) => {
+      onOpen(file);
+    },
+    [onOpen]
+  );
+
+  const handleMoveWrapper = useCallback(
+    (file: IFileDataWithSharing) => {
+      onMove(file);
+    },
+    [onMove]
+  );
+
+  const handleCopyWrapper = useCallback(
+    (file: IFileDataWithSharing) => {
+      onCopy(file);
+    },
+    [onCopy]
+  );
+
+  // Create columns with updated handlers that work with IFileDataWithSharing
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
     onDownload: handleDownloadWrapper,
     onShare: handleShareWrapper,
     onDelete: handleDeleteWrapper,
-    onMove: onMove,
-    onCopy: onCopy,
-    onOpen: handleViewDetailsWrapper,
+    onMove: handleMoveWrapper,
+    onCopy: handleCopyWrapper,
+    onOpen: handleOpenWrapper,
     onRename: handleRenameWrapper,
     t,
+    // Pass shared users data to columns for rendering
   });
 
   if (error) {
@@ -235,7 +271,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
                 lastModified:
                   typeof selectedFile.lastModified === 'string'
                     ? selectedFile.lastModified
-                    : selectedFile.lastModified.toISOString(),
+                    : (selectedFile.lastModified?.toISOString?.() ?? ''),
                 isShared: selectedFile.isShared ?? false,
               }
             : null

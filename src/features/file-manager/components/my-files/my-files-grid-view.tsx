@@ -411,11 +411,11 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
           selectedFile
             ? {
                 ...selectedFile,
+                isShared: selectedFile.isShared ?? false,
                 lastModified:
                   typeof selectedFile.lastModified === 'string'
                     ? selectedFile.lastModified
-                    : (selectedFile.lastModified?.toISOString?.() ?? ''),
-                isShared: selectedFile.isShared ?? false,
+                    : selectedFile.lastModified.toISOString(),
               }
             : null
         }
