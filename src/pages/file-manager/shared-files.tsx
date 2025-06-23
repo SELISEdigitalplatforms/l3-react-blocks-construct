@@ -1,20 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable no-empty-pattern */
 import React, { useState, useCallback } from 'react';
-import {
-  Search,
-  X,
-  Plus,
-  ListFilter,
-  AlignJustify,
-  LayoutGrid,
-  PlusCircle,
-  Check,
-} from 'lucide-react';
+import { Search, X, ListFilter, AlignJustify, LayoutGrid, PlusCircle, Check } from 'lucide-react';
 
 import { useIsMobile } from 'hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
-import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
@@ -32,7 +23,14 @@ import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
 import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
 import { DateRange, SharedFilters } from 'features/file-manager/types/file-manager.type';
-import { sharedUsers } from 'features/file-manager/utils/file-manager';
+import {
+  IFileDataWithSharing,
+  SharedUser,
+  sharedUsers,
+} from 'features/file-manager/utils/file-manager';
+import { ShareWithMeModal } from 'features/file-manager/components/shared-user-modal';
+import { RenameModal } from 'features/file-manager/components/rename-modal';
+import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 
 const DateRangeFilter: React.FC<{
   date?: DateRange;
@@ -193,6 +191,8 @@ interface SharedWithMeHeaderToolbarProps {
   onSearchChange?: (query: string) => void;
   filters: SharedFilters;
   onFiltersChange: (filters: SharedFilters) => void;
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
 }
 
 const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
@@ -202,6 +202,8 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
   onSearchChange,
   filters,
   onFiltersChange,
+  onFileUpload,
+  onFolderCreate,
 }) => {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
@@ -444,10 +446,8 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
           <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
             {t('SHARED_WITH_ME')}
           </h3>
-          <Button size="sm" className="h-8">
-            <Plus className="h-4 w-4" />
-            {t('ADD_NEW')}
-          </Button>
+
+          <AddDropdownMenu onFileUpload={onFileUpload} onFolderCreate={onFolderCreate} />
         </div>
 
         <div className="flex items-center w-full mt-2">
@@ -537,10 +537,8 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button size="sm" className="h-10 text-sm font-bold">
-            <Plus className="h-4 w-4 mr-1" />
-            {t('ADD_NEW')}
-          </Button>
+
+          <AddDropdownMenu onFileUpload={onFileUpload} onFolderCreate={onFolderCreate} />
         </div>
       </div>
 
@@ -582,6 +580,21 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
             onDateChange={handleModifiedDateRangeChange}
             title="MODIFIED_DATE"
           />
+
+          <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
+            <SelectTrigger className="h-8 w-[140px]">
+              <PlusCircle className="h-4 w-4 mr-1" />
+              <SelectValue placeholder={t('FILE_TYPE')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
+              {fileTypeOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -602,7 +615,7 @@ interface SharedWithMeProps {
   onCreateFile?: () => void;
 }
 
-export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
+export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<SharedFilters>({
@@ -613,36 +626,172 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
     modifiedDate: undefined,
   });
 
-  const handleViewDetails = useCallback((file: IFileData) => {
-    console.log('View details:', file);
+  const [newFiles, setNewFiles] = useState<IFileDataWithSharing[]>([]);
+  const [newFolders, setNewFolders] = useState<IFileDataWithSharing[]>([]);
+  const [renamedFiles, setRenamedFiles] = useState<Map<string, IFileDataWithSharing>>(new Map());
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [fileToShare, setFileToShare] = useState<IFileDataWithSharing | null>(null);
+  const [fileSharedUsers, setFileSharedUsers] = useState<{ [key: string]: SharedUser[] }>({});
+  const [filePermissions, setFilePermissions] = useState<{
+    [key: string]: { [key: string]: string };
+  }>({});
+
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [fileToRename, setFileToRename] = useState<IFileDataWithSharing | null>(null);
+
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedFileForDetails, setSelectedFileForDetails] = useState<IFileDataWithSharing | null>(
+    null
+  );
+
+  const handleShare = useCallback((file: IFileDataWithSharing) => {
+    setFileToShare(file);
+    setIsShareModalOpen(true);
   }, []);
 
-  const handleDownload = useCallback((file: IFileData) => {
+  const handleShareModalClose = useCallback(() => {
+    setIsShareModalOpen(false);
+    setFileToShare(null);
+  }, []);
+
+  const handleRename = useCallback((file: IFileDataWithSharing) => {
+    setFileToRename(file);
+    setIsRenameModalOpen(true);
+  }, []);
+
+  const handleRenameConfirm = useCallback(
+    (newName: string) => {
+      if (!fileToRename) return;
+
+      const updatedFile = {
+        ...fileToRename,
+        name: newName,
+        lastModified: new Date(),
+      };
+
+      const isLocalFile =
+        fileToRename.fileType === 'Folder'
+          ? newFolders.some((folder) => folder.id === fileToRename.id)
+          : newFiles.some((file) => file.id === fileToRename.id);
+
+      if (isLocalFile) {
+        if (fileToRename.fileType === 'Folder') {
+          setNewFolders((prev) =>
+            prev.map((folder) => (folder.id === fileToRename.id ? updatedFile : folder))
+          );
+        } else {
+          setNewFiles((prev) =>
+            prev.map((file) => (file.id === fileToRename.id ? updatedFile : file))
+          );
+        }
+      } else {
+        setRenamedFiles((prev) => new Map(prev.set(fileToRename.id, updatedFile)));
+      }
+
+      setIsRenameModalOpen(false);
+      setFileToRename(null);
+    },
+    [fileToRename, newFiles, newFolders]
+  );
+
+  const handleRenameModalClose = useCallback(() => {
+    setIsRenameModalOpen(false);
+    setFileToRename(null);
+  }, []);
+
+  const handleRenameUpdate = useCallback(
+    (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => {
+      const isLocalFile =
+        oldFile.fileType === 'Folder'
+          ? newFolders.some((folder) => folder.id === oldFile.id)
+          : newFiles.some((file) => file.id === oldFile.id);
+
+      if (isLocalFile) {
+        if (oldFile.fileType === 'Folder') {
+          setNewFolders((prev) =>
+            prev.map((folder) => (folder.id === oldFile.id ? newFile : folder))
+          );
+        } else {
+          setNewFiles((prev) => prev.map((file) => (file.id === oldFile.id ? newFile : file)));
+        }
+      } else {
+        setRenamedFiles((prev) => new Map(prev.set(oldFile.id, newFile)));
+      }
+    },
+    [newFiles, newFolders]
+  );
+
+  const getFileTypeFromFile = (file: File): 'File' | 'Image' | 'Audio' | 'Video' => {
+    const type = file.type;
+    if (type.startsWith('image/')) return 'Image';
+    if (type.startsWith('audio/')) return 'Audio';
+    if (type.startsWith('video/')) return 'Video';
+    return 'File';
+  };
+
+  const handleFileUpload = useCallback((files: File[]) => {
+    const uploadedFiles: IFileDataWithSharing[] = files.map((file) => ({
+      id: Date.now().toString() + Math.random().toString(),
+      name: file.name,
+      fileType: getFileTypeFromFile(file),
+      size: file.size.toString(),
+      lastModified: new Date(),
+      sharedBy: { id: 'current', name: 'Current User' }, // For shared files context
+      sharedDate: new Date(),
+    }));
+
+    setNewFiles((prev) => [...prev, ...uploadedFiles]);
+  }, []);
+
+  const handleFolderCreate = useCallback((folderName: string) => {
+    const newFolder: IFileDataWithSharing = {
+      id: Date.now().toString() + Math.random().toString(),
+      name: folderName,
+      fileType: 'Folder',
+      size: '0',
+      lastModified: new Date(),
+      sharedBy: { id: 'current', name: 'Current User' },
+      sharedDate: new Date(),
+    };
+
+    setNewFolders((prev) => [...prev, newFolder]);
+  }, []);
+
+  const handleDownload = useCallback((file: IFileDataWithSharing) => {
     console.log('Download:', file);
   }, []);
 
-  const handleShare = useCallback((file: IFileData) => {
-    console.log('Share:', file);
+  const handleDelete = useCallback((file: IFileDataWithSharing) => {
+    setNewFiles((prev) => prev.filter((f) => f.id !== file.id));
+    setNewFolders((prev) => prev.filter((f) => f.id !== file.id));
+    setRenamedFiles((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(file.id);
+      return newMap;
+    });
+    setFileSharedUsers((prev) => {
+      const newSharedUsers = { ...prev };
+      delete newSharedUsers[file.id];
+      return newSharedUsers;
+    });
+    setFilePermissions((prev) => {
+      const newPermissions = { ...prev };
+      delete newPermissions[file.id];
+      return newPermissions;
+    });
   }, []);
 
-  const handleDelete = useCallback((file: IFileData) => {
-    console.log('Delete:', file);
-  }, []);
-
-  const handleMove = useCallback((file: IFileData) => {
+  const handleMove = useCallback((file: IFileDataWithSharing) => {
     console.log('Move:', file);
   }, []);
 
-  const handleCopy = useCallback((file: IFileData) => {
+  const handleCopy = useCallback((file: IFileDataWithSharing) => {
     console.log('Copy:', file);
   }, []);
 
-  const handleOpen = useCallback((file: IFileData) => {
+  const handleOpen = useCallback((file: IFileDataWithSharing) => {
     console.log('Open:', file);
-  }, []);
-
-  const handleRename = useCallback((file: IFileData) => {
-    console.log('Rename:', file);
   }, []);
 
   const handleViewModeChange = useCallback((mode: string) => {
@@ -651,12 +800,125 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
+    setFilters((prev) => ({
+      ...prev,
+      name: query,
+    }));
   }, []);
 
   const handleFiltersChange = useCallback((newFilters: SharedFilters) => {
-    setFilters(newFilters);
-    setSearchQuery(newFilters.name);
+    setFilters((prevFilters) => {
+      if (JSON.stringify(prevFilters) === JSON.stringify(newFilters)) {
+        return prevFilters;
+      }
+      return newFilters;
+    });
+    setSearchQuery(newFilters.name || '');
   }, []);
+
+  const handleCreateFile = useCallback(() => {
+    if (onCreateFile) {
+      onCreateFile();
+    }
+  }, [onCreateFile]);
+
+  const getUpdatedFile = useCallback(
+    (file: IFileDataWithSharing): IFileDataWithSharing => {
+      const renamedFile = renamedFiles.get(file.id);
+      if (renamedFile) {
+        return renamedFile;
+      }
+
+      const isLocalFile =
+        file.fileType === 'Folder'
+          ? newFolders.some((folder) => folder.id === file.id)
+          : newFiles.some((f) => f.id === file.id);
+
+      if (isLocalFile) {
+        const localFile =
+          file.fileType === 'Folder'
+            ? newFolders.find((folder) => folder.id === file.id)
+            : newFiles.find((f) => f.id === file.id);
+        return localFile || file;
+      }
+
+      const sharedUsers = fileSharedUsers[file.id];
+      const permissions = filePermissions[file.id];
+
+      if (sharedUsers || permissions) {
+        return {
+          ...file,
+          sharedWith: sharedUsers || file.sharedWith,
+          sharePermissions: permissions || file.sharePermissions,
+          isShared:
+            (sharedUsers && sharedUsers.length > 0) ||
+            (file.sharedWith && file.sharedWith.length > 0),
+        };
+      }
+
+      return file;
+    },
+    [newFiles, newFolders, renamedFiles, fileSharedUsers, filePermissions]
+  );
+
+  const handleViewDetails = useCallback(
+    (file: IFileDataWithSharing) => {
+      const updatedFile = getUpdatedFile(file);
+      setSelectedFileForDetails(updatedFile);
+      setIsDetailsOpen(true);
+    },
+    [getUpdatedFile]
+  );
+
+  const handleShareConfirm = useCallback(
+    (users: SharedUser[], permissions: { [key: string]: string }) => {
+      if (!fileToShare) return;
+
+      const updatedFile = {
+        ...fileToShare,
+        sharedWith: users,
+        sharePermissions: permissions,
+        lastModified: new Date(),
+        isShared: users.length > 0,
+      };
+
+      const isLocalFile =
+        fileToShare.fileType === 'Folder'
+          ? newFolders.some((folder) => folder.id === fileToShare.id)
+          : newFiles.some((file) => file.id === fileToShare.id);
+
+      if (isLocalFile) {
+        if (fileToShare.fileType === 'Folder') {
+          setNewFolders((prev) =>
+            prev.map((folder) => (folder.id === fileToShare.id ? updatedFile : folder))
+          );
+        } else {
+          setNewFiles((prev) =>
+            prev.map((file) => (file.id === fileToShare.id ? updatedFile : file))
+          );
+        }
+      } else {
+        setRenamedFiles((prev) => new Map(prev.set(fileToShare.id, updatedFile)));
+      }
+
+      setFileSharedUsers((prev) => ({
+        ...prev,
+        [fileToShare.id]: users,
+      }));
+      setFilePermissions((prev) => ({
+        ...prev,
+        [fileToShare.id]: permissions,
+      }));
+
+      if (selectedFileForDetails && selectedFileForDetails.id === fileToShare.id) {
+        setSelectedFileForDetails(updatedFile);
+      }
+
+      setIsShareModalOpen(false);
+      setFileToShare(null);
+    },
+    [fileToShare, newFiles, newFolders, selectedFileForDetails]
+  );
 
   const commonViewProps = {
     onViewDetails: handleViewDetails,
@@ -667,7 +929,13 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
     onCopy: handleCopy,
     onOpen: handleOpen,
     onRename: handleRename,
+    onRenameUpdate: handleRenameUpdate,
     filters,
+    newFiles,
+    newFolders,
+    renamedFiles,
+    fileSharedUsers,
+    filePermissions,
   };
 
   return (
@@ -679,6 +947,8 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
         onSearchChange={handleSearchChange}
         filters={filters}
         onFiltersChange={handleFiltersChange}
+        onFileUpload={handleFileUpload}
+        onFolderCreate={handleFolderCreate}
       />
 
       <div className="flex-1 overflow-hidden">
@@ -692,6 +962,21 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = () => {
           </div>
         )}
       </div>
+
+      <RenameModal
+        isOpen={isRenameModalOpen}
+        onClose={handleRenameModalClose}
+        onConfirm={handleRenameConfirm}
+        file={fileToRename}
+      />
+
+      <ShareWithMeModal
+        isOpen={isShareModalOpen}
+        onClose={handleShareModalClose}
+        onConfirm={handleShareConfirm}
+        file={fileToShare}
+        currentSharedUsers={fileToShare ? fileToShare.sharedWith || [] : []}
+      />
     </div>
   );
 };
