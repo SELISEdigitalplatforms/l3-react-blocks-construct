@@ -199,6 +199,18 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
     (filters.deletedBy ? 1 : 0) +
     ((filters.trashedDate?.from ?? filters.trashedDate?.to) ? 1 : 0);
 
+  const getDateRangeLabel = (dateRange: DateRange) => {
+    if (dateRange.from && dateRange.to) {
+      return `Trashed: ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`;
+    }
+
+    if (dateRange.from) {
+      return `Trashed from ${dateRange.from.toLocaleDateString()}`;
+    }
+
+    return `Trashed until ${dateRange.to?.toLocaleDateString()}`;
+  };
+
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
       <div className={isMobile ? 'w-full' : ''}>
@@ -256,12 +268,7 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
 
     if (filters.trashedDate?.from || filters.trashedDate?.to) {
       const dateRange = filters.trashedDate;
-      const label =
-        dateRange.from && dateRange.to
-          ? `Trashed: ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
-          : dateRange.from
-            ? `Trashed from ${dateRange.from.toLocaleDateString()}`
-            : `Trashed until ${dateRange.to?.toLocaleDateString()}`;
+      const label = getDateRangeLabel(dateRange);
 
       activeFilters.push(
         <Badge key="trashedDate" variant="secondary" className="h-6">
@@ -270,7 +277,7 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
             variant="ghost"
             size="sm"
             className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleTrashedDateRangeChange(undefined)}
+            onClick={() => handleTrashedDateRangeChange()}
           >
             <X className="h-3 w-3" />
           </Button>
