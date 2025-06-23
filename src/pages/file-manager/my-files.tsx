@@ -644,16 +644,13 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
   }, []);
 
   const handleDelete = useCallback((file: IFileDataWithSharing) => {
-    // Remove from local files
     setNewFiles((prev) => prev.filter((f) => f.id !== file.id));
     setNewFolders((prev) => prev.filter((f) => f.id !== file.id));
-    // Remove from renamed files if it exists there
     setRenamedFiles((prev) => {
       const newMap = new Map(prev);
       newMap.delete(file.id);
       return newMap;
     });
-    // Remove from sharing data
     setFileSharedUsers((prev) => {
       const newSharedUsers = { ...prev };
       delete newSharedUsers[file.id];
@@ -664,18 +661,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
       delete newPermissions[file.id];
       return newPermissions;
     });
-  }, []);
-
-  const handleMove = useCallback((file: IFileDataWithSharing) => {
-    console.log('Move:', file);
-  }, []);
-
-  const handleCopy = useCallback((file: IFileDataWithSharing) => {
-    console.log('Copy:', file);
-  }, []);
-
-  const handleOpen = useCallback((file: IFileDataWithSharing) => {
-    console.log('Open:', file);
   }, []);
 
   const handleViewModeChange = useCallback((mode: string) => {
@@ -711,16 +696,13 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     null
   );
 
-  // Add this helper function to get the most up-to-date file data
   const getUpdatedFile = useCallback(
     (file: IFileDataWithSharing): IFileDataWithSharing => {
-      // Check if this file has been renamed
       const renamedFile = renamedFiles.get(file.id);
       if (renamedFile) {
         return renamedFile;
       }
 
-      // Check if this file has been updated in local state
       const isLocalFile =
         file.fileType === 'Folder'
           ? newFolders.some((folder) => folder.id === file.id)
@@ -734,7 +716,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
         return localFile || file;
       }
 
-      // Return original file with any sharing updates applied
       const sharedUsers = fileSharedUsers[file.id];
       const permissions = filePermissions[file.id];
 
@@ -754,7 +735,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     [newFiles, newFolders, renamedFiles, fileSharedUsers, filePermissions]
   );
 
-  // Update the handleViewDetails function
   const handleViewDetails = useCallback(
     (file: IFileDataWithSharing) => {
       const updatedFile = getUpdatedFile(file);
@@ -764,7 +744,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     [getUpdatedFile]
   );
 
-  // Update handleShareConfirm to also update the details if it's the same file
   const handleShareConfirm = useCallback(
     (users: SharedUser[], permissions: { [key: string]: string }) => {
       if (!fileToShare) return;
@@ -777,14 +756,12 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
         isShared: users.length > 0,
       };
 
-      // Update the file with sharing information
       const isLocalFile =
         fileToShare.fileType === 'Folder'
           ? newFolders.some((folder) => folder.id === fileToShare.id)
           : newFiles.some((file) => file.id === fileToShare.id);
 
       if (isLocalFile) {
-        // Handle local files
         if (fileToShare.fileType === 'Folder') {
           setNewFolders((prev) =>
             prev.map((folder) => (folder.id === fileToShare.id ? updatedFile : folder))
@@ -795,11 +772,9 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
           );
         }
       } else {
-        // Handle server files - add to renamed files map
         setRenamedFiles((prev) => new Map(prev.set(fileToShare.id, updatedFile)));
       }
 
-      // Update the separate tracking objects for easier access
       setFileSharedUsers((prev) => ({
         ...prev,
         [fileToShare.id]: users,
@@ -809,7 +784,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
         [fileToShare.id]: permissions,
       }));
 
-      // If the details sheet is open for this file, update it
       if (selectedFileForDetails && selectedFileForDetails.id === fileToShare.id) {
         setSelectedFileForDetails(updatedFile);
       }
@@ -820,21 +794,12 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     [fileToShare, newFiles, newFolders, selectedFileForDetails]
   );
 
-  // Add close handler for details
-  const handleDetailsClose = useCallback(() => {
-    setIsDetailsOpen(false);
-    setSelectedFileForDetails(null);
-  }, []);
-
-  // Updated commonViewProps
   const commonViewProps = {
-    onViewDetails: handleViewDetails, // Updated to open details sheet
+    onViewDetails: handleViewDetails,
     onDownload: handleDownload,
     onShare: handleShare,
     onDelete: handleDelete,
-    onMove: handleMove,
-    onCopy: handleCopy,
-    onOpen: handleOpen,
+
     onRename: handleRename,
     onRenameUpdate: handleRenameUpdate,
     filters,
@@ -844,25 +809,6 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
     fileSharedUsers,
     filePermissions,
   };
-
-  // // Updated commonViewProps to include sharing functionality
-  // const commonViewProps = {
-  //   onViewDetails: handleViewDetails,
-  //   onDownload: handleDownload,
-  //   onShare: handleShare, // Updated to use the new share handler
-  //   onDelete: handleDelete,
-  //   onMove: handleMove,
-  //   onCopy: handleCopy,
-  //   onOpen: handleOpen,
-  //   onRename: handleRename,
-  //   onRenameUpdate: handleRenameUpdate,
-  //   filters,
-  //   newFiles,
-  //   newFolders,
-  //   renamedFiles,
-  //   fileSharedUsers, // Pass sharing data to views
-  //   filePermissions, // Pass permissions data to views
-  // };
 
   return (
     <div className="flex flex-col h-full w-full space-y-4 p-4 md:p-6">

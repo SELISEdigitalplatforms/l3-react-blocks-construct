@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
-import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
+import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import {
+  FileCardProps,
   getFileTypeIcon,
   getFileTypeInfo,
   IFileDataWithSharing,
@@ -15,46 +16,12 @@ import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
 import FileDetailsSheet from './my-files-details';
 
-interface FileCardProps {
-  file: IFileData;
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
-  t: (key: string) => string;
-}
-
-interface FileGridViewProps {
-  onViewDetails: (file: IFileDataWithSharing) => void;
-  onDownload: (file: IFileDataWithSharing) => void;
-  onShare: (file: IFileDataWithSharing) => void;
-  onDelete: (file: IFileDataWithSharing) => void;
-  onMove: (file: IFileDataWithSharing) => void;
-  onCopy: (file: IFileDataWithSharing) => void;
-  onOpen: (file: IFileDataWithSharing) => void;
-  onRename: (file: IFileDataWithSharing) => void;
-  filters: {
-    name: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
-  newFiles?: IFileDataWithSharing[];
-  newFolders?: IFileDataWithSharing[];
-  renamedFiles?: Map<string, IFileDataWithSharing>;
-  fileSharedUsers?: { [key: string]: SharedUser[] };
-  filePermissions?: { [key: string]: { [key: string]: string } };
-}
-
 const FileCard: React.FC<FileCardProps> = ({
   file,
   onViewDetails,
   onDownload,
   onShare,
   onDelete,
-  onMove,
   onRename,
 }) => {
   const IconComponent = getFileTypeIcon(file.fileType);
@@ -106,7 +73,6 @@ const FileCard: React.FC<FileCardProps> = ({
                   onDownload={onDownload}
                   onShare={onShare}
                   onDelete={onDelete}
-                  onMove={onMove}
                   onRename={onRename}
                 />
               </div>
@@ -130,7 +96,6 @@ const FileCard: React.FC<FileCardProps> = ({
                   onDownload={onDownload}
                   onShare={onShare}
                   onDelete={onDelete}
-                  onMove={onMove}
                   onRename={onRename}
                 />
               </div>
@@ -147,9 +112,7 @@ interface FileGridViewProps {
   onDownload: (file: IFileDataWithSharing) => void;
   onShare: (file: IFileDataWithSharing) => void;
   onDelete: (file: IFileDataWithSharing) => void;
-  onMove: (file: IFileDataWithSharing) => void;
-  onCopy: (file: IFileDataWithSharing) => void;
-  onOpen: (file: IFileDataWithSharing) => void;
+
   onRename: (file: IFileDataWithSharing) => void;
   filters: {
     name: string;
@@ -167,9 +130,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
   onDownload,
   onShare,
   onDelete,
-  onMove,
-  onCopy,
-  onOpen,
+
   onRename,
   filters,
   newFiles = [],
@@ -241,7 +202,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <p className="text-red-600 mb-2">{t('ERROR_LOADING_FILES')}</p>
+          <p className="text-error mb-2">{t('ERROR_LOADING_FILES')}</p>
         </div>
       </div>
     );
@@ -260,12 +221,10 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
 
   const existingFiles = data?.data || [];
 
-  // Process server files with renamed versions and sharing data
   const processedServerFiles = existingFiles.map((file) => {
     const renamedVersion = renamedFiles.get(file.id);
     const baseFile = renamedVersion || file;
 
-    // Enhance with sharing data from props
     const enhancedFile: IFileDataWithSharing = {
       ...baseFile,
       sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
@@ -278,7 +237,6 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
   const newFileIds = new Set([...newFiles.map((f) => f.id), ...newFolders.map((f) => f.id)]);
   const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
 
-  // Enhance new files and folders with shared user data
   const enhancedNewFiles = newFiles.map((file) => ({
     ...file,
     sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
@@ -323,9 +281,6 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
                         onDownload={onDownload}
                         onShare={onShare}
                         onDelete={onDelete}
-                        onMove={onMove}
-                        onCopy={onCopy}
-                        onOpen={onOpen}
                         onRename={onRename}
                         t={t}
                       />
@@ -350,9 +305,6 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
                         onDownload={onDownload}
                         onShare={onShare}
                         onDelete={onDelete}
-                        onMove={onMove}
-                        onCopy={onCopy}
-                        onOpen={onOpen}
                         onRename={onRename}
                         t={t}
                       />

@@ -213,7 +213,7 @@ const AddDropdownMenu = ({
               </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 pt-4">
               <Button variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>

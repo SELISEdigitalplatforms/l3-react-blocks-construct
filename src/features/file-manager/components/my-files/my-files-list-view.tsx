@@ -5,35 +5,16 @@ import { createFileTableColumns } from './my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
 import FileDetailsSheet from './my-files-details';
-import { IFileDataWithSharing, PaginationState, SharedUser } from '../../utils/file-manager';
-
-interface MyFilesListViewProps {
-  onViewDetails: (file: IFileDataWithSharing) => void;
-  onShare: (file: IFileDataWithSharing) => void;
-  onDelete: (file: IFileDataWithSharing) => void;
-  onMove: (file: IFileDataWithSharing) => void;
-  onCopy: (file: IFileDataWithSharing) => void;
-  onOpen: (file: IFileDataWithSharing) => void;
-  onRename: (file: IFileDataWithSharing) => void;
-  onRenameUpdate?: (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => void;
-  filters: {
-    name?: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
-  newFiles: IFileDataWithSharing[];
-  newFolders: IFileDataWithSharing[];
-  renamedFiles: Map<string, IFileDataWithSharing>;
-  fileSharedUsers?: { [key: string]: SharedUser[] };
-  filePermissions?: { [key: string]: { [key: string]: string } };
-}
+import {
+  IFileDataWithSharing,
+  MyFilesListViewProps,
+  PaginationState,
+} from '../../utils/file-manager';
 
 const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   onViewDetails,
   onShare,
   onDelete,
-  onMove,
-  onCopy,
-  onOpen,
   onRename,
   filters,
   newFiles,
@@ -186,35 +167,11 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     [onRename]
   );
 
-  const handleOpenWrapper = useCallback(
-    (file: IFileDataWithSharing) => {
-      onOpen(file);
-    },
-    [onOpen]
-  );
-
-  const handleMoveWrapper = useCallback(
-    (file: IFileDataWithSharing) => {
-      onMove(file);
-    },
-    [onMove]
-  );
-
-  const handleCopyWrapper = useCallback(
-    (file: IFileDataWithSharing) => {
-      onCopy(file);
-    },
-    [onCopy]
-  );
-
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
     onDownload: handleDownloadWrapper,
     onShare: handleShareWrapper,
     onDelete: handleDeleteWrapper,
-    onMove: handleMoveWrapper,
-    onCopy: handleCopyWrapper,
-    onOpen: handleOpenWrapper,
     onRename: handleRenameWrapper,
     t,
   });
