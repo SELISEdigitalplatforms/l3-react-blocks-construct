@@ -99,14 +99,11 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
   const handleDateSelect = (selectedDate: Date | undefined, type: 'from' | 'to') => {
     if (!selectedDate) return;
 
-    // Ensure we're working with a clean date object
     const cleanDate = new Date(selectedDate);
 
     if (type === 'from') {
-      // Set to start of day for 'from' date
       cleanDate.setHours(0, 0, 0, 0);
     } else {
-      // Set to end of day for 'to' date
       cleanDate.setHours(23, 59, 59, 999);
     }
 
@@ -219,7 +216,6 @@ const UserFilter: React.FC<UserFilterProps> = ({ value, onValueChange, title, us
   );
 };
 
-// Select Filter Component (for dropdowns like file type)
 interface SelectFilterProps {
   value?: string;
   onValueChange: (value: string) => void;
@@ -259,7 +255,6 @@ const SelectFilter: React.FC<SelectFilterProps> = ({
   );
 };
 
-// Active Filter Badge Component
 interface ActiveFilterBadgeProps {
   label: string;
   onRemove: () => void;
@@ -281,7 +276,6 @@ const ActiveFilterBadge: React.FC<ActiveFilterBadgeProps> = ({
   );
 };
 
-// Active Filters Container Component
 interface ActiveFiltersContainerProps {
   children: React.ReactNode;
   onResetAll?: () => void;
