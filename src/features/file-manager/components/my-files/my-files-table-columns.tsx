@@ -4,8 +4,13 @@ import { IFileData } from '../../hooks/use-mock-files-query';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { compareValues } from 'features/iam/services/user-service';
 import { FileTableRowActions } from '../file-manager-row-actions';
-import { getFileTypeIcon, getFileTypeInfo, getFileTypeOptions } from '../../utils/file-manager';
-import { Users } from 'lucide-react';
+import {
+  getFileTypeIcon,
+  getFileTypeInfo,
+  getFileTypeOptions,
+  IFileDataWithSharing,
+} from '../../utils/file-manager';
+import { Info, Users } from 'lucide-react';
 
 /**
  * Creates the columns for the File Management table.
@@ -42,9 +47,7 @@ import { Users } from 'lucide-react';
 interface ColumnFactoryProps {
   onViewDetails: (file: IFileData) => void;
   onDownload: (file: IFileData) => void;
-  onMove: (file: IFileData) => void;
-  onCopy: (file: IFileData) => void;
-  onOpen: (file: IFileData) => void;
+
   onRename: (file: IFileData) => void;
   onShare: (file: IFileData) => void;
   onDelete: (file: IFileData) => void;
@@ -56,10 +59,9 @@ export const createFileTableColumns = ({
   onDownload,
   onShare,
   onDelete,
-  onMove,
   onRename,
   t,
-}: ColumnFactoryProps): ColumnDef<IFileData, any>[] => [
+}: ColumnFactoryProps): ColumnDef<IFileDataWithSharing, any>[] => [
   {
     id: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('NAME')} />,
@@ -67,13 +69,15 @@ export const createFileTableColumns = ({
     cell: ({ row }) => {
       const IconComponent = getFileTypeIcon(row.original.fileType);
       const { iconColor, backgroundColor } = getFileTypeInfo(row.original.fileType);
+      const isShared =
+        row.original.isShared || (row.original.sharedWith && row.original.sharedWith.length > 0);
       return (
         <div className="flex items-center gap-2">
           <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${backgroundColor}`}>
             <IconComponent className={`w-4 h-4 ${iconColor}`} />
           </div>
           <span className="max-w-[300px] truncate font-medium">{row.original.name}</span>
-          {row.original.isShared && (
+          {isShared && (
             <span title={t('SHARED')}>
               <Users className="h-4 w-4 text-low-emphasis" />
             </span>
@@ -177,15 +181,25 @@ export const createFileTableColumns = ({
   },
   {
     id: 'actions',
+    header: () => (
+      <div className="flex justify-end text-primary">
+        <Info />
+      </div>
+    ),
     cell: ({ row }) => (
-      <div onClick={(e) => e.stopPropagation()} className="flex justify-end">
+      <div
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        className="flex justify-end"
+      >
         <FileTableRowActions
           row={row}
           onViewDetails={onViewDetails}
           onDownload={onDownload}
           onShare={onShare}
           onDelete={onDelete}
-          onMove={onMove}
           onRename={onRename}
         />
       </div>

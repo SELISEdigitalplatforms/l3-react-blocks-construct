@@ -1,4 +1,24 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
+import { IFileData } from '../hooks/use-mock-files-query';
+import { t } from 'i18next';
+
+export interface PaginationState {
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+}
+
+export interface SharedUser {
+  id: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+}
+
+export interface IFileDataWithSharing extends IFileData {
+  sharedWith?: SharedUser[];
+  sharePermissions?: { [key: string]: string };
+}
 
 export const sharedUsers = [
   { id: '1', name: 'Luca Meier' },
@@ -7,13 +27,21 @@ export const sharedUsers = [
   { id: '4', name: 'Adrian Müller' },
 ];
 
-type FileTypeOption = {
+export type FileTypeOption = {
   value: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   iconColor: string;
   backgroundColor: string;
 };
+
+export const fileTypeOptions = [
+  { value: 'Folder', label: t('FOLDER') },
+  { value: 'File', label: t('FILE') },
+  { value: 'Image', label: t('IMAGE') },
+  { value: 'Audio', label: t('AUDIO') },
+  { value: 'Video', label: t('VIDEO') },
+];
 
 export const getFileTypeOptions = (t: (key: string) => string): FileTypeOption[] => [
   {
@@ -156,3 +184,121 @@ export const trashMockData: IFileTrashData[] = [
     isShared: false,
   },
 ];
+
+export const getFileTypeDisplayName = (fileType: string): string => {
+  switch (fileType) {
+    case 'Folder':
+      return 'Folder';
+    case 'File':
+      return 'Document';
+    case 'Image':
+      return 'Image';
+    case 'Audio':
+      return 'Audio File';
+    case 'Video':
+      return 'Video File';
+    default:
+      return 'Unknown';
+  }
+};
+
+export interface FileDetailsSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  file: IFileData | null;
+  t: (key: string) => string;
+}
+
+export interface SharedUser {
+  id: string;
+  name: string;
+  role: 'Viewer' | 'Editor' | 'Owner';
+  avatar?: string;
+}
+
+export const getSharedUsers = (file: IFileData | null): SharedUser[] => {
+  if (!file) return [];
+
+  const users: SharedUser[] = [
+    {
+      id: 'owner',
+      name: 'Luca Meier',
+      role: 'Owner',
+      avatar: '/avatars/luca.jpg',
+    },
+  ];
+
+  if (file.isShared) {
+    users.push(
+      {
+        id: '2',
+        name: 'Aaron Green',
+        role: 'Editor',
+        avatar: '/avatars/aaron.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        role: 'Viewer',
+        avatar: '/avatars/sarah.jpg',
+      },
+      {
+        id: '4',
+        name: 'Michael Chen',
+        role: 'Viewer',
+        avatar: '/avatars/michael.jpg',
+      }
+    );
+  }
+
+  return users;
+};
+
+export interface FileCardProps {
+  file: IFileData;
+  onViewDetails?: (file: IFileData) => void;
+  onDownload?: (file: IFileData) => void;
+  onShare?: (file: IFileData) => void;
+  onDelete?: (file: IFileData) => void;
+  onMove?: (file: IFileData) => void;
+  onCopy?: (file: IFileData) => void;
+  onOpen?: (file: IFileData) => void;
+  onRename?: (file: IFileData) => void;
+  t: (key: string) => string;
+}
+
+export interface FileGridViewProps {
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onDownload: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+
+  onRename: (file: IFileDataWithSharing) => void;
+  filters: {
+    name: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+}
+
+export interface MyFilesListViewProps {
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+
+  onRename: (file: IFileDataWithSharing) => void;
+  onRenameUpdate?: (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => void;
+  filters: {
+    name?: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+  newFiles: IFileDataWithSharing[];
+  newFolders: IFileDataWithSharing[];
+  renamedFiles: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+}
