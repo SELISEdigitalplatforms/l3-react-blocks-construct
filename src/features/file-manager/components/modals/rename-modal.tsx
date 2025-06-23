@@ -3,8 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'components/ui/
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import { Label } from 'components/ui/label';
-import { IFileData } from '../hooks/use-mock-files-query';
 import { useTranslation } from 'react-i18next';
+import { IFileData } from '../../hooks/use-mock-files-query';
 
 interface RenameModalProps {
   isOpen: boolean;

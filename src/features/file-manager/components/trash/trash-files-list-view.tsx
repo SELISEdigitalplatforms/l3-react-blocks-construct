@@ -6,7 +6,7 @@ import DataTable from 'components/blocks/data-table/data-table';
 import { IFileTrashData, PaginationState } from '../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableColumns } from './trash-files-table-columns';
-import TrashDetailsSheet from './trash-files-details';
+import { TrashDetailsSheet } from './trash-files-details';
 
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
@@ -160,7 +160,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     };
   }, [data?.totalCount, paginationState]);
 
-  // Handle error after all hooks have been called
   if (error) {
     return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
   }
@@ -204,6 +203,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
                 ...selectedFile,
                 lastModified:
                   selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+                isShared: selectedFile.isShared ?? false,
               }
             : null
         }

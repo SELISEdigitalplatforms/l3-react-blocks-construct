@@ -14,8 +14,8 @@ import {
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
-import FileDetailsSheet from '../my-files/my-files-details';
 import { DateRange } from '../../types/file-manager.type';
+import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 
 interface FileGridViewProps {
   onViewDetails?: (file: IFileDataWithSharing) => void;
@@ -428,7 +428,7 @@ const SharedFileGridView: React.FC<FileGridViewProps> = ({
         </div>
       </div>
 
-      <FileDetailsSheet
+      <RegularFileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
         file={

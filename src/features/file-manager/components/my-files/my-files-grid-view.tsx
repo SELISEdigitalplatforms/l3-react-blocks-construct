@@ -14,7 +14,7 @@ import {
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
-import FileDetailsSheet from './my-files-details';
+import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 
 const FileCard: React.FC<FileCardProps> = ({
   file,
@@ -362,7 +362,7 @@ export const FileGridView: React.FC<FileGridViewProps> = ({
         </div>
       </div>
 
-      <FileDetailsSheet
+      <RegularFileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
         file={

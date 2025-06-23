@@ -12,8 +12,8 @@ import {
 import { useIsMobile } from 'hooks/use-mobile';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableRowActions } from './trash-files-row-actions';
-import TrashDetailsSheet from './trash-files-details';
 import { DateRange } from '../../types/file-manager.type';
+import { TrashDetailsSheet } from './trash-files-details';
 
 interface TrashCardProps {
   file: IFileTrashData;
@@ -365,6 +365,7 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
                 ...selectedFile,
                 lastModified:
                   selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+                isShared: selectedFile.isShared ?? false,
               }
             : null
         }

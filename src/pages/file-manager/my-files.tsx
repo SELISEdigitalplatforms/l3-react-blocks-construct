@@ -22,15 +22,15 @@ import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 import { FileGridView } from 'features/file-manager/components/my-files/my-files-grid-view';
-import { RenameModal } from 'features/file-manager/components/rename-modal';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
-import { ShareWithMeModal } from 'features/file-manager/components/shared-user-modal';
+import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import {
   fileTypeOptions,
   IFileDataWithSharing,
   SharedUser,
 } from 'features/file-manager/utils/file-manager';
 import { DateRange } from 'features/file-manager/types/file-manager.type';
+import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
 
 interface FileFilters {
   name: string;

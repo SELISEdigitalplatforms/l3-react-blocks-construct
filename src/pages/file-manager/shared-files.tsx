@@ -29,9 +29,9 @@ import {
   SharedUser,
   sharedUsers,
 } from 'features/file-manager/utils/file-manager';
-import { ShareWithMeModal } from 'features/file-manager/components/shared-user-modal';
-import { RenameModal } from 'features/file-manager/components/rename-modal';
+import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
+import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
 
 const DateRangeFilter: React.FC<{
   date?: DateRange;
