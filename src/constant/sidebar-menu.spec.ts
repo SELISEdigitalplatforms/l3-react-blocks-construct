@@ -3,7 +3,7 @@ import { menuItems } from '../constant/sidebar-menu';
 describe('menuItems', () => {
   test('should have the correct structure', () => {
     expect(Array.isArray(menuItems)).toBe(true);
-    expect(menuItems.length).toBe(13);
+    expect(menuItems.length).toBe(14);
   });
 
   test('each menu item should have required properties', () => {

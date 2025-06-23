@@ -2,7 +2,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { getFileTypeIcon, getFileTypeInfo, IFileTrashData } from '../../utils/file-manager';
-import { Users } from 'lucide-react';
+import { Info, Users } from 'lucide-react';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
 import { TrashTableRowActions } from './trash-files-row-actions';
 
@@ -74,6 +74,11 @@ export const TrashTableColumns = ({
   },
   {
     id: 'actions',
+    header: () => (
+      <div className="flex justify-end text-primary">
+        <Info />
+      </div>
+    ),
     cell: ({ row }) => (
       <div onClick={(e) => e.stopPropagation()} className="flex justify-end">
         <TrashTableRowActions row={row} onRestore={onRestore} onDelete={onDelete} />

@@ -27,8 +27,8 @@ import { Badge } from 'components/ui/badge';
 import { Input } from 'components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import TrashFilesListView from 'features/file-manager/components/trash/trash-files-list-view';
 import TrashGridView from 'features/file-manager/components/trash/trash-files-grid-view';
+import { TrashFilesListView } from 'features/file-manager/components/trash/trash-files-list-view';
 
 interface DateRange {
   from?: Date;
@@ -463,7 +463,7 @@ interface TrashProps {
   onClearTrash?: () => void;
 }
 
-export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
+const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -474,9 +474,15 @@ export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, 
     trashedDate: undefined,
   });
 
+  const [deletedItemIds, setDeletedItemIds] = useState<Set<string>>(new Set());
+  const [restoredItemIds, setRestoredItemIds] = useState<Set<string>>(new Set());
+
   const handleRestoreFile = useCallback(
     (file: IFileTrashData) => {
-      console.log('Restore file:', file);
+      setRestoredItemIds((prev) => new Set([...Array.from(prev), file.id]));
+
+      setSelectedItems((prev) => prev.filter((id) => id !== file.id));
+
       onRestoreFile?.(file);
     },
     [onRestoreFile]
@@ -484,15 +490,25 @@ export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, 
 
   const handlePermanentDelete = useCallback(
     (file: IFileTrashData) => {
-      console.log('Permanently delete:', file);
+      setDeletedItemIds((prev) => new Set([...Array.from(prev), file.id]));
+
+      setSelectedItems((prev) => prev.filter((id) => id !== file.id));
+
       onPermanentDelete?.(file);
     },
     [onPermanentDelete]
   );
 
   const handleRestoreSelected = useCallback(() => {
-    console.log('Restore selected items:', selectedItems);
+    setRestoredItemIds((prev) => new Set([...Array.from(prev), ...selectedItems]));
+    setSelectedItems([]);
   }, [selectedItems]);
+
+  const handleClearTrash = useCallback(() => {
+    onClearTrash?.();
+
+    setSelectedItems([]);
+  }, [onClearTrash]);
 
   const handleViewModeChange = useCallback((mode: string) => {
     setViewMode(mode as 'grid' | 'list');
@@ -514,6 +530,8 @@ export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, 
     filters,
     selectedItems,
     onSelectionChange: setSelectedItems,
+    deletedItemIds,
+    restoredItemIds,
   };
 
   return (
@@ -525,7 +543,7 @@ export const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, 
         onSearchChange={handleSearchChange}
         filters={filters}
         onFiltersChange={handleFiltersChange}
-        onClearTrash={onClearTrash}
+        onClearTrash={handleClearTrash}
         onRestoreSelected={handleRestoreSelected}
         selectedItems={selectedItems}
       />
