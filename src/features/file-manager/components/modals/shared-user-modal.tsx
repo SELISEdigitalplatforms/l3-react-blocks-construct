@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Search, X, ChevronDown, Trash2 } from 'lucide-react';
-import { SharedUser } from '../utils/file-manager';
+import { SharedUser } from '../../utils/file-manager';
 import { Button } from 'components/ui/button';
 
 interface PermissionOption {

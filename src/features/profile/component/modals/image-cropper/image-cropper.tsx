@@ -14,6 +14,14 @@ import {
 import { Slider } from 'components/ui/slider';
 import { Separator } from 'components/ui/separator';
 
+/**
+ * Props for the ImageCropper component
+ * @typedef {Object} ImageCropperProps
+ * @property {string} image - The source URL of the image to be cropped
+ * @property {() => void} onClose - Callback function called when the dialog is closed
+ * @property {(croppedImage: string) => void} onCropComplete - Callback function called with the cropped image data URL
+ * @property {number} [aspect=1] - The aspect ratio (width/height) for the crop area (default: 1 for square)
+ */
 type ImageCropperProps = {
   image: string;
   onClose: () => void;
@@ -21,6 +29,19 @@ type ImageCropperProps = {
   aspect?: number;
 };
 
+/**
+ * A modal dialog component for cropping and resizing profile images.
+ * @component
+ * @example
+ * ```tsx
+ * <ImageCropper
+ *   image="https://example.com/profile.jpg"
+ *   onClose={() => setShowCropper(false)}
+ *   onCropComplete={(croppedImage) => handleCropComplete(croppedImage)}
+ *   aspect={1}
+ * />
+ * ```
+ */
 export const ImageCropper: React.FC<ImageCropperProps> = ({
   image,
   onClose,

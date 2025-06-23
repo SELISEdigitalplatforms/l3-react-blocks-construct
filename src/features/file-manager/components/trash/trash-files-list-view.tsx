@@ -6,12 +6,12 @@ import DataTable from 'components/blocks/data-table/data-table';
 import { IFileTrashData, PaginationState } from '../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableColumns } from './trash-files-table-columns';
-import TrashDetailsSheet from './trash-files-details';
+import { TrashDetailsSheet } from './trash-files-details';
 
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
   onDelete: (file: IFileTrashData) => void;
-  onPermanentDelete?: (file: IFileTrashData) => void;
+  readonly onPermanentDelete?: (file: IFileTrashData) => void;
   filters: {
     name?: string;
     fileType?: string;
@@ -127,10 +127,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     setSelectedFile(null);
   }, []);
 
-  if (error) {
-    return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
-  }
-
   const columns = useMemo(() => {
     return TrashTableColumns({
       onRestore: handleRestoreWrapper,
@@ -155,12 +151,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     });
   }, [data?.data, deletedItemIds, restoredItemIds]);
 
-  if (error) {
-    return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
-  }
-
-  const shouldHideMainContent = isMobile && isDetailsOpen;
-
   const paginationProps = useMemo(() => {
     return {
       pageIndex: paginationState.pageIndex,
@@ -169,6 +159,12 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
       manualPagination: true,
     };
   }, [data?.totalCount, paginationState]);
+
+  if (error) {
+    return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
+  }
+
+  const shouldHideMainContent = isMobile && isDetailsOpen;
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
@@ -207,6 +203,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
                 ...selectedFile,
                 lastModified:
                   selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+                isShared: selectedFile.isShared ?? false,
               }
             : null
         }

@@ -66,8 +66,8 @@ const AddDropdownMenu = ({
     setUploadedFiles((prev) => [...prev, ...newFiles]);
   }, []);
 
-  const handleDrop = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop: React.DragEventHandler = useCallback(
+    (event) => {
       event.preventDefault();
       const files = Array.from(event.dataTransfer.files);
       processFiles(files);
@@ -75,11 +75,11 @@ const AddDropdownMenu = ({
     [processFiles]
   );
 
-  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver: React.DragEventHandler = useCallback((event) => {
     event.preventDefault();
   }, []);
 
-  const handleDragLeave = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave: React.DragEventHandler = useCallback((event) => {
     event.preventDefault();
   }, []);
 
@@ -116,9 +116,9 @@ const AddDropdownMenu = ({
     setFolderName('');
   };
 
-  const handleFolderNameKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && folderName.trim()) {
-      handleCreateFolderSubmit();
+  const handleFolderNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCreateFolder();
     }
   };
 
@@ -150,23 +150,15 @@ const AddDropdownMenu = ({
           </DialogHeader>
 
           <div className="space-y-6">
-            <div
-              className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-16 text-center transition-colors cursor-pointer"
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
+              className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-16 text-center transition-colors cursor-pointer w-full bg-transparent"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onClick={() => {
                 const input = document.getElementById('file-input');
                 if (input) input.click();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  const input = document.getElementById('file-input');
-                  if (input) input.click();
-                }
               }}
             >
               <div className="flex flex-col items-center gap-4">
@@ -188,7 +180,7 @@ const AddDropdownMenu = ({
                   accept=".pdf,.docx,.jpg,.jpeg,.png,.txt,.doc,.xlsx,.xls,.pptx,.ppt"
                 />
               </div>
-            </div>
+            </button>
 
             {uploadedFiles.length > 0 && (
               <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -255,7 +247,7 @@ const AddDropdownMenu = ({
                 type="text"
                 value={folderName}
                 onChange={(e) => setFolderName(e.target.value)}
-                onKeyPress={handleFolderNameKeyPress}
+                onKeyDown={handleFolderNameKeyDown}
                 placeholder="Enter folder name"
                 className="w-full"
                 autoFocus

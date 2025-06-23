@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 
-import { Dialog } from 'components/ui/dialog';
 import { IFileData } from '../hooks/use-mock-files-query';
 
 interface FileTableRowActionsProps {
@@ -46,10 +45,12 @@ export function FileTableRowActions({
 }: Readonly<FileTableRowActionsProps>) {
   const { t } = useTranslation();
   const file = row.original;
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleItemClick = (action: (file: IFileData) => void) => {
+  const handleItemClick = (action: (file: IFileData) => void) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     setIsDropdownOpen(false);
     setTimeout(() => {
       action(file);
@@ -59,8 +60,15 @@ export function FileTableRowActions({
   const handleDropdownTriggerClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
     setIsDropdownOpen((prev) => !prev);
+  };
+
+  const handleDropdownTriggerKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDropdownOpen((prev) => !prev);
+    }
   };
 
   const handleDropdownOpenChange = (open: boolean) => {
@@ -68,6 +76,10 @@ export function FileTableRowActions({
   };
 
   const handleDropdownContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleDropdownContentKeyDown = (e: React.KeyboardEvent) => {
     e.stopPropagation();
   };
 
@@ -86,6 +98,7 @@ export function FileTableRowActions({
             variant="ghost"
             className="h-8 w-8 p-0"
             onClick={handleDropdownTriggerClick}
+            onKeyDown={handleDropdownTriggerKeyDown}
             onMouseDown={(e) => e.stopPropagation()}
           >
             <span className="sr-only">Open menu</span>
@@ -96,43 +109,44 @@ export function FileTableRowActions({
           align="end"
           className="w-48"
           onClick={handleDropdownContentClick}
+          onKeyDown={handleDropdownContentKeyDown}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
           {canOpen && (
-            <DropdownMenuItem onClick={() => handleItemClick(onOpen)}>
+            <DropdownMenuItem onClick={handleItemClick(onOpen)}>
               <ExternalLink className="mr-2 h-4 w-4" />
               {t('OPEN')}
             </DropdownMenuItem>
           )}
 
           {canShare && (
-            <DropdownMenuItem onClick={() => handleItemClick(onShare)}>
+            <DropdownMenuItem onClick={handleItemClick(onShare)}>
               <UserPlus className="mr-2 h-4 w-4" />
               {t('SHARE')}
             </DropdownMenuItem>
           )}
 
           {canCopy && (
-            <DropdownMenuItem onClick={() => handleItemClick(onCopy)}>
+            <DropdownMenuItem onClick={handleItemClick(onCopy)}>
               <Copy className="mr-2 h-4 w-4" />
               {t('COPY')}
             </DropdownMenuItem>
           )}
 
           {canRename && (
-            <DropdownMenuItem onClick={() => handleItemClick(onRename)}>
+            <DropdownMenuItem onClick={handleItemClick(onRename)}>
               <PencilLine className="mr-2 h-4 w-4" />
               {t('RENAME')}
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem onClick={() => handleItemClick(onViewDetails)}>
+          <DropdownMenuItem onClick={handleItemClick(onViewDetails)}>
             <Info className="mr-2 h-4 w-4" />
             {t('VIEW_DETAILS')}
           </DropdownMenuItem>
 
           {canDownload && (
-            <DropdownMenuItem onClick={() => handleItemClick(onDownload)}>
+            <DropdownMenuItem onClick={handleItemClick(onDownload)}>
               <Download className="mr-2 h-4 w-4" />
               {t('DOWNLOAD')}
             </DropdownMenuItem>
@@ -140,7 +154,7 @@ export function FileTableRowActions({
 
           {canDelete && (
             <DropdownMenuItem
-              onClick={() => handleItemClick(onDelete)}
+              onClick={handleItemClick(onDelete)}
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
@@ -149,8 +163,6 @@ export function FileTableRowActions({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}></Dialog>
     </>
   );
 }
