@@ -8,11 +8,14 @@ export interface PaginationState {
   totalCount: number;
 }
 
+export type UserRole = 'Viewer' | 'Editor' | 'Owner';
+
 export interface SharedUser {
   id: string;
   name: string;
   email?: string;
   avatar?: string;
+  role?: UserRole;
 }
 
 export interface IFileDataWithSharing extends IFileData {
@@ -140,7 +143,7 @@ export const trashMockData: IFileTrashData[] = [
     name: 'Adventure_Video.mp4',
     fileType: 'Video',
     size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
+    trashedDate: new Date('2025-01-03'),
     isShared: false,
   },
   {
@@ -156,7 +159,7 @@ export const trashMockData: IFileTrashData[] = [
     name: 'Design Assets',
     fileType: 'Folder',
     size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
+    trashedDate: new Date('2025-03-03'),
     isShared: true,
   },
   {
@@ -164,7 +167,7 @@ export const trashMockData: IFileTrashData[] = [
     name: 'Design Assets 2',
     fileType: 'Folder',
     size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
+    trashedDate: new Date('2025-04-03'),
     isShared: true,
   },
   {
@@ -172,7 +175,7 @@ export const trashMockData: IFileTrashData[] = [
     name: 'Ftoof.jpg',
     fileType: 'Image',
     size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
+    trashedDate: new Date('2025-05-03'),
     isShared: false,
   },
   {
@@ -180,7 +183,7 @@ export const trashMockData: IFileTrashData[] = [
     name: 'Project Documents.doc',
     fileType: 'File',
     size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
+    trashedDate: new Date('2025-05-05'),
     isShared: false,
   },
 ];
@@ -207,13 +210,6 @@ export interface FileDetailsSheetProps {
   onClose: () => void;
   file: IFileData | null;
   t: (key: string) => string;
-}
-
-export interface SharedUser {
-  id: string;
-  name: string;
-  role: 'Viewer' | 'Editor' | 'Owner';
-  avatar?: string;
 }
 
 export const getSharedUsers = (file: IFileData | null): SharedUser[] => {

@@ -39,6 +39,7 @@ export function FileTableRowActions({
   onDownload,
   onShare,
   onDelete,
+  onMove,
   onCopy,
   onOpen,
   onRename,
@@ -89,6 +90,7 @@ export function FileTableRowActions({
   const canRename = onRename !== undefined;
   const canCopy = onCopy !== undefined;
   const canOpen = onOpen !== undefined;
+  const canMove = onMove !== undefined;
 
   return (
     <>
@@ -130,6 +132,12 @@ export function FileTableRowActions({
             <DropdownMenuItem onClick={handleItemClick(onCopy)}>
               <Copy className="mr-2 h-4 w-4" />
               {t('COPY')}
+            </DropdownMenuItem>
+          )}
+          {canMove && (
+            <DropdownMenuItem onClick={handleItemClick(onMove)}>
+              <Copy className="mr-2 h-4 w-4" />
+              {t('MOVE')}
             </DropdownMenuItem>
           )}
 

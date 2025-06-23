@@ -1,39 +1,25 @@
 /* eslint-disable no-console */
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Button } from 'components/ui/button';
-import {
-  AlignJustify,
-  LayoutGrid,
-  ListFilter,
-  PlusCircle,
-  Recycle,
-  RotateCcw,
-  Search,
-  X,
-} from 'lucide-react';
-import { Calendar } from 'components/ui/calendar';
+import { AlignJustify, LayoutGrid, ListFilter, Recycle, RotateCcw, X } from 'lucide-react';
 import { fileTypeOptions, IFileTrashData } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'components/ui/select';
-import { Badge } from 'components/ui/badge';
-import { Input } from 'components/ui/input';
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 import TrashGridView from 'features/file-manager/components/trash/trash-files-grid-view';
 import { TrashFilesListView } from 'features/file-manager/components/trash/trash-files-list-view';
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
+import { DateRange } from 'features/file-manager/types/file-manager.type';
+import {
+  ActiveFilterBadge,
+  ActiveFiltersContainer,
+  countActiveFilters,
+  DateRangeFilter,
+  getDateRangeLabel,
+  SearchInput,
+  SelectFilter,
+} from 'features/file-manager/components/common-filters';
 
 interface TrashFilters {
   name: string;
@@ -41,86 +27,6 @@ interface TrashFilters {
   deletedBy?: string;
   trashedDate?: DateRange;
 }
-
-const DateRangeFilter: React.FC<{
-  date?: DateRange;
-  onDateChange: (date?: DateRange) => void;
-  title: string;
-}> = ({ date, onDateChange, title }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
-
-  const handleDateSelect = (selectedDate: Date | undefined, type: 'from' | 'to') => {
-    if (!selectedDate) return;
-
-    const newRange = {
-      from: type === 'from' ? selectedDate : date?.from,
-      to: type === 'to' ? selectedDate : date?.to,
-    };
-
-    onDateChange(newRange);
-  };
-
-  const clearDateRange = () => {
-    onDateChange(undefined);
-  };
-
-  const formatDateRange = (range?: DateRange) => {
-    if (!range?.from && !range?.to) return t(title);
-    if (range.from && !range.to) return `From ${range.from.toLocaleDateString()}`;
-    if (!range.from && range.to) return `Until ${range.to?.toLocaleDateString()}`;
-    return `${range.from?.toLocaleDateString()} - ${range.to?.toLocaleDateString()}`;
-  };
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="h-8 px-3 justify-start">
-          <PlusCircle className="h-4 w-4 mr-1" />
-          <span className="text-sm">{formatDateRange(date)}</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-medium">{t(title)}</div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-x-4 flex">
-            <div>
-              <label className="text-xs text-muted-foreground mb-2 block">From</label>
-              <Calendar
-                mode="single"
-                selected={date?.from}
-                onSelect={(date) => handleDateSelect(date, 'from')}
-                className="rounded-md border"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-2 block">To</label>
-              <Calendar
-                mode="single"
-                selected={date?.to}
-                onSelect={(date) => handleDateSelect(date, 'to')}
-                className="rounded-md border"
-              />
-            </div>
-          </div>
-          <div className="flex justify-center mt-2">
-            <Button variant="outline" onClick={clearDateRange} className="w-full">
-              Clear filter
-            </Button>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-};
 
 interface TrashHeaderToolbarProps {
   viewMode?: string;
@@ -149,16 +55,15 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
   const { t } = useTranslation();
   const [openSheet, setOpenSheet] = useState(false);
 
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
-    onSearchChange?.(newQuery);
+  const handleSearchChange = (query: string) => {
+    onSearchChange?.(query);
     onFiltersChange({
       ...filters,
-      name: newQuery,
+      name: query,
     });
   };
 
-  const clearSearch = () => {
+  const handleSearchClear = () => {
     onSearchChange?.('');
     onFiltersChange({
       ...filters,
@@ -167,15 +72,14 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
   };
 
   const handleFileTypeChange = (value: string) => {
-    const fileType =
-      value === 'all' ? undefined : (value as 'Folder' | 'File' | 'Image' | 'Audio' | 'Video');
+    const fileType = value === 'all' ? undefined : (value as TrashFilters['fileType']);
     onFiltersChange({
       ...filters,
       fileType,
     });
   };
 
-  const handleTrashedDateRangeChange = (dateRange?: DateRange) => {
+  const handleTrashedDateChange = (dateRange?: DateRange) => {
     onFiltersChange({
       ...filters,
       trashedDate: dateRange,
@@ -192,24 +96,8 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
     });
   };
 
-  const isFiltered = filters.name ?? filters.fileType ?? filters.deletedBy ?? filters.trashedDate;
-  const activeFiltersCount =
-    (filters.name ? 1 : 0) +
-    (filters.fileType ? 1 : 0) +
-    (filters.deletedBy ? 1 : 0) +
-    ((filters.trashedDate?.from ?? filters.trashedDate?.to) ? 1 : 0);
-
-  const getDateRangeLabel = (dateRange: DateRange) => {
-    if (dateRange.from && dateRange.to) {
-      return `Trashed: ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`;
-    }
-
-    if (dateRange.from) {
-      return `Trashed from ${dateRange.from.toLocaleDateString()}`;
-    }
-
-    return `Trashed until ${dateRange.to?.toLocaleDateString()}`;
-  };
+  const activeFiltersCount = countActiveFilters(filters);
+  const isFiltered = activeFiltersCount > 0;
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
@@ -217,32 +105,26 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
         <label className={`text-sm font-medium ${isMobile ? 'block mb-2' : 'sr-only'}`}>
           {t('FILE_TYPE')}
         </label>
-        <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
-          <SelectTrigger className={`h-8 ${isMobile ? 'w-full' : 'w-[140px]'}`}>
-            <SelectValue placeholder={t('FILE_TYPE')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
-            {fileTypeOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SelectFilter
+          value={filters.fileType}
+          onValueChange={handleFileTypeChange}
+          title="FILE_TYPE"
+          options={fileTypeOptions}
+          allValue="all"
+          allLabel="ALL_TYPES"
+          className={isMobile ? 'w-full' : 'w-[140px]'}
+        />
       </div>
 
       {isMobile && (
-        <>
-          <div className="w-full">
-            <label className="text-sm font-medium block mb-2">{t('TRASHED_DATE')}</label>
-            <DateRangeFilter
-              date={filters.trashedDate}
-              onDateChange={handleTrashedDateRangeChange}
-              title="TRASHED_DATE"
-            />
-          </div>
-        </>
+        <div className="w-full">
+          <label className="text-sm font-medium block mb-2">{t('TRASHED_DATE')}</label>
+          <DateRangeFilter
+            date={filters.trashedDate}
+            onDateChange={handleTrashedDateChange}
+            title="TRASHED_DATE"
+          />
+        </div>
       )}
     </div>
   );
@@ -252,41 +134,31 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
 
     if (filters.fileType) {
       activeFilters.push(
-        <Badge key="fileType" variant="secondary" className="h-6 text-foreground">
-          {t(filters.fileType.toUpperCase())}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleFileTypeChange('all')}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </Badge>
+        <ActiveFilterBadge
+          key="fileType"
+          label={t(filters.fileType.toUpperCase())}
+          onRemove={() => handleFileTypeChange('all')}
+        />
       );
     }
 
     if (filters.trashedDate?.from || filters.trashedDate?.to) {
-      const dateRange = filters.trashedDate;
-      const label = getDateRangeLabel(dateRange);
-
-      activeFilters.push(
-        <Badge key="trashedDate" variant="secondary" className="h-6">
-          {label}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleTrashedDateRangeChange()}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </Badge>
-      );
+      const label = getDateRangeLabel(filters.trashedDate);
+      if (label) {
+        activeFilters.push(
+          <ActiveFilterBadge
+            key="trashedDate"
+            label={`Trashed: ${label}`}
+            onRemove={() => handleTrashedDateChange()}
+          />
+        );
+      }
     }
 
     return activeFilters.length > 0 ? (
-      <div className="flex flex-wrap gap-2 mt-2">{activeFilters}</div>
+      <ActiveFiltersContainer onResetAll={handleResetFilters}>
+        {activeFilters}
+      </ActiveFiltersContainer>
     ) : null;
   };
 
@@ -311,25 +183,13 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
         </div>
 
         <div className="flex items-center w-full mt-2">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder={t('SEARCH_BY_FILE_FOLDER_NAME')}
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              className="h-8 w-full rounded-lg bg-background pl-8 pr-8"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label="Clear search"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onClear={handleSearchClear}
+            placeholder="SEARCH_BY_FILE_FOLDER_NAME"
+            className="flex-grow"
+          />
 
           <div className="flex ml-2 gap-1">
             <Sheet open={openSheet} onOpenChange={setOpenSheet}>
@@ -419,44 +279,32 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
       </div>
 
       <div className="flex items-center gap-2 w-full">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder={t('SEARCH_BY_FILE_FOLDER_NAME')}
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            className="h-8 w-full rounded-lg bg-background pl-9 pr-8"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+        <SearchInput
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onClear={handleSearchClear}
+          placeholder="SEARCH_BY_FILE_FOLDER_NAME"
+        />
 
         <div className="flex items-center gap-2">
+          <SelectFilter
+            value={filters.fileType}
+            onValueChange={handleFileTypeChange}
+            title="FILE_TYPE"
+            options={fileTypeOptions}
+            allValue="all"
+            allLabel="ALL_TYPES"
+          />
+
           <DateRangeFilter
             date={filters.trashedDate}
-            onDateChange={handleTrashedDateRangeChange}
+            onDateChange={handleTrashedDateChange}
             title="TRASHED_DATE"
           />
         </div>
       </div>
 
-      {isFiltered && (
-        <div className="flex items-center gap-2">
-          <ActiveFilters />
-          <Button variant="ghost" onClick={handleResetFilters} className="h-8 px-2">
-            {t('RESET')}
-            <X className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      )}
+      {isFiltered && <ActiveFilters />}
     </div>
   );
 };
