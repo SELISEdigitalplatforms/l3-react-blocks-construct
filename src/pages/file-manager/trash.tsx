@@ -192,12 +192,12 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
     });
   };
 
-  const isFiltered = filters.name || filters.fileType || filters.deletedBy || filters.trashedDate;
+  const isFiltered = filters.name ?? filters.fileType ?? filters.deletedBy ?? filters.trashedDate;
   const activeFiltersCount =
     (filters.name ? 1 : 0) +
     (filters.fileType ? 1 : 0) +
     (filters.deletedBy ? 1 : 0) +
-    (filters.trashedDate?.from || filters.trashedDate?.to ? 1 : 0);
+    ((filters.trashedDate?.from ?? filters.trashedDate?.to) ? 1 : 0);
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
@@ -205,7 +205,7 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
         <label className={`text-sm font-medium ${isMobile ? 'block mb-2' : 'sr-only'}`}>
           {t('FILE_TYPE')}
         </label>
-        <Select value={filters.fileType || 'all'} onValueChange={handleFileTypeChange}>
+        <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
           <SelectTrigger className={`h-8 ${isMobile ? 'w-full' : 'w-[140px]'}`}>
             <SelectValue placeholder={t('FILE_TYPE')} />
           </SelectTrigger>

@@ -119,7 +119,7 @@ export function IamTableToolbar<TData>({ table, onSearch }: Readonly<IamTableToo
     onSearch?.({ email: '', name: '' });
   };
 
-  const isFiltered = filters.email || filters.name || table.getState().columnFilters.length > 0;
+  const isFiltered = filters.email ?? filters.name ?? table.getState().columnFilters.length > 0;
 
   const activeFiltersCount =
     table.getState().columnFilters.length + (filters.email || filters.name ? 1 : 0);
