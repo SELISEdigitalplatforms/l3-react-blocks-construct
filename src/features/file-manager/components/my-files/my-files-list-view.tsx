@@ -4,12 +4,12 @@ import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-qu
 import { createFileTableColumns } from './my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
-import FileDetailsSheet from './my-files-details';
 import {
   IFileDataWithSharing,
   MyFilesListViewProps,
   PaginationState,
 } from '../../utils/file-manager';
+import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 
 const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   onViewDetails,
@@ -210,7 +210,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
         </div>
       )}
 
-      <FileDetailsSheet
+      <RegularFileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
         file={

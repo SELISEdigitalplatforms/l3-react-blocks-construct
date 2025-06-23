@@ -1,50 +1,88 @@
 import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { X } from 'lucide-react';
 import {
   getFileTypeDisplayName,
   getFileTypeIcon,
   getFileTypeInfo,
-  SharedUser,
+  getSharedUsers,
 } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
-interface IFileDataWithSharing {
+export interface IFileDataWithSharing {
   id: string;
   name: string;
   fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
   size: string;
-  lastModified: string;
+  lastModified: string | Date;
   isShared: boolean;
   sharedWith?: SharedUser[];
   sharePermissions?: { [key: string]: string };
 }
 
-interface FileDetailsSheetProps {
+export interface SharedUser {
+  id: string;
+  name: string;
+  avatar?: string;
+  role: string;
+}
+
+export interface BaseFileDetailsSheetProps {
   isOpen: boolean;
   onClose: () => void;
   file: IFileDataWithSharing | null;
   t: (key: string) => string;
+  variant?: 'default' | 'trash';
 }
 
-const Avatar: React.FC<{ className?: string; children: React.ReactNode }> = ({
+// Utility functions
+const getCreationDate = (lastModified: Date | string): Date => {
+  const creationDate = new Date(lastModified);
+  const hoursBack = Math.floor(Math.random() * 720) + 24;
+  creationDate.setHours(creationDate.getHours() - hoursBack);
+  return creationDate;
+};
+
+const getOwnerName = (sharedUsers: SharedUser[], variant: 'default' | 'trash'): string => {
+  if (variant === 'trash') {
+    return 'Luca Meier';
+  }
+  return sharedUsers.find((user) => user.role === 'Owner')?.name || '';
+};
+
+const getDateCreated = (file: IFileDataWithSharing, variant: 'default' | 'trash'): Date => {
+  if (variant === 'trash' && file.lastModified instanceof Date) {
+    return getCreationDate(file.lastModified);
+  }
+  return new Date(file.lastModified);
+};
+
+const FallbackAvatar: React.FC<{ className?: string; children: React.ReactNode }> = ({
   className = '',
   children,
 }) => <div className={`rounded-full overflow-hidden ${className}`}>{children}</div>;
 
-const AvatarImage: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
+const FallbackAvatarImage: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
   if (!src) return null;
   return <img src={src} alt={alt} className="w-full h-full object-cover" />;
 };
 
-const AvatarFallback: React.FC<{ className?: string; children: React.ReactNode }> = ({
+const FallbackAvatarFallback: React.FC<{ className?: string; children: React.ReactNode }> = ({
   className = '',
   children,
 }) => (
   <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
 );
 
-const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, file, t }) => {
+// Main shared component
+const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
+  isOpen,
+  onClose,
+  file,
+  t,
+  variant = 'default',
+}) => {
   const isMobile = useIsMobile();
 
   if (!isOpen || !file) return null;
@@ -52,8 +90,16 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
   const IconComponent = getFileTypeIcon(file.fileType);
   const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
 
-  const sharedUsers = file.sharedWith || [];
-  const creationDate = file.lastModified;
+  const sharedUsers =
+    variant === 'trash'
+      ? getSharedUsers({
+          ...file,
+          lastModified:
+            file.lastModified instanceof Date ? file.lastModified : new Date(file.lastModified),
+        })
+      : file.sharedWith || [];
+  const ownerName = getOwnerName(sharedUsers, variant);
+  const creationDate = getDateCreated(file, variant);
   const fileTypeDisplayName = getFileTypeDisplayName(file.fileType);
 
   const containerClasses = isMobile
@@ -67,6 +113,10 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
   const contentClasses = isMobile
     ? 'flex-1 overflow-y-auto p-4 space-y-6'
     : 'flex-1 overflow-y-auto p-6 space-y-6';
+
+  const AvatarComponent = Avatar || FallbackAvatar;
+  const AvatarImageComponent = AvatarImage || FallbackAvatarImage;
+  const AvatarFallbackComponent = AvatarFallback || FallbackAvatarFallback;
 
   return (
     <div className={containerClasses}>
@@ -116,9 +166,7 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
 
             <div className="space-y-1">
               <label className="text-sm text-gray-600">{t('OWNER')}</label>
-              <div className="text-sm font-medium text-gray-900">
-                {sharedUsers.find((user) => user.role === 'Owner')?.name}
-              </div>
+              <div className="text-sm font-medium text-gray-900">{ownerName}</div>
             </div>
 
             <div className="space-y-1">
@@ -168,16 +216,16 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
             <div className="space-y-3">
               {sharedUsers.map((user) => (
                 <div key={user.id} className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="text-xs bg-gray-100">
+                  <AvatarComponent className="h-9 w-9">
+                    <AvatarImageComponent src={user.avatar} alt={user.name} />
+                    <AvatarFallbackComponent className="text-xs bg-gray-100">
                       {user.name
                         .split(' ')
                         .map((n) => n[0])
                         .join('')
                         .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                    </AvatarFallbackComponent>
+                  </AvatarComponent>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-900 truncate">
                       {user.name}

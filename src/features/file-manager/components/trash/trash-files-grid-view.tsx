@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Trash2 } from 'lucide-react';
-import { Button } from 'components/ui/button';
+import { DateRange } from '../../types/file-manager.type';
 import {
   getFileTypeIcon,
   getFileTypeInfo,
@@ -10,17 +8,12 @@ import {
   PaginationState,
 } from '../../utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
+import { useCallback, useEffect, useState } from 'react';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableRowActions } from './trash-files-row-actions';
-import TrashDetailsSheet from './trash-files-details';
-import { DateRange } from '../../types/file-manager.type';
-
-interface TrashCardProps {
-  file: IFileTrashData;
-  onRestore?: (file: IFileTrashData) => void;
-  onPermanentDelete?: (file: IFileTrashData) => void;
-  onViewDetails?: (file: IFileTrashData) => void;
-}
+import { TrashDetailsSheet } from './trash-files-details';
+import { CommonGridView } from '../common-grid-view';
+import { Trash2 } from 'lucide-react';
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;
@@ -38,121 +31,9 @@ interface TrashGridViewProps {
   readonly onSelectionChange?: (items: string[]) => void;
 }
 
-const TrashCard: React.FC<TrashCardProps> = ({
-  file,
-  onRestore,
-  onPermanentDelete,
-  onViewDetails,
-}) => {
-  const IconComponent = getFileTypeIcon(file.fileType);
-  const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
-
-  const handleCardClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    onViewDetails?.(file);
-  };
-
-  const mockRow = {
-    original: file,
-    id: file.id.toString(),
-    index: 0,
-    getValue: () => {},
-    getVisibleCells: () => [],
-    getAllCells: () => [],
-    getLeftVisibleCells: () => [],
-    getRightVisibleCells: () => [],
-    getCenterVisibleCells: () => [],
-  } as any;
-
-  return (
-    <div
-      className="group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
-      role="button"
-      tabIndex={0}
-      onClick={handleCardClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleCardClick(e as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>);
-        }
-      }}
-    >
-      <div
-        className={`${file.fileType === 'Folder' ? 'p-3 flex items-center space-x-3' : 'p-6 flex flex-col items-center text-center space-y-4'}`}
-      >
-        <div
-          className={
-            (file.fileType === 'Folder' ? 'w-8 h-8' : 'w-20 h-20') +
-            ' flex items-center ' +
-            (file.fileType === 'Folder' ? backgroundColor : '') +
-            ' justify-center'
-          }
-        >
-          <IconComponent
-            className={`${file.fileType === 'Folder' ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor}`}
-          />
-        </div>
-
-        <div className={`${file.fileType === 'Folder' ? 'flex-1' : 'w-full'}`}>
-          {file.fileType === 'Folder' ? (
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
-                  {file.name}
-                </h3>
-              </div>
-              <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-                <TrashTableRowActions
-                  row={mockRow}
-                  onRestore={onRestore || (() => {})}
-                  onDelete={onPermanentDelete || (() => {})}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between space-x-2 mt-2">
-              <div className="flex items-center space-x-2 flex-1 min-w-0">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${backgroundColor}`}
-                >
-                  <IconComponent className={`w-4 h-4 ${iconColor}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
-                    {file.name}
-                  </h3>
-                </div>
-              </div>
-              <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-                <TrashTableRowActions
-                  row={mockRow}
-                  onRestore={onRestore || (() => {})}
-                  onDelete={onPermanentDelete || (() => {})}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TrashGridView: React.FC<TrashGridViewProps> = ({
-  onRestore,
-  onPermanentDelete,
-  onViewDetails,
-  filters,
-  deletedItemIds = new Set(),
-  restoredItemIds = new Set(),
-  selectedItems = [],
-  onSelectionChange,
-}) => {
+const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -167,210 +48,177 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     page: paginationState.pageIndex,
     pageSize: paginationState.pageSize,
     filter: {
-      name: filters.name ?? '',
-      fileType: allowedFileTypes.includes(filters.fileType as AllowedFileType)
-        ? (filters.fileType as AllowedFileType)
+      name: props.filters.name ?? '',
+      fileType: allowedFileTypes.includes(props.filters.fileType as AllowedFileType)
+        ? (props.filters.fileType as AllowedFileType)
         : undefined,
-      deletedBy: filters.deletedBy,
-      trashedDateFrom: filters.trashedDate?.from?.toISOString(),
-      trashedDateTo: filters.trashedDate?.to?.toISOString(),
+      deletedBy: props.filters.deletedBy,
+      trashedDateFrom: props.filters.trashedDate?.from?.toISOString(),
+      trashedDateTo: props.filters.trashedDate?.to?.toISOString(),
     },
   };
 
   const { data, isLoading, error } = useMockTrashFilesQuery(queryParams);
 
-  const filteredFiles = useMemo(() => {
-    if (!data?.data) return [];
-
-    return data.data.filter((file) => {
-      const fileId = file.id.toString();
-      return !deletedItemIds.has(fileId) && !restoredItemIds.has(fileId);
-    });
-  }, [data?.data, deletedItemIds, restoredItemIds]);
-
+  // Update pagination state when data changes
   useEffect(() => {
     if (data?.totalCount !== undefined) {
-      const adjustedCount = data.totalCount - deletedItemIds.size - restoredItemIds.size;
+      const adjustedCount =
+        data.totalCount - (props.deletedItemIds?.size || 0) - (props.restoredItemIds?.size || 0);
       setPaginationState((prev) => ({
         ...prev,
         totalCount: Math.max(0, adjustedCount),
       }));
     }
-  }, [data?.totalCount, deletedItemIds.size, restoredItemIds.size]);
+  }, [data?.totalCount, props.deletedItemIds?.size, props.restoredItemIds?.size]);
 
+  // Reset pagination when filters change
   useEffect(() => {
     setPaginationState((prev) => ({
       ...prev,
       pageIndex: 0,
     }));
-  }, [filters]);
+  }, [props.filters]);
 
   const handleLoadMore = useCallback(() => {
-    if (
-      data &&
-      filteredFiles.length < data.totalCount - deletedItemIds.size - restoredItemIds.size
-    ) {
+    if (data && data.data.length < data.totalCount) {
       setPaginationState((prev) => ({
         ...prev,
         pageIndex: prev.pageIndex + 1,
       }));
     }
-  }, [data, filteredFiles.length, deletedItemIds.size, restoredItemIds.size]);
+  }, [data]);
 
-  const handleViewDetails = useCallback(
-    (file: IFileTrashData) => {
-      setSelectedFile(file);
-      setIsDetailsOpen(true);
-      onViewDetails?.(file);
+  const processFiles = useCallback(
+    (files: IFileTrashData[]) => {
+      if (!files) return [];
+
+      // Filter out deleted and restored items
+      return files.filter((file) => {
+        const fileId = file.id.toString();
+        return !props.deletedItemIds?.has(fileId) && !props.restoredItemIds?.has(fileId);
+      });
     },
-    [onViewDetails]
+    [props.deletedItemIds, props.restoredItemIds]
   );
 
-  const handleCloseDetails = useCallback(() => {
-    setIsDetailsOpen(false);
-    setSelectedFile(null);
+  const filterFiles = useCallback((files: IFileTrashData[], filters: any) => {
+    return files.filter((file) => {
+      const matchesName =
+        !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
+      const matchesType = !filters.fileType || file.fileType === filters.fileType;
+
+      let matchesDate = true;
+      if (filters.trashedDate?.from || filters.trashedDate?.to) {
+        const trashedDate = new Date(file.trashedDate);
+        if (filters.trashedDate.from) {
+          matchesDate = matchesDate && trashedDate >= filters.trashedDate.from;
+        }
+        if (filters.trashedDate.to) {
+          matchesDate = matchesDate && trashedDate <= filters.trashedDate.to;
+        }
+      }
+
+      return matchesName && matchesType && matchesDate;
+    });
   }, []);
 
-  const handleRestore = useCallback(
+  const renderActions = useCallback(
     (file: IFileTrashData) => {
-      onRestore?.(file);
-      if (onSelectionChange && selectedItems.includes(file.id.toString())) {
-        onSelectionChange(selectedItems.filter((id) => id !== file.id.toString()));
-      }
+      const mockRow = {
+        original: file,
+        id: file.id.toString(),
+        index: 0,
+        getValue: () => {},
+        getVisibleCells: () => [],
+        getAllCells: () => [],
+        getLeftVisibleCells: () => [],
+        getRightVisibleCells: () => [],
+        getCenterVisibleCells: () => [],
+      } as any;
+
+      const handleRestore = (fileToRestore: IFileTrashData) => {
+        props.onRestore?.(fileToRestore);
+        if (props.onSelectionChange && props.selectedItems?.includes(fileToRestore.id.toString())) {
+          props.onSelectionChange(
+            props.selectedItems.filter((id) => id !== fileToRestore.id.toString())
+          );
+        }
+      };
+
+      const handlePermanentDelete = (fileToDelete: IFileTrashData) => {
+        props.onPermanentDelete?.(fileToDelete);
+        if (props.onSelectionChange && props.selectedItems?.includes(fileToDelete.id.toString())) {
+          props.onSelectionChange(
+            props.selectedItems.filter((id) => id !== fileToDelete.id.toString())
+          );
+        }
+      };
+
+      return (
+        <TrashTableRowActions
+          row={mockRow}
+          onRestore={handleRestore}
+          onDelete={handlePermanentDelete}
+        />
+      );
     },
-    [onRestore, onSelectionChange, selectedItems]
+    [props]
   );
 
-  const handlePermanentDelete = useCallback(
-    (file: IFileTrashData) => {
-      onPermanentDelete?.(file);
-      if (onSelectionChange && selectedItems.includes(file.id.toString())) {
-        onSelectionChange(selectedItems.filter((id) => id !== file.id.toString()));
-      }
-      if (selectedFile?.id === file.id) {
-        handleCloseDetails();
-      }
-    },
-    [onPermanentDelete, onSelectionChange, selectedItems, selectedFile?.id, handleCloseDetails]
-  );
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <p className="text-red-600 mb-2">{t('ERROR_LOADING_FILES')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading && !filteredFiles.length) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">{t('LOADING')}</p>
-        </div>
-      </div>
-    );
-  }
-
-  const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
-  const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
-
-  return (
-    <div className="flex h-full w-full">
-      <div className={`flex flex-col h-full ${isDetailsOpen ? 'flex-1' : 'w-full'}`}>
-        <div className="flex-1">
-          <div className="space-y-8">
-            {folders.length > 0 && (
-              <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
-                  {t('FOLDER')}
-                </h2>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                  {folders.map((file) => (
-                    <TrashCard
-                      key={file.id}
-                      file={file}
-                      onViewDetails={handleViewDetails}
-                      onRestore={handleRestore}
-                      onPermanentDelete={handlePermanentDelete}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {regularFiles.length > 0 && (
-              <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                  {regularFiles.map((file) => (
-                    <TrashCard
-                      key={file.id}
-                      file={file}
-                      onViewDetails={handleViewDetails}
-                      onRestore={handleRestore}
-                      onPermanentDelete={handlePermanentDelete}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {filteredFiles.length === 0 && !isLoading && (
-              <div className="flex flex-col items-center justify-center p-12 text-center">
-                <Trash2 className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('TRASH_EMPTY')}</h3>
-                <p className="text-gray-500 max-w-sm">
-                  {filters.name || filters.fileType || filters.deletedBy || filters.trashedDate
-                    ? t('NO_FILES_MATCH_CRITERIA')
-                    : t('NO_DELETED_FILES')}
-                </p>
-              </div>
-            )}
-
-            {data &&
-              filteredFiles.length <
-                data.totalCount - deletedItemIds.size - restoredItemIds.size && (
-                <div className="flex justify-center pt-6">
-                  <Button
-                    onClick={handleLoadMore}
-                    variant="outline"
-                    disabled={isLoading}
-                    className="min-w-32"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                        {t('LOADING')}
-                      </div>
-                    ) : (
-                      t('LOAD_MORE')
-                    )}
-                  </Button>
-                </div>
-              )}
-          </div>
-        </div>
-      </div>
-
+  const renderDetailsSheet = useCallback(
+    (file: IFileTrashData | null, isOpen: boolean, onClose: () => void) => (
       <TrashDetailsSheet
-        isOpen={isDetailsOpen}
-        onClose={handleCloseDetails}
+        isOpen={isOpen}
+        onClose={onClose}
         file={
-          selectedFile
+          file
             ? {
-                ...selectedFile,
-                lastModified:
-                  selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+                ...file,
+                lastModified: file.trashedDate ?? new Date(file.trashedDate ?? Date.now()),
+                isShared: file.isShared ?? false,
               }
             : null
         }
         t={t}
       />
-    </div>
+    ),
+    [t]
+  );
+
+  return (
+    <CommonGridView
+      onViewDetails={props.onViewDetails}
+      filters={props.filters}
+      data={data ?? undefined}
+      isLoading={isLoading}
+      error={error}
+      onLoadMore={handleLoadMore}
+      renderDetailsSheet={renderDetailsSheet}
+      getFileTypeIcon={getFileTypeIcon}
+      getFileTypeInfo={getFileTypeInfo}
+      renderActions={renderActions}
+      emptyStateConfig={{
+        icon: Trash2,
+        title: t('TRASH_EMPTY'),
+        description:
+          props.filters.name ||
+          props.filters.fileType ||
+          props.filters.deletedBy ||
+          props.filters.trashedDate
+            ? t('NO_FILES_MATCH_CRITERIA')
+            : t('NO_DELETED_FILES'),
+      }}
+      sectionLabels={{
+        folder: t('FOLDER'),
+        file: t('FILE'),
+      }}
+      errorMessage={t('ERROR_LOADING_FILES')}
+      loadingMessage={t('LOADING')}
+      loadMoreLabel={t('LOAD_MORE')}
+      processFiles={processFiles}
+      filterFiles={filterFiles}
+    />
   );
 };
 
