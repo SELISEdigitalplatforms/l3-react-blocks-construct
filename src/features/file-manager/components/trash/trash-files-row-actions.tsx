@@ -25,14 +25,14 @@ interface TrashTableRowActionsProps {
   row: Row<IFileTrashData>;
   onRestore: (file: IFileTrashData) => void;
   onDelete: (file: IFileTrashData) => void;
-  onDeleteForever?: (file: IFileTrashData) => void;
+  onPermanentDelete?: (file: IFileTrashData) => void;
 }
 
 export function TrashTableRowActions({
   row,
   onRestore,
   onDelete,
-  onDeleteForever,
+  onPermanentDelete,
 }: Readonly<TrashTableRowActionsProps>) {
   const { t } = useTranslation();
   const file = row.original;
@@ -43,7 +43,7 @@ export function TrashTableRowActions({
     setIsDropdownOpen(false);
     setTimeout(() => {
       action(file);
-    }, 0);
+    }, 100); // Small delay to ensure dropdown closes smoothly
   };
 
   const handleDropdownTriggerClick = (e: React.MouseEvent) => {
@@ -65,8 +65,9 @@ export function TrashTableRowActions({
   };
 
   const handleDeleteForeverConfirm = () => {
-    if (onDeleteForever) {
-      onDeleteForever(file);
+    // For mock data, this will immediately "delete" the item
+    if (onPermanentDelete) {
+      onPermanentDelete(file);
     } else if (onDelete) {
       onDelete(file);
     }

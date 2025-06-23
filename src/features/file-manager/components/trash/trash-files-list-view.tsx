@@ -3,20 +3,15 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
-import { IFileTrashData } from '../../utils/file-manager';
+import { IFileTrashData, PaginationState } from '../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableColumns } from './trash-files-table-columns';
 import TrashDetailsSheet from './trash-files-details';
 
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
-}
-
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
   onDelete: (file: IFileTrashData) => void;
+  onPermanentDelete?: (file: IFileTrashData) => void;
   filters: {
     name?: string;
     fileType?: string;
@@ -25,12 +20,18 @@ interface TrashFilesListViewProps {
       to?: Date;
     };
   };
+  selectedItems?: string[];
+  onSelectionChange?: (items: string[]) => void;
+  deletedItemIds?: Set<string>;
+  restoredItemIds?: Set<string>;
 }
 
 export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
   onRestore,
   onDelete,
   filters,
+  deletedItemIds = new Set(),
+  restoredItemIds = new Set(),
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -44,8 +45,10 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     totalCount: 0,
   });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const allowedFileTypes = ['Folder', 'File', 'Image', 'Audio', 'Video'] as const;
+  const allowedFileTypes = useMemo(
+    () => ['Folder', 'File', 'Image', 'Audio', 'Video'] as const,
+    []
+  );
   type AllowedFileType = (typeof allowedFileTypes)[number];
 
   const queryParams = useMemo(() => {
@@ -124,6 +127,10 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     setSelectedFile(null);
   }, []);
 
+  if (error) {
+    return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
+  }
+
   const columns = useMemo(() => {
     return TrashTableColumns({
       onRestore: handleRestoreWrapper,
@@ -138,33 +145,15 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     }
 
     return data.data.filter((file: IFileTrashData) => {
-      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      if (deletedItemIds.has(file.id)) {
         return false;
       }
-
-      if (filters.fileType && file.fileType !== filters.fileType) {
+      if (restoredItemIds.has(file.id)) {
         return false;
       }
-
-      if (filters.deletedDate?.from || filters.deletedDate?.to) {
-        const deletedDate = file.trashedDate;
-        if (!deletedDate) return false;
-
-        if (filters.deletedDate.from && deletedDate < filters.deletedDate.from) {
-          return false;
-        }
-        if (filters.deletedDate.to) {
-          const endOfDay = new Date(filters.deletedDate.to);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (deletedDate > endOfDay) {
-            return false;
-          }
-        }
-      }
-
       return true;
     });
-  }, [data?.data, filters.name, filters.fileType, filters.deletedDate]);
+  }, [data?.data, deletedItemIds, restoredItemIds]);
 
   if (error) {
     return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
@@ -173,24 +162,13 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
   const shouldHideMainContent = isMobile && isDetailsOpen;
 
   const paginationProps = useMemo(() => {
-    const hasClientFiltering = displayData.length !== (data?.data?.length || 0);
-
-    if (hasClientFiltering) {
-      return {
-        pageIndex: paginationState.pageIndex,
-        pageSize: paginationState.pageSize,
-        totalCount: displayData.length,
-        manualPagination: false,
-      };
-    } else {
-      return {
-        pageIndex: paginationState.pageIndex,
-        pageSize: paginationState.pageSize,
-        totalCount: paginationState.totalCount,
-        manualPagination: true,
-      };
-    }
-  }, [displayData.length, data?.data?.length, paginationState]);
+    return {
+      pageIndex: paginationState.pageIndex,
+      pageSize: paginationState.pageSize,
+      totalCount: data?.totalCount || 0,
+      manualPagination: true,
+    };
+  }, [data?.totalCount, paginationState]);
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
@@ -237,5 +215,3 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     </div>
   );
 };
-
-export default TrashFilesListView;

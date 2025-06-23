@@ -1,24 +1,19 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Trash2 } from 'lucide-react';
 import { Button } from 'components/ui/button';
-import { getFileTypeIcon, getFileTypeInfo, IFileTrashData } from '../../utils/file-manager';
+import {
+  getFileTypeIcon,
+  getFileTypeInfo,
+  IFileTrashData,
+  PaginationState,
+} from '../../utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableRowActions } from './trash-files-row-actions';
 import TrashDetailsSheet from './trash-files-details';
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
-}
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
+import { DateRange } from '../../types/file-manager.type';
 
 interface TrashCardProps {
   file: IFileTrashData;
@@ -39,6 +34,11 @@ interface TrashGridViewProps {
     deletedBy?: string;
     trashedDate?: DateRange;
   };
+  // Add these props for mock data handling
+  deletedItemIds?: Set<string>;
+  restoredItemIds?: Set<string>;
+  selectedItems?: string[];
+  onSelectionChange?: (items: string[]) => void;
 }
 
 const TrashCard: React.FC<TrashCardProps> = ({
@@ -96,7 +96,6 @@ const TrashCard: React.FC<TrashCardProps> = ({
                   row={mockRow}
                   onRestore={onRestore || (() => {})}
                   onDelete={onPermanentDelete || (() => {})}
-                  onDeleteForever={onPermanentDelete}
                 />
               </div>
             </div>
@@ -119,7 +118,6 @@ const TrashCard: React.FC<TrashCardProps> = ({
                   row={mockRow}
                   onRestore={onRestore || (() => {})}
                   onDelete={onPermanentDelete || (() => {})}
-                  onDeleteForever={onPermanentDelete}
                 />
               </div>
             </div>
@@ -135,6 +133,10 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
   onPermanentDelete,
   onViewDetails,
   filters,
+  deletedItemIds = new Set(),
+  restoredItemIds = new Set(),
+  selectedItems = [],
+  onSelectionChange,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
@@ -167,14 +169,24 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
 
   const { data, isLoading, error } = useMockTrashFilesQuery(queryParams);
 
+  const filteredFiles = useMemo(() => {
+    if (!data?.data) return [];
+
+    return data.data.filter((file) => {
+      const fileId = file.id.toString();
+      return !deletedItemIds.has(fileId) && !restoredItemIds.has(fileId);
+    });
+  }, [data?.data, deletedItemIds, restoredItemIds]);
+
   useEffect(() => {
     if (data?.totalCount !== undefined) {
+      const adjustedCount = data.totalCount - deletedItemIds.size - restoredItemIds.size;
       setPaginationState((prev) => ({
         ...prev,
-        totalCount: data.totalCount,
+        totalCount: Math.max(0, adjustedCount),
       }));
     }
-  }, [data?.totalCount]);
+  }, [data?.totalCount, deletedItemIds.size, restoredItemIds.size]);
 
   useEffect(() => {
     setPaginationState((prev) => ({
@@ -184,13 +196,16 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
   }, [filters]);
 
   const handleLoadMore = useCallback(() => {
-    if (data && data.data.length < data.totalCount) {
+    if (
+      data &&
+      filteredFiles.length < data.totalCount - deletedItemIds.size - restoredItemIds.size
+    ) {
       setPaginationState((prev) => ({
         ...prev,
         pageIndex: prev.pageIndex + 1,
       }));
     }
-  }, [data]);
+  }, [data, filteredFiles.length, deletedItemIds.size, restoredItemIds.size]);
 
   const handleViewDetails = useCallback(
     (file: IFileTrashData) => {
@@ -206,6 +221,29 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     setSelectedFile(null);
   }, []);
 
+  const handleRestore = useCallback(
+    (file: IFileTrashData) => {
+      onRestore?.(file);
+      if (onSelectionChange && selectedItems.includes(file.id.toString())) {
+        onSelectionChange(selectedItems.filter((id) => id !== file.id.toString()));
+      }
+    },
+    [onRestore, onSelectionChange, selectedItems]
+  );
+
+  const handlePermanentDelete = useCallback(
+    (file: IFileTrashData) => {
+      onPermanentDelete?.(file);
+      if (onSelectionChange && selectedItems.includes(file.id.toString())) {
+        onSelectionChange(selectedItems.filter((id) => id !== file.id.toString()));
+      }
+      if (selectedFile?.id === file.id) {
+        handleCloseDetails();
+      }
+    },
+    [onPermanentDelete, onSelectionChange, selectedItems, selectedFile?.id, handleCloseDetails]
+  );
+
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -216,7 +254,7 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     );
   }
 
-  if (isLoading && !data?.data?.length) {
+  if (isLoading && !filteredFiles.length) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
@@ -227,9 +265,8 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     );
   }
 
-  const files = data?.data || [];
-  const folders = files.filter((file) => file.fileType === 'Folder');
-  const regularFiles = files.filter((file) => file.fileType !== 'Folder');
+  const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
+  const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
 
   return (
     <div className="flex h-full w-full">
@@ -247,8 +284,8 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
                       key={file.id}
                       file={file}
                       onViewDetails={handleViewDetails}
-                      onRestore={onRestore}
-                      onPermanentDelete={onPermanentDelete}
+                      onRestore={handleRestore}
+                      onPermanentDelete={handlePermanentDelete}
                       t={t}
                     />
                   ))}
@@ -265,8 +302,8 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
                       key={file.id}
                       file={file}
                       onViewDetails={handleViewDetails}
-                      onRestore={onRestore}
-                      onPermanentDelete={onPermanentDelete}
+                      onRestore={handleRestore}
+                      onPermanentDelete={handlePermanentDelete}
                       t={t}
                     />
                   ))}
@@ -274,7 +311,7 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
               </div>
             )}
 
-            {files.length === 0 && !isLoading && (
+            {filteredFiles.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Trash2 className="h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{t('TRASH_EMPTY')}</h3>
@@ -286,25 +323,27 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
               </div>
             )}
 
-            {data && data.data.length < data.totalCount && (
-              <div className="flex justify-center pt-6">
-                <Button
-                  onClick={handleLoadMore}
-                  variant="outline"
-                  disabled={isLoading}
-                  className="min-w-32"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                      {t('LOADING')}
-                    </div>
-                  ) : (
-                    t('LOAD_MORE')
-                  )}
-                </Button>
-              </div>
-            )}
+            {data &&
+              filteredFiles.length <
+                data.totalCount - deletedItemIds.size - restoredItemIds.size && (
+                <div className="flex justify-center pt-6">
+                  <Button
+                    onClick={handleLoadMore}
+                    variant="outline"
+                    disabled={isLoading}
+                    className="min-w-32"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                        {t('LOADING')}
+                      </div>
+                    ) : (
+                      t('LOAD_MORE')
+                    )}
+                  </Button>
+                </div>
+              )}
           </div>
         </div>
       </div>
