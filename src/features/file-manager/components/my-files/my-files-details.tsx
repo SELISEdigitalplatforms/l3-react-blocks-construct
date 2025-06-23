@@ -122,9 +122,7 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-gray-600">
-                {t('LAST_MODIFIED') || 'Last modified'}
-              </label>
+              <label className="text-sm text-gray-600">{t('LAST_MODIFIED')}</label>
               <div className="text-sm font-medium text-gray-900">
                 {CustomtDateFormat(file.lastModified)}
               </div>

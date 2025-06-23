@@ -247,8 +247,8 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
     () => ({
       page: queryParams.page,
       pageSize: queryParams.pageSize,
-      filterName: queryParams.filter.name || '',
-      filterFileType: queryParams.filter.fileType || '',
+      filterName: queryParams.filter.name ?? '',
+      filterFileType: queryParams.filter.fileType ?? '',
     }),
     [queryParams.page, queryParams.pageSize, queryParams.filter.name, queryParams.filter.fileType]
   );

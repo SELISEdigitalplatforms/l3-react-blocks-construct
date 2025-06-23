@@ -20,12 +20,10 @@ interface TrashCardProps {
   onRestore?: (file: IFileTrashData) => void;
   onPermanentDelete?: (file: IFileTrashData) => void;
   onViewDetails?: (file: IFileTrashData) => void;
-  t: (key: string) => string;
 }
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;
-  onDelete?: (file: IFileTrashData) => void;
   onPermanentDelete?: (file: IFileTrashData) => void;
   onViewDetails?: (file: IFileTrashData) => void;
   filters: {
@@ -34,11 +32,10 @@ interface TrashGridViewProps {
     deletedBy?: string;
     trashedDate?: DateRange;
   };
-  // Add these props for mock data handling
   deletedItemIds?: Set<string>;
   restoredItemIds?: Set<string>;
   selectedItems?: string[];
-  onSelectionChange?: (items: string[]) => void;
+  readonly onSelectionChange?: (items: string[]) => void;
 }
 
 const TrashCard: React.FC<TrashCardProps> = ({
@@ -157,7 +154,7 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
     page: paginationState.pageIndex,
     pageSize: paginationState.pageSize,
     filter: {
-      name: filters.name || '',
+      name: filters.name ?? '',
       fileType: allowedFileTypes.includes(filters.fileType as AllowedFileType)
         ? (filters.fileType as AllowedFileType)
         : undefined,
@@ -286,7 +283,6 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
                       onViewDetails={handleViewDetails}
                       onRestore={handleRestore}
                       onPermanentDelete={handlePermanentDelete}
-                      t={t}
                     />
                   ))}
                 </div>
@@ -304,7 +300,6 @@ const TrashGridView: React.FC<TrashGridViewProps> = ({
                       onViewDetails={handleViewDetails}
                       onRestore={handleRestore}
                       onPermanentDelete={handlePermanentDelete}
-                      t={t}
                     />
                   ))}
                 </div>

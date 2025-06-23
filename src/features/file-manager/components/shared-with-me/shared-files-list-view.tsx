@@ -46,11 +46,11 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
       page: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
       filter: {
-        name: filters.name || undefined,
-        fileType: filters.fileType || undefined,
+        name: filters.name ?? undefined,
+        fileType: filters.fileType ?? undefined,
         sharedBy: normalizedSharedBy,
-        sharedDate: filters.sharedDate || undefined,
-        modifiedDate: filters.modifiedDate || undefined,
+        sharedDate: filters.sharedDate ?? undefined,
+        modifiedDate: filters.modifiedDate ?? undefined,
       },
     };
   }, [

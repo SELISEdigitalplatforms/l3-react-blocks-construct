@@ -167,7 +167,7 @@ const SharedFileGridView: React.FC<FileGridViewProps> = ({
     page: paginationState.pageIndex,
     pageSize: paginationState.pageSize,
     filter: {
-      name: filters.name || '',
+      name: filters.name ?? '',
       fileType: filters.fileType,
       sharedBy: filters.sharedBy,
       sharedDateFrom: filters.sharedDate?.from?.toISOString(),

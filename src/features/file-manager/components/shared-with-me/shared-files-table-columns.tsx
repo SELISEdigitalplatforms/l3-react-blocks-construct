@@ -58,7 +58,7 @@ export const SharedFileTableColumns = ({
   },
   {
     id: 'sharedBy',
-    accessorFn: (row) => row.sharedBy?.name || '',
+    accessorFn: (row) => row.sharedBy?.name ?? '',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('SHARED_BY')} />,
     cell: ({ row }) => {
       const sharedBy = row.original.sharedBy;
@@ -118,12 +118,12 @@ export const SharedFileTableColumns = ({
         if (value.length === 0) return true;
         return value.includes(sharedBy.id);
       } else {
-        return sharedBy.name.toLowerCase().includes(value.toLowerCase()) || sharedBy.id === value;
+        return sharedBy.name.toLowerCase().includes(value.toLowerCase()) ?? sharedBy.id === value;
       }
     },
     sortingFn: (rowA, rowB) => {
-      const nameA = rowA.original.sharedBy?.name || '';
-      const nameB = rowB.original.sharedBy?.name || '';
+      const nameA = rowA.original.sharedBy?.name ?? '';
+      const nameB = rowB.original.sharedBy?.name ?? '';
       return nameA.localeCompare(nameB);
     },
   },
@@ -142,8 +142,8 @@ export const SharedFileTableColumns = ({
       );
     },
     sortingFn: (rowA, rowB) => {
-      const a = rowA.original.sharedDate?.getTime() || 0;
-      const b = rowB.original.sharedDate?.getTime() || 0;
+      const a = rowA.original.sharedDate?.getTime() ?? 0;
+      const b = rowB.original.sharedDate?.getTime() ?? 0;
       return compareValues(a, b);
     },
     filterFn: (row, id, value: DateRange) => {
@@ -241,7 +241,8 @@ export const SharedFileTableColumns = ({
     ),
     sortingFn: (rowA, rowB) => {
       const parseSize = (size: string): number => {
-        const match = size.match(/^([\d.]+)\s*([KMGT]?B)$/i);
+        const regex = /^([\d.]+)\s*([KMGT]?B)$/i;
+        const match = regex.exec(size);
         if (!match) return 0;
 
         const value = parseFloat(match[1]);
@@ -255,7 +256,7 @@ export const SharedFileTableColumns = ({
           TB: 1024 * 1024 * 1024 * 1024,
         };
 
-        return value * (multipliers[unit] || 1);
+        return value * (multipliers[unit] ?? 1);
       };
 
       const a = parseSize(rowA.original.size);
