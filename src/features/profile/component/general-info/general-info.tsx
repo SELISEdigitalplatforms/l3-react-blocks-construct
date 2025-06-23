@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGetAccount } from '../../hooks/use-account';
-import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
-import { UserMfaType } from '../../enums/user-mfa-type-enum';
 import { useTranslation } from 'react-i18next';
 import { ProfileCard } from './profile-card';
 import { SecurityCard } from './security-card';
+import { useGetAccount } from '../../hooks/use-account';
+import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
+import { UserMfaType } from '../../enums/user-mfa-type-enum';
 
 /**
  * `GeneralInfo` component renders a user profile and account security section with options to
