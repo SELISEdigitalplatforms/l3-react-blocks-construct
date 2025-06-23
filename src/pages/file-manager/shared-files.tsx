@@ -24,6 +24,7 @@ import SharedFilesListView from 'features/file-manager/components/shared-with-me
 import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
 import { DateRange, SharedFilters } from 'features/file-manager/types/file-manager.type';
 import {
+  fileTypeOptions,
   IFileDataWithSharing,
   SharedUser,
   sharedUsers,
@@ -279,14 +280,6 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
     (filters.sharedBy ? 1 : 0) +
     (filters.sharedDate?.from || filters.sharedDate?.to ? 1 : 0) +
     (filters.modifiedDate?.from || filters.modifiedDate?.to ? 1 : 0);
-
-  const fileTypeOptions = [
-    { value: 'Folder', label: t('FOLDER') },
-    { value: 'File', label: t('FILE') },
-    { value: 'Image', label: t('IMAGE') },
-    { value: 'Audio', label: t('AUDIO') },
-    { value: 'Video', label: t('VIDEO') },
-  ];
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>

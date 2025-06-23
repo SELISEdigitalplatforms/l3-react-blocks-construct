@@ -1,5 +1,6 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
 import { IFileData } from '../hooks/use-mock-files-query';
+import { t } from 'i18next';
 
 export interface PaginationState {
   pageIndex: number;
@@ -33,6 +34,14 @@ export type FileTypeOption = {
   iconColor: string;
   backgroundColor: string;
 };
+
+export const fileTypeOptions = [
+  { value: 'Folder', label: t('FOLDER') },
+  { value: 'File', label: t('FILE') },
+  { value: 'Image', label: t('IMAGE') },
+  { value: 'Audio', label: t('AUDIO') },
+  { value: 'Video', label: t('VIDEO') },
+];
 
 export const getFileTypeOptions = (t: (key: string) => string): FileTypeOption[] => [
   {

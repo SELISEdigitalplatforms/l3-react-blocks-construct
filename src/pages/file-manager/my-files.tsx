@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
-// import { IFileData } from 'features/file-manager/hooks/use-mock-files-query';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
@@ -26,7 +25,11 @@ import { FileGridView } from 'features/file-manager/components/my-files/my-files
 import { RenameModal } from 'features/file-manager/components/rename-modal';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/shared-user-modal';
-import { IFileDataWithSharing, SharedUser } from 'features/file-manager/utils/file-manager';
+import {
+  fileTypeOptions,
+  IFileDataWithSharing,
+  SharedUser,
+} from 'features/file-manager/utils/file-manager';
 import { DateRange } from 'features/file-manager/types/file-manager.type';
 
 interface FileFilters {
@@ -191,14 +194,6 @@ const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
     (filters.name ? 1 : 0) +
     (filters.fileType ? 1 : 0) +
     (filters.lastModified?.from || filters.lastModified?.to ? 1 : 0);
-
-  const fileTypeOptions = [
-    { value: 'Folder', label: t('FOLDER') },
-    { value: 'File', label: t('FILE') },
-    { value: 'Image', label: t('IMAGE') },
-    { value: 'Audio', label: t('AUDIO') },
-    { value: 'Video', label: t('VIDEO') },
-  ];
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>

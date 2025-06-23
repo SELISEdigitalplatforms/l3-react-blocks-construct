@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { Calendar } from 'components/ui/calendar';
-import { IFileTrashData } from 'features/file-manager/utils/file-manager';
+import { fileTypeOptions, IFileTrashData } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import {
   Select,
@@ -201,14 +201,6 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
     (filters.fileType ? 1 : 0) +
     (filters.deletedBy ? 1 : 0) +
     (filters.trashedDate?.from || filters.trashedDate?.to ? 1 : 0);
-
-  const fileTypeOptions = [
-    { value: 'Folder', label: t('FOLDER') },
-    { value: 'File', label: t('FILE') },
-    { value: 'Image', label: t('IMAGE') },
-    { value: 'Audio', label: t('AUDIO') },
-    { value: 'Video', label: t('VIDEO') },
-  ];
 
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
