@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Moon, Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +11,10 @@ import {
 } from 'components/ui/dropdown-menu';
 import { useSignoutMutation } from 'features/auth/hooks/use-auth';
 import { useAuthStore } from 'state/store/auth';
-import { useNavigate } from 'react-router-dom';
 import DummyProfile from 'assets/images/dummy_profile.png';
 import { Skeleton } from 'components/ui/skeleton';
 import { useGetAccount } from 'features/profile/hooks/use-account';
 import { useTheme } from 'components/core/theme-provider';
-import { useTranslation } from 'react-i18next';
 
 /**
  * UProfileMenu Component
@@ -78,7 +78,11 @@ export const UProfileMenu = () => {
               <Skeleton className="h-8 w-8 rounded-full" />
             ) : (
               <img
-                src={data?.profileImageUrl || DummyProfile}
+                src={
+                  data?.profileImageUrl !== ''
+                    ? (data?.profileImageUrl ?? DummyProfile)
+                    : DummyProfile
+                }
                 alt="profile"
                 loading="lazy"
                 className="w-full h-full object-cover"

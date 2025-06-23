@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Trash, Upload } from 'lucide-react';
-import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
+import { Trash, Upload } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
 import { User } from 'types/user.type';
 import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
-import { useQueryClient } from '@tanstack/react-query';
-
+import { ImageCropper } from '../image-cropper/image-cropper';
 import {
   DialogContent,
   DialogDescription,
@@ -22,7 +23,6 @@ import { Input } from 'components/ui/input';
 import { Form, FormField, FormItem, FormControl, FormMessage } from 'components/ui/form';
 import UIPhoneInput from 'components/core/phone-input/phone-input';
 import DummyProfile from 'assets/images/dummy_profile.png';
-import { useTranslation } from 'react-i18next';
 
 /**
  * `EditProfile` component allows the user to edit their profile details, including their full name, email, phone number, and profile image.
@@ -63,6 +63,10 @@ type EditProfileProps = {
 };
 
 export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) => {
+  const [previewImage, setPreviewImage] = useState<string>(DummyProfile);
+  const [isFormChanged, setIsFormChanged] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string>('');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -83,9 +87,6 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
       navigate('/profile');
     },
   });
-
-  const [previewImage, setPreviewImage] = useState<string>(DummyProfile);
-  const [isFormChanged, setIsFormChanged] = useState(false);
 
   const form = useForm<FormData>({
     defaultValues: {
@@ -165,7 +166,17 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
 
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    if (file) {
+    if (!file) return;
+
+    const MAX_FILE_SIZE = 2 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageToCrop(reader.result as string);
+        setShowCropper(true);
+      };
+      reader.readAsDataURL(file);
+    } else {
       setValue('profileImageUrl', file);
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -289,6 +300,24 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
           </DialogFooter>
         </form>
       </Form>
+
+      {showCropper && (
+        <ImageCropper
+          image={imageToCrop}
+          onClose={() => setShowCropper(false)}
+          onCropComplete={(croppedImage) => {
+            fetch(croppedImage)
+              .then((res) => res.blob())
+              .then((blob) => {
+                const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+                setValue('profileImageUrl', file);
+                setPreviewImage(croppedImage);
+                setShowCropper(false);
+              });
+          }}
+          aspect={1}
+        />
+      )}
     </DialogContent>
   );
 };
