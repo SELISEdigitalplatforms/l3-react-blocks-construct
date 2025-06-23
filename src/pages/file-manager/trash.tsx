@@ -463,7 +463,7 @@ const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = ({
 
 interface TrashProps {
   onRestoreFile?: (file: IFileTrashData) => void;
-  onPermanentDelete?: (file: IFileTrashData) => void;
+  readonly onPermanentDelete?: (file: IFileTrashData) => void;
   onClearTrash?: () => void;
 }
 

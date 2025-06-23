@@ -28,7 +28,6 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
-
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -63,8 +62,6 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     filters.modifiedDate,
   ]);
 
-  const { data, isLoading, error } = useMockFilesQuery(queryParams);
-
   const localFiles = useMemo(() => {
     const enhancedNewFiles = newFiles.map((file) => ({
       ...file,
@@ -80,6 +77,8 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
 
     return [...enhancedNewFiles, ...enhancedNewFolders];
   }, [newFiles, newFolders, fileSharedUsers, filePermissions]);
+
+  const { data, isLoading, error } = useMockFilesQuery(queryParams);
 
   const combinedData = useMemo(() => {
     const serverFiles = data?.data || [];
@@ -192,6 +191,26 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     filters.modifiedDate,
   ]);
 
+  const paginationProps = useMemo(() => {
+    const hasClientFiltering = displayData.length !== combinedData.length;
+
+    if (hasClientFiltering) {
+      return {
+        pageIndex: paginationState.pageIndex,
+        pageSize: paginationState.pageSize,
+        totalCount: displayData.length,
+        manualPagination: false,
+      };
+    } else {
+      return {
+        pageIndex: paginationState.pageIndex,
+        pageSize: paginationState.pageSize,
+        totalCount: paginationState.totalCount,
+        manualPagination: true,
+      };
+    }
+  }, [displayData.length, combinedData.length, paginationState]);
+
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
       setPaginationState((prev) => ({
@@ -202,22 +221,6 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     },
     []
   );
-
-  useEffect(() => {
-    if (data?.totalCount !== undefined) {
-      setPaginationState((prev) => ({
-        ...prev,
-        totalCount: data.totalCount + localFiles.length,
-      }));
-    }
-  }, [data?.totalCount, localFiles.length]);
-
-  useEffect(() => {
-    setPaginationState((prev) => ({
-      ...prev,
-      pageIndex: 0,
-    }));
-  }, [filters]);
 
   const handleViewDetailsWrapper = useCallback(
     (file: IFileDataWithSharing) => {
@@ -233,7 +236,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     setSelectedFile(null);
   }, []);
 
-  const handleDownloadWrapper = () => undefined;
+  const handleDownloadWrapper = useCallback(() => undefined, []);
 
   const handleShareWrapper = useCallback(
     (file: IFileDataWithSharing) => {
@@ -258,6 +261,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     [onRename]
   );
 
+  // Columns memoization - this should be after all the callback definitions
   const columns = useMemo(() => {
     return SharedFileTableColumns({
       onViewDetails: handleViewDetailsWrapper,
@@ -272,6 +276,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     });
   }, [
     handleViewDetailsWrapper,
+    handleDownloadWrapper,
     handleShareWrapper,
     handleDeleteWrapper,
     onMove,
@@ -280,31 +285,27 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     t,
   ]);
 
+  useEffect(() => {
+    if (data?.totalCount !== undefined) {
+      setPaginationState((prev) => ({
+        ...prev,
+        totalCount: data.totalCount + localFiles.length,
+      }));
+    }
+  }, [data?.totalCount, localFiles.length]);
+
+  useEffect(() => {
+    setPaginationState((prev) => ({
+      ...prev,
+      pageIndex: 0,
+    }));
+  }, [filters]);
+
   if (error) {
     return <div className="p-4 text-error">{t('ERROR_LOADING_FILES')}</div>;
   }
 
   const shouldHideMainContent = isMobile && isDetailsOpen;
-
-  const paginationProps = useMemo(() => {
-    const hasClientFiltering = displayData.length !== combinedData.length;
-
-    if (hasClientFiltering) {
-      return {
-        pageIndex: paginationState.pageIndex,
-        pageSize: paginationState.pageSize,
-        totalCount: displayData.length,
-        manualPagination: false,
-      };
-    } else {
-      return {
-        pageIndex: paginationState.pageIndex,
-        pageSize: paginationState.pageSize,
-        totalCount: paginationState.totalCount,
-        manualPagination: true,
-      };
-    }
-  }, [displayData.length, combinedData.length, paginationState]);
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
