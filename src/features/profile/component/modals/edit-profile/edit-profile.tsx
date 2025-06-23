@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Trash, Upload } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from 'hooks/use-toast';
 import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
 import { User } from 'types/user.type';
 import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
@@ -70,6 +71,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const parseFullName = (fullName: string) => {
     const names = fullName.trim().split(' ');
@@ -131,6 +133,14 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
 
     if (typeof data.profileImageUrl === 'object') {
       const file = data.profileImageUrl;
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: t('IMAGE_TOO_LARGE'),
+          description: t('PLEASE_UPLOAD_IMAGE_SMALLER_SIZE'),
+          variant: 'destructive',
+        });
+        return;
+      }
       profileImageUrl = await convertFileToBase64(file);
     } else {
       profileImageUrl = data.profileImageUrl;
@@ -146,8 +156,6 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
     };
 
     updateAccount(payload);
-    onClose();
-    navigate('/profile');
   };
 
   const handleRemoveImage = () => {
@@ -168,18 +176,12 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
     const file = acceptedFiles[0];
     if (!file) return;
 
-    const MAX_FILE_SIZE = 2 * 1024 * 1024;
-    if (file.size > MAX_FILE_SIZE) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImageToCrop(reader.result as string);
-        setShowCropper(true);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setValue('profileImageUrl', file);
-      setPreviewImage(URL.createObjectURL(file));
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageToCrop(reader.result as string);
+      setShowCropper(true);
+    };
+    reader.readAsDataURL(file);
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -309,6 +311,14 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
             fetch(croppedImage)
               .then((res) => res.blob())
               .then((blob) => {
+                if (blob.size > 2 * 1024 * 1024) {
+                  toast({
+                    title: t('IMAGE_TOO_LARGE'),
+                    description: t('CROPPED_IMAGE_TOO_LARGE'),
+                    variant: 'destructive',
+                  });
+                  return;
+                }
                 const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
                 setValue('profileImageUrl', file);
                 setPreviewImage(croppedImage);
