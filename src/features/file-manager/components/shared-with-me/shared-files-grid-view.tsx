@@ -74,13 +74,26 @@ const FileCard: React.FC<FileCardProps> = ({
   return (
     <div
       className="group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+      role="button"
+      tabIndex={0}
       onClick={handleCardClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick(e as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>);
+        }
+      }}
     >
       <div
         className={`${file.fileType === 'Folder' ? 'p-3 flex items-center space-x-3' : 'p-6 flex flex-col items-center text-center space-y-4'}`}
       >
         <div
-          className={`${file.fileType === 'Folder' ? 'w-8 h-8' : 'w-20 h-20'} flex items-center ${file.fileType === 'Folder' ? `${backgroundColor}` : ''}  justify-center`}
+          className={
+            (file.fileType === 'Folder' ? 'w-8 h-8' : 'w-20 h-20') +
+            ' flex items-center ' +
+            (file.fileType === 'Folder' ? backgroundColor : '') +
+            ' justify-center'
+          }
         >
           <IconComponent
             className={`${file.fileType === 'Folder' ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor}`}
@@ -93,7 +106,7 @@ const FileCard: React.FC<FileCardProps> = ({
               <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
                 {file.name}
               </h3>
-              <div onClick={(e) => e.stopPropagation()}>
+              <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
                 <FileTableRowActions
                   row={mockRow}
                   onViewDetails={onViewDetails || (() => {})}
@@ -117,7 +130,7 @@ const FileCard: React.FC<FileCardProps> = ({
                   {file.name}
                 </h3>
               </div>
-              <div onClick={(e) => e.stopPropagation()}>
+              <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
                 <FileTableRowActions
                   row={mockRow}
                   onViewDetails={onViewDetails || (() => {})}

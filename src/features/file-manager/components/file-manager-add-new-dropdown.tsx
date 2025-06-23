@@ -152,12 +152,21 @@ const AddDropdownMenu = ({
           <div className="space-y-6">
             <div
               className="border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-16 text-center transition-colors cursor-pointer"
+              role="button"
+              tabIndex={0}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onClick={() => {
                 const input = document.getElementById('file-input');
                 if (input) input.click();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const input = document.getElementById('file-input');
+                  if (input) input.click();
+                }
               }}
             >
               <div className="flex flex-col items-center gap-4">
