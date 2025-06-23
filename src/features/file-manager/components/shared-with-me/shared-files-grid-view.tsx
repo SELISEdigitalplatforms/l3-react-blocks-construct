@@ -304,7 +304,22 @@ const SharedFileGridView: React.FC<FileGridViewProps> = ({
 
   const allFiles = [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
 
-  const filteredFiles = allFiles.filter((file) => {
+  const isDateInRange = (
+    dateValue: string | Date | undefined,
+    fromDate: Date | undefined,
+    toDate: Date | undefined
+  ): boolean => {
+    if (!fromDate && !toDate) return true;
+
+    const date = new Date(dateValue ?? '');
+
+    if (fromDate && date < fromDate) return false;
+    if (toDate && date > toDate) return false;
+
+    return true;
+  };
+
+  const matchesBasicFilters = (file: IFileDataWithSharing, filters: SharedFilters) => {
     if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
       return false;
     }
@@ -317,28 +332,20 @@ const SharedFileGridView: React.FC<FileGridViewProps> = ({
       return false;
     }
 
-    if (filters.sharedDate?.from || filters.sharedDate?.to) {
-      const sharedDate = new Date(file.sharedDate ?? file.sharedDate ?? '');
+    return true;
+  };
 
-      if (filters.sharedDate.from && sharedDate < filters.sharedDate.from) {
-        return false;
-      }
-
-      if (filters.sharedDate.to && sharedDate > filters.sharedDate.to) {
-        return false;
-      }
+  const filteredFiles = allFiles.filter((file) => {
+    if (!matchesBasicFilters(file, filters)) {
+      return false;
     }
 
-    if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
-      const modifiedDate = new Date(file.lastModified ?? file.lastModified ?? '');
+    if (!isDateInRange(file.sharedDate, filters.sharedDate?.from, filters.sharedDate?.to)) {
+      return false;
+    }
 
-      if (filters.modifiedDate.from && modifiedDate < filters.modifiedDate.from) {
-        return false;
-      }
-
-      if (filters.modifiedDate.to && modifiedDate > filters.modifiedDate.to) {
-        return false;
-      }
+    if (!isDateInRange(file.lastModified, filters.modifiedDate?.from, filters.modifiedDate?.to)) {
+      return false;
     }
 
     return true;
@@ -348,12 +355,12 @@ const SharedFileGridView: React.FC<FileGridViewProps> = ({
   const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
 
   const hasActiveFilters =
-    filters.name ||
-    filters.fileType ||
-    filters.sharedBy ||
-    filters.sharedDate?.from ||
-    filters.sharedDate?.to ||
-    filters.modifiedDate?.from ||
+    filters.name ??
+    filters.fileType ??
+    filters.sharedBy ??
+    filters.sharedDate?.from ??
+    filters.sharedDate?.to ??
+    filters.modifiedDate?.from ??
     filters.modifiedDate?.to;
 
   return (

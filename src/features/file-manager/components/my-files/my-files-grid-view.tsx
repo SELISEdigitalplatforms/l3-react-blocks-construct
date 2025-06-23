@@ -30,7 +30,6 @@ const FileCard: React.FC<FileCardProps> = ({
   const isFolder = file.fileType === 'Folder';
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Only handle click if it's not from an interactive child element
     const target = e.target as HTMLElement;
     const isActionButton = target.closest('[data-action-button="true"]');
 
