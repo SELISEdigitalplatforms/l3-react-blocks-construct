@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Users, ArrowRight, Edit3, Info, Download, Trash2, MoreVertical } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 
 type FileDropdownMenuProps = {
   file: any;
@@ -88,11 +89,11 @@ export const FileDropdownMenu: React.FC<FileDropdownMenuProps> = ({ file, onActi
           ref={menuRef}
           className="absolute top-full right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
         >
-          {menuItems.map((item, index) => {
+          {menuItems.map((item) => {
             const IconComponent = item.icon;
             return (
               <button
-                key={index}
+                key={uuidv4()}
                 onClick={() => handleMenuItemClick(item.action)}
                 className={`w-full flex items-center px-4 py-3 text-sm transition-colors duration-150 ${item.className}`}
               >

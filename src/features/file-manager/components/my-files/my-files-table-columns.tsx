@@ -157,7 +157,9 @@ export const createFileTableColumns = ({
     ),
     sortingFn: (rowA, rowB) => {
       const parseSize = (size: string): number => {
-        const match = size.match(/^([\d.]+)\s*([KMGT]?B)$/i);
+        const regex = /^([\d.]+)\s*([KMGT]?B)$/i;
+        const match = regex.exec(size);
+
         if (!match) return 0;
 
         const value = parseFloat(match[1]);

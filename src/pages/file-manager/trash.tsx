@@ -85,9 +85,6 @@ const DateRangeFilter: React.FC<{
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm font-medium">{t(title)}</div>
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={clearDateRange}>
-                Clear filter
-              </Button>
               <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>

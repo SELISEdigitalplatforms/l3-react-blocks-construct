@@ -21,7 +21,7 @@ interface TrashFilesListViewProps {
     };
   };
   selectedItems?: string[];
-  onSelectionChange?: (items: string[]) => void;
+  readonly onSelectionChange?: (items: string[]) => void;
   deletedItemIds?: Set<string>;
   restoredItemIds?: Set<string>;
 }
@@ -56,11 +56,11 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
       page: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
       filter: {
-        name: filters.name || undefined,
+        name: filters.name ?? undefined,
         fileType: allowedFileTypes.includes(filters.fileType as AllowedFileType)
           ? (filters.fileType as AllowedFileType)
           : undefined,
-        deletedDate: filters.deletedDate || undefined,
+        deletedDate: filters.deletedDate ?? undefined,
       },
     };
   }, [
@@ -165,7 +165,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return {
       pageIndex: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
-      totalCount: data?.totalCount || 0,
+      totalCount: data?.totalCount ?? 0,
       manualPagination: true,
     };
   }, [data?.totalCount, paginationState]);

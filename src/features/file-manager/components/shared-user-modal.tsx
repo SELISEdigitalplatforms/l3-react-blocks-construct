@@ -15,7 +15,6 @@ interface ShareWithMeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (selectedUsers: SharedUser[], permissions: { [key: string]: string }) => void;
-  file?: { name: string; id: string } | null;
   currentSharedUsers?: SharedUser[];
   availableRoles?: PermissionOption[];
   defaultRole?: string;
@@ -81,7 +80,7 @@ const PermissionDropdown: React.FC<{
   return (
     <div className="relative">
       <Button disabled variant="outline" onClick={() => setIsOpen(!isOpen)} className=" bg-gray">
-        {options.find((opt) => opt.value === value)?.label || 'Select'}
+        {options.find((opt) => opt.value === value)?.label ?? 'Select'}
         <ChevronDown className="w-4 h-4" />
       </Button>
 
@@ -127,10 +126,12 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
     return initialPermissions;
   });
 
+  type UserRole = 'Editor' | 'Viewer' | 'Owner';
+
   useEffect(() => {
     const initialPermissions: { [key: string]: string } = {};
     const syncedUsers = currentSharedUsers.map((user) => {
-      const userPermission = user.role || (defaultRole as 'Editor' | 'Viewer' | 'Owner');
+      const userPermission = user.role ?? (defaultRole as UserRole);
       initialPermissions[user.id] = userPermission;
       return { ...user, role: userPermission };
     });
@@ -150,13 +151,11 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
     });
     setSearchQuery('');
     setCurrentView('share');
-    setDefaultPermission(defaultRole as 'Editor' | 'Viewer' | 'Owner');
+    setDefaultPermission(defaultRole as UserRole);
     onClose();
   }, [currentSharedUsers, defaultRole, onClose]);
   const [currentView, setCurrentView] = useState<'share' | 'manage'>('share');
-  const [defaultPermission, setDefaultPermission] = useState<'Editor' | 'Viewer' | 'Owner'>(
-    defaultRole as 'Editor' | 'Viewer' | 'Owner'
-  );
+  const [defaultPermission, setDefaultPermission] = useState<UserRole>(defaultRole as UserRole);
 
   const handlePermissionChange = useCallback((userId: string, permission: string) => {
     setPermissions((prev) => ({
@@ -165,16 +164,14 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
     }));
 
     setSelectedUsers((prev) =>
-      prev.map((user) =>
-        user.id === userId ? { ...user, role: permission as 'Editor' | 'Viewer' | 'Owner' } : user
-      )
+      prev.map((user) => (user.id === userId ? { ...user, role: permission as UserRole } : user))
     );
   }, []);
 
   const handleConfirm = useCallback(() => {
     const updatedUsers = selectedUsers.map((user) => ({
       ...user,
-      role: (permissions[user.id] || user.role) as 'Editor' | 'Viewer' | 'Owner',
+      role: (permissions[user.id] || user.role) as UserRole,
     }));
 
     onConfirm(updatedUsers, permissions);
@@ -216,7 +213,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
   useEffect(() => {
     const initialPermissions: { [key: string]: string } = {};
     const syncedUsers = currentSharedUsers.map((user) => {
-      const userPermission = (user.role || defaultRole) as 'Editor' | 'Viewer' | 'Owner';
+      const userPermission = (user.role || defaultRole) as UserRole;
       initialPermissions[user.id] = userPermission;
       return { ...user, role: userPermission };
     });
@@ -270,9 +267,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <PermissionDropdown
                     value={defaultPermission}
-                    onChange={(value) =>
-                      setDefaultPermission(value as 'Editor' | 'Viewer' | 'Owner')
-                    }
+                    onChange={(value) => setDefaultPermission(value as UserRole)}
                     options={permissionOptions}
                   />
                 </div>
