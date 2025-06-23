@@ -99,9 +99,20 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
   const handleDateSelect = (selectedDate: Date | undefined, type: 'from' | 'to') => {
     if (!selectedDate) return;
 
+    // Ensure we're working with a clean date object
+    const cleanDate = new Date(selectedDate);
+
+    if (type === 'from') {
+      // Set to start of day for 'from' date
+      cleanDate.setHours(0, 0, 0, 0);
+    } else {
+      // Set to end of day for 'to' date
+      cleanDate.setHours(23, 59, 59, 999);
+    }
+
     const newRange = {
-      from: type === 'from' ? selectedDate : date?.from,
-      to: type === 'to' ? selectedDate : date?.to,
+      from: type === 'from' ? cleanDate : date?.from,
+      to: type === 'to' ? cleanDate : date?.to,
     };
 
     onDateChange(newRange);
@@ -154,7 +165,6 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
   );
 };
 
-// User Selection Filter Component
 interface UserFilterProps {
   value?: string;
   onValueChange: (value?: string) => void;

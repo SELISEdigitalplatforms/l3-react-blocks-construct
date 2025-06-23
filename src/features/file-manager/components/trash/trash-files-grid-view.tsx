@@ -9,11 +9,11 @@ import {
 } from '../../utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { useCallback, useEffect, useState } from 'react';
-import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableRowActions } from './trash-files-row-actions';
 import { TrashDetailsSheet } from './trash-files-details';
 import { CommonGridView } from '../common-grid-view';
 import { Trash2 } from 'lucide-react';
+import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;
@@ -31,7 +31,7 @@ interface TrashGridViewProps {
   readonly onSelectionChange?: (items: string[]) => void;
 }
 
-const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
+export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
@@ -72,7 +72,6 @@ const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
     }
   }, [data?.totalCount, props.deletedItemIds?.size, props.restoredItemIds?.size]);
 
-  // Reset pagination when filters change
   useEffect(() => {
     setPaginationState((prev) => ({
       ...prev,
@@ -93,34 +92,61 @@ const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
     (files: IFileTrashData[]) => {
       if (!files) return [];
 
-      // Filter out deleted and restored items
-      return files.filter((file) => {
+      // Only filter out deleted and restored items
+      const processed = files.filter((file) => {
         const fileId = file.id.toString();
-        return !props.deletedItemIds?.has(fileId) && !props.restoredItemIds?.has(fileId);
+        const isDeleted = props.deletedItemIds?.has(fileId);
+        const isRestored = props.restoredItemIds?.has(fileId);
+        return !isDeleted && !isRestored;
       });
+
+      return processed;
     },
     [props.deletedItemIds, props.restoredItemIds]
   );
 
   const filterFiles = useCallback((files: IFileTrashData[], filters: any) => {
-    return files.filter((file) => {
+    if (!files || files.length === 0) return [];
+
+    const filtered = files.filter((file) => {
       const matchesName =
         !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
+
       const matchesType = !filters.fileType || file.fileType === filters.fileType;
 
       let matchesDate = true;
       if (filters.trashedDate?.from || filters.trashedDate?.to) {
         const trashedDate = new Date(file.trashedDate);
-        if (filters.trashedDate.from) {
-          matchesDate = matchesDate && trashedDate >= filters.trashedDate.from;
+
+        // Validate the trashed date
+        if (isNaN(trashedDate.getTime())) {
+          console.warn('Invalid trashed date for file:', file.name, file.trashedDate);
+          return false;
         }
+
+        if (filters.trashedDate.from) {
+          const fromDate = new Date(filters.trashedDate.from);
+          fromDate.setHours(0, 0, 0, 0);
+          const compareTrashedDate = new Date(trashedDate);
+          compareTrashedDate.setHours(0, 0, 0, 0);
+          matchesDate = matchesDate && compareTrashedDate >= fromDate;
+        }
+
         if (filters.trashedDate.to) {
-          matchesDate = matchesDate && trashedDate <= filters.trashedDate.to;
+          const toDate = new Date(filters.trashedDate.to);
+          toDate.setHours(23, 59, 59, 999);
+          const compareTrashedDate = new Date(trashedDate);
+          compareTrashedDate.setHours(23, 59, 59, 999);
+          matchesDate = matchesDate && compareTrashedDate <= toDate;
         }
       }
 
-      return matchesName && matchesType && matchesDate;
+      const result = matchesName && matchesType && matchesDate;
+
+      return result;
     });
+
+    return filtered;
   }, []);
 
   const renderActions = useCallback(
@@ -217,9 +243,7 @@ const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       loadingMessage={t('LOADING')}
       loadMoreLabel={t('LOAD_MORE')}
       processFiles={processFiles}
-      filterFiles={filterFiles}
+      filterFiles={filterFiles} // CRITICAL: Make sure this is included
     />
   );
 };
-
-export default TrashGridView;

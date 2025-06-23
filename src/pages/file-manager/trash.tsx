@@ -8,7 +8,6 @@ import { useIsMobile } from 'hooks/use-mobile';
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import TrashGridView from 'features/file-manager/components/trash/trash-files-grid-view';
 import { TrashFilesListView } from 'features/file-manager/components/trash/trash-files-list-view';
 import { DateRange } from 'features/file-manager/types/file-manager.type';
 import {
@@ -20,6 +19,7 @@ import {
   SearchInput,
   SelectFilter,
 } from 'features/file-manager/components/common-filters';
+import { TrashGridView } from 'features/file-manager/components/trash/trash-files-grid-view';
 
 interface TrashFilters {
   name: string;
