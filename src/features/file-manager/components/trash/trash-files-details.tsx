@@ -1,59 +1,32 @@
 import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { X } from 'lucide-react';
 import {
+  FileDetailsSheetProps,
   getFileTypeDisplayName,
   getFileTypeIcon,
   getFileTypeInfo,
-  SharedUser,
+  getSharedUsers,
 } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
 
-interface IFileDataWithSharing {
-  id: string;
-  name: string;
-  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  size: string;
-  lastModified: string;
-  isShared: boolean;
-  sharedWith?: SharedUser[];
-  sharePermissions?: { [key: string]: string };
-}
-
-interface FileDetailsSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  file: IFileDataWithSharing | null;
-  t: (key: string) => string;
-}
-
-const Avatar: React.FC<{ className?: string; children: React.ReactNode }> = ({
-  className = '',
-  children,
-}) => <div className={`rounded-full overflow-hidden ${className}`}>{children}</div>;
-
-const AvatarImage: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
-  if (!src) return null;
-  return <img src={src} alt={alt} className="w-full h-full object-cover" />;
+const getCreationDate = (lastModified: Date): Date => {
+  const creationDate = new Date(lastModified);
+  const hoursBack = Math.floor(Math.random() * 720) + 24;
+  creationDate.setHours(creationDate.getHours() - hoursBack);
+  return creationDate;
 };
 
-const AvatarFallback: React.FC<{ className?: string; children: React.ReactNode }> = ({
-  className = '',
-  children,
-}) => (
-  <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
-);
-
-const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, file, t }) => {
+const TrashDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, file, t }) => {
   const isMobile = useIsMobile();
 
   if (!isOpen || !file) return null;
 
   const IconComponent = getFileTypeIcon(file.fileType);
   const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
-
-  const sharedUsers = file.sharedWith || [];
-  const creationDate = file.lastModified;
+  const sharedUsers = getSharedUsers(file);
+  const creationDate = getCreationDate(file.lastModified);
   const fileTypeDisplayName = getFileTypeDisplayName(file.fileType);
 
   const containerClasses = isMobile
@@ -116,9 +89,7 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
 
             <div className="space-y-1">
               <label className="text-sm text-gray-600">{t('OWNER') || 'Owner'}</label>
-              <div className="text-sm font-medium text-gray-900">
-                {sharedUsers.find((user) => user.role === 'Owner')?.name || 'Luca Meier'}
-              </div>
+              <div className="text-sm font-medium text-gray-900">Luca Meier</div>
             </div>
 
             <div className="space-y-1">
@@ -202,4 +173,4 @@ const FileDetailsSheet: React.FC<FileDetailsSheetProps> = ({ isOpen, onClose, fi
   );
 };
 
-export default FileDetailsSheet;
+export default TrashDetailsSheet;

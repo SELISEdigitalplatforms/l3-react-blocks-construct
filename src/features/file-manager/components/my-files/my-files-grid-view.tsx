@@ -2,46 +2,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
-import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
+import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
+import {
+  FileCardProps,
+  getFileTypeIcon,
+  getFileTypeInfo,
+  IFileDataWithSharing,
+  PaginationState,
+  SharedUser,
+} from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
 import FileDetailsSheet from './my-files-details';
-
-interface FileCardProps {
-  file: IFileData;
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
-  t: (key: string) => string;
-}
-
-interface FileGridViewProps {
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
-  filters: {
-    name: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
-}
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
-}
 
 const FileCard: React.FC<FileCardProps> = ({
   file,
@@ -49,7 +22,6 @@ const FileCard: React.FC<FileCardProps> = ({
   onDownload,
   onShare,
   onDelete,
-  onMove,
   onRename,
 }) => {
   const IconComponent = getFileTypeIcon(file.fileType);
@@ -101,7 +73,6 @@ const FileCard: React.FC<FileCardProps> = ({
                   onDownload={onDownload}
                   onShare={onShare}
                   onDelete={onDelete}
-                  onMove={onMove}
                   onRename={onRename}
                 />
               </div>
@@ -125,7 +96,6 @@ const FileCard: React.FC<FileCardProps> = ({
                   onDownload={onDownload}
                   onShare={onShare}
                   onDelete={onDelete}
-                  onMove={onMove}
                   onRename={onRename}
                 />
               </div>
@@ -137,22 +107,43 @@ const FileCard: React.FC<FileCardProps> = ({
   );
 };
 
-const FileGridView: React.FC<FileGridViewProps> = ({
+interface FileGridViewProps {
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onDownload: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+
+  onRename: (file: IFileDataWithSharing) => void;
+  filters: {
+    name: string;
+    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  };
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+}
+
+export const FileGridView: React.FC<FileGridViewProps> = ({
   onViewDetails,
   onDownload,
   onShare,
   onDelete,
-  onMove,
-  onCopy,
-  onOpen,
+
   onRename,
   filters,
+  newFiles = [],
+  newFolders = [],
+  renamedFiles = new Map(),
+  fileSharedUsers = {},
+  filePermissions = {},
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -193,9 +184,8 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     }
   }, [data]);
 
-  // Enhanced handlers to manage details sheet
   const handleViewDetails = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       setIsDetailsOpen(true);
       onViewDetails?.(file);
@@ -212,13 +202,13 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <p className="text-red-600 mb-2">{t('ERROR_LOADING_FILES')}</p>
+          <p className="text-error mb-2">{t('ERROR_LOADING_FILES')}</p>
         </div>
       </div>
     );
   }
 
-  if (isLoading && !data?.data?.length) {
+  if (isLoading && !data?.data?.length && newFiles.length === 0 && newFolders.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
@@ -229,9 +219,47 @@ const FileGridView: React.FC<FileGridViewProps> = ({
     );
   }
 
-  const files = data?.data || [];
-  const folders = files.filter((file) => file.fileType === 'Folder');
-  const regularFiles = files.filter((file) => file.fileType !== 'Folder');
+  const existingFiles = data?.data || [];
+
+  const processedServerFiles = existingFiles.map((file) => {
+    const renamedVersion = renamedFiles.get(file.id);
+    const baseFile = renamedVersion || file;
+
+    const enhancedFile: IFileDataWithSharing = {
+      ...baseFile,
+      sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
+      sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
+    };
+
+    return enhancedFile;
+  });
+
+  const newFileIds = new Set([...newFiles.map((f) => f.id), ...newFolders.map((f) => f.id)]);
+  const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
+
+  const enhancedNewFiles = newFiles.map((file) => ({
+    ...file,
+    sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
+    sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
+  }));
+
+  const enhancedNewFolders = newFolders.map((folder) => ({
+    ...folder,
+    sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
+    sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
+  }));
+
+  const allFiles = [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
+
+  const filteredFiles = allFiles.filter((file) => {
+    const matchesName =
+      !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
+    const matchesType = !filters.fileType || file.fileType === filters.fileType;
+    return matchesName && matchesType;
+  });
+
+  const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
+  const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
 
   return (
     <div className="flex h-full w-full">
@@ -241,52 +269,52 @@ const FileGridView: React.FC<FileGridViewProps> = ({
             {folders.length > 0 && (
               <div>
                 <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
-                  {t('FOLDER')}
+                  {t('FOLDER')} ({folders.length})
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                  {folders.map((file) => (
-                    <FileCard
-                      key={file.id}
-                      file={file}
-                      onViewDetails={handleViewDetails}
-                      onDownload={onDownload}
-                      onShare={onShare}
-                      onDelete={onDelete}
-                      onMove={onMove}
-                      onCopy={onCopy}
-                      onOpen={onOpen}
-                      onRename={onRename}
-                      t={t}
-                    />
-                  ))}
+                  {folders.map((file) => {
+                    return (
+                      <FileCard
+                        key={`folder-${file.id}-${file.name}`}
+                        file={file}
+                        onViewDetails={handleViewDetails}
+                        onDownload={onDownload}
+                        onShare={onShare}
+                        onDelete={onDelete}
+                        onRename={onRename}
+                        t={t}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             {regularFiles.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">{t('FILE')}</h2>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                  {t('FILE')} ({regularFiles.length})
+                </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-                  {regularFiles.map((file) => (
-                    <FileCard
-                      key={file.id}
-                      file={file}
-                      onViewDetails={handleViewDetails}
-                      onDownload={onDownload}
-                      onShare={onShare}
-                      onDelete={onDelete}
-                      onMove={onMove}
-                      onCopy={onCopy}
-                      onOpen={onOpen}
-                      onRename={onRename}
-                      t={t}
-                    />
-                  ))}
+                  {regularFiles.map((file) => {
+                    return (
+                      <FileCard
+                        key={`file-${file.id}-${file.name}`}
+                        file={file}
+                        onViewDetails={handleViewDetails}
+                        onDownload={onDownload}
+                        onShare={onShare}
+                        onDelete={onDelete}
+                        onRename={onRename}
+                        t={t}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {files.length === 0 && !isLoading && (
+            {filteredFiles.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Folder className="h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{t('NO_FILES_FOUND')}</h3>
@@ -324,11 +352,20 @@ const FileGridView: React.FC<FileGridViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                isShared: selectedFile.isShared ?? false,
+                lastModified:
+                  typeof selectedFile.lastModified === 'string'
+                    ? selectedFile.lastModified
+                    : selectedFile.lastModified.toISOString(),
+              }
+            : null
+        }
         t={t}
       />
     </div>
   );
 };
-
-export default FileGridView;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { IFileTrashData, trashMockData } from '../utils/file-manager';
 
 export interface IFileData {
@@ -23,7 +23,7 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
-    isShared: true,
+    isShared: false,
     sharedBy: {
       id: '1',
       name: 'Luca Meier',
@@ -37,7 +37,7 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Folder',
     size: '21.4 MB',
-    isShared: true,
+    isShared: false,
     sharedBy: {
       id: '2',
       name: 'Aaron Green',
@@ -107,7 +107,7 @@ export const mockFileData: IFileData[] = [
     lastModified: new Date('2025-02-03'),
     fileType: 'Image',
     size: '21.4 MB',
-    isShared: true,
+    isShared: false,
     sharedBy: {
       id: '4',
       name: 'Adrian Müller',
@@ -243,30 +243,66 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<null | unknown>(null);
 
+  const memoizedQueryParams = useMemo(
+    () => ({
+      page: queryParams.page,
+      pageSize: queryParams.pageSize,
+      filterName: queryParams.filter.name || '',
+      filterFileType: queryParams.filter.fileType || '',
+    }),
+    [queryParams.page, queryParams.pageSize, queryParams.filter.name, queryParams.filter.fileType]
+  );
+
+  const refetch = useCallback(() => {
+    setIsLoading(true);
+    setError(null);
+  }, []);
+
   useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
     const timer = setTimeout(() => {
       try {
         let filteredData = [...mockFileData];
 
-        if (queryParams.filter.name) {
+        if (memoizedQueryParams.filterName) {
           filteredData = filteredData.filter((file) =>
-            file.name.toLowerCase().includes(queryParams.filter.name?.toLowerCase() ?? '')
+            file.name.toLowerCase().includes(memoizedQueryParams.filterName.toLowerCase())
           );
         }
 
-        if (queryParams.filter.fileType) {
+        if (memoizedQueryParams.filterFileType) {
           filteredData = filteredData.filter(
-            (file) => file.fileType === queryParams.filter.fileType
+            (file) => file.fileType === memoizedQueryParams.filterFileType
           );
         }
 
-        const startIndex = queryParams.page * queryParams.pageSize;
-        const endIndex = startIndex + queryParams.pageSize;
+        const startIndex = memoizedQueryParams.page * memoizedQueryParams.pageSize;
+        const endIndex = startIndex + memoizedQueryParams.pageSize;
         const paginatedData = filteredData.slice(startIndex, endIndex);
 
-        setData({
-          data: paginatedData,
-          totalCount: filteredData.length,
+        setData((prevData) => {
+          const newData = {
+            data: paginatedData,
+            totalCount: filteredData.length,
+          };
+
+          if (
+            prevData &&
+            prevData.totalCount === newData.totalCount &&
+            prevData.data.length === newData.data.length &&
+            prevData.data.every(
+              (item, index) =>
+                item.id === newData.data[index]?.id &&
+                item.name === newData.data[index]?.name &&
+                item.lastModified?.getTime() === newData.data[index]?.lastModified?.getTime()
+            )
+          ) {
+            return prevData;
+          }
+
+          return newData;
         });
         setIsLoading(false);
       } catch (err) {
@@ -276,9 +312,9 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [queryParams]);
+  }, [memoizedQueryParams, refetch]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch };
 };
 
 interface TrashQueryParams {

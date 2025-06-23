@@ -1,45 +1,33 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
+import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
 import { createFileTableColumns } from './my-files-table-columns';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
 import FileDetailsSheet from './my-files-details';
+import {
+  IFileDataWithSharing,
+  MyFilesListViewProps,
+  PaginationState,
+} from '../../utils/file-manager';
 
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
-}
-
-interface SharedFileListViewProps {
-  onViewDetails: (file: IFileData) => void;
-  onShare: (file: IFileData) => void;
-  onDelete: (file: IFileData) => void;
-  onMove: (file: IFileData) => void;
-  onCopy: (file: IFileData) => void;
-  onOpen: (file: IFileData) => void;
-  onRename: (file: IFileData) => void;
-  filters: {
-    name?: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
-}
-
-const SharedFileListView: React.FC<SharedFileListViewProps> = ({
+const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   onViewDetails,
   onShare,
   onDelete,
-  onMove,
-  onCopy,
   onRename,
   filters,
+  newFiles,
+  newFolders,
+  renamedFiles,
+  fileSharedUsers = {},
+  filePermissions = {},
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -54,6 +42,64 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
   };
 
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
+
+  const localFiles = useMemo(() => {
+    const enhancedNewFiles = newFiles.map((file) => ({
+      ...file,
+      sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
+      sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
+    }));
+
+    const enhancedNewFolders = newFolders.map((folder) => ({
+      ...folder,
+      sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
+      sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
+    }));
+
+    return [...enhancedNewFiles, ...enhancedNewFolders];
+  }, [newFiles, newFolders, fileSharedUsers, filePermissions]);
+
+  const combinedData = useMemo(() => {
+    const serverFiles = data?.data || [];
+
+    const processedServerFiles = serverFiles.map((file: any) => {
+      const renamedVersion = renamedFiles.get(file.id);
+      const baseFile = renamedVersion || file;
+
+      const enhancedFile: IFileDataWithSharing = {
+        ...baseFile,
+        sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
+        sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
+      };
+
+      return enhancedFile;
+    });
+
+    const filteredLocalFiles = localFiles.filter((file) => {
+      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+        return false;
+      }
+      if (filters.fileType && file.fileType !== filters.fileType) {
+        return false;
+      }
+      return true;
+    });
+
+    const filteredServerFiles = processedServerFiles.filter((file: IFileDataWithSharing) => {
+      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+        return false;
+      }
+      if (filters.fileType && file.fileType !== filters.fileType) {
+        return false;
+      }
+      return true;
+    });
+
+    const localFileIds = new Set(filteredLocalFiles.map((f) => f.id));
+    const uniqueServerFiles = filteredServerFiles.filter((f) => !localFileIds.has(f.id));
+
+    return [...filteredLocalFiles, ...uniqueServerFiles];
+  }, [localFiles, data?.data, filters, renamedFiles, fileSharedUsers, filePermissions]);
 
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
@@ -70,10 +116,10 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
     if (data?.totalCount !== undefined) {
       setPaginationState((prev) => ({
         ...prev,
-        totalCount: data.totalCount,
+        totalCount: data.totalCount + localFiles.length,
       }));
     }
-  }, [data?.totalCount]);
+  }, [data?.totalCount, localFiles.length]);
 
   useEffect(() => {
     setPaginationState((prev) => ({
@@ -83,7 +129,7 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
   }, [filters]);
 
   const handleViewDetailsWrapper = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       setIsDetailsOpen(true);
       onViewDetails(file);
@@ -98,29 +144,35 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
 
   const handleDownloadWrapper = () => undefined;
 
-  const handleShareWrapper = (file: IFileData) => {
-    setSelectedFile(file);
-    onShare(file);
-  };
+  const handleShareWrapper = useCallback(
+    (file: IFileDataWithSharing) => {
+      setSelectedFile(file);
+      onShare(file);
+    },
+    [onShare]
+  );
 
-  const handleDeleteWrapper = (file: IFileData) => {
-    setSelectedFile(file);
-    onDelete(file);
-  };
+  const handleDeleteWrapper = useCallback(
+    (file: IFileDataWithSharing) => {
+      setSelectedFile(file);
+      onDelete(file);
+    },
+    [onDelete]
+  );
 
-  const handleOpenWrapper = (file: IFileData) => {
-    handleViewDetailsWrapper(file);
-  };
+  const handleRenameWrapper = useCallback(
+    (file: IFileDataWithSharing) => {
+      onRename(file);
+    },
+    [onRename]
+  );
 
   const columns = createFileTableColumns({
     onViewDetails: handleViewDetailsWrapper,
     onDownload: handleDownloadWrapper,
     onShare: handleShareWrapper,
     onDelete: handleDeleteWrapper,
-    onMove: onMove,
-    onCopy: onCopy,
-    onOpen: handleOpenWrapper,
-    onRename: onRename,
+    onRename: handleRenameWrapper,
     t,
   });
 
@@ -140,7 +192,7 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
         >
           <div className="h-full flex-col flex w-full gap-6 md:gap-8">
             <DataTable
-              data={data?.data || []}
+              data={combinedData}
               columns={columns}
               onRowClick={handleViewDetailsWrapper}
               isLoading={isLoading}
@@ -161,11 +213,22 @@ const SharedFileListView: React.FC<SharedFileListViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  typeof selectedFile.lastModified === 'string'
+                    ? selectedFile.lastModified
+                    : (selectedFile.lastModified?.toISOString?.() ?? ''),
+                isShared: selectedFile.isShared ?? false,
+              }
+            : null
+        }
         t={t}
       />
     </div>
   );
 };
 
-export default SharedFileListView;
+export default MyFilesListView;

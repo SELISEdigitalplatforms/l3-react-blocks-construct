@@ -2,36 +2,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Folder } from 'lucide-react';
-import { IFileData, useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { getFileTypeIcon, getFileTypeInfo } from 'features/file-manager/utils/file-manager';
+import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
+import {
+  FileCardProps,
+  getFileTypeIcon,
+  getFileTypeInfo,
+  IFileDataWithSharing,
+  PaginationState,
+  SharedUser,
+} from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
 import { Button } from 'components/ui/button';
 import FileDetailsSheet from '../my-files/my-files-details';
+import { DateRange } from '../../types/file-manager.type';
 
-interface FileCardProps {
-  file: IFileData;
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
-  t: (key: string) => string;
-}
-
-interface SharedFileGridViewProps {
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
+interface FileGridViewProps {
+  onViewDetails?: (file: IFileDataWithSharing) => void;
+  onDownload?: (file: IFileDataWithSharing) => void;
+  onShare?: (file: IFileDataWithSharing) => void;
+  onDelete?: (file: IFileDataWithSharing) => void;
+  onMove?: (file: IFileDataWithSharing) => void;
+  onCopy?: (file: IFileDataWithSharing) => void;
+  onOpen?: (file: IFileDataWithSharing) => void;
+  onRename?: (file: IFileDataWithSharing) => void;
   filters: SharedFilters;
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
 }
 
 interface SharedFilters {
@@ -40,17 +40,6 @@ interface SharedFilters {
   sharedBy?: string;
   sharedDate?: DateRange;
   modifiedDate?: DateRange;
-}
-
-interface DateRange {
-  from?: Date;
-  to?: Date;
-}
-
-interface PaginationState {
-  pageIndex: number;
-  pageSize: number;
-  totalCount: number;
 }
 
 const FileCard: React.FC<FileCardProps> = ({
@@ -147,22 +136,26 @@ const FileCard: React.FC<FileCardProps> = ({
   );
 };
 
-const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
+const SharedFileGridView: React.FC<FileGridViewProps> = ({
   onViewDetails,
   onDownload,
   onShare,
   onDelete,
   onMove,
-  onCopy,
-  onOpen,
+
   onRename,
   filters,
+  newFiles = [],
+  newFolders = [],
+  renamedFiles = new Map(),
+  fileSharedUsers = {},
+  filePermissions = {},
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<IFileData | null>(null);
+  const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -212,7 +205,7 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
   }, [data]);
 
   const handleViewDetails = useCallback(
-    (file: IFileData) => {
+    (file: IFileDataWithSharing) => {
       setSelectedFile(file);
       setIsDetailsOpen(true);
       onViewDetails?.(file);
@@ -225,62 +218,17 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
     setSelectedFile(null);
   }, []);
 
-  const applyClientSideFilters = useCallback(
-    (files: IFileData[]) => {
-      return files.filter((file) => {
-        if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
-          return false;
-        }
-
-        if (filters.fileType && file.fileType !== filters.fileType) {
-          return false;
-        }
-
-        if (filters.sharedBy && file.sharedBy?.id !== filters.sharedBy) {
-          return false;
-        }
-
-        if (filters.sharedDate?.from || filters.sharedDate?.to) {
-          const sharedDate = new Date(file.sharedDate ?? file.sharedDate ?? '');
-
-          if (filters.sharedDate.from && sharedDate < filters.sharedDate.from) {
-            return false;
-          }
-
-          if (filters.sharedDate.to && sharedDate > filters.sharedDate.to) {
-            return false;
-          }
-        }
-
-        if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
-          const modifiedDate = new Date(file.lastModified ?? file.sharedDate ?? '');
-
-          if (filters.modifiedDate.from && modifiedDate < filters.modifiedDate.from) {
-            return false;
-          }
-
-          if (filters.modifiedDate.to && modifiedDate > filters.modifiedDate.to) {
-            return false;
-          }
-        }
-
-        return true;
-      });
-    },
-    [filters]
-  );
-
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <p className="text-red-600 mb-2">{t('ERROR_LOADING_FILES')}</p>
+          <p className="text-error mb-2">{t('ERROR_LOADING_FILES')}</p>
         </div>
       </div>
     );
   }
 
-  if (isLoading && !data?.data?.length) {
+  if (isLoading && !data?.data?.length && newFiles.length === 0 && newFolders.length === 0) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
@@ -291,8 +239,77 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
     );
   }
 
-  const rawFiles = data?.data || [];
-  const filteredFiles = applyClientSideFilters(rawFiles);
+  const existingFiles = data?.data || [];
+
+  const processedServerFiles = existingFiles.map((file) => {
+    const renamedVersion = renamedFiles.get(file.id);
+    const baseFile = renamedVersion || file;
+
+    const enhancedFile: IFileDataWithSharing = {
+      ...baseFile,
+      sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
+      sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
+    };
+
+    return enhancedFile;
+  });
+
+  const newFileIds = new Set([...newFiles.map((f) => f.id), ...newFolders.map((f) => f.id)]);
+  const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
+
+  const enhancedNewFiles = newFiles.map((file) => ({
+    ...file,
+    sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
+    sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
+  }));
+
+  const enhancedNewFolders = newFolders.map((folder) => ({
+    ...folder,
+    sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
+    sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
+  }));
+
+  const allFiles = [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
+
+  const filteredFiles = allFiles.filter((file) => {
+    if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
+    }
+
+    if (filters.fileType && file.fileType !== filters.fileType) {
+      return false;
+    }
+
+    if (filters.sharedBy && file.sharedBy?.id !== filters.sharedBy) {
+      return false;
+    }
+
+    if (filters.sharedDate?.from || filters.sharedDate?.to) {
+      const sharedDate = new Date(file.sharedDate ?? file.sharedDate ?? '');
+
+      if (filters.sharedDate.from && sharedDate < filters.sharedDate.from) {
+        return false;
+      }
+
+      if (filters.sharedDate.to && sharedDate > filters.sharedDate.to) {
+        return false;
+      }
+    }
+
+    if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
+      const modifiedDate = new Date(file.lastModified ?? file.lastModified ?? '');
+
+      if (filters.modifiedDate.from && modifiedDate < filters.modifiedDate.from) {
+        return false;
+      }
+
+      if (filters.modifiedDate.to && modifiedDate > filters.modifiedDate.to) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   const folders = filteredFiles.filter((file) => file.fileType === 'Folder');
   const regularFiles = filteredFiles.filter((file) => file.fileType !== 'Folder');
@@ -313,24 +330,19 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
           <div className="space-y-8">
             {folders.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded flex items-center gap-2">
-                  {t('FOLDER')}
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                    {folders.length}
-                  </span>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                  {t('FOLDER')} ({folders.length})
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {folders.map((file) => (
                     <FileCard
-                      key={file.id}
+                      key={`folder-${file.id}-${file.name}`}
                       file={file}
                       onViewDetails={handleViewDetails}
                       onDownload={onDownload}
                       onShare={onShare}
                       onDelete={onDelete}
                       onMove={onMove}
-                      onCopy={onCopy}
-                      onOpen={onOpen}
                       onRename={onRename}
                       t={t}
                     />
@@ -341,24 +353,19 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
 
             {regularFiles.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded flex items-center gap-2">
-                  {t('FILE')}
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                    {regularFiles.length}
-                  </span>
+                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                  {t('FILE')} ({regularFiles.length})
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {regularFiles.map((file) => (
                     <FileCard
-                      key={file.id}
+                      key={`file-${file.id}-${file.name}`}
                       file={file}
                       onViewDetails={handleViewDetails}
                       onDownload={onDownload}
                       onShare={onShare}
                       onDelete={onDelete}
                       onMove={onMove}
-                      onCopy={onCopy}
-                      onOpen={onOpen}
                       onRename={onRename}
                       t={t}
                     />
@@ -374,19 +381,18 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
                   {hasActiveFilters ? t('NO_FILES_MATCH_CRITERIA') : t('NO_FILES_FOUND')}
                 </h3>
                 <p className="text-gray-500 max-w-sm">
-                  {hasActiveFilters
-                    ? t('TRY_ADJUSTING_FILTERS_OR_SEARCH_TERMS')
+                  {filters.name ||
+                  filters.fileType ||
+                  filters.sharedBy ||
+                  filters.sharedDate ||
+                  filters.modifiedDate
+                    ? t('NO_FILES_MATCH_CRITERIA')
                     : t('NO_FILES_UPLOADED_YET')}
                 </p>
-                {hasActiveFilters && (
-                  <Button variant="outline" className="mt-4" onClick={() => {}}>
-                    {t('CLEAR_ALL_FILTERS')}
-                  </Button>
-                )}
               </div>
             )}
 
-            {data && rawFiles.length < data.totalCount && (
+            {data && data.data.length < data.totalCount && (
               <div className="flex justify-center pt-6">
                 <Button
                   onClick={handleLoadMore}
@@ -400,24 +406,9 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
                       {t('LOADING')}
                     </div>
                   ) : (
-                    <>
-                      {t('LOAD_MORE')}
-                      <span className="ml-2 text-xs bg-gray-100 px-2 py-1 rounded-full">
-                        {rawFiles.length} / {data.totalCount}
-                      </span>
-                    </>
+                    t('LOAD_MORE')
                   )}
                 </Button>
-              </div>
-            )}
-
-            {hasActiveFilters && filteredFiles.length > 0 && (
-              <div className="flex justify-center pt-4">
-                <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
-                  {t('SHOWING')} {filteredFiles.length} {t('OF')} {rawFiles.length} {t('FILES')}
-                  {rawFiles.length < (data?.totalCount ?? 0) &&
-                    ` (${data?.totalCount ?? 0} ${t('TOTAL')})`}
-                </div>
               </div>
             )}
           </div>
@@ -427,7 +418,20 @@ const SharedFileGridView: React.FC<SharedFileGridViewProps> = ({
       <FileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={selectedFile}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                isShared: selectedFile.isShared ?? false,
+                lastModified:
+                  typeof selectedFile.lastModified === 'string'
+                    ? selectedFile.lastModified
+                    : (selectedFile.lastModified?.toISOString?.() ??
+                      selectedFile.lastModified ??
+                      ''),
+              }
+            : null
+        }
         t={t}
       />
     </div>
