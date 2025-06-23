@@ -21,7 +21,6 @@ import { Input } from 'components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
-import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
 import { DateRange, SharedFilters } from 'features/file-manager/types/file-manager.type';
 import {
   fileTypeOptions,
@@ -32,6 +31,7 @@ import {
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
+import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
 
 const DateRangeFilter: React.FC<{
   date?: DateRange;

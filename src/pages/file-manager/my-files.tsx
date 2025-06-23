@@ -21,7 +21,6 @@ import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
-import { FileGridView } from 'features/file-manager/components/my-files/my-files-grid-view';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import {
@@ -31,6 +30,7 @@ import {
 } from 'features/file-manager/utils/file-manager';
 import { DateRange } from 'features/file-manager/types/file-manager.type';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
+import MyFileGridView from 'features/file-manager/components/my-files/my-files-grid-view';
 
 interface FileFilters {
   name: string;
@@ -758,7 +758,7 @@ export const FileManager: React.FC<FileManagerProps> = ({ onCreateFile }) => {
       <div className="flex-1 overflow-hidden">
         {viewMode === 'grid' ? (
           <div className="h-full overflow-y-auto">
-            <FileGridView {...commonViewProps} />
+            <MyFileGridView {...commonViewProps} />
           </div>
         ) : (
           <div className="h-full">
