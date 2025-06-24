@@ -1,17 +1,10 @@
 import { IFileData } from '../hooks/use-mock-files-query';
 import { IFileDataWithSharing, SharedUser } from '../utils/file-manager';
+import { SharedFilters } from './header-toolbar.type';
 
 export interface DateRange {
   from?: Date;
   to?: Date;
-}
-
-export interface SharedFilters {
-  name: string;
-  fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  sharedBy?: string;
-  sharedDate?: DateRange;
-  modifiedDate?: DateRange;
 }
 
 export interface SharedFilesListViewProps {

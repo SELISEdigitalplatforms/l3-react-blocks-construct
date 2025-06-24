@@ -183,7 +183,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
   const displayData = useMemo(() => {
     return combinedData.filter((file: IFileDataWithSharing) => {
       return (
-        isNameMatch(file, filters.name) &&
+        isNameMatch(file, filters.name ?? '') &&
         isFileTypeMatch(file, filters.fileType ?? '') &&
         isSharedByMatch(file, filters.sharedBy) &&
         isSharedDateMatch(file, filters.sharedDate ?? {}) &&

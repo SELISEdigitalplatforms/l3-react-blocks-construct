@@ -11,9 +11,10 @@ import {
 } from 'features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions';
 import { useIsMobile } from 'hooks/use-mobile';
-import { SharedFilesListViewProps, SharedFilters } from '../../types/file-manager.type';
+import { SharedFilesListViewProps } from '../../types/file-manager.type';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 import { CommonGridView } from '../common-grid-view';
+import { SharedFilters } from '../../types/header-toolbar.type';
 
 const SharedFileGridView: React.FC<SharedFilesListViewProps> = (props) => {
   const { t } = useTranslation();
