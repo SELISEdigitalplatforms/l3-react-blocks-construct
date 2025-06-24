@@ -53,7 +53,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLButtonElement>(null);
   const [preview, setPreview] = useState<string>('');
 
   const onCropChange = (location: Point) => {
@@ -74,7 +74,9 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
         const image = new Image();
         image.crossOrigin = 'anonymous';
         image.addEventListener('load', () => resolve(image));
-        image.addEventListener('error', (error) => reject(error));
+        image.addEventListener('error', (error) =>
+          reject(new Error(`Failed to load image: ${error.message || 'Unknown error'}`))
+        );
         image.src = url;
       }),
     []
@@ -105,20 +107,20 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
         pixelCrop.height
       );
 
+      const handleBlob = (blob: Blob | null): Promise<string> => {
+        if (!blob) {
+          return Promise.reject(new Error('Canvas is empty'));
+        }
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
       return new Promise((resolve, reject) => {
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              return reject(new Error('Canvas is empty'));
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          },
-          'image/jpeg',
-          0.92
-        );
+        canvas.toBlob((blob) => handleBlob(blob).then(resolve).catch(reject), 'image/jpeg', 0.92);
       });
     },
     [createImage]
@@ -161,7 +163,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       <div className="flex flex-col md:flex-row w-full gap-6">
         <div className="w-full items-center justify-center md:items-start md:justify-start md:w-1/2 flex flex-col">
           <h3 className="text-sm font-semibold text-high-emphasis mb-4">{t('RESIZE_THUMBNAIL')}</h3>
-          <div
+          <button
             ref={containerRef}
             className="relative w-[200px] h-[200px] md:w-[312px] md:h-[312px] overflow-hidden"
             onMouseEnter={() => setIsDragging(true)}
@@ -192,7 +194,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
                 </div>
               </div>
             )}
-          </div>
+          </button>
           <div className="mt-6 flex w-full items-center gap-1">
             <Button
               variant="ghost"
