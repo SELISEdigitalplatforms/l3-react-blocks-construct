@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback } from 'react';
 import { SharedFilesListViewProps } from '../../types/file-manager.type';
-import { BaseGridView, createSharedFileFilter } from '../common-grid-view-helpers';
+import { createSharedFileFilter } from '../common-filters';
+import { BaseGridView } from '../basic-grid-view';
 
 const SharedFileGridView: React.FC<SharedFilesListViewProps> = (props) => {
   const queryBuilder = useCallback(

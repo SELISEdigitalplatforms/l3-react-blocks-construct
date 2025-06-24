@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useCallback } from 'react';
-import { BaseGridView, createBasicFileFilter } from '../common-grid-view-helpers';
 import { MyFileGridViewProps } from '../../types/file-manager.type';
+import { createBasicFileFilter } from '../common-filters';
+import { BaseGridView } from '../basic-grid-view';
 
 const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
   const queryBuilder = useCallback(

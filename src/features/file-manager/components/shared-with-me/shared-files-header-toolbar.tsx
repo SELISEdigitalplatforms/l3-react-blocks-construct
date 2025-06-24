@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { FilterConfig } from '../../types/header-toolbar.type';
+import { fileTypeFilterConfig, FilterConfig } from '../../types/header-toolbar.type';
 import { SharedWithMeHeaderToolbarProps } from '../../utils/file-manager';
 import { BaseHeaderToolbar } from '../header-toolbar/base-header-toolbar';
 
@@ -21,19 +21,7 @@ export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps>
       type: 'dateRange',
       label: 'MODIFIED_DATE',
     },
-    {
-      key: 'fileType',
-      type: 'select',
-      label: 'FILE_TYPE',
-      options: [
-        { value: 'Folder', label: 'FOLDER' },
-        { value: 'File', label: 'FILE' },
-        { value: 'Image', label: 'IMAGE' },
-        { value: 'Audio', label: 'AUDIO' },
-        { value: 'Video', label: 'VIDEO' },
-      ],
-      width: 'w-[140px]',
-    },
+    fileTypeFilterConfig,
   ];
 
   return (

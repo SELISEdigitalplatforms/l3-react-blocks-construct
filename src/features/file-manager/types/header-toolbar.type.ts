@@ -60,3 +60,31 @@ export interface HeaderToolbarConfig<T extends FilterType> {
   onFileUpload?: (files: File[]) => void;
   onFolderCreate?: (name: string) => void;
 }
+
+export const fileTypeFilter = {
+  key: 'fileType',
+  type: 'select',
+  label: 'FILE_TYPE',
+  options: [
+    { value: 'Folder', label: 'FOLDER' },
+    { value: 'File', label: 'FILE' },
+    { value: 'Image', label: 'IMAGE' },
+    { value: 'Audio', label: 'AUDIO' },
+    { value: 'Video', label: 'VIDEO' },
+  ],
+  width: 'w-[140px]',
+};
+
+export const fileTypeFilterConfig: FilterConfig = {
+  key: 'fileType',
+  type: 'select',
+  label: 'FILE_TYPE',
+  options: [
+    { value: 'Folder', label: 'FOLDER' },
+    { value: 'File', label: 'FILE' },
+    { value: 'Image', label: 'IMAGE' },
+    { value: 'Audio', label: 'AUDIO' },
+    { value: 'Video', label: 'VIDEO' },
+  ],
+  width: 'w-[140px]',
+};

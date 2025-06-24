@@ -1,24 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Recycle, RotateCcw } from 'lucide-react';
 import { BaseHeaderToolbar } from '../header-toolbar/base-header-toolbar';
-import { ActionConfig, FilterConfig } from '../../types/header-toolbar.type';
+import { ActionConfig, fileTypeFilterConfig, FilterConfig } from '../../types/header-toolbar.type';
 import { TrashHeaderToolbarProps } from '../../utils/file-manager';
 
 export const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = (props) => {
   const filterConfigs: FilterConfig[] = [
-    {
-      key: 'fileType',
-      type: 'select',
-      label: 'FILE_TYPE',
-      options: [
-        { value: 'Folder', label: 'FOLDER' },
-        { value: 'File', label: 'FILE' },
-        { value: 'Image', label: 'IMAGE' },
-        { value: 'Audio', label: 'AUDIO' },
-        { value: 'Video', label: 'VIDEO' },
-      ],
-      width: 'w-[140px]',
-    },
+    fileTypeFilterConfig,
     {
       key: 'trashedDate',
       type: 'dateRange',

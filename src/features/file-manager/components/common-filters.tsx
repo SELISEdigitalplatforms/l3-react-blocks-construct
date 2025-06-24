@@ -15,6 +15,49 @@ import {
 } from 'components/ui/select';
 import { Badge } from 'components/ui/badge';
 import { DateRange } from '../types/file-manager.type';
+import { IFileDataWithSharing } from '../utils/file-manager';
+
+export interface BasicFilters {
+  name?: string;
+  fileType?: string;
+}
+
+export interface SharedFilters extends BasicFilters {
+  sharedBy?: string;
+  sharedDate?: { from?: Date; to?: Date };
+  modifiedDate?: { from?: Date; to?: Date };
+}
+
+export const createBasicFileFilter = () => {
+  return (files: IFileDataWithSharing[], filters: BasicFilters) => {
+    return files.filter((file) => {
+      const matchesName =
+        !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
+      const matchesType = !filters.fileType || file.fileType === filters.fileType;
+      return matchesName && matchesType;
+    });
+  };
+};
+
+export const createSharedFileFilter = () => {
+  const validateFilter = (file: IFileDataWithSharing, filters: SharedFilters) => {
+    if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
+    }
+    if (filters.fileType && file.fileType !== filters.fileType) {
+      return false;
+    }
+    if (filters.sharedBy && file.sharedBy?.id !== filters.sharedBy) {
+      return false;
+    }
+    return true;
+  };
+
+  return (files: IFileDataWithSharing[], filters: Record<string, any>) => {
+    const sharedFilters = filters as SharedFilters;
+    return files.filter((file) => validateFilter(file, sharedFilters));
+  };
+};
 
 interface User {
   id: string;

@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 // hooks/usePagination.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { Row } from '@tanstack/react-table';
+import { IFileDataWithSharing } from '../utils/file-manager';
+import { FileTableRowActions } from './file-manager-row-actions';
+import { IFileData } from '../hooks/use-mock-files-query';
+import { useIsMobile } from 'hooks/use-mobile';
+import { RegularFileDetailsSheet } from './regular-file-details-sheet';
 
 export interface PaginationState {
   pageIndex: number;
@@ -51,113 +57,6 @@ export const usePagination = (filters?: any) => {
     loadMore,
   };
 };
-
-// hooks/useFileEnhancement.ts
-
-export interface FileEnhancementProps {
-  fileSharedUsers?: Record<string, any[]>;
-  filePermissions?: Record<string, any>;
-}
-
-export const useFileEnhancement = ({ fileSharedUsers, filePermissions }: FileEnhancementProps) => {
-  const enhanceWithSharingData = useCallback(
-    (file: IFileDataWithSharing) => ({
-      ...file,
-      sharedWith: fileSharedUsers?.[file.id] || file.sharedWith || [],
-      sharePermissions: filePermissions?.[file.id] || file.sharePermissions || {},
-    }),
-    [fileSharedUsers, filePermissions]
-  );
-
-  return { enhanceWithSharingData };
-};
-
-export interface FileProcessingProps extends FileEnhancementProps {
-  newFiles?: IFileDataWithSharing[];
-  newFolders?: IFileDataWithSharing[];
-  renamedFiles?: Map<string, IFileDataWithSharing>;
-}
-
-export const useFileProcessing = (props: FileProcessingProps) => {
-  const { enhanceWithSharingData } = useFileEnhancement(props);
-
-  const processFiles = useCallback(
-    (files: IFileDataWithSharing[]) => {
-      const existingFiles = files || [];
-
-      // Process server files with renamed versions
-      const processedServerFiles = existingFiles.map((file) => {
-        const renamedVersion = props.renamedFiles?.get(file.id);
-        const baseFile = renamedVersion || file;
-        return enhanceWithSharingData(baseFile);
-      });
-
-      // Filter out files that exist in new files/folders
-      const newFileIds = new Set([
-        ...(props.newFiles?.map((f) => f.id) || []),
-        ...(props.newFolders?.map((f) => f.id) || []),
-      ]);
-      const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
-
-      // Enhance new files and folders
-      const enhancedNewFiles = (props.newFiles || []).map(enhanceWithSharingData);
-      const enhancedNewFolders = (props.newFolders || []).map(enhanceWithSharingData);
-
-      return [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
-    },
-    [props.newFiles, props.newFolders, props.renamedFiles, enhanceWithSharingData]
-  );
-
-  return { processFiles };
-};
-
-// utils/fileFilters.ts
-export interface BasicFilters {
-  name?: string;
-  fileType?: string;
-}
-
-export interface SharedFilters extends BasicFilters {
-  sharedBy?: string;
-  sharedDate?: { from?: Date; to?: Date };
-  modifiedDate?: { from?: Date; to?: Date };
-}
-
-export const createBasicFileFilter = () => {
-  return (files: IFileDataWithSharing[], filters: BasicFilters) => {
-    return files.filter((file) => {
-      const matchesName =
-        !filters.name || file.name.toLowerCase().includes(filters.name.toLowerCase());
-      const matchesType = !filters.fileType || file.fileType === filters.fileType;
-      return matchesName && matchesType;
-    });
-  };
-};
-
-export const createSharedFileFilter = () => {
-  const validateFilter = (file: IFileDataWithSharing, filters: SharedFilters) => {
-    if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
-      return false;
-    }
-    if (filters.fileType && file.fileType !== filters.fileType) {
-      return false;
-    }
-    if (filters.sharedBy && file.sharedBy?.id !== filters.sharedBy) {
-      return false;
-    }
-    // Add date filtering logic here if needed
-    return true;
-  };
-
-  return (files: IFileDataWithSharing[], filters: Record<string, any>) => {
-    const sharedFilters = filters as SharedFilters;
-    return files.filter((file) => validateFilter(file, sharedFilters));
-  };
-};
-
-// utils/fileActions.ts
-import { useCallback } from 'react';
-import { Row } from '@tanstack/react-table';
 
 export interface FileActionProps {
   onViewDetails?: (file: IFileDataWithSharing) => void;
@@ -215,11 +114,10 @@ export const createTableRowMock = (file: IFileDataWithSharing): Row<IFileData> =
     getIsPinned: () => false,
     getPinnedIndex: () => -1,
     getCanPin: () => false,
-    _getAllVisibleCells: () => [], // <-- Added to satisfy Row<IFileData>
+    _getAllVisibleCells: () => [],
   } as Row<IFileData>;
 };
 
-// Alternative 2: Create a simplified file actions component that doesn't need Row
 export interface DirectFileActionsProps extends FileActionProps {
   file: IFileDataWithSharing;
   className?: string;
@@ -290,7 +188,6 @@ export const useFileActions = (props: FileActionProps) => {
     [props]
   );
 
-  // Option 2: Use the direct actions component
   const renderActionsDirectly = useCallback(
     (file: IFileDataWithSharing) => (
       <DirectFileActions
@@ -307,8 +204,8 @@ export const useFileActions = (props: FileActionProps) => {
   );
 
   return {
-    renderActions, // Use this if you want to keep FileTableRowActions
-    renderActionsDirectly, // Use this for a simpler approach
+    renderActions,
+    renderActionsDirectly,
   };
 };
 
@@ -343,93 +240,4 @@ export const useFileDetailsSheet = (t: any) => {
 
 // hooks/useGridViewData.ts
 
-export const useGridViewData = (filters: any, queryBuilder: (params: any) => any) => {
-  const { paginationState, updateTotalCount, loadMore } = usePagination(filters);
-
-  const queryParams = queryBuilder({
-    page: paginationState.pageIndex,
-    pageSize: paginationState.pageSize,
-    filters,
-  });
-
-  const { data, isLoading, error } = useMockFilesQuery(queryParams);
-
-  useEffect(() => {
-    if (data?.totalCount !== undefined) {
-      updateTotalCount(data.totalCount);
-    }
-  }, [data?.totalCount, updateTotalCount]);
-
-  const handleLoadMore = useCallback(() => {
-    if (data && data.data.length < data.totalCount) {
-      loadMore();
-    }
-  }, [data, loadMore]);
-
-  return {
-    data,
-    isLoading,
-    error,
-    handleLoadMore,
-  };
-};
-
 // components/BaseGridView.tsx
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Folder } from 'lucide-react';
-import { useIsMobile } from 'hooks/use-mobile';
-import { getFileTypeIcon, getFileTypeInfo, IFileDataWithSharing } from '../utils/file-manager';
-import { IFileData, useMockFilesQuery } from '../hooks/use-mock-files-query';
-import { FileTableRowActions } from './file-manager-row-actions';
-import { RegularFileDetailsSheet } from './regular-file-details-sheet';
-import { CommonGridView } from './common-grid-view';
-
-export interface BaseGridViewProps extends FileActionProps, FileProcessingProps {
-  filters: any;
-  onViewDetails?: (file: IFileDataWithSharing) => void;
-  queryBuilder: (params: any) => any;
-  filterFiles: (files: IFileDataWithSharing[], filters: any) => IFileDataWithSharing[];
-}
-
-export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
-  const { t } = useTranslation();
-
-  const { data, isLoading, error, handleLoadMore } = useGridViewData(
-    props.filters,
-    props.queryBuilder
-  );
-
-  const { processFiles } = useFileProcessing(props);
-  const { renderActions } = useFileActions(props);
-  const { renderDetailsSheet } = useFileDetailsSheet(t);
-
-  return (
-    <CommonGridView
-      onViewDetails={props.onViewDetails}
-      filters={props.filters}
-      data={data ?? undefined}
-      isLoading={isLoading}
-      error={error}
-      onLoadMore={handleLoadMore}
-      renderDetailsSheet={renderDetailsSheet}
-      getFileTypeIcon={getFileTypeIcon}
-      getFileTypeInfo={getFileTypeInfo}
-      renderActions={renderActions}
-      emptyStateConfig={{
-        icon: Folder,
-        title: t('NO_FILES_FOUND'),
-        description: t('NO_FILES_UPLOADED_YET'),
-      }}
-      sectionLabels={{
-        folder: t('FOLDER'),
-        file: t('FILE'),
-      }}
-      errorMessage={t('ERROR_LOADING_FILES')}
-      loadingMessage={t('LOADING')}
-      loadMoreLabel={t('LOAD_MORE')}
-      processFiles={processFiles}
-      filterFiles={props.filterFiles}
-    />
-  );
-};
