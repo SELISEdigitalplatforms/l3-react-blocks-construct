@@ -60,11 +60,10 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
 
   const { data, isLoading, error } = useMockTrashFilesQuery(queryParams);
 
-  // Update pagination state when data changes
   useEffect(() => {
     if (data?.totalCount !== undefined) {
       const adjustedCount =
-        data.totalCount - (props.deletedItemIds?.size || 0) - (props.restoredItemIds?.size || 0);
+        data.totalCount - (props.deletedItemIds?.size ?? 0) - (props.restoredItemIds?.size ?? 0);
       setPaginationState((prev) => ({
         ...prev,
         totalCount: Math.max(0, adjustedCount),
@@ -92,7 +91,6 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
     (files: IFileTrashData[]) => {
       if (!files) return [];
 
-      // Only filter out deleted and restored items
       const processed = files.filter((file) => {
         const fileId = file.id.toString();
         const isDeleted = props.deletedItemIds?.has(fileId);
@@ -118,7 +116,6 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       if (filters.trashedDate?.from || filters.trashedDate?.to) {
         const trashedDate = new Date(file.trashedDate);
 
-        // Validate the trashed date
         if (isNaN(trashedDate.getTime())) {
           console.warn('Invalid trashed date for file:', file.name, file.trashedDate);
           return false;

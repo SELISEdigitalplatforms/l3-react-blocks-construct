@@ -12,7 +12,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'comp
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
-import { fileTypeOptions } from 'features/file-manager/utils/file-manager';
+import {
+  FileManagerHeaderToolbarProps,
+  fileTypeOptions,
+} from 'features/file-manager/utils/file-manager';
 import { DateRange } from 'features/file-manager/types/file-manager.type';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
 import MyFileGridView from 'features/file-manager/components/my-files/my-files-grid-view';
@@ -30,22 +33,8 @@ import {
   getDateRangeLabel,
   SearchInput,
   SelectFilter,
-  User,
   UserFilter,
 } from 'features/file-manager/components/common-filters';
-
-interface FileManagerHeaderToolbarProps {
-  onOpen: () => void;
-  viewMode?: string;
-  handleViewMode: (view: string) => void;
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
-  filters: FileFilters;
-  onFiltersChange: (filters: FileFilters) => void;
-  onFileUpload?: (files: File[]) => void;
-  onFolderCreate?: (folderName: string) => void;
-  sharedUsers?: User[];
-}
 
 const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = ({
   viewMode = 'grid',

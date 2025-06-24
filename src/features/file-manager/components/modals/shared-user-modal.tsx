@@ -121,7 +121,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
   const [permissions, setPermissions] = useState<{ [key: string]: string }>(() => {
     const initialPermissions: { [key: string]: string } = {};
     currentSharedUsers.forEach((user) => {
-      initialPermissions[user.id] = user.role || defaultRole;
+      initialPermissions[user.id] = user.role ?? defaultRole;
     });
     return initialPermissions;
   });
@@ -145,7 +145,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
     setPermissions(() => {
       const initialPermissions: { [key: string]: string } = {};
       currentSharedUsers.forEach((user) => {
-        initialPermissions[user.id] = user.role || defaultRole;
+        initialPermissions[user.id] = user.role ?? defaultRole;
       });
       return initialPermissions;
     });
@@ -213,7 +213,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
   useEffect(() => {
     const initialPermissions: { [key: string]: string } = {};
     const syncedUsers = currentSharedUsers.map((user) => {
-      const userPermission = (user.role || defaultRole) as UserRole;
+      const userPermission = (user.role ?? defaultRole) as UserRole;
       initialPermissions[user.id] = userPermission;
       return { ...user, role: userPermission };
     });
@@ -228,22 +228,28 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
 
   const filteredUsers = sharedUsers.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.email && user.email.toLowerCase().includes(searchQuery.toLowerCase()))
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ??
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const getDialogTitle = () => {
+    if (currentView === 'share') {
+      return 'Share';
+    }
+
+    if (selectedUsers.length > 0) {
+      return 'Listed people';
+    }
+
+    return 'Share people';
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md mx-4 max-h-[80vh] flex flex-col shadow-xl">
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-900">
-              {currentView === 'share'
-                ? 'Share'
-                : selectedUsers.length > 0
-                  ? 'Listed people'
-                  : 'Share people'}
-            </h2>
+            <h2 className="text-lg font-medium text-gray-900">{getDialogTitle()}</h2>
             <button onClick={handleCancel} className="p-1 hover:bg-gray-100 rounded-full">
               <X className="w-5 h-5 text-gray-500" />
             </button>
@@ -280,12 +286,14 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
                   {filteredUsers.map((user) => {
                     const isSelected = selectedUsers.some((u) => u.id === user.id);
                     return (
-                      <div
+                      <button
                         key={user.id}
                         onClick={() => handleUserToggle(user)}
-                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 border-2 transition-all ${
+                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 border-2 transition-all w-full text-left ${
                           isSelected ? 'bg-blue-50 border-blue-200' : 'border-transparent'
                         }`}
+                        aria-pressed={isSelected}
+                        aria-label={`${isSelected ? 'Deselect' : 'Select'} user ${user.name}`}
                       >
                         <Avatar name={user.name} />
                         <div className="flex-1 min-w-0">
@@ -295,7 +303,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
                           <div className="text-xs text-gray-500 truncate">{user.email}</div>
                         </div>
                         {isSelected && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
-                      </div>
+                      </button>
                     );
                   })}
                   {filteredUsers.length === 0 && (

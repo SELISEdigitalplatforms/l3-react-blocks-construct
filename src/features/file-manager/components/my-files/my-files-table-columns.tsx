@@ -190,7 +190,7 @@ export const createFileTableColumns = ({
     ),
     cell: ({ row }) => (
       <div
-        onClick={(e) => {
+        onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}

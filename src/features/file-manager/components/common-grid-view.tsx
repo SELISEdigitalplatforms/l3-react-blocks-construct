@@ -85,14 +85,9 @@ const CommonCard = <T extends BaseFile>({
           {file.name}
         </h3>
       </div>
-      <div
-        data-action-button="true"
-        className="flex-shrink-0"
-        role="region"
-        aria-label="File actions"
-      >
+      <section data-action-button="true" className="flex-shrink-0" aria-label="File actions">
         {renderActions(file)}
-      </div>
+      </section>
     </div>
   );
 
@@ -108,30 +103,18 @@ const CommonCard = <T extends BaseFile>({
           </h3>
         </div>
       </div>
-      <div
-        data-action-button="true"
-        className="flex-shrink-0"
-        role="region"
-        aria-label="File actions"
-      >
+      <section data-action-button="true" className="flex-shrink-0" aria-label="File actions">
         {renderActions(file)}
-      </div>
+      </section>
     </div>
   );
 
   return (
-    <div
+    <button
       className={containerClasses}
       onClick={handleCardClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleCardClick(e as any);
-        }
-      }}
-      role="button"
-      tabIndex={0}
       aria-label={`View details for ${file.name}`}
+      type="button"
     >
       <div className={contentClasses}>
         <div className={iconContainerClasses}>
@@ -141,11 +124,10 @@ const CommonCard = <T extends BaseFile>({
           {isFolder ? renderFolderLayout() : renderFileLayout()}
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
-// Common Grid View Component
 export const CommonGridView = <T extends BaseFile>({
   onViewDetails,
   filters,
