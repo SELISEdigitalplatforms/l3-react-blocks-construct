@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { IFileTrashData, trashMockData } from '../utils/file-manager';
+import { FileType, IFileTrashData, trashMockData } from '../utils/file-manager';
 
 export interface IFileData {
   id: string;
   name: string;
   lastModified: Date;
-  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  fileType: FileType;
   size: string;
   isShared?: boolean;
   sharedBy?: {
@@ -241,7 +241,7 @@ interface QueryParams {
 export const useMockFilesQuery = (queryParams: QueryParams) => {
   const [data, setData] = useState<null | { data: IFileData[]; totalCount: number }>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<null | unknown>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const memoizedQueryParams = useMemo(
     () => ({
@@ -281,6 +281,15 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
         const startIndex = memoizedQueryParams.page * memoizedQueryParams.pageSize;
         const endIndex = startIndex + memoizedQueryParams.pageSize;
         const paginatedData = filteredData.slice(startIndex, endIndex);
+        const areItemsEqual = (item1: any, item2: any): boolean => {
+          if (!item2) return false;
+
+          return (
+            item1.id === item2.id &&
+            item1.name === item2.name &&
+            item1.lastModified?.getTime() === item2.lastModified?.getTime()
+          );
+        };
 
         setData((prevData) => {
           const newData = {
@@ -292,12 +301,7 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
             prevData &&
             prevData.totalCount === newData.totalCount &&
             prevData.data.length === newData.data.length &&
-            prevData.data.every(
-              (item, index) =>
-                item.id === newData.data[index]?.id &&
-                item.name === newData.data[index]?.name &&
-                item.lastModified?.getTime() === newData.data[index]?.lastModified?.getTime()
-            )
+            prevData.data.every((item, index) => areItemsEqual(item, newData.data[index]))
           ) {
             return prevData;
           }
@@ -306,7 +310,11 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
         });
         setIsLoading(false);
       } catch (err) {
-        setError(err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred');
+        }
         setIsLoading(false);
       }
     }, 500);
@@ -333,7 +341,7 @@ interface TrashQueryParams {
 export const useMockTrashFilesQuery = (queryParams: TrashQueryParams) => {
   const [data, setData] = useState<null | { data: IFileTrashData[]; totalCount: number }>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<null | unknown>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -386,7 +394,11 @@ export const useMockTrashFilesQuery = (queryParams: TrashQueryParams) => {
         });
         setIsLoading(false);
       } catch (err) {
-        setError(err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred');
+        }
         setIsLoading(false);
       }
     }, 500);

@@ -267,8 +267,10 @@ export const SharedFileTableColumns = ({
     ),
     cell: ({ row }) => (
       <div
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         className="flex justify-end"
       >
         <FileTableRowActions

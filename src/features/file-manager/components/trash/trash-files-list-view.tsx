@@ -11,7 +11,6 @@ import { TrashDetailsSheet } from './trash-files-details';
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
   onDelete: (file: IFileTrashData) => void;
-  readonly onPermanentDelete?: (file: IFileTrashData) => void;
   filters: {
     name?: string;
     fileType?: string;
@@ -20,8 +19,6 @@ interface TrashFilesListViewProps {
       to?: Date;
     };
   };
-  selectedItems?: string[];
-  readonly onSelectionChange?: (items: string[]) => void;
   deletedItemIds?: Set<string>;
   restoredItemIds?: Set<string>;
 }

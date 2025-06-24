@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { X } from 'lucide-react';
 import {
+  FileType,
   getFileTypeDisplayName,
   getFileTypeIcon,
   getFileTypeInfo,
@@ -14,7 +15,7 @@ import { CustomtDateFormat } from 'lib/custom-date-formatter';
 export interface IFileDataWithSharing {
   id: string;
   name: string;
-  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  fileType: FileType;
   size: string;
   lastModified: string | Date;
   isShared: boolean;
@@ -42,7 +43,7 @@ const getOwnerName = (sharedUsers: SharedUser[], variant: 'default' | 'trash'): 
   if (variant === 'trash') {
     return 'Luca Meier';
   }
-  return sharedUsers.find((user) => user.role === 'Owner')?.name || '';
+  return sharedUsers.find((user) => user.role === 'Owner')?.name ?? '';
 };
 
 const getDateCreated = (file: IFileDataWithSharing, variant: 'default' | 'trash'): Date => {

@@ -196,7 +196,7 @@ export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps>
           <ActiveFilterBadge
             key="sharedBy"
             label={`Shared by ${selectedUser.name}`}
-            onRemove={() => handleSharedByChange(undefined)}
+            onRemove={() => handleSharedByChange()}
           />
         );
       }
@@ -209,7 +209,7 @@ export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps>
           <ActiveFilterBadge
             key="sharedDate"
             label={`Shared: ${label}`}
-            onRemove={() => handleSharedDateRangeChange(undefined)}
+            onRemove={() => handleSharedDateRangeChange()}
           />
         );
       }
@@ -222,7 +222,7 @@ export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps>
           <ActiveFilterBadge
             key="modifiedDate"
             label={`Modified: ${label}`}
-            onRemove={() => handleModifiedDateRangeChange(undefined)}
+            onRemove={() => handleModifiedDateRangeChange()}
           />
         );
       }

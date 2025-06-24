@@ -1,6 +1,7 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
 import { IFileData } from '../hooks/use-mock-files-query';
 import { t } from 'i18next';
+import { FileFilters, User } from '../components/common-filters';
 
 export interface PaginationState {
   pageIndex: number;
@@ -128,10 +129,11 @@ export const getFileTypeInfo = (fileType: string) => {
   return config[fileType as keyof typeof config] || config.File;
 };
 
+export type FileType = 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
 export interface IFileTrashData {
   id: string;
   name: string;
-  fileType: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  fileType: FileType;
   size: string;
   trashedDate: Date;
   isShared?: boolean;
@@ -297,4 +299,17 @@ export interface MyFilesListViewProps {
   renamedFiles: Map<string, IFileDataWithSharing>;
   fileSharedUsers?: { [key: string]: SharedUser[] };
   filePermissions?: { [key: string]: { [key: string]: string } };
+}
+
+export interface FileManagerHeaderToolbarProps {
+  onOpen: () => void;
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  filters: FileFilters;
+  onFiltersChange: (filters: FileFilters) => void;
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
+  sharedUsers?: User[];
 }

@@ -135,7 +135,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
     >
       <div className="space-x-4 flex">
         <div>
-          <label className="text-xs text-muted-foreground mb-2 block">From</label>
+          <h3 className="text-xs text-muted-foreground mb-2 block">From</h3>
           <Calendar
             mode="single"
             selected={date?.from}
@@ -144,7 +144,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
           />
         </div>
         <div>
-          <label className="text-xs text-muted-foreground mb-2 block">To</label>
+          <h3 className="text-xs text-muted-foreground mb-2 block">To</h3>
           <Calendar
             mode="single"
             selected={date?.to}
@@ -189,12 +189,12 @@ const UserFilter: React.FC<UserFilterProps> = ({ value, onValueChange, title, us
       onOpenChange={setIsOpen}
       title={title}
       displayValue={selectedUser ? selectedUser.name : t(title)}
-      onClear={() => onValueChange(undefined)}
+      onClear={() => onValueChange()}
       showClearInHeader
     >
       <div className="space-y-2">
         {users.map((user) => (
-          <div
+          <button
             key={user.id}
             className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
             onClick={() => {
@@ -209,7 +209,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ value, onValueChange, title, us
             </div>
             <span className="text-sm">{user.name}</span>
             {value === user.id && <Check className="h-4 w-4 text-primary" />}
-          </div>
+          </button>
         ))}
       </div>
     </BaseFilterPopover>
@@ -239,7 +239,7 @@ const SelectFilter: React.FC<SelectFilterProps> = ({
 
   return (
     <Select value={value ?? allValue} onValueChange={onValueChange}>
-      <SelectTrigger className={`h-8 ${className || 'w-[140px]'}`}>
+      <SelectTrigger className={`h-8 ${className ?? 'w-[140px]'}`}>
         <PlusCircle className="h-4 w-4 mr-1" />
         <SelectValue placeholder={t(title)} />
       </SelectTrigger>
@@ -329,7 +329,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   return (
-    <div className={`relative ${className || 'flex-1 max-w-md'}`}>
+    <div className={`relative ${className ?? 'flex-1 max-w-md'}`}>
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
       <Input
         placeholder={t(placeholder)}
