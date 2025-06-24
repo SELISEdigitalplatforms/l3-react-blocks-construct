@@ -7,27 +7,48 @@ jobs:
 
     steps:
       
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+          cache: 'npm'
 
       - name: Set Environment Variables
         uses: ./.github/actions/setvars
         with:
           varFilePath: ./.github/variables/vars.env
       
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Run Linting
+        run: npm run lint
+      
       - name: Run Tests
-        working-directory: ./src
-        shell: pwsh
         run: |
-          dotnet restore "./${{ vars.SOLUTION_NAME }}" -s https://www.nuget.org/api/v2/ -s https://nuget.selise.biz/nuget
-          dotnet build "./${{ vars.SOLUTION_NAME }}" --no-incremental
-          dotnet test ./XUnitTests/XUnitTests.csproj /p:CollectCoverage=true --no-build --collect:"XPlat Code Coverage"
-          dotnet test "./XUnitTests/XUnitTests.csproj" --no-build --verbosity normal --logger:"junit;LogFilePath=test-results/xunit_results.xml"
+          npm run test:ci
+          
+      - name: Generate JUnit Test Report
+        if: always()
+        run: |
+          mkdir -p test-results
+          # Run tests again with JUnit reporter for GitHub Actions
+          CI=true npm test -- --ci --watchAll=false --reporters=default --reporters=jest-junit --outputFile=test-results/jest-results.xml
           
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         id: test-results
         if: always()
         with:
-          files: "./src/XUnitTests/test-results/*.xml"
+          files: "./test-results/*.xml"
+          
+      - name: Upload Coverage Reports
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          directory: ./coverage
+          fail_ci_if_error: false
