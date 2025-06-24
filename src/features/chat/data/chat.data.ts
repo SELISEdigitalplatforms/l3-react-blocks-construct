@@ -12,34 +12,9 @@ const createMessage = (
   timestamp,
 });
 
-const createContact = (
-  id: string,
-  name: string,
-  email: string,
-  phoneNo: string,
-  avatarSrc: string,
-  avatarFallback: string,
-  date: string,
-  status: {
-    isOnline?: boolean;
-    isUnread?: boolean;
-    isGroup?: boolean;
-    isMuted?: boolean;
-  },
-  messages: Message[],
-  members?: GroupMember[]
-): ChatContact => ({
-  id,
-  name,
-  email,
-  phoneNo,
-  avatarSrc,
-  avatarFallback,
-  date,
-  status,
-  messages,
-  ...(members && { members }),
-});
+const createContact = (contactData: ChatContact): ChatContact => {
+  return contactData;
+};
 
 export const mockUserProfile: UserProfile = {
   name: 'Block Smith',
@@ -316,104 +291,104 @@ const teamMembers: GroupMember[] = [
 ];
 
 export const mockChatContacts: ChatContact[] = [
-  createContact(
-    'USR-1282912',
-    'Adrian Müller',
-    'adrian.mueller@example.com',
-    '+43 123 456 7890',
-    'https://i.pravatar.cc/150?img=1',
-    'AM',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: true },
-    adrianMessages
-  ),
-  createContact(
-    'USR-1282913',
-    'Aaron Green',
-    'aaron.green@example.com',
-    '+43 148 492 023',
-    'https://i.pravatar.cc/150?img=2',
-    'AG',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: true },
-    aaronMessages
-  ),
-  createContact(
-    'USR-1282914',
-    'The Rotund Tableur',
-    'rotund.tableur@example.com',
-    '+44 574 393 3930',
-    '',
-    'RT',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: false },
-    rotundMessages
-  ),
-  createContact(
-    'USR-1282915',
-    'Luca Fischer',
-    'luca.fischer@example.com',
-    '+49 170 123 4567',
-    '',
-    'LF',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: false, isUnread: true, isMuted: true },
-    lucaMessages
-  ),
-  createContact(
-    'USR-1282916',
-    'Sarah Pavan',
-    'sarah.pavan@example.com',
-    '+1 555 123 4567',
-    'https://i.pravatar.cc/150?img=3',
-    'SP',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: true },
-    sarahMessages
-  ),
-  createContact(
-    'USR-1282917',
-    'Blocks Team',
-    'blocks.team@example.com',
-    '+1 800 555 1234',
-    '',
-    'NH',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: false, isUnread: true, isGroup: true },
-    blocksTeamMessages,
-    teamMembers
-  ),
-  createContact(
-    'USR-1282918',
-    'Watchparty',
-    'watchparty@example.com',
-    '+44 20 7123 4567',
-    '',
-    'W',
-    '2024-12-26T00:00:00.000Z',
-    { isOnline: false },
-    watchpartyMessages
-  ),
-  createContact(
-    'USR-1282919',
-    'Taylor Morgan',
-    'taylor.morgan@example.com',
-    '+1 415 555 6789',
-    'https://i.pravatar.cc/150?img=4',
-    'TM',
-    '2024-12-27T11:45:00.000Z',
-    { isOnline: true, isUnread: false },
-    taylorMessages
-  ),
-  createContact(
-    'USR-1282920',
-    'Dhanvir Johnny',
-    'dhan-johnny@example.com',
-    '+1 650 555 4321',
-    '',
-    'DJ',
-    '2024-12-27T15:30:00.000Z',
-    { isOnline: true, isUnread: true },
-    dhanvirMessages
-  ),
+  createContact({
+    id: 'USR-1282912',
+    name: 'Adrian Müller',
+    email: 'adrian.mueller@example.com',
+    phoneNo: '+43 123 456 7890',
+    avatarSrc: 'https://i.pravatar.cc/150?img=1',
+    avatarFallback: 'AM',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: true },
+    messages: adrianMessages,
+  }),
+  createContact({
+    id: 'USR-1282913',
+    name: 'Aaron Green',
+    email: 'aaron.green@example.com',
+    phoneNo: '+43 148 492 023',
+    avatarSrc: 'https://i.pravatar.cc/150?img=2',
+    avatarFallback: 'AG',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: true },
+    messages: aaronMessages,
+  }),
+  createContact({
+    id: 'USR-1282914',
+    name: 'The Rotund Tableur',
+    email: 'rotund.tableur@example.com',
+    phoneNo: '+44 574 393 3930',
+    avatarSrc: '',
+    avatarFallback: 'RT',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: false },
+    messages: rotundMessages,
+  }),
+  createContact({
+    id: 'USR-1282915',
+    name: 'Luca Fischer',
+    email: 'luca.fischer@example.com',
+    phoneNo: '+49 170 123 4567',
+    avatarSrc: '',
+    avatarFallback: 'LF',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: false, isUnread: true, isMuted: true },
+    messages: lucaMessages,
+  }),
+  createContact({
+    id: 'USR-1282916',
+    name: 'Sarah Pavan',
+    email: 'sarah.pavan@example.com',
+    phoneNo: '+1 555 123 4567',
+    avatarSrc: 'https://i.pravatar.cc/150?img=3',
+    avatarFallback: 'SP',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: true },
+    messages: sarahMessages,
+  }),
+  createContact({
+    id: 'USR-1282917',
+    name: 'Blocks Team',
+    email: 'blocks.team@example.com',
+    phoneNo: '+1 800 555 1234',
+    avatarSrc: '',
+    avatarFallback: 'NH',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: false, isUnread: true, isGroup: true },
+    messages: blocksTeamMessages,
+    members: teamMembers,
+  }),
+  createContact({
+    id: 'USR-1282918',
+    name: 'Watchparty',
+    email: 'watchparty@example.com',
+    phoneNo: '+44 20 7123 4567',
+    avatarSrc: '',
+    avatarFallback: 'W',
+    date: '2024-12-26T00:00:00.000Z',
+    status: { isOnline: false },
+    messages: watchpartyMessages,
+  }),
+  createContact({
+    id: 'USR-1282919',
+    name: 'Taylor Morgan',
+    email: 'taylor.morgan@example.com',
+    phoneNo: '+1 415 555 6789',
+    avatarSrc: 'https://i.pravatar.cc/150?img=4',
+    avatarFallback: 'TM',
+    date: '2024-12-27T11:45:00.000Z',
+    status: { isOnline: true, isUnread: false },
+    messages: taylorMessages,
+  }),
+  createContact({
+    id: 'USR-1282920',
+    name: 'Dhanvir Johnny',
+    email: 'dhan-johnny@example.com',
+    phoneNo: '+1 650 555 4321',
+    avatarSrc: '',
+    avatarFallback: 'DJ',
+    date: '2024-12-27T15:30:00.000Z',
+    status: { isOnline: true, isUnread: true },
+    messages: dhanvirMessages,
+  }),
 ];

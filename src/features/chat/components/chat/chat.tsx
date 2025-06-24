@@ -146,15 +146,19 @@ export const Chat = () => {
 
   const handleLeaveGroup = (contactId: string) => {
     const contact = contacts.find((c) => c.id === contactId);
-    if (!contact || !contact.members) return;
+    const me = contact?.members?.find((m) => m.isMe);
 
-    const me = contact.members.find((m) => m.isMe);
-    if (!me) return;
+    if (!contact || !me) {
+      return;
+    }
 
     handleDeleteMember(contactId, me.id);
 
     if (selectedContact?.id === contactId) {
       setSelectedContact(null);
+      if (isMobile) {
+        setMobileView('list');
+      }
     }
   };
 
