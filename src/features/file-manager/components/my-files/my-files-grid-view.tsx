@@ -58,18 +58,23 @@ const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
     }
   }, [data]);
 
+  const enhanceWithSharingData = useCallback(
+    (file: IFileDataWithSharing) => ({
+      ...file,
+      sharedWith: props.fileSharedUsers?.[file.id] || file.sharedWith || [],
+      sharePermissions: props.filePermissions?.[file.id] || file.sharePermissions || {},
+    }),
+    [props.fileSharedUsers, props.filePermissions]
+  );
+
   const processFiles = useCallback(
     (files: IFileDataWithSharing[]) => {
       const existingFiles = files || [];
+
       const processedServerFiles = existingFiles.map((file) => {
         const renamedVersion = props.renamedFiles?.get(file.id);
         const baseFile = renamedVersion || file;
-
-        return {
-          ...baseFile,
-          sharedWith: props.fileSharedUsers?.[file.id] || baseFile.sharedWith || [],
-          sharePermissions: props.filePermissions?.[file.id] || baseFile.sharePermissions || {},
-        };
+        return enhanceWithSharingData(baseFile);
       });
 
       const newFileIds = new Set([
@@ -78,27 +83,12 @@ const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
       ]);
       const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
 
-      const enhancedNewFiles = (props.newFiles || []).map((file) => ({
-        ...file,
-        sharedWith: props.fileSharedUsers?.[file.id] || file.sharedWith || [],
-        sharePermissions: props.filePermissions?.[file.id] || file.sharePermissions || {},
-      }));
-
-      const enhancedNewFolders = (props.newFolders || []).map((folder) => ({
-        ...folder,
-        sharedWith: props.fileSharedUsers?.[folder.id] || folder.sharedWith || [],
-        sharePermissions: props.filePermissions?.[folder.id] || folder.sharePermissions || {},
-      }));
+      const enhancedNewFiles = (props.newFiles || []).map(enhanceWithSharingData);
+      const enhancedNewFolders = (props.newFolders || []).map(enhanceWithSharingData);
 
       return [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
     },
-    [
-      props.newFiles,
-      props.newFolders,
-      props.renamedFiles,
-      props.fileSharedUsers,
-      props.filePermissions,
-    ]
+    [props.newFiles, props.newFolders, props.renamedFiles, enhanceWithSharingData]
   );
 
   const filterFiles = useCallback((files: IFileDataWithSharing[], filters: any) => {
@@ -190,4 +180,5 @@ const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
     />
   );
 };
+
 export default MyFileGridView;

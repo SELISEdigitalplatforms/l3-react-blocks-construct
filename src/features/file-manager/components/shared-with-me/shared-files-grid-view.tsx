@@ -67,68 +67,65 @@ const SharedFileGridView: React.FC<SharedFilesListViewProps> = (props) => {
     }
   }, [data]);
 
+  // Helper function to enhance files with sharing data
+  const enhanceWithSharingData = useCallback(
+    (file: IFileDataWithSharing) => ({
+      ...file,
+      sharedWith: props.fileSharedUsers?.[file.id] || file.sharedWith || [],
+      sharePermissions: props.filePermissions?.[file.id] || file.sharePermissions || {},
+    }),
+    [props.fileSharedUsers, props.filePermissions]
+  );
+
   const processFiles = useCallback(
     (files: IFileDataWithSharing[]) => {
       const existingFiles = files || [];
+
+      // Process server files with renamed versions
       const processedServerFiles = existingFiles.map((file) => {
         const renamedVersion = props.renamedFiles?.get(file.id);
         const baseFile = renamedVersion || file;
-
-        return {
-          ...baseFile,
-          sharedWith: props.fileSharedUsers?.[file.id] || baseFile.sharedWith || [],
-          sharePermissions: props.filePermissions?.[file.id] || baseFile.sharePermissions || {},
-        };
+        return enhanceWithSharingData(baseFile);
       });
 
+      // Filter out files that exist in new files/folders
       const newFileIds = new Set([
         ...(props.newFiles?.map((f) => f.id) || []),
         ...(props.newFolders?.map((f) => f.id) || []),
       ]);
       const filteredServerFiles = processedServerFiles.filter((file) => !newFileIds.has(file.id));
 
-      const enhancedNewFiles = (props.newFiles || []).map((file) => ({
-        ...file,
-        sharedWith: props.fileSharedUsers?.[file.id] || file.sharedWith || [],
-        sharePermissions: props.filePermissions?.[file.id] || file.sharePermissions || {},
-      }));
-
-      const enhancedNewFolders = (props.newFolders || []).map((folder) => ({
-        ...folder,
-        sharedWith: props.fileSharedUsers?.[folder.id] || folder.sharedWith || [],
-        sharePermissions: props.filePermissions?.[folder.id] || folder.sharePermissions || {},
-      }));
+      // Enhance new files and folders
+      const enhancedNewFiles = (props.newFiles || []).map(enhanceWithSharingData);
+      const enhancedNewFolders = (props.newFolders || []).map(enhanceWithSharingData);
 
       return [...enhancedNewFolders, ...enhancedNewFiles, ...filteredServerFiles];
     },
-    [
-      props.newFiles,
-      props.newFolders,
-      props.renamedFiles,
-      props.fileSharedUsers,
-      props.filePermissions,
-    ]
+    [props.newFiles, props.newFolders, props.renamedFiles, enhanceWithSharingData]
   );
 
-  const filterFiles = useCallback((files: IFileDataWithSharing[], filters: Record<string, any>) => {
-    const sharedFilters = filters as SharedFilters;
-    return files.filter((file) => {
-      if (
-        sharedFilters.name &&
-        !file.name.toLowerCase().includes(sharedFilters.name.toLowerCase())
-      ) {
-        return false;
-      }
-      if (sharedFilters.fileType && file.fileType !== sharedFilters.fileType) {
-        return false;
-      }
-      if (sharedFilters.sharedBy && file.sharedBy?.id !== sharedFilters.sharedBy) {
-        return false;
-      }
-      // Add date filtering logic here
-      return true;
-    });
+  // Helper function for filter validation
+  const validateFilter = useCallback((file: IFileDataWithSharing, filters: SharedFilters) => {
+    if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
+    }
+    if (filters.fileType && file.fileType !== filters.fileType) {
+      return false;
+    }
+    if (filters.sharedBy && file.sharedBy?.id !== filters.sharedBy) {
+      return false;
+    }
+    // Add date filtering logic here if needed
+    return true;
   }, []);
+
+  const filterFiles = useCallback(
+    (files: IFileDataWithSharing[], filters: Record<string, any>) => {
+      const sharedFilters = filters as SharedFilters;
+      return files.filter((file) => validateFilter(file, sharedFilters));
+    },
+    [validateFilter]
+  );
 
   const renderActions = useCallback(
     (file: IFileDataWithSharing) => {

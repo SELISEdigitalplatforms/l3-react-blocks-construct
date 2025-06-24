@@ -13,7 +13,7 @@ import { TrashTableRowActions } from './trash-files-row-actions';
 import { TrashDetailsSheet } from './trash-files-details';
 import { CommonGridView } from '../common-grid-view';
 import { Trash2 } from 'lucide-react';
-import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
+import { useMockTrashFilesQuery } from '../../hooks/use-mock-trash-files-query';
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;

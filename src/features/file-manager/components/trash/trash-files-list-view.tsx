@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
 import DataTable from 'components/blocks/data-table/data-table';
 import { IFileTrashData, PaginationState } from '../../utils/file-manager';
-import { useMockTrashFilesQuery } from '../../hooks/use-mock-files-query';
 import { TrashTableColumns } from './trash-files-table-columns';
 import { TrashDetailsSheet } from './trash-files-details';
+import { useMockTrashFilesQuery } from '../../hooks/use-mock-trash-files-query';
 
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
