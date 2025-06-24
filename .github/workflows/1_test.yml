@@ -20,8 +20,8 @@ jobs:
         working-directory: ./src
         shell: pwsh
         run: |
-          dotnet restore "./${{ env.SOLUTION_NAME }}" -s https://www.nuget.org/api/v2/ -s https://nuget.selise.biz/nuget
-          dotnet build "./${{ env.SOLUTION_NAME }}" --no-incremental
+          dotnet restore "./${{ vars.SOLUTION_NAME }}" -s https://www.nuget.org/api/v2/ -s https://nuget.selise.biz/nuget
+          dotnet build "./${{ vars.SOLUTION_NAME }}" --no-incremental
           dotnet test ./XUnitTests/XUnitTests.csproj /p:CollectCoverage=true --no-build --collect:"XPlat Code Coverage"
           dotnet test "./XUnitTests/XUnitTests.csproj" --no-build --verbosity normal --logger:"junit;LogFilePath=test-results/xunit_results.xml"
           
