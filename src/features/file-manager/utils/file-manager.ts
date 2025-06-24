@@ -1,7 +1,7 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
 import { IFileData } from '../hooks/use-mock-files-query';
 import { t } from 'i18next';
-import { FileManagerFilters, SharedFilters } from '../types/header-toolbar.type';
+import { FileManagerFilters, SharedFilters, TrashFilters } from '../types/header-toolbar.type';
 
 export interface PaginationState {
   pageIndex: number;
@@ -324,4 +324,16 @@ export interface SharedWithMeHeaderToolbarProps {
   onFileUpload?: (files: File[]) => void;
   onFolderCreate?: (folderName: string) => void;
   sharedUsers?: Array<{ id: string; name: string }>;
+}
+
+export interface TrashHeaderToolbarProps {
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  filters: TrashFilters;
+  onFiltersChange: (filters: TrashFilters) => void;
+  onClearTrash?: () => void;
+  onRestoreSelected?: () => void;
+  selectedItems?: string[];
 }

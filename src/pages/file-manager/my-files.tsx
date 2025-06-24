@@ -1,12 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable react/jsx-no-undef */
-/* eslint-disable no-console */
-
 import React, { useCallback } from 'react';
-
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
-
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
 import MyFileGridView from 'features/file-manager/components/my-files/my-files-grid-view';
 import { FileManagerLayout } from 'features/file-manager/file-manager-layout';
@@ -14,51 +8,8 @@ import { FileViewRenderer } from 'features/file-manager/components/file-view-ren
 import { useFileManager } from 'features/file-manager/hooks/use-file-manager';
 import { useFileFilters } from 'features/file-manager/hooks/use-file-filters';
 import { FileModals } from 'features/file-manager/components/modals/file-modals';
-import { FilterConfig } from 'features/file-manager/types/header-toolbar.type';
-import { BaseHeaderToolbar } from 'features/file-manager/components/header-toolbar/base-header-toolbar';
 import { FileFilters } from 'features/file-manager/components/common-filters';
-import { FileManagerHeaderToolbarProps } from 'features/file-manager/utils/file-manager';
-
-export const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> = (props) => {
-  const filterConfigs: FilterConfig[] = [
-    {
-      key: 'fileType',
-      type: 'select',
-      label: 'FILE_TYPE',
-      options: [
-        { value: 'Folder', label: 'FOLDER' },
-        { value: 'File', label: 'FILE' },
-        { value: 'Image', label: 'IMAGE' },
-        { value: 'Audio', label: 'AUDIO' },
-        { value: 'Video', label: 'VIDEO' },
-      ],
-      width: 'w-[140px]',
-    },
-    {
-      key: 'lastModified',
-      type: 'dateRange',
-      label: 'LAST_MODIFIED',
-      showInMobile: true,
-    },
-  ];
-
-  return (
-    <BaseHeaderToolbar
-      title="MY_FILES"
-      viewMode={props.viewMode ?? 'grid'}
-      searchQuery={props.searchQuery ?? ''}
-      filters={props.filters}
-      filterConfigs={filterConfigs}
-      showFileUpload={true}
-      showFolderCreate={true}
-      onViewModeChange={props.handleViewMode}
-      onSearchChange={props.onSearchChange ?? (() => {})}
-      onFiltersChange={props.onFiltersChange}
-      onFileUpload={props.onFileUpload}
-      onFolderCreate={props.onFolderCreate}
-    />
-  );
-};
+import { FileManagerHeaderToolbar } from 'features/file-manager/components/my-files/my-files-header-toolbar';
 
 interface FileManagerMyFilesProps {
   onCreateFile?: () => void;

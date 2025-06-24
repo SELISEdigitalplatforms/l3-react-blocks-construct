@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 import React, { useCallback } from 'react';
 import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
@@ -11,60 +8,8 @@ import { useFileFilters } from 'features/file-manager/hooks/use-file-filters';
 import { FileModals } from 'features/file-manager/components/modals/file-modals';
 import { FileManagerLayout } from 'features/file-manager/file-manager-layout';
 import { FileViewRenderer } from 'features/file-manager/components/file-view-renderer';
-import { BaseHeaderToolbar } from 'features/file-manager/components/header-toolbar/base-header-toolbar';
-import { FilterConfig, SharedFilters } from 'features/file-manager/types/header-toolbar.type';
-import { SharedWithMeHeaderToolbarProps } from 'features/file-manager/utils/file-manager';
-
-export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = (props) => {
-  const filterConfigs: FilterConfig[] = [
-    {
-      key: 'sharedBy',
-      type: 'user',
-      label: 'SHARED_BY',
-      users: props.sharedUsers,
-    },
-    {
-      key: 'sharedDate',
-      type: 'dateRange',
-      label: 'SHARED_DATE',
-    },
-    {
-      key: 'modifiedDate',
-      type: 'dateRange',
-      label: 'MODIFIED_DATE',
-    },
-    {
-      key: 'fileType',
-      type: 'select',
-      label: 'FILE_TYPE',
-      options: [
-        { value: 'Folder', label: 'FOLDER' },
-        { value: 'File', label: 'FILE' },
-        { value: 'Image', label: 'IMAGE' },
-        { value: 'Audio', label: 'AUDIO' },
-        { value: 'Video', label: 'VIDEO' },
-      ],
-      width: 'w-[140px]',
-    },
-  ];
-
-  return (
-    <BaseHeaderToolbar
-      title="SHARED_WITH_ME"
-      viewMode={props.viewMode ?? 'grid'}
-      searchQuery={props.searchQuery ?? ''}
-      filters={props.filters}
-      filterConfigs={filterConfigs}
-      showFileUpload={true}
-      showFolderCreate={true}
-      onViewModeChange={props.handleViewMode}
-      onSearchChange={props.onSearchChange ?? (() => {})}
-      onFiltersChange={props.onFiltersChange}
-      onFileUpload={props.onFileUpload}
-      onFolderCreate={props.onFolderCreate}
-    />
-  );
-};
+import { SharedFilters } from 'features/file-manager/types/header-toolbar.type';
+import { SharedWithMeHeaderToolbar } from 'features/file-manager/components/shared-with-me/shared-files-header-toolbar';
 
 interface SharedWithMeProps {
   onCreateFile?: () => void;
