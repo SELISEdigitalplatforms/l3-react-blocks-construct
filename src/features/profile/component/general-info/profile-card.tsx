@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
+import { Pencil } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import DummyProfile from 'assets/images/dummy_profile.png';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
 import { Button } from 'components/ui/button';
-import { Pencil } from 'lucide-react';
 import { Dialog } from 'components/ui/dialog';
-import { EditProfile } from '../modals/edit-profile/edit-profile';
 import { Separator } from 'components/ui/separator';
 import { Skeleton } from 'components/ui/skeleton';
+import { EditProfile } from '../modals/edit-profile/edit-profile';
 
 export const ProfileCard: React.FC<{
   userInfo: any;

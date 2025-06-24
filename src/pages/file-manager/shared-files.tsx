@@ -1,186 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-console */
-/* eslint-disable no-empty-pattern */
 import React, { useState, useCallback } from 'react';
-import { Search, X, ListFilter, AlignJustify, LayoutGrid, PlusCircle, Check } from 'lucide-react';
+import { X, ListFilter, AlignJustify, LayoutGrid } from 'lucide-react';
 
 import { useIsMobile } from 'hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
-import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'components/ui/select';
-import { Badge } from 'components/ui/badge';
-import { Input } from 'components/ui/input';
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
-import { DateRange, SharedFilters } from 'features/file-manager/types/file-manager.type';
-import {
-  fileTypeOptions,
-  IFileDataWithSharing,
-  SharedUser,
-  sharedUsers,
-} from 'features/file-manager/utils/file-manager';
+import { DateRange } from 'features/file-manager/types/file-manager.type';
+
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import AddDropdownMenu from 'features/file-manager/components/file-manager-add-new-dropdown';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
 import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
+import { useFileManager } from 'features/file-manager/hooks/use-file-manager';
+import { useFileFilters } from 'features/file-manager/hooks/use-file-filters';
+import { FileModals } from 'features/file-manager/components/modals/file-modals';
+import { FileManagerLayout } from 'features/file-manager/file-manager-layout';
+import { FileViewRenderer } from 'features/file-manager/components/file-view-renderer';
+import {
+  ActiveFilterBadge,
+  ActiveFiltersContainer,
+  countActiveFilters,
+  DateRangeFilter,
+  getDateRangeLabel,
+  SearchInput,
+  SelectFilter,
+  User,
+  UserFilter,
+} from 'features/file-manager/components/common-filters';
+import { fileTypeOptions, sharedUsers } from 'features/file-manager/utils/file-manager';
 
-const DateRangeFilter: React.FC<{
-  date?: DateRange;
-  onDateChange: (date?: DateRange) => void;
-  title: string;
-}> = ({ date, onDateChange, title }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
-
-  const handleDateSelect = (selectedDate: Date | undefined, type: 'from' | 'to') => {
-    if (!selectedDate) return;
-
-    const newRange = {
-      from: type === 'from' ? selectedDate : date?.from,
-      to: type === 'to' ? selectedDate : date?.to,
-    };
-
-    onDateChange(newRange);
-  };
-
-  const clearDateRange = () => {
-    onDateChange(undefined);
-  };
-
-  const formatDateRange = (range?: DateRange) => {
-    if (!range?.from && !range?.to) return t(title);
-    if (range.from && !range.to) return `From ${range.from.toLocaleDateString()}`;
-    if (!range.from && range.to) return `Until ${range.to?.toLocaleDateString()}`;
-    return `${range.from?.toLocaleDateString()} - ${range.to?.toLocaleDateString()}`;
-  };
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="h-8 px-3 justify-start">
-          <PlusCircle className="h-4 w-4 mr-1" />
-          <span className="text-sm">{formatDateRange(date)}</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-medium">{t(title)}</div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-x-4 flex">
-            <div>
-              <label className="text-xs text-muted-foreground mb-2 block">From</label>
-              <Calendar
-                mode="single"
-                selected={date?.from}
-                onSelect={(date) => handleDateSelect(date, 'from')}
-                className="rounded-md border"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground mb-2 block">To</label>
-              <Calendar
-                mode="single"
-                selected={date?.to}
-                onSelect={(date) => handleDateSelect(date, 'to')}
-                className="rounded-md border"
-              />
-            </div>
-          </div>
-          <div className="flex justify-center mt-2">
-            <Button variant="outline" onClick={clearDateRange} className="w-full">
-              Clear filter
-            </Button>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-};
-
-const SharedByFilter: React.FC<{
-  value?: string;
-  onValueChange: (value?: string) => void;
-  title: string;
-}> = ({ value, onValueChange, title }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { t } = useTranslation();
-
-  const selectedUser = sharedUsers.find((user) => user.id === value);
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="h-8 px-3 justify-start">
-          <PlusCircle className="h-4 w-4 mr-1" />
-          <span className="text-sm">{selectedUser ? selectedUser.name : t(title)}</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-medium">{t(title)}</div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  onValueChange(undefined);
-                  setIsOpen(false);
-                }}
-              >
-                Clear filter
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            {sharedUsers.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                onClick={() => {
-                  onValueChange(user.id);
-                  setIsOpen(false);
-                }}
-              >
-                <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-xs font-medium text-gray-600">
-                    {user.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase()}
-                  </span>
-                </div>
-                <span className="text-sm">{user.name}</span>
-                {value === user.id && <Check className="h-4 w-4 text-primary" />}
-              </div>
-            ))}
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-};
+interface SharedFilters {
+  name?: string;
+  fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+  sharedBy?: string;
+  sharedDate?: DateRange;
+  modifiedDate?: DateRange;
+}
 
 interface SharedWithMeHeaderToolbarProps {
   viewMode?: string;
@@ -193,7 +53,7 @@ interface SharedWithMeHeaderToolbarProps {
   onFolderCreate?: (folderName: string) => void;
 }
 
-const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
+export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
   viewMode = 'grid',
   handleViewMode,
   searchQuery = '',
@@ -207,6 +67,7 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
   const { t } = useTranslation();
   const [openSheet, setOpenSheet] = useState(false);
 
+  // Filter handlers
   const handleSharedByChange = (value?: string) => {
     onFiltersChange({
       ...filters,
@@ -214,26 +75,16 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
     });
   };
 
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
-    onSearchChange?.(newQuery);
+  const handleSearchChange = (query: string) => {
+    onSearchChange?.(query);
     onFiltersChange({
       ...filters,
-      name: newQuery,
-    });
-  };
-
-  const clearSearch = () => {
-    onSearchChange?.('');
-    onFiltersChange({
-      ...filters,
-      name: '',
+      name: query,
     });
   };
 
   const handleFileTypeChange = (value: string) => {
-    const fileType =
-      value === 'all' ? undefined : (value as 'Folder' | 'File' | 'Image' | 'Audio' | 'Video');
+    const fileType = value === 'all' ? undefined : (value as SharedFilters['fileType']);
     onFiltersChange({
       ...filters,
       fileType,
@@ -265,48 +116,42 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
     });
   };
 
-  const isFiltered =
-    filters.name ??
-    filters.fileType ??
-    filters.sharedBy ??
-    filters.sharedDate ??
-    filters.modifiedDate;
-  const activeFiltersCount =
-    (filters.name ? 1 : 0) +
-    (filters.fileType ? 1 : 0) +
-    (filters.sharedBy ? 1 : 0) +
-    ((filters.sharedDate?.from ?? filters.sharedDate?.to) ? 1 : 0) +
-    ((filters.modifiedDate?.from ?? filters.modifiedDate?.to) ? 1 : 0);
+  // Helper functions
+  const isFiltered = Object.values(filters).some((value) => {
+    if (value === null || value === undefined || value === '') return false;
+    if (typeof value === 'object' && 'from' in value && 'to' in value) {
+      return value.from || value.to;
+    }
+    return true;
+  });
 
+  const activeFiltersCount = countActiveFilters(filters);
+
+  // Filter Controls Component
   const FilterControls = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
       <div className={isMobile ? 'w-full' : ''}>
-        <label className={`text-sm font-medium ${isMobile ? 'block mb-2' : 'sr-only'}`}>
-          {t('FILE_TYPE')}
-        </label>
-        <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
-          <SelectTrigger className={`h-8 ${isMobile ? 'w-full' : 'w-[140px]'}`}>
-            <SelectValue placeholder={t('FILE_TYPE')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
-            {fileTypeOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {isMobile && <label className="text-sm font-medium block mb-2">{t('FILE_TYPE')}</label>}
+        <SelectFilter
+          value={filters.fileType}
+          onValueChange={handleFileTypeChange}
+          title="FILE_TYPE"
+          options={fileTypeOptions}
+          allValue="all"
+          allLabel="ALL_TYPES"
+          className={isMobile ? 'w-full' : 'w-[140px]'}
+        />
       </div>
 
       {isMobile && (
         <>
           <div className="w-full">
             <label className="text-sm font-medium block mb-2">{t('SHARED_BY')}</label>
-            <SharedByFilter
+            <UserFilter
               value={filters.sharedBy}
               onValueChange={handleSharedByChange}
               title="SHARED_BY"
+              users={sharedUsers}
             />
           </div>
           <div className="w-full">
@@ -330,101 +175,63 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
     </div>
   );
 
+  // Active Filters Component
   const ActiveFilters = () => {
     const activeFilters = [];
 
     if (filters.fileType) {
       activeFilters.push(
-        <Badge key="fileType" variant="secondary" className="h-6 text-foreground">
-          {t(filters.fileType.toUpperCase())}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleFileTypeChange('all')}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </Badge>
+        <ActiveFilterBadge
+          key="fileType"
+          label={t(filters.fileType.toUpperCase())}
+          onRemove={() => handleFileTypeChange('all')}
+        />
       );
     }
 
     if (filters.sharedBy) {
-      const sharedUsers = [
-        { id: '1', name: 'Luca Meier' },
-        { id: '2', name: 'Aaron Green' },
-        { id: '3', name: 'Sarah Pavan' },
-        { id: '4', name: 'Adrian Müller' },
-      ];
       const selectedUser = sharedUsers.find((user) => user.id === filters.sharedBy);
-
       if (selectedUser) {
         activeFilters.push(
-          <Badge key="sharedBy" variant="secondary" className="h-6">
-            Shared by {selectedUser.name}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-4 w-4 p-0 ml-1"
-              onClick={() => handleSharedByChange(undefined)}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </Badge>
+          <ActiveFilterBadge
+            key="sharedBy"
+            label={`Shared by ${selectedUser.name}`}
+            onRemove={() => handleSharedByChange(undefined)}
+          />
         );
       }
     }
 
     if (filters.sharedDate?.from || filters.sharedDate?.to) {
-      const dateRange = filters.sharedDate;
-      const label =
-        dateRange.from && dateRange.to
-          ? `Shared: ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
-          : dateRange.from
-            ? `Shared from ${dateRange.from.toLocaleDateString()}`
-            : `Shared until ${dateRange.to?.toLocaleDateString()}`;
-
-      activeFilters.push(
-        <Badge key="sharedDate" variant="secondary" className="h-6">
-          {label}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleSharedDateRangeChange(undefined)}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </Badge>
-      );
+      const label = getDateRangeLabel(filters.sharedDate);
+      if (label) {
+        activeFilters.push(
+          <ActiveFilterBadge
+            key="sharedDate"
+            label={`Shared: ${label}`}
+            onRemove={() => handleSharedDateRangeChange(undefined)}
+          />
+        );
+      }
     }
 
     if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
-      const dateRange = filters.modifiedDate;
-      const label =
-        dateRange.from && dateRange.to
-          ? `Modified: ${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
-          : dateRange.from
-            ? `Modified from ${dateRange.from.toLocaleDateString()}`
-            : `Modified until ${dateRange.to?.toLocaleDateString()}`;
-
-      activeFilters.push(
-        <Badge key="modifiedDate" variant="secondary" className="h-6">
-          {label}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-4 w-4 p-0 ml-1"
-            onClick={() => handleModifiedDateRangeChange(undefined)}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </Badge>
-      );
+      const label = getDateRangeLabel(filters.modifiedDate);
+      if (label) {
+        activeFilters.push(
+          <ActiveFilterBadge
+            key="modifiedDate"
+            label={`Modified: ${label}`}
+            onRemove={() => handleModifiedDateRangeChange(undefined)}
+          />
+        );
+      }
     }
 
     return activeFilters.length > 0 ? (
-      <div className="flex flex-wrap gap-2 mt-2">{activeFilters}</div>
+      <ActiveFiltersContainer onResetAll={handleResetFilters}>
+        {activeFilters}
+      </ActiveFiltersContainer>
     ) : null;
   };
 
@@ -436,30 +243,16 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
           <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
             {t('SHARED_WITH_ME')}
           </h3>
-
           <AddDropdownMenu onFileUpload={onFileUpload} onFolderCreate={onFolderCreate} />
         </div>
 
         <div className="flex items-center w-full mt-2">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder={t('SEARCH_BY_FILE_FOLDER_NAME')}
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-              className="h-8 w-full rounded-lg bg-background pl-8 pr-8"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label="Clear search"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="SEARCH_BY_FILE_FOLDER_NAME"
+            className="flex-grow"
+          />
 
           <div className="flex ml-2 gap-1">
             <Sheet open={openSheet} onOpenChange={setOpenSheet}>
@@ -527,76 +320,48 @@ const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = ({
               </TabsTrigger>
             </TabsList>
           </Tabs>
-
           <AddDropdownMenu onFileUpload={onFileUpload} onFolderCreate={onFolderCreate} />
         </div>
       </div>
 
       <div className="flex items-center gap-2 w-full">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder={t('SEARCH_BY_FILE_FOLDER_NAME')}
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            className="h-8 w-full rounded-lg bg-background pl-9 pr-8"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+        <SearchInput
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="SEARCH_BY_FILE_FOLDER_NAME"
+          className="flex-1 max-w-md"
+        />
 
         <div className="flex items-center gap-2">
-          <SharedByFilter
+          <UserFilter
             value={filters.sharedBy}
             onValueChange={handleSharedByChange}
             title="SHARED_BY"
+            users={sharedUsers}
           />
           <DateRangeFilter
             date={filters.sharedDate}
             onDateChange={handleSharedDateRangeChange}
             title="SHARED_DATE"
           />
-
           <DateRangeFilter
             date={filters.modifiedDate}
             onDateChange={handleModifiedDateRangeChange}
             title="MODIFIED_DATE"
           />
-
-          <Select value={filters.fileType ?? 'all'} onValueChange={handleFileTypeChange}>
-            <SelectTrigger className="h-8 w-[140px]">
-              <PlusCircle className="h-4 w-4 mr-1" />
-              <SelectValue placeholder={t('FILE_TYPE')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('ALL_TYPES')}</SelectItem>
-              {fileTypeOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SelectFilter
+            value={filters.fileType}
+            onValueChange={handleFileTypeChange}
+            title="FILE_TYPE"
+            options={fileTypeOptions}
+            allValue="all"
+            allLabel="ALL_TYPES"
+            className="w-[140px]"
+          />
         </div>
       </div>
 
-      {isFiltered && (
-        <div className="flex items-center gap-2">
-          <ActiveFilters />
-          <Button variant="ghost" onClick={handleResetFilters} className="h-8 px-2">
-            {t('RESET')}
-            <X className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      )}
+      {isFiltered && <ActiveFilters />}
     </div>
   );
 };
@@ -606,9 +371,8 @@ interface SharedWithMeProps {
 }
 
 export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [filters, setFilters] = useState<SharedFilters>({
+  const fileManager = useFileManager({ onCreateFile });
+  const { filters, handleFiltersChange } = useFileFilters<SharedFilters>({
     name: '',
     fileType: undefined,
     sharedBy: undefined,
@@ -616,357 +380,80 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     modifiedDate: undefined,
   });
 
-  const [newFiles, setNewFiles] = useState<IFileDataWithSharing[]>([]);
-  const [newFolders, setNewFolders] = useState<IFileDataWithSharing[]>([]);
-  const [renamedFiles, setRenamedFiles] = useState<Map<string, IFileDataWithSharing>>(new Map());
-
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [fileToShare, setFileToShare] = useState<IFileDataWithSharing | null>(null);
-  const [fileSharedUsers, setFileSharedUsers] = useState<{ [key: string]: SharedUser[] }>({});
-  const [filePermissions, setFilePermissions] = useState<{
-    [key: string]: { [key: string]: string };
-  }>({});
-
-  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
-  const [fileToRename, setFileToRename] = useState<IFileDataWithSharing | null>(null);
-
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFileForDetails, setSelectedFileForDetails] = useState<IFileDataWithSharing | null>(
-    null
-  );
-
-  const handleShare = useCallback((file: IFileDataWithSharing) => {
-    setFileToShare(file);
-    setIsShareModalOpen(true);
-  }, []);
-
-  const handleShareModalClose = useCallback(() => {
-    setIsShareModalOpen(false);
-    setFileToShare(null);
-  }, []);
-
-  const handleRename = useCallback((file: IFileDataWithSharing) => {
-    setFileToRename(file);
-    setIsRenameModalOpen(true);
-  }, []);
-
-  const handleRenameConfirm = useCallback(
-    (newName: string) => {
-      if (!fileToRename) return;
-
-      const updatedFile = {
-        ...fileToRename,
-        name: newName,
-        lastModified: new Date(),
-      };
-
-      const isLocalFile =
-        fileToRename.fileType === 'Folder'
-          ? newFolders.some((folder) => folder.id === fileToRename.id)
-          : newFiles.some((file) => file.id === fileToRename.id);
-
-      if (isLocalFile) {
-        if (fileToRename.fileType === 'Folder') {
-          setNewFolders((prev) =>
-            prev.map((folder) => (folder.id === fileToRename.id ? updatedFile : folder))
-          );
-        } else {
-          setNewFiles((prev) =>
-            prev.map((file) => (file.id === fileToRename.id ? updatedFile : file))
-          );
-        }
-      } else {
-        setRenamedFiles((prev) => new Map(prev.set(fileToRename.id, updatedFile)));
-      }
-
-      setIsRenameModalOpen(false);
-      setFileToRename(null);
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      fileManager.handleSearchChange(query);
+      handleFiltersChange({
+        ...filters,
+        name: query,
+      });
     },
-    [fileToRename, newFiles, newFolders]
-  );
-
-  const handleRenameModalClose = useCallback(() => {
-    setIsRenameModalOpen(false);
-    setFileToRename(null);
-  }, []);
-
-  const handleRenameUpdate = useCallback(
-    (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => {
-      const isLocalFile =
-        oldFile.fileType === 'Folder'
-          ? newFolders.some((folder) => folder.id === oldFile.id)
-          : newFiles.some((file) => file.id === oldFile.id);
-
-      if (isLocalFile) {
-        if (oldFile.fileType === 'Folder') {
-          setNewFolders((prev) =>
-            prev.map((folder) => (folder.id === oldFile.id ? newFile : folder))
-          );
-        } else {
-          setNewFiles((prev) => prev.map((file) => (file.id === oldFile.id ? newFile : file)));
-        }
-      } else {
-        setRenamedFiles((prev) => new Map(prev.set(oldFile.id, newFile)));
-      }
-    },
-    [newFiles, newFolders]
-  );
-
-  const getFileTypeFromFile = (file: File): 'File' | 'Image' | 'Audio' | 'Video' => {
-    const type = file.type;
-    if (type.startsWith('image/')) return 'Image';
-    if (type.startsWith('audio/')) return 'Audio';
-    if (type.startsWith('video/')) return 'Video';
-    return 'File';
-  };
-
-  const handleFileUpload = useCallback((files: File[]) => {
-    const uploadedFiles: IFileDataWithSharing[] = files.map((file) => ({
-      id: Date.now().toString() + Math.random().toString(),
-      name: file.name,
-      fileType: getFileTypeFromFile(file),
-      size: file.size.toString(),
-      lastModified: new Date(),
-      sharedBy: { id: 'current', name: 'Current User' }, // For shared files context
-      sharedDate: new Date(),
-    }));
-
-    setNewFiles((prev) => [...prev, ...uploadedFiles]);
-  }, []);
-
-  const handleFolderCreate = useCallback((folderName: string) => {
-    const newFolder: IFileDataWithSharing = {
-      id: Date.now().toString() + Math.random().toString(),
-      name: folderName,
-      fileType: 'Folder',
-      size: '0',
-      lastModified: new Date(),
-      sharedBy: { id: 'current', name: 'Current User' },
-      sharedDate: new Date(),
-    };
-
-    setNewFolders((prev) => [...prev, newFolder]);
-  }, []);
-
-  const handleDownload = useCallback((file: IFileDataWithSharing) => {
-    console.log('Download:', file);
-  }, []);
-
-  const handleDelete = useCallback((file: IFileDataWithSharing) => {
-    setNewFiles((prev) => prev.filter((f) => f.id !== file.id));
-    setNewFolders((prev) => prev.filter((f) => f.id !== file.id));
-    setRenamedFiles((prev) => {
-      const newMap = new Map(prev);
-      newMap.delete(file.id);
-      return newMap;
-    });
-    setFileSharedUsers((prev) => {
-      const newSharedUsers = { ...prev };
-      delete newSharedUsers[file.id];
-      return newSharedUsers;
-    });
-    setFilePermissions((prev) => {
-      const newPermissions = { ...prev };
-      delete newPermissions[file.id];
-      return newPermissions;
-    });
-  }, []);
-
-  const handleMove = useCallback((file: IFileDataWithSharing) => {
-    console.log('Move:', file);
-  }, []);
-
-  const handleCopy = useCallback((file: IFileDataWithSharing) => {
-    console.log('Copy:', file);
-  }, []);
-
-  const handleOpen = useCallback((file: IFileDataWithSharing) => {
-    console.log('Open:', file);
-  }, []);
-
-  const handleViewModeChange = useCallback((mode: string) => {
-    setViewMode(mode as 'grid' | 'list');
-  }, []);
-
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
-    setFilters((prev) => ({
-      ...prev,
-      name: query,
-    }));
-  }, []);
-
-  const handleFiltersChange = useCallback((newFilters: SharedFilters) => {
-    setFilters((prevFilters) => {
-      if (JSON.stringify(prevFilters) === JSON.stringify(newFilters)) {
-        return prevFilters;
-      }
-      return newFilters;
-    });
-    setSearchQuery(newFilters.name || '');
-  }, []);
-
-  const handleCreateFile = useCallback(() => {
-    if (onCreateFile) {
-      onCreateFile();
-    }
-  }, [onCreateFile]);
-
-  const getUpdatedFile = useCallback(
-    (file: IFileDataWithSharing): IFileDataWithSharing => {
-      const renamedFile = renamedFiles.get(file.id);
-      if (renamedFile) {
-        return renamedFile;
-      }
-
-      const isLocalFile =
-        file.fileType === 'Folder'
-          ? newFolders.some((folder) => folder.id === file.id)
-          : newFiles.some((f) => f.id === file.id);
-
-      if (isLocalFile) {
-        const localFile =
-          file.fileType === 'Folder'
-            ? newFolders.find((folder) => folder.id === file.id)
-            : newFiles.find((f) => f.id === file.id);
-        return localFile || file;
-      }
-
-      const sharedUsers = fileSharedUsers[file.id];
-      const permissions = filePermissions[file.id];
-
-      if (sharedUsers || permissions) {
-        return {
-          ...file,
-          sharedWith: sharedUsers || file.sharedWith,
-          sharePermissions: permissions || file.sharePermissions,
-          isShared:
-            (sharedUsers && sharedUsers.length > 0) ||
-            (file.sharedWith && file.sharedWith.length > 0),
-        };
-      }
-
-      return file;
-    },
-    [newFiles, newFolders, renamedFiles, fileSharedUsers, filePermissions]
-  );
-
-  const handleViewDetails = useCallback(
-    (file: IFileDataWithSharing) => {
-      const updatedFile = getUpdatedFile(file);
-      setSelectedFileForDetails(updatedFile);
-      setIsDetailsOpen(true);
-    },
-    [getUpdatedFile]
-  );
-
-  const handleShareConfirm = useCallback(
-    (users: SharedUser[], permissions: { [key: string]: string }) => {
-      if (!fileToShare) return;
-
-      const updatedFile = {
-        ...fileToShare,
-        sharedWith: users,
-        sharePermissions: permissions,
-        lastModified: new Date(),
-        isShared: users.length > 0,
-      };
-
-      const isLocalFile =
-        fileToShare.fileType === 'Folder'
-          ? newFolders.some((folder) => folder.id === fileToShare.id)
-          : newFiles.some((file) => file.id === fileToShare.id);
-
-      if (isLocalFile) {
-        if (fileToShare.fileType === 'Folder') {
-          setNewFolders((prev) =>
-            prev.map((folder) => (folder.id === fileToShare.id ? updatedFile : folder))
-          );
-        } else {
-          setNewFiles((prev) =>
-            prev.map((file) => (file.id === fileToShare.id ? updatedFile : file))
-          );
-        }
-      } else {
-        setRenamedFiles((prev) => new Map(prev.set(fileToShare.id, updatedFile)));
-      }
-
-      setFileSharedUsers((prev) => ({
-        ...prev,
-        [fileToShare.id]: users,
-      }));
-      setFilePermissions((prev) => ({
-        ...prev,
-        [fileToShare.id]: permissions,
-      }));
-
-      if (selectedFileForDetails && selectedFileForDetails.id === fileToShare.id) {
-        setSelectedFileForDetails(updatedFile);
-      }
-
-      setIsShareModalOpen(false);
-      setFileToShare(null);
-    },
-    [fileToShare, newFiles, newFolders, selectedFileForDetails]
+    [fileManager, handleFiltersChange, filters]
   );
 
   const commonViewProps = {
-    onViewDetails: handleViewDetails,
-    onDownload: handleDownload,
-    onShare: handleShare,
-    onDelete: handleDelete,
-    onMove: handleMove,
-    onCopy: handleCopy,
-    onOpen: handleOpen,
-    onRename: handleRename,
-    onRenameUpdate: handleRenameUpdate,
+    onViewDetails: fileManager.handleViewDetails,
+    onDownload: fileManager.handleDownload,
+    onShare: fileManager.handleShare,
+    onDelete: fileManager.handleDelete,
+    onMove: fileManager.handleMove,
+    onCopy: fileManager.handleCopy,
+    onOpen: fileManager.handleOpen,
+    onRename: fileManager.handleRename,
+    onRenameUpdate: fileManager.handleRenameUpdate,
     filters,
-    newFiles,
-    newFolders,
-    renamedFiles,
-    fileSharedUsers,
-    filePermissions,
+    newFiles: fileManager.newFiles,
+    newFolders: fileManager.newFolders,
+    renamedFiles: fileManager.renamedFiles,
+    fileSharedUsers: fileManager.fileSharedUsers,
+    filePermissions: fileManager.filePermissions,
   };
 
+  const headerToolbar = (
+    <SharedWithMeHeaderToolbar
+      viewMode={fileManager.viewMode}
+      handleViewMode={fileManager.handleViewModeChange}
+      searchQuery={fileManager.searchQuery}
+      onSearchChange={handleSearchChange}
+      filters={filters}
+      onFiltersChange={handleFiltersChange}
+      onFileUpload={(files) => fileManager.handleFileUpload(files, true)}
+      onFolderCreate={(name) => fileManager.handleFolderCreate(name, true)}
+    />
+  );
+
+  const modals = (
+    <FileModals
+      isRenameModalOpen={fileManager.isRenameModalOpen}
+      onRenameModalClose={fileManager.handleRenameModalClose}
+      onRenameConfirm={fileManager.handleRenameConfirm}
+      fileToRename={
+        fileManager.fileToRename
+          ? { ...fileManager.fileToRename, isShared: !!fileManager.fileToRename.isShared }
+          : null
+      }
+      isShareModalOpen={fileManager.isShareModalOpen}
+      onShareModalClose={fileManager.handleShareModalClose}
+      onShareConfirm={fileManager.handleShareConfirm}
+      fileToShare={
+        fileManager.fileToShare
+          ? { ...fileManager.fileToShare, isShared: !!fileManager.fileToShare.isShared }
+          : null
+      }
+      RenameModalComponent={RenameModal}
+      ShareModalComponent={ShareWithMeModal}
+    />
+  );
+
   return (
-    <div className="flex flex-col h-full w-full space-y-4 p-4 md:p-6">
-      <SharedWithMeHeaderToolbar
-        viewMode={viewMode}
-        handleViewMode={handleViewModeChange}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        onFileUpload={handleFileUpload}
-        onFolderCreate={handleFolderCreate}
+    <FileManagerLayout headerToolbar={headerToolbar} modals={modals}>
+      <FileViewRenderer
+        viewMode={fileManager.viewMode}
+        GridComponent={SharedFilesGridView}
+        ListComponent={SharedFilesListView}
+        commonViewProps={commonViewProps}
       />
-
-      <div className="flex-1 overflow-hidden">
-        {viewMode === 'grid' ? (
-          <div className="h-full overflow-y-auto">
-            <SharedFilesGridView {...commonViewProps} />
-          </div>
-        ) : (
-          <div className="h-full">
-            <SharedFilesListView {...commonViewProps} />
-          </div>
-        )}
-      </div>
-
-      <RenameModal
-        isOpen={isRenameModalOpen}
-        onClose={handleRenameModalClose}
-        onConfirm={handleRenameConfirm}
-        file={fileToRename}
-      />
-
-      <ShareWithMeModal
-        isOpen={isShareModalOpen}
-        onClose={handleShareModalClose}
-        onConfirm={handleShareConfirm}
-        currentSharedUsers={fileToShare ? fileToShare.sharedWith || [] : []}
-      />
-    </div>
+    </FileManagerLayout>
   );
 };
 

@@ -15,7 +15,7 @@ interface TrashFilesListViewProps {
   filters: {
     name?: string;
     fileType?: string;
-    deletedDate?: {
+    trashedDate?: {
       from?: Date;
       to?: Date;
     };
@@ -60,7 +60,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         fileType: allowedFileTypes.includes(filters.fileType as AllowedFileType)
           ? (filters.fileType as AllowedFileType)
           : undefined,
-        deletedDate: filters.deletedDate ?? undefined,
+        deletedDate: filters.trashedDate ?? undefined,
       },
     };
   }, [
@@ -68,7 +68,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     paginationState.pageSize,
     filters.name,
     filters.fileType,
-    filters.deletedDate,
+    filters.trashedDate,
     allowedFileTypes,
   ]);
 
@@ -135,30 +135,53 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     });
   }, [handleRestoreWrapper, handleDeleteWrapper, t]);
 
+  // Enhanced display data with client-side date filtering
   const displayData = useMemo(() => {
     if (!data?.data) {
       return [];
     }
 
     return data.data.filter((file: IFileTrashData) => {
+      // Filter out deleted and restored items
       if (deletedItemIds.has(file.id)) {
         return false;
       }
       if (restoredItemIds.has(file.id)) {
         return false;
       }
+
+      // Apply date range filtering
+      if (filters.trashedDate) {
+        const fileDate = new Date(file.trashedDate);
+        const { from, to } = filters.trashedDate;
+
+        if (from && fileDate < from) {
+          return false;
+        }
+        if (to && fileDate > to) {
+          return false;
+        }
+      }
+
       return true;
     });
-  }, [data?.data, deletedItemIds, restoredItemIds]);
+  }, [data?.data, deletedItemIds, restoredItemIds, filters.trashedDate]);
 
   const paginationProps = useMemo(() => {
     return {
       pageIndex: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
-      totalCount: data?.totalCount ?? 0,
-      manualPagination: true,
+      totalCount: displayData.length, // Use filtered data count for accurate pagination
+      manualPagination: false, // Changed to false since we're doing client-side filtering
     };
-  }, [data?.totalCount, paginationState]);
+  }, [displayData.length, paginationState]);
+
+  // Paginate the filtered data client-side
+  const paginatedData = useMemo(() => {
+    const startIndex = paginationState.pageIndex * paginationState.pageSize;
+    const endIndex = startIndex + paginationState.pageSize;
+    return displayData.slice(startIndex, endIndex);
+  }, [displayData, paginationState.pageIndex, paginationState.pageSize]);
 
   if (error) {
     return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
@@ -176,7 +199,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         >
           <div className="h-full flex-col flex w-full gap-6 md:gap-8">
             <DataTable
-              data={displayData}
+              data={paginatedData}
               columns={columns}
               onRowClick={handleViewDetailsWrapper}
               isLoading={isLoading}

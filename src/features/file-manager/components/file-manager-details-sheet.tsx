@@ -6,6 +6,7 @@ import {
   getFileTypeIcon,
   getFileTypeInfo,
   getSharedUsers,
+  SharedUser,
 } from 'features/file-manager/utils/file-manager';
 import { useIsMobile } from 'hooks/use-mobile';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
@@ -19,13 +20,6 @@ export interface IFileDataWithSharing {
   isShared: boolean;
   sharedWith?: SharedUser[];
   sharePermissions?: { [key: string]: string };
-}
-
-export interface SharedUser {
-  id: string;
-  name: string;
-  avatar?: string;
-  role: string;
 }
 
 export interface BaseFileDetailsSheetProps {
@@ -234,7 +228,7 @@ const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
                       )}
                     </div>
                     <div className="text-xs text-gray-500 capitalize">
-                      {user.role.toLowerCase()}
+                      {(user.role ?? '').toLowerCase()}
                     </div>
                   </div>
                   {user.role !== 'Owner' && <div className="text-xs text-gray-400"></div>}
