@@ -53,7 +53,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLButtonElement>(null);
   const [preview, setPreview] = useState<string>('');
 
   const onCropChange = (location: Point) => {
@@ -65,7 +65,9 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   };
 
   const onCropCompleteCallback = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+    if (croppedAreaPixels.width > 0 && croppedAreaPixels.height > 0) {
+      setCroppedAreaPixels(croppedAreaPixels);
+    }
   }, []);
 
   const createImage = useCallback(
@@ -74,52 +76,85 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
         const image = new Image();
         image.crossOrigin = 'anonymous';
         image.addEventListener('load', () => resolve(image));
-        image.addEventListener('error', (error) => reject(error));
+        image.addEventListener('error', (error) =>
+          reject(new Error(`Failed to load image: ${error.message || 'Unknown error'}`))
+        );
         image.src = url;
       }),
     []
   );
 
+  /**
+   * Converts a Blob to a data URL string
+   */
+  const createCanvas = (width: number, height: number): HTMLCanvasElement => {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  };
+
+  const getCanvasContext = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Could not get 2D context');
+    }
+    return ctx;
+  };
+
+  const drawImageOnCanvas = (
+    ctx: CanvasRenderingContext2D,
+    image: HTMLImageElement,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ) => {
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(image, Math.max(0, x), Math.max(0, y), width, height, 0, 0, width, height);
+  };
+
+  const canvasToDataURL = (canvas: HTMLCanvasElement): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const handleBlob = (blob: Blob | null) => {
+        if (!blob) {
+          try {
+            resolve(canvas.toDataURL('image/jpeg', 0.92));
+          } catch (e) {
+            reject(new Error('Failed to create image from canvas'));
+          }
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error('Failed to read blob'));
+        reader.readAsDataURL(blob);
+      };
+
+      canvas.toBlob(handleBlob, 'image/jpeg', 0.92);
+    });
+  };
+
+  /**
+   * Creates a cropped image from the source image and crop area
+   */
   const getCroppedImg = useCallback(
     async (imageSrc: string, pixelCrop: Area): Promise<string> => {
-      const image = await createImage(imageSrc);
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const width = Math.max(1, Math.floor(pixelCrop.width || 1));
+      const height = Math.max(1, Math.floor(pixelCrop.height || 1));
 
-      if (!ctx) {
-        throw new Error('No 2d context');
+      try {
+        const image = await createImage(imageSrc);
+        const canvas = createCanvas(width, height);
+        const ctx = getCanvasContext(canvas);
+
+        drawImageOnCanvas(ctx, image, pixelCrop.x || 0, pixelCrop.y || 0, width, height);
+        return await canvasToDataURL(canvas);
+      } catch (error) {
+        console.error('Error in getCroppedImg:', error);
+        throw error;
       }
-
-      canvas.width = pixelCrop.width;
-      canvas.height = pixelCrop.height;
-
-      ctx.drawImage(
-        image,
-        pixelCrop.x,
-        pixelCrop.y,
-        pixelCrop.width,
-        pixelCrop.height,
-        0,
-        0,
-        pixelCrop.width,
-        pixelCrop.height
-      );
-
-      return new Promise((resolve, reject) => {
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) {
-              return reject(new Error('Canvas is empty'));
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          },
-          'image/jpeg',
-          0.92
-        );
-      });
     },
     [createImage]
   );
@@ -137,19 +172,32 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   }, [croppedAreaPixels, getCroppedImg, image, onClose, onCropComplete]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const updatePreview = async () => {
-      if (!croppedAreaPixels) return;
+      if (!croppedAreaPixels?.width || !croppedAreaPixels?.height) {
+        if (isMounted) setPreview('');
+        return;
+      }
 
       try {
         const croppedPreview = await getCroppedImg(image, croppedAreaPixels);
-        setPreview(croppedPreview);
+        if (isMounted) {
+          setPreview(croppedPreview);
+        }
       } catch (e) {
         console.error('Error generating preview', e);
-        setPreview('');
+        if (isMounted) {
+          setPreview('');
+        }
       }
     };
 
     updatePreview();
+
+    return () => {
+      isMounted = false;
+    };
   }, [croppedAreaPixels, image, getCroppedImg]);
 
   return (
@@ -161,7 +209,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
       <div className="flex flex-col md:flex-row w-full gap-6">
         <div className="w-full items-center justify-center md:items-start md:justify-start md:w-1/2 flex flex-col">
           <h3 className="text-sm font-semibold text-high-emphasis mb-4">{t('RESIZE_THUMBNAIL')}</h3>
-          <div
+          <button
             ref={containerRef}
             className="relative w-[200px] h-[200px] md:w-[312px] md:h-[312px] overflow-hidden"
             onMouseEnter={() => setIsDragging(true)}
@@ -192,7 +240,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
                 </div>
               </div>
             )}
-          </div>
+          </button>
           <div className="mt-6 flex w-full items-center gap-1">
             <Button
               variant="ghost"

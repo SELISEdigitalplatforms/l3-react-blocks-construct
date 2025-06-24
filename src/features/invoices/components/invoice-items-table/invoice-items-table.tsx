@@ -196,7 +196,7 @@ export function InvoiceItemsTable({
               )}
             />
           </div>
-          <div className="flex flex-col gap-4  w-[40%]">
+          <div className="flex flex-col gap-4 w-[40%]">
             <div className="flex justify-between">
               <span className="text-sm">{t('SUBTOTAL')}</span>
               <span className="text-sm font-medium">
