@@ -65,7 +65,9 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   };
 
   const onCropCompleteCallback = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+    if (croppedAreaPixels.width > 0 && croppedAreaPixels.height > 0) {
+      setCroppedAreaPixels(croppedAreaPixels);
+    }
   }, []);
 
   const createImage = useCallback(
@@ -82,46 +84,66 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
     []
   );
 
+  /**
+   * Converts a Blob to a data URL string
+   */
+  /**
+   * Creates a cropped image from the source image and crop area
+   */
   const getCroppedImg = useCallback(
     async (imageSrc: string, pixelCrop: Area): Promise<string> => {
-      const image = await createImage(imageSrc);
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const width = Math.max(1, Math.floor(pixelCrop.width || 1));
+      const height = Math.max(1, Math.floor(pixelCrop.height || 1));
 
-      if (!ctx) {
-        throw new Error('No 2d context');
-      }
+      try {
+        const image = await createImage(imageSrc);
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
 
-      canvas.width = pixelCrop.width;
-      canvas.height = pixelCrop.height;
-
-      ctx.drawImage(
-        image,
-        pixelCrop.x,
-        pixelCrop.y,
-        pixelCrop.width,
-        pixelCrop.height,
-        0,
-        0,
-        pixelCrop.width,
-        pixelCrop.height
-      );
-
-      const handleBlob = (blob: Blob | null): Promise<string> => {
-        if (!blob) {
-          return Promise.reject(new Error('Canvas is empty'));
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('Could not get 2D context');
         }
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      };
 
-      return new Promise((resolve, reject) => {
-        canvas.toBlob((blob) => handleBlob(blob).then(resolve).catch(reject), 'image/jpeg', 0.92);
-      });
+        ctx.clearRect(0, 0, width, height);
+        ctx.drawImage(
+          image,
+          Math.max(0, pixelCrop.x || 0),
+          Math.max(0, pixelCrop.y || 0),
+          width,
+          height,
+          0,
+          0,
+          width,
+          height
+        );
+
+        return new Promise((resolve, reject) => {
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                try {
+                  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                  resolve(dataUrl);
+                } catch (e) {
+                  reject(new Error('Failed to create image from canvas'));
+                }
+              } else {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.onerror = () => reject(new Error('Failed to read blob'));
+                reader.readAsDataURL(blob);
+              }
+            },
+            'image/jpeg',
+            0.92
+          );
+        });
+      } catch (error) {
+        console.error('Error in getCroppedImg:', error);
+        throw error;
+      }
     },
     [createImage]
   );
@@ -139,19 +161,32 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   }, [croppedAreaPixels, getCroppedImg, image, onClose, onCropComplete]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const updatePreview = async () => {
-      if (!croppedAreaPixels) return;
+      if (!croppedAreaPixels || !croppedAreaPixels.width || !croppedAreaPixels.height) {
+        if (isMounted) setPreview('');
+        return;
+      }
 
       try {
         const croppedPreview = await getCroppedImg(image, croppedAreaPixels);
-        setPreview(croppedPreview);
+        if (isMounted) {
+          setPreview(croppedPreview);
+        }
       } catch (e) {
         console.error('Error generating preview', e);
-        setPreview('');
+        if (isMounted) {
+          setPreview('');
+        }
       }
     };
 
     updatePreview();
+
+    return () => {
+      isMounted = false;
+    };
   }, [croppedAreaPixels, image, getCroppedImg]);
 
   return (
