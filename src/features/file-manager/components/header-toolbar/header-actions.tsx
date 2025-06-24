@@ -32,8 +32,8 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
         return (
           <Button
             key={action.key}
-            size={isMobile ? 'sm' : action.size || 'sm'}
-            variant={action.variant || 'outline'}
+            size={isMobile ? 'sm' : (action.size ?? 'sm')}
+            variant={action.variant ?? 'outline'}
             className={isMobile ? 'h-8' : 'h-10 text-sm font-bold'}
             onClick={action.onClick}
           >
