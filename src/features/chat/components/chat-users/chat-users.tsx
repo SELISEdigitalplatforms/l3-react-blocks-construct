@@ -181,6 +181,7 @@ interface ChatUsersProps {
   onMuteToggle?: (contactId: string) => void;
   onDeleteContact?: (contactId: string) => void;
   onDeleteMember?: (contactId: string, memberId: string) => void;
+  onLeaveGroup?: (contactId: string) => void;
   hideProfile?: boolean;
   onOpenProfileSheet?: () => void;
 }
@@ -210,6 +211,7 @@ export const ChatUsers = ({
   onMuteToggle,
   onDeleteContact,
   onDeleteMember,
+  onLeaveGroup,
   hideProfile = false,
   onOpenProfileSheet,
 }: Readonly<ChatUsersProps>) => {
@@ -507,9 +509,10 @@ export const ChatUsers = ({
         <div className="hidden lg:flex flex-col w-[40%] h-full">
           <ChatProfile
             contact={contact}
-            onGroupNameUpdate={contact.status?.isGroup ? handleGroupNameUpdate : undefined}
-            onMuteToggle={onMuteToggle}
-            onDeleteMember={onDeleteMember}
+            onGroupNameUpdate={handleGroupNameUpdate}
+            onMuteToggle={() => onMuteToggle?.(contact.id)}
+            onDeleteMember={(contactId, memberId) => onDeleteMember?.(contactId, memberId)}
+            onLeaveGroup={() => onLeaveGroup?.(contact.id)}
           />
         </div>
       )}

@@ -17,6 +17,7 @@ import {
   CircleUser,
   Pen,
   Trash,
+  UserRoundX,
 } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { ScrollArea } from 'components/ui/scroll-area';
@@ -35,6 +36,7 @@ interface ChatProfileProps {
   onGroupNameUpdate?: (newName: string) => void;
   onMuteToggle?: (contactId: string) => void;
   onDeleteMember?: (contactId: string, memberId: string) => void;
+  onLeaveGroup?: (contactId: string) => void;
 }
 
 export function ChatProfile({
@@ -42,6 +44,7 @@ export function ChatProfile({
   onGroupNameUpdate,
   onMuteToggle,
   onDeleteMember,
+  onLeaveGroup,
 }: Readonly<ChatProfileProps>) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -49,6 +52,7 @@ export function ChatProfile({
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   const handleSaveGroupName = async (newName: string) => {
     if (newName === contact.name) {
@@ -127,6 +131,24 @@ export function ChatProfile({
     }
   };
 
+  const handleLeaveClick = () => {
+    if (contact.status?.isGroup) {
+      setShowLeaveModal(true);
+    }
+  };
+
+  const handleConfirmLeave = () => {
+    if (onLeaveGroup) {
+      onLeaveGroup(contact.id);
+      toast({
+        variant: 'success',
+        title: t('YOU_LEFT_GROUP'),
+        description: t('GROUP_EXIT_SUCCESS_MESSAGE'),
+      });
+      setShowLeaveModal(false);
+    }
+  };
+
   const ProfileAvatar = ({ contact }: { contact: any }) => {
     if (contact.status?.isMuted) {
       return <BellOff className="w-8 h-8 text-low-emphasis" />;
@@ -181,9 +203,19 @@ export function ChatProfile({
           )}
         </div>
         <div className="flex gap-3">
-          <Button variant="ghost" className="flex flex-col items-center gap-0 py-3">
-            <CircleUser className="w-5 h-5 text-medium-emphasis" />
-            <span className="text-xs text-medium-emphasis">{t('PROFILE')}</span>
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-0 py-3"
+            onClick={handleLeaveClick}
+          >
+            {contact.status?.isGroup ? (
+              <UserRoundX className="w-5 h-5 text-medium-emphasis" />
+            ) : (
+              <CircleUser className="w-5 h-5 text-medium-emphasis" />
+            )}
+            <span className="text-xs text-medium-emphasis">
+              {contact.status?.isGroup ? t('LEAVE') : t('PROFILE')}
+            </span>
           </Button>
           <Button
             variant="ghost"
@@ -306,6 +338,15 @@ export function ChatProfile({
         onConfirm={handleConfirmDelete}
         confirmText={t('YES')}
         cancelText={t('LABEL_NO')}
+      />
+      <ConfirmationModal
+        open={showLeaveModal}
+        onOpenChange={setShowLeaveModal}
+        title={t('LEAVE_GROUP')}
+        description={t('LEAVE_GROUP_CONFIRMATION_MESSAGE')}
+        onConfirm={handleConfirmLeave}
+        confirmText={t('LEAVE')}
+        cancelText={t('CANCEL')}
       />
     </div>
   );

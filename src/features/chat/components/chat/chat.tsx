@@ -144,6 +144,20 @@ export const Chat = () => {
     }
   };
 
+  const handleLeaveGroup = (contactId: string) => {
+    const contact = contacts.find((c) => c.id === contactId);
+    if (!contact || !contact.members) return;
+
+    const me = contact.members.find((m) => m.isMe);
+    if (!me) return;
+
+    handleDeleteMember(contactId, me.id);
+
+    if (selectedContact?.id === contactId) {
+      setSelectedContact(null);
+    }
+  };
+
   const handleEditClick = () => {
     setShowChatSearch(true);
     if (isMobile) setMobileView('search');
@@ -246,6 +260,7 @@ export const Chat = () => {
           onMuteToggle={handleMuteToggle}
           onDeleteContact={handleDeleteContact}
           onDeleteMember={handleDeleteMember}
+          onLeaveGroup={handleLeaveGroup}
           hideProfile={isMobile}
           onOpenProfileSheet={isMobile ? () => setShowProfileSheet(true) : undefined}
         />
@@ -270,13 +285,12 @@ export const Chat = () => {
             <SheetContent side="right" className="w-full max-w-md p-0 overflow-y-auto">
               <ChatProfile
                 contact={selectedContact}
+                onGroupNameUpdate={(newName) =>
+                  handleContactNameUpdate(selectedContact.id, newName)
+                }
                 onMuteToggle={() => handleMuteToggle(selectedContact.id)}
-                onGroupNameUpdate={(newName) => {
-                  handleContactNameUpdate(selectedContact.id, newName);
-                }}
-                onDeleteMember={(contactId, memberId) => {
-                  handleDeleteMember(contactId, memberId);
-                }}
+                onDeleteMember={handleDeleteMember}
+                onLeaveGroup={handleLeaveGroup}
               />
             </SheetContent>
           </Sheet>
