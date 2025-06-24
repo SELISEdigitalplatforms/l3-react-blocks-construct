@@ -31,10 +31,11 @@ export interface BaseFileDetailsSheetProps {
   variant?: 'default' | 'trash';
 }
 
-// Utility functions
 const getCreationDate = (lastModified: Date | string): Date => {
   const creationDate = new Date(lastModified);
-  const hoursBack = Math.floor(Math.random() * 720) + 24;
+  const randomArray = new Uint32Array(1);
+  crypto.getRandomValues(randomArray);
+  const hoursBack = (randomArray[0] % 721) + 24;
   creationDate.setHours(creationDate.getHours() - hoursBack);
   return creationDate;
 };

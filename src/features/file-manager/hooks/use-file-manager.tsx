@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { IFileDataWithSharing, SharedUser, UserRole } from '../utils/file-manager';
+import { v4 as uuidv4 } from 'uuid';
 
 interface UseFileManagerProps {
   onCreateFile?: () => void;
@@ -36,7 +37,7 @@ export const useFileManager = ({ onCreateFile }: UseFileManagerProps = {}) => {
 
   const handleFileUpload = useCallback((files: File[], isSharedContext = false) => {
     const uploadedFiles: IFileDataWithSharing[] = files.map((file) => ({
-      id: Date.now().toString() + Math.random().toString(),
+      id: uuidv4(),
       name: file.name,
       fileType: getFileTypeFromFile(file),
       size: file.size.toString(),
@@ -52,7 +53,7 @@ export const useFileManager = ({ onCreateFile }: UseFileManagerProps = {}) => {
 
   const handleFolderCreate = useCallback((folderName: string, isSharedContext = false) => {
     const newFolder: IFileDataWithSharing = {
-      id: Date.now().toString() + Math.random().toString(),
+      id: uuidv4(),
       name: folderName,
       fileType: 'Folder',
       size: '0',

@@ -1,7 +1,7 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
 import { IFileData } from '../hooks/use-mock-files-query';
 import { t } from 'i18next';
-import { FileFilters, User } from '../components/common-filters';
+import { FileManagerFilters, SharedFilters } from '../types/header-toolbar.type';
 
 export interface PaginationState {
   pageIndex: number;
@@ -130,6 +130,7 @@ export const getFileTypeInfo = (fileType: string) => {
 };
 
 export type FileType = 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+
 export interface IFileTrashData {
   id: string;
   name: string;
@@ -274,7 +275,7 @@ export interface FileGridViewProps {
   onRename: (file: IFileDataWithSharing) => void;
   filters: {
     name: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+    fileType?: FileType;
   };
   newFiles?: IFileDataWithSharing[];
   newFolders?: IFileDataWithSharing[];
@@ -292,7 +293,7 @@ export interface MyFilesListViewProps {
   onRenameUpdate?: (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => void;
   filters: {
     name?: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+    fileType?: FileType;
   };
   newFiles: IFileDataWithSharing[];
   newFolders: IFileDataWithSharing[];
@@ -302,14 +303,25 @@ export interface MyFilesListViewProps {
 }
 
 export interface FileManagerHeaderToolbarProps {
-  onOpen: () => void;
   viewMode?: string;
   handleViewMode: (view: string) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
-  filters: FileFilters;
-  onFiltersChange: (filters: FileFilters) => void;
+  filters: FileManagerFilters;
+  onFiltersChange: (filters: FileManagerFilters) => void;
   onFileUpload?: (files: File[]) => void;
   onFolderCreate?: (folderName: string) => void;
-  sharedUsers?: User[];
+  sharedUsers?: Array<{ id: string; name: string }>;
+}
+
+export interface SharedWithMeHeaderToolbarProps {
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  filters: SharedFilters;
+  onFiltersChange: (filters: SharedFilters) => void;
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
+  sharedUsers?: Array<{ id: string; name: string }>;
 }
