@@ -29,6 +29,152 @@ import { ChatProfile } from '../chat-profile/chat-profile';
 import { ChatInput } from '../chat-input/chat-input';
 import { ChatContact, Message } from '../../types/chat.types';
 
+const MessageMenu = ({
+  msg,
+  openDropdownId,
+  setOpenDropdownId,
+  handleOpenForwardModal,
+  handleDeleteMessage,
+  t,
+}: {
+  msg: Message;
+  openDropdownId: string | null;
+  setOpenDropdownId: (id: string | null) => void;
+  handleOpenForwardModal: (msg: Message) => void;
+  handleDeleteMessage: (id: string) => void;
+  t: (key: string) => string;
+}) => (
+  <DropdownMenu
+    open={openDropdownId === msg.id}
+    onOpenChange={(open) => setOpenDropdownId(open ? msg.id : null)}
+  >
+    <DropdownMenuTrigger asChild>
+      <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+        <EllipsisVertical className="w-4 h-4" />
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent className="w-40" align="end">
+      <DropdownMenuItem
+        onClick={() => handleOpenForwardModal(msg)}
+        data-testid={`msg-${msg.id}-forward-btn`}
+      >
+        <Reply className="w-4 h-4 mr-2" />
+        {t('FORWARD')}
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() => handleDeleteMessage(msg.id)}
+        data-testid={`msg-${msg.id}-delete-btn`}
+      >
+        <Trash className="w-4 h-4 mr-2" />
+        {t('DELETE')}
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
+
+const MessageContent = ({
+  msg,
+  formatFileSize,
+  handleDownload,
+}: {
+  msg: Message;
+  formatFileSize: (size: number) => string;
+  handleDownload: (file: { url: string; name: string }) => void;
+}) => (
+  <>
+    <p className="text-sm text-high-emphasis">{msg.content}</p>
+    {msg.attachment && (
+      <div className="mt-2">
+        {msg.attachment.type.startsWith('image/') ? (
+          <img
+            src={msg.attachment.url}
+            alt={msg.attachment.name}
+            className="max-w-full max-h-64 rounded-lg border border-border"
+          />
+        ) : (
+          <div className="flex items-center gap-4 w-full">
+            <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
+              <FileText className="w-6 h-6 text-secondary" />
+            </div>
+            <div className="flex flex-col">
+              <div className="text-sm text-medium-emphasis truncate">{msg.attachment.name}</div>
+              <div className="text-xs text-low-emphasis">{formatFileSize(msg.attachment.size)}</div>
+            </div>
+            {msg.attachment &&
+              (() => {
+                const { url, name } = msg.attachment;
+                return (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    onClick={() => handleDownload({ url, name })}
+                    aria-label="Download"
+                  >
+                    <Download className="w-5 h-5 text-medium-emphasis" />
+                  </Button>
+                );
+              })()}
+          </div>
+        )}
+      </div>
+    )}
+  </>
+);
+
+const MessageActions = ({
+  isMe,
+  msg,
+  openDropdownId,
+  setOpenDropdownId,
+  handleOpenForwardModal,
+  handleDeleteMessage,
+  t,
+}: {
+  isMe: boolean;
+  msg: Message;
+  openDropdownId: string | null;
+  setOpenDropdownId: (id: string | null) => void;
+  handleOpenForwardModal: (msg: Message) => void;
+  handleDeleteMessage: (id: string) => void;
+  t: (key: string) => string;
+}) => {
+  const actions = [
+    <Button key="smile" variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
+      <Smile className="w-4 h-4" />
+    </Button>,
+    <Button
+      key="reply"
+      variant="ghost"
+      size="icon"
+      className="h-6 w-6 p-0.5 rounded-full"
+      onClick={() => handleOpenForwardModal(msg)}
+    >
+      <Reply className="w-4 h-4" />
+    </Button>,
+    <MessageMenu
+      key="menu"
+      msg={msg}
+      openDropdownId={openDropdownId}
+      setOpenDropdownId={setOpenDropdownId}
+      handleOpenForwardModal={handleOpenForwardModal}
+      handleDeleteMessage={handleDeleteMessage}
+      t={t}
+    />,
+  ];
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-1 transition-opacity duration-200',
+        openDropdownId === msg.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+      )}
+    >
+      {isMe ? actions.slice().reverse() : actions}
+    </div>
+  );
+};
+
 interface ChatUsersProps {
   contact: ChatContact;
   onContactNameUpdate?: (contactId: string, newName: string) => void;
@@ -277,56 +423,15 @@ export const ChatUsers = ({
               msg.sender === 'me' ? (
                 <div key={msg.id} className="group flex w-full justify-end">
                   <div className="flex w-[70%] gap-2 justify-end">
-                    <div
-                      className={cn(
-                        'flex items-center gap-1 transition-opacity duration-200',
-                        openDropdownId === msg.id
-                          ? 'opacity-100'
-                          : 'opacity-0 group-hover:opacity-100'
-                      )}
-                    >
-                      <DropdownMenu
-                        open={openDropdownId === msg.id}
-                        onOpenChange={(open) => setOpenDropdownId(open ? msg.id : null)}
-                      >
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 p-0.5 rounded-full"
-                          >
-                            <EllipsisVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-40" align="end">
-                          <DropdownMenuItem
-                            onClick={() => handleOpenForwardModal(msg)}
-                            data-testid={`msg-${msg.id}-forward-btn`}
-                          >
-                            <Reply className="w-4 h-4 mr-2" />
-                            {t('FORWARD')}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteMessage(msg.id)}
-                            data-testid={`msg-${msg.id}-delete-btn`}
-                          >
-                            <Trash className="w-4 h-4 mr-2" />
-                            {t('DELETE')}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 p-0.5 rounded-full"
-                        onClick={() => handleOpenForwardModal(msg)}
-                      >
-                        <Reply className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
-                        <Smile className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    <MessageActions
+                      isMe={true}
+                      msg={msg}
+                      openDropdownId={openDropdownId}
+                      setOpenDropdownId={setOpenDropdownId}
+                      handleOpenForwardModal={handleOpenForwardModal}
+                      handleDeleteMessage={handleDeleteMessage}
+                      t={t}
+                    />
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-end">
                         <p className="text-xs text-low-emphasis">
@@ -335,47 +440,11 @@ export const ChatUsers = ({
                       </div>
                       <div className="relative group">
                         <div className="rounded-xl px-4 py-2 bg-primary-50 rounded-tr-[2px]">
-                          <p className="text-sm text-high-emphasis">{msg.content}</p>
-                          {msg.attachment && (
-                            <div className="mt-2">
-                              {msg.attachment.type.startsWith('image/') ? (
-                                <img
-                                  src={msg.attachment.url}
-                                  alt={msg.attachment.name}
-                                  className="max-w-full max-h-64 rounded-lg border border-border"
-                                />
-                              ) : (
-                                <div className="flex items-center gap-4 w-full">
-                                  <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
-                                    <FileText className="w-6 h-6 text-secondary" />
-                                  </div>
-                                  <div className="flex flex-col">
-                                    <div className="text-sm text-medium-emphasis truncate">
-                                      {msg.attachment.name}
-                                    </div>
-                                    <div className="text-xs text-low-emphasis">
-                                      {formatFileSize(msg.attachment.size)}
-                                    </div>
-                                  </div>
-                                  {msg.attachment &&
-                                    (() => {
-                                      const { url, name } = msg.attachment;
-                                      return (
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="rounded-full"
-                                          onClick={() => handleDownload({ url, name })}
-                                          aria-label="Download"
-                                        >
-                                          <Download className="w-5 h-5 text-medium-emphasis" />
-                                        </Button>
-                                      );
-                                    })()}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          <MessageContent
+                            msg={msg}
+                            formatFileSize={formatFileSize}
+                            handleDownload={handleDownload}
+                          />
                         </div>
                       </div>
                     </div>
@@ -401,100 +470,23 @@ export const ChatUsers = ({
                       </div>
                       <div className="relative group">
                         <div className="rounded-xl px-4 py-2 bg-surface rounded-tl-[2px]">
-                          <p className="text-sm text-high-emphasis">{msg.content}</p>
-                          {msg.attachment && (
-                            <div className="mt-2">
-                              {msg.attachment.type.startsWith('image/') ? (
-                                <img
-                                  src={msg.attachment.url}
-                                  alt={msg.attachment.name}
-                                  className="max-w-full max-h-64 rounded-lg border border-border"
-                                />
-                              ) : (
-                                <div className="flex items-center gap-4 w-full">
-                                  <div className="flex items-center justify-center w-10 h-10 bg-white rounded-[4px]">
-                                    <FileText className="w-6 h-6 text-secondary" />
-                                  </div>
-                                  <div className="flex flex-col">
-                                    <div className="text-sm text-medium-emphasis truncate">
-                                      {msg.attachment.name}
-                                    </div>
-                                    <div className="text-xs text-low-emphasis">
-                                      {formatFileSize(msg.attachment.size)}
-                                    </div>
-                                  </div>
-                                  {msg.attachment &&
-                                    (() => {
-                                      const { url, name } = msg.attachment;
-                                      return (
-                                        <Button
-                                          variant="ghost"
-                                          size="icon"
-                                          className="rounded-full"
-                                          onClick={() => handleDownload({ url, name })}
-                                          aria-label="Download"
-                                        >
-                                          <Download className="w-5 h-5 text-medium-emphasis" />
-                                        </Button>
-                                      );
-                                    })()}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          <MessageContent
+                            msg={msg}
+                            formatFileSize={formatFileSize}
+                            handleDownload={handleDownload}
+                          />
                         </div>
                       </div>
                     </div>
-                    <div
-                      className={cn(
-                        'flex items-center gap-1 transition-opacity duration-200',
-                        openDropdownId === msg.id
-                          ? 'opacity-100'
-                          : 'opacity-0 group-hover:opacity-100'
-                      )}
-                    >
-                      <Button variant="ghost" size="icon" className="h-6 w-6 p-0.5 rounded-full">
-                        <Smile className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 p-0.5 rounded-full"
-                        onClick={() => handleOpenForwardModal(msg)}
-                      >
-                        <Reply className="w-4 h-4" />
-                      </Button>
-                      <DropdownMenu
-                        open={openDropdownId === msg.id}
-                        onOpenChange={(open) => setOpenDropdownId(open ? msg.id : null)}
-                      >
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 p-0.5 rounded-full"
-                          >
-                            <EllipsisVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-40" align="end">
-                          <DropdownMenuItem
-                            onClick={() => handleOpenForwardModal(msg)}
-                            data-testid={`msg-${msg.id}-forward-btn`}
-                          >
-                            <Reply className="w-4 h-4 mr-2" />
-                            {t('FORWARD')}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteMessage(msg.id)}
-                            data-testid={`msg-${msg.id}-delete-btn`}
-                          >
-                            <Trash className="w-4 h-4 mr-2" />
-                            {t('DELETE')}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    <MessageActions
+                      isMe={false}
+                      msg={msg}
+                      openDropdownId={openDropdownId}
+                      setOpenDropdownId={setOpenDropdownId}
+                      handleOpenForwardModal={handleOpenForwardModal}
+                      handleDeleteMessage={handleDeleteMessage}
+                      t={t}
+                    />
                   </div>
                 </div>
               )

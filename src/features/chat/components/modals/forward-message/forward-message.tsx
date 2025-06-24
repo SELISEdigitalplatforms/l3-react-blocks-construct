@@ -109,7 +109,7 @@ export function ForwardMessage({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('CANCEL')}
           </Button>
-          <Button onClick={handleForward} disabled={!recipient}>
+          <Button onClick={handleForward} disabled={!recipient} className="mb-4 md:mb-0">
             {t('FORWARD')}
           </Button>
         </DialogFooter>
