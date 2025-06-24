@@ -50,7 +50,7 @@ export function BaseInvoiceForm({
   onSubmit,
   title,
   showSuccessToast,
-}: BaseInvoiceFormProps) {
+}: Readonly<BaseInvoiceFormProps>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
