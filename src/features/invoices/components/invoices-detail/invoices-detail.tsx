@@ -27,6 +27,9 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
 
   const invoiceRef = useRef<HTMLDivElement>(null);
 
+  const { subtotal, taxes, discount } = invoice.orderDetails;
+  const totalAmount = subtotal + taxes - (discount || 0);
+
   const handleSendInvoice = () => {
     setShowSendDialog(false);
     toast({
@@ -260,7 +263,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <div className="flex justify-between border-t border-border pt-4">
                 <span className="font-semibold text-high-emphasis">{t('TOTAL_AMOUNT')}</span>
                 <span className="text-xl font-bold text-high-emphasis">
-                  {invoice.currency} {invoice.amount.toFixed(2)}
+                  {invoice.currency} {totalAmount.toFixed(2)}
                 </span>
               </div>
             </div>
