@@ -20,60 +20,74 @@ export const ActiveFilters = <T extends FilterType>({
 }: ActiveFiltersProps<T>) => {
   const { t } = useTranslation();
 
+  const createRemoveHandler = (config: any) => () =>
+    onFiltersChange({
+      ...filters,
+      [config.key]: undefined,
+    } as T);
+
+  const createSelectBadge = (config: any, filterValue: any) => {
+    if (!filterValue) return null;
+
+    return {
+      label: t(filterValue.toUpperCase()),
+      onRemove: createRemoveHandler(config),
+    };
+  };
+
+  const createDateRangeBadge = (config: any, filterValue: any) => {
+    if (!filterValue?.from && !filterValue?.to) return null;
+
+    const dateLabel = getDateRangeLabel(filterValue);
+    if (!dateLabel) return null;
+
+    return {
+      label: `${t(config.label)}: ${dateLabel}`,
+      onRemove: createRemoveHandler(config),
+    };
+  };
+
+  const createUserBadge = (config: any, filterValue: any) => {
+    if (!filterValue || !config.users) return null;
+
+    const selectedUser = config.users.find((user: any) => user.id === filterValue);
+    if (!selectedUser) return null;
+
+    return {
+      label: `${t(config.label)}: ${selectedUser.name}`,
+      onRemove: createRemoveHandler(config),
+    };
+  };
+
+  const getBadgeData = (config: any, filterValue: any) => {
+    switch (config.type) {
+      case 'select':
+        return createSelectBadge(config, filterValue);
+      case 'dateRange':
+        return createDateRangeBadge(config, filterValue);
+      case 'user':
+        return createUserBadge(config, filterValue);
+      default:
+        return null;
+    }
+  };
+
   const createFilterBadges = () => {
     const badges: React.ReactElement[] = [];
 
     filterConfigs.forEach((config) => {
       const filterValue = (filters as any)[config.key];
-
       if (!filterValue) return;
 
-      let label = '';
-      let onRemove = () => {};
-
-      switch (config.type) {
-        case 'select':
-          if (filterValue) {
-            label = t(filterValue.toUpperCase());
-            onRemove = () =>
-              onFiltersChange({
-                ...filters,
-                [config.key]: undefined,
-              } as T);
-          }
-          break;
-
-        case 'dateRange':
-          if (filterValue?.from || filterValue?.to) {
-            const dateLabel = getDateRangeLabel(filterValue);
-            if (dateLabel) {
-              label = `${t(config.label)}: ${dateLabel}`;
-              onRemove = () =>
-                onFiltersChange({
-                  ...filters,
-                  [config.key]: undefined,
-                } as T);
-            }
-          }
-          break;
-
-        case 'user':
-          if (filterValue && config.users) {
-            const selectedUser = config.users.find((user) => user.id === filterValue);
-            if (selectedUser) {
-              label = `${t(config.label)}: ${selectedUser.name}`;
-              onRemove = () =>
-                onFiltersChange({
-                  ...filters,
-                  [config.key]: undefined,
-                } as T);
-            }
-          }
-          break;
-      }
-
-      if (label) {
-        badges.push(<ActiveFilterBadge key={config.key} label={label} onRemove={onRemove} />);
+      const badgeData = getBadgeData(config, filterValue);
+      if (badgeData) {
+        badges.push(
+          <ActiveFilterBadge
+            key={config.key}
+            label={badgeData.label}
+            onRemove={badgeData.onRemove}
+          />
+        );
       }
     });
 

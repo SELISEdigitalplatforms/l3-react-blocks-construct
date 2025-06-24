@@ -51,14 +51,14 @@ export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps>
   return (
     <BaseHeaderToolbar
       title="SHARED_WITH_ME"
-      viewMode={props.viewMode || 'grid'}
-      searchQuery={props.searchQuery || ''}
+      viewMode={props.viewMode ?? 'grid'}
+      searchQuery={props.searchQuery ?? ''}
       filters={props.filters}
       filterConfigs={filterConfigs}
       showFileUpload={true}
       showFolderCreate={true}
       onViewModeChange={props.handleViewMode}
-      onSearchChange={props.onSearchChange || (() => {})}
+      onSearchChange={props.onSearchChange ?? (() => {})}
       onFiltersChange={props.onFiltersChange}
       onFileUpload={props.onFileUpload}
       onFolderCreate={props.onFolderCreate}

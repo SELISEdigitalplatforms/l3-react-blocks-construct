@@ -189,12 +189,12 @@ export const createFileTableColumns = ({
       </div>
     ),
     cell: ({ row }) => (
-      <div
+      <button
         onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
-        className="flex justify-end"
+        type="button"
       >
         <FileTableRowActions
           row={row}
@@ -204,7 +204,7 @@ export const createFileTableColumns = ({
           onDelete={onDelete}
           onRename={onRename}
         />
-      </div>
+      </button>
     ),
   },
 ];

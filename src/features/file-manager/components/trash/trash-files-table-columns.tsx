@@ -80,15 +80,15 @@ export const TrashTableColumns = ({
       </div>
     ),
     cell: ({ row }) => (
-      <div
+      <button
         onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
-        className="flex justify-end"
+        type="button"
       >
         <TrashTableRowActions row={row} onRestore={onRestore} onDelete={onDelete} />
-      </div>
+      </button>
     ),
   },
 ];
