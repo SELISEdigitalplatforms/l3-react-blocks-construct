@@ -87,6 +87,55 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
   /**
    * Converts a Blob to a data URL string
    */
+  const createCanvas = (width: number, height: number): HTMLCanvasElement => {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  };
+
+  const getCanvasContext = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Could not get 2D context');
+    }
+    return ctx;
+  };
+
+  const drawImageOnCanvas = (
+    ctx: CanvasRenderingContext2D,
+    image: HTMLImageElement,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ) => {
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(image, Math.max(0, x), Math.max(0, y), width, height, 0, 0, width, height);
+  };
+
+  const canvasToDataURL = (canvas: HTMLCanvasElement): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const handleBlob = (blob: Blob | null) => {
+        if (!blob) {
+          try {
+            resolve(canvas.toDataURL('image/jpeg', 0.92));
+          } catch (e) {
+            reject(new Error('Failed to create image from canvas'));
+          }
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error('Failed to read blob'));
+        reader.readAsDataURL(blob);
+      };
+
+      canvas.toBlob(handleBlob, 'image/jpeg', 0.92);
+    });
+  };
+
   /**
    * Creates a cropped image from the source image and crop area
    */
@@ -97,49 +146,11 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
 
       try {
         const image = await createImage(imageSrc);
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
+        const canvas = createCanvas(width, height);
+        const ctx = getCanvasContext(canvas);
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          throw new Error('Could not get 2D context');
-        }
-
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(
-          image,
-          Math.max(0, pixelCrop.x || 0),
-          Math.max(0, pixelCrop.y || 0),
-          width,
-          height,
-          0,
-          0,
-          width,
-          height
-        );
-
-        return new Promise((resolve, reject) => {
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                try {
-                  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-                  resolve(dataUrl);
-                } catch (e) {
-                  reject(new Error('Failed to create image from canvas'));
-                }
-              } else {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = () => reject(new Error('Failed to read blob'));
-                reader.readAsDataURL(blob);
-              }
-            },
-            'image/jpeg',
-            0.92
-          );
-        });
+        drawImageOnCanvas(ctx, image, pixelCrop.x || 0, pixelCrop.y || 0, width, height);
+        return await canvasToDataURL(canvas);
       } catch (error) {
         console.error('Error in getCroppedImg:', error);
         throw error;
@@ -164,7 +175,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
     let isMounted = true;
 
     const updatePreview = async () => {
-      if (!croppedAreaPixels || !croppedAreaPixels.width || !croppedAreaPixels.height) {
+      if (!croppedAreaPixels?.width || !croppedAreaPixels?.height) {
         if (isMounted) setPreview('');
         return;
       }

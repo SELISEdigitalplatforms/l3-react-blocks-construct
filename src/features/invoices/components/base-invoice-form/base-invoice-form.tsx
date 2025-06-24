@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
-import { calculateInvoiceTotals, createInvoiceFromForm } from '../../utils/invoice-utils';
+import { createInvoiceFromForm } from '../../utils/invoice-utils';
 import {
   invoiceFormSchema,
   type InvoiceFormValues,
@@ -50,7 +50,7 @@ export function BaseInvoiceForm({
   onSubmit,
   title,
   showSuccessToast,
-}: BaseInvoiceFormProps) {
+}: Readonly<BaseInvoiceFormProps>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -200,7 +200,11 @@ export function BaseInvoiceForm({
                 subtotal={items.reduce((acc, item) => acc + item.total, 0)}
                 taxRate={7.5}
                 discount={50}
-                totalAmount={calculateInvoiceTotals(items, 7.5, 50).totalAmount}
+                totalAmount={
+                  items.reduce((acc, item) => acc + item.total, 0) +
+                  items.reduce((acc, item) => acc + item.total, 0) * (7.5 / 100) -
+                  50
+                }
                 currency={form.watch('currency')?.toUpperCase() || 'CHF'}
               />
             </div>

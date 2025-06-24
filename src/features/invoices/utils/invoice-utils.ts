@@ -9,9 +9,8 @@ export const generateInvoiceId = (): string => {
 
 export function calculateInvoiceTotals(items: InvoiceItem[], taxRate: number, discount: number) {
   const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-  const discountedSubtotal = subtotal - discount;
-  const taxes = (discountedSubtotal * taxRate) / 100;
-  const totalAmount = discountedSubtotal + taxes;
+  const taxes = (subtotal * taxRate) / 100;
+  const totalAmount = subtotal + taxes - discount;
 
   return {
     subtotal,
