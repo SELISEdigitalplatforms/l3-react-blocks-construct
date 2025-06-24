@@ -45,14 +45,14 @@ export const FileManagerHeaderToolbar: React.FC<FileManagerHeaderToolbarProps> =
   return (
     <BaseHeaderToolbar
       title="MY_FILES"
-      viewMode={props.viewMode || 'grid'}
-      searchQuery={props.searchQuery || ''}
+      viewMode={props.viewMode ?? 'grid'}
+      searchQuery={props.searchQuery ?? ''}
       filters={props.filters}
       filterConfigs={filterConfigs}
       showFileUpload={true}
       showFolderCreate={true}
       onViewModeChange={props.handleViewMode}
-      onSearchChange={props.onSearchChange || (() => {})}
+      onSearchChange={props.onSearchChange ?? (() => {})}
       onFiltersChange={props.onFiltersChange}
       onFileUpload={props.onFileUpload}
       onFolderCreate={props.onFolderCreate}

@@ -232,7 +232,7 @@ export const mockFileData: IFileData[] = [
 interface QueryParams {
   filter: {
     name?: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
+    fileType?: FileType;
   };
   page: number;
   pageSize: number;
@@ -258,69 +258,94 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
     setError(null);
   }, []);
 
+  const filterData = useCallback((data: IFileData[], params: typeof memoizedQueryParams) => {
+    let filteredData = [...data];
+
+    if (params.filterName) {
+      filteredData = filteredData.filter((file) =>
+        file.name.toLowerCase().includes(params.filterName.toLowerCase())
+      );
+    }
+
+    if (params.filterFileType) {
+      filteredData = filteredData.filter((file) => file.fileType === params.filterFileType);
+    }
+
+    return filteredData;
+  }, []);
+
+  const paginateData = useCallback((data: IFileData[], params: typeof memoizedQueryParams) => {
+    const startIndex = params.page * params.pageSize;
+    const endIndex = startIndex + params.pageSize;
+    return data.slice(startIndex, endIndex);
+  }, []);
+
+  const areItemsEqual = useCallback((item1: any, item2: any): boolean => {
+    if (!item2) return false;
+
+    return (
+      item1.id === item2.id &&
+      item1.name === item2.name &&
+      item1.lastModified?.getTime() === item2.lastModified?.getTime()
+    );
+  }, []);
+
+  const isDataEqual = useCallback(
+    (prevData: any, newData: any) => {
+      if (!prevData) return false;
+
+      if (prevData.totalCount !== newData.totalCount) return false;
+      if (prevData.data.length !== newData.data.length) return false;
+
+      return prevData.data.every((item: any, index: number) =>
+        areItemsEqual(item, newData.data[index])
+      );
+    },
+    [areItemsEqual]
+  );
+
+  const processData = useCallback(() => {
+    const filteredData = filterData(mockFileData, memoizedQueryParams);
+    const paginatedData = paginateData(filteredData, memoizedQueryParams);
+
+    return {
+      data: paginatedData,
+      totalCount: filteredData.length,
+    };
+  }, [filterData, paginateData, memoizedQueryParams]);
+
+  const handleError = useCallback((err: unknown) => {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError('An unexpected error occurred');
+    }
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     setIsLoading(true);
     setError(null);
 
     const timer = setTimeout(() => {
       try {
-        let filteredData = [...mockFileData];
-
-        if (memoizedQueryParams.filterName) {
-          filteredData = filteredData.filter((file) =>
-            file.name.toLowerCase().includes(memoizedQueryParams.filterName.toLowerCase())
-          );
-        }
-
-        if (memoizedQueryParams.filterFileType) {
-          filteredData = filteredData.filter(
-            (file) => file.fileType === memoizedQueryParams.filterFileType
-          );
-        }
-
-        const startIndex = memoizedQueryParams.page * memoizedQueryParams.pageSize;
-        const endIndex = startIndex + memoizedQueryParams.pageSize;
-        const paginatedData = filteredData.slice(startIndex, endIndex);
-        const areItemsEqual = (item1: any, item2: any): boolean => {
-          if (!item2) return false;
-
-          return (
-            item1.id === item2.id &&
-            item1.name === item2.name &&
-            item1.lastModified?.getTime() === item2.lastModified?.getTime()
-          );
-        };
+        const newData = processData();
 
         setData((prevData) => {
-          const newData = {
-            data: paginatedData,
-            totalCount: filteredData.length,
-          };
-
-          if (
-            prevData &&
-            prevData.totalCount === newData.totalCount &&
-            prevData.data.length === newData.data.length &&
-            prevData.data.every((item, index) => areItemsEqual(item, newData.data[index]))
-          ) {
+          if (isDataEqual(prevData, newData)) {
             return prevData;
           }
-
           return newData;
         });
+
         setIsLoading(false);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('An unexpected error occurred');
-        }
-        setIsLoading(false);
+        handleError(err);
       }
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [memoizedQueryParams, refetch]);
+  }, [memoizedQueryParams, refetch, processData, isDataEqual, handleError]);
 
   return { data, isLoading, error, refetch };
 };

@@ -68,14 +68,14 @@ export const TrashHeaderToolbar: React.FC<TrashHeaderToolbarProps> = (props) => 
   return (
     <BaseHeaderToolbar
       title="TRASH"
-      viewMode={props.viewMode || 'list'}
-      searchQuery={props.searchQuery || ''}
+      viewMode={props.viewMode ?? 'list'}
+      searchQuery={props.searchQuery ?? ''}
       filters={props.filters}
       selectedItems={props.selectedItems}
       filterConfigs={filterConfigs}
       actions={actions}
       onViewModeChange={props.handleViewMode}
-      onSearchChange={props.onSearchChange || (() => {})}
+      onSearchChange={props.onSearchChange ?? (() => {})}
       onFiltersChange={props.onFiltersChange}
     />
   );

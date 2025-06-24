@@ -266,12 +266,12 @@ export const SharedFileTableColumns = ({
       </div>
     ),
     cell: ({ row }) => (
-      <div
+      <button
         onMouseDown={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
-        className="flex justify-end"
+        type="button"
       >
         <FileTableRowActions
           row={row}
@@ -282,7 +282,7 @@ export const SharedFileTableColumns = ({
           onMove={onMove}
           onRename={onRename}
         />
-      </div>
+      </button>
     ),
   },
 ];
