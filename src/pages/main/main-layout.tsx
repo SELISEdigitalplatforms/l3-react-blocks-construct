@@ -5,6 +5,8 @@ import { UProfileMenu } from '../../components/blocks/u-profile-menu';
 import { SidebarTrigger, useSidebar } from 'components/ui/sidebar';
 import LanguageSelector from '../../components/blocks/language-selector/language-selector';
 import { Button } from 'components/ui/button';
+import { Menubar, MenubarMenu, MenubarTrigger } from 'components/ui/menubar';
+import { Notification } from 'features/notification/component/notification/notification';
 
 export default function MainLayout() {
   const { open, isMobile } = useSidebar();
@@ -40,9 +42,22 @@ export default function MainLayout() {
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
               <Library className="!w-5 !h-5 text-medium-emphasis" />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
-              <Bell className="!w-5 !h-5 text-medium-emphasis" />
-            </Button>
+            <Menubar className="border-none">
+              <MenubarMenu>
+                <MenubarTrigger
+                  asChild
+                  className="cursor-pointer focus:bg-transparent data-[state=open]:bg-transparent"
+                >
+                  <div className="relative">
+                    <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
+                      <Bell className="!w-5 !h-5 text-medium-emphasis" />
+                    </Button>
+                    <div className="w-2 h-2 bg-error rounded-full absolute top-[13px] right-[20px]" />
+                  </div>
+                </MenubarTrigger>
+                <Notification />
+              </MenubarMenu>
+            </Menubar>
             <LanguageSelector />
             <UProfileMenu />
           </div>
