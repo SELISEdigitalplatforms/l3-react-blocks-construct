@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { MenubarContent } from 'components/ui/menubar';
 import { Button } from 'components/ui/button';
+import { useMarkAllNotificationAsRead } from '../../hooks/use-notification';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
 import { NotificationItem } from '../notification-item/notification-item';
 import { subscribeNotifications } from '@seliseblocks/notifications';
@@ -58,15 +59,25 @@ export function Notification() {
     };
   }, [accessToken]);
 
+  const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead();
+
+  const handleMarkAllAsRead = () => {
+    markAllAsRead();
+  };
+
   return (
     <MenubarContent align="center" className="w-screen md:w-[420px] p-0">
       <div className="flex w-full flex-col">
         <div className="flex w-full flex-col gap-4">
           <div className="flex items-center justify-between px-4 pt-4 bg-background z-10">
             <h3 className="text-xl font-bold text-high-emphasis">{t('NOTIFICATIONS')}</h3>
-            <Button variant="ghost" size="sm">
-              <Check className="w-4 h-4 text-primary" />
-              <span className="text-primary">{t('MARK_ALL_AS_READ')}</span>
+            <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead} disabled={isPending}>
+              {isPending ? (
+                <Loader2 className="w-4 h-4 text-primary animate-spin" />
+              ) : (
+                <Check className="w-4 h-4 text-primary" />
+              )}
+              <span className="text-primary ml-1">{t('MARK_ALL_AS_READ')}</span>
             </Button>
           </div>
           <Tabs value={tabId}>

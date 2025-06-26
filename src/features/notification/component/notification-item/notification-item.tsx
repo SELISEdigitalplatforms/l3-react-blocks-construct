@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { EllipsisVertical } from 'lucide-react';
+import { EllipsisVertical, Loader2 } from 'lucide-react';
 import { parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
+import { useMarkNotificationAsRead } from '../../hooks/use-notification';
 import type { Notification } from '../../types/notification.types';
 import {
   DropdownMenu,
@@ -18,6 +19,15 @@ interface NotificationItemProps {
 export const NotificationItem = ({ notification }: Readonly<NotificationItemProps>) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const { mutate: markAsRead, isPending } = useMarkNotificationAsRead();
+
+  const handleMarkAsRead = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!notification.isRead) {
+      markAsRead(notification.id);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
     const now = new Date();
@@ -67,7 +77,20 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>{t('MARK_AS_READ')}</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleMarkAsRead}
+                  disabled={notification.isRead || isPending}
+                  className="flex items-center gap-2"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>{t('MARKING_AS_READ')}</span>
+                    </>
+                  ) : (
+                    <span>{t('MARK_AS_READ')}</span>
+                  )}
+                </DropdownMenuItem>
                 <DropdownMenuItem disabled>{t('REMOVE_NOTIFICATION')}</DropdownMenuItem>
                 <DropdownMenuItem>{t('TURN_OFF_NOTIFICATION_MODULE')}</DropdownMenuItem>
               </DropdownMenuContent>
