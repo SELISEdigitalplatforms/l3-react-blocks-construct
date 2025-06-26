@@ -14,7 +14,7 @@ import {
  * @param params - Query parameters for filtering and pagination
  * @returns Query result with notifications and metadata
  */
-export const useNotifications = (params: GetNotificationsParams) => {
+export const useGetNotifications = (params: GetNotificationsParams) => {
   return useGlobalQuery({
     queryKey: ['notifications', params],
     queryFn: getNotifications,
@@ -52,9 +52,7 @@ export const useMarkNotificationAsRead = () => {
         return {
           ...old,
           notifications: old.notifications.map((notification) =>
-            notification.notificationId === notificationId
-              ? { ...notification, isUnread: false }
-              : notification
+            notification.id === notificationId ? { ...notification, isRead: true } : notification
           ),
         };
       });

@@ -37,21 +37,24 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
   return (
     <div className="border-b border-border last:border-b-0">
       <div className="group flex items-start gap-3 p-2 hover:bg-muted/50 transition-colors cursor-pointer">
-        <div className={`w-2 h-2 rounded-full mt-3 ${notification.isUnread && 'bg-secondary'}`} />
+        <div className={`w-2 h-2 rounded-full mt-3 ${!notification.isRead && 'bg-secondary'}`} />
         <div className="flex w-full justify-between">
           <div className="flex flex-col gap-1">
             <h4
-              className={`text-high-emphasis truncate text-base ${notification.isUnread && 'font-bold'}`}
+              className={`text-high-emphasis truncate text-base ${!notification.isRead && 'font-bold'}`}
             >
-              {notification.title}
+              {notification.payload.notificationType}
             </h4>
-            <p className="text-high-emphasis text-sm line-clamp-2">{notification.description}</p>
+            <p className="text-high-emphasis text-sm line-clamp-2">
+              {notification.payload.responseValue}
+            </p>
             <div className="flex items-center gap-2">
               <span className="text-xs text-medium-emphasis">
-                {formatDate(notification.createdAt)}
+                {formatDate(notification.createdTime)}
               </span>
-              <div className="w-[6px] h-[6px] rounded-full bg-neutral-200" />
-              <span className="text-xs text-medium-emphasis">{notification.module}</span>
+              {/* TODO FE: Might need to binding later */}
+              {/* <div className="w-[6px] h-[6px] rounded-full bg-neutral-200" />
+              <span className="text-xs text-medium-emphasis">IAM</span> */}
             </div>
           </div>
           <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -65,7 +68,7 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>{t('MARK_AS_READ')}</DropdownMenuItem>
-                <DropdownMenuItem>{t('REMOVE_NOTIFICATION')}</DropdownMenuItem>
+                <DropdownMenuItem disabled>{t('REMOVE_NOTIFICATION')}</DropdownMenuItem>
                 <DropdownMenuItem>{t('TURN_OFF_NOTIFICATION_MODULE')}</DropdownMenuItem>
               </DropdownMenuContent>
             </div>

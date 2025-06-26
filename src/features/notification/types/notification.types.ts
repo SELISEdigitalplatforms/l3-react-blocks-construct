@@ -1,14 +1,4 @@
-//Remove this one after API implementation of getNOtifications
-export type Notification = {
-  notificationId: string;
-  title: string;
-  description?: string;
-  module: string;
-  createdAt: string;
-  isUnread: boolean;
-};
-
-export interface Notification1 {
+export interface Notification {
   id: string;
   correlationId: string;
   payload: {
@@ -23,14 +13,14 @@ export interface Notification1 {
     responseValue: string;
   };
   denormalizedPayload: string;
-  createdTime: string; // ISO date string
+  createdTime: string;
   readByUserIds: string[];
   readByRoles: string[];
   isRead: boolean;
 }
 
 export interface GetNotificationsResponse {
-  notifications: Notification1[];
+  notifications: Notification[];
   unReadNotificationsCount: number;
   totalNotificationsCount: number;
 }

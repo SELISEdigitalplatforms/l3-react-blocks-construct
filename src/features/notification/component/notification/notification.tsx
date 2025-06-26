@@ -1,18 +1,62 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { MenubarContent } from 'components/ui/menubar';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
 import { NotificationItem } from '../notification-item/notification-item';
-import { notifications } from '../../data/notifications.data';
+import { subscribeNotifications } from '@seliseblocks/notifications';
+import API_CONFIG from 'config/api';
+import { useAuthStore } from 'state/store/auth';
+import { useGetNotifications } from '../../hooks/use-notification';
 
 export function Notification() {
   const { t } = useTranslation();
   const [tabId, setTabId] = useState('all');
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const { data: notificationsData } = useGetNotifications({
+    Page: 0,
+    PageSize: 10,
+  });
 
+  const notifications = notificationsData?.notifications ?? [];
   const filteredNotifications =
-    tabId === 'all' ? notifications : notifications.filter((notification) => notification.isUnread);
+    tabId === 'all' ? notifications : notifications.filter((notification) => !notification.isRead);
+
+  useEffect(() => {
+    let subscription: any;
+
+    const setupNotifications = async () => {
+      if (!accessToken) {
+        console.error('No access token available, skipping notification setup');
+        return;
+      }
+
+      try {
+        subscription = subscribeNotifications(
+          `${API_CONFIG.baseUrl}/notification/v1/`,
+          {
+            projectKey: API_CONFIG.blocksKey,
+            accessTokenFactory: () => accessToken ?? '',
+          },
+          (channel: string, message: any) => {
+            // eslint-disable-next-line no-console
+            console.log('Received notification:', { channel, message });
+          }
+        );
+      } catch (error) {
+        console.error('Failed to subscribe to notifications:', error);
+      }
+    };
+
+    setupNotifications();
+
+    return () => {
+      if (subscription?.unsubscribe) {
+        subscription.unsubscribe();
+      }
+    };
+  }, [accessToken]);
 
   return (
     <MenubarContent align="center" className="w-screen md:w-[420px] p-0">
@@ -40,10 +84,7 @@ export function Notification() {
               <TabsContent value={tabId} className="m-0">
                 {filteredNotifications.length > 0 ? (
                   filteredNotifications.map((notification) => (
-                    <NotificationItem
-                      key={notification.notificationId}
-                      notification={notification}
-                    />
+                    <NotificationItem key={notification.id} notification={notification} />
                   ))
                 ) : (
                   <div className="flex items-center justify-center p-4">
