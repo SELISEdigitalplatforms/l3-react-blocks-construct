@@ -59,7 +59,7 @@ describe('NotificationItem', () => {
     expect(screen.getByText('Today')).toBeInTheDocument();
   });
 
-  it('calls markAsRead when menu item is clicked', () => {
+  it('calls markAsRead with notification id and onError callback when menu item is clicked', () => {
     render(<NotificationItem notification={mockNotification as any} />);
     // Open the menu (simulate hover)
     fireEvent.mouseOver(screen.getByText('Test Type'));
@@ -67,7 +67,12 @@ describe('NotificationItem', () => {
     fireEvent.click(screen.getByTestId('ellipsis-icon'));
     // Click the Mark as Read menu item
     fireEvent.click(screen.getByText('MARK_AS_READ'));
-    expect(mutateMock).toHaveBeenCalledWith('notif-1');
+    expect(mutateMock).toHaveBeenCalledWith(
+      'notif-1',
+      expect.objectContaining({
+        onError: expect.any(Function),
+      })
+    );
   });
 
   it('disables mark as read if already read', () => {

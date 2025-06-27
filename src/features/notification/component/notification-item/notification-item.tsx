@@ -19,12 +19,18 @@ interface NotificationItemProps {
 export const NotificationItem = ({ notification }: Readonly<NotificationItemProps>) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isRead, setIsRead] = useState(notification.isRead);
   const { mutate: markAsRead, isPending } = useMarkNotificationAsRead();
 
   const handleMarkAsRead = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!notification.isRead) {
-      markAsRead(notification.id);
+    if (!isRead) {
+      setIsRead(true);
+      markAsRead(notification.id, {
+        onError: () => {
+          setIsRead(false);
+        },
+      });
     }
   };
 
@@ -47,12 +53,10 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
   return (
     <div className="border-b border-border last:border-b-0">
       <div className="group flex items-start gap-3 p-2 hover:bg-muted/50 transition-colors cursor-pointer">
-        <div className={`w-2 h-2 rounded-full mt-3 ${!notification.isRead && 'bg-secondary'}`} />
+        <div className={`w-2 h-2 rounded-full mt-3 ${!isRead && 'bg-secondary'}`} />
         <div className="flex w-full justify-between">
           <div className="flex flex-col gap-1">
-            <h4
-              className={`text-high-emphasis truncate text-base ${!notification.isRead && 'font-bold'}`}
-            >
+            <h4 className={`text-high-emphasis truncate text-base ${!isRead && 'font-bold'}`}>
               {notification.payload.notificationType}
             </h4>
             <p className="text-high-emphasis text-sm line-clamp-2">
@@ -79,7 +83,7 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   onClick={handleMarkAsRead}
-                  disabled={notification.isRead || isPending}
+                  disabled={isRead || isPending}
                   className="flex items-center gap-2"
                 >
                   {isPending ? (
@@ -92,7 +96,7 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>{t('REMOVE_NOTIFICATION')}</DropdownMenuItem>
-                <DropdownMenuItem>{t('TURN_OFF_NOTIFICATION_MODULE')}</DropdownMenuItem>
+                <DropdownMenuItem disabled>{t('TURN_OFF_NOTIFICATION_MODULE')}</DropdownMenuItem>
               </DropdownMenuContent>
             </div>
           </DropdownMenu>
