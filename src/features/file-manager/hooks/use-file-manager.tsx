@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useCallback, useState } from 'react';
 import { IFileDataWithSharing, SharedUser, UserRole } from '../utils/file-manager';
 import { v4 as uuidv4 } from 'uuid';
