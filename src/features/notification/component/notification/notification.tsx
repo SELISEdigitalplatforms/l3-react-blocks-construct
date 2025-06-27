@@ -81,10 +81,7 @@ export function Notification() {
     let subscription: { stop: () => Promise<void> } | null = null;
 
     const setupNotifications = async () => {
-      if (!accessToken) {
-        console.error('No access token available, skipping notification setup');
-        return;
-      }
+      if (!accessToken) return;
 
       try {
         subscription = subscribeNotifications(
