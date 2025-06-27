@@ -18,8 +18,8 @@ export const useGetNotifications = (params: GetNotificationsParams) => {
   return useGlobalQuery({
     queryKey: ['notifications', params],
     queryFn: getNotifications,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };
@@ -42,10 +42,8 @@ export const useMarkNotificationAsRead = () => {
   return useMutation({
     mutationFn: markNotificationAsRead,
     onSuccess: (data, notificationId) => {
-      // Invalidate and refetch notifications to update the UI
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
 
-      // Optimistically update the notification in the cache
       queryClient.setQueryData<{ notifications: Notification[] }>(['notifications'], (old) => {
         if (!old) return old;
 
@@ -57,26 +55,33 @@ export const useMarkNotificationAsRead = () => {
         };
       });
 
-      // Show success toast
       if (data.isSuccess) {
         toast({
-          title: t('Success'),
-          description: t('Notification marked as read'),
-          variant: 'default',
+          variant: 'success',
+          title: t('MARK_AS_READ'),
+          description: t('MARKED_THIS_NOTIFICATION_AS_READ'),
         });
       }
-    },
-    onError: (error: Error) => {
-      console.error('Error marking notification as read:', error);
-      toast({
-        title: t('Error'),
-        description: t('Failed to mark notification as read'),
-        variant: 'destructive',
-      });
     },
   });
 };
 
+/**
+ * Custom hook to mark all notifications as read
+ *
+ * @returns {Object} The mutation object from react-query with the following properties:
+ * @property {Function} mutate - Function to trigger the mark all as read action
+ * @property {boolean} isPending - Indicates if the mutation is in progress
+ * @property {Error | null} error - Error object if the mutation fails
+ * @property {boolean} isSuccess - Indicates if the mutation was successful
+ * @property {Function} reset - Function to reset the mutation state
+ *
+ * @example
+ * const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead();
+ *
+ * // To mark all notifications as read:
+ * markAllAsRead();
+ */
 export const useMarkAllNotificationAsRead = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -85,25 +90,15 @@ export const useMarkAllNotificationAsRead = () => {
   return useMutation({
     mutationFn: markAllNotificationAsRead,
     onSuccess: (data) => {
-      // Invalidate and refetch notifications to update the UI
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
 
-      // Show success toast
       if (data.isSuccess) {
         toast({
-          title: t('Success'),
-          description: t('All notifications marked as read'),
-          variant: 'default',
+          title: t('MARKED_ALL_AS_READ'),
+          description: t('ALL_NOTIFICATIONS_MARKED_AS_READ'),
+          variant: 'success',
         });
       }
-    },
-    onError: (error: Error) => {
-      console.error('Error marking all notifications as read:', error);
-      toast({
-        title: t('Error'),
-        description: t('Failed to mark all notifications as read'),
-        variant: 'destructive',
-      });
     },
   });
 };

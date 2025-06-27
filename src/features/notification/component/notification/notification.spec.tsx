@@ -15,6 +15,7 @@ jest.mock('../../hooks/use-notification', () => ({
     data: { notifications: [] },
     isFetching: false,
     isLoading: false,
+    refetch: jest.fn(),
   }),
   useMarkAllNotificationAsRead: jest.fn().mockReturnValue({
     mutate: jest.fn(),

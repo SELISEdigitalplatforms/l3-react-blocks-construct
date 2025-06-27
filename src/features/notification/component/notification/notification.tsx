@@ -20,14 +20,25 @@ export function Notification() {
   const [tabId, setTabId] = useState('all');
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [allNotifications, setAllNotifications] = useState<NotificationType[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
   const accessToken = useAuthStore((state) => state.accessToken);
+
+  const [tabData, setTabData] = useState<{
+    all: NotificationType[];
+    unread: NotificationType[];
+  }>({ all: [], unread: [] });
+
+  const currentTabNotifications = React.useMemo(() => {
+    return tabData[tabId as keyof typeof tabData] || [];
+  }, [tabData, tabId]);
 
   const {
     data: notificationsData,
     isFetching,
     isLoading,
+    refetch,
   } = useGetNotifications({
     Page: page,
     PageSize: PAGE_SIZE,
@@ -36,46 +47,80 @@ export function Notification() {
     SortIsDescending: true,
   });
 
-  // Update allNotifications when new data is fetched
   useEffect(() => {
-    if (notificationsData?.notifications) {
-      if (page === 0) {
-        setAllNotifications(notificationsData.notifications);
-      } else {
-        setAllNotifications((prev) => [...prev, ...notificationsData.notifications]);
-      }
-      // Check if we've reached the end of the list
-      setHasMore(notificationsData.notifications.length === PAGE_SIZE);
-    }
-  }, [notificationsData, page]);
+    if (!notificationsData) return;
 
-  // Reset pagination when tab changes
+    if (notificationsData.notifications) {
+      setTabData((prev) => {
+        if (page === 0) {
+          return {
+            ...prev,
+            [tabId]: notificationsData.notifications,
+          };
+        }
+
+        if (notificationsData.notifications.length === 0) {
+          setHasMore(false);
+          return prev;
+        }
+
+        const newData = [
+          ...(prev[tabId as keyof typeof prev] || []),
+          ...notificationsData.notifications,
+        ];
+
+        const uniqueData = newData.filter(
+          (notification, index, self) => index === self.findIndex((n) => n.id === notification.id)
+        );
+
+        return {
+          ...prev,
+          [tabId]: uniqueData,
+        };
+      });
+
+      setHasMore(notificationsData.notifications.length === PAGE_SIZE);
+    } else if (page > 0) {
+      setHasMore(false);
+    }
+
+    setIsLoadingMore(false);
+  }, [notificationsData, page, tabId]);
+
   useEffect(() => {
     setPage(0);
-    setAllNotifications([]);
     setHasMore(true);
-  }, [tabId]);
+    setIsLoadingMore(false);
+    void refetch();
+  }, [tabId, refetch]);
 
-  // Handle scroll events for infinite loading
   const handleScroll = useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (!container || isFetching || !hasMore) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100; // Load more when 100px from bottom
-
-    if (isNearBottom) {
-      setPage((prev) => prev + 1);
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
     }
-  }, [isFetching, hasMore]);
 
-  const filteredNotifications = React.useMemo(
-    () =>
-      tabId === 'all'
-        ? allNotifications
-        : allNotifications.filter((notification) => notification && !notification.isRead),
-    [allNotifications, tabId]
-  );
+    scrollTimeoutRef.current = setTimeout(() => {
+      const container = scrollContainerRef.current;
+      if (!container || isFetching || !hasMore || isLoadingMore) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+      if (isNearBottom && hasMore) {
+        setIsLoadingMore(true);
+        setPage((prev) => {
+          const nextPage = prev + 1;
+          return nextPage;
+        });
+      }
+    }, 150);
+  }, [isFetching, hasMore, isLoadingMore]);
+
+  const filteredNotifications = React.useMemo(() => {
+    return currentTabNotifications.filter(
+      (notification) => tabId === 'all' || !notification.isRead
+    );
+  }, [currentTabNotifications, tabId]);
 
   useEffect(() => {
     let subscription: { stop: () => Promise<void> } | null = null;
@@ -161,7 +206,9 @@ export function Notification() {
                           <NotificationItem key={notification.id} notification={notification} />
                         )
                     )}
-                    {isFetching && page > 0 && <NotificationSkeletonList count={3} />}
+                    {(isFetching || isLoadingMore) && page > 0 && (
+                      <NotificationSkeletonList count={3} />
+                    )}
                     {!hasMore && filteredNotifications.length > 0 && (
                       <div className="text-center py-4 text-sm text-muted-foreground">
                         {t('NO_MORE_NOTIFICATIONS')}
