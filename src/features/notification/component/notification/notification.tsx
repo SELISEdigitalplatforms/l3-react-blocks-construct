@@ -11,7 +11,7 @@ import { subscribeNotifications } from '@seliseblocks/notifications';
 import API_CONFIG from 'config/api';
 import { useAuthStore } from 'state/store/auth';
 import type { Notification as NotificationType } from '../../types/notification.types';
-import { NotificationSkeletonList } from './notification-skeleton';
+import { NotificationSkeletonList } from '../notification-skeleton/notification-skeleton';
 
 const PAGE_SIZE = 10;
 
@@ -116,7 +116,11 @@ export function Notification() {
   };
 
   return (
-    <MenubarContent align="center" className="w-screen md:w-[420px] p-0">
+    <MenubarContent
+      sideOffset={4}
+      align="center"
+      className="w-screen md:w-[420px] p-0 rounded-t-none"
+    >
       <div className="flex w-full flex-col">
         <div className="flex w-full flex-col gap-4">
           <div className="flex items-center justify-between px-4 pt-4 bg-background z-10">

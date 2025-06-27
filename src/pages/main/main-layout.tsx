@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Bell, Library } from 'lucide-react';
 import { AppSidebar } from '../../components/blocks/layout/app-sidebar';
@@ -11,7 +10,6 @@ import { Notification } from 'features/notification/component/notification/notif
 import { useGetNotifications } from 'features/notification/hooks/use-notification';
 
 export default function MainLayout() {
-  const [openMenu, setOpenMenu] = useState(false);
   const { open, isMobile } = useSidebar();
   const { pathname } = useLocation();
   const segments = pathname?.split('/').filter(Boolean);
@@ -35,18 +33,6 @@ export default function MainLayout() {
   };
 
   const marginClass = getMarginClass();
-
-  useEffect(() => {
-    if (openMenu) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [openMenu]);
 
   return (
     <div className="flex w-full min-h-screen relative">
@@ -72,7 +58,6 @@ export default function MainLayout() {
                 <MenubarTrigger
                   asChild
                   className="cursor-pointer focus:bg-transparent data-[state=open]:bg-transparent"
-                  onClick={() => setOpenMenu(!openMenu)}
                 >
                   <div className="relative">
                     <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
