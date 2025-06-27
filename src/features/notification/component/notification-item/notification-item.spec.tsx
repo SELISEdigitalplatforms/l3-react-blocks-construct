@@ -56,7 +56,7 @@ describe('NotificationItem', () => {
     render(<NotificationItem notification={mockNotification as any} />);
     expect(screen.getByText('Test Type')).toBeInTheDocument();
     expect(screen.getByText('Test message')).toBeInTheDocument();
-    expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByText(/^TODAY, \d{2}:\d{2}$/)).toBeInTheDocument();
   });
 
   it('calls markAsRead with notification id and onError callback when menu item is clicked', () => {
