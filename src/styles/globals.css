@@ -49,14 +49,14 @@ html.dark {
     @apply -bottom-px border-b border-border;
   }
 
-  input[type="time"] {
+  input[type='time'] {
     -webkit-appearance: none;
     appearance: none;
   }
-  input[type="time"]::-webkit-calendar-picker-indicator {
+  input[type='time']::-webkit-calendar-picker-indicator {
     display: none !important;
   }
-  input[type="time"]::-moz-calendar-picker-indicator {
+  input[type='time']::-moz-calendar-picker-indicator {
     display: none !important;
   }
 
@@ -188,6 +188,23 @@ html.dark {
     --emerald-green-500: 157 40% 42%;
 
     --transition-duration: 200ms;
+
+    /* File type icon colors */
+
+    --folder-icon-color: 34, 94%, 50%;
+    --folder-icon-background: 37, 100%, 94%;
+
+    --file-icon-color: 179, 100%, 28%;
+    --file-icon-background: 183, 41%, 91%;
+
+    --image-icon-color: 354, 70%, 54%;
+    --image-icon-background: 345, 100%, 98%;
+
+    --audio-icon-color: 300, 33%, 42%;
+    --audio-icon-background: 300, 26%, 93%;
+
+    --video-icon-color: 202, 68%, 53%;
+    --video-icon-background: 198, 76%, 93%;
   }
 
   .dark {
@@ -314,6 +331,21 @@ html.dark {
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 142.4 71.8% 29.2%;
+    /* File type icon colors */
+    --folder-icon-color: 34, 94%, 50%;
+    --folder-icon-background: 37, 100%, 94%;
+
+    --file-icon-color: 179, 100%, 28%;
+    --file-icon-background: 183, 41%, 91%;
+
+    --image-icon-color: 354, 70%, 54%;
+    --image-icon-background: 345, 100%, 98%;
+
+    --audio-icon-color: 300, 33%, 42%;
+    --audio-icon-background: 300, 26%, 93%;
+
+    --video-icon-color: 202, 68%, 53%;
+    --video-icon-background: 198, 76%, 93%;
   }
 }
 

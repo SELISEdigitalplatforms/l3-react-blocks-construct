@@ -19,7 +19,10 @@ export interface MenuItem {
     | 'Calendar'
     | 'SearchX'
     | 'TriangleAlert'
-    | 'ChartNoAxesCombined';
+    | 'ChartNoAxesCombined'
+    | 'Folder'
+    | 'ReceiptText'
+    | 'MessageSquareText';
   children?: MenuItem[];
 }
 

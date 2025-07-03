@@ -16,6 +16,9 @@ import {
   SearchX,
   TriangleAlert,
   ChartNoAxesCombined,
+  ReceiptText,
+  Folder,
+  MessageSquareText,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -71,7 +74,10 @@ const iconMap = {
   History,
   SearchX,
   TriangleAlert,
-  ChartNoAxesCombined
+  ChartNoAxesCombined,
+  ReceiptText,
+  Folder,
+  MessageSquareText,
 } as const;
 
 export type IconName = keyof typeof iconMap;

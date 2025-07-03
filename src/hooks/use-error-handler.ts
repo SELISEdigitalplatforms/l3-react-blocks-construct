@@ -45,7 +45,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     const parsedDescription = parseJsonError(err.error_description);
     if (parsedDescription) {
       return {
-        error: parsedDescription.error || err.error,
+        error: parsedDescription.error ?? err.error,
         error_description: parsedDescription.error_description,
         message: parsedDescription.message ?? err.message,
       };
