@@ -47,45 +47,51 @@ export function Notification() {
     SortIsDescending: true,
   });
 
+  const updateTabData = useCallback(
+    (prev: { all: NotificationType[]; unread: NotificationType[] }) => {
+      if (!notificationsData?.notifications) return prev;
+
+      if (page === 0) {
+        return {
+          ...prev,
+          [tabId]: notificationsData.notifications,
+        };
+      }
+
+      if (notificationsData.notifications.length === 0) {
+        setHasMore(false);
+        return prev;
+      }
+
+      const newData = [
+        ...(prev[tabId as keyof typeof prev] || []),
+        ...notificationsData.notifications,
+      ];
+
+      const uniqueData = newData.filter(
+        (notification, index, self) => index === self.findIndex((n) => n.id === notification.id)
+      );
+
+      return {
+        ...prev,
+        [tabId]: uniqueData,
+      };
+    },
+    [notificationsData, page, tabId]
+  );
+
   useEffect(() => {
     if (!notificationsData) return;
 
     if (notificationsData.notifications) {
-      setTabData((prev) => {
-        if (page === 0) {
-          return {
-            ...prev,
-            [tabId]: notificationsData.notifications,
-          };
-        }
-
-        if (notificationsData.notifications.length === 0) {
-          setHasMore(false);
-          return prev;
-        }
-
-        const newData = [
-          ...(prev[tabId as keyof typeof prev] || []),
-          ...notificationsData.notifications,
-        ];
-
-        const uniqueData = newData.filter(
-          (notification, index, self) => index === self.findIndex((n) => n.id === notification.id)
-        );
-
-        return {
-          ...prev,
-          [tabId]: uniqueData,
-        };
-      });
-
+      setTabData(updateTabData);
       setHasMore(notificationsData.notifications.length === PAGE_SIZE);
     } else if (page > 0) {
       setHasMore(false);
     }
 
     setIsLoadingMore(false);
-  }, [notificationsData, page, tabId]);
+  }, [notificationsData, page, tabId, updateTabData]);
 
   useEffect(() => {
     setPage(0);
@@ -121,6 +127,35 @@ export function Notification() {
       (notification) => tabId === 'all' || !notification.isRead
     );
   }, [currentTabNotifications, tabId]);
+
+  const renderNotificationContent = () => {
+    if (isLoading && page === 0) {
+      return <NotificationSkeletonList count={5} />;
+    }
+
+    if (filteredNotifications.length > 0) {
+      return (
+        <>
+          {filteredNotifications.map(
+            (notification) =>
+              notification && <NotificationItem key={notification.id} notification={notification} />
+          )}
+          {(isFetching || isLoadingMore) && page > 0 && <NotificationSkeletonList count={3} />}
+          {!hasMore && filteredNotifications.length > 0 && (
+            <div className="text-center py-4 text-sm text-muted-foreground">
+              {t('NO_MORE_NOTIFICATIONS')}
+            </div>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <div className="flex items-center justify-center p-4">
+        <p className="text-low-emphasis">{t('NO_NOTIFICATIONS')}</p>
+      </div>
+    );
+  };
 
   useEffect(() => {
     let subscription: { stop: () => Promise<void> } | null = null;
@@ -196,30 +231,7 @@ export function Notification() {
               className="flex flex-col border-t border-border max-h-[calc(100vh-13rem)] md:max-h-[500px] overflow-y-auto"
             >
               <TabsContent value={tabId} className="m-0">
-                {isLoading && page === 0 ? (
-                  <NotificationSkeletonList count={5} />
-                ) : filteredNotifications.length > 0 ? (
-                  <>
-                    {filteredNotifications.map(
-                      (notification) =>
-                        notification && (
-                          <NotificationItem key={notification.id} notification={notification} />
-                        )
-                    )}
-                    {(isFetching || isLoadingMore) && page > 0 && (
-                      <NotificationSkeletonList count={3} />
-                    )}
-                    {!hasMore && filteredNotifications.length > 0 && (
-                      <div className="text-center py-4 text-sm text-muted-foreground">
-                        {t('NO_MORE_NOTIFICATIONS')}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center p-4">
-                    <p className="text-low-emphasis">{t('NO_NOTIFICATIONS')}</p>
-                  </div>
-                )}
+                {renderNotificationContent()}
               </TabsContent>
             </div>
           </Tabs>

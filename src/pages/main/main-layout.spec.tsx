@@ -1,4 +1,4 @@
-process.env.REACT_APP_API_BASE_URL = 'http://test-api.com';
+process.env.REACT_APP_API_BASE_URL = 'https://test-api.com';
 process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY = 'test-key';
 
 import React from 'react';

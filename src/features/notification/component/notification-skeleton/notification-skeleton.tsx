@@ -17,7 +17,7 @@ export const NotificationSkeleton = () => (
 export const NotificationSkeletonList = ({ count = 3 }: { count?: number }) => (
   <div data-testid="skeleton-list-container" className="animate-pulse">
     {Array.from({ length: count }).map((_, i) => (
-      <NotificationSkeleton key={i} />
+      <NotificationSkeleton key={`notification-skeleton-${i}`} />
     ))}
   </div>
 );

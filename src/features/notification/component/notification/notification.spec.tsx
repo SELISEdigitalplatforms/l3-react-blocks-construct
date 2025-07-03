@@ -55,7 +55,7 @@ jest.mock('state/store/auth', () => ({
 }));
 jest.mock('config/api', () => ({
   default: {
-    baseUrl: 'http://test-api.com',
+    baseUrl: 'https://test-api.com',
     blocksKey: 'test-key',
   },
 }));
