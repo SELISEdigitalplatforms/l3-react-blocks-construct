@@ -1,4 +1,12 @@
+import { useId, useMemo } from 'react';
 import { Skeleton } from 'components/ui/skeleton';
+
+const useSkeletonIds = (count: number) => {
+  const baseId = useId();
+  return useMemo(() => {
+    return Array.from({ length: count }, (_, i) => `${baseId}-${i}`);
+  }, [baseId, count]);
+};
 
 export const NotificationSkeleton = () => (
   <div
@@ -14,10 +22,14 @@ export const NotificationSkeleton = () => (
   </div>
 );
 
-export const NotificationSkeletonList = ({ count = 3 }: { count?: number }) => (
-  <div data-testid="skeleton-list-container" className="animate-pulse">
-    {Array.from({ length: count }).map((_, i) => (
-      <NotificationSkeleton key={`notification-skeleton-${i}`} />
-    ))}
-  </div>
-);
+export const NotificationSkeletonList = ({ count = 3 }: { count?: number }) => {
+  const skeletonKeys = useSkeletonIds(count);
+
+  return (
+    <div data-testid="skeleton-list-container" className="animate-pulse">
+      {skeletonKeys.map((key) => (
+        <NotificationSkeleton key={key} />
+      ))}
+    </div>
+  );
+};
