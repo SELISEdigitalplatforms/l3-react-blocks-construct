@@ -1,4 +1,5 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {Config} */
+/** @typedef {import('tailwindcss').Config} Config */
 
 module.exports = {
   content: [
@@ -128,6 +129,29 @@ module.exports = {
           700: 'hsl(var(--burgundy-700))',
           800: 'hsl(var(--burgundy-800))',
           900: 'hsl(var(--burgundy-900))',
+        },
+
+        'file-type': {
+          folder: {
+            icon: 'hsl(var(--folder-icon-color))',
+            background: 'hsl(var(--folder-icon-background))',
+          },
+          file: {
+            icon: 'hsl(var(--file-icon-color))',
+            background: 'hsl(var(--file-icon-background))',
+          },
+          image: {
+            icon: 'hsl(var(--image-icon-color))',
+            background: 'hsl(var(--image-icon-background))',
+          },
+          audio: {
+            icon: 'hsl(var(--audio-icon-color))',
+            background: 'hsl(var(--audio-icon-background))',
+          },
+          video: {
+            icon: 'hsl(var(--video-icon-color))',
+            background: 'hsl(var(--video-icon-background))',
+          },
         },
 
         success: {

@@ -68,7 +68,7 @@ export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
                 <span
                   className={`ml-3 truncate ${!showText && 'hidden'} ${isActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
                 >
-                  {item.name}
+                  {t(item.name)}
                 </span>
                 {showText && (
                   <ChevronRight
@@ -96,7 +96,7 @@ export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
                         <span
                           className={`ml-3 truncate ${!showText && 'hidden'} ${isChildActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
                         >
-                          {child.name}
+                          {t(child.name)}
                         </span>
                       </Link>
                     </SidebarMenuSubButton>

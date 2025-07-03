@@ -10,6 +10,9 @@ env:
 
 jobs:
   initialization:
+    permissions:
+        contents: read
+        id-token: write
     runs-on: ubuntu-22.04
     steps:
     - name: desciption
@@ -24,6 +27,9 @@ jobs:
 
   cd-job:
     if: ${{ github.event_name == 'push' }}
+    permissions:
+        contents: read
+        id-token: write
     uses: ./.github/workflows/3_stg_web.yml
     with:
       CONTAINER_NAME: 'stg-$SERVICE_NAME-webclient'

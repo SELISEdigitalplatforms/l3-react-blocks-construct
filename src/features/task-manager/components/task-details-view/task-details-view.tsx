@@ -264,8 +264,8 @@ export default function TaskDetailsView({
     setOpen(false);
     toast({
       variant: 'success',
-      title: t('DELETED'),
-      description: t('TASK_DELETED_SUCCESSFULLY'),
+      title: t('TASK_REMOVED'),
+      description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
     });
   };
 

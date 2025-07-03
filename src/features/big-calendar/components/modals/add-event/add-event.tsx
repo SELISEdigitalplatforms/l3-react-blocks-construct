@@ -353,8 +353,8 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
     if (fullEnd < fullStart) {
       toast({
         variant: 'destructive',
-        title: t('ERROR_SELECTING_TIME_SLOT'),
-        description: t('END_TIME_CANNOT_BEFORE_START_TIME'),
+        title: t('WRONG_TIME_SELECTED'),
+        description: t('PLEASE_SELECT_PROPER_END_TIME'),
       });
       return;
     }

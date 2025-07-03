@@ -221,12 +221,9 @@ export function EmailList({
                           {email.isStarred && <Star className="h-4 w-4 text-warning" />}
                         </div>
                       </div>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: htmlToPlainText(email?.preview),
-                        }}
-                        className="line-clamp-2 text-sm text-medium-emphasis"
-                      />
+                      <div className="line-clamp-2 text-sm text-medium-emphasis">
+                        {htmlToPlainText(email?.preview)}
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -351,13 +348,11 @@ export function EmailList({
                               {email.isStarred && <Star className="h-4 w-4 text-warning" />}
                             </div>
                           </div>
-                          <div
-                            dangerouslySetInnerHTML={{ __html: email?.preview }}
-                            className="line-clamp-2 text-sm text-medium-emphasis"
-                          />
+                          <div className="line-clamp-2 text-sm text-medium-emphasis">
+                            {htmlToPlainText(email?.preview)}
+                          </div>
                         </div>
                       </div>
-                      {/* </div> */}{' '}
                     </button>
                   ))}
                 </div>

@@ -95,7 +95,7 @@ export const ConfirmOtpVerification: React.FC<ConfirmOtpVerificationProps> = ({
               toast({
                 variant: 'success',
                 title: t('OTP_RESENT'),
-                description: t('NEW_VERIFICATION_CODE_SENT'),
+                description: t('NEW_VERIFICATION_CODE_SENT_DEVICE'),
               });
             }
           },
@@ -110,15 +110,15 @@ export const ConfirmOtpVerification: React.FC<ConfirmOtpVerificationProps> = ({
                 toast({
                   variant: 'success',
                   title: t('OTP_SENT'),
-                  description: t('NEW_VERIFICATION_CODE_SENT'),
+                  description: t('NEW_VERIFICATION_CODE_SENT_DEVICE'),
                 });
               }
             },
             onError: () => {
               toast({
                 variant: 'destructive',
-                title: t('RESEND_FAILED'),
-                description: t('FAILED_SEND_NEW_VERIFICATION_CODE'),
+                title: t('COULDNT_SEND_CODE'),
+                description: t('COULDNT_NEW_VERIFICATION_CODE'),
               });
             },
           }
@@ -139,7 +139,7 @@ export const ConfirmOtpVerification: React.FC<ConfirmOtpVerificationProps> = ({
         onError: () => {
           toast({
             variant: 'destructive',
-            title: t('FAILED_GENERATE_OTP'),
+            title: t('UNABLE_GENERATE_CODE'),
             description: t('PLEASE_TRY_AGAIN_LATER'),
           });
         },
@@ -151,8 +151,8 @@ export const ConfirmOtpVerification: React.FC<ConfirmOtpVerificationProps> = ({
     if (mfaType === UserMfaType.EMAIL_VERIFICATION && !mfaId) {
       toast({
         variant: 'destructive',
-        title: t('VERIFICATION_ERROR'),
-        description: t('PLEASE_WAIT_FOR_VERIFICATION_CODE'),
+        title: t('VERIFICATION_ISSUE'),
+        description: t('PLEASE_WAIT_BEFORE_REQUESTING_ANOTHER_CODE'),
       });
       return;
     }

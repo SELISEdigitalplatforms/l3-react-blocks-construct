@@ -81,28 +81,25 @@ export function EventInvitation({
 
   const { acceptedCount, declinedCount, noResponseCount } = getMemberCounts();
 
-  // Extracted toast notification logic
   const showResponseToast = (status: MEMBER_STATUS.ACCEPTED | MEMBER_STATUS.DECLINED) => {
-    const statusText = status === MEMBER_STATUS.ACCEPTED ? t('ACCEPTED') : t('DECLINED');
-    const statusTextLower = statusText.toLowerCase();
+    const statusText =
+      status === MEMBER_STATUS.ACCEPTED ? t('YOU_ACCEPTED_INVITATION') : t('DECLINED');
 
     toast({
       variant: 'success',
       title: `${t('INVITATION')} ${statusText}`,
-      description: (
-        <>
-          {t('YOU_HAVE_SUCCESSFULLY')} {statusTextLower} {t('THE_INVITATION_FOR')}{' '}
-          <span className="text-primary-700 text-sm font-semibold">{event.title}</span>.
-        </>
-      ),
+      description:
+        status === MEMBER_STATUS.ACCEPTED
+          ? t('YOU_ACCEPTED_INVITATION')
+          : t('YOU_DECLINED_INVITATION'),
     });
   };
 
   const showMeetingLinkToast = () => {
     toast({
       variant: 'success',
-      title: t('ZOOM_LINK_CLICKED'),
-      description: t('OPENING_ZOOM_PLACEHOLDER_LINK'),
+      title: t('OPENING_MEETING_LINK'),
+      description: t('REDIRECTING_MEETING_LINK'),
     });
   };
 

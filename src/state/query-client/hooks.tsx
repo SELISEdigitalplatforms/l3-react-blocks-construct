@@ -1,109 +1,125 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  QueryKey,
-  useMutation,
   UseMutationOptions,
-  useQuery,
   UseQueryOptions,
+  useMutation,
+  useQuery,
+  QueryKey,
 } from '@tanstack/react-query';
 import { useAuthStore } from '../store/auth';
-import { publicRoutes } from 'constant/auth-public-routes';
-import { useToast } from 'hooks/use-toast';
+import { useErrorHandler, ErrorResponse } from '../../hooks/use-error-handler';
+
+// Helper to process API errors consistently
+const processApiError = (err: any): ErrorResponse => {
+  const errorInfo = {
+    error: err.error?.error || err.response?.data?.error || 'UNKNOWN_ERROR',
+    message: err.error?.message || err.response?.data?.message,
+    details: err.error?.details || err.response?.data?.details,
+  };
+
+  const apiError: ErrorResponse = {
+    error: errorInfo,
+    error_description:
+      err.error_description || err.message || err.response?.data?.error_description,
+  };
+
+  if (errorInfo.error === 'invalid_refresh_token') {
+    apiError.error = {
+      error: 'invalid_refresh_token',
+      message: 'LOGGED_OUT_DUE_SESSION_EXPIRATION',
+    };
+    apiError.error_description = 'LOGGED_OUT_DUE_SESSION_EXPIRATION';
+  }
+
+  return apiError;
+};
+
+// Helper to handle session expiration
+const handleSessionExpiration = (
+  logout: () => void,
+  navigate: (path: string) => void,
+  handleError: (error: any, options?: any) => void,
+  duration = 3000
+) => {
+  setTimeout(() => {
+    logout();
+    navigate('/login');
+    handleError('LOGGED_OUT_DUE_SESSION_EXPIRATION', {
+      variant: 'destructive',
+      duration,
+      title: 'LOGGED_OUT',
+    });
+  }, 1500);
+};
+
+type ToastVariant = 'default' | 'destructive';
+
+type ApiError = ErrorResponse;
 
 /**
- * useGlobalQuery Hook
- *
- * An enhanced React Query useQuery hook that handles authentication errors globally
- * by automatically logging out users and redirecting to login when refresh tokens expire.
- *
- * Features:
- * - Wraps React Query's useQuery with authentication error handling
- * - Automatically redirects to login page on invalid refresh tokens
- * - Preserves all original useQuery functionality and return values
- * - Supports public routes where auth errors shouldn't trigger logout
- * - Fully typed with generics for query data, errors and variables
- *
- * @template TQueryFnData The type of data returned by the query function
- * @template TError The type of error returned by the query function (defaults to ApiError)
- * @template TData The type of transformed data returned by the select option
- * @template TQueryKey The type of the query key
- *
- * @param {UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>} option - Standard React Query options
- * @returns {UseQueryResult<TData, TError>} The query result object from React Query
- *
- * @example
- * // Basic usage
- * const { data, isLoading } = useGlobalQuery({
- *   queryKey: ['users'],
- *   queryFn: () => clients.get('users'),
- * });
+ * A wrapper around React Query's useQuery that adds global error handling
  */
+const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password'];
 
-interface ApiError {
-  error?: {
-    error?: string;
-    message?: string;
-    code?: number;
-  };
-}
-
-const overlay = document.createElement('div');
-overlay.style.position = 'fixed';
-overlay.style.top = '0';
-overlay.style.left = '0';
-overlay.style.width = '100%';
-overlay.style.height = '100%';
-overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-overlay.style.zIndex = '40';
-overlay.id = 'session-expired-overlay';
+type GlobalQueryOptions<TQueryFnData, TError, TData, TQueryKey extends QueryKey> = Omit<
+  UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+  'onError'
+> & {
+  messageMap?: Record<string, string>;
+  variant?: ToastVariant;
+  duration?: number;
+  onError?: (error: TError) => void;
+};
 
 export const useGlobalQuery = <
   TQueryFnData = unknown,
-  TError = ApiError,
+  TError = ErrorResponse,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 >(
-  option: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>
+  options: GlobalQueryOptions<TQueryFnData, TError, TData, TQueryKey>
 ) => {
+  const { handleError } = useErrorHandler();
+  const { t } = useTranslation();
   const { logout } = useAuthStore();
   const navigate = useNavigate();
-  const currentPath = location.pathname;
-  const { t } = useTranslation();
+  const location = useLocation();
+  const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
-  const queryResult = useQuery(option);
-  const isPublicRoute = publicRoutes.includes(currentPath);
-  const { toast } = useToast();
+  const hasHandledError = useRef(false);
+
+  const queryResult = useQuery<TQueryFnData, TError, TData, TQueryKey>({
+    ...options,
+    retry: false,
+  });
 
   useEffect(() => {
-    if (queryResult.error) {
-      const errorMessage = (queryResult.error as ApiError).error?.error;
+    if (queryResult.error && !hasHandledError.current) {
+      hasHandledError.current = true;
+      const err = queryResult.error as any;
+      const apiError = processApiError(err);
 
-      if (errorMessage === 'invalid_refresh_token' && !isPublicRoute) {
-        document.body.appendChild(overlay);
-
-        toast({
-          variant: 'success',
-          title: t('SUCCESS'),
-          description: t('LOGGING_OUT_SESSION_EXPIRATION'),
-          duration: 2000,
-        });
-
-        new Promise((resolve) => setTimeout(resolve, 1500)).then(() => {
-          logout();
-          navigate('/login');
-
-          const existingOverlay = document.getElementById('session-expired-overlay');
-
-          if (existingOverlay?.parentNode) {
-            existingOverlay.parentNode.removeChild(existingOverlay);
-          }
+      if (apiError.error?.error === 'invalid_refresh_token' && !isPublicRoute) {
+        handleSessionExpiration(logout, navigate, handleError);
+      } else {
+        handleError(apiError, {
+          variant: 'destructive',
         });
       }
+
+      // Call the original onError if it exists
+      if (options.onError) {
+        options.onError(queryResult.error);
+      }
     }
-  }, [queryResult.error, logout, isPublicRoute, navigate, toast, t]);
+
+    // Reset the flag when the error changes
+    if (!queryResult.error) {
+      hasHandledError.current = false;
+    }
+  }, [queryResult.error, isPublicRoute, handleError, logout, navigate, options, t]);
 
   return queryResult;
 };
@@ -140,7 +156,7 @@ export const useGlobalQuery = <
 
 export const useGlobalMutation = <
   TData = unknown,
-  TError = ApiError, // Use the custom error type
+  TError = ApiError,
   TVariables = void,
   TContext = unknown,
 >(
@@ -148,39 +164,42 @@ export const useGlobalMutation = <
 ) => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
 
   return useMutation({
     ...option,
-    onError: (error, variables, context) => {
-      const errorMessage = (error as ApiError).error?.error;
+    onError: (errorData, variables, context) => {
+      const err = errorData as any;
+      const apiError = processApiError(err);
 
-      if (errorMessage === 'invalid_refresh_token') {
-        document.body.appendChild(overlay);
-
-        toast({
-          variant: 'success',
-          title: t('SUCCESS'),
-          description: t('LOGGING_OUT_SESSION_EXPIRATION'),
-          duration: 2000,
-        });
-
-        new Promise((resolve) => setTimeout(resolve, 1500)).then(() => {
-          logout();
-
-          navigate('/login');
-
-          const existingOverlay = document.getElementById('session-expired-overlay');
-          if (existingOverlay?.parentNode) {
-            existingOverlay.parentNode.removeChild(existingOverlay);
-          }
-        });
+      if (apiError.error?.error === 'invalid_refresh_token') {
+        handleSessionExpiration(logout, navigate, handleError);
+        return;
       }
 
-      if (option.onError) {
-        option.onError(error, variables, context);
+      // Handle validation errors
+      if (apiError.error?.error === 'validation_failed' && apiError.error?.details) {
+        handleError(apiError, {
+          variant: 'destructive',
+        });
+        return;
       }
+
+      // Handle specific error messages
+      if (apiError.error_description || apiError.error?.message) {
+        handleError(apiError, {
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Default error handling
+      handleError(apiError, {
+        variant: 'destructive',
+      });
+
+      // Call the original onError if provided
+      option.onError?.(errorData, variables, context);
     },
   });
 };
