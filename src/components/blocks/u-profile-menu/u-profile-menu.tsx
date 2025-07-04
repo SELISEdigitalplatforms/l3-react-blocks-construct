@@ -14,7 +14,7 @@ import { useAuthStore } from 'state/store/auth';
 import DummyProfile from 'assets/images/dummy_profile.png';
 import { Skeleton } from 'components/ui/skeleton';
 import { useGetAccount } from 'features/profile/hooks/use-account';
-import { useTheme } from 'components/core/theme-provider';
+import { useTheme } from 'theme/theme-provider';
 
 /**
  * UProfileMenu Component

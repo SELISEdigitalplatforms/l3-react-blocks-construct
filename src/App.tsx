@@ -22,7 +22,7 @@ import { Profile } from './pages/profile/profile';
 import { Storage } from './pages/services/storage/storage';
 import { Mail } from './pages/services/mail/mail';
 import { Help } from './pages/help/help';
-import { ThemeProvider } from './components/core/theme-provider';
+import { ThemeProvider } from './theme/theme-provider';
 import { Inventory } from './pages/inventory/inventory';
 import { InventoryDetails } from './pages/inventory/inventory-details';
 import { SidebarProvider } from 'components/ui/sidebar';
@@ -75,60 +75,58 @@ function AppContent() {
     <div className="min-h-screen bg-background font-sans antialiased relative">
       <RedirectHandler />
       <ClientMiddleware>
-        <ThemeProvider>
-          <SidebarProvider>
-            <Routes>
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<SigninPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/sent-email" element={<EmailVerification />} />
-                <Route path="/activate" element={<SetPasswordPage />} />
-                <Route path="/resetpassword" element={<ResetPasswordPage />} />
-                <Route path="/success" element={<ActivationSuccess />} />
-                <Route path="/activate-failed" element={<VerificationFailed />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/verify-key" element={<VerifyOtpKey />} />
+        <SidebarProvider>
+          <Routes>
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<SigninPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/sent-email" element={<EmailVerification />} />
+              <Route path="/activate" element={<SetPasswordPage />} />
+              <Route path="/resetpassword" element={<ResetPasswordPage />} />
+              <Route path="/success" element={<ActivationSuccess />} />
+              <Route path="/activate-failed" element={<VerificationFailed />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/verify-key" element={<VerifyOtpKey />} />
+            </Route>
+            <Route element={<MainLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/finance" element={<Finance />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/inventory" element={<Inventory />} />
+              <Route path="/inventory/add" element={<InventoryForm />} />
+              <Route path="/inventory/:itemId" element={<InventoryDetails />} />
+              <Route path="/activity-log" element={<ActivityLogPage1 />} />
+              <Route path="/timeline" element={<ActivityLogPage2 />} />
+              <Route path="/mail" element={<Email />} />
+              <Route path="/mail/:category" element={<Email />} />
+              <Route path="/mail/:category/:emailId" element={<Email />} />
+              <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/identity-management" element={<TaskPage />} />
+              <Route path="/services/storage" element={<Storage />} />
+              <Route path="/services/mail" element={<Mail />} />
+              <Route path="/task-manager" element={<TaskManager />} />
+              <Route path="/chat" element={<ChatPage />} />
+              <Route element={<InvoiceLayout />}>
+                <Route path="/invoices" element={<InvoicesPage />} />
+                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
+                <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
               </Route>
-              <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/finance" element={<Finance />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/inventory/add" element={<InventoryForm />} />
-                <Route path="/inventory/:itemId" element={<InventoryDetails />} />
-                <Route path="/activity-log" element={<ActivityLogPage1 />} />
-                <Route path="/timeline" element={<ActivityLogPage2 />} />
-                <Route path="/mail" element={<Email />} />
-                <Route path="/mail/:category" element={<Email />} />
-                <Route path="/mail/:category/:emailId" element={<Email />} />
-                <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/identity-management" element={<TaskPage />} />
-                <Route path="/services/storage" element={<Storage />} />
-                <Route path="/services/mail" element={<Mail />} />
-                <Route path="/task-manager" element={<TaskManager />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route element={<InvoiceLayout />}>
-                  <Route path="/invoices" element={<InvoicesPage />} />
-                  <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                  <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
-                  <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
-                </Route>
-                <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash" element={<Trash />} />
+              <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
+              <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
+              <Route path="/file-manager/trash" element={<Trash />} />
 
-                <Route path="/calendar" element={<CalendarPage />} />
-                <Route path="/503" element={<ServiceUnavailable />} />
-                <Route path="/404" element={<NotFound />} />
-              </Route>
+              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/503" element={<ServiceUnavailable />} />
+              <Route path="/404" element={<NotFound />} />
+            </Route>
 
-              {/* redirecting */}
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-              <Route path="*" element={<Navigate to="/404" />} />
-            </Routes>
-          </SidebarProvider>
-        </ThemeProvider>
+            {/* redirecting */}
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="*" element={<Navigate to="/404" />} />
+          </Routes>
+        </SidebarProvider>
       </ClientMiddleware>
       <Toaster />
     </div>
@@ -136,11 +134,16 @@ function AppContent() {
 }
 
 function App() {
+  const primaryColor = process.env.REACT_APP_PRIMARY_COLOR || '#008F8F';
+  const secondaryColor = process.env.REACT_APP_SECONDARY_COLOR || '#7498AD';
+
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider defaultLanguage="en-US" defaultModules={['common', 'auth']}>
-          <AppContent />
+          <ThemeProvider initialPrimaryColor={primaryColor} initialSecondaryColor={secondaryColor}>
+            <AppContent />
+          </ThemeProvider>
         </LanguageProvider>
       </QueryClientProvider>
     </BrowserRouter>

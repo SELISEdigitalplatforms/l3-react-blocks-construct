@@ -2,9 +2,9 @@ import { SigninForm } from 'features/auth/components/signin-form';
 import { Link } from 'react-router-dom';
 import darklogo from 'assets/images/construct_logo_dark.svg';
 import lightlogo from 'assets/images/construct_logo_light.svg';
-import { useTheme } from 'components/core/theme-provider';
 import { useTranslation } from 'react-i18next';
 import { useGetLoginOptions } from 'features/auth/hooks/use-auth';
+import { useTheme } from 'theme/theme-provider';
 
 export function SigninPage() {
   const { theme } = useTheme();

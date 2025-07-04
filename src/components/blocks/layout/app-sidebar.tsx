@@ -3,11 +3,11 @@ import { useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '../../ui/sidebar';
 import { menuItems } from '../../../constant/sidebar-menu';
 
-import { useTheme } from 'components/core/theme-provider';
 import { LogoSection } from '../sidebar/logo-section';
 import { MenuSection } from '../sidebar/menu-section';
 import { getSidebarStyle } from 'utils/sidebar-utils';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from 'theme/theme-provider';
 
 /**
  * AppSidebar Component
