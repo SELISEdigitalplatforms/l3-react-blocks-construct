@@ -3,9 +3,9 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthState } from 'state/client-middleware';
 import bgAuthLight from 'assets/images/bg_auth_light.svg';
 import bgAuthDark from 'assets/images/bg_auth_dark.svg';
-import { useTheme } from 'components/core/theme-provider';
 import LanguageSelector from 'components/blocks/language-selector/language-selector';
 import { useGetLoginOptions } from 'features/auth/hooks/use-auth';
+import { useTheme } from 'theme/theme-provider';
 
 export function AuthLayout() {
   const { isLoading } = useGetLoginOptions();
