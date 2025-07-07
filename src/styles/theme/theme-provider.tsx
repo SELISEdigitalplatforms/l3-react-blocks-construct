@@ -105,19 +105,16 @@ export function ThemeProvider({
     };
   });
 
-  // Update CSS variables when colors change
   useEffect(() => {
     const { light, dark } = getThemeColors();
     const isDark =
       theme === 'dark' ||
       (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-    // Get the appropriate color set based on theme
     const colorSet = isDark ? dark : light;
 
     const style = document.documentElement.style;
 
-    // Helper function to safely set color variables
     const setColorVariables = (prefix: string, palette: ColorPalette) => {
       Object.entries(palette).forEach(([key, value]) => {
         if (value) {
@@ -126,7 +123,6 @@ export function ThemeProvider({
       });
     };
 
-    // Update primary and secondary colors
     if (colorSet.primary) {
       setColorVariables('primary', colorSet.primary);
     }
@@ -135,7 +131,6 @@ export function ThemeProvider({
       setColorVariables('secondary', colorSet.secondary);
     }
 
-    // Update colors in state
     setColors({
       primary: process.env.REACT_APP_PRIMARY_COLOR || '#15969B',
       secondary: process.env.REACT_APP_SECONDARY_COLOR || '#5194B8',

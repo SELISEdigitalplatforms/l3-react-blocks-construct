@@ -41,7 +41,6 @@ export const generateColorPalette = (baseColor: string, isDark = false): ColorPa
 
   if (isDark) {
     if (isPrimary) {
-      // Dark theme - primary colors
       return {
         50: { h, s: Math.max(15, s * 0.3), l: 12 },
         100: { h, s: Math.max(20, s * 0.4), l: 17 },
@@ -56,7 +55,6 @@ export const generateColorPalette = (baseColor: string, isDark = false): ColorPa
       };
     }
 
-    // Dark theme - secondary colors
     return {
       50: { h, s: Math.max(20, s * 0.3), l: 15 },
       100: { h, s: Math.max(25, s * 0.4), l: 22 },
@@ -72,7 +70,6 @@ export const generateColorPalette = (baseColor: string, isDark = false): ColorPa
   }
 
   if (isPrimary) {
-    // Light theme - primary colors
     return {
       50: { h, s: Math.max(15, s * 0.3), l: 88 },
       100: { h, s: Math.max(20, s * 0.4), l: 75 },
@@ -87,7 +84,6 @@ export const generateColorPalette = (baseColor: string, isDark = false): ColorPa
     };
   }
 
-  // Light theme - secondary colors
   return {
     50: { h, s: Math.max(10, s * 0.2), l: 97 },
     100: { h, s: Math.max(15, s * 0.3), l: 93 },
@@ -102,7 +98,6 @@ export const generateColorPalette = (baseColor: string, isDark = false): ColorPa
   };
 };
 
-// Default color values from globals.css
 const defaultColors = {
   light: {
     primary: {
