@@ -44,7 +44,7 @@ const config: Config = {
       },
     ],
   },
-  transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(uuid|color|color-string|color-convert|color-name)/)'],
 };
 
 export default config;

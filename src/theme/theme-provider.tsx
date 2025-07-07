@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
-import { applyTheme } from './utils/utils';
+import { applyTheme, isValidColor } from './utils/utils';
 
 // Types
 export type Theme = 'dark' | 'light' | 'system';
@@ -139,12 +139,3 @@ export const useTheme = () => {
   if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider');
   return context;
 };
-
-// Helper function to validate color format
-function isValidColor(color: string): boolean {
-  // Check if it's a valid hex color
-  const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  // Check if it's a valid HSL color
-  const hslRegex = /^hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)$/;
-  return hexRegex.test(color) || hslRegex.test(color);
-}
