@@ -83,21 +83,26 @@ export function ThemeProvider({
   const [colors, setColors] = useState(() => {
     const themeColors = getThemeColors();
     const currentTheme = theme === 'dark' ? themeColors.dark : themeColors.light;
-    const defaultPrimary = process.env.REACT_APP_PRIMARY_COLOR || '#15969B';
-    const defaultSecondary = process.env.REACT_APP_SECONDARY_COLOR || '#5194B8';
+    const defaultPrimary = process.env.REACT_APP_PRIMARY_COLOR ?? '#15969B';
+    const defaultSecondary = process.env.REACT_APP_SECONDARY_COLOR ?? '#5194B8';
 
-    // Convert HSLColor to string if needed, or use default
-    const primaryColor = currentTheme.primary
-      ? typeof currentTheme.primary === 'string'
-        ? currentTheme.primary
-        : `hsl(${currentTheme.primary.h}, ${currentTheme.primary.s}%, ${currentTheme.primary.l}%)`
-      : defaultPrimary;
+    // Helper function to resolve color value
+    const resolveColor = (
+      color: string | HSLColor | ColorPalette | null | undefined,
+      defaultValue: string
+    ): string => {
+      if (!color) return defaultValue;
+      if (typeof color === 'string') return color;
+      if ('h' in color && 's' in color && 'l' in color) {
+        return `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
+      }
+      // If it's a ColorPalette, use the first color (or default)
+      const firstColor = Object.values(color)[0];
+      return firstColor ? `hsl(${firstColor.h}, ${firstColor.s}%, ${firstColor.l}%)` : defaultValue;
+    };
 
-    const secondaryColor = currentTheme.secondary
-      ? typeof currentTheme.secondary === 'string'
-        ? currentTheme.secondary
-        : `hsl(${currentTheme.secondary.h}, ${currentTheme.secondary.s}%, ${currentTheme.secondary.l}%)`
-      : defaultSecondary;
+    const primaryColor = resolveColor(currentTheme.primary, defaultPrimary);
+    const secondaryColor = resolveColor(currentTheme.secondary, defaultSecondary);
 
     return {
       primary: primaryColor,
@@ -132,8 +137,8 @@ export function ThemeProvider({
     }
 
     setColors({
-      primary: process.env.REACT_APP_PRIMARY_COLOR || '#15969B',
-      secondary: process.env.REACT_APP_SECONDARY_COLOR || '#5194B8',
+      primary: process.env.REACT_APP_PRIMARY_COLOR ?? '#15969B',
+      secondary: process.env.REACT_APP_SECONDARY_COLOR ?? '#5194B8',
     });
   }, [theme]);
 
