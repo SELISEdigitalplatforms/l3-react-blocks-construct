@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { getThemeColors, type HSLColor } from './utils/utils';
 
 /**
  * ThemeProvider Component
@@ -48,11 +49,23 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: Theme;
+  colors: {
+    primary: string;
+    secondary: string;
+  };
   setTheme: (theme: Theme) => void;
+};
+
+type ColorPalette = {
+  [key: string]: HSLColor;
 };
 
 const initialState: ThemeProviderState = {
   theme: 'light',
+  colors: {
+    primary: process.env.REACT_APP_PRIMARY_COLOR ?? '',
+    secondary: process.env.REACT_APP_SECONDARY_COLOR ?? '',
+  },
   setTheme: () => null,
 };
 
@@ -66,6 +79,63 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+
+  const [colors, setColors] = useState(() => {
+    const themeColors = getThemeColors();
+    const currentTheme = theme === 'dark' ? themeColors.dark : themeColors.light;
+    const defaultPrimary = process.env.REACT_APP_PRIMARY_COLOR || '#15969B';
+    const defaultSecondary = process.env.REACT_APP_SECONDARY_COLOR || '#5194B8';
+
+    // Convert HSLColor to string if needed, or use default
+    const primaryColor = currentTheme.primary
+      ? typeof currentTheme.primary === 'string'
+        ? currentTheme.primary
+        : `hsl(${currentTheme.primary.h}, ${currentTheme.primary.s}%, ${currentTheme.primary.l}%)`
+      : defaultPrimary;
+
+    const secondaryColor = currentTheme.secondary
+      ? typeof currentTheme.secondary === 'string'
+        ? currentTheme.secondary
+        : `hsl(${currentTheme.secondary.h}, ${currentTheme.secondary.s}%, ${currentTheme.secondary.l}%)`
+      : defaultSecondary;
+
+    return {
+      primary: primaryColor,
+      secondary: secondaryColor,
+    };
+  });
+
+  useEffect(() => {
+    const { light, dark } = getThemeColors();
+    const isDark =
+      theme === 'dark' ||
+      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    const colorSet = isDark ? dark : light;
+
+    const style = document.documentElement.style;
+
+    const setColorVariables = (prefix: string, palette: ColorPalette) => {
+      Object.entries(palette).forEach(([key, value]) => {
+        if (value) {
+          style.setProperty(`--${prefix}-${key}`, `${value.h}, ${value.s}%, ${value.l}%`);
+        }
+      });
+    };
+
+    if (colorSet.primary) {
+      setColorVariables('primary', colorSet.primary);
+    }
+
+    if (colorSet.secondary) {
+      setColorVariables('secondary', colorSet.secondary);
+    }
+
+    setColors({
+      primary: process.env.REACT_APP_PRIMARY_COLOR || '#15969B',
+      secondary: process.env.REACT_APP_SECONDARY_COLOR || '#5194B8',
+    });
+  }, [theme]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -85,12 +155,13 @@ export function ThemeProvider({
   const value = useMemo(
     () => ({
       theme,
-      setTheme: (theme: Theme) => {
-        localStorage.setItem(storageKey, theme);
-        setTheme(theme);
+      colors,
+      setTheme: (newTheme: Theme) => {
+        localStorage.setItem(storageKey, newTheme);
+        setTheme(newTheme);
       },
     }),
-    [storageKey, theme]
+    [theme, colors, storageKey]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
