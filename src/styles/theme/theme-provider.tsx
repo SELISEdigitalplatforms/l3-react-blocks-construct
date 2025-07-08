@@ -93,12 +93,25 @@ export function ThemeProvider({
     ): string => {
       if (!color) return defaultValue;
       if (typeof color === 'string') return color;
-      if ('h' in color && 's' in color && 'l' in color) {
-        return `hsl(${color.h}, ${color.s}%, ${color.l}%)`;
+
+      const hslColor = color as HSLColor;
+      if (
+        hslColor &&
+        typeof hslColor === 'object' &&
+        'h' in hslColor &&
+        's' in hslColor &&
+        'l' in hslColor
+      ) {
+        return `hsl(${hslColor.h}, ${hslColor.s}%, ${hslColor.l}%)`;
       }
-      // If it's a ColorPalette, use the first color (or default)
-      const firstColor = Object.values(color)[0];
-      return firstColor ? `hsl(${firstColor.h}, ${firstColor.s}%, ${firstColor.l}%)` : defaultValue;
+
+      const colorPalette = color as ColorPalette;
+      const firstColor = Object.values(colorPalette)[0];
+      if (firstColor && 'h' in firstColor && 's' in firstColor && 'l' in firstColor) {
+        return `hsl(${firstColor.h}, ${firstColor.s}%, ${firstColor.l}%)`;
+      }
+
+      return defaultValue;
     };
 
     const primaryColor = resolveColor(currentTheme.primary, defaultPrimary);
