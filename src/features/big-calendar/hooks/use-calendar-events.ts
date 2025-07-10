@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { CalendarEvent, myEventsList, Member } from 'features/big-calendar';
 import { MEMBER_STATUS } from 'features/big-calendar/enums/calendar.enum';
 
@@ -8,6 +8,11 @@ import { MEMBER_STATUS } from 'features/big-calendar/enums/calendar.enum';
  */
 export const useCalendarEvents = () => {
   const [events, setEvents] = useState(myEventsList);
+  // Store the last deleted event and related information for undo functionality
+  // Using useRef instead of useState to ensure the value persists between renders
+  const lastDeletedEventRef = useRef<CalendarEvent | null>(null);
+  // Store the original events list before deletion to ensure proper restoration
+  const eventsBeforeDeletionRef = useRef<CalendarEvent[]>([]);
   const currentUserId = crypto.randomUUID();
 
   /**
@@ -99,48 +104,71 @@ export const useCalendarEvents = () => {
     event.resource?.color === originalColor;
 
   /**
-   * Delete an event or a recurring series of events
+   * Delete an event from the calendar
+   * @param eventId - ID of the event to delete
+   * @param deleteOption - Option for recurring events ('this', 'thisAndFollowing', 'all')
    */
   const deleteEvent = (eventId: string, deleteOption?: 'this' | 'thisAndFollowing' | 'all') => {
+    // Find the event to delete
     const eventToDelete = events.find((event) => event.eventId === eventId);
-    if (!eventToDelete) return;
-
-    // Simple case: non-recurring event or delete just this occurrence
-    if (!eventToDelete.resource?.recurring || deleteOption === 'this') {
-      setEvents((prev) => prev.filter((event) => event.eventId !== eventId));
+    if (!eventToDelete) {
       return;
     }
 
+    // Store the current events list before deletion for proper restoration
+    const eventsCopy = [...events];
+    eventsBeforeDeletionRef.current = eventsCopy;
+
+    // Store the deleted event for potential restoration
+    const deletedEventCopy = JSON.parse(JSON.stringify(eventToDelete));
+    lastDeletedEventRef.current = deletedEventCopy;
+
+    // Get the original title and color for recurring event identification
     const originalTitle = eventToDelete.title;
     const originalColor = eventToDelete.resource?.color;
+
+    // Create a new events array without the deleted event
+    let updatedEvents: CalendarEvent[] = [];
+
+    // Simple case: non-recurring event or delete just this occurrence
+    if (!eventToDelete.resource?.recurring || deleteOption === 'this') {
+      updatedEvents = events.filter((event) => event.eventId !== eventId);
+      setEvents(updatedEvents);
+      return;
+    }
 
     // Delete this and all future occurrences
     if (deleteOption === 'thisAndFollowing') {
       const eventDate = new Date(eventToDelete.start);
-      setEvents((prev) =>
-        prev.filter((event) => {
-          if (event.title !== originalTitle) return true;
-          if (event.resource?.color !== originalColor) return true;
 
-          if (!isSameRecurringSeries(event, originalTitle, originalColor)) return true;
+      updatedEvents = events.filter((event) => {
+        if (event.title !== originalTitle) return true;
+        if (event.resource?.color !== originalColor) return true;
+        if (!isSameRecurringSeries(event, originalTitle, originalColor)) return true;
 
-          return new Date(event.start) < eventDate;
-        })
-      );
+        return new Date(event.start) < eventDate;
+      });
+
+      setEvents(updatedEvents);
       return;
     }
 
-    // Delete entire series
+    // Delete all occurrences of this recurring event
     if (deleteOption === 'all') {
-      setEvents((prev) =>
-        prev.filter((event) => {
-          if (event.title !== originalTitle) return true;
-          if (event.resource?.color !== originalColor) return true;
-
-          return !isSameRecurringSeries(event, originalTitle, originalColor);
-        })
+      updatedEvents = events.filter(
+        (event) =>
+          event.title !== originalTitle ||
+          event.resource?.color !== originalColor ||
+          !isSameRecurringSeries(event, originalTitle, originalColor)
       );
+
+      setEvents(updatedEvents);
+      return;
     }
+
+    // Default case - shouldn't reach here but just in case
+    updatedEvents = events.filter((event) => event.eventId !== eventId);
+    setEvents(updatedEvents);
   };
 
   /**
@@ -271,6 +299,34 @@ export const useCalendarEvents = () => {
     setEvents((prev) => prev.map((ev) => (ev.eventId === tempEvent.eventId ? tempEvent : ev)));
   };
 
+  /**
+   * Restore the last deleted event
+   * Uses the events snapshot from before deletion to restore the exact state
+   */
+  const restoreEvent = () => {
+    if (
+      !lastDeletedEventRef.current ||
+      !eventsBeforeDeletionRef.current ||
+      eventsBeforeDeletionRef.current.length === 0
+    ) {
+      return false;
+    }
+
+    const eventsToRestore = JSON.parse(JSON.stringify(eventsBeforeDeletionRef.current));
+    const processedEvents = eventsToRestore.map((event: CalendarEvent) => ({
+      ...event,
+      start: new Date(event.start),
+      end: new Date(event.end),
+    }));
+
+    setEvents(processedEvents);
+
+    lastDeletedEventRef.current = null;
+    eventsBeforeDeletionRef.current = [];
+
+    return true;
+  };
+
   return {
     events,
     currentUserId,
@@ -281,5 +337,7 @@ export const useCalendarEvents = () => {
     updateEvent,
     filterEvents,
     updateEventPosition,
+    lastDeletedEventRef,
+    restoreEvent,
   };
 };

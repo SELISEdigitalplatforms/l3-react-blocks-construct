@@ -12,7 +12,9 @@ jobs:
   build:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
-
+    permissions:
+        contents: read
+        id-token: write
     steps:
       - uses: actions/checkout@v2
         with:
@@ -54,13 +56,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-sonar
 
-      - uses: sonarsource/sonarqube-scan-action@master
+      - uses: sonarsource/sonarqube-scan-action@v5.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
 
       - name: SonarQube Quality Gate check
-        uses: sonarsource/sonarqube-quality-gate-action@master
+        uses: sonarsource/sonarqube-quality-gate-action@v1.2.0
         # Force to fail step after specific time.
         timeout-minutes: 5
         env:

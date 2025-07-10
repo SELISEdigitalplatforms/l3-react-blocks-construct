@@ -97,16 +97,13 @@ const PasswordStrengthIndicator = ({
 
     setChecks(newChecks);
 
-    // Calculate strength score
     const strengthScore = Object.values(newChecks).filter(Boolean).length;
 
-    // Additional check for password match
     const passwordsMatch = confirmPassword
       ? password === confirmPassword && password.length > 0
       : true;
 
-    // Adjust strength based on password match
-    const finalStrength = passwordsMatch ? strengthScore * 25 : Math.min(strengthScore * 25, 75); // Cap at 75% if passwords don't match
+    const finalStrength = passwordsMatch ? strengthScore * 25 : Math.min(strengthScore * 25, 75);
 
     setStrength(finalStrength);
 
@@ -146,7 +143,6 @@ const PasswordStrengthIndicator = ({
         />
       </div>
 
-      {/* Strength indicator */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span>Strength</span>
@@ -163,7 +159,6 @@ const PasswordStrengthIndicator = ({
         )}
       </div>
 
-      {/* Requirements list */}
       <div className="space-y-2">
         <span className="text-sm font-medium">Requirements:</span>
         <ul className="space-y-1">
@@ -180,9 +175,9 @@ const PasswordStrengthIndicator = ({
           {confirmPassword && (
             <li className="flex items-center text-sm">
               {passwordsMatch ? (
-                <Check className="mr-2 h-4 w-4 text-green-500" />
+                <Check className="mr-2 h-4 w-4 text-success" />
               ) : (
-                <X className="mr-2 h-4 w-4 text-red-500" />
+                <X className="mr-2 h-4 w-4 text-error" />
               )}
               Passwords must match
             </li>

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGetAccount } from '../../hooks/use-account';
-import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
-import { UserMfaType } from '../../enums/user-mfa-type-enum';
 import { useTranslation } from 'react-i18next';
 import { ProfileCard } from './profile-card';
 import { SecurityCard } from './security-card';
+import { useGetAccount } from '../../hooks/use-account';
+import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
+import { UserMfaType } from '../../enums/user-mfa-type-enum';
 
 /**
  * `GeneralInfo` component renders a user profile and account security section with options to
@@ -15,7 +15,7 @@ import { SecurityCard } from './security-card';
  */
 
 export const GeneralInfo = () => {
-  const { data: userInfo, isLoading, isFetching } = useGetAccount();
+  const { data: userInfo, isLoading } = useGetAccount();
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [currentDialog, setCurrentDialog] = useState(MfaDialogState.NONE);
@@ -61,7 +61,6 @@ export const GeneralInfo = () => {
       <ProfileCard
         userInfo={userInfo}
         isLoading={isLoading}
-        isFetching={isFetching}
         formatDate={formatDate}
         onEditClick={() => setIsEditProfileModalOpen(true)}
         isEditProfileModalOpen={isEditProfileModalOpen}
@@ -72,7 +71,6 @@ export const GeneralInfo = () => {
       <SecurityCard
         userInfo={userInfo}
         isLoading={isLoading}
-        isFetching={isFetching}
         isDemoAccount={isDemoAccount}
         t={t}
         currentDialog={currentDialog}

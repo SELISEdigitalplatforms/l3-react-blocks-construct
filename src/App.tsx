@@ -36,6 +36,14 @@ import { CalendarPage } from './pages/calendar/calendar';
 import ServiceUnavailable from './pages/error/service-unavailable/service-unavailable';
 import NotFound from './pages/error/not-found/not-found';
 import Finance from './pages/finance/finance';
+import { InvoicesPage } from './pages/invoices/invoices';
+import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
+import { InvoiceLayout } from './pages/invoices/invoice-layout';
+import { CreateInvoice, EditInvoice } from './features/invoices';
+import SharedWithMe from 'pages/file-manager/shared-files';
+import Trash from 'pages/file-manager/trash';
+import { ChatPage } from './pages/chat/chat';
+import { FileManagerMyFiles } from './pages/file-manager/my-files';
 
 const queryClient = new QueryClient();
 
@@ -99,6 +107,17 @@ function AppContent() {
                 <Route path="/services/storage" element={<Storage />} />
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
+                <Route path="/chat" element={<ChatPage />} />
+                <Route element={<InvoiceLayout />}>
+                  <Route path="/invoices" element={<InvoicesPage />} />
+                  <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                  <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
+                  <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
+                </Route>
+                <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
+                <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
+                <Route path="/file-manager/trash" element={<Trash />} />
+
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/503" element={<ServiceUnavailable />} />
                 <Route path="/404" element={<NotFound />} />

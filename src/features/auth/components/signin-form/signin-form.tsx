@@ -10,6 +10,7 @@ import { Button } from 'components/ui/button';
 import { UPasswordInput } from 'components/core/u-password-input';
 import { Captcha } from 'features/captcha';
 import { useAuthStore } from 'state/store/auth';
+import { useErrorHandler } from 'hooks/use-error-handler';
 import { useSigninMutation } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
 import { SignInResponse } from '../../services/auth.service';
@@ -59,6 +60,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { login } = useAuthStore();
+  const { handleError } = useErrorHandler();
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
@@ -71,7 +73,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
     resolver: zodResolver(getSigninFormValidationSchema(t)),
   });
 
-  const { isPending, mutateAsync, isError, errorDetails } = useSigninMutation();
+  const { isPending, mutateAsync, isError } = useSigninMutation();
 
   const handleCaptchaVerify = (token: SetStateAction<string>) => {
     setCaptchaToken(token);
@@ -101,7 +103,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
         login(res.access_token, res.refresh_token);
         navigate('/');
       }
-    } catch (_error) {
+    } catch (error) {
       if (captchaEnabled) {
         const newFailedAttempts = failedAttempts + 1;
         setFailedAttempts(newFailedAttempts);
@@ -110,6 +112,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
           setShowCaptcha(true);
         }
       }
+      handleError(error);
     }
   };
 
@@ -118,11 +121,15 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
 
   const signin = useCallback(
     async (code: string, state: string) => {
-      const res = await mutateAsync({ grantType: 'social', code, state });
-      login(res.access_token, res.refresh_token);
-      navigate('/');
+      try {
+        const res = await mutateAsync({ grantType: 'social', code, state });
+        login(res.access_token, res.refresh_token);
+        navigate('/');
+      } catch (error) {
+        handleError(error);
+      }
     },
-    [login, mutateAsync, navigate]
+    [login, mutateAsync, navigate, handleError]
   );
 
   useEffect(() => {
@@ -136,7 +143,11 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
 
   return (
     <div className="w-full">
-      <ErrorAlert isError={isError} title={errorDetails.title} message={errorDetails.message} />
+      <ErrorAlert
+        isError={isError}
+        title={t('INVALID_CREDENTIALS')}
+        message={t('EMAIL_PASSWORD_NOT_VALID')}
+      />
 
       {/* Only render the form if password grant type is allowed */}
       {passwordGrantAllowed && (

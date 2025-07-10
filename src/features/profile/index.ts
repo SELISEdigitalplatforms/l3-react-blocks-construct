@@ -8,3 +8,4 @@ export { EnableMfa } from './component/modals/enable-mfa/enable-mfa';
 export { AuthenticatorAppSetup } from './component/modals/authenticator-app-setup/authenticator-app-setup';
 export { ManageTwoFactorAuthentication } from './component/modals/manage-two-factor-authentication/manage-two-factor-authentication';
 export { EmailVerification } from './component/modals/email-verification/email-verification';
+export { ImageCropper } from './component/modals/image-cropper/image-cropper';

@@ -86,8 +86,8 @@ export const CalendarSettingSheet = ({
     });
     toast({
       variant: 'success',
-      title: t('SETTINGS_SAVED'),
-      description: t('CALENDAR_SETTINGS_HAVE_BEEN_UPDATED'),
+      title: t('UPDATED_SETTINGS'),
+      description: t('SUCCESSFULLY_UPDATED_CALENDAR_SETTINGS'),
     });
     onOpenChange(false);
   };
