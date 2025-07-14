@@ -10,7 +10,14 @@ export const DYNAMIC_BREADCRUMB_TITLES: Record<string, string | null> = {
   '/timeline': 'TIMELINE',
   '/inventory/add': 'ADD_ITEM',
   '/task-manager': 'TASK_MANAGER',
+  '/chat': 'CHAT',
+  '/invoices': 'INVOICES',
+  '/invoices/create-invoice': 'CREATE_INVOICE',
+  '/file-manager': 'FILE_MANAGER',
+  '/file-manager/my-files': 'MY_FILES',
+  '/file-manager/shared-files': 'SHARED_FILES',
+  '/file-manager/trash': 'TRASH',
   '/calendar': 'CALENDAR',
   '/404': 'ERROR_404',
-  '/503': 'ERROR_503'
+  '/503': 'ERROR_503',
 };

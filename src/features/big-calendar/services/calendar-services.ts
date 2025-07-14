@@ -141,8 +141,8 @@ const createEventBase = ({
   resource: {
     color,
     members,
-    meetingLink: '',
-    description: '',
+    meetingLink: ZOOM_MEETING_LINK,
+    description: description || '',
   },
 });
 
@@ -174,12 +174,17 @@ export const myEventsList: CalendarEvent[] = [
 
   createEvent({
     eventId: 'HogihwbMpu',
-    title: 'Client Presentation',
+    title: 'Client Presentation(Test evennt invitation)',
     start: new Date('2025-04-02T14:00:00.000Z'),
     end: new Date('2025-04-02T15:30:00.000Z'),
     description: `Present the Q2 marketing strategy to the client. The presentation will include an overview of the target audience, key performance indicators (KPIs), and projected outcomes. Additionally, we will discuss potential risks and mitigation strategies to ensure alignment with the client's expectations.`,
     color: CalendarEventColor.SECONDARY100,
     members: createClientPresentationMembers(),
+    additionalProps: {
+      resource: {
+        invitationAccepted: false,
+      },
+    },
   }),
 
   createEvent({

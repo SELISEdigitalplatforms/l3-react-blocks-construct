@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Moon, Sun } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +11,10 @@ import {
 } from 'components/ui/dropdown-menu';
 import { useSignoutMutation } from 'features/auth/hooks/use-auth';
 import { useAuthStore } from 'state/store/auth';
-import { useNavigate } from 'react-router-dom';
 import DummyProfile from 'assets/images/dummy_profile.png';
 import { Skeleton } from 'components/ui/skeleton';
 import { useGetAccount } from 'features/profile/hooks/use-account';
 import { useTheme } from 'components/core/theme-provider';
-import { useTranslation } from 'react-i18next';
 
 /**
  * UProfileMenu Component
@@ -53,7 +53,7 @@ export const UProfileMenu = () => {
   const { logout } = useAuthStore();
   const { mutateAsync } = useSignoutMutation();
   const navigate = useNavigate();
-  const { data, isLoading, isFetching } = useGetAccount();
+  const { data, isLoading } = useGetAccount();
 
   const signoutHandler = async () => {
     try {
@@ -68,18 +68,21 @@ export const UProfileMenu = () => {
   };
 
   const fullName = `${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim() ?? ' ';
-  const loading = isLoading || isFetching;
 
   return (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild className="cursor-pointer p-1 rounded-[2px]">
         <div className="flex justify-between items-center gap-1 sm:gap-3 cursor-pointer">
           <div className="relative overflow-hidden rounded-full border shadow-sm border-white h-8 w-8">
-            {loading ? (
+            {isLoading ? (
               <Skeleton className="h-8 w-8 rounded-full" />
             ) : (
               <img
-                src={data?.profileImageUrl ?? DummyProfile}
+                src={
+                  data?.profileImageUrl !== ''
+                    ? (data?.profileImageUrl ?? DummyProfile)
+                    : DummyProfile
+                }
                 alt="profile"
                 loading="lazy"
                 className="w-full h-full object-cover"
@@ -87,7 +90,7 @@ export const UProfileMenu = () => {
             )}
           </div>
           <div className="flex flex-col">
-            {loading ? (
+            {isLoading ? (
               <Skeleton className="w-24 h-4 mb-1" />
             ) : (
               <h2 className="text-xs font-semibold text-high-emphasis">{fullName}</h2>

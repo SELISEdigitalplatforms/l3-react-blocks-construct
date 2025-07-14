@@ -13,6 +13,7 @@ import { usePasswordStrength } from 'features/auth/hooks/use-password-strength/u
  * - Real-time password strength visualization with color indicators
  * - Checklist of password requirements with pass/fail status
  * - Password matching validation
+ * - Optional password exclusion check (e.g., different from current password)
  * - Callback for parent components when all requirements are met
  * - Styled container with consistent visual design
  *
@@ -20,6 +21,8 @@ import { usePasswordStrength } from 'features/auth/hooks/use-password-strength/u
  * @param {string} password - The current password value to check against requirements
  * @param {string} confirmPassword - The confirmation password to verify matching
  * @param {(met: boolean) => void} onRequirementsMet - Callback that triggers when requirements status changes
+ * @param {string} [excludePassword] - Optional password that the new password should NOT match (e.g., current password)
+ * @param {string} [excludePasswordLabel] - Optional label for the exclusion check (defaults to translation key)
  *
  * @returns {JSX.Element} A password strength indicator with requirement checklist
  *
@@ -31,34 +34,84 @@ import { usePasswordStrength } from 'features/auth/hooks/use-password-strength/u
  *   onRequirementsMet={setIsValid}
  * />
  *
- * @remarks
- * This component relies on the `usePasswordStrength` hook which should provide:
- * - `strength`: Numerical value (0-100) representing password strength
- * - `checks`: Object with boolean values for each requirement
- * - `getStrengthColor`: Function that returns appropriate CSS color class
- * - `requirements`: Array of requirement objects with keys and labels
+ * // Usage with current password exclusion (for password change)
+ * <SharedPasswordStrengthChecker
+ *   password={newPassword}
+ *   confirmPassword={confirmPassword}
+ *   onRequirementsMet={setIsValid}
+ *   excludePassword={currentPassword}
+ * />
  */
 
 interface SharedPasswordStrengthCheckerProps {
   password: string;
   confirmPassword: string;
   onRequirementsMet: (met: boolean) => void;
+  excludePassword?: string;
+  excludePasswordLabel?: string;
 }
 
 export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheckerProps> = ({
   password,
   confirmPassword,
   onRequirementsMet,
+  excludePassword,
+  excludePasswordLabel,
 }) => {
   const { t } = useTranslation();
-  const { strength, checks, getStrengthColor, requirements } = usePasswordStrength(password);
+  const { checks, requirements } = usePasswordStrength(password);
   const [passwordsMatch, setPasswordsMatch] = useState(false);
+  const [isDifferentFromExcluded, setIsDifferentFromExcluded] = useState(true);
 
   useEffect(() => {
     setPasswordsMatch(password === confirmPassword && password !== '');
-    const allMet = Object.values(checks).every((check) => check) && passwordsMatch;
+
+    if (excludePassword && password !== '') {
+      setIsDifferentFromExcluded(password !== excludePassword);
+    } else {
+      setIsDifferentFromExcluded(true);
+    }
+
+    const allMet =
+      Object.values(checks).every((check) => check) && passwordsMatch && isDifferentFromExcluded;
     onRequirementsMet(allMet);
-  }, [password, confirmPassword, checks, passwordsMatch, onRequirementsMet]);
+  }, [
+    password,
+    confirmPassword,
+    checks,
+    passwordsMatch,
+    excludePassword,
+    isDifferentFromExcluded,
+    onRequirementsMet,
+  ]);
+
+  const getAdjustedStrength = () => {
+    const basicRequirements = Object.values(checks).filter(Boolean).length;
+    let totalRequirements = Object.keys(checks).length;
+    let metRequirements = basicRequirements;
+
+    totalRequirements += 1;
+    if (passwordsMatch) {
+      metRequirements += 1;
+    }
+
+    if (excludePassword && password !== '') {
+      totalRequirements += 1;
+      if (isDifferentFromExcluded) {
+        metRequirements += 1;
+      }
+    }
+
+    return totalRequirements > 0 ? (metRequirements / totalRequirements) * 100 : 0;
+  };
+
+  const getAdjustedStrengthColor = () => {
+    const adjustedStrength = getAdjustedStrength();
+    if (adjustedStrength <= 25) return 'bg-red-500';
+    if (adjustedStrength <= 50) return 'bg-orange-500';
+    if (adjustedStrength <= 75) return 'bg-yellow-500';
+    return 'bg-green-600';
+  };
 
   return (
     <div className="w-full mx-auto px-6 py-4 rounded-lg shadow-sm border border-primary-50">
@@ -67,8 +120,8 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
       </h2>
       <div className="h-1 w-full bg-primary-50 rounded mb-2">
         <div
-          className={`h-1 rounded-full transition-all duration-300 ${getStrengthColor()}`}
-          style={{ width: `${strength}%` }}
+          className={`h-1 rounded-full transition-all duration-300 ${getAdjustedStrengthColor()}`}
+          style={{ width: `${getAdjustedStrength()}%` }}
         />
       </div>
 
@@ -87,6 +140,18 @@ export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheck
             {requirement.label}
           </li>
         ))}
+
+        {excludePassword && password !== '' && (
+          <li className="flex items-center gap-2">
+            {isDifferentFromExcluded ? (
+              <Check className="w-4 h-4 text-success" />
+            ) : (
+              <X className="w-4 h-4 text-red-500" />
+            )}
+            {excludePasswordLabel ?? "New password shouldn't match current password"}
+          </li>
+        )}
+
         <li className="flex items-center gap-2">
           {passwordsMatch ? (
             <Check className="w-4 h-4 text-success" />
