@@ -8,6 +8,7 @@ import { createAdvanceTableColumns } from 'features/inventory/component/advance-
 import { InventoryData, inventoryData } from 'features/inventory/services/inventory-service';
 import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
 import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
+import { useGetInventory } from 'features/inventory/hooks/use-graphql-inventory';
 
 interface PaginationState {
   pageIndex: number;
@@ -26,6 +27,14 @@ export function Inventory() {
     totalCount: inventoryData.length,
   });
   const navigate = useNavigate();
+
+  // Debug: Log GraphQL inventory API response
+  const {
+    data: gqlData,
+    isLoading: gqlLoading,
+    error: gqlError,
+  } = useGetInventory({ pageNo: 1, pageSize: 10 });
+  console.log('GraphQL Inventory Data:', gqlData, 'Loading:', gqlLoading, 'Error:', gqlError);
 
   useEffect(() => {
     const timer = setTimeout(() => {
