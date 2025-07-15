@@ -7,21 +7,26 @@
 
 // Base Inventory Item Type
 export interface InventoryItem {
-  id: string;
-  itemName: string;
-  category: string;
-  supplier: string;
-  itemLocation: string;
-  stock: number;
-  price: string;
-  status: 'ACTIVE' | 'DISCONTINUED';
-  lastUpdated: string;
-  itemImage?: string;
-  description?: string;
-  warranty?: boolean;
-  replacement?: boolean;
-  discount?: boolean;
-  tags?: string[];
+  _id: string;
+  Category: string;
+  CreatedBy: string;
+  CreatedDate: string;
+  IsActive: boolean;
+  IsDeleted: boolean;
+  ItemId: string;
+  ItemImageFileId: string;
+  ItemImageFileIds: string;
+  ItemLoc: string;
+  ItemName: string;
+  Language: string;
+  Stock: number;
+  LastUpdatedBy: string;
+  LastUpdatedDate: string;
+  OrganizationIds: string;
+  Price: number;
+  Status: string;
+  Supplier: string;
+  Tags: string;
 }
 
 // GraphQL Query Response Types

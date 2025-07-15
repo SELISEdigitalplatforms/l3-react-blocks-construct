@@ -21,12 +21,12 @@ import {
   categoryOptions,
   checkedTags,
   images,
-  inventoryData,
   InventoryStatus,
   locationOptions,
   statusColors,
   tags,
 } from '../../services/inventory-service';
+import { useGetInventory } from 'features/inventory/hooks/use-graphql-inventory';
 
 /**
  * A detailed view and editing interface for an individual inventory item.
@@ -58,10 +58,13 @@ export function AdvanceInventoryDetails() {
   const [editedFields, setEditedFields] = useState({});
   const navigate = useNavigate();
   const { t } = useTranslation();
-
   const { itemId } = useParams();
-  const initialInventory = inventoryData.find((item) => item.itemId === itemId);
-  const [selectedInventory, setSelectedInventory] = useState(initialInventory);
+  const { data, isLoading } = useGetInventory({ pageNo: 1, pageSize: 1000 });
+  const inventoryData = data as { InventoryItems?: { items: any[] } };
+  const items = inventoryData?.InventoryItems?.items ?? [];
+  const selectedInventory = items.find(
+    (item: any) => String(item._id).trim() === String(itemId).trim()
+  );
 
   const handleEditDetails = () => setEditDetails(true);
   const handleCancelEdit = () => {
@@ -71,8 +74,7 @@ export function AdvanceInventoryDetails() {
 
   const handleUpdateDetails = () => {
     if (selectedInventory) {
-      const updatedInventory = { ...selectedInventory, ...editedFields };
-      setSelectedInventory(updatedInventory);
+      Object.assign(selectedInventory, editedFields);
       setEditDetails(false);
     }
   };
@@ -99,11 +101,14 @@ export function AdvanceInventoryDetails() {
     isSelect = false,
     options: string[] = []
   ) => {
+    const safeOptions = options.filter((option) => !!option && option !== '');
+    const safeValue = value && value !== '' ? value : safeOptions[0] || '';
+
     const renderContent = () => {
       if (!editable) {
         return (
           <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>
-            {t(String(value).toUpperCase())}
+            {field === 'status' ? t(String(value).toUpperCase()) : value}
           </span>
         );
       }
@@ -111,14 +116,14 @@ export function AdvanceInventoryDetails() {
       if (isSelect) {
         return (
           <Select
-            defaultValue={value as string}
+            defaultValue={String(safeValue)}
             onValueChange={(newValue) => handleFieldChange(field, newValue)}
           >
             <SelectTrigger>
               <SelectValue placeholder={label} />
             </SelectTrigger>
             <SelectContent>
-              {options.map((option) => (
+              {safeOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {field === 'status' ? t(option.toUpperCase()) : option}
                 </SelectItem>
@@ -172,6 +177,8 @@ export function AdvanceInventoryDetails() {
     multiple: true,
   });
 
+  const inventoryToShow = selectedInventory;
+
   return (
     <div className="flex flex-col w-full">
       <div className="mb-[18px] flex items-center text-base text-high-emphasis md:mb-[24px] gap-2">
@@ -211,91 +218,120 @@ export function AdvanceInventoryDetails() {
             <Separator className="mt-4" />
           </CardHeader>
           <CardContent className="w-full !pt-0">
-            <div className="flex flex-col md:flex-row gap-14">
-              <div className="flex w-full gap-6 flex-col md:w-[30%]">
-                <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border">
-                  <img src={selectedImage} alt="Product" className="w-full h-full object-contain" />
+            {isLoading ? (
+              <div className="flex flex-col md:flex-row gap-14">
+                <div className="flex w-full gap-6 flex-col md:w-[30%]">
+                  <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border bg-muted animate-pulse" />
+                  <div className="flex w-full items-center justify-between mt-2">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="w-12 h-12 bg-muted rounded-md animate-pulse" />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex w-full items-center justify-between">
-                  {thumbnail.map((img) => (
-                    <div key={img} className="relative">
-                      {editDetails && (
-                        <Button
-                          onClick={() => handleDeleteImage(img)}
-                          variant="ghost"
-                          size="icon"
-                          className="bg-surface absolute -top-4 -right-4 text-white border border-white rounded-full w-8 h-8"
-                        >
-                          <Trash className="text-destructive" />
-                        </Button>
-                      )}
-                      <div
-                        className={`flex items-center p-1 justify-center rounded-md cursor-pointer border ${
-                          selectedImage === img ? 'border-[1.5px] border-primary' : ''
-                        } ${editDetails ? 'w-10 h-10' : 'w-16 h-12'}`}
-                      >
-                        <Button
-                          variant="ghost"
-                          key={img}
-                          className="p-0 hover:bg-transparent focus:outline-none"
-                          onClick={() => setSelectedImage(img)}
-                        >
-                          <img src={img} alt="Thumbnail" className="w-full h-full object-contain" />
-                        </Button>
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
+                  {[...Array(7)].map((_, i) => (
+                    <div key={i} className="flex flex-col gap-2">
+                      <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                      <div className="h-10 w-full bg-muted rounded animate-pulse" />
                     </div>
                   ))}
-                  {editDetails && thumbnail.length < 5 && (
-                    <div
-                      {...getRootProps()}
-                      className="border border-dashed rounded-md w-12 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
-                    >
-                      <input {...getInputProps()} />
-                      <Plus className="text-high-emphasis" />
-                    </div>
-                  )}
                 </div>
               </div>
-              {selectedInventory ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
-                  {renderField(t('ITEM_NAME'), 'itemName', selectedInventory.itemName, editDetails)}
-                  {renderField(
-                    t('CATEGORY'),
-                    'category',
-                    selectedInventory.category,
-                    editDetails,
-                    true,
-                    categoryOptions
-                  )}
-                  {renderField(t('SUPPLIER'), 'supplier', selectedInventory.supplier, editDetails)}
-                  {renderField(
-                    t('ITEM_LOCATION'),
-                    'itemLoc',
-                    selectedInventory.itemLoc,
-                    editDetails,
-                    true,
-                    locationOptions
-                  )}
-                  {renderField(
-                    `${t('PRICE')} (CHF)`,
-                    'price',
-                    selectedInventory.price,
-                    editDetails
-                  )}
-                  {renderField(t('STOCK'), 'stock', selectedInventory.stock ?? 0, editDetails)}
-                  {renderField(
-                    t('STATUS'),
-                    'status',
-                    selectedInventory.status,
-                    editDetails,
-                    true,
-                    statusOptions
-                  )}
+            ) : (
+              <div className="flex flex-col md:flex-row gap-14">
+                <div className="flex w-full gap-6 flex-col md:w-[30%]">
+                  <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border">
+                    <img
+                      src={selectedImage}
+                      alt="Product"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="flex w-full items-center justify-between">
+                    {thumbnail.map((img) => (
+                      <div key={img} className="relative">
+                        {editDetails && (
+                          <Button
+                            onClick={() => handleDeleteImage(img)}
+                            variant="ghost"
+                            size="icon"
+                            className="bg-surface absolute -top-4 -right-4 text-white border border-white rounded-full w-8 h-8"
+                          >
+                            <Trash className="text-destructive" />
+                          </Button>
+                        )}
+                        <div
+                          className={`flex items-center p-1 justify-center rounded-md cursor-pointer border ${
+                            selectedImage === img ? 'border-[1.5px] border-primary' : ''
+                          } ${editDetails ? 'w-10 h-10' : 'w-16 h-12'}`}
+                        >
+                          <Button
+                            variant="ghost"
+                            key={img}
+                            className="p-0 hover:bg-transparent focus:outline-none"
+                            onClick={() => setSelectedImage(img)}
+                          >
+                            <img
+                              src={img}
+                              alt="Thumbnail"
+                              className="w-full h-full object-contain"
+                            />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {editDetails && thumbnail.length < 5 && (
+                      <div
+                        {...getRootProps()}
+                        className="border border-dashed rounded-md w-12 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                      >
+                        <input {...getInputProps()} />
+                        <Plus className="text-high-emphasis" />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <p>{t('ITEM_NOT_FOUND')}</p>
-              )}
-            </div>
+                {inventoryToShow ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
+                    {renderField(t('ITEM_NAME'), 'itemName', inventoryToShow.ItemName, editDetails)}
+                    {renderField(
+                      t('CATEGORY'),
+                      'category',
+                      inventoryToShow.Category,
+                      editDetails,
+                      true,
+                      categoryOptions
+                    )}
+                    {renderField(t('SUPPLIER'), 'supplier', inventoryToShow.Supplier, editDetails)}
+                    {renderField(
+                      t('ITEM_LOCATION'),
+                      'itemLoc',
+                      inventoryToShow.ItemLoc,
+                      editDetails,
+                      true,
+                      locationOptions
+                    )}
+                    {renderField(
+                      `${t('PRICE')} (CHF)`,
+                      'price',
+                      inventoryToShow.Price,
+                      editDetails
+                    )}
+                    {renderField(t('STOCK'), 'stock', inventoryToShow.Stock ?? 0, editDetails)}
+                    {renderField(
+                      t('STATUS'),
+                      'status',
+                      inventoryToShow.Status,
+                      editDetails,
+                      true,
+                      statusOptions
+                    )}
+                  </div>
+                ) : (
+                  <p>{t('ITEM_NOT_FOUND')}</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
         <Card className="w-full border-none rounded-[4px] shadow-sm">
@@ -304,49 +340,69 @@ export function AdvanceInventoryDetails() {
             <Separator className="mt-4" />
           </CardHeader>
           <CardContent className="flex flex-col md:flex-row w-full gap-10 !pt-0">
-            <div className="flex flex-col gap-4 w-full md:w-[50%]">
-              <div className="flex items-center gap-2 justify-between">
-                <span>{t('ELIGIBLE_FOR_WARRANTY')}</span>
-                <Switch checked={warranty} onCheckedChange={setWarranty} />
-              </div>
-              <div className="flex items-center gap-2 justify-between">
-                <span>{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
-                <Switch checked={replacement} onCheckedChange={setReplacement} />
-              </div>
-              <div className="flex items-center gap-2 justify-between">
-                <span>{t('DISCOUNT')}</span>
-                <Switch checked={discount} onCheckedChange={setDiscount} />
-              </div>
-            </div>
-            <div className="flex flex-col w-full md:w-[50%]">
-              <span className="mb-2">{t('TAGS')}</span>
-              <div className="w-full border rounded-lg">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-medium-emphasis w-4 h-4" />
-                  <Input
-                    className="w-full pl-10 border-none shadow-none outline-none focus-visible:ring-0"
-                    placeholder={t('ENTER_TAG_NAME')}
-                    value={searchTags}
-                    onChange={(e) => setSearchTags(e.target.value)}
-                  />
+            {isLoading ? (
+              <>
+                <div className="flex flex-col gap-4 w-full md:w-[50%]">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-10 w-full bg-muted rounded animate-pulse" />
+                  ))}
                 </div>
-                <div className="flex p-2 gap-2 flex-col border-t">
-                  {filterSearchTags.length > 0 ? (
-                    filterSearchTags.map((tag) => (
-                      <div key={tag} className="flex items-center gap-2">
-                        <Checkbox
-                          checked={selectedTags.includes(tag)}
-                          onCheckedChange={() => handleTagToggle(tag)}
-                        />
-                        <span>{tag}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-low-emphasis">{t('NO_TAGS_FOUND')}</p>
-                  )}
+                <div className="flex flex-col w-full md:w-[50%]">
+                  <div className="h-4 w-24 bg-muted rounded animate-pulse mb-2" />
+                  <div className="w-full border rounded-lg p-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-6 w-full bg-muted rounded animate-pulse mb-2" />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col gap-4 w-full md:w-[50%]">
+                  <div className="flex items-center gap-2 justify-between">
+                    <span>{t('ELIGIBLE_FOR_WARRANTY')}</span>
+                    <Switch checked={warranty} onCheckedChange={setWarranty} />
+                  </div>
+                  <div className="flex items-center gap-2 justify-between">
+                    <span>{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
+                    <Switch checked={replacement} onCheckedChange={setReplacement} />
+                  </div>
+                  <div className="flex items-center gap-2 justify-between">
+                    <span>{t('DISCOUNT')}</span>
+                    <Switch checked={discount} onCheckedChange={setDiscount} />
+                  </div>
+                </div>
+                <div className="flex flex-col w-full md:w-[50%]">
+                  <span className="mb-2">{t('TAGS')}</span>
+                  <div className="w-full border rounded-lg">
+                    <div className="relative w-full">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-medium-emphasis w-4 h-4" />
+                      <Input
+                        className="w-full pl-10 border-none shadow-none outline-none focus-visible:ring-0"
+                        placeholder={t('ENTER_TAG_NAME')}
+                        value={searchTags}
+                        onChange={(e) => setSearchTags(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex p-2 gap-2 flex-col border-t">
+                      {filterSearchTags.length > 0 ? (
+                        filterSearchTags.map((tag) => (
+                          <div key={tag} className="flex items-center gap-2">
+                            <Checkbox
+                              checked={selectedTags.includes(tag)}
+                              onCheckedChange={() => handleTagToggle(tag)}
+                            />
+                            <span>{tag}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-low-emphasis">{t('NO_TAGS_FOUND')}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

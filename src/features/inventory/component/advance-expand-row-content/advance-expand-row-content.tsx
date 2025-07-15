@@ -8,7 +8,8 @@ import { Checkbox } from 'components/ui/checkbox';
 import { Button } from 'components/ui/button';
 import { Switch } from 'components/ui/switch';
 import { Separator } from 'components/ui/separator';
-import { checkedTags, images, InventoryData, tags } from '../../services/inventory-service';
+import { checkedTags, images, tags } from '../../services/inventory-service';
+import { InventoryItem } from '../../types/graphql.types';
 
 /**
  * AdvanceExpandRowContent component renders expanded row content for an inventory item in a table.
@@ -34,7 +35,7 @@ import { checkedTags, images, InventoryData, tags } from '../../services/invento
 interface AdvanceExpandRowContentProps {
   rowId?: string;
   colSpan?: number;
-  data: InventoryData[];
+  data: InventoryItem[];
 }
 
 export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandRowContentProps) => {
@@ -66,7 +67,7 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
       return null;
     }
     const rowData = data[index];
-    navigate(`/inventory/${rowData?.itemId || ''}`);
+    navigate(`/inventory/${rowData?._id || ''}`);
   };
 
   useEffect(() => {

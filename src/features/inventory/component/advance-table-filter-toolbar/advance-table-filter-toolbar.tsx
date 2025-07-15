@@ -16,7 +16,7 @@ import { Checkbox } from 'components/ui/checkbox';
 import StockFilterDropdown from '../stock-filter-dropdown/stock-filter-dropdown';
 import LastUpdatedFilterDropdown from '../last-updated-filter-dropdown/last-updated-filter-dropdown';
 
-const selectFilterColumns = new Set(['category', 'itemLoc', 'status']);
+const selectFilterColumns = new Set(['Category', 'ItemLoc', 'Status']);
 /**
  * A component that provides a toolbar for filtering columns in a table. This toolbar renders various types of filters
  * depending on the column's data, including text-based filters, select filters, and custom dropdown filters. It also
@@ -88,18 +88,20 @@ export function AdvanceTableFilterToolbar<TData>({
                   {t('NO_DATA_FOUND')}
                 </div>
               ) : (
-                Array.from(column.getFacetedUniqueValues().keys()).map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {column.id === 'status' ? t(option.toUpperCase()) : option}
-                  </SelectItem>
-                ))
+                Array.from(column.getFacetedUniqueValues().keys())
+                  .filter((option) => !!option && option !== '')
+                  .map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {column.id === 'Status' ? t(option.toUpperCase()) : option}
+                    </SelectItem>
+                  ))
               )}
             </SelectContent>
           </Select>
         );
       }
 
-      if (column.id === 'stock') {
+      if (column.id === 'Stock') {
         return (
           <StockFilterDropdown
             ref={clearStockFilterDropdownRef}
@@ -108,7 +110,7 @@ export function AdvanceTableFilterToolbar<TData>({
         );
       }
 
-      if (column.id === 'lastupdated') {
+      if (column.id === 'LastUpdatedDate') {
         return (
           <LastUpdatedFilterDropdown
             ref={clearLastUpdatedFilterDropdownRef}

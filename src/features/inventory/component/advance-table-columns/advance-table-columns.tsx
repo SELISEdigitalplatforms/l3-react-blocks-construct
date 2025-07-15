@@ -1,12 +1,13 @@
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import { InventoryData, InventoryStatus, statusColors } from '../../services/inventory-service';
+import { InventoryStatus, statusColors } from '../../services/inventory-service';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
+import { InventoryItem } from '../../types/graphql.types';
 
 /**
  * Creates column definitions for an advanced inventory table.
- * @returns {ColumnDef<InventoryData>[]} An array of column definitions for the table.
+ * @returns {ColumnDef<InventoryItem>[]} An array of column definitions for the table.
  */
 interface AdvanceTableColumnProps {
   t: (key: string) => string;
@@ -14,7 +15,7 @@ interface AdvanceTableColumnProps {
 
 export const createAdvanceTableColumns = ({
   t,
-}: AdvanceTableColumnProps): ColumnDef<InventoryData>[] => [
+}: AdvanceTableColumnProps): ColumnDef<InventoryItem>[] => [
   /**
    * Column for selecting an action on the inventory item.
    */
@@ -32,23 +33,23 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the item name and its image.
    */
   {
-    id: 'itemName',
+    id: 'ItemName',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('ITEM_NAME')} />,
     meta: 'ITEM_NAME',
     enablePinning: true,
-    accessorFn: (row) => `${row.itemName || ''}`.trim(),
+    accessorFn: (row) => `${row.ItemName || ''}`.trim(),
     size: 160,
     cell: ({ row }) => {
       return (
         <div className="flex items-center gap-2">
           <div className="flex items-center p-[2px] justify-center rounded-md cursor-pointer border w-10 h-10">
             <img
-              src={row.original.itemImage}
+              src={row.original.ItemImageFileId}
               alt="item view"
               className="w-full h-full object-cover"
             />
           </div>
-          <span className="truncate font-medium">{row.original.itemName}</span>
+          <span className="truncate font-medium">{row.original.ItemName}</span>
         </div>
       );
     },
@@ -57,13 +58,13 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the item category.
    */
   {
-    id: 'category',
+    id: 'Category',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('CATEGORY')} />,
     meta: 'CATEGORY',
-    accessorFn: (row) => `${row.category || ''}`.trim(),
+    accessorFn: (row) => `${row.Category || ''}`.trim(),
     cell: ({ row }) => (
       <div className="flex items-center w-[180px]">
-        <span className="truncate">{row.original.category}</span>
+        <span className="truncate">{row.original.Category}</span>
       </div>
     ),
   },
@@ -71,14 +72,14 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the item's supplier.
    */
   {
-    id: 'supplier',
+    id: 'Supplier',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('SUPPLIER')} />,
     meta: 'SUPPLIER',
-    accessorFn: (row) => `${row.supplier || ''}`.trim(),
+    accessorFn: (row) => `${row.Supplier || ''}`.trim(),
     cell: ({ row }) => {
       return (
         <div className="flex w-[180px] items-center">
-          <span className="truncate">{row.original.supplier}</span>
+          <span className="truncate">{row.original.Supplier}</span>
         </div>
       );
     },
@@ -87,15 +88,15 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the item location.
    */
   {
-    id: 'itemLoc',
-    accessorFn: (row) => `${row.itemLoc || ''}`.trim(),
+    id: 'ItemLoc',
+    accessorFn: (row) => `${row.ItemLoc || ''}`.trim(),
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('ITEM_LOCATION')} />,
     meta: 'ITEM_LOCATION',
     size: 180,
     cell: ({ row }) => {
       return (
         <div className="flex items-center">
-          <span className="truncate">{row.original.itemLoc}</span>
+          <span className="truncate">{row.original.ItemLoc}</span>
         </div>
       );
     },
@@ -104,15 +105,15 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the stock quantity of the item.
    */
   {
-    id: 'stock',
+    id: 'Stock',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STOCK')} />,
     meta: 'STOCK',
-    accessorFn: (row) => `${row.stock ?? 0}`.trim(),
+    accessorFn: (row) => `${row.Stock ?? 0}`.trim(),
     size: 100,
     cell: ({ row }) => {
       return (
         <div className="flex items-center">
-          <span className="truncate">{row.original.stock}</span>
+          <span className="truncate">{row.original.Stock}</span>
         </div>
       );
     },
@@ -138,13 +139,14 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the last updated date of the inventory item.
    */
   {
-    id: 'lastupdated',
+    id: 'LastUpdatedDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('LAST_UPDATED')} />,
     meta: 'LAST_UPDATED',
     size: 180,
-    accessorFn: (row) => (row.lastupdated ? format(new Date(row.lastupdated), 'yyyy-MM-dd') : ''),
+    accessorFn: (row) =>
+      row.LastUpdatedDate ? format(new Date(row.LastUpdatedDate), 'yyyy-MM-dd') : '',
     cell: ({ row }) => {
-      const lastUpdated = row.original.lastupdated;
+      const lastUpdated = row.original.LastUpdatedDate;
 
       const date = lastUpdated
         ? CustomtDateFormat(lastUpdated, {
@@ -159,7 +161,7 @@ export const createAdvanceTableColumns = ({
       );
     },
     filterFn: (
-      row: Row<InventoryData>,
+      row: Row<InventoryItem>,
       columnId: string,
       filterValue: { type?: string; date?: string; from?: string; to?: string }
     ) => {
@@ -195,15 +197,15 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the price of the item.
    */
   {
-    id: 'price',
+    id: 'Price',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('PRICE')} />,
     meta: 'PRICE',
     size: 100,
-    accessorFn: (row) => `${row.price || ''}`.trim(),
+    accessorFn: (row) => `${row.Price || ''}`.trim(),
     cell: ({ row }) => {
       return (
         <div className="flex items-center">
-          <span className="truncate">{row.original.price}</span>
+          <span className="truncate">{row.original.Price}</span>
         </div>
       );
     },
@@ -212,14 +214,14 @@ export const createAdvanceTableColumns = ({
    * Column for displaying the status of the inventory item.
    */
   {
-    id: 'status',
+    id: 'Status',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
     meta: 'STATUS',
     size: 100,
-    accessorFn: (row) => `${row.status || ''}`.trim(),
+    accessorFn: (row) => `${row.Status || ''}`.trim(),
     cell: ({ row }) => {
       const status: InventoryStatus =
-        (row.original.status as InventoryStatus) || InventoryStatus.DISCONTINUED;
+        (row.original.Status as InventoryStatus) || InventoryStatus.DISCONTINUED;
 
       return (
         <div className="flex items-center">
