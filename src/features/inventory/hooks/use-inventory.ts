@@ -9,7 +9,7 @@ import {
   addInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
-} from '../services/graphql-inventory.service';
+} from '../services/inventory.service';
 
 /**
  * GraphQL Inventory Hooks

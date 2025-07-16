@@ -15,6 +15,7 @@ import {
 import { Checkbox } from 'components/ui/checkbox';
 import StockFilterDropdown from '../stock-filter-dropdown/stock-filter-dropdown';
 import LastUpdatedFilterDropdown from '../last-updated-filter-dropdown/last-updated-filter-dropdown';
+import { InventoryStatus } from '../../types/graphql.types';
 
 const selectFilterColumns = new Set(['Category', 'ItemLoc', 'Status']);
 /**
@@ -74,6 +75,14 @@ export function AdvanceTableFilterToolbar<TData>({
       if (!column.getCanFilter()) return null;
 
       if (selectFilterColumns.has(column.id)) {
+        const isStatusColumn = column.id === 'Status';
+
+        const options = isStatusColumn
+          ? Object.values(InventoryStatus)
+          : Array.from(column.getFacetedUniqueValues().keys()).filter(
+              (option) => !!option && option !== ''
+            );
+
         return (
           <Select
             onValueChange={(value) => column.setFilterValue(value)}
@@ -83,18 +92,16 @@ export function AdvanceTableFilterToolbar<TData>({
               <SelectValue placeholder={t('SELECT')} />
             </SelectTrigger>
             <SelectContent>
-              {Array.from(column.getFacetedUniqueValues().keys()).length === 0 ? (
+              {options.length === 0 ? (
                 <div className="p-2 text-sm text-center text-low-emphasis">
                   {t('NO_DATA_FOUND')}
                 </div>
               ) : (
-                Array.from(column.getFacetedUniqueValues().keys())
-                  .filter((option) => !!option && option !== '')
-                  .map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {column.id === 'Status' ? t(option.toUpperCase()) : option}
-                    </SelectItem>
-                  ))
+                options.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {isStatusColumn ? t(option.toUpperCase()) : option}
+                  </SelectItem>
+                ))
               )}
             </SelectContent>
           </Select>

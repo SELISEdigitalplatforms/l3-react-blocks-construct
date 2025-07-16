@@ -5,7 +5,28 @@
  * related to inventory management, following the same patterns as REST API types.
  */
 
-// Base Inventory Item Type
+export enum InventoryStatus {
+  ACTIVE = 'Active',
+  DISCONTINUED = 'Discontinued',
+}
+
+export const statusColors: Record<InventoryStatus, string> = {
+  [InventoryStatus.ACTIVE]: 'success',
+  [InventoryStatus.DISCONTINUED]: 'low-emphasis',
+};
+
+export const tags = ['Accessories', 'Electronic', 'Gaming', 'Monitor'];
+
+export const categoryOptions = [
+  'Supplies',
+  'Electronics',
+  'Furniture',
+  'Apparel',
+  'Accessories',
+  'Wearables',
+];
+export const itemLocOptions = ['Warehouse A', 'Warehouse B', 'Warehouse C'];
+
 export interface InventoryItem {
   _id: string;
   Category: string;

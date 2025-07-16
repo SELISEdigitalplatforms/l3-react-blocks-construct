@@ -1,10 +1,10 @@
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import { InventoryStatus, statusColors } from '../../services/inventory-service';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
 import { InventoryItem } from '../../types/graphql.types';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
+import { InventoryStatus } from '../../types/graphql.types';
 
 /**
  * Creates column definitions for an advanced inventory table.
@@ -223,13 +223,18 @@ export const createAdvanceTableColumns = ({
     size: 100,
     accessorFn: (row) => `${row.Status || ''}`.trim(),
     cell: ({ row }) => {
-      const status: InventoryStatus =
-        (row.original.Status as InventoryStatus) || InventoryStatus.DISCONTINUED;
+      const statusValue = String(row.original.Status || '').trim();
+
+      const isActive = statusValue.toLowerCase() === InventoryStatus.ACTIVE.toLowerCase();
+
+      const normalizedStatus = isActive ? InventoryStatus.ACTIVE : InventoryStatus.DISCONTINUED;
+
+      const statusColorClass = isActive ? 'text-success' : 'text-low-emphasis';
 
       return (
         <div className="flex items-center">
-          <span className={`px-2 py-1 rounded-md truncate text-${statusColors[status]}`}>
-            {t(status.toUpperCase())}
+          <span className={`px-2 py-1 rounded-md truncate font-medium ${statusColorClass}`}>
+            {t(normalizedStatus.toUpperCase())}
           </span>
         </div>
       );

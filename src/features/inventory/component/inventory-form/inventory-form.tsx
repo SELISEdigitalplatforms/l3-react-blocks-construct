@@ -6,11 +6,11 @@ import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storag
 import API_CONFIG from 'config/api';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
-import { categoryOptions, locationOptions, tags } from '../../services/inventory-service';
 import { GeneralInfoForm } from './general-info-form';
 import { AdditionalInfoForm } from './additional-info-form';
 import { ImageUploader } from '../image-uploader/image-uploader';
-import { useAddInventoryItem } from 'features/inventory/hooks/use-graphql-inventory';
+import { useAddInventoryItem } from 'features/inventory/hooks/use-inventory';
+import { categoryOptions, itemLocOptions, tags } from '../../types/graphql.types';
 
 /**
  * Stepper component provides a multi-step navigation interface, displaying the steps and allowing the user to
@@ -119,7 +119,7 @@ export function InventoryForm() {
     itemName: '',
     category: categoryOptions[0],
     supplier: '',
-    itemLoc: locationOptions[0],
+    itemLoc: itemLocOptions[0],
     price: 0,
     status: 'ACTIVE',
     stock: 0,
@@ -142,7 +142,6 @@ export function InventoryForm() {
   };
 
   const handleAddImages = async (files: (File | string)[]) => {
-    // Filter out any string URLs (in case the component still passes them)
     const fileObjects = files.filter((file): file is File => file instanceof File);
 
     if (fileObjects.length === 0) return;
@@ -176,7 +175,7 @@ export function InventoryForm() {
                         });
                         resolve({
                           fileId: data.fileId || '',
-                          uploadUrl: data.uploadUrl.split('?')[0], // Use the upload URL without query params
+                          uploadUrl: data.uploadUrl.split('?')[0],
                         });
                       } catch (error) {
                         console.error('Error uploading file:', error);
@@ -204,7 +203,7 @@ export function InventoryForm() {
 
         setFormData((prev) => ({
           ...prev,
-          itemImageUrl: uploadUrls[0], // First URL as the main image
+          itemImageUrl: uploadUrls[0],
           itemImageUrls: [...(prev.itemImageUrls || []), ...uploadUrls],
           images: [...prev.images, ...imageUrls],
         }));
@@ -313,7 +312,7 @@ export function InventoryForm() {
                   }}
                   handleInputChange={handleInputChange}
                   categoryOptions={categoryOptions}
-                  locationOptions={locationOptions}
+                  locationOptions={itemLocOptions}
                 />
                 <ImageUploader
                   images={formData.images}

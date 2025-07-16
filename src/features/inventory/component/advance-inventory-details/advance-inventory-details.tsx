@@ -20,12 +20,12 @@ import { Checkbox } from 'components/ui/checkbox';
 import {
   categoryOptions,
   InventoryStatus,
-  locationOptions,
+  itemLocOptions,
   statusColors,
   tags,
-} from '../../services/inventory-service';
-import { useGetInventories } from 'features/inventory/hooks/use-graphql-inventory';
-import { useUpdateInventoryItem } from 'features/inventory/hooks/use-graphql-inventory';
+} from '../../types/graphql.types';
+import { useGetInventories } from 'features/inventory/hooks/use-inventory';
+import { useUpdateInventoryItem } from 'features/inventory/hooks/use-inventory';
 import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
 import API_CONFIG from 'config/api';
 import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.services';
@@ -483,7 +483,7 @@ export function AdvanceInventoryDetails() {
                       inventoryToShow.ItemLoc,
                       editDetails,
                       true,
-                      locationOptions
+                      itemLocOptions
                     )}
                     {renderField(
                       `${t('PRICE')} (CHF)`,

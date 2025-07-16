@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { tags } from '../../services/inventory-service';
+import { tags } from '../../types/graphql.types';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TableCell, TableRow } from 'components/ui/table';
