@@ -35,6 +35,9 @@ export const GET_INVENTORY_QUERY = `
         Stock
         Supplier
         Tags
+        EligibleWarranty
+        EligibleReplacement
+        Discount
       }
     }
   }

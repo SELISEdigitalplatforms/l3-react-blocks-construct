@@ -60,6 +60,9 @@ export function Inventory() {
         Stock: item.Stock,
         Supplier: item.Supplier,
         Tags: item.Tags,
+        EligibleWarranty: item.EligibleWarranty,
+        EligibleReplacement: item.EligibleReplacement,
+        Discount: item.Discount,
       }));
       setInventoryTableData(inventoryDataMap);
       setPaginationState((prev) => ({

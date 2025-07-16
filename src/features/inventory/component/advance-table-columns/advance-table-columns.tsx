@@ -142,7 +142,6 @@ export const createAdvanceTableColumns = ({
     id: 'LastUpdatedDate',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('LAST_UPDATED')} />,
     meta: 'LAST_UPDATED',
-    size: 180,
     accessorFn: (row) =>
       row.LastUpdatedDate ? format(new Date(row.LastUpdatedDate), 'yyyy-MM-dd') : '',
     cell: ({ row }) => {
@@ -155,7 +154,7 @@ export const createAdvanceTableColumns = ({
         : '-';
 
       return (
-        <div className="flex items-center">
+        <div className="flex items-center min-w-[180px]">
           <span className="truncate">{date}</span>
         </div>
       );
@@ -200,11 +199,10 @@ export const createAdvanceTableColumns = ({
     id: 'Price',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('PRICE')} />,
     meta: 'PRICE',
-    size: 100,
     accessorFn: (row) => `${row.Price || ''}`.trim(),
     cell: ({ row }) => {
       return (
-        <div className="flex items-center">
+        <div className="flex items-center min-w-[100px]">
           <span className="truncate">{row.original.Price}</span>
         </div>
       );
