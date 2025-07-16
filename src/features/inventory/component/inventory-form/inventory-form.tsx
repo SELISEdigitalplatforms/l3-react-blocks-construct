@@ -10,7 +10,7 @@ import { GeneralInfoForm } from './general-info-form';
 import { AdditionalInfoForm } from './additional-info-form';
 import { ImageUploader } from '../image-uploader/image-uploader';
 import { useAddInventoryItem } from 'features/inventory/hooks/use-inventory';
-import { categoryOptions, itemLocOptions, tags } from '../../types/graphql.types';
+import { categoryOptions, InventoryStatus, itemLocOptions, tags } from '../../types/graphql.types';
 
 /**
  * Stepper component provides a multi-step navigation interface, displaying the steps and allowing the user to
@@ -96,7 +96,7 @@ interface InventoryFormData {
   supplier: string;
   itemLoc: string;
   price: number;
-  status: string;
+  status: InventoryStatus;
   stock: number;
   tags: string[];
   eligibleWarranty: boolean;
@@ -121,7 +121,7 @@ export function InventoryForm() {
     supplier: '',
     itemLoc: itemLocOptions[0],
     price: 0,
-    status: 'ACTIVE',
+    status: InventoryStatus.ACTIVE,
     stock: 0,
     tags: [],
     eligibleWarranty: true,
@@ -243,9 +243,10 @@ export function InventoryForm() {
       Supplier: formData.supplier,
       ItemLoc: formData.itemLoc,
       Price: formData.price,
-      Status: (formData.status.trim().toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'DISCONTINUED') as
-        | 'ACTIVE'
-        | 'DISCONTINUED',
+      Status:
+        formData.status.trim().toUpperCase() === InventoryStatus.ACTIVE.toString().toUpperCase()
+          ? InventoryStatus.ACTIVE
+          : InventoryStatus.DISCONTINUED,
       Stock: formData.stock,
       Tags: formData.tags,
       EligibleWarranty: formData.eligibleWarranty,

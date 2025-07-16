@@ -10,6 +10,7 @@ import {
 } from 'components/ui/select';
 import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { StockSlider } from '../stock-slider/stock-slider';
+import { InventoryStatus } from '../../types/graphql.types';
 
 /**
  * GeneralInfoForm component allows users to fill in general information about an item, including its name, category,
@@ -67,7 +68,7 @@ interface GeneralInfoFormProps {
     Supplier: string;
     ItemLoc: string;
     Price: number;
-    Status: string;
+    Status: InventoryStatus;
     Stock: number;
   };
   handleInputChange: (field: string, value: any) => void;
@@ -160,8 +161,8 @@ export function GeneralInfoForm({
         <div className="flex flex-col gap-2">
           <Label>{t('STATUS')}</Label>
           <RadioGroup
-            value={formData.Status}
-            onValueChange={(value) => handleInputChange('status', value)}
+            value={formData.Status.toLowerCase()}
+            onValueChange={(value) => handleInputChange('status', value === 'active' ? InventoryStatus.ACTIVE : InventoryStatus.DISCONTINUED)}
             className="flex items-center gap-4"
           >
             <div className="flex items-center space-x-2">

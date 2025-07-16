@@ -4,13 +4,11 @@ import {
   AddInventoryItemParams,
   UpdateInventoryItemResponse,
   UpdateInventoryItemParams,
-  DeleteInventoryItemResponse,
 } from '../types/graphql.types';
 import { GET_INVENTORY_QUERY } from '../graphql/queries';
 import {
   INSERT_INVENTORY_ITEM_MUTATION,
   UPDATE_INVENTORY_ITEM_MUTATION,
-  DELETE_INVENTORY_ITEM_MUTATION,
 } from '../graphql/mutations';
 
 /**
@@ -86,22 +84,5 @@ export const updateInventoryItem = async (
     query: UPDATE_INVENTORY_ITEM_MUTATION,
     variables: params,
   });
-  return response;
-};
-
-/**
- * Deletes an inventory item
- * @param id - Item ID to delete
- * @returns Promise with deletion result
- * @example
- * // Basic usage
- * const result = await deleteInventoryItem('item-123');
- */
-export const deleteInventoryItem = async (id: string): Promise<DeleteInventoryItemResponse> => {
-  const response = await graphqlClient.mutate<DeleteInventoryItemResponse>({
-    query: DELETE_INVENTORY_ITEM_MUTATION,
-    variables: { id },
-  });
-
   return response;
 };

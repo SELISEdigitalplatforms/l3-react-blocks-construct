@@ -53,7 +53,6 @@ export interface InventoryItem {
   Discount: boolean;
 }
 
-// GraphQL Query Response Types
 export interface GetInventoryResponse {
   inventory: {
     items: InventoryItem[];
@@ -89,29 +88,13 @@ export interface GetInventoryStatsResponse {
   };
 }
 
-// GraphQL Mutation Response Types
-export interface CreateInventoryItemResponse {
-  createInventoryItem: {
-    item: InventoryItem;
-    success: boolean;
-    errors?: string[];
-  };
-}
-
-export interface DeleteInventoryItemResponse {
-  deleteInventoryItem: {
-    success: boolean;
-    errors?: string[];
-  };
-}
-
 export interface AddInventoryItemInput {
   ItemName: string;
   Category: string;
   Supplier: string;
   ItemLoc: string;
   Price: number;
-  Status: 'ACTIVE' | 'DISCONTINUED';
+  Status: InventoryStatus;
   Stock: number;
   Tags: string[];
   EligibleWarranty: boolean;
@@ -133,14 +116,13 @@ export interface AddInventoryItemResponse {
   };
 }
 
-// For new updateInventoryItem mutation (filter + input)
-export interface InventoryItemUpdateInput {
+export interface UpdateInventoryItemInput {
   ItemName?: string;
   Category?: string;
   Supplier?: string;
   ItemLoc?: string;
   Price?: number;
-  Status?: 'ACTIVE' | 'DISCONTINUED';
+  Status?: InventoryStatus;
   Stock?: number;
   Tags?: string[];
   EligibleWarranty?: boolean;
@@ -152,7 +134,7 @@ export interface InventoryItemUpdateInput {
 
 export interface UpdateInventoryItemParams {
   filter: string;
-  input: InventoryItemUpdateInput;
+  input: UpdateInventoryItemInput;
 }
 
 export interface UpdateInventoryItemResponse {

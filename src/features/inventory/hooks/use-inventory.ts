@@ -4,12 +4,7 @@ import { useToast } from 'hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from 'hooks/use-error-handler';
 import { AddInventoryItemParams, UpdateInventoryItemParams } from '../types/graphql.types';
-import {
-  getInventory,
-  addInventoryItem,
-  updateInventoryItem,
-  deleteInventoryItem,
-} from '../services/inventory.service';
+import { getInventory, addInventoryItem, updateInventoryItem } from '../services/inventory.service';
 
 /**
  * GraphQL Inventory Hooks
@@ -77,8 +72,8 @@ export const useAddInventoryItem = () => {
       if (data.insertInventoryItem?.acknowledged) {
         toast({
           variant: 'success',
-          title: t('ITEM_CREATED'),
-          description: t('INVENTORY_ITEM_CREATED_SUCCESSFULLY'),
+          title: t('INVENTORY_ITEM_ADDED'),
+          description: t('INVENTORY_ITEM_SUCCESSFULLY_CREATED'),
         });
       }
     },
@@ -104,60 +99,25 @@ export const useUpdateInventoryItem = () => {
 
   return useGlobalMutation({
     mutationFn: (params: UpdateInventoryItemParams) => updateInventoryItem(params),
-    onSuccess: (data) => {
-      // Invalidate and refetch inventory queries
-      queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      queryClient.invalidateQueries({ queryKey: ['inventoryStats'] });
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'inventory',
+      });
+
+      queryClient.refetchQueries({
+        predicate: (query) => query.queryKey[0] === 'inventory',
+        type: 'active',
+      });
 
       if (data.updateInventoryItem.acknowledged) {
         toast({
           variant: 'success',
-          title: t('ITEM_UPDATED'),
-          description: t('INVENTORY_ITEM_UPDATED_SUCCESSFULLY'),
+          title: t('INVENTORY_ITEM_UPDATED'),
+          description: t('INVENTORY_ITEM_SUCCESSFULLY_UPDATED'),
         });
       } else {
         handleError(
-          { error: { message: t('INVENTORY_ITEM_UPDATE_FAILED') } },
-          { variant: 'destructive' }
-        );
-      }
-    },
-    onError: (error) => {
-      handleError(error, { variant: 'destructive' });
-    },
-  });
-};
-
-/**
- * Hook to delete an inventory item
- * @returns Mutation function to delete inventory item with loading and error states
- *
- * @example
- * const { mutate: deleteItem, isPending } = useDeleteInventoryItem();
- * deleteItem('item-123');
- */
-export const useDeleteInventoryItem = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const { handleError } = useErrorHandler();
-
-  return useGlobalMutation({
-    mutationFn: (id: string) => deleteInventoryItem(id),
-    onSuccess: (data) => {
-      // Invalidate and refetch inventory queries
-      queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      queryClient.invalidateQueries({ queryKey: ['inventoryStats'] });
-
-      if (data.deleteInventoryItem.success) {
-        toast({
-          variant: 'success',
-          title: t('ITEM_DELETED'),
-          description: t('INVENTORY_ITEM_DELETED_SUCCESSFULLY'),
-        });
-      } else {
-        handleError(
-          { error: { message: data.deleteInventoryItem.errors?.join(', ') } },
+          { error: { message: t('UNABLE_UPDATE_INVENTORY_ITEM') } },
           { variant: 'destructive' }
         );
       }
