@@ -15,18 +15,21 @@ export interface InventoryItem {
   IsDeleted: boolean;
   ItemId: string;
   ItemImageFileId: string;
-  ItemImageFileIds: string;
+  ItemImageFileIds: string[];
   ItemLoc: string;
   ItemName: string;
   Language: string;
   Stock: number;
   LastUpdatedBy: string;
   LastUpdatedDate: string;
-  OrganizationIds: string;
+  OrganizationIds: string[];
   Price: number;
   Status: string;
   Supplier: string;
-  Tags: string;
+  Tags: string[];
+  EligibleWarranty: boolean;
+  EligibleReplacement: boolean;
+  Discount: boolean;
 }
 
 // GraphQL Query Response Types
@@ -65,33 +68,6 @@ export interface GetInventoryStatsResponse {
   };
 }
 
-export interface GetCategoriesResponse {
-  categories: Array<{
-    id: string;
-    name: string;
-    description: string;
-    itemCount: number;
-  }>;
-}
-
-export interface GetSuppliersResponse {
-  suppliers: Array<{
-    id: string;
-    name: string;
-    contactInfo: string;
-    itemCount: number;
-  }>;
-}
-
-export interface GetLocationsResponse {
-  locations: Array<{
-    id: string;
-    name: string;
-    address: string;
-    itemCount: number;
-  }>;
-}
-
 // GraphQL Mutation Response Types
 export interface CreateInventoryItemResponse {
   createInventoryItem: {
@@ -111,35 +87,6 @@ export interface UpdateInventoryItemResponse {
 
 export interface DeleteInventoryItemResponse {
   deleteInventoryItem: {
-    success: boolean;
-    errors?: string[];
-  };
-}
-
-export interface BulkUpdateInventoryResponse {
-  bulkUpdateInventory: {
-    updatedItems: InventoryItem[];
-    success: boolean;
-    errors?: string[];
-  };
-}
-
-export interface ImportInventoryResponse {
-  importInventory: {
-    importedItems: InventoryItem[];
-    success: boolean;
-    errors?: string[];
-    summary: {
-      totalProcessed: number;
-      successfulImports: number;
-      failedImports: number;
-    };
-  };
-}
-
-export interface ExportInventoryResponse {
-  exportInventory: {
-    downloadUrl: string;
     success: boolean;
     errors?: string[];
   };
@@ -179,26 +126,6 @@ export interface UpdateInventoryItemInput {
   tags?: string[];
 }
 
-// Query Variables Types
-export interface GetInventoryParams {
-  page?: number;
-  pageSize?: number;
-  filter?: {
-    category?: string;
-    supplier?: string;
-    status?: 'ACTIVE' | 'DISCONTINUED';
-    search?: string;
-  };
-  sort?: {
-    field: string;
-    direction: 'ASC' | 'DESC';
-  };
-}
-
-export interface GetInventoryItemParams {
-  id: string;
-}
-
 // Mutation Variables Types
 export interface CreateInventoryItemParams {
   input: CreateInventoryItemInput;
@@ -210,30 +137,4 @@ export interface UpdateInventoryItemParams {
 
 export interface DeleteInventoryItemParams {
   id: string;
-}
-
-export interface BulkUpdateInventoryParams {
-  input: {
-    items: Array<{
-      id: string;
-      updates: Partial<UpdateInventoryItemInput>;
-    }>;
-  };
-}
-
-export interface ImportInventoryParams {
-  input: {
-    file: File;
-    options?: {
-      skipHeader?: boolean;
-      delimiter?: string;
-    };
-  };
-}
-
-export interface ExportInventoryParams {
-  input: {
-    format: 'CSV' | 'EXCEL';
-    filters?: GetInventoryParams['filter'];
-  };
 }

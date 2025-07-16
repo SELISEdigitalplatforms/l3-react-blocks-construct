@@ -42,12 +42,12 @@ import { v4 as uuidv4 } from 'uuid';
  */
 
 interface StepperProps {
-  readonly steps: readonly string[];
-  readonly currentStep: number;
-  readonly onStepChange: (step: number) => void;
+  steps: string[];
+  currentStep: number;
+  onStepChange: (step: number) => void;
 }
 
-export function Stepper({ steps, currentStep, onStepChange }: StepperProps) {
+export function Stepper({ steps, currentStep, onStepChange }: Readonly<StepperProps>) {
   return (
     <div className="w-full flex justify-center mb-6">
       <div className="w-96">

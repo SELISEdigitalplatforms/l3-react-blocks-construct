@@ -7,7 +7,7 @@ import AdvanceDataTable from 'features/inventory/component/advance-data-table/ad
 import { createAdvanceTableColumns } from 'features/inventory/component/advance-table-columns/advance-table-columns';
 import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
 import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
-import { useGetInventory } from 'features/inventory/hooks/use-graphql-inventory';
+import { useGetInventories } from 'features/inventory/hooks/use-graphql-inventory';
 import { InventoryItem } from 'features/inventory/types/graphql.types';
 
 interface PaginationState {
@@ -31,7 +31,7 @@ export function Inventory() {
     data: inventoryData,
     isLoading: isInventoryLoading,
     error: inventoryError,
-  } = useGetInventory({
+  } = useGetInventories({
     pageNo: paginationState.pageIndex + 1,
     pageSize: paginationState.pageSize,
   });
@@ -39,7 +39,7 @@ export function Inventory() {
 
   useEffect(() => {
     if (data?.InventoryItems?.items) {
-      const inventoryDataMap = data.InventoryItems.items.map((item: any) => ({
+      const inventoryDataMap = data.InventoryItems.items.map((item: InventoryItem) => ({
         _id: item._id,
         Category: item.Category,
         CreatedBy: item.CreatedBy,

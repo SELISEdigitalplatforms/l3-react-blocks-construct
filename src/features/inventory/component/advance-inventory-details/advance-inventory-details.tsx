@@ -26,7 +26,7 @@ import {
   statusColors,
   tags,
 } from '../../services/inventory-service';
-import { useGetInventory } from 'features/inventory/hooks/use-graphql-inventory';
+import { useGetInventories } from 'features/inventory/hooks/use-graphql-inventory';
 
 /**
  * A detailed view and editing interface for an individual inventory item.
@@ -59,7 +59,7 @@ export function AdvanceInventoryDetails() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { itemId } = useParams();
-  const { data, isLoading } = useGetInventory({ pageNo: 1, pageSize: 1000 });
+  const { data, isLoading } = useGetInventories({ pageNo: 1, pageSize: 1000 });
   const inventoryData = data as { InventoryItems?: { items: any[] } };
   const items = inventoryData?.InventoryItems?.items ?? [];
   const selectedInventory = items.find(
