@@ -77,44 +77,11 @@ export interface CreateInventoryItemResponse {
   };
 }
 
-export interface UpdateInventoryItemResponse {
-  updateInventoryItem: {
-    item: InventoryItem;
-    success: boolean;
-    errors?: string[];
-  };
-}
-
 export interface DeleteInventoryItemResponse {
   deleteInventoryItem: {
     success: boolean;
     errors?: string[];
   };
-}
-
-export interface UpdateInventoryItemInput {
-  id: string;
-  itemName?: string;
-  category?: string;
-  supplier?: string;
-  itemLocation?: string;
-  stock?: number;
-  price?: string;
-  status?: 'ACTIVE' | 'DISCONTINUED';
-  itemImage?: string;
-  description?: string;
-  warranty?: boolean;
-  replacement?: boolean;
-  discount?: boolean;
-  tags?: string[];
-}
-
-export interface UpdateInventoryItemParams {
-  input: UpdateInventoryItemInput;
-}
-
-export interface DeleteInventoryItemParams {
-  id: string;
 }
 
 export interface AddInventoryItemInput {
@@ -139,6 +106,36 @@ export interface AddInventoryItemParams {
 
 export interface AddInventoryItemResponse {
   insertInventoryItem: {
+    itemId: string;
+    totalImpactedData: number;
+    acknowledged: boolean;
+  };
+}
+
+// For new updateInventoryItem mutation (filter + input)
+export interface InventoryItemUpdateInput {
+  ItemName?: string;
+  Category?: string;
+  Supplier?: string;
+  ItemLoc?: string;
+  Price?: number;
+  Status?: 'ACTIVE' | 'DISCONTINUED';
+  Stock?: number;
+  Tags?: string[];
+  EligibleWarranty?: boolean;
+  EligibleReplacement?: boolean;
+  Discount?: boolean;
+  ItemImageFileId?: string;
+  ItemImageFileIds?: string[];
+}
+
+export interface UpdateInventoryItemParams {
+  filter: string;
+  input: InventoryItemUpdateInput;
+}
+
+export interface UpdateInventoryItemResponse {
+  updateInventoryItem: {
     itemId: string;
     totalImpactedData: number;
     acknowledged: boolean;

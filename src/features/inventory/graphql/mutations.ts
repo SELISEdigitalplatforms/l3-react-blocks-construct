@@ -18,27 +18,11 @@ export const INSERT_INVENTORY_ITEM_MUTATION = `
 
 // Mutation to update an existing inventory item
 export const UPDATE_INVENTORY_ITEM_MUTATION = `
-  mutation UpdateInventoryItem($input: UpdateInventoryItemInput!) {
-    updateInventoryItem(input: $input) {
-      item {
-        id
-        itemName
-        category
-        supplier
-        itemLocation
-        stock
-        price
-        status
-        lastUpdated
-        itemImage
-        description
-        warranty
-        replacement
-        discount
-        tags
-      }
-      success
-      errors
+  mutation UpdateInventoryItem($filter: String!, $input: InventoryItemUpdateInput!) {
+    updateInventoryItem(filter: $filter, input: $input) {
+      itemId
+      totalImpactedData
+      acknowledged
     }
   }
 `;

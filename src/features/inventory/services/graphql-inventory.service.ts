@@ -86,7 +86,6 @@ export const updateInventoryItem = async (
     query: UPDATE_INVENTORY_ITEM_MUTATION,
     variables: params,
   });
-
   return response;
 };
 

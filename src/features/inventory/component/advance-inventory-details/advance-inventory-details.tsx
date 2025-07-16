@@ -27,6 +27,7 @@ import {
   tags,
 } from '../../services/inventory-service';
 import { useGetInventories } from 'features/inventory/hooks/use-graphql-inventory';
+import { useUpdateInventoryItem } from 'features/inventory/hooks/use-graphql-inventory';
 
 /**
  * A detailed view and editing interface for an individual inventory item.
@@ -55,7 +56,7 @@ export function AdvanceInventoryDetails() {
   const [replacement, setReplacement] = useState(true);
   const [discount, setDiscount] = useState(false);
   const [thumbnail, setThumbnail] = useState(images);
-  const [editedFields, setEditedFields] = useState({});
+  const [editedFields, setEditedFields] = useState<Record<string, any>>({});
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { itemId } = useParams();
@@ -65,6 +66,7 @@ export function AdvanceInventoryDetails() {
   const selectedInventory = items.find(
     (item: any) => String(item._id).trim() === String(itemId).trim()
   );
+  const { mutate: updateInventoryItem } = useUpdateInventoryItem();
 
   const handleEditDetails = () => setEditDetails(true);
   const handleCancelEdit = () => {
@@ -74,8 +76,37 @@ export function AdvanceInventoryDetails() {
 
   const handleUpdateDetails = () => {
     if (selectedInventory) {
-      Object.assign(selectedInventory, editedFields);
-      setEditDetails(false);
+      const editedInput: any = {
+        ...(editedFields.itemName && { ItemName: editedFields.itemName }),
+        ...(editedFields.category && { Category: editedFields.category }),
+        ...(editedFields.supplier && { Supplier: editedFields.supplier }),
+        ...(editedFields.itemLoc && { ItemLoc: editedFields.itemLoc }),
+        ...(editedFields.price && { Price: Number(editedFields.price) }),
+        ...(editedFields.status && { Status: editedFields.status }),
+        ...(editedFields.stock && { Stock: Number(editedFields.stock) }),
+        ...(editedFields.tags && { Tags: editedFields.tags }),
+        ...(editedFields.eligibleWarranty !== undefined && {
+          EligibleWarranty: editedFields.eligibleWarranty,
+        }),
+        ...(editedFields.eligibleReplacement !== undefined && {
+          EligibleReplacement: editedFields.eligibleReplacement,
+        }),
+        ...(editedFields.discount !== undefined && { Discount: editedFields.discount }),
+        ...(editedFields.itemImageFileId && { ItemImageFileId: editedFields.itemImageFileId }),
+        ...(editedFields.itemImageFileIds && { ItemImageFileIds: editedFields.itemImageFileIds }),
+      };
+      updateInventoryItem(
+        {
+          filter: `{_id: "${selectedInventory._id}"}`,
+          input: editedInput,
+        },
+        {
+          onSuccess: () => {
+            setEditDetails(false);
+            setEditedFields({});
+          },
+        }
+      );
     }
   };
 

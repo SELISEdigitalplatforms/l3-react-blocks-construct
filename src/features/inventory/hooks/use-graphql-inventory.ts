@@ -109,7 +109,7 @@ export const useUpdateInventoryItem = () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
       queryClient.invalidateQueries({ queryKey: ['inventoryStats'] });
 
-      if (data.updateInventoryItem.success) {
+      if (data.updateInventoryItem.acknowledged) {
         toast({
           variant: 'success',
           title: t('ITEM_UPDATED'),
@@ -117,7 +117,7 @@ export const useUpdateInventoryItem = () => {
         });
       } else {
         handleError(
-          { error: { message: data.updateInventoryItem.errors?.join(', ') } },
+          { error: { message: t('INVENTORY_ITEM_UPDATE_FAILED') } },
           { variant: 'destructive' }
         );
       }
