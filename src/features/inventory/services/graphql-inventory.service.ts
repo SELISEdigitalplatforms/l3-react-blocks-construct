@@ -1,14 +1,14 @@
 import { graphqlClient } from 'lib/graphql-client';
 import {
-  CreateInventoryItemResponse,
-  CreateInventoryItemParams,
+  AddInventoryItemResponse,
+  AddInventoryItemParams,
   UpdateInventoryItemResponse,
   UpdateInventoryItemParams,
   DeleteInventoryItemResponse,
 } from '../types/graphql.types';
 import { GET_INVENTORY_QUERY } from '../graphql/queries';
 import {
-  CREATE_INVENTORY_ITEM_MUTATION,
+  INSERT_INVENTORY_ITEM_MUTATION,
   UPDATE_INVENTORY_ITEM_MUTATION,
   DELETE_INVENTORY_ITEM_MUTATION,
 } from '../graphql/mutations';
@@ -50,23 +50,22 @@ export const getInventory = async (context: {
 };
 
 /**
- * Creates a new inventory item
- * @param params - Create inventory item parameters
- * @returns Promise with created item data
+ * Inserts a new inventory item (GraphQL)
+ * @param params - Inventory item insert parameters
+ * @returns Promise with inserted item data
  * @example
  * // Basic usage
- * const result = await createInventoryItem({
+ * const result = await inventoryItemInsert({
  *   input: { itemName: 'New Item', category: 'Electronics', ... }
  * });
  */
-export const createInventoryItem = async (
-  params: CreateInventoryItemParams
-): Promise<CreateInventoryItemResponse> => {
-  const response = await graphqlClient.mutate<CreateInventoryItemResponse>({
-    query: CREATE_INVENTORY_ITEM_MUTATION,
+export const addInventoryItem = async (
+  params: AddInventoryItemParams
+): Promise<AddInventoryItemResponse> => {
+  const response = await graphqlClient.mutate<AddInventoryItemResponse>({
+    query: INSERT_INVENTORY_ITEM_MUTATION,
     variables: params,
   });
-
   return response;
 };
 

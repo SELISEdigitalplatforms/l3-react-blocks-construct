@@ -92,23 +92,6 @@ export interface DeleteInventoryItemResponse {
   };
 }
 
-// Input Types for Mutations
-export interface CreateInventoryItemInput {
-  itemName: string;
-  category: string;
-  supplier: string;
-  itemLocation: string;
-  stock: number;
-  price: string;
-  status: 'ACTIVE' | 'DISCONTINUED';
-  itemImage?: string;
-  description?: string;
-  warranty?: boolean;
-  replacement?: boolean;
-  discount?: boolean;
-  tags?: string[];
-}
-
 export interface UpdateInventoryItemInput {
   id: string;
   itemName?: string;
@@ -126,15 +109,38 @@ export interface UpdateInventoryItemInput {
   tags?: string[];
 }
 
-// Mutation Variables Types
-export interface CreateInventoryItemParams {
-  input: CreateInventoryItemInput;
-}
-
 export interface UpdateInventoryItemParams {
   input: UpdateInventoryItemInput;
 }
 
 export interface DeleteInventoryItemParams {
   id: string;
+}
+
+export interface AddInventoryItemInput {
+  ItemName: string;
+  Category: string;
+  Supplier: string;
+  ItemLoc: string;
+  Price: number;
+  Status: 'ACTIVE' | 'DISCONTINUED';
+  Stock: number;
+  Tags: string[];
+  EligibleWarranty: boolean;
+  EligibleReplacement: boolean;
+  Discount: boolean;
+  ItemImageFileId: string;
+  ItemImageFileIds: string[];
+}
+
+export interface AddInventoryItemParams {
+  input: AddInventoryItemInput;
+}
+
+export interface AddInventoryItemResponse {
+  insertInventoryItem: {
+    itemId: string;
+    totalImpactedData: number;
+    acknowledged: boolean;
+  };
 }

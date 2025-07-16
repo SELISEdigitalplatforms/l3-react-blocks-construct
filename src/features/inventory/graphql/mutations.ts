@@ -5,29 +5,13 @@
  * These mutations are used with the graphqlClient for data modifications.
  */
 
-// Mutation to create a new inventory item
-export const CREATE_INVENTORY_ITEM_MUTATION = `
-  mutation CreateInventoryItem($input: CreateInventoryItemInput!) {
-    createInventoryItem(input: $input) {
-      item {
-        id
-        itemName
-        category
-        supplier
-        itemLocation
-        stock
-        price
-        status
-        lastUpdated
-        itemImage
-        description
-        warranty
-        replacement
-        discount
-        tags
-      }
-      success
-      errors
+// Mutation to insert a new inventory item (matches backend API)
+export const INSERT_INVENTORY_ITEM_MUTATION = `
+  mutation InsertInventoryItem($input: InventoryItemInsertInput!) {
+    insertInventoryItem(input: $input) {
+      itemId
+      totalImpactedData
+      acknowledged
     }
   }
 `;

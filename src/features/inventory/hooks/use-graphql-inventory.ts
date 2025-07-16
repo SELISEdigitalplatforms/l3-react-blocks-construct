@@ -3,10 +3,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from 'hooks/use-error-handler';
-import { CreateInventoryItemParams, UpdateInventoryItemParams } from '../types/graphql.types';
+import { AddInventoryItemParams, UpdateInventoryItemParams } from '../types/graphql.types';
 import {
   getInventory,
-  createInventoryItem,
+  addInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
 } from '../services/graphql-inventory.service';
@@ -50,41 +50,40 @@ export const useGetInventories = (params: InventoryQueryParams) => {
 };
 
 /**
- * Hook to create a new inventory item
- * @returns Mutation function to create inventory item with loading and error states
+ * Hook to insert a new inventory item
+ * @returns Mutation function to insert inventory item with loading and error states
  *
  * @example
- * const { mutate: createItem, isPending } = useCreateInventoryItem();
- * createItem({ input: itemData });
+ * const { mutate: insertItem, isPending } = useInventoryItemInsert();
+ * insertItem({ input: itemData });
  */
-export const useCreateInventoryItem = () => {
+export const useAddInventoryItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
-    mutationFn: (params: CreateInventoryItemParams) => createInventoryItem(params),
-    onSuccess: (data) => {
-      // Invalidate and refetch inventory queries
-      queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      queryClient.invalidateQueries({ queryKey: ['inventoryStats'] });
+    mutationFn: (params: AddInventoryItemParams) => addInventoryItem(params),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'inventory',
+      });
 
-      if (data.createInventoryItem.success) {
+      queryClient.refetchQueries({
+        predicate: (query) => query.queryKey[0] === 'inventory',
+        type: 'active',
+      });
+
+      if (data.insertInventoryItem?.acknowledged) {
         toast({
           variant: 'success',
           title: t('ITEM_CREATED'),
           description: t('INVENTORY_ITEM_CREATED_SUCCESSFULLY'),
         });
-      } else {
-        handleError(
-          { error: { message: data.createInventoryItem.errors?.join(', ') } },
-          { variant: 'destructive' }
-        );
       }
     },
     onError: (error) => {
-      handleError(error, { variant: 'destructive' });
+      throw error;
     },
   });
 };

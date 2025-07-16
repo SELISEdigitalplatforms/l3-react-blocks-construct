@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Check, ChevronLeft } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
 import {
   categoryOptions,
   inventoryData,
-  InventoryData,
   locationOptions,
   tags,
 } from '../../services/inventory-service';
 import { GeneralInfoForm } from './general-info-form';
 import { AdditionalInfoForm } from './additional-info-form';
 import { ImageUploader } from '../image-uploader/image-uploader';
-import { Check, ChevronLeft } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
+import { useAddInventoryItem } from 'features/inventory/hooks/use-graphql-inventory';
 
 /**
  * Stepper component provides a multi-step navigation interface, displaying the steps and allowing the user to
@@ -94,40 +93,45 @@ export function Stepper({ steps, currentStep, onStepChange }: Readonly<StepperPr
  * @returns {JSX.Element} The rendered InventoryForm component.
  */
 
-interface InventoryItem {
+interface InventoryFormData {
   itemName: string;
   category: string;
   supplier: string;
   itemLoc: string;
-  price: string;
+  price: number;
   status: string;
   stock: number;
-  images: string[];
-  warranty: boolean;
-  replacement: boolean;
-  discount: boolean;
   tags: string[];
+  eligibleWarranty: boolean;
+  eligibleReplacement: boolean;
+  discount: boolean;
+  images: string[];
+  itemImageFileId: string;
+  itemImageFileIds: string[];
 }
 
 export function InventoryForm() {
   const { t } = useTranslation();
   const steps = [t('GENERAL_INFO'), t('ADDITIONAL_INFO')];
   const [currentStep, setCurrentStep] = useState(0);
-  const [inventory, setInventory] = useState<InventoryData[]>(inventoryData);
+  const [loading, setLoading] = useState(false);
+  const { mutate: addInventoryItem } = useAddInventoryItem();
 
-  const [formData, setFormData] = useState<InventoryItem>({
+  const [formData, setFormData] = useState<InventoryFormData>({
     itemName: '',
     category: categoryOptions[0],
     supplier: '',
     itemLoc: locationOptions[0],
-    price: '',
-    status: 'active',
+    price: 0,
+    status: 'ACTIVE',
     stock: 0,
-    images: [],
-    warranty: true,
-    replacement: true,
-    discount: false,
     tags: [],
+    eligibleWarranty: true,
+    eligibleReplacement: true,
+    discount: false,
+    images: [],
+    itemImageFileId: '',
+    itemImageFileIds: [],
   });
 
   const navigate = useNavigate();
@@ -135,7 +139,7 @@ export function InventoryForm() {
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: field === 'price' ? Number(value) : value,
     }));
   };
 
@@ -143,6 +147,7 @@ export function InventoryForm() {
     setFormData((prev) => ({
       ...prev,
       images: [...prev.images, ...newImages],
+      itemImageFileIds: [...prev.itemImageFileIds, ...newImages],
     }));
   };
 
@@ -150,6 +155,7 @@ export function InventoryForm() {
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((img) => img !== image),
+      itemImageFileIds: prev.itemImageFileIds.filter((img) => img !== image),
     }));
   };
 
@@ -165,26 +171,38 @@ export function InventoryForm() {
     }
   };
 
-  const generateItemId = () => {
-    return uuidv4();
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newItem: InventoryData = {
-      itemId: generateItemId(),
-      itemName: formData.itemName || '',
-      itemImage: formData.images?.[0] || '',
-      category: formData.category || '',
-      supplier: formData.supplier || '',
-      itemLoc: formData.itemLoc || '',
-      stock: formData.stock ? Number(formData.stock) : null,
-      lastupdated: new Date().toISOString(),
-      price: formData.price || '',
-      status: formData.status || 'inactive',
+    setLoading(true);
+    const input = {
+      ItemName: formData.itemName,
+      Category: formData.category,
+      Supplier: formData.supplier,
+      ItemLoc: formData.itemLoc,
+      Price: formData.price,
+      Status: (formData.status.trim().toUpperCase() === 'ACTIVE' ? 'ACTIVE' : 'DISCONTINUED') as
+        | 'ACTIVE'
+        | 'DISCONTINUED',
+      Stock: formData.stock,
+      Tags: formData.tags,
+      EligibleWarranty: formData.eligibleWarranty,
+      EligibleReplacement: formData.eligibleReplacement,
+      Discount: formData.discount,
+      ItemImageFileId: formData.itemImageFileId,
+      ItemImageFileIds: formData.itemImageFileIds,
     };
-    setInventory((prevInventory) => [...prevInventory, newItem]);
-    navigate('/inventory');
+    addInventoryItem(
+      { input },
+      {
+        onSuccess: (result: any) => {
+          if (result.insertInventoryItem?.acknowledged) {
+            navigate('/inventory');
+          }
+          setLoading(false);
+        },
+        onError: () => setLoading(false),
+      }
+    );
   };
 
   const isGeneralInfoValid = () => {
@@ -193,7 +211,7 @@ export function InventoryForm() {
       formData.category.trim() !== '' &&
       formData.supplier.trim() !== '' &&
       formData.itemLoc.trim() !== '' &&
-      formData.price.trim() !== '' &&
+      formData.price > 0 &&
       formData.stock > 0
     );
   };
@@ -209,7 +227,7 @@ export function InventoryForm() {
         >
           <ChevronLeft />
         </Button>
-        <h3 className={`text-2xl font-bold tracking-tight ${inventory ? 'mb-0' : ''}`}>
+        <h3 className={`text-2xl font-bold tracking-tight ${inventoryData ? 'mb-0' : ''}`}>
           {t('ADD_ITEM')}
         </h3>
       </div>
@@ -222,7 +240,15 @@ export function InventoryForm() {
             <Card className="w-full border-none rounded-lg justify-center flex shadow-sm mb-6">
               <CardContent className="pt-6 w-[774px]">
                 <GeneralInfoForm
-                  formData={formData}
+                  formData={{
+                    ItemName: formData.itemName,
+                    Category: formData.category,
+                    Supplier: formData.supplier,
+                    ItemLoc: formData.itemLoc,
+                    Price: formData.price,
+                    Status: formData.status,
+                    Stock: formData.stock,
+                  }}
                   handleInputChange={handleInputChange}
                   categoryOptions={categoryOptions}
                   locationOptions={locationOptions}
@@ -258,14 +284,19 @@ export function InventoryForm() {
             <Card className="w-full border-none rounded-lg flex justify-center shadow-sm mb-6">
               <CardContent className="w-[774px]">
                 <AdditionalInfoForm
-                  formData={formData}
+                  formData={{
+                    EligibleWarranty: formData.eligibleWarranty,
+                    EligibleReplacement: formData.eligibleReplacement,
+                    Discount: formData.discount,
+                    Tags: formData.tags,
+                  }}
                   handleInputChange={handleInputChange}
                   tags={tags}
                   handleTagToggle={(tag) =>
                     setFormData((prev) => ({
                       ...prev,
                       tags: prev.tags.includes(tag)
-                        ? prev.tags.filter((t) => t !== tag)
+                        ? prev.tags.filter((t: string) => t !== tag)
                         : [...prev.tags, tag],
                     }))
                   }
@@ -288,8 +319,8 @@ export function InventoryForm() {
                     >
                       {t('PREVIOUS')}
                     </Button>
-                    <Button type="submit" className="h-10 bg-primary font-bold">
-                      {t('FINISH')}
+                    <Button type="submit" className="h-10 bg-primary font-bold" disabled={loading}>
+                      {loading ? t('LOADING') : t('FINISH')}
                     </Button>
                   </div>
                 </div>
