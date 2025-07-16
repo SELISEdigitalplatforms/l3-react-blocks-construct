@@ -4,6 +4,7 @@ import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-c
 import { InventoryStatus, statusColors } from '../../services/inventory-service';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
 import { InventoryItem } from '../../types/graphql.types';
+import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**
  * Creates column definitions for an advanced inventory table.
@@ -44,9 +45,13 @@ export const createAdvanceTableColumns = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center p-[2px] justify-center rounded-md cursor-pointer border w-10 h-10">
             <img
-              src={row.original.ItemImageFileId}
+              src={row.original.ItemImageFileId || PlaceHolderImage}
               alt="item view"
               className="w-full h-full object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = PlaceHolderImage;
+              }}
             />
           </div>
           <span className="truncate font-medium">{row.original.ItemName}</span>

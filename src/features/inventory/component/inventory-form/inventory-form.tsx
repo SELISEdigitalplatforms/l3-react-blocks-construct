@@ -6,12 +6,7 @@ import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storag
 import API_CONFIG from 'config/api';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
-import {
-  categoryOptions,
-  inventoryData,
-  locationOptions,
-  tags,
-} from '../../services/inventory-service';
+import { categoryOptions, locationOptions, tags } from '../../services/inventory-service';
 import { GeneralInfoForm } from './general-info-form';
 import { AdditionalInfoForm } from './additional-info-form';
 import { ImageUploader } from '../image-uploader/image-uploader';
@@ -296,9 +291,7 @@ export function InventoryForm() {
         >
           <ChevronLeft />
         </Button>
-        <h3 className={`text-2xl font-bold tracking-tight ${inventoryData ? 'mb-0' : ''}`}>
-          {t('ADD_ITEM')}
-        </h3>
+        <h3 className="text-2xl font-bold tracking-tight">{t('ADD_ITEM')}</h3>
       </div>
 
       <div className="container mx-auto py-6">

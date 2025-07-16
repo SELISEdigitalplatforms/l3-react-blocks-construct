@@ -1,15 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
+import { tags } from '../../services/inventory-service';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TableCell, TableRow } from 'components/ui/table';
 import { Input } from 'components/ui/input';
 import { Checkbox } from 'components/ui/checkbox';
 import { Button } from 'components/ui/button';
+import { Label } from 'components/ui/label';
 import { Switch } from 'components/ui/switch';
 import { Separator } from 'components/ui/separator';
-import { checkedTags, images, tags } from '../../services/inventory-service';
 import { InventoryItem } from '../../types/graphql.types';
+import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**
  * AdvanceExpandRowContent component renders expanded row content for an inventory item in a table.
@@ -39,35 +41,63 @@ interface AdvanceExpandRowContentProps {
 }
 
 export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandRowContentProps) => {
-  const [searchTags, setSearchTags] = useState('');
-  const [selectedImage, setSelectedImage] = useState(images[0]);
-  const [warranty, setWarranty] = useState(true);
-  const [replacement, setReplacement] = useState(true);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedImage, setSelectedImage] = useState('');
+  const [warranty, setWarranty] = useState(false);
+  const [replacement, setReplacement] = useState(false);
   const [discount, setDiscount] = useState(false);
-  const [stock, setStock] = useState(30);
-  const [selectedTags, setSelectedTags] = useState(checkedTags);
+  const [stock, setStock] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const actionRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const handleTagToggle = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
+  const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  const displayTags = searchTerm ? filteredTags : tags;
 
-  const filterSearchTags = tags.filter((tag) =>
-    tag.toLowerCase().includes(searchTags.toLowerCase())
-  );
+  const currentItem = React.useMemo(() => {
+    if (!rowId || !data || data.length === 0) return null;
+    const index = Number(rowId);
+    if (isNaN(index)) return null;
+    return data[index];
+  }, [rowId, data]);
+
+  React.useEffect(() => {
+    if (currentItem) {
+      setWarranty(currentItem.EligibleWarranty || false);
+      setReplacement(currentItem.EligibleReplacement || false);
+      setDiscount(currentItem.Discount || false);
+      setStock(currentItem.Stock || 0);
+      setSelectedTags(currentItem.Tags || []);
+
+      const itemImages = (
+        Array.isArray(currentItem.ItemImageFileIds)
+          ? currentItem.ItemImageFileIds
+          : currentItem.ItemImageFileId
+            ? [currentItem.ItemImageFileId]
+            : []
+      ).filter((img): img is string => Boolean(img));
+
+      setImages(itemImages);
+      setSelectedImage(itemImages[0] || PlaceHolderImage);
+    }
+  }, [
+    currentItem,
+    setWarranty,
+    setReplacement,
+    setDiscount,
+    setStock,
+    setSelectedTags,
+    setImages,
+    setSelectedImage,
+  ]);
 
   const handleInventoryDetails = () => {
-    const index = Number(rowId);
-    if (isNaN(index)) {
-      return null;
+    if (currentItem?._id) {
+      navigate(`/inventory/${currentItem._id}`);
     }
-    const rowData = data[index];
-    navigate(`/inventory/${rowData?._id || ''}`);
   };
 
   useEffect(() => {
@@ -92,45 +122,83 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
           <div className="flex gap-6 justify-between">
             <div className="flex gap-4 flex-col">
               <img
-                src={selectedImage}
+                src={selectedImage || PlaceHolderImage}
                 alt="Product"
                 className="w-44 h-44 object-cover rounded-lg border"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = PlaceHolderImage;
+                }}
               />
-              <div className="flex w-full items-center justify-between">
-                {images.map((img) => (
-                  <Button
-                    variant="ghost"
-                    key={img}
-                    className="p-0 rounded-md focus:outline-none"
-                    onClick={() => setSelectedImage(img)}
-                  >
-                    <img
-                      src={img}
-                      alt="Thumbnail"
-                      className={`w-12 h-12 object-cover rounded-md border ${
-                        selectedImage === img ? 'border-[1.5px] border-primary' : ''
-                      }`}
-                    />
-                  </Button>
-                ))}
-              </div>
+              {images.length > 0 && (
+                <div className="flex w-full items-center gap-2 flex-wrap">
+                  {images.map((img, index) => (
+                    <Button
+                      variant="ghost"
+                      key={index}
+                      className="p-0 rounded-md focus:outline-none h-12 w-12 min-w-0"
+                      onClick={() => setSelectedImage(img)}
+                    >
+                      <img
+                        src={img || PlaceHolderImage}
+                        alt={`Thumbnail ${index + 1}`}
+                        className={`w-full h-full object-cover rounded-md border ${
+                          selectedImage === img ? 'border-[1.5px] border-primary' : ''
+                        }`}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = PlaceHolderImage;
+                        }}
+                      />
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex flex-col gap-4 w-[40%]">
               <div className="flex items-center gap-2 justify-between">
                 <span>{t('ELIGIBLE_FOR_WARRANTY')}</span>
-                <Switch checked={warranty} onCheckedChange={setWarranty} />
+                <Switch
+                  checked={warranty}
+                  onCheckedChange={undefined}
+                  disabled={true}
+                  className="opacity-70 cursor-not-allowed"
+                  aria-disabled="true"
+                />
               </div>
               <div className="flex items-center gap-2 justify-between">
                 <span>{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
-                <Switch checked={replacement} onCheckedChange={setReplacement} />
+                <Switch
+                  checked={replacement}
+                  onCheckedChange={undefined}
+                  disabled={true}
+                  className="opacity-70 cursor-not-allowed"
+                  aria-disabled="true"
+                />
               </div>
               <div className="flex items-center gap-2 justify-between">
                 <span>{t('DISCOUNT')}</span>
-                <Switch checked={discount} onCheckedChange={setDiscount} />
+                <Switch
+                  checked={discount}
+                  onCheckedChange={undefined}
+                  disabled={true}
+                  className="opacity-70 cursor-not-allowed"
+                  aria-disabled="true"
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <span>{t('STOCK')}</span>
-                <Input value={stock} onChange={(e) => setStock(Number(e.target.value))} />
+                <Input
+                  value={stock}
+                  onChange={undefined}
+                  disabled={true}
+                  type="number"
+                  min="0"
+                  className="cursor-not-allowed"
+                  aria-disabled="true"
+                />
               </div>
             </div>
             <div className="flex flex-col w-[30%]">
@@ -141,23 +209,40 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
                   <Input
                     className="w-full pl-10 border-none shadow-none outline-none focus-visible:ring-0"
                     placeholder={t('ENTER_TAG_NAME')}
-                    value={searchTags}
-                    onChange={(e) => setSearchTags(e.target.value)}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    disabled={false}
                   />
                 </div>
-                <div className="flex p-2 gap-2 flex-col border-t">
-                  {filterSearchTags.length > 0 ? (
-                    filterSearchTags.map((tag) => (
-                      <div key={tag} className="flex items-center gap-2">
-                        <Checkbox
-                          checked={selectedTags.includes(tag)}
-                          onCheckedChange={() => handleTagToggle(tag)}
-                        />
-                        <span>{tag}</span>
-                      </div>
-                    ))
+                <div className="flex p-2 gap-2 flex-col border-t max-h-40 overflow-y-auto">
+                  {displayTags.length > 0 ? (
+                    <div className="space-y-2">
+                      {displayTags.map((tag) => {
+                        const isChecked = selectedTags.includes(tag);
+                        return (
+                          <div key={tag} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`tag-${tag}`}
+                              checked={isChecked}
+                              onCheckedChange={undefined}
+                              disabled={true}
+                              className={`opacity-100 ${isChecked ? 'opacity-100' : 'opacity-50'}`}
+                              aria-disabled="true"
+                            />
+                            <Label
+                              htmlFor={`tag-${tag}`}
+                              className={`text-sm ${isChecked ? 'font-medium' : 'font-normal'}`}
+                            >
+                              {tag}
+                            </Label>
+                          </div>
+                        );
+                      })}
+                    </div>
                   ) : (
-                    <p className="text-low-emphasis">{t('NO_TAGS_FOUND')}</p>
+                    <p className="text-muted-foreground text-sm py-2 text-center">
+                      {t('NO_TAGS_FOUND')}
+                    </p>
                   )}
                 </div>
               </div>

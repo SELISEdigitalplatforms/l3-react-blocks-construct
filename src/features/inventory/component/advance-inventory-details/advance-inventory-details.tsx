@@ -29,6 +29,7 @@ import { useUpdateInventoryItem } from 'features/inventory/hooks/use-graphql-inv
 import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
 import API_CONFIG from 'config/api';
 import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.services';
+import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**
  * A detailed view and editing interface for an individual inventory item.
@@ -71,7 +72,6 @@ export function AdvanceInventoryDetails() {
   );
   const { mutate: updateInventoryItem } = useUpdateInventoryItem();
 
-  // Initialize state when selectedInventory changes
   useEffect(() => {
     if (selectedInventory) {
       setWarranty(selectedInventory.EligibleWarranty || false);
@@ -79,21 +79,16 @@ export function AdvanceInventoryDetails() {
       setDiscount(selectedInventory.Discount || false);
       setSelectedTags(selectedInventory.Tags || []);
 
-      // Set images from the inventory
-      if (selectedInventory.ItemImageFileIds?.length > 0) {
-        const imageUrls = Array.isArray(selectedInventory.ItemImageFileIds)
+      const itemImages = (
+        Array.isArray(selectedInventory.ItemImageFileIds)
           ? selectedInventory.ItemImageFileIds
-          : [selectedInventory.ItemImageFileId];
+          : selectedInventory.ItemImageFileId
+            ? [selectedInventory.ItemImageFileId]
+            : []
+      ).filter((img: any): img is string => Boolean(img));
 
-        setThumbnail(imageUrls.filter(Boolean));
-        setSelectedImage(imageUrls[0] || '');
-      } else if (selectedInventory.ItemImageFileId) {
-        setThumbnail([selectedInventory.ItemImageFileId]);
-        setSelectedImage(selectedInventory.ItemImageFileId);
-      } else {
-        setThumbnail([]);
-        setSelectedImage('');
-      }
+      setThumbnail(itemImages);
+      setSelectedImage(itemImages[0] || PlaceHolderImage);
     }
   }, [selectedInventory]);
 
@@ -410,21 +405,16 @@ export function AdvanceInventoryDetails() {
               <div className="flex flex-col md:flex-row gap-14">
                 <div className="flex w-full gap-6 flex-col md:w-[30%]">
                   <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border">
-                    {selectedImage ? (
-                      <img
-                        src={selectedImage}
-                        alt="Product"
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          // Handle broken image
-                          const target = e.target as HTMLImageElement;
-                          target.onerror = null;
-                          target.src = 'placeholder-image-url'; // Add a placeholder image URL
-                        }}
-                      />
-                    ) : (
-                      <div className="text-muted-foreground">{t('NO_IMAGE_AVAILABLE')}</div>
-                    )}
+                    <img
+                      src={selectedImage || PlaceHolderImage}
+                      alt="Product"
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = PlaceHolderImage;
+                      }}
+                    />
                   </div>
                   <div className="flex w-full items-center justify-between">
                     {thumbnail.map((img) => (
@@ -451,9 +441,14 @@ export function AdvanceInventoryDetails() {
                             onClick={() => setSelectedImage(img)}
                           >
                             <img
-                              src={img}
+                              src={img || PlaceHolderImage}
                               alt="Thumbnail"
                               className="w-full h-full object-contain"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.onerror = null;
+                                target.src = PlaceHolderImage;
+                              }}
                             />
                           </Button>
                         </div>
