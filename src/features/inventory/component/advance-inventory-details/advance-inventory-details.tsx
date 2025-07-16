@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
+import { ChevronLeft, Pen, Plus, Search, X } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
@@ -19,8 +19,6 @@ import { Switch } from 'components/ui/switch';
 import { Checkbox } from 'components/ui/checkbox';
 import {
   categoryOptions,
-  checkedTags,
-  images,
   InventoryStatus,
   locationOptions,
   statusColors,
@@ -28,6 +26,9 @@ import {
 } from '../../services/inventory-service';
 import { useGetInventories } from 'features/inventory/hooks/use-graphql-inventory';
 import { useUpdateInventoryItem } from 'features/inventory/hooks/use-graphql-inventory';
+import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
+import API_CONFIG from 'config/api';
+import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.services';
 
 /**
  * A detailed view and editing interface for an individual inventory item.
@@ -48,16 +49,18 @@ import { useUpdateInventoryItem } from 'features/inventory/hooks/use-graphql-inv
  */
 
 export function AdvanceInventoryDetails() {
-  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const [selectedImage, setSelectedImage] = useState('');
   const [editDetails, setEditDetails] = useState(false);
   const [searchTags, setSearchTags] = useState('');
-  const [selectedTags, setSelectedTags] = useState(checkedTags);
-  const [warranty, setWarranty] = useState(true);
-  const [replacement, setReplacement] = useState(true);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [warranty, setWarranty] = useState(false);
+  const [replacement, setReplacement] = useState(false);
   const [discount, setDiscount] = useState(false);
-  const [thumbnail, setThumbnail] = useState(images);
+  const [thumbnail, setThumbnail] = useState<string[]>([]);
   const [editedFields, setEditedFields] = useState<Record<string, any>>({});
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
+  const { mutate: getPreSignedUrl } = useGetPreSignedUrlForUpload();
   const { t } = useTranslation();
   const { itemId } = useParams();
   const { data, isLoading } = useGetInventories({ pageNo: 1, pageSize: 1000 });
@@ -68,33 +71,120 @@ export function AdvanceInventoryDetails() {
   );
   const { mutate: updateInventoryItem } = useUpdateInventoryItem();
 
+  // Initialize state when selectedInventory changes
+  useEffect(() => {
+    if (selectedInventory) {
+      setWarranty(selectedInventory.EligibleWarranty || false);
+      setReplacement(selectedInventory.EligibleReplacement || false);
+      setDiscount(selectedInventory.Discount || false);
+      setSelectedTags(selectedInventory.Tags || []);
+
+      // Set images from the inventory
+      if (selectedInventory.ItemImageFileIds?.length > 0) {
+        const imageUrls = Array.isArray(selectedInventory.ItemImageFileIds)
+          ? selectedInventory.ItemImageFileIds
+          : [selectedInventory.ItemImageFileId];
+
+        setThumbnail(imageUrls.filter(Boolean));
+        setSelectedImage(imageUrls[0] || '');
+      } else if (selectedInventory.ItemImageFileId) {
+        setThumbnail([selectedInventory.ItemImageFileId]);
+        setSelectedImage(selectedInventory.ItemImageFileId);
+      } else {
+        setThumbnail([]);
+        setSelectedImage('');
+      }
+    }
+  }, [selectedInventory]);
+
   const handleEditDetails = () => setEditDetails(true);
   const handleCancelEdit = () => {
     setEditDetails(false);
     setEditedFields({});
   };
 
-  const handleUpdateDetails = () => {
-    if (selectedInventory) {
+  const uploadImages = async (files: File[]): Promise<{ uploadUrl: string; fileId: string }[]> => {
+    const uploadFile = async (
+      file: File
+    ): Promise<{ uploadUrl: string; fileId: string } | null> => {
+      try {
+        const data = await new Promise<GetPreSignedUrlForUploadResponse>((resolve, reject) => {
+          getPreSignedUrl(
+            {
+              name: file.name,
+              projectKey: API_CONFIG.blocksKey,
+              itemId: '',
+              metaData: '',
+              accessModifier: 'Public',
+              configurationName: 'Default',
+              parentDirectoryId: '',
+              tags: '',
+            },
+            {
+              onSuccess: (responseData) => resolve(responseData),
+              onError: (error) => reject(error),
+            }
+          );
+        });
+
+        if (data?.isSuccess && data.uploadUrl) {
+          const uploadResponse = await fetch(data.uploadUrl, {
+            method: 'PUT',
+            body: file,
+            headers: {
+              'Content-Type': file.type,
+              'x-ms-blob-type': 'BlockBlob',
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error(`Upload failed with status ${uploadResponse.status}`);
+          }
+
+          return {
+            fileId: data.fileId || '',
+            uploadUrl: data.uploadUrl.split('?')[0],
+          };
+        }
+
+        console.error('Failed to get pre-signed URL:', data?.errors);
+        return null;
+      } catch (error) {
+        console.error('Error in uploadFile:', error);
+        return null;
+      }
+    };
+
+    const results = await Promise.all(files.map((file) => uploadFile(file)));
+
+    return results.filter(
+      (result): result is { uploadUrl: string; fileId: string } =>
+        result !== null && Boolean(result.fileId) && Boolean(result.uploadUrl)
+    );
+  };
+
+  const handleUpdateDetails = async () => {
+    if (!selectedInventory) return;
+
+    try {
+      setIsUploading(true);
+
       const editedInput: any = {
         ...(editedFields.itemName && { ItemName: editedFields.itemName }),
         ...(editedFields.category && { Category: editedFields.category }),
         ...(editedFields.supplier && { Supplier: editedFields.supplier }),
         ...(editedFields.itemLoc && { ItemLoc: editedFields.itemLoc }),
-        ...(editedFields.price && { Price: Number(editedFields.price) }),
+        ...(editedFields.price !== undefined && { Price: Number(editedFields.price) }),
         ...(editedFields.status && { Status: editedFields.status }),
-        ...(editedFields.stock && { Stock: Number(editedFields.stock) }),
-        ...(editedFields.tags && { Tags: editedFields.tags }),
-        ...(editedFields.eligibleWarranty !== undefined && {
-          EligibleWarranty: editedFields.eligibleWarranty,
-        }),
-        ...(editedFields.eligibleReplacement !== undefined && {
-          EligibleReplacement: editedFields.eligibleReplacement,
-        }),
-        ...(editedFields.discount !== undefined && { Discount: editedFields.discount }),
+        ...(editedFields.stock !== undefined && { Stock: Number(editedFields.stock) }),
+        ...(selectedTags.length > 0 && { Tags: selectedTags }),
+        EligibleWarranty: warranty,
+        EligibleReplacement: replacement,
+        Discount: discount,
         ...(editedFields.itemImageFileId && { ItemImageFileId: editedFields.itemImageFileId }),
         ...(editedFields.itemImageFileIds && { ItemImageFileIds: editedFields.itemImageFileIds }),
       };
+
       updateInventoryItem(
         {
           filter: `{_id: "${selectedInventory._id}"}`,
@@ -104,21 +194,39 @@ export function AdvanceInventoryDetails() {
           onSuccess: () => {
             setEditDetails(false);
             setEditedFields({});
+            setIsUploading(false);
+
+            thumbnail.forEach((url) => {
+              if (url.startsWith('blob:')) {
+                URL.revokeObjectURL(url);
+              }
+            });
+          },
+          onError: (error) => {
+            console.error('Error updating inventory:', error);
+            setIsUploading(false);
           },
         }
       );
+    } catch (error) {
+      console.error('Error in handleUpdateDetails:', error);
     }
   };
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
+    const newTags = selectedTags.includes(tag)
+      ? selectedTags.filter((t) => t !== tag)
+      : [...selectedTags, tag];
+    setSelectedTags(newTags);
+    setEditedFields((prev) => ({
+      ...prev,
+      tags: newTags,
+    }));
   };
 
-  const filterSearchTags = tags.filter((tag) =>
-    tag.toLowerCase().includes(searchTags.toLowerCase())
-  );
+  const filteredTags = searchTags
+    ? tags.filter((tag) => tag.toLowerCase().includes(searchTags.toLowerCase()))
+    : tags;
 
   const handleFieldChange = (field: string, value: string | number) => {
     setEditedFields((prev) => ({ ...prev, [field]: value }));
@@ -186,26 +294,56 @@ export function AdvanceInventoryDetails() {
   const handleDeleteImage = (img: string) => {
     const updatedImages = thumbnail.filter((image) => image !== img);
     setThumbnail(updatedImages);
-    if (selectedImage === img && updatedImages.length > 0) {
-      setSelectedImage(updatedImages[0]);
+
+    if (selectedImage === img) {
+      setSelectedImage(updatedImages[0] || '');
+    }
+    setEditedFields((prev) => ({
+      ...prev,
+      itemImageFileId: updatedImages[0] || '',
+      itemImageFileIds: updatedImages,
+    }));
+
+    if (!thumbnail.includes(img) && img.startsWith('blob:')) {
+      URL.revokeObjectURL(img);
     }
   };
 
-  const onDrop = (acceptedFiles: File[]) => {
+  const onDrop = async (acceptedFiles: File[]) => {
     const remainingSlots = 5 - thumbnail.length;
     const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+
     if (filesToAdd.length > 0) {
-      const newImages = filesToAdd.map((file) => URL.createObjectURL(file));
-      const newThumbnailArray = [...thumbnail, ...newImages];
-      setThumbnail(newThumbnailArray);
-      setSelectedImage(newThumbnailArray[newThumbnailArray.length - 1]);
+      try {
+        setIsUploading(true);
+
+        const successfulUploads = await uploadImages(filesToAdd);
+
+        if (successfulUploads.length > 0) {
+          const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
+          const updatedThumbnails = [...thumbnail, ...uploadUrls];
+
+          setThumbnail(updatedThumbnails);
+          setSelectedImage(uploadUrls[0] || selectedImage);
+
+          setEditedFields((prev) => ({
+            ...prev,
+            itemImageFileId: uploadUrls[0] || prev.itemImageFileId,
+            itemImageFileIds: updatedThumbnails,
+          }));
+        }
+      } catch (error) {
+        console.error('Error uploading images:', error);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: { 'image/*': [] },
-    multiple: true,
+    multiple: false,
   });
 
   const inventoryToShow = selectedInventory;
@@ -240,8 +378,8 @@ export function AdvanceInventoryDetails() {
                   <Button size="sm" variant="outline" onClick={handleCancelEdit}>
                     {t('CANCEL')}
                   </Button>
-                  <Button size="sm" onClick={handleUpdateDetails}>
-                    {t('UPDATE')}
+                  <Button size="sm" onClick={handleUpdateDetails} disabled={isUploading}>
+                    {isUploading ? t('UPDATING') : t('UPDATE')}
                   </Button>
                 </div>
               )}
@@ -272,11 +410,21 @@ export function AdvanceInventoryDetails() {
               <div className="flex flex-col md:flex-row gap-14">
                 <div className="flex w-full gap-6 flex-col md:w-[30%]">
                   <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border">
-                    <img
-                      src={selectedImage}
-                      alt="Product"
-                      className="w-full h-full object-contain"
-                    />
+                    {selectedImage ? (
+                      <img
+                        src={selectedImage}
+                        alt="Product"
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          // Handle broken image
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = 'placeholder-image-url'; // Add a placeholder image URL
+                        }}
+                      />
+                    ) : (
+                      <div className="text-muted-foreground">{t('NO_IMAGE_AVAILABLE')}</div>
+                    )}
                   </div>
                   <div className="flex w-full items-center justify-between">
                     {thumbnail.map((img) => (
@@ -288,7 +436,7 @@ export function AdvanceInventoryDetails() {
                             size="icon"
                             className="bg-surface absolute -top-4 -right-4 text-white border border-white rounded-full w-8 h-8"
                           >
-                            <Trash className="text-destructive" />
+                            <X className="text-destructive" />
                           </Button>
                         )}
                         <div
@@ -392,19 +540,63 @@ export function AdvanceInventoryDetails() {
                 <div className="flex flex-col gap-4 w-full md:w-[50%]">
                   <div className="flex items-center gap-2 justify-between">
                     <span>{t('ELIGIBLE_FOR_WARRANTY')}</span>
-                    <Switch checked={warranty} onCheckedChange={setWarranty} />
+                    <div
+                      className={`flex items-center ${!editDetails ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <Switch
+                        checked={warranty}
+                        onCheckedChange={(checked) => {
+                          setWarranty(checked);
+                          setEditedFields((prev) => ({
+                            ...prev,
+                            eligibleWarranty: checked,
+                          }));
+                        }}
+                        disabled={!editDetails}
+                      />
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 justify-between">
                     <span>{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
-                    <Switch checked={replacement} onCheckedChange={setReplacement} />
+                    <div
+                      className={`flex items-center ${!editDetails ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <Switch
+                        checked={replacement}
+                        onCheckedChange={(checked) => {
+                          setReplacement(checked);
+                          setEditedFields((prev) => ({
+                            ...prev,
+                            eligibleReplacement: checked,
+                          }));
+                        }}
+                        disabled={!editDetails}
+                      />
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 justify-between">
                     <span>{t('DISCOUNT')}</span>
-                    <Switch checked={discount} onCheckedChange={setDiscount} />
+                    <div
+                      className={`flex items-center ${!editDetails ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <Switch
+                        checked={discount}
+                        onCheckedChange={(checked) => {
+                          setDiscount(checked);
+                          setEditedFields((prev) => ({
+                            ...prev,
+                            discount: checked,
+                          }));
+                        }}
+                        disabled={!editDetails}
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col w-full md:w-[50%]">
-                  <span className="mb-2">{t('TAGS')}</span>
+                  <div className="mb-2">
+                    <span>{t('TAGS')}</span>
+                  </div>
                   <div className="w-full border rounded-lg">
                     <div className="relative w-full">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-medium-emphasis w-4 h-4" />
@@ -413,21 +605,47 @@ export function AdvanceInventoryDetails() {
                         placeholder={t('ENTER_TAG_NAME')}
                         value={searchTags}
                         onChange={(e) => setSearchTags(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && editDetails) {
+                            e.preventDefault();
+                            const newTag = searchTags.trim();
+                            if (newTag && !selectedTags.includes(newTag)) {
+                              const newTags = [...selectedTags, newTag];
+                              setSelectedTags(newTags);
+                              setSearchTags('');
+                              setEditedFields((prev) => ({
+                                ...prev,
+                                tags: newTags,
+                              }));
+                            }
+                          }
+                        }}
                       />
                     </div>
-                    <div className="flex p-2 gap-2 flex-col border-t">
-                      {filterSearchTags.length > 0 ? (
-                        filterSearchTags.map((tag) => (
-                          <div key={tag} className="flex items-center gap-2">
-                            <Checkbox
-                              checked={selectedTags.includes(tag)}
-                              onCheckedChange={() => handleTagToggle(tag)}
-                            />
-                            <span>{tag}</span>
-                          </div>
-                        ))
+                    <div className="flex p-2 gap-2 flex-col border-t max-h-40 overflow-y-auto">
+                      {filteredTags.length > 0 ? (
+                        <div className="space-y-2 mb-2">
+                          {filteredTags.map((tag) => (
+                            <div key={tag} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`tag-${tag}`}
+                                checked={selectedTags.includes(tag)}
+                                onCheckedChange={() => handleTagToggle(tag)}
+                                disabled={!editDetails}
+                              />
+                              <Label
+                                htmlFor={`tag-${tag}`}
+                                className="text-sm font-normal cursor-pointer flex-1"
+                              >
+                                {tag}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
                       ) : (
-                        <p className="text-low-emphasis">{t('NO_TAGS_FOUND')}</p>
+                        <p className="text-muted-foreground text-sm py-2 text-center">
+                          {t('NO_TAGS_FOUND')}
+                        </p>
                       )}
                     </div>
                   </div>

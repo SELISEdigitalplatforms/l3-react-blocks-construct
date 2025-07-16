@@ -119,6 +119,7 @@ export function Inventory() {
           pageSize: paginationState.pageSize,
           totalCount: paginationState.totalCount,
         }}
+        manualPagination={true}
         columnPinningConfig={{ left: ['select', 'ItemName'] }}
         onPaginationChange={handlePaginationChange}
       />

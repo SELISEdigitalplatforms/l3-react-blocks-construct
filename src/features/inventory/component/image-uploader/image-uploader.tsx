@@ -32,9 +32,10 @@ import { Trash, Plus } from 'lucide-react';
 
 interface ImageUploaderProps {
   readonly images: readonly string[];
-  readonly onAddImages: (newImages: string[]) => void;
+  readonly onAddImages: (files: File[]) => void;
   readonly onDeleteImage: (image: string) => void;
   readonly maxImages?: number;
+  readonly isPending?: boolean;
 }
 
 export function ImageUploader({
@@ -42,6 +43,7 @@ export function ImageUploader({
   onAddImages,
   onDeleteImage,
   maxImages = 5,
+  isPending = false,
 }: ImageUploaderProps) {
   const inputId = 'image-upload-input';
   const { t } = useTranslation();
@@ -50,15 +52,14 @@ export function ImageUploader({
     const remainingSlots = maxImages - images.length;
     const filesToAdd = acceptedFiles.slice(0, remainingSlots);
     if (filesToAdd.length > 0) {
-      const newImages = filesToAdd.map((file) => URL.createObjectURL(file));
-      onAddImages(newImages);
+      onAddImages(filesToAdd);
     }
   };
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: { 'image/*': [] },
-    multiple: true,
+    multiple: false,
   });
 
   return (
@@ -88,9 +89,9 @@ export function ImageUploader({
         {images.length < maxImages && (
           <div
             {...getRootProps()}
-            className="border border-dashed rounded-md w-32 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+            className={`border border-dashed rounded-md w-32 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
           >
-            <input id={inputId} {...getInputProps()} />
+            <input id={inputId} {...getInputProps()} disabled={isPending} />
             <Plus className="text-gray-500" />
           </div>
         )}

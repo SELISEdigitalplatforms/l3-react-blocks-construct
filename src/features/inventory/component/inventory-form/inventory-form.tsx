@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronLeft } from 'lucide-react';
+import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
+import API_CONFIG from 'config/api';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
 import {
@@ -106,8 +108,8 @@ interface InventoryFormData {
   eligibleReplacement: boolean;
   discount: boolean;
   images: string[];
-  itemImageFileId: string;
-  itemImageFileIds: string[];
+  itemImageUrl: string;
+  itemImageUrls: string[];
 }
 
 export function InventoryForm() {
@@ -116,6 +118,7 @@ export function InventoryForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const { mutate: addInventoryItem } = useAddInventoryItem();
+  const { mutate: getPreSignedUrl } = useGetPreSignedUrlForUpload();
 
   const [formData, setFormData] = useState<InventoryFormData>({
     itemName: '',
@@ -130,8 +133,8 @@ export function InventoryForm() {
     eligibleReplacement: true,
     discount: false,
     images: [],
-    itemImageFileId: '',
-    itemImageFileIds: [],
+    itemImageUrl: '',
+    itemImageUrls: [],
   });
 
   const navigate = useNavigate();
@@ -143,19 +146,85 @@ export function InventoryForm() {
     }));
   };
 
-  const handleAddImages = (newImages: string[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, ...newImages],
-      itemImageFileIds: [...prev.itemImageFileIds, ...newImages],
-    }));
+  const handleAddImages = async (files: (File | string)[]) => {
+    // Filter out any string URLs (in case the component still passes them)
+    const fileObjects = files.filter((file): file is File => file instanceof File);
+
+    if (fileObjects.length === 0) return;
+    try {
+      const uploadResults = await Promise.all(
+        fileObjects.map(
+          (file) =>
+            new Promise<{ fileId: string; uploadUrl: string } | null>((resolve) => {
+              getPreSignedUrl(
+                {
+                  name: file.name,
+                  projectKey: API_CONFIG.blocksKey,
+                  itemId: '',
+                  metaData: '',
+                  accessModifier: 'Public',
+                  configurationName: 'Default',
+                  parentDirectoryId: '',
+                  tags: '',
+                },
+                {
+                  onSuccess: async (data) => {
+                    if (data.isSuccess && data.uploadUrl) {
+                      try {
+                        await fetch(data.uploadUrl, {
+                          method: 'PUT',
+                          body: file,
+                          headers: {
+                            'Content-Type': file.type,
+                            'x-ms-blob-type': 'BlockBlob',
+                          },
+                        });
+                        resolve({
+                          fileId: data.fileId || '',
+                          uploadUrl: data.uploadUrl.split('?')[0], // Use the upload URL without query params
+                        });
+                      } catch (error) {
+                        console.error('Error uploading file:', error);
+                        resolve(null);
+                      }
+                    } else {
+                      resolve(null);
+                    }
+                  },
+                  onError: () => resolve(null),
+                }
+              );
+            })
+        )
+      );
+
+      const successfulUploads = uploadResults.filter(
+        (result): result is { fileId: string; uploadUrl: string } =>
+          result !== null && Boolean(result.fileId) && Boolean(result.uploadUrl)
+      );
+
+      if (successfulUploads.length > 0) {
+        const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
+        const imageUrls = successfulUploads.map((upload) => upload.uploadUrl);
+
+        setFormData((prev) => ({
+          ...prev,
+          itemImageUrl: uploadUrls[0], // First URL as the main image
+          itemImageUrls: [...(prev.itemImageUrls || []), ...uploadUrls],
+          images: [...prev.images, ...imageUrls],
+        }));
+      }
+    } catch (error) {
+      console.error('Error processing files:', error);
+    }
   };
 
-  const handleDeleteImage = (image: string) => {
+  const handleDeleteImage = (imageUrl: string) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((img) => img !== image),
-      itemImageFileIds: prev.itemImageFileIds.filter((img) => img !== image),
+      images: prev.images.filter((img) => img !== imageUrl),
+      itemImageUrls: prev.itemImageUrls?.filter((url) => url !== imageUrl) || [],
+      itemImageUrl: prev.itemImageUrl === imageUrl ? '' : prev.itemImageUrl,
     }));
   };
 
@@ -188,8 +257,8 @@ export function InventoryForm() {
       EligibleWarranty: formData.eligibleWarranty,
       EligibleReplacement: formData.eligibleReplacement,
       Discount: formData.discount,
-      ItemImageFileId: formData.itemImageFileId,
-      ItemImageFileIds: formData.itemImageFileIds,
+      ItemImageFileId: formData.itemImageUrl,
+      ItemImageFileIds: formData.itemImageUrls,
     };
     addInventoryItem(
       { input },
@@ -257,6 +326,7 @@ export function InventoryForm() {
                   images={formData.images}
                   onAddImages={handleAddImages}
                   onDeleteImage={handleDeleteImage}
+                  isPending={loading}
                 />
                 <div className="flex justify-between mt-6">
                   <Button
