@@ -28,7 +28,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const { subtotal, taxes, discount } = invoice.orderDetails;
-  const totalAmount = subtotal + taxes - (discount || 0);
+  const totalAmount = subtotal + taxes - (discount ?? 0);
 
   const handleSendInvoice = () => {
     setShowSendDialog(false);

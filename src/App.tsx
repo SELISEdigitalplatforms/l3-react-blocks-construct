@@ -22,7 +22,7 @@ import { Profile } from './pages/profile/profile';
 import { Storage } from './pages/services/storage/storage';
 import { Mail } from './pages/services/mail/mail';
 import { Help } from './pages/help/help';
-import { ThemeProvider } from './components/core/theme-provider';
+import { ThemeProvider } from 'styles/theme/theme-provider';
 import { Inventory } from './pages/inventory/inventory';
 import { InventoryDetails } from './pages/inventory/inventory-details';
 import { SidebarProvider } from 'components/ui/sidebar';
