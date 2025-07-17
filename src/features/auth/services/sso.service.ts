@@ -65,19 +65,19 @@ export class SSOservice {
 
 export const getLoginOption = async (): Promise<LoginOption | null> => {
   try {
-    const response = await fetch(
-      `${API_CONFIG.baseUrl}/authentication/v1/Social/GetLoginOptions`,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      {
-        method: 'GET',
-        headers: { 'X-Blocks-Key': API_CONFIG.blocksKey },
-        referrerPolicy: 'no-referrer',
-      }
-    );
+    const response = await fetch(`${API_CONFIG.baseUrl}/authentication/v1/Social/GetLoginOptions`, {
+      method: 'GET',
+      headers: { 'X-Blocks-Key': API_CONFIG.blocksKey },
+      referrerPolicy: 'no-referrer',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
 
     return await response.json();
   } catch (error) {
     console.error('Error fetching login options:', error);
-    return null;
+    throw error;
   }
 };
