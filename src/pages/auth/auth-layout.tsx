@@ -29,7 +29,6 @@ export function AuthLayout() {
     return theme === 'dark' ? bgAuthDark : bgAuthLight;
   };
 
-  // Check if login options API returns 404 error
   const is404Error = (error: any) => {
     return (
       error?.message?.includes('HTTP 404') ||
@@ -39,10 +38,6 @@ export function AuthLayout() {
   };
 
   if (isLoading) return null;
-
-  // Debug logging
-  console.log('loginOptionsError:', loginOptionsError);
-  console.log('is404Error result:', is404Error(loginOptionsError));
 
   return (
     <div className="flex w-full h-screen">
