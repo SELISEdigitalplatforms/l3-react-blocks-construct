@@ -254,7 +254,6 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
           <Button variant="outline" onClick={handleInventoryDetails}>
             {t('VIEW_DETAILS')}
           </Button>
-          <Button disabled>{t('UPDATE')}</Button>
         </div>
       </TableCell>
     </TableRow>

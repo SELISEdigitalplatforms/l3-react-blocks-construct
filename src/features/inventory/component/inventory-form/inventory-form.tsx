@@ -260,7 +260,7 @@ export function InventoryForm() {
       {
         onSuccess: (result: any) => {
           if (result.insertInventoryItem?.acknowledged) {
-            navigate('/inventory');
+            navigate(`/inventory/${result.insertInventoryItem.itemId}`);
           }
           setLoading(false);
         },
