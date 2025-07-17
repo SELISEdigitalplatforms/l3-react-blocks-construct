@@ -7,7 +7,7 @@ import googleIcon from 'assets/images/social_media_google.svg';
 import { SignupForm } from 'features/auth/components/signup-form';
 import darklogo from 'assets/images/construct_logo_dark.svg';
 import lightlogo from 'assets/images/construct_logo_light.svg';
-import { useTheme } from 'components/core/theme-provider';
+import { useTheme } from 'styles/theme/theme-provider';
 import { useTranslation } from 'react-i18next';
 
 export function SignupPage() {
