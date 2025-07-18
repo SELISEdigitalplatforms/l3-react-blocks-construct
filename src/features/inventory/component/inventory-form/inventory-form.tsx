@@ -112,6 +112,7 @@ export function InventoryForm() {
   const steps = [t('GENERAL_INFO'), t('ADDITIONAL_INFO')];
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { mutate: addInventoryItem } = useAddInventoryItem();
   const { mutate: getPreSignedUrl } = useGetPreSignedUrlForUpload();
 
@@ -145,6 +146,7 @@ export function InventoryForm() {
     const fileObjects = files.filter((file): file is File => file instanceof File);
 
     if (fileObjects.length === 0) return;
+    setIsUploading(true);
     try {
       const uploadResults = await Promise.all(
         fileObjects.map(
@@ -210,6 +212,8 @@ export function InventoryForm() {
       }
     } catch (error) {
       console.error('Error processing files:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -319,7 +323,7 @@ export function InventoryForm() {
                   images={formData.images}
                   onAddImages={handleAddImages}
                   onDeleteImage={handleDeleteImage}
-                  isPending={loading}
+                  isPending={isUploading}
                 />
                 <div className="flex justify-between mt-6">
                   <Button
@@ -383,7 +387,7 @@ export function InventoryForm() {
                       {t('PREVIOUS')}
                     </Button>
                     <Button type="submit" className="h-10 bg-primary font-bold" disabled={loading}>
-                      {loading ? t('LOADING') : t('FINISH')}
+                      {t('FINISH')}
                     </Button>
                   </div>
                 </div>

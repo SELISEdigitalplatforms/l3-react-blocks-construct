@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Pen, Plus, Search, X, Trash } from 'lucide-react';
+import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
@@ -29,6 +29,7 @@ import {
   useUpdateInventoryItem,
   useDeleteInventoryItem,
 } from 'features/inventory/hooks/use-inventory';
+import { Skeleton } from 'components/ui/skeleton';
 import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
 import API_CONFIG from 'config/api';
 import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.service';
@@ -73,7 +74,7 @@ export function AdvanceInventoryDetails() {
   const selectedInventory = items.find(
     (item: any) => String(item.ItemId).trim() === String(itemId).trim()
   );
-  const { mutate: updateInventoryItem } = useUpdateInventoryItem();
+  const { mutate: updateInventoryItem, isPending: isUpdatePending } = useUpdateInventoryItem();
   const { mutate: deleteItem, isPending } = useDeleteInventoryItem();
 
   useEffect(() => {
@@ -372,7 +373,9 @@ export function AdvanceInventoryDetails() {
           >
             <ChevronLeft />
           </Button>
-          <h3 className="text-2xl font-bold tracking-tight">{t('INVENTORY')}</h3>
+          <h3 className="text-2xl font-bold tracking-tight">
+            {inventoryToShow?.ItemName || t('INVENTORY')}
+          </h3>
         </div>
         <Button
           size="sm"
@@ -417,8 +420,8 @@ export function AdvanceInventoryDetails() {
                   <Button size="sm" variant="outline" onClick={handleCancelEdit}>
                     {t('CANCEL')}
                   </Button>
-                  <Button size="sm" onClick={handleUpdateDetails} disabled={isUploading}>
-                    {isUploading ? t('UPDATING') : t('UPDATE')}
+                  <Button size="sm" onClick={handleUpdateDetails} disabled={isUpdatePending}>
+                    {t('UPDATE')}
                   </Button>
                 </div>
               )}
@@ -429,18 +432,18 @@ export function AdvanceInventoryDetails() {
             {isLoading ? (
               <div className="flex flex-col md:flex-row gap-14">
                 <div className="flex w-full gap-6 flex-col md:w-[30%]">
-                  <div className="flex p-3 items-center justify-center w-full h-64 rounded-lg border bg-muted animate-pulse" />
+                  <Skeleton className="flex p-3 items-center justify-center w-full h-64 rounded-lg border bg-muted" />
                   <div className="flex w-full items-center justify-between mt-2">
                     {[...Array(3)].map((_, i) => (
-                      <div key={i} className="w-12 h-12 bg-muted rounded-md animate-pulse" />
+                      <Skeleton key={i} className="w-12 h-12 rounded-md" />
                     ))}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
                   {[...Array(7)].map((_, i) => (
                     <div key={i} className="flex flex-col gap-2">
-                      <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-                      <div className="h-10 w-full bg-muted rounded animate-pulse" />
+                      <Skeleton className="h-4 w-24 rounded" />
+                      <Skeleton className="h-10 w-full rounded" />
                     </div>
                   ))}
                 </div>
@@ -468,9 +471,9 @@ export function AdvanceInventoryDetails() {
                             onClick={() => handleDeleteImage(img)}
                             variant="ghost"
                             size="icon"
-                            className="bg-surface absolute -top-4 -right-4 text-white border border-white rounded-full w-8 h-8"
+                            className="bg-surface absolute -top-3 -right-3 text-white border border-white rounded-full w-6 h-6"
                           >
-                            <X className="text-destructive" />
+                            <Trash className="text-destructive !w-3 !h-3" />
                           </Button>
                         )}
                         <div
@@ -498,6 +501,9 @@ export function AdvanceInventoryDetails() {
                         </div>
                       </div>
                     ))}
+                    {isUploading && !isUpdatePending && (
+                      <Skeleton className="w-10 h-10 rounded-md" />
+                    )}
                     {editDetails && thumbnail.length < 5 && (
                       <div
                         {...getRootProps()}
@@ -562,14 +568,14 @@ export function AdvanceInventoryDetails() {
               <>
                 <div className="flex flex-col gap-4 w-full md:w-[50%]">
                   {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-10 w-full bg-muted rounded animate-pulse" />
+                    <Skeleton key={i} className="h-10 w-full rounded" />
                   ))}
                 </div>
                 <div className="flex flex-col w-full md:w-[50%]">
-                  <div className="h-4 w-24 bg-muted rounded animate-pulse mb-2" />
+                  <Skeleton className="h-4 w-24 rounded mb-2" />
                   <div className="w-full border rounded-lg p-4">
                     {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-6 w-full bg-muted rounded animate-pulse mb-2" />
+                      <Skeleton key={i} className="h-6 w-full rounded mb-2" />
                     ))}
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Trash, Plus } from 'lucide-react';
+import { Skeleton } from 'components/ui/skeleton';
 
 /**
  * ImageUploader component for handling image uploads and deletions.
@@ -86,10 +87,13 @@ export function ImageUploader({
             </div>
           </div>
         ))}
+        {/* Show skeleton loader as the next slot when uploading */}
+        {isPending && <Skeleton className="w-32 h-12 rounded-md" />}
+        {/* Always show the add button */}
         {images.length < maxImages && (
           <div
             {...getRootProps()}
-            className={`border border-dashed rounded-md w-32 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
+            className="border border-dashed rounded-md w-32 h-12 flex items-center justify-center hover:bg-slate-100 cursor-pointer"
           >
             <input id={inputId} {...getInputProps()} disabled={isPending} />
             <Plus className="text-gray-500" />
