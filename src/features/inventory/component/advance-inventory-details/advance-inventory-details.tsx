@@ -175,7 +175,7 @@ export function AdvanceInventoryDetails() {
         ...(editedFields.supplier && { Supplier: editedFields.supplier }),
         ...(editedFields.itemLoc && { ItemLoc: editedFields.itemLoc }),
         ...(editedFields.price !== undefined && { Price: Number(editedFields.price) }),
-        ...(editedFields.status && { Status: editedFields.status }),
+        Status: editedFields.status ?? inventoryToShow.Status ?? InventoryStatus.ACTIVE,
         ...(editedFields.stock !== undefined && { Stock: Number(editedFields.stock) }),
         ...(selectedTags.length > 0 && { Tags: selectedTags }),
         EligibleWarranty: warranty,
@@ -463,7 +463,7 @@ export function AdvanceInventoryDetails() {
                       }}
                     />
                   </div>
-                  <div className="flex w-full items-center justify-between">
+                  <div className={`flex w-full items-center ${!editDetails ? 'gap-2' : 'gap-4'}`}>
                     {thumbnail.map((img) => (
                       <div key={img} className="relative">
                         {editDetails && (
@@ -479,7 +479,7 @@ export function AdvanceInventoryDetails() {
                         <div
                           className={`flex items-center p-1 justify-center rounded-md cursor-pointer border ${
                             selectedImage === img ? 'border-[1.5px] border-primary' : ''
-                          } ${editDetails ? 'w-10 h-10' : 'w-16 h-12'}`}
+                          } ${editDetails ? 'w-10 h-10' : 'w-13 h-12'}`}
                         >
                           <Button
                             variant="ghost"

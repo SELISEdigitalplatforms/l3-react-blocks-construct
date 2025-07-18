@@ -84,7 +84,7 @@ export const createAdvanceTableColumns = ({
     cell: ({ row }) => {
       return (
         <div className="flex w-[180px] items-center">
-          <span className="truncate">{row.original.Supplier}</span>
+          <span className="truncate">{row.original.Supplier ? row.original.Supplier : '_'}</span>
         </div>
       );
     },
