@@ -9,7 +9,9 @@ import { GET_INVENTORY_QUERY } from '../graphql/queries';
 import {
   INSERT_INVENTORY_ITEM_MUTATION,
   UPDATE_INVENTORY_ITEM_MUTATION,
+  DELETE_INVENTORY_ITEM_MUTATION,
 } from '../graphql/mutations';
+import { DeleteInventoryItemResponse } from '../types/graphql.types';
 
 /**
  * GraphQL Inventory Service
@@ -83,6 +85,25 @@ export const updateInventoryItem = async (
   const response = await graphqlClient.mutate<UpdateInventoryItemResponse>({
     query: UPDATE_INVENTORY_ITEM_MUTATION,
     variables: params,
+  });
+  return response;
+};
+
+/**
+ * Deletes an inventory item by ID
+ * @param filter - The filter string to identify the item to delete (usually the itemId)
+ * @returns Promise with deletion result
+ * @example
+ * // Basic usage
+ * const result = await deleteInventoryItem('item-123');
+ */
+export const deleteInventoryItem = async (
+  filter: string,
+  input: { isHardDelete: boolean }
+): Promise<DeleteInventoryItemResponse> => {
+  const response = await graphqlClient.mutate<DeleteInventoryItemResponse>({
+    query: DELETE_INVENTORY_ITEM_MUTATION,
+    variables: { filter, input },
   });
   return response;
 };

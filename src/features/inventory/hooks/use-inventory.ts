@@ -4,7 +4,12 @@ import { useToast } from 'hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from 'hooks/use-error-handler';
 import { AddInventoryItemParams, UpdateInventoryItemParams } from '../types/graphql.types';
-import { getInventory, addInventoryItem, updateInventoryItem } from '../services/inventory.service';
+import {
+  getInventory,
+  addInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+} from '../services/inventory.service';
 
 /**
  * GraphQL Inventory Hooks
@@ -118,6 +123,52 @@ export const useUpdateInventoryItem = () => {
       } else {
         handleError(
           { error: { message: t('UNABLE_UPDATE_INVENTORY_ITEM') } },
+          { variant: 'destructive' }
+        );
+      }
+    },
+    onError: (error) => {
+      handleError(error, { variant: 'destructive' });
+    },
+  });
+};
+
+/**
+ * Hook to delete an inventory item by ID
+ * @returns Mutation function to delete inventory item with loading and error states
+ *
+ * @example
+ * const { mutate: deleteItem, isPending } = useDeleteInventoryItem();
+ * deleteItem('item-123');
+ */
+export const useDeleteInventoryItem = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+
+  return useGlobalMutation({
+    mutationFn: ({ filter, input }: { filter: string; input: { isHardDelete: boolean } }) =>
+      deleteInventoryItem(filter, input),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'inventory',
+      });
+
+      queryClient.refetchQueries({
+        predicate: (query) => query.queryKey[0] === 'inventory',
+        type: 'active',
+      });
+
+      if (data.deleteInventoryItem?.acknowledged) {
+        toast({
+          variant: 'success',
+          title: t('INVENTORY_ITEM_DELETED'),
+          description: t('INVENTORY_ITEM_SUCCESSFULLY_DELETED'),
+        });
+      } else {
+        handleError(
+          { error: { message: t('UNABLE_DELETE_INVENTORY_ITEM') } },
           { variant: 'destructive' }
         );
       }

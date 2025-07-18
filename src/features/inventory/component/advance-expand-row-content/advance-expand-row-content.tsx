@@ -95,8 +95,8 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
   ]);
 
   const handleInventoryDetails = () => {
-    if (currentItem?._id) {
-      navigate(`/inventory/${currentItem._id}`);
+    if (currentItem?.ItemId) {
+      navigate(`/inventory/${currentItem.ItemId}`);
     }
   };
 

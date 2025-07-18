@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Pen, Plus, Search, X } from 'lucide-react';
+import { ChevronLeft, Pen, Plus, Search, X, Trash } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
@@ -25,10 +25,13 @@ import {
   tags,
 } from '../../types/graphql.types';
 import { useGetInventories } from 'features/inventory/hooks/use-inventory';
-import { useUpdateInventoryItem } from 'features/inventory/hooks/use-inventory';
+import {
+  useUpdateInventoryItem,
+  useDeleteInventoryItem,
+} from 'features/inventory/hooks/use-inventory';
 import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
 import API_CONFIG from 'config/api';
-import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.services';
+import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.service';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**
@@ -68,9 +71,10 @@ export function AdvanceInventoryDetails() {
   const inventoryData = data as { InventoryItems?: { items: any[] } };
   const items = inventoryData?.InventoryItems?.items ?? [];
   const selectedInventory = items.find(
-    (item: any) => String(item._id).trim() === String(itemId).trim()
+    (item: any) => String(item.ItemId).trim() === String(itemId).trim()
   );
   const { mutate: updateInventoryItem } = useUpdateInventoryItem();
+  const { mutate: deleteItem, isPending: isDeleting } = useDeleteInventoryItem();
 
   useEffect(() => {
     if (selectedInventory) {
@@ -182,7 +186,7 @@ export function AdvanceInventoryDetails() {
 
       updateInventoryItem(
         {
-          filter: `{_id: "${selectedInventory._id}"}`,
+          filter: `{_id: "${selectedInventory.ItemId}"}`,
           input: editedInput,
         },
         {
@@ -343,18 +347,58 @@ export function AdvanceInventoryDetails() {
 
   const inventoryToShow = selectedInventory;
 
+  const handleDelete = () => {
+    if (itemId) {
+      deleteItem(
+        { filter: `{_id: "${itemId}"}`, input: { isHardDelete: true } },
+        {
+          onSuccess: () => {
+            navigate('/inventory');
+          },
+        }
+      );
+    }
+  };
+
   return (
     <div className="flex flex-col w-full">
-      <div className="mb-[18px] flex items-center text-base text-high-emphasis md:mb-[24px] gap-2">
+      <div className="mb-[18px] flex items-center justify-between md:mb-[24px]">
+        <div className="flex items-center gap-2">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="bg-card hover:bg-card/60 rounded-full"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft />
+          </Button>
+          <h3 className="text-2xl font-bold tracking-tight">{t('INVENTORY')}</h3>
+        </div>
         <Button
-          size="icon"
-          variant="ghost"
-          className="bg-card hover:bg-card/60 rounded-full"
-          onClick={() => navigate(-1)}
+          size="sm"
+          variant="outline"
+          onClick={handleDelete}
+          disabled={isDeleting || !itemId}
+          aria-label={t('DELETE')}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && itemId) {
+              deleteItem(
+                { filter: `{_id: "${itemId}"}`, input: { isHardDelete: true } },
+                {
+                  onSuccess: () => {
+                    navigate('/inventory');
+                  },
+                }
+              );
+            }
+          }}
         >
-          <ChevronLeft />
+          <Trash className="w-3 h-3 text-destructive" />
+          <span className="text-destructive text-sm font-bold sr-only sm:not-sr-only sm:whitespace-nowrap">
+            {isDeleting ? t('DELETING') : t('DELETE')}
+          </span>
         </Button>
-        <h3 className="text-2xl font-bold tracking-tight">{t('INVENTORY')}</h3>
       </div>
       <div className="flex flex-col gap-4 w-full">
         <Card className="w-full border-none rounded-[4px] shadow-sm">

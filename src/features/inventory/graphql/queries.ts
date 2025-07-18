@@ -15,13 +15,12 @@ export const GET_INVENTORY_QUERY = `
       pageSize
       pageNo
       items {
-        _id
+        ItemId
         Category
         CreatedBy
         CreatedDate
         IsActive
         IsDeleted
-        ItemId
         ItemImageFileId
         ItemImageFileIds
         ItemLoc

@@ -40,13 +40,12 @@ export function Inventory() {
   useEffect(() => {
     if (data?.InventoryItems?.items) {
       const inventoryDataMap = data.InventoryItems.items.map((item: InventoryItem) => ({
-        _id: item._id,
+        ItemId: item.ItemId,
         Category: item.Category,
         CreatedBy: item.CreatedBy,
         CreatedDate: item.CreatedDate,
         IsActive: item.IsActive,
         IsDeleted: item.IsDeleted,
-        ItemId: item.ItemId,
         ItemImageFileId: item.ItemImageFileId,
         ItemImageFileIds: item.ItemImageFileIds,
         ItemLoc: item.ItemLoc,
@@ -84,7 +83,7 @@ export function Inventory() {
   );
 
   const handleInventoryDetails = (item: InventoryItem) => {
-    navigate(`/inventory/${item._id}`);
+    navigate(`/inventory/${item.ItemId}`);
   };
 
   const renderColumnsToolbar = (table: Table<InventoryItem>) => (

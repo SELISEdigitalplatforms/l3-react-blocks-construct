@@ -3,7 +3,7 @@ import {
   getPreSignedUrlForUpload,
   GetPreSignedUrlForUploadPayload,
   GetPreSignedUrlForUploadResponse,
-} from '../services/storage.services';
+} from '../services/storage.service';
 import { useErrorHandler } from 'hooks/use-error-handler';
 
 export const useGetPreSignedUrlForUpload = () => {

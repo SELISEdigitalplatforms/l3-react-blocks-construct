@@ -28,7 +28,6 @@ export const categoryOptions = [
 export const itemLocOptions = ['Warehouse A', 'Warehouse B', 'Warehouse C'];
 
 export interface InventoryItem {
-  _id: string;
   Category: string;
   CreatedBy: string;
   CreatedDate: string;
@@ -139,6 +138,14 @@ export interface UpdateInventoryItemParams {
 
 export interface UpdateInventoryItemResponse {
   updateInventoryItem: {
+    itemId: string;
+    totalImpactedData: number;
+    acknowledged: boolean;
+  };
+}
+
+export interface DeleteInventoryItemResponse {
+  deleteInventoryItem: {
     itemId: string;
     totalImpactedData: number;
     acknowledged: boolean;

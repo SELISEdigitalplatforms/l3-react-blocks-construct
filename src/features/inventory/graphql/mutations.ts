@@ -24,3 +24,13 @@ export const UPDATE_INVENTORY_ITEM_MUTATION = `
     }
   }
 `;
+
+export const DELETE_INVENTORY_ITEM_MUTATION = `
+  mutation DeleteInventoryItem($filter: String!, $input: InventoryItemDeleteInput!) {
+    deleteInventoryItem(filter: $filter, input: $input) {
+      itemId
+      totalImpactedData
+      acknowledged
+    }
+  }
+`;
