@@ -74,7 +74,7 @@ export function AdvanceInventoryDetails() {
     (item: any) => String(item.ItemId).trim() === String(itemId).trim()
   );
   const { mutate: updateInventoryItem } = useUpdateInventoryItem();
-  const { mutate: deleteItem, isPending: isDeleting } = useDeleteInventoryItem();
+  const { mutate: deleteItem, isPending } = useDeleteInventoryItem();
 
   useEffect(() => {
     if (selectedInventory) {
@@ -378,7 +378,7 @@ export function AdvanceInventoryDetails() {
           size="sm"
           variant="outline"
           onClick={handleDelete}
-          disabled={isDeleting || !itemId}
+          disabled={isPending || !itemId}
           aria-label={t('DELETE')}
           tabIndex={0}
           onKeyDown={(e) => {
@@ -396,7 +396,7 @@ export function AdvanceInventoryDetails() {
         >
           <Trash className="w-3 h-3 text-destructive" />
           <span className="text-destructive text-sm font-bold sr-only sm:not-sr-only sm:whitespace-nowrap">
-            {isDeleting ? t('DELETING') : t('DELETE')}
+            {t('DELETE')}
           </span>
         </Button>
       </div>

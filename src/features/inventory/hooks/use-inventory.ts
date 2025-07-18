@@ -168,7 +168,7 @@ export const useDeleteInventoryItem = () => {
         });
       } else {
         handleError(
-          { error: { message: t('UNABLE_DELETE_INVENTORY_ITEM') } },
+          { error: { title: 'UNABLE_DELETE_ITEM', message: t('UNABLE_DELETE_INVENTORY_ITEM') } },
           { variant: 'destructive' }
         );
       }
