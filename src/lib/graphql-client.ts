@@ -49,7 +49,9 @@ interface GraphQLClient {
 }
 
 // GraphQL endpoint configuration
-const GRAPHQL_ENDPOINT = process.env.REACT_APP_PUBLIC_GRAPHQL_ENDPOINT || 'https://dev-api.seliseblocks.com/graphql/v1/graphql/';
+const GRAPHQL_ENDPOINT =
+  process.env.REACT_APP_PUBLIC_GRAPHQL_URL ||
+  'https://dev-api.seliseblocks.com/graphql/v1/graphql/';
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {
