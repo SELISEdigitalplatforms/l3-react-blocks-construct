@@ -122,7 +122,7 @@ export const useUpdateInventoryItem = () => {
         });
       } else {
         handleError(
-          { error: { message: t('UNABLE_UPDATE_INVENTORY_ITEM') } },
+          { error: { title: 'UNABLE_UPDATE_ITEM', message: t('UNABLE_UPDATE_INVENTORY_ITEM') } },
           { variant: 'destructive' }
         );
       }
