@@ -43,12 +43,12 @@ export function DataTablePagination<TData>({
   onPaginationChange,
   showSelectedRowContent = true,
 }: Readonly<DataTablePaginationProps<TData>>) {
-  const totalRows = table.getFilteredRowModel().rows.length;
   const { t } = useTranslation();
+  const totalCount = table.getPageCount() * table.getState().pagination.pageSize;
   const pageSizes = Array.from(
-    { length: Math.min(5, Math.ceil(totalRows / 10)) },
-    (_, i) => (i + 1) * 10
-  );
+    { length: Math.min(5, Math.max(1, Math.ceil(totalCount / 10))) },
+    (_, i) => Math.min((i + 1) * 10, 50)
+  ).filter((size, i) => i === 0 || size <= totalCount);
 
   return (
     <div className="flex w-full items-center justify-between px-2">

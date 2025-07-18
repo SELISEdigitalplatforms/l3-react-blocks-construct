@@ -14,7 +14,7 @@ export function SigninPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="w-32 h-14 mb-2">
-        <img src={theme == 'dark' ? darklogo : lightlogo} className="w-full h-full" alt="logo" />
+        <img src={theme == 'dark' ? lightlogo : darklogo} className="w-full h-full" alt="logo" />
       </div>
       <div>
         <div className="text-2xl font-bold text-high-emphasis">{t('LOG_IN')}</div>

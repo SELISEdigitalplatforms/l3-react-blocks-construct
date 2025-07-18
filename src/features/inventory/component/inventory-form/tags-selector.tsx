@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 import { Checkbox } from 'components/ui/checkbox';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
-import { Search } from 'lucide-react';
 
 /**
  * TagsSelector component allows users to filter and select tags from a list of available tags.
@@ -34,12 +34,12 @@ import { Search } from 'lucide-react';
  */
 
 interface TagsSelectorProps {
-  readonly tags: string[];
-  readonly selectedTags: string[];
-  readonly handleTagToggle: (tag: string) => void;
+  tags: string[];
+  selectedTags: string[];
+  handleTagToggle: (tag: string) => void;
 }
 
-export function TagsSelector({ tags, selectedTags, handleTagToggle }: TagsSelectorProps) {
+export function TagsSelector({ tags, selectedTags, handleTagToggle }: Readonly<TagsSelectorProps>) {
   const { t } = useTranslation();
   const [searchTags, setSearchTags] = React.useState('');
   const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(searchTags.toLowerCase()));

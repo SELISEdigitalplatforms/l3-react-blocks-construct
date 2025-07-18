@@ -69,7 +69,7 @@ jest.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
 }));
 
 // Mock image import
-jest.mock('assets/images/construct_logo.svg', () => 'mock-logo-path');
+jest.mock('assets/images/construct_logo_dark.svg', () => 'mock-logo-path');
 
 describe('InvoicesDetail', () => {
   // Sample invoice data for testing

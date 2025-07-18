@@ -8,7 +8,7 @@ import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
 import { Separator } from 'components/ui/separator';
-import logo from 'assets/images/construct_logo.svg';
+import darklogo from 'assets/images/construct_logo_dark.svg';
 import { Badge } from 'components/ui/badge';
 import { Invoice, statusColors } from '../../data/invoice-data';
 import { useToast } from 'hooks/use-toast';
@@ -125,7 +125,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
         <CardContent className="flex flex-col !p-[24px] sm:!py-[56px] sm:!px-[70px] gap-6">
           <div className="flex flex-col sm:flex-row sm:justify-between">
             <div className="w-[220px] h-[80px]">
-              <img src={logo} alt="logo" className="w-full h-full object-cover" />
+              <img src={darklogo} alt="logo" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col border-l-none sm:border-l sm:border-medium-emphasis pl-4">
               <h2 className="font-semibold text-high-emphasis">Blocks Construct</h2>

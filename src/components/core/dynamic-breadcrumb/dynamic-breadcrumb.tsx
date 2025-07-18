@@ -45,6 +45,7 @@ import { DYNAMIC_BREADCRUMB_TITLES } from 'constant/dynamic-breadcrumb-title';
 type DynamicBreadcrumbSegment = {
   href: string;
   label: string;
+  isIdSegment?: boolean;
 };
 
 type DynamicBreadcrumbProps = {
@@ -56,11 +57,13 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
   const { t } = useTranslation();
   const pathSegments = location.pathname.split('/').filter((segment) => segment);
 
-  const dynamicBreadcrumbs: DynamicBreadcrumbSegment[] = pathSegments.map((_, index) => {
+  const dynamicBreadcrumbs: DynamicBreadcrumbSegment[] = pathSegments.map((segment, index) => {
     const href = `/${pathSegments.slice(0, index + 1).join('/')}`;
+    const isIdSegment = /^[a-f0-9-]{8,}$/i.test(segment);
     return {
       href,
-      label: pathSegments[index].replace(/-/g, ' ').toUpperCase(),
+      label: isIdSegment ? segment.toUpperCase() : segment.replace(/-/g, ' ').toUpperCase(),
+      isIdSegment,
     };
   });
 
@@ -82,13 +85,16 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
           const isDynamicSegment = breadcrumb.label.includes('[') && breadcrumb.label.includes(']');
           const parentPath = breadcrumb.href.split('/').slice(0, -1).join('/');
           const parentTitle = parentPath ? DYNAMIC_BREADCRUMB_TITLES[parentPath] : null;
-
-          let displayLabel = t(breadcrumb.label);
+          let displayLabel = breadcrumb.isIdSegment ? breadcrumb.label : t(breadcrumb.label);
           if (isDynamicSegment && parentTitle) {
             displayLabel = `${t(parentTitle)} > ${t(breadcrumb.label.replace(/[[\]]/g, ''))}`;
           } else if (title) {
             displayLabel = t(title);
           }
+
+          // Edge cases to consider in future:
+          // - If you have other dynamic segments (e.g. slugs, codes), you may want to refine isIdSegment
+          // - If you want to support custom formatting for other dynamic values, add logic here
 
           return (
             <React.Fragment key={breadcrumb.href}>
