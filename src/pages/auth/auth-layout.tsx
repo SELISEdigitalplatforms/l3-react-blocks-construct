@@ -32,9 +32,35 @@ export function AuthLayout() {
   const is404Error = (error: any) => {
     return (
       error?.message?.includes('HTTP 404') ||
+      error?.message?.includes('HTTP 403') ||
+      error?.message?.includes('HTTP 406') ||
+      error?.message?.includes('HTTP 424') ||
       error?.response?.status === 404 ||
-      error?.status === 404
+      error?.response?.status === 403 ||
+      error?.response?.status === 406 ||
+      error?.response?.status === 424 ||
+      error?.status === 404 ||
+      error?.status === 403 ||
+      error?.status === 406 ||
+      error?.status === 424
     );
+  };
+
+  const is500Error = (error: any) => {
+    const status = error?.response?.status || error?.status;
+    if (status && status >= 500 && status < 600) {
+      return true;
+    }
+
+    if (error?.message) {
+      const httpMatch = error.message.match(/HTTP (\d{3})/);
+      if (httpMatch) {
+        const statusFromMessage = parseInt(httpMatch[1], 10);
+        return statusFromMessage >= 500 && statusFromMessage < 600;
+      }
+    }
+
+    return false;
   };
 
   if (isLoading) return null;
@@ -86,6 +112,32 @@ export function AuthLayout() {
                         .env
                       </code>{' '}
                       configuration in Construct accordingly.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : is500Error(loginOptionsError) ? (
+          <div className="w-full max-w-xl mx-auto">
+            <div className="relative overflow-hidden rounded-xl border border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/50 p-8 shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-transparent"></div>
+              <div className="relative z-10">
+                <div className="mb-4 flex justify-center">
+                  <div className="rounded-full bg-orange-100 p-3">
+                    <AlertTriangle className="h-8 w-8 text-orange-600" />
+                  </div>
+                </div>
+                <div className="text-center space-y-4">
+                  <h2 className="text-2xl font-bold text-orange-900 tracking-tight">
+                    Services Temporarily Unavailable
+                  </h2>
+                  <div className="space-y-3 text-orange-700">
+                    <p className="text-base leading-relaxed">
+                      The services are temporarily unavailable.
+                    </p>
+                    <p className="text-base leading-relaxed font-semibold">
+                      Everything will be back to normal soon.
                     </p>
                   </div>
                 </div>
