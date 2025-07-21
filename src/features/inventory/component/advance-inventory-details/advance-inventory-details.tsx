@@ -234,6 +234,52 @@ export function AdvanceInventoryDetails() {
     setEditedFields((prev) => ({ ...prev, [field]: value }));
   };
 
+  const renderContent = (
+    label: string,
+    field: string,
+    value: string | number,
+    editable: boolean,
+    isSelect: boolean,
+    safeOptions: string[],
+    safeValue: string | number
+  ) => {
+    if (!editable) {
+      return (
+        <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>
+          {field === 'status' ? t(String(value).toUpperCase()) : value}
+        </span>
+      );
+    }
+
+    if (isSelect) {
+      return (
+        <Select
+          defaultValue={String(safeValue)}
+          onValueChange={(newValue) => handleFieldChange(field, newValue)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={label} />
+          </SelectTrigger>
+          <SelectContent>
+            {safeOptions.map((option) => (
+              <SelectItem key={option} value={option}>
+                {field === 'status' ? t(option.toUpperCase()) : option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      );
+    }
+
+    return (
+      <Input
+        placeholder={`${t('ENTER')} ${label.toLowerCase()}`}
+        defaultValue={value}
+        onChange={(e) => handleFieldChange(field, e.target.value)}
+      />
+    );
+  };
+
   const renderField = (
     label: string,
     field: string,
@@ -245,48 +291,10 @@ export function AdvanceInventoryDetails() {
     const safeOptions = options.filter((option) => !!option && option !== '');
     const safeValue = value && value !== '' ? value : safeOptions[0] || '';
 
-    const renderContent = () => {
-      if (!editable) {
-        return (
-          <span className={`text-base text-${statusColors[value as InventoryStatus]}`}>
-            {field === 'status' ? t(String(value).toUpperCase()) : value}
-          </span>
-        );
-      }
-
-      if (isSelect) {
-        return (
-          <Select
-            defaultValue={String(safeValue)}
-            onValueChange={(newValue) => handleFieldChange(field, newValue)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={label} />
-            </SelectTrigger>
-            <SelectContent>
-              {safeOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {field === 'status' ? t(option.toUpperCase()) : option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      }
-
-      return (
-        <Input
-          placeholder={`${t('ENTER')} ${label.toLowerCase()}`}
-          defaultValue={value}
-          onChange={(e) => handleFieldChange(field, e.target.value)}
-        />
-      );
-    };
-
     return (
       <div className="flex flex-col gap-2">
         <Label>{label}</Label>
-        {renderContent()}
+        {renderContent(label, field, value, editable, isSelect, safeOptions, String(safeValue))}
       </div>
     );
   };
@@ -311,38 +319,39 @@ export function AdvanceInventoryDetails() {
     }
   };
 
-  const onDrop = (acceptedFiles: File[]) => {
-    const handleUpload = async () => {
-      const remainingSlots = 5 - thumbnail.length;
-      const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+  const handleUpload = async (acceptedFiles: File[]) => {
+    const remainingSlots = 5 - thumbnail.length;
+    const filesToAdd = acceptedFiles.slice(0, remainingSlots);
 
-      if (filesToAdd.length > 0) {
-        try {
-          setIsUploading(true);
+    if (filesToAdd.length === 0) return;
 
-          const successfulUploads = await uploadImages(filesToAdd);
+    try {
+      setIsUploading(true);
 
-          if (successfulUploads.length > 0) {
-            const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
-            const updatedThumbnails = [...thumbnail, ...uploadUrls];
+      const successfulUploads = await uploadImages(filesToAdd);
 
-            setThumbnail(updatedThumbnails);
-            setSelectedImage(uploadUrls[0] || selectedImage);
+      if (successfulUploads.length > 0) {
+        const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
+        const updatedThumbnails = [...thumbnail, ...uploadUrls];
 
-            setEditedFields((prev) => ({
-              ...prev,
-              itemImageFileId: uploadUrls[0] || prev.itemImageFileId,
-              itemImageFileIds: updatedThumbnails,
-            }));
-          }
-        } catch (error) {
-          console.error('Error uploading images:', error);
-        } finally {
-          setIsUploading(false);
-        }
+        setThumbnail(updatedThumbnails);
+        setSelectedImage(uploadUrls[0] || selectedImage);
+
+        setEditedFields((prev) => ({
+          ...prev,
+          itemImageFileId: uploadUrls[0] || prev.itemImageFileId,
+          itemImageFileIds: updatedThumbnails,
+        }));
       }
-    };
-    void handleUpload();
+    } catch (error) {
+      console.error('Error uploading images:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const onDrop = (acceptedFiles: File[]) => {
+    void handleUpload(acceptedFiles);
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -432,14 +441,24 @@ export function AdvanceInventoryDetails() {
                 <div className="flex w-full gap-6 flex-col md:w-[30%]">
                   <Skeleton className="flex p-3 items-center justify-center w-full h-64 rounded-lg border bg-muted" />
                   <div className="flex w-full items-center justify-between mt-2">
-                    {[...Array(3)].map((_, i) => (
-                      <Skeleton key={`thumbnail-skeleton-${i}`} className="w-12 h-12 rounded-md" />
-                    ))}
+                    {['thumbnail-skeleton-1', 'thumbnail-skeleton-2', 'thumbnail-skeleton-3'].map(
+                      (key) => (
+                        <Skeleton key={key} className="w-12 h-12 rounded-md" />
+                      )
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
-                  {[...Array(7)].map((_, i) => (
-                    <div key={`field-skeleton-${i}`} className="flex flex-col gap-2">
+                  {[
+                    'field-skeleton-1',
+                    'field-skeleton-2',
+                    'field-skeleton-3',
+                    'field-skeleton-4',
+                    'field-skeleton-5',
+                    'field-skeleton-6',
+                    'field-skeleton-7',
+                  ].map((key) => (
+                    <div key={key} className="flex flex-col gap-2">
                       <Skeleton className="h-4 w-24 rounded" />
                       <Skeleton className="h-10 w-full rounded" />
                     </div>
@@ -565,18 +584,19 @@ export function AdvanceInventoryDetails() {
             {isLoading ? (
               <>
                 <div className="flex flex-col gap-4 w-full md:w-[50%]">
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton
-                      key={`additional-info-skeleton-${i}`}
-                      className="h-10 w-full rounded"
-                    />
+                  {[
+                    'additional-info-skeleton-1',
+                    'additional-info-skeleton-2',
+                    'additional-info-skeleton-3',
+                  ].map((key) => (
+                    <Skeleton key={key} className="h-10 w-full rounded" />
                   ))}
                 </div>
                 <div className="flex flex-col w-full md:w-[50%]">
                   <Skeleton className="h-4 w-24 rounded mb-2" />
                   <div className="w-full border rounded-lg p-4">
-                    {[...Array(3)].map((_, i) => (
-                      <Skeleton key={`tags-skeleton-${i}`} className="h-6 w-full rounded mb-2" />
+                    {['tags-skeleton-1', 'tags-skeleton-2', 'tags-skeleton-3'].map((key) => (
+                      <Skeleton key={key} className="h-6 w-full rounded mb-2" />
                     ))}
                   </div>
                 </div>
