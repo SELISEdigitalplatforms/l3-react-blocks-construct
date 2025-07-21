@@ -10,7 +10,12 @@ import { GeneralInfoForm } from './general-info-form';
 import { AdditionalInfoForm } from './additional-info-form';
 import { ImageUploader } from '../image-uploader/image-uploader';
 import { useAddInventoryItem } from 'features/inventory/hooks/use-inventory';
-import { categoryOptions, InventoryStatus, itemLocOptions, tags } from '../../types/graphql.types';
+import {
+  categoryOptions,
+  InventoryStatus,
+  itemLocOptions,
+  tags,
+} from '../../types/inventory.types';
 
 /**
  * Stepper component provides a multi-step navigation interface, displaying the steps and allowing the user to

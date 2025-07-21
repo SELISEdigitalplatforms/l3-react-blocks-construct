@@ -23,7 +23,7 @@ import {
   itemLocOptions,
   statusColors,
   tags,
-} from '../../types/graphql.types';
+} from '../../types/inventory.types';
 import { useGetInventories } from 'features/inventory/hooks/use-inventory';
 import {
   useUpdateInventoryItem,
@@ -479,7 +479,7 @@ export function AdvanceInventoryDetails() {
                         <div
                           className={`flex items-center p-1 justify-center rounded-md cursor-pointer border ${
                             selectedImage === img ? 'border-[1.5px] border-primary' : ''
-                          } ${editDetails ? 'w-10 h-10' : 'w-13 h-12'}`}
+                          } ${editDetails ? 'w-10 h-10' : 'w-16 h-12'}`}
                         >
                           <Button
                             variant="ghost"

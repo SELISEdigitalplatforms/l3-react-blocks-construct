@@ -8,7 +8,7 @@ import { createAdvanceTableColumns } from 'features/inventory/component/advance-
 import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
 import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
 import { useGetInventories } from 'features/inventory/hooks/use-inventory';
-import { InventoryItem } from 'features/inventory/types/graphql.types';
+import { InventoryItem } from 'features/inventory/types/inventory.types';
 
 interface PaginationState {
   pageIndex: number;

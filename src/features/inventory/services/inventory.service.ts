@@ -4,14 +4,14 @@ import {
   AddInventoryItemParams,
   UpdateInventoryItemResponse,
   UpdateInventoryItemParams,
-} from '../types/graphql.types';
+} from '../types/inventory.types';
 import { GET_INVENTORY_QUERY } from '../graphql/queries';
 import {
   INSERT_INVENTORY_ITEM_MUTATION,
   UPDATE_INVENTORY_ITEM_MUTATION,
   DELETE_INVENTORY_ITEM_MUTATION,
 } from '../graphql/mutations';
-import { DeleteInventoryItemResponse } from '../types/graphql.types';
+import { DeleteInventoryItemResponse } from '../types/inventory.types';
 
 /**
  * GraphQL Inventory Service

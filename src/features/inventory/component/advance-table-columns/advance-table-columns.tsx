@@ -2,9 +2,9 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { CustomtDateFormat } from 'lib/custom-date-formatter';
-import { InventoryItem } from '../../types/graphql.types';
+import { InventoryItem } from '../../types/inventory.types';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
-import { InventoryStatus } from '../../types/graphql.types';
+import { InventoryStatus } from '../../types/inventory.types';
 
 /**
  * Creates column definitions for an advanced inventory table.

@@ -15,7 +15,7 @@ import {
 import { Checkbox } from 'components/ui/checkbox';
 import StockFilterDropdown from '../stock-filter-dropdown/stock-filter-dropdown';
 import LastUpdatedFilterDropdown from '../last-updated-filter-dropdown/last-updated-filter-dropdown';
-import { InventoryStatus } from '../../types/graphql.types';
+import { InventoryStatus } from '../../types/inventory.types';
 
 const selectFilterColumns = new Set(['Category', 'ItemLoc', 'Status']);
 /**

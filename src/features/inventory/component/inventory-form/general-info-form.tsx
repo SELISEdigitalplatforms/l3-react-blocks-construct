@@ -10,7 +10,7 @@ import {
 } from 'components/ui/select';
 import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { StockSlider } from '../stock-slider/stock-slider';
-import { InventoryStatus } from '../../types/graphql.types';
+import { InventoryStatus } from '../../types/inventory.types';
 
 /**
  * GeneralInfoForm component allows users to fill in general information about an item, including its name, category,
@@ -162,7 +162,12 @@ export function GeneralInfoForm({
           <Label>{t('STATUS')}</Label>
           <RadioGroup
             value={formData.Status.toLowerCase()}
-            onValueChange={(value) => handleInputChange('status', value === 'active' ? InventoryStatus.ACTIVE : InventoryStatus.DISCONTINUED)}
+            onValueChange={(value) =>
+              handleInputChange(
+                'status',
+                value === 'active' ? InventoryStatus.ACTIVE : InventoryStatus.DISCONTINUED
+              )
+            }
             className="flex items-center gap-4"
           >
             <div className="flex items-center space-x-2">
