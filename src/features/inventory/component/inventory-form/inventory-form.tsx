@@ -147,58 +147,58 @@ export function InventoryForm() {
     }));
   };
 
+  const uploadFile = async (url: string, file: File) => {
+    await fetch(url, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+        'x-ms-blob-type': 'BlockBlob',
+      },
+    });
+    return { uploadUrl: url.split('?')[0] };
+  };
+
+  const getPresignedUrlAndUpload = (
+    file: File
+  ): Promise<{ fileId: string; uploadUrl: string } | null> =>
+    new Promise((resolve) => {
+      getPreSignedUrl(
+        {
+          name: file.name,
+          projectKey: API_CONFIG.blocksKey,
+          itemId: '',
+          metaData: '',
+          accessModifier: 'Public',
+          configurationName: 'Default',
+          parentDirectoryId: '',
+          tags: '',
+        },
+        {
+          onSuccess: async (data) => {
+            if (!data.isSuccess || !data.uploadUrl) {
+              return resolve(null);
+            }
+            try {
+              const { uploadUrl } = await uploadFile(data.uploadUrl, file);
+              resolve({ fileId: data.fileId ?? '', uploadUrl });
+            } catch (error) {
+              console.error('Error uploading file:', error);
+              resolve(null);
+            }
+          },
+          onError: () => resolve(null),
+        }
+      );
+    });
+
   const handleAddImages = async (files: (File | string)[]) => {
     const fileObjects = files.filter((file): file is File => file instanceof File);
-
     if (fileObjects.length === 0) return;
+
     setIsUploading(true);
     try {
-      const uploadResults = await Promise.all(
-        fileObjects.map(
-          (file) =>
-            new Promise<{ fileId: string; uploadUrl: string } | null>((resolve) => {
-              getPreSignedUrl(
-                {
-                  name: file.name,
-                  projectKey: API_CONFIG.blocksKey,
-                  itemId: '',
-                  metaData: '',
-                  accessModifier: 'Public',
-                  configurationName: 'Default',
-                  parentDirectoryId: '',
-                  tags: '',
-                },
-                {
-                  onSuccess: async (data) => {
-                    if (data.isSuccess && data.uploadUrl) {
-                      try {
-                        await fetch(data.uploadUrl, {
-                          method: 'PUT',
-                          body: file,
-                          headers: {
-                            'Content-Type': file.type,
-                            'x-ms-blob-type': 'BlockBlob',
-                          },
-                        });
-                        resolve({
-                          fileId: data.fileId || '',
-                          uploadUrl: data.uploadUrl.split('?')[0],
-                        });
-                      } catch (error) {
-                        console.error('Error uploading file:', error);
-                        resolve(null);
-                      }
-                    } else {
-                      resolve(null);
-                    }
-                  },
-                  onError: () => resolve(null),
-                }
-              );
-            })
-        )
-      );
-
+      const uploadResults = await Promise.all(fileObjects.map(getPresignedUrlAndUpload));
       const successfulUploads = uploadResults.filter(
         (result): result is { fileId: string; uploadUrl: string } =>
           result !== null && Boolean(result.fileId) && Boolean(result.uploadUrl)
@@ -206,13 +206,12 @@ export function InventoryForm() {
 
       if (successfulUploads.length > 0) {
         const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
-        const imageUrls = successfulUploads.map((upload) => upload.uploadUrl);
 
         setFormData((prev) => ({
           ...prev,
           itemImageUrl: uploadUrls[0],
           itemImageUrls: [...(prev.itemImageUrls || []), ...uploadUrls],
-          images: [...prev.images, ...imageUrls],
+          images: [...prev.images, ...uploadUrls],
         }));
       }
     } catch (error) {

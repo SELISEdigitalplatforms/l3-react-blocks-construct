@@ -48,10 +48,11 @@ interface GraphQLClient {
   mutate<T>(request: GraphQLRequest): Promise<T>;
 }
 
-// GraphQL endpoint configuration
-const BASE_BACKEND_URL = (
-  process.env.REACT_APP_PUBLIC_BACKEND_URL || 'https://dev-api.seliseblocks.com'
-).replace(/\/+$/, '');
+let baseUrl = process.env.REACT_APP_PUBLIC_BACKEND_URL ?? 'https://dev-api.seliseblocks.com';
+while (baseUrl.endsWith('/')) {
+  baseUrl = baseUrl.slice(0, -1);
+}
+const BASE_BACKEND_URL = baseUrl;
 const GRAPHQL_BASE_URL = `${BASE_BACKEND_URL}/graphql/v1/graphql`;
 
 export const graphqlClient: GraphQLClient = {

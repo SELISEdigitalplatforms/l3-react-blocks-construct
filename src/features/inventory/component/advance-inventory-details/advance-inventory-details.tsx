@@ -24,8 +24,8 @@ import {
   statusColors,
   tags,
 } from '../../types/inventory.types';
-import { useGetInventories } from 'features/inventory/hooks/use-inventory';
 import {
+  useGetInventories,
   useUpdateInventoryItem,
   useDeleteInventoryItem,
 } from 'features/inventory/hooks/use-inventory';
@@ -84,13 +84,17 @@ export function AdvanceInventoryDetails() {
       setDiscount(selectedInventory.Discount || false);
       setSelectedTags(selectedInventory.Tags || []);
 
-      const itemImages = (
-        Array.isArray(selectedInventory.ItemImageFileIds)
-          ? selectedInventory.ItemImageFileIds
-          : selectedInventory.ItemImageFileId
-            ? [selectedInventory.ItemImageFileId]
-            : []
-      ).filter((img: any): img is string => Boolean(img));
+      const getImages = () => {
+        if (Array.isArray(selectedInventory.ItemImageFileIds)) {
+          return selectedInventory.ItemImageFileIds;
+        }
+        if (selectedInventory.ItemImageFileId) {
+          return [selectedInventory.ItemImageFileId];
+        }
+        return [];
+      };
+
+      const itemImages = getImages().filter((img: any): img is string => Boolean(img));
 
       setThumbnail(itemImages);
       setSelectedImage(itemImages[0] || PlaceHolderImage);
@@ -103,58 +107,56 @@ export function AdvanceInventoryDetails() {
     setEditedFields({});
   };
 
-  const uploadImages = async (files: File[]): Promise<{ uploadUrl: string; fileId: string }[]> => {
-    const uploadFile = async (
-      file: File
-    ): Promise<{ uploadUrl: string; fileId: string } | null> => {
-      try {
-        const data = await new Promise<GetPreSignedUrlForUploadResponse>((resolve, reject) => {
-          getPreSignedUrl(
-            {
-              name: file.name,
-              projectKey: API_CONFIG.blocksKey,
-              itemId: '',
-              metaData: '',
-              accessModifier: 'Public',
-              configurationName: 'Default',
-              parentDirectoryId: '',
-              tags: '',
-            },
-            {
-              onSuccess: (responseData) => resolve(responseData),
-              onError: (error) => reject(error),
-            }
-          );
+  const uploadFile = async (file: File): Promise<{ uploadUrl: string; fileId: string } | null> => {
+    try {
+      const data = await new Promise<GetPreSignedUrlForUploadResponse>((resolve, reject) => {
+        getPreSignedUrl(
+          {
+            name: file.name,
+            projectKey: API_CONFIG.blocksKey,
+            itemId: '',
+            metaData: '',
+            accessModifier: 'Public',
+            configurationName: 'Default',
+            parentDirectoryId: '',
+            tags: '',
+          },
+          {
+            onSuccess: (responseData) => resolve(responseData),
+            onError: (error) => reject(error),
+          }
+        );
+      });
+
+      if (data?.isSuccess && data.uploadUrl) {
+        const uploadResponse = await fetch(data.uploadUrl, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+            'x-ms-blob-type': 'BlockBlob',
+          },
         });
 
-        if (data?.isSuccess && data.uploadUrl) {
-          const uploadResponse = await fetch(data.uploadUrl, {
-            method: 'PUT',
-            body: file,
-            headers: {
-              'Content-Type': file.type,
-              'x-ms-blob-type': 'BlockBlob',
-            },
-          });
-
-          if (!uploadResponse.ok) {
-            throw new Error(`Upload failed with status ${uploadResponse.status}`);
-          }
-
-          return {
-            fileId: data.fileId || '',
-            uploadUrl: data.uploadUrl.split('?')[0],
-          };
+        if (!uploadResponse.ok) {
+          throw new Error(`Upload failed with status ${uploadResponse.status}`);
         }
 
-        console.error('Failed to get pre-signed URL:', data?.errors);
-        return null;
-      } catch (error) {
-        console.error('Error in uploadFile:', error);
-        return null;
+        return {
+          fileId: data.fileId ?? '',
+          uploadUrl: data.uploadUrl.split('?')[0],
+        };
       }
-    };
 
+      console.error('Failed to get pre-signed URL:', data?.errors);
+      return null;
+    } catch (error) {
+      console.error('Error in uploadFile:', error);
+      return null;
+    }
+  };
+
+  const uploadImages = async (files: File[]): Promise<{ uploadUrl: string; fileId: string }[]> => {
     const results = await Promise.all(files.map((file) => uploadFile(file)));
 
     return results.filter(
@@ -309,35 +311,38 @@ export function AdvanceInventoryDetails() {
     }
   };
 
-  const onDrop = async (acceptedFiles: File[]) => {
-    const remainingSlots = 5 - thumbnail.length;
-    const filesToAdd = acceptedFiles.slice(0, remainingSlots);
+  const onDrop = (acceptedFiles: File[]) => {
+    const handleUpload = async () => {
+      const remainingSlots = 5 - thumbnail.length;
+      const filesToAdd = acceptedFiles.slice(0, remainingSlots);
 
-    if (filesToAdd.length > 0) {
-      try {
-        setIsUploading(true);
+      if (filesToAdd.length > 0) {
+        try {
+          setIsUploading(true);
 
-        const successfulUploads = await uploadImages(filesToAdd);
+          const successfulUploads = await uploadImages(filesToAdd);
 
-        if (successfulUploads.length > 0) {
-          const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
-          const updatedThumbnails = [...thumbnail, ...uploadUrls];
+          if (successfulUploads.length > 0) {
+            const uploadUrls = successfulUploads.map((upload) => upload.uploadUrl);
+            const updatedThumbnails = [...thumbnail, ...uploadUrls];
 
-          setThumbnail(updatedThumbnails);
-          setSelectedImage(uploadUrls[0] || selectedImage);
+            setThumbnail(updatedThumbnails);
+            setSelectedImage(uploadUrls[0] || selectedImage);
 
-          setEditedFields((prev) => ({
-            ...prev,
-            itemImageFileId: uploadUrls[0] || prev.itemImageFileId,
-            itemImageFileIds: updatedThumbnails,
-          }));
+            setEditedFields((prev) => ({
+              ...prev,
+              itemImageFileId: uploadUrls[0] || prev.itemImageFileId,
+              itemImageFileIds: updatedThumbnails,
+            }));
+          }
+        } catch (error) {
+          console.error('Error uploading images:', error);
+        } finally {
+          setIsUploading(false);
         }
-      } catch (error) {
-        console.error('Error uploading images:', error);
-      } finally {
-        setIsUploading(false);
       }
-    }
+    };
+    void handleUpload();
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -385,15 +390,8 @@ export function AdvanceInventoryDetails() {
           aria-label={t('DELETE')}
           tabIndex={0}
           onKeyDown={(e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && itemId) {
-              deleteItem(
-                { filter: `{_id: "${itemId}"}`, input: { isHardDelete: true } },
-                {
-                  onSuccess: () => {
-                    navigate('/inventory');
-                  },
-                }
-              );
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleDelete();
             }
           }}
         >
@@ -435,13 +433,13 @@ export function AdvanceInventoryDetails() {
                   <Skeleton className="flex p-3 items-center justify-center w-full h-64 rounded-lg border bg-muted" />
                   <div className="flex w-full items-center justify-between mt-2">
                     {[...Array(3)].map((_, i) => (
-                      <Skeleton key={i} className="w-12 h-12 rounded-md" />
+                      <Skeleton key={`thumbnail-skeleton-${i}`} className="w-12 h-12 rounded-md" />
                     ))}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-[70%]">
                   {[...Array(7)].map((_, i) => (
-                    <div key={i} className="flex flex-col gap-2">
+                    <div key={`field-skeleton-${i}`} className="flex flex-col gap-2">
                       <Skeleton className="h-4 w-24 rounded" />
                       <Skeleton className="h-10 w-full rounded" />
                     </div>
@@ -568,14 +566,17 @@ export function AdvanceInventoryDetails() {
               <>
                 <div className="flex flex-col gap-4 w-full md:w-[50%]">
                   {[...Array(3)].map((_, i) => (
-                    <Skeleton key={i} className="h-10 w-full rounded" />
+                    <Skeleton
+                      key={`additional-info-skeleton-${i}`}
+                      className="h-10 w-full rounded"
+                    />
                   ))}
                 </div>
                 <div className="flex flex-col w-full md:w-[50%]">
                   <Skeleton className="h-4 w-24 rounded mb-2" />
                   <div className="w-full border rounded-lg p-4">
                     {[...Array(3)].map((_, i) => (
-                      <Skeleton key={i} className="h-6 w-full rounded mb-2" />
+                      <Skeleton key={`tags-skeleton-${i}`} className="h-6 w-full rounded mb-2" />
                     ))}
                   </div>
                 </div>
