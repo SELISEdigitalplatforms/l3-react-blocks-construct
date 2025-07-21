@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { tags, InventoryItem } from '../../types/inventory.types';
+import { tags } from '../../types/inventory.types';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { TableCell, TableRow } from 'components/ui/table';
@@ -10,6 +10,7 @@ import { Button } from 'components/ui/button';
 import { Label } from 'components/ui/label';
 import { Switch } from 'components/ui/switch';
 import { Separator } from 'components/ui/separator';
+import { InventoryItem } from '../../types/inventory.types';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**
