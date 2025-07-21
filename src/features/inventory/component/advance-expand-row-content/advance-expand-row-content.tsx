@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { tags } from '../../types/inventory.types';
 import { useNavigate } from 'react-router-dom';
@@ -57,14 +57,14 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
   const filteredTags = tags.filter((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
   const displayTags = searchTerm ? filteredTags : tags;
 
-  const currentItem = React.useMemo(() => {
+  const currentItem = useMemo(() => {
     if (!rowId || !data || data.length === 0) return null;
     const index = Number(rowId);
     if (isNaN(index)) return null;
     return data[index];
   }, [rowId, data]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentItem) {
       setWarranty(currentItem.EligibleWarranty || false);
       setReplacement(currentItem.EligibleReplacement || false);
@@ -72,13 +72,17 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
       setStock(currentItem.Stock || 0);
       setSelectedTags(currentItem.Tags || []);
 
-      const itemImages = (
-        Array.isArray(currentItem.ItemImageFileIds)
-          ? currentItem.ItemImageFileIds
-          : currentItem.ItemImageFileId
-            ? [currentItem.ItemImageFileId]
-            : []
-      ).filter((img): img is string => Boolean(img));
+      const getImages = () => {
+        if (Array.isArray(currentItem.ItemImageFileIds)) {
+          return currentItem.ItemImageFileIds;
+        }
+        if (currentItem.ItemImageFileId) {
+          return [currentItem.ItemImageFileId];
+        }
+        return [];
+      };
+
+      const itemImages = getImages().filter((img): img is string => Boolean(img));
 
       setImages(itemImages);
       setSelectedImage(itemImages[0] || PlaceHolderImage);
@@ -133,16 +137,16 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
               />
               {images.length > 0 && (
                 <div className="flex w-full items-center gap-2 flex-wrap">
-                  {images.map((img, index) => (
+                  {images.map((img) => (
                     <Button
                       variant="ghost"
-                      key={index}
+                      key={img}
                       className="p-0 rounded-md focus:outline-none h-12 w-12 min-w-0"
                       onClick={() => setSelectedImage(img)}
                     >
                       <img
                         src={img || PlaceHolderImage}
-                        alt={`Thumbnail ${index + 1}`}
+                        alt="Thumbnail"
                         className={`w-full h-full object-cover rounded-md border ${
                           selectedImage === img ? 'border-[1.5px] border-primary' : ''
                         }`}
