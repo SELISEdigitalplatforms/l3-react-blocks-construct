@@ -49,9 +49,10 @@ interface GraphQLClient {
 }
 
 // GraphQL endpoint configuration
-const GRAPHQL_ENDPOINT =
-  process.env.REACT_APP_PUBLIC_GRAPHQL_URL ||
-  'https://dev-api.seliseblocks.com/graphql/v1/graphql/';
+const BASE_BACKEND_URL = (
+  process.env.REACT_APP_PUBLIC_BACKEND_URL || 'https://dev-api.seliseblocks.com'
+).replace(/\/+$/, '');
+const GRAPHQL_BASE_URL = `${BASE_BACKEND_URL}/graphql/v1/graphql`;
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {
@@ -61,7 +62,7 @@ export const graphqlClient: GraphQLClient = {
     };
 
     const response = await clients.post<GraphQLResponse<T>>(
-      GRAPHQL_ENDPOINT,
+      GRAPHQL_BASE_URL,
       JSON.stringify(payload),
       {
         'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ export const graphqlClient: GraphQLClient = {
     };
 
     const response = await clients.post<GraphQLResponse<T>>(
-      GRAPHQL_ENDPOINT,
+      GRAPHQL_BASE_URL,
       JSON.stringify(payload),
       {
         'Content-Type': 'application/json',
