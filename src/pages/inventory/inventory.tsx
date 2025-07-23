@@ -44,7 +44,6 @@ export function Inventory() {
         Category: item.Category,
         CreatedBy: item.CreatedBy,
         CreatedDate: item.CreatedDate,
-        IsActive: item.IsActive,
         IsDeleted: item.IsDeleted,
         ItemImageFileId: item.ItemImageFileId,
         ItemImageFileIds: item.ItemImageFileIds,

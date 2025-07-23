@@ -31,7 +31,6 @@ export interface InventoryItem {
   Category: string;
   CreatedBy: string;
   CreatedDate: string;
-  IsActive: boolean;
   IsDeleted: boolean;
   ItemId: string;
   ItemImageFileId: string;
