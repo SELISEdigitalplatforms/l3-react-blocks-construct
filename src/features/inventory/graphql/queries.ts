@@ -19,7 +19,6 @@ export const GET_INVENTORY_QUERY = `
         Category
         CreatedBy
         CreatedDate
-        IsActive
         IsDeleted
         ItemImageFileId
         ItemImageFileIds
