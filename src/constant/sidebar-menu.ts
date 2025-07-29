@@ -34,7 +34,7 @@ export const menuItems: MenuItem[] = [
   createMenuItem('dashboard', 'DASHBOARD', '/dashboard', 'LayoutDashboard'),
   createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined'),
   createMenuItem('iam', 'IAM', '/identity-management', 'Users', { isIntegrated: true }),
-  createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store'),
+  createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store', { isIntegrated: true }),
   createMenuItem('mail', 'MAIL', '/mail/inbox', 'Inbox'),
   createMenuItem('calendar', 'CALENDAR', '/calendar', 'Calendar'),
   createMenuItem('activity-log', 'ACTIVITY_LOG', '/activity-log', 'FileClock'),
