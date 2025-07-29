@@ -10,6 +10,8 @@ import { Button } from 'components/ui/button';
 import { Label } from 'components/ui/label';
 import { Switch } from 'components/ui/switch';
 import { Separator } from 'components/ui/separator';
+import { Skeleton } from 'components/ui/skeleton';
+import { cn } from 'lib/utils';
 import { InventoryItem } from '../../types/inventory.types';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
@@ -49,6 +51,8 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
   const [discount, setDiscount] = useState(false);
   const [stock, setStock] = useState(0);
   const [images, setImages] = useState<string[]>([]);
+  const [loadingImages, setLoadingImages] = useState<Record<string, boolean>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
   const actionRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -63,6 +67,15 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
     if (isNaN(index)) return null;
     return data[index];
   }, [rowId, data]);
+
+  const handleImageLoad = (imgSrc: string) => {
+    setLoadingImages((prev) => ({ ...prev, [imgSrc]: false }));
+  };
+
+  const handleImageError = (imgSrc: string) => {
+    setImageErrors((prev) => ({ ...prev, [imgSrc]: true }));
+    setLoadingImages((prev) => ({ ...prev, [imgSrc]: false }));
+  };
 
   useEffect(() => {
     if (currentItem) {
@@ -84,6 +97,16 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
 
       const itemImages = getImages().filter((img): img is string => Boolean(img));
 
+      const initialLoadingState = itemImages.reduce(
+        (acc, img) => ({
+          ...acc,
+          [img]: true,
+        }),
+        {}
+      );
+
+      setLoadingImages(initialLoadingState);
+      setImageErrors({});
       setImages(itemImages);
       setSelectedImage(itemImages[0] || PlaceHolderImage);
     }
@@ -125,36 +148,44 @@ export const AdvanceExpandRowContent = ({ rowId, colSpan, data }: AdvanceExpandR
         <div ref={containerRef} className="flex flex-col pt-4 px-4 pb-[90px]">
           <div className="flex gap-6 justify-between">
             <div className="flex gap-4 flex-col">
-              <img
-                src={selectedImage || PlaceHolderImage}
-                alt="Product"
-                className="w-44 h-44 object-cover rounded-lg border"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = PlaceHolderImage;
-                }}
-              />
+              <div className="relative w-44 h-44">
+                {loadingImages[selectedImage] && <Skeleton className="w-full h-full rounded-lg" />}
+                <img
+                  src={imageErrors[selectedImage] ? PlaceHolderImage : selectedImage}
+                  alt="Product"
+                  className={cn(
+                    'w-full h-full object-cover rounded-lg border',
+                    loadingImages[selectedImage] && 'hidden'
+                  )}
+                  onLoad={() => handleImageLoad(selectedImage)}
+                  onError={() => handleImageError(selectedImage)}
+                />
+              </div>
               {images.length > 0 && (
                 <div className="flex w-full items-center gap-2 flex-wrap">
                   {images.map((img) => (
                     <Button
                       variant="ghost"
                       key={img}
-                      className="p-0 rounded-md focus:outline-none h-12 w-12 min-w-0"
-                      onClick={() => setSelectedImage(img)}
+                      className="p-0 rounded-md focus:outline-none h-12 w-12 min-w-0 relative"
+                      onClick={() => {
+                        setSelectedImage(img);
+                        if (!loadingImages[img] && !imageErrors[img]) {
+                          setLoadingImages((prev) => ({ ...prev, [img]: true }));
+                        }
+                      }}
                     >
+                      {loadingImages[img] && <Skeleton className="absolute inset-0 rounded-md" />}
                       <img
-                        src={img || PlaceHolderImage}
+                        src={imageErrors[img] ? PlaceHolderImage : img}
                         alt="Thumbnail"
-                        className={`w-full h-full object-cover rounded-md border ${
-                          selectedImage === img ? 'border-[1.5px] border-primary' : ''
-                        }`}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.onerror = null;
-                          target.src = PlaceHolderImage;
-                        }}
+                        className={cn(
+                          'w-full h-full object-cover rounded-md border',
+                          selectedImage === img && 'border-[1.5px] border-primary',
+                          loadingImages[img] && 'opacity-0'
+                        )}
+                        onLoad={() => handleImageLoad(img)}
+                        onError={() => handleImageError(img)}
                       />
                     </Button>
                   ))}
