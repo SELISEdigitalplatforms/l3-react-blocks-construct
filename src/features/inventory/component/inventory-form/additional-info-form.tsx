@@ -51,15 +51,15 @@ import { TagsSelector } from './tags-selector';
  */
 
 interface AdditionalInfoFormProps {
-  readonly formData: {
-    readonly warranty: boolean;
-    readonly replacement: boolean;
-    readonly discount: boolean;
-    readonly tags: string[];
+  formData: {
+    EligibleWarranty: boolean;
+    EligibleReplacement: boolean;
+    Discount: boolean;
+    Tags: string[];
   };
-  readonly handleInputChange: (field: string, value: any) => void;
-  readonly tags: string[];
-  readonly handleTagToggle: (tag: string) => void;
+  handleInputChange: (field: string, value: any) => void;
+  tags: string[];
+  handleTagToggle: (tag: string) => void;
 }
 
 export function AdditionalInfoForm({
@@ -67,7 +67,7 @@ export function AdditionalInfoForm({
   handleInputChange,
   tags,
   handleTagToggle,
-}: AdditionalInfoFormProps) {
+}: Readonly<AdditionalInfoFormProps>) {
   const { t } = useTranslation();
 
   return (
@@ -76,28 +76,28 @@ export function AdditionalInfoForm({
       <div className="flex items-center justify-between">
         <span className="text-high-emphasis">{t('ELIGIBLE_FOR_WARRANTY')}</span>
         <Switch
-          checked={formData.warranty}
-          onCheckedChange={(checked) => handleInputChange('warranty', checked)}
+          checked={formData.EligibleWarranty}
+          onCheckedChange={(checked) => handleInputChange('eligibleWarranty', checked)}
         />
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-high-emphasis">{t('ELIGIBLE_FOR_REPLACEMENT')}</span>
         <Switch
-          checked={formData.replacement}
-          onCheckedChange={(checked) => handleInputChange('replacement', checked)}
+          checked={formData.EligibleReplacement}
+          onCheckedChange={(checked) => handleInputChange('eligibleReplacement', checked)}
         />
       </div>
 
       <div className="flex items-center justify-between">
         <span className="text-high-emphasis">{t('DISCOUNT')}</span>
         <Switch
-          checked={formData.discount}
+          checked={formData.Discount}
           onCheckedChange={(checked) => handleInputChange('discount', checked)}
         />
       </div>
 
-      <TagsSelector tags={tags} selectedTags={formData.tags} handleTagToggle={handleTagToggle} />
+      <TagsSelector tags={tags} selectedTags={formData.Tags} handleTagToggle={handleTagToggle} />
     </div>
   );
 }

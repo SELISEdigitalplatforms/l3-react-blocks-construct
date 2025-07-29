@@ -356,5 +356,4 @@ export function AdvanceDataTable<TData, TValue>({
     </div>
   );
 }
-
 export default AdvanceDataTable;

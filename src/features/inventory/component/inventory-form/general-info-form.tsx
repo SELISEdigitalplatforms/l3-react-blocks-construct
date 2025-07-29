@@ -10,6 +10,7 @@ import {
 } from 'components/ui/select';
 import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { StockSlider } from '../stock-slider/stock-slider';
+import { InventoryStatus } from '../../types/inventory.types';
 
 /**
  * GeneralInfoForm component allows users to fill in general information about an item, including its name, category,
@@ -61,18 +62,18 @@ import { StockSlider } from '../stock-slider/stock-slider';
  */
 
 interface GeneralInfoFormProps {
-  readonly formData: {
-    readonly itemName: string;
-    readonly category: string;
-    readonly supplier: string;
-    readonly itemLoc: string;
-    readonly price: string;
-    readonly status: string;
-    readonly stock: number;
+  formData: {
+    ItemName: string;
+    Category: string;
+    Supplier: string;
+    ItemLoc: string;
+    Price: number;
+    Status: InventoryStatus;
+    Stock: number;
   };
-  readonly handleInputChange: (field: string, value: any) => void;
-  readonly categoryOptions: readonly string[];
-  readonly locationOptions: readonly string[];
+  handleInputChange: (field: string, value: any) => void;
+  categoryOptions: string[];
+  locationOptions: string[];
 }
 
 export function GeneralInfoForm({
@@ -80,7 +81,7 @@ export function GeneralInfoForm({
   handleInputChange,
   categoryOptions,
   locationOptions,
-}: GeneralInfoFormProps) {
+}: Readonly<GeneralInfoFormProps>) {
   const { t } = useTranslation();
 
   return (
@@ -90,7 +91,7 @@ export function GeneralInfoForm({
           <Label htmlFor="itemName">{t('ITEM_NAME')}</Label>
           <Input
             id="itemName"
-            value={formData.itemName}
+            value={formData.ItemName}
             onChange={(e) => handleInputChange('itemName', e.target.value)}
             placeholder={t('ENTER_ITEM_NAME')}
           />
@@ -99,7 +100,7 @@ export function GeneralInfoForm({
         <div className="flex flex-col gap-2">
           <Label htmlFor="category">{t('CATEGORY')}</Label>
           <Select
-            value={formData.category}
+            value={formData.Category}
             onValueChange={(value) => handleInputChange('category', value)}
           >
             <SelectTrigger id="category">
@@ -119,7 +120,7 @@ export function GeneralInfoForm({
           <Label htmlFor="supplier">{t('SUPPLIER')}</Label>
           <Input
             id="supplier"
-            value={formData.supplier}
+            value={formData.Supplier}
             onChange={(e) => handleInputChange('supplier', e.target.value)}
             placeholder={t('ENTER_SUPPLIER')}
           />
@@ -128,7 +129,7 @@ export function GeneralInfoForm({
         <div className="flex flex-col gap-2">
           <Label htmlFor="itemLoc">{t('ITEM_LOCATION')}</Label>
           <Select
-            value={formData.itemLoc}
+            value={formData.ItemLoc}
             onValueChange={(value) => handleInputChange('itemLoc', value)}
           >
             <SelectTrigger id="itemLoc">
@@ -148,7 +149,7 @@ export function GeneralInfoForm({
           <Label htmlFor="price">{`${t('PRICE')} (CHF)`}</Label>
           <Input
             id="price"
-            value={formData.price}
+            value={formData.Price}
             onChange={(e) => {
               const numericValue = e.target.value.replace(/[^0-9.]/g, '');
               handleInputChange('price', numericValue);
@@ -160,8 +161,13 @@ export function GeneralInfoForm({
         <div className="flex flex-col gap-2">
           <Label>{t('STATUS')}</Label>
           <RadioGroup
-            value={formData.status}
-            onValueChange={(value) => handleInputChange('status', value)}
+            value={formData.Status.toLowerCase()}
+            onValueChange={(value) =>
+              handleInputChange(
+                'status',
+                value === 'active' ? InventoryStatus.ACTIVE : InventoryStatus.DISCONTINUED
+              )
+            }
             className="flex items-center gap-4"
           >
             <div className="flex items-center space-x-2">
@@ -183,7 +189,7 @@ export function GeneralInfoForm({
 
       <div className="w-full">
         <StockSlider
-          value={formData.stock}
+          value={formData.Stock}
           onChange={(value) => handleInputChange('stock', value)}
           max={1000}
         />
