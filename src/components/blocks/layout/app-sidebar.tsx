@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '../../ui/sidebar';
 import { menuItems } from '../../../constant/sidebar-menu';
-
-import { useTheme } from 'components/core/theme-provider';
+import { useTheme } from 'styles/theme/theme-provider';
 import { LogoSection } from '../sidebar/logo-section';
 import { MenuSection } from '../sidebar/menu-section';
 import { getSidebarStyle } from 'utils/sidebar-utils';

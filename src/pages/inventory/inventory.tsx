@@ -5,9 +5,10 @@ import { Table } from '@tanstack/react-table';
 import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
 import AdvanceDataTable from 'features/inventory/component/advance-data-table/advance-data-table';
 import { createAdvanceTableColumns } from 'features/inventory/component/advance-table-columns/advance-table-columns';
-import { InventoryData, inventoryData } from 'features/inventory/services/inventory-service';
 import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
 import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
+import { useGetInventories } from 'features/inventory/hooks/use-inventory';
+import { InventoryItem } from 'features/inventory/types/inventory.types';
 
 interface PaginationState {
   pageIndex: number;
@@ -18,23 +19,56 @@ interface PaginationState {
 export function Inventory() {
   const { t } = useTranslation();
   const columns = createAdvanceTableColumns({ t });
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<InventoryData[]>([]);
+  const navigate = useNavigate();
+  const [inventoryTableData, setInventoryTableData] = useState<InventoryItem[]>([]);
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
-    totalCount: inventoryData.length,
+    totalCount: 0,
   });
-  const navigate = useNavigate();
+
+  const {
+    data: inventoryData,
+    isLoading: isInventoryLoading,
+    error: inventoryError,
+  } = useGetInventories({
+    pageNo: paginationState.pageIndex + 1,
+    pageSize: paginationState.pageSize,
+  });
+  const data = inventoryData as { InventoryItems: any };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setData(inventoryData);
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
+    if (data?.InventoryItems?.items) {
+      const inventoryDataMap = data.InventoryItems.items.map((item: InventoryItem) => ({
+        ItemId: item.ItemId,
+        Category: item.Category,
+        CreatedBy: item.CreatedBy,
+        CreatedDate: item.CreatedDate,
+        IsDeleted: item.IsDeleted,
+        ItemImageFileId: item.ItemImageFileId,
+        ItemImageFileIds: item.ItemImageFileIds,
+        ItemLoc: item.ItemLoc,
+        ItemName: item.ItemName,
+        Language: item.Language,
+        LastUpdatedBy: item.LastUpdatedBy,
+        LastUpdatedDate: item.LastUpdatedDate,
+        OrganizationIds: item.OrganizationIds,
+        Price: item.Price,
+        Status: item.Status,
+        Stock: item.Stock,
+        Supplier: item.Supplier,
+        Tags: item.Tags,
+        EligibleWarranty: item.EligibleWarranty,
+        EligibleReplacement: item.EligibleReplacement,
+        Discount: item.Discount,
+      }));
+      setInventoryTableData(inventoryDataMap);
+      setPaginationState((prev) => ({
+        ...prev,
+        totalCount: data.InventoryItems.totalCount ?? 0,
+      }));
+    }
+  }, [data]);
 
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
@@ -47,34 +81,34 @@ export function Inventory() {
     []
   );
 
-  const handleInventoryDetails = (data: InventoryData) => {
-    navigate(`/inventory/${data.itemId}`);
+  const handleInventoryDetails = (item: InventoryItem) => {
+    navigate(`/inventory/${item.ItemId}`);
   };
 
-  const renderColumnsToolbar = (table: Table<InventoryData>) => (
+  const renderColumnsToolbar = (table: Table<InventoryItem>) => (
     <AdvancedTableColumnsToolbar
-      disabledColumns={['itemName', 'stock', 'price', 'status']}
+      disabledColumns={['ItemName', 'Stock', 'Price', 'Status']}
       table={table}
       title="INVENTORY"
     />
   );
 
   const renderExpandRowContent = (rowId: string, colSpan: number) => (
-    <AdvanceExpandRowContent rowId={rowId} colSpan={colSpan} data={data} />
+    <AdvanceExpandRowContent rowId={rowId} colSpan={colSpan} data={inventoryTableData} />
   );
 
-  const renderFilterToolbar = (table: Table<InventoryData>) => (
+  const renderFilterToolbar = (table: Table<InventoryItem>) => (
     <AdvanceTableFilterToolbar table={table} />
   );
 
   return (
     <div className="flex w-full flex-col">
       <AdvanceDataTable
-        data={data}
+        data={inventoryTableData}
         columns={columns}
         onRowClick={handleInventoryDetails}
-        isLoading={isLoading}
-        error={null}
+        isLoading={isInventoryLoading}
+        error={inventoryError instanceof Error ? inventoryError : null}
         columnsToolbar={renderColumnsToolbar}
         filterToolbar={renderFilterToolbar}
         expandRowContent={renderExpandRowContent}
@@ -83,7 +117,8 @@ export function Inventory() {
           pageSize: paginationState.pageSize,
           totalCount: paginationState.totalCount,
         }}
-        columnPinningConfig={{ left: ['select', 'itemName'] }}
+        manualPagination={true}
+        columnPinningConfig={{ left: ['select', 'ItemName'] }}
         onPaginationChange={handlePaginationChange}
       />
     </div>

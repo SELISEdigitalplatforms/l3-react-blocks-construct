@@ -5,9 +5,9 @@ import linkedinIcon from 'assets/images/social_media_in.svg';
 import microsoftIcon from 'assets/images/social_media_ms.svg';
 import googleIcon from 'assets/images/social_media_google.svg';
 import { SignupForm } from 'features/auth/components/signup-form';
-import darklogo from 'assets/images/construct_logo_dark.svg';
-import lightlogo from 'assets/images/construct_logo_light.svg';
-import { useTheme } from 'components/core/theme-provider';
+import darkLogo from 'assets/images/construct_logo_dark.svg';
+import lightLogo from 'assets/images/construct_logo_light.svg';
+import { useTheme } from 'styles/theme/theme-provider';
 import { useTranslation } from 'react-i18next';
 
 export function SignupPage() {
@@ -38,7 +38,7 @@ type LogoProps = Readonly<{
 function Logo({ theme }: LogoProps) {
   return (
     <div className="w-32 h-14 mb-2">
-      <img src={theme === 'dark' ? darklogo : lightlogo} className="w-full h-full" alt="logo" />
+      <img src={theme === 'dark' ? lightLogo : darkLogo} className="w-full h-full" alt="logo" />
     </div>
   );
 }
