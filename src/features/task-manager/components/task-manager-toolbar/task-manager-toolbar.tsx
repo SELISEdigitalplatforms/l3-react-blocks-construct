@@ -5,7 +5,7 @@ import { useIsMobile } from 'hooks/use-mobile';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { useTaskContext } from '../../contexts/task-context';
+// import { useTaskContext } from '../../contexts/task-context';
 import { TaskManagerFilterSheet } from '../task-manager-filters-sheet/task-manager-filters-sheet';
 
 /**
@@ -54,7 +54,7 @@ export default function TaskManagerToolbar({
   const isMobile = useIsMobile();
   const { t } = useTranslation();
 
-  const { searchQuery, setSearchQuery } = useTaskContext();
+  // const { searchQuery, setSearchQuery } = useTaskContext();
 
   const [openSheet, setOpenSheet] = useState(false);
 
@@ -94,11 +94,11 @@ export default function TaskManagerToolbar({
             <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
             <Input
               placeholder={t('SEARCH')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={''}
+              // onChange={(e) => setSearchQuery(e.target.value)}
               className="h-8 w-full rounded-lg bg-background pl-8"
             />
-            {searchQuery && (
+            {/* {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
@@ -107,7 +107,7 @@ export default function TaskManagerToolbar({
               >
                 ✕
               </button>
-            )}
+            )} */}
           </div>
 
           <div className="flex ml-2 gap-1">
@@ -150,11 +150,11 @@ export default function TaskManagerToolbar({
           <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
           <Input
             placeholder={t('SEARCH')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // value={searchQuery}
+            // onChange={(e) => setSearchQuery(e.target.value)}
             className="h-8 w-full rounded-lg bg-background pl-8"
           />
-          {searchQuery && (
+          {/* {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
@@ -163,7 +163,7 @@ export default function TaskManagerToolbar({
             >
               ✕
             </button>
-          )}
+          )} */}
         </div>
         <Button onClick={() => setOpenSheet(true)} variant="outline" size="sm" className="h-8 px-3">
           <ListFilter className="h-4 w-4" />

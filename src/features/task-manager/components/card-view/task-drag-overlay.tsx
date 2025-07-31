@@ -1,5 +1,5 @@
 import { Card } from 'components/ui/card';
-import { ITask, TPriority } from '../../types/task';
+import { TaskItem, TaskPriority } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 
@@ -17,7 +17,7 @@ import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
  * - Dynamically adjusts based on the active task being dragged
  *
  * Props:
- * @param {ITask | null} activeTask - The task object currently being dragged, or null if no task is active
+ * @param {TaskItem | null} activeTask - The task object currently being dragged, or null if no task is active
  *
  * @returns {JSX.Element | null} The drag overlay component when a task is active, or null otherwise
  *
@@ -27,7 +27,7 @@ import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
  */
 
 interface TaskDragOverlayProps {
-  activeTask: ITask | null;
+  activeTask: TaskItem | null;
 }
 
 export function TaskDragOverlay({ activeTask }: Readonly<TaskDragOverlayProps>) {
@@ -37,24 +37,25 @@ export function TaskDragOverlay({ activeTask }: Readonly<TaskDragOverlayProps>) 
     <Card className="p-3 bg-white shadow-lg w-72 opacity-90">
       <div className="flex gap-2 items-start">
         <div className="mt-0.5 flex-shrink-0">
-          <StatusCircle isCompleted={activeTask.isCompleted} />
+          <StatusCircle isCompleted={activeTask.IsCompleted ?? false} />
         </div>
-        <p className="text-sm text-high-emphasis font-medium">{activeTask.content}</p>
+        <p className="text-sm text-high-emphasis font-medium">{activeTask.Title || ''}</p>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        {activeTask.priority && (
-          <TaskManagerBadge priority={activeTask.priority as TPriority} className="px-2 py-0.5">
-            {activeTask.priority}
+        {activeTask.Priority && (
+          <TaskManagerBadge
+            priority={activeTask.Priority || TaskPriority.MEDIUM}
+            className="px-2 py-0.5"
+          >
+            {activeTask.Priority}
           </TaskManagerBadge>
         )}
-        {activeTask.tags &&
-          activeTask.tags.length > 0 &&
-          activeTask.tags.map((tag) => (
-            <TaskManagerBadge key={tag} className="px-2 py-0.5">
-              {tag}
-            </TaskManagerBadge>
-          ))}
+        {activeTask.Tags?.map((tag) => (
+          <TaskManagerBadge key={tag} className="px-2 py-0.5">
+            {tag}
+          </TaskManagerBadge>
+        ))}
       </div>
     </Card>
   );

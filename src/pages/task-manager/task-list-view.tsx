@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import {
@@ -12,7 +12,7 @@ import {
   DragEndEvent,
   DragOverlay,
 } from '@dnd-kit/core';
-import { ITask } from 'features/task-manager/types/task';
+import { TaskItem } from '../../features/task-manager/types/task-manager.types';
 import {
   NewTaskRow,
   SortableTaskItem,
@@ -52,7 +52,7 @@ export function TaskListView() {
   const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, getFilteredTasks } = useListTasks();
   const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
-  const [activeTask, setActiveTask] = useState<ITask | null>(null);
+  const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
@@ -102,42 +102,29 @@ export function TaskListView() {
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const activeId = active.id.toString();
-
-    if (activeId.startsWith('task-')) {
-      const taskId = activeId.replace('task-', '');
-      const task = tasks.find((t) => t.id === taskId);
-      if (task) {
-        setActiveTask(task);
-      }
-    }
+    setActiveTask(tasks.find((task) => `task-${task.ItemId}` === active.id) || null);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    if (!over) return;
 
-    if (!over) {
-      setActiveTask(null);
-      return;
-    }
+    const activeIndex = tasks.findIndex((task) => `task-${task.ItemId}` === active.id);
+    const overIndex = tasks.findIndex((task) => `task-${task.ItemId}` === over.id);
 
-    if (active.id !== over.id) {
-      const activeIndex = tasks.findIndex((task) => `task-${task.id}` === active.id);
-      const overIndex = tasks.findIndex((task) => `task-${task.id}` === over.id);
-
+    if (activeIndex !== overIndex) {
       updateTaskOrder(activeIndex, overIndex);
     }
-
     setActiveTask(null);
   };
 
   const filteredTasks = getFilteredTasks(statusFilter);
-  const taskIds = filteredTasks.map((task) => `task-${task.id}`);
+  const taskIds = filteredTasks.map((task) => `task-${task.ItemId}`);
 
-  const handleTaskClick = (id: string) => {
-    setSelectedTaskId(id);
+  const handleTaskClick = useCallback((taskId: string) => {
+    setSelectedTaskId(taskId);
     setIsTaskDetailsModalOpen(true);
-  };
+  }, []);
 
   return (
     <div className="mt-4">
@@ -158,7 +145,11 @@ export function TaskListView() {
 
                 {filteredTasks.length > 0 ? (
                   filteredTasks.map((task) => (
-                    <SortableTaskItem handleTaskClick={handleTaskClick} key={task.id} task={task} />
+                    <SortableTaskItem
+                      handleTaskClick={handleTaskClick}
+                      key={task.ItemId}
+                      task={task}
+                    />
                   ))
                 ) : (
                   <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
@@ -169,10 +160,10 @@ export function TaskListView() {
                 {activeTask && (
                   <div className="flex items-center bg-white shadow-lg border border-gray-200 p-4 rounded-lg w-full">
                     <div className="flex-shrink-0 mr-3">
-                      <StatusCircle isCompleted={true} />
+                      <StatusCircle isCompleted={activeTask.IsCompleted} />
                     </div>
                     <div className="flex-grow">
-                      <p className="font-medium text-sm text-high-emphasis">{activeTask.content}</p>
+                      <p className="font-medium text-sm text-high-emphasis">{activeTask.Title}</p>
                     </div>
                   </div>
                 )}

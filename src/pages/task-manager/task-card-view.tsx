@@ -1,28 +1,24 @@
-import { useEffect } from 'react';
-import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import { useEffect, useMemo, useCallback } from 'react';
+import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
+import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
+import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
+import { useToast } from 'hooks/use-toast';
+import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
+import { Skeleton } from 'components/ui/skeleton';
+import * as Dialog from '@radix-ui/react-dialog';
+import type { TaskSection } from 'features/task-manager/types/task-manager.types';
+import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
 import { AddColumnDialog } from 'features/task-manager/components/card-view/add-column-dialog';
 import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
 import { AddTaskDialog } from 'features/task-manager/components/card-view/add-task-dialog';
-import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
-import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
-import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
-import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 
 /**
  * TaskCardView Component
  *
  * A card-based (Kanban-style) task board for managing tasks within draggable columns.
- * Built using `@dnd-kit/core` for drag-and-drop and internal task management
- * via the `useCardTasks` hook. Supports adaptive drag sensitivity based on device.
+ * Built using `@dnd-kit/core` for drag-and-drop and external task management
+ * via the `useGetTaskSections` hook. Supports adaptive drag sensitivity based on device.
  *
  * Features:
  * - Drag-and-drop columns and tasks
@@ -58,22 +54,14 @@ export function TaskCardView({
   isNewTaskModalOpen,
   setNewTaskModalOpen,
 }: Readonly<TaskCardViewProps>) {
-  const { touchEnabled, screenSize } = useDeviceCapabilities();
+  const { touchEnabled } = useDeviceCapabilities();
 
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: screenSize === 'tablet' ? 5 : 10,
-    },
+  const { data: sectionsData, isLoading } = useGetTaskSections({
+    pageNo: 1,
+    pageSize: 100,
   });
 
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: screenSize === 'mobile' ? 250 : 150,
-      tolerance: screenSize === 'mobile' ? 5 : 3,
-    },
-  });
-
-  const dndSensors = useSensors(touchSensor, mouseSensor);
+  const { toast } = useToast();
 
   const {
     columns,
@@ -83,11 +71,76 @@ export function TaskCardView({
     addColumn,
     renameColumn,
     deleteColumn,
-    addTask,
+    addTask: addTaskToColumn,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    sensors,
   } = useCardTasks();
+
+  // Handle adding a new task to a column
+  const handleAddTask = useCallback(
+    async (columnId: string, content: string) => {
+      try {
+        const taskId = await addTaskToColumn(columnId, content);
+        return taskId;
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to add task. Please try again.',
+        });
+        console.error('Error adding task:', error);
+        throw error; // Re-throw to be handled by the TaskColumn component
+      }
+    },
+    [addTaskToColumn, toast]
+  );
+
+  const apiColumns = useMemo(() => {
+    if (!sectionsData?.TaskManagerSections?.items) return [];
+
+    return sectionsData.TaskManagerSections.items.map((section) => ({
+      ...section,
+      IsDeleted: section.IsDeleted || false,
+      Language: section.Language || 'en',
+      LastUpdatedBy: section.LastUpdatedBy,
+      LastUpdatedDate: section.LastUpdatedDate,
+      OrganizationIds: section.OrganizationIds || [],
+      Tags: section.Tags || [],
+      tasks: [], // Tasks will be managed locally
+    }));
+  }, [sectionsData]);
+
+  const handleAddColumn = useCallback(
+    async (title: string) => {
+      try {
+        // Call the addColumn function from useCardTasks which handles both API and local state
+        const newSectionId = await addColumn(title);
+
+        if (!newSectionId) {
+          throw new Error('No section ID returned from server');
+        }
+
+        toast({
+          variant: 'success',
+          title: 'Column created',
+          description: 'The new column has been created successfully',
+        });
+      } catch (error) {
+        console.error('Error creating column:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error creating column',
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Failed to create the column. Please try again.',
+        });
+      }
+    },
+    [addColumn, toast]
+  );
 
   useEffect(() => {
     const handleSetActiveColumn = (event: Event) => {
@@ -102,20 +155,31 @@ export function TaskCardView({
     };
   }, [setActiveColumn]);
 
+  if (isLoading) {
+    return (
+      <div className="flex space-x-4 p-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="w-64 p-4 space-y-4">
+            <Skeleton className="h-8 w-3/4" />
+            <div className="space-y-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="h-full w-full">
       <DndContext
-        sensors={dndSensors}
+        sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
-        autoScroll={{
-          threshold: {
-            x: 0.2,
-            y: 0.2,
-          },
-        }}
+        autoScroll={true}
         measuring={{
           draggable: {
             measure: (element) => element.getBoundingClientRect(),
@@ -129,20 +193,25 @@ export function TaskCardView({
           }}
         >
           <div className="flex space-x-4 min-h-full">
-            {columns.map((column) => (
-              <TaskColumn
-                key={column.id}
-                column={column}
-                tasks={column.tasks || []}
-                setActiveColumn={setActiveColumn}
-                onAddTask={(columnId, content) => addTask(columnId, content)}
-                onRenameColumn={(columnId, newTitle) => renameColumn(columnId, newTitle)}
-                onDeleteColumn={(columnId) => deleteColumn(columnId)}
-              />
-            ))}
+            {apiColumns.map((column: TaskSection) => {
+              // Get tasks for this specific column from the local state
+              const columnTasks = columns.find(col => col.ItemId === column.ItemId)?.tasks || [];
+              
+              return (
+                <TaskColumn
+                  key={column.ItemId}
+                  column={column}
+                  tasks={columnTasks}
+                  setActiveColumn={setActiveColumn}
+                  onAddTask={handleAddTask}
+                  onRenameColumn={(columnId, newTitle) => renameColumn(columnId, newTitle)}
+                  onDeleteColumn={(columnId) => deleteColumn(columnId)}
+                />
+              );
+            })}
 
             <div className="flex items-start pt-10 px-2">
-              <AddColumnDialog onAddColumn={(title) => addColumn(title)} />
+              <AddColumnDialog onAddColumn={handleAddColumn} />
             </div>
           </div>
         </div>
@@ -153,17 +222,27 @@ export function TaskCardView({
       <AddTaskDialog
         activeColumn={activeColumn}
         columns={columns}
-        onAddTask={(columnId, content) => addTask(columnId, content)}
+        onAddTask={async (columnId, content) => {
+          try {
+            await handleAddTask(columnId, content);
+          } catch (error) {
+            // Error is already handled by handleAddTask
+            console.error('Error in AddTaskDialog:', error);
+          }
+        }}
       />
 
-      <Dialog open={isNewTaskModalOpen} onOpenChange={setNewTaskModalOpen}>
-        {isNewTaskModalOpen && (
-          <TaskDetailsView
-            onClose={() => setNewTaskModalOpen(false)}
-            isNewTaskModalOpen={isNewTaskModalOpen}
-          />
-        )}
-      </Dialog>
+      <Dialog.Root open={isNewTaskModalOpen} onOpenChange={setNewTaskModalOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg">
+            <TaskDetailsView
+              onClose={() => setNewTaskModalOpen(false)}
+              isNewTaskModalOpen={isNewTaskModalOpen}
+            />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
+import { TaskPriority } from '../../types/task-manager.types';
 import { format } from 'date-fns';
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
@@ -27,9 +28,7 @@ import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
-import { TPriority } from '../../types/task';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
-import { useTaskContext } from '../../contexts/task-context';
 
 /**
  * TaskDetailsView Component
@@ -80,6 +79,7 @@ type TaskDetailsViewProps = {
   readonly taskId?: string;
   readonly isNewTaskModalOpen?: boolean;
   readonly onTaskAddedList?: () => void;
+  readonly addTask?: (task: Partial<TaskDetails>) => string | undefined;
 };
 
 const toTranslationKey = (title: string): string => {
@@ -91,9 +91,12 @@ export default function TaskDetailsView({
   taskId,
   isNewTaskModalOpen,
   onTaskAddedList,
+  addTask,
 }: TaskDetailsViewProps) {
   const { t } = useTranslation();
-  const { addTask, tags, assignees: availableAssignees } = useTaskContext();
+  // Use local state for tags and assignees (empty for now, ready for API integration)
+  const tags = useMemo<Tag[]>(() => [], []);
+  const availableAssignees = useMemo<Assignee[]>(() => [], []);
   const { columns } = useCardTasks();
   const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
   const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
@@ -104,18 +107,22 @@ export default function TaskDetailsView({
   const [mark, setMark] = useState<boolean>(task?.isCompleted ?? false);
   const [section, setSection] = useState<string>(task?.section ?? 'To Do');
   const [attachments, setAttachments] = useState<Attachment[]>(task?.attachments || []);
-  const [priority, setPriority] = useState<string>(
-    task?.priority === 'Low' || task?.priority === 'Medium' || task?.priority === 'High'
-      ? task.priority
-      : ''
-  );
+  const getInitialPriority = (): TaskPriority => {
+    if (task?.priority && Object.values(TaskPriority).includes(task.priority as TaskPriority)) {
+      return task.priority as TaskPriority;
+    }
+    return TaskPriority.HIGH;
+  };
+
+  const [priority, setPriority] = useState<TaskPriority>(getInitialPriority());
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>(task?.tags.map((tag) => tag.id) || []);
+  const initialTags = useMemo(() => task?.tags?.map((tag) => tag.id) || [], [task?.tags]);
+  const [selectedTags, setSelectedTags] = useState<string[]>(initialTags);
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>(task?.assignees || []);
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
-  const badgeArray = ['Low', 'Medium', 'High'];
+  const badgeArray = useMemo(() => [TaskPriority.HIGH, TaskPriority.MEDIUM, TaskPriority.LOW], []);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -157,11 +164,9 @@ export default function TaskDetailsView({
     setComments(comments.filter((comment) => comment.id !== id));
   };
 
-  const handlePriorityChange = (value: string) => {
-    if (value === 'Low' || value === 'Medium' || value === 'High') {
-      setPriority(value);
-      updateTaskDetails({ priority: value });
-    }
+  const handlePriorityChange = (newPriority: TaskPriority) => {
+    setPriority(newPriority);
+    updateTaskDetails({ priority: newPriority });
   };
 
   const handleStartWritingComment = () => {
@@ -191,6 +196,9 @@ export default function TaskDetailsView({
     }
   };
 
+  // Provide a default no-op for addTask if not provided
+  const safeAddTask = addTask ?? (() => undefined);
+
   const handleAddItem = () => {
     if (isNewTaskModalOpen === true && !newTaskAdded) {
       const newTags: Tag[] = selectedTags
@@ -210,7 +218,7 @@ export default function TaskDetailsView({
         attachments: attachments,
         comments: [],
       };
-      const newTaskId = title && addTask(newTask);
+      const newTaskId = title && safeAddTask(newTask);
       setCurrentTaskId(newTaskId);
       setNewTaskAdded(true);
       onTaskAddedList && onTaskAddedList();
@@ -312,8 +320,8 @@ export default function TaskDetailsView({
                 </SelectTrigger>
                 <SelectContent>
                   {columns.map((column) => (
-                    <SelectItem key={column.id} value={column.title}>
-                      {t(toTranslationKey(column.title))}
+                    <SelectItem key={column.ItemId} value={column.Title}>
+                      {t(toTranslationKey(column.Title))}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -325,8 +333,8 @@ export default function TaskDetailsView({
                 {badgeArray.map((item) => (
                   <TaskManagerBadge
                     key={item}
-                    {...(task?.priority === item && { priority: task?.priority as TPriority })}
-                    {...(priority === item && { priority: priority as TPriority })}
+                    {...(task?.priority === item && { priority: task.priority as TaskPriority })}
+                    {...(priority === item && { priority: priority })}
                     withBorder
                     className="px-3 py-1 cursor-pointer"
                     onClick={() => handlePriorityChange(item)}

@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { useToast } from 'hooks/use-toast';
-import { ITask } from 'features/task-manager/types/task';
+import { TaskItem } from 'features/task-manager/types/task-manager.types';
 
 /**
  * TaskManagerDropdownMenu Component
@@ -37,7 +37,7 @@ import { ITask } from 'features/task-manager/types/task';
  * - Toast notifications for successful actions
  *
  * Props:
- * @param {ITask} task - The task object being managed
+ * @param {TaskItem} task - The task object being managed
  * @param {{ id: string; title: string }[]} columns - The list of columns for moving tasks
  * @param {() => void} onToggleComplete - Callback triggered to toggle task completion
  * @param {() => void} onDelete - Callback triggered to delete the task
@@ -57,7 +57,7 @@ import { ITask } from 'features/task-manager/types/task';
  */
 
 interface TaskDropdownMenuProps {
-  task: ITask;
+  task: TaskItem;
   columns: { id: string; title: string }[];
   onToggleComplete: () => void;
   onDelete: () => void;
@@ -70,7 +70,7 @@ export const TaskManagerDropdownMenu = ({
   onToggleComplete,
   onDelete,
   onMoveToColumn,
-}: TaskDropdownMenuProps) => {
+}: Readonly<TaskDropdownMenuProps>) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -93,7 +93,7 @@ export const TaskManagerDropdownMenu = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-56">
           <DropdownMenuItem className="flex p-3 gap-2.5" onClick={onToggleComplete}>
-            {task.isCompleted ? (
+            {task.IsCompleted ? (
               <>
                 <CircleCheckBig className="h-5 w-5 text-primary-400" />
                 <p className="font-normal text-high-emphasis">{t('MARK_AS_COMPLETE')}</p>
@@ -119,7 +119,7 @@ export const TaskManagerDropdownMenu = ({
                     className="flex gap-2.5"
                     onClick={() => onMoveToColumn(column.title)}
                   >
-                    {task.status === column.title ? (
+                    {task.Section === column.title ? (
                       <Check className="h-5 w-5 text-primary-400" />
                     ) : (
                       <span className="h-4 w-4 inline-block" />

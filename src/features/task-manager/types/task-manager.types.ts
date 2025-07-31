@@ -9,22 +9,15 @@ export enum TaskPriority {
   LOW = 'Low',
   MEDIUM = 'Medium',
   HIGH = 'High',
-  URGENT = 'Urgent',
 }
 
 export const priorityColors: Record<TaskPriority, string> = {
   [TaskPriority.LOW]: 'info',
   [TaskPriority.MEDIUM]: 'warning',
   [TaskPriority.HIGH]: 'error',
-  [TaskPriority.URGENT]: 'error',
 };
 
-export const priorityOptions = [
-  TaskPriority.LOW,
-  TaskPriority.MEDIUM,
-  TaskPriority.HIGH,
-  TaskPriority.URGENT,
-];
+export const priorityOptions = [TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH];
 
 export interface TaskItem {
   ItemId: string;
@@ -64,12 +57,11 @@ export interface GetTasksResponse {
   TaskManagerItems: {
     items: TaskItem[];
     totalCount: number;
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      pageSize: number;
-      pageNo: number;
-    };
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    pageNo: number;
+    totalPages: number;
   };
 }
 
@@ -77,12 +69,11 @@ export interface GetSectionsResponse {
   TaskManagerSections: {
     items: TaskSection[];
     totalCount: number;
-    pageInfo: {
-      hasNextPage: boolean;
-      hasPreviousPage: boolean;
-      pageSize: number;
-      pageNo: number;
-    };
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    pageNo: number;
+    totalPages: number;
   };
 }
 
@@ -104,6 +95,9 @@ export interface TaskItemUpdateInput extends Partial<TaskItemInsertInput> {
 }
 
 export interface TaskSectionInsertInput {
+  ItemId?: string;
+  Assignee?: string;
+  DueDate?: string;
   Title: string;
   Language?: string;
   OrganizationIds?: string[];
@@ -114,16 +108,17 @@ export interface TaskSectionUpdateInput extends Partial<TaskSectionInsertInput> 
   IsDeleted?: boolean;
 }
 
-// Query parameter types
+export interface UpdateTaskManagerSectionResponse {
+  updateTaskManagerSection: {
+    itemId: string | null;
+    totalImpactedData: number;
+    acknowledged: boolean;
+  };
+}
+
 export interface PaginationParams {
   pageNo: number;
   pageSize: number;
   filter?: Record<string, unknown>;
   sort?: Record<string, 'asc' | 'desc'>;
-}
-
-export interface TaskQueryParams extends PaginationParams {
-  sectionId?: string;
-  assigneeId?: string;
-  isCompleted?: boolean;
 }

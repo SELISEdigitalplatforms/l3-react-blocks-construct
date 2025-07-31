@@ -1,6 +1,6 @@
-import { TPriority } from '../../types/task';
 import { Badge } from 'components/ui/badge';
 import { cn } from 'lib/utils';
+import { TaskPriority } from '../../types/task-manager.types';
 
 /**
  * TaskManagerBadge Component
@@ -37,7 +37,7 @@ import { cn } from 'lib/utils';
  */
 
 interface TaskManagerBadgeProps {
-  priority?: TPriority;
+  priority?: TaskPriority | 'normal';
   withBorder?: boolean;
   children?: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;

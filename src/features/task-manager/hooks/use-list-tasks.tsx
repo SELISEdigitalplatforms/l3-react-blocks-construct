@@ -1,5 +1,5 @@
-import { useTaskContext } from '../contexts/task-context';
-import { ITask } from '../types/task';
+import { useState } from 'react';
+import { TaskItem } from '../types/task-manager.types';
 
 /**
  * useListTasks Hook
@@ -33,57 +33,78 @@ import { ITask } from '../types/task';
  */
 
 export function useListTasks() {
-  const { listTasks, addTask, deleteTask, updateTaskStatus, reorderTasks, moveTask, updateTask } =
-    useTaskContext();
+  // Local state for tasks (empty for now, ready for API integration)
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
 
+  // Create a new task
   const createTask = (title: string, status: string) => {
-    const section = status;
+    if (title.trim()) {
+      const newTask: TaskItem = {
+        ItemId: Date.now().toString(),
+        Title: title,
+        Section: status,
+        IsCompleted: false,
+        IsDeleted: false,
+        CreatedBy: 'current-user', // TODO: Replace with actual user
+        CreatedDate: new Date().toISOString(),
+        Language: 'en', // Default language
+        OrganizationIds: [], // Default empty array
+      };
+      setTasks((prev) => [newTask, ...prev]);
+      return newTask.ItemId;
+    }
+    return null;
+  };
 
-    return addTask({
-      title,
-      section,
-      priority: '',
-      dueDate: null,
-      isCompleted: false,
+  // Remove a task
+  const removeTask = (id: string) => {
+    setTasks((prev) => prev.filter((task) => task.ItemId !== id));
+  };
+
+  // Toggle task completion
+  const toggleTaskCompletion = (id: string, isCompleted: boolean) => {
+    setTasks((prev) => 
+      prev.map((task) => 
+        task.ItemId === id ? { ...task, IsCompleted: isCompleted } : task
+      )
+    );
+  };
+
+  // Update task order
+  const updateTaskOrder = (activeIndex: number, overIndex: number) => {
+    setTasks((prev) => {
+      const updated = [...prev];
+      const [removed] = updated.splice(activeIndex, 1);
+      updated.splice(overIndex, 0, removed);
+      return updated;
     });
   };
 
-  const removeTask = (id: string) => {
-    deleteTask(id);
-  };
-
-  const toggleTaskCompletion = (id: string, isCompleted: boolean) => {
-    updateTaskStatus(id, isCompleted);
-  };
-
-  const updateTaskOrder = (
-    activeIndex: number,
-    overIndex: number,
-    status?: 'todo' | 'inprogress' | 'done'
-  ) => {
-    reorderTasks(activeIndex, overIndex, status);
-  };
-
+  // Get filtered tasks
   const getFilteredTasks = (statusFilter: 'todo' | 'inprogress' | 'done' | null) => {
-    return statusFilter ? listTasks.filter((task) => task.status === statusFilter) : listTasks;
+    return statusFilter ? tasks.filter((task) => task.Section === statusFilter) : tasks;
   };
 
+  // Change task status
   const changeTaskStatus = (taskId: string, newStatus: 'todo' | 'inprogress' | 'done') => {
-    moveTask(taskId, newStatus);
+    setTasks((prev) =>
+      prev.map((task) => 
+        task.ItemId === taskId ? { ...task, Section: newStatus } : task
+      )
+    );
   };
 
-  const updateTaskProperties = (taskId: string, updates: Partial<ITask>) => {
-    const detailsUpdates: Record<string, any> = {};
-
-    if (updates.content) detailsUpdates.title = updates.content;
-    if (updates.priority) detailsUpdates.priority = updates.priority;
-    if (updates.isCompleted !== undefined) detailsUpdates.isCompleted = updates.isCompleted;
-
-    updateTask(taskId, detailsUpdates);
+  // Update task properties
+  const updateTaskProperties = (taskId: string, updates: Partial<TaskItem>) => {
+    setTasks((prev) => 
+      prev.map((task) => 
+        task.ItemId === taskId ? { ...task, ...updates } : task
+      )
+    );
   };
 
   return {
-    tasks: listTasks,
+    tasks,
     createTask,
     removeTask,
     toggleTaskCompletion,

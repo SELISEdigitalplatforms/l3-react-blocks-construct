@@ -90,8 +90,8 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
           <SelectContent>
             <SelectGroup>
               {columns.map((column) => (
-                <SelectItem key={column.id} value={column.title}>
-                  {t(toTranslationKey(column.title))}
+                <SelectItem key={column.ItemId} value={column.Title}>
+                  {t(toTranslationKey(column.Title))}
                 </SelectItem>
               ))}
             </SelectGroup>

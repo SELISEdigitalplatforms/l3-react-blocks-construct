@@ -5,10 +5,10 @@ import type {
   TaskItemUpdateInput,
   TaskSectionInsertInput,
   TaskSectionUpdateInput,
-  TaskQueryParams,
   PaginationParams,
   GetTasksResponse,
   GetSectionsResponse,
+  UpdateTaskManagerSectionResponse,
 } from '../types/task-manager.types';
 
 export interface BaseMutationResponse {
@@ -62,23 +62,73 @@ import {
  * @param params - Query parameters including pagination and filters
  * @returns Promise with task items data
  */
-export const getTasks = async (params: TaskQueryParams): Promise<GetTasksResponse> => {
-  const { pageNo, pageSize, filter, sort, ...rest } = params;
 
-  const input = {
-    pageNo,
-    pageSize,
-    filter: filter ? JSON.stringify(filter) : undefined,
-    sort: sort ? JSON.stringify(sort) : undefined,
-    ...rest,
-  };
+export const getTasks = async (params: PaginationParams): Promise<GetTasksResponse> => {
+  const { pageNo, pageSize, filter = {}, sort = {} } = params;
 
-  const response = await graphqlClient.query({
-    query: GET_TASK_MANAGER_QUERY,
-    variables: { input },
-  });
+  try {
+    const response = await graphqlClient.query({
+      query: GET_TASK_MANAGER_QUERY,
+      variables: {
+        input: {
+          filter: JSON.stringify(filter),
+          sort: JSON.stringify(sort),
+          pageNo,
+          pageSize,
+        },
+      },
+    });
 
-  return (response as any).data as GetTasksResponse;
+    const responseData = (response as any)?.data || response;
+    let taskManagerItems: GetTasksResponse['TaskManagerItems'] | null = null;
+
+    if (responseData && typeof responseData === 'object') {
+      if ('TaskManagerItems' in responseData) {
+        taskManagerItems = responseData.TaskManagerItems;
+      } else if ('items' in responseData || 'totalCount' in responseData) {
+        taskManagerItems = responseData as GetTasksResponse['TaskManagerItems'];
+      }
+    }
+
+    if (taskManagerItems) {
+      return {
+        TaskManagerItems: {
+          items: taskManagerItems.items || [],
+          totalCount: taskManagerItems.totalCount || 0,
+          hasNextPage: taskManagerItems.hasNextPage || false,
+          hasPreviousPage: taskManagerItems.hasPreviousPage || false,
+          pageSize: taskManagerItems.pageSize || pageSize,
+          pageNo: taskManagerItems.pageNo || pageNo,
+          totalPages: taskManagerItems.totalPages || 1,
+        },
+      };
+    }
+    console.warn('Unexpected response structure, returning default sections');
+    return {
+      TaskManagerItems: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching task items:', error);
+    return {
+      TaskManagerItems: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  }
 };
 
 /**
@@ -89,19 +139,69 @@ export const getTasks = async (params: TaskQueryParams): Promise<GetTasksRespons
 export const getTaskSections = async (params: PaginationParams): Promise<GetSectionsResponse> => {
   const { pageNo, pageSize, filter = {}, sort = {} } = params;
 
-  const response = await graphqlClient.query({
-    query: GET_TASK_MANAGER_SECTIONS_QUERY,
-    variables: {
-      input: {
-        filter: JSON.stringify(filter),
-        sort: JSON.stringify(sort),
-        pageNo,
-        pageSize,
+  try {
+    const response = await graphqlClient.query({
+      query: GET_TASK_MANAGER_SECTIONS_QUERY,
+      variables: {
+        input: {
+          filter: JSON.stringify(filter),
+          sort: JSON.stringify(sort),
+          pageNo,
+          pageSize,
+        },
       },
-    },
-  });
+    });
 
-  return (response as any).data as GetSectionsResponse;
+    const responseData = (response as any)?.data || response;
+    let taskManagerSections: GetSectionsResponse['TaskManagerSections'] | null = null;
+
+    if (responseData && typeof responseData === 'object') {
+      if ('TaskManagerSections' in responseData) {
+        taskManagerSections = responseData.TaskManagerSections;
+      } else if ('items' in responseData || 'totalCount' in responseData) {
+        taskManagerSections = responseData as GetSectionsResponse['TaskManagerSections'];
+      }
+    }
+
+    if (taskManagerSections) {
+      return {
+        TaskManagerSections: {
+          items: taskManagerSections.items || [],
+          totalCount: taskManagerSections.totalCount || 0,
+          hasNextPage: taskManagerSections.hasNextPage || false,
+          hasPreviousPage: taskManagerSections.hasPreviousPage || false,
+          pageSize: taskManagerSections.pageSize || pageSize,
+          pageNo: taskManagerSections.pageNo || pageNo,
+          totalPages: taskManagerSections.totalPages || 1,
+        },
+      };
+    }
+    console.warn('Unexpected response structure, returning default sections');
+    return {
+      TaskManagerSections: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching task sections:', error);
+    return {
+      TaskManagerSections: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  }
 };
 
 /**
@@ -112,12 +212,32 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
 export const createTaskItem = async (
   input: TaskItemInsertInput
 ): Promise<InsertTaskItemResponse> => {
-  const response = await graphqlClient.mutate({
-    query: INSERT_TASK_MANAGER_ITEM_MUTATION,
-    variables: { input },
-  });
+  try {
+    // Execute the mutation with proper typing
+    const response = await graphqlClient.mutate<{
+      insertTaskManagerItem: { itemId: string };
+    }>({
+      query: INSERT_TASK_MANAGER_ITEM_MUTATION,
+      variables: { input },
+    });
 
-  return (response as any).data as InsertTaskItemResponse;
+    // The response might be the data directly or have a data property
+    const responseData = (response as any).data || response;
+    
+    if (!responseData) {
+      throw new Error('No response data received from server');
+    }
+    
+    // Check if we have the expected response structure
+    if (!responseData.insertTaskManagerItem?.itemId) {
+      throw new Error('No task ID in response');
+    }
+    
+    return responseData;
+  } catch (error) {
+    console.error('Error in createTaskItem:', error);
+    throw error;
+  }
 };
 
 /**
@@ -133,7 +253,7 @@ export const updateTaskItem = async (
   const response = await graphqlClient.mutate({
     query: UPDATE_TASK_MANAGER_ITEM_MUTATION,
     variables: {
-      filter: JSON.stringify({ ItemId: itemId }),
+      filter: JSON.stringify({ _id: itemId }),
       input,
     },
   });
@@ -154,7 +274,7 @@ export const deleteTaskItem = async (
   const response = await graphqlClient.mutate({
     query: DELETE_TASK_MANAGER_ITEM_MUTATION,
     variables: {
-      filter: JSON.stringify({ ItemId: itemId }),
+      filter: JSON.stringify({ _id: itemId }),
       input: { isHardDelete },
     },
   });
@@ -170,14 +290,35 @@ export const deleteTaskItem = async (
 export const createTaskSection = async (
   input: TaskSectionInsertInput
 ): Promise<InsertTaskSectionResponse> => {
-  const response = await graphqlClient.mutate({
-    query: INSERT_TASK_MANAGER_SECTION_MUTATION,
-    variables: { input },
-  });
+  try {
+    // Apollo client's mutate returns a promise that resolves to the data
+    const response = await graphqlClient.mutate({
+      query: INSERT_TASK_MANAGER_SECTION_MUTATION,
+      variables: { input },
+    });
 
-  return (response as any).data as InsertTaskSectionResponse;
+    // The response should have the shape: { data: { insertTaskManagerSection: { itemId: string, ... } } }
+    const responseData = (response as any)?.data || response;
+
+    if (!responseData?.insertTaskManagerSection) {
+      throw new Error('Invalid response format from server');
+    }
+
+    return {
+      insertTaskManagerSection: responseData.insertTaskManagerSection
+    };
+  } catch (error) {
+    console.error('Error in createTaskSection:', error);
+    throw error;
+  }
 };
 
+/**
+ * Updates an existing task section
+ * @param sectionId - ID of the section to update
+ * @param input - Updated section data
+ * @returns Promise with update result
+ */
 /**
  * Updates an existing task section
  * @param sectionId - ID of the section to update
@@ -187,16 +328,46 @@ export const createTaskSection = async (
 export const updateTaskSection = async (
   sectionId: string,
   input: TaskSectionUpdateInput
-): Promise<UpdateTaskSectionResponse> => {
-  const response = await graphqlClient.mutate({
-    query: UPDATE_TASK_MANAGER_SECTION_MUTATION,
-    variables: {
-      filter: JSON.stringify({ ItemId: sectionId }),
-      input,
-    },
-  });
+): Promise<UpdateTaskManagerSectionResponse> => {
+  try {
+    const response = await graphqlClient.mutate<{
+      updateTaskManagerSection: UpdateTaskManagerSectionResponse['updateTaskManagerSection'];
+      errors?: Array<{ message: string }>;
+    }>({
+      query: UPDATE_TASK_MANAGER_SECTION_MUTATION,
+      variables: {
+        filter: JSON.stringify({ _id: sectionId }),
+        input,
+      },
+    });
 
-  return (response as any).data as UpdateTaskSectionResponse;
+    if (!response) {
+      throw new Error('No response received from server');
+    }
+    if (response.errors && response.errors.length > 0) {
+      const errorMessage = response.errors.map((e) => e.message).join('; ');
+      throw new Error(`GraphQL Error: ${errorMessage}`);
+    }
+
+    if (!response.updateTaskManagerSection) {
+      throw new Error('No update data in response');
+    }
+
+    return {
+      updateTaskManagerSection: response.updateTaskManagerSection,
+    };
+  } catch (error) {
+    console.error('Error in updateTaskSection:', error);
+    const updateError = new Error(
+      error instanceof Error
+        ? error.message
+        : 'An unknown error occurred while updating the section'
+    );
+
+    (updateError as any).originalError = error;
+
+    throw updateError;
+  }
 };
 
 /**
@@ -212,7 +383,7 @@ export const deleteTaskSection = async (
   const response = await graphqlClient.mutate({
     query: DELETE_TASK_MANAGER_SECTION_MUTATION,
     variables: {
-      filter: JSON.stringify({ ItemId: sectionId }),
+      filter: JSON.stringify({ _id: sectionId }),
       input: { isHardDelete },
     },
   });

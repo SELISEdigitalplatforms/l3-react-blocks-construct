@@ -1,21 +1,21 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
+import type { GetSectionsResponse, GetTasksResponse } from '../types/task-manager.types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from 'hooks/use-error-handler';
 import type {
-  TaskQueryParams,
   TaskItemInsertInput,
   TaskItemUpdateInput,
   TaskSectionInsertInput,
   TaskSectionUpdateInput,
+  UpdateTaskManagerSectionResponse,
 } from '../types/task-manager.types';
 import type {
   InsertTaskItemResponse,
   UpdateTaskItemResponse,
   DeleteTaskItemResponse,
   InsertTaskSectionResponse,
-  UpdateTaskSectionResponse,
   DeleteTaskSectionResponse,
 } from '../services/task-manager.service';
 import {
@@ -28,6 +28,11 @@ import {
   updateTaskSection,
   deleteTaskSection,
 } from '../services/task-manager.service';
+
+interface TaskSectionsQueryParams {
+  pageNo: number;
+  pageSize: number;
+}
 
 /**
  * Task Manager Hooks
@@ -50,13 +55,16 @@ import {
  *   isCompleted: false
  * });
  */
-export const useGetTasks = (params: TaskQueryParams) => {
-  return useGlobalQuery({
+export const useGetTasks = (params: TaskSectionsQueryParams) => {
+  return useGlobalQuery<GetTasksResponse>({
     queryKey: ['tasks', params],
     queryFn: () => getTasks(params),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
+    onError: (error) => {
+      throw error;
+    },
   });
 };
 
@@ -71,13 +79,16 @@ export const useGetTasks = (params: TaskQueryParams) => {
  *   pageSize: 20
  * });
  */
-export const useGetTaskSections = (params: { pageNo: number; pageSize: number }) => {
-  return useGlobalQuery({
+export const useGetTaskSections = (params: TaskSectionsQueryParams) => {
+  return useGlobalQuery<GetSectionsResponse>({
     queryKey: ['task-sections', params],
     queryFn: () => getTaskSections(params),
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
+    onError: (error) => {
+      throw error;
+    },
   });
 };
 
@@ -94,7 +105,6 @@ export const useGetTaskSections = (params: { pageNo: number; pageSize: number })
  *   Priority: TaskPriority.MEDIUM
  * });
  */
-// Task Item Hooks
 export const useCreateTaskItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -102,19 +112,20 @@ export const useCreateTaskItem = () => {
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<InsertTaskItemResponse, Error, TaskItemInsertInput>({
-    mutationFn: (input) => createTaskItem(input),
+    mutationFn: createTaskItem,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('common.success'),
-        description: t('taskManager.taskCreated'),
-        variant: 'default',
+        variant: 'success',
+        title: t('Created Task'),
+        description: t('You have successfully created the new task!'),
       });
     },
     onError: (error: Error) => {
+      console.error('Error in useCreateTaskItem:', error);
       handleError(error, {
-        title: t('common.errors.somethingWentWrong'),
-        defaultMessage: t('taskManager.errors.failedToCreateTask'),
+        title: t('ERROR'),
+        defaultMessage: t('Failed to create task. Please try again.'),
       });
     },
   });
@@ -135,16 +146,13 @@ export const useUpdateTaskItem = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('common.success'),
-        description: t('taskManager.taskUpdated'),
-        variant: 'default',
+        variant: 'success',
+        title: t('Updated task'),
+        description: t('You have updated the task successfully'),
       });
     },
     onError: (error: Error) => {
-      handleError(error, {
-        title: t('common.errors.somethingWentWrong'),
-        defaultMessage: t('taskManager.errors.failedToUpdateTask'),
-      });
+      handleError(error);
     },
   });
 };
@@ -160,21 +168,17 @@ export const useDeleteTaskItem = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
-        title: t('common.success'),
-        description: t('taskManager.taskDeleted'),
-        variant: 'default',
+        variant: 'success',
+        title: t('Deleted task'),
+        description: t('You have successfully deleted a task'),
       });
     },
     onError: (error: Error) => {
-      handleError(error, {
-        title: t('common.errors.somethingWentWrong'),
-        defaultMessage: t('taskManager.errors.failedToDeleteTask'),
-      });
+      handleError(error);
     },
   });
 };
 
-// Task Section Hooks
 export const useCreateTaskSection = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -186,16 +190,13 @@ export const useCreateTaskSection = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-sections'] });
       toast({
-        title: t('common.success'),
-        description: t('taskManager.sectionCreated'),
-        variant: 'default',
+        variant: 'success',
+        title: t('Create New Section'),
+        description: t('You have successfully created a new section'),
       });
     },
     onError: (error: Error) => {
-      handleError(error, {
-        title: t('common.errors.somethingWentWrong'),
-        defaultMessage: t('taskManager.errors.failedToCreateSection'),
-      });
+      handleError(error);
     },
   });
 };
@@ -207,24 +208,52 @@ export const useUpdateTaskSection = () => {
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<
-    UpdateTaskSectionResponse,
+    UpdateTaskManagerSectionResponse,
     Error,
     { sectionId: string; input: TaskSectionUpdateInput }
   >({
     mutationFn: (variables) => updateTaskSection(variables.sectionId, variables.input),
-    onSuccess: () => {
+    onSuccess: (responseData) => {
       queryClient.invalidateQueries({ queryKey: ['task-sections'] });
-      toast({
-        title: t('common.success'),
-        description: t('taskManager.sectionUpdated'),
-        variant: 'default',
-      });
+
+      const { acknowledged, totalImpactedData } = responseData.updateTaskManagerSection;
+
+      if (acknowledged) {
+        toast({
+          variant: 'success',
+          title: t('Section Updated'),
+          description: t('The section has been updated successfully'),
+        });
+      } else if (totalImpactedData === 0) {
+        toast({
+          variant: 'default',
+          title: t('No Changes'),
+          description: t('The section was not modified. The data may be the same.'),
+        });
+      }
+
+      return responseData;
     },
     onError: (error: Error) => {
-      handleError(error, {
-        title: t('common.errors.somethingWentWrong'),
-        defaultMessage: t('taskManager.errors.failedToUpdateSection'),
+      let errorMessage = t('Failed to update section. Please try again.');
+
+      if (
+        error.message.includes('No records were updated') ||
+        error.message.includes('No response received') ||
+        error.message.includes('No data in response')
+      ) {
+        errorMessage = t(
+          'No changes were made. The section may not exist or the data is the same.'
+        );
+      }
+
+      toast({
+        variant: 'destructive',
+        title: t('Error'),
+        description: errorMessage,
       });
+
+      handleError(error);
     },
   });
 };
@@ -236,20 +265,17 @@ export const useDeleteTaskSection = () => {
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<DeleteTaskSectionResponse, Error, string>({
-    mutationFn: (sectionId) => deleteTaskSection(sectionId, false),
+    mutationFn: (sectionId) => deleteTaskSection(sectionId, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['task-sections'] });
       toast({
-        title: t('common.success'),
-        description: t('taskManager.sectionDeleted'),
-        variant: 'default',
+        variant: 'success',
+        title: t('COLUMN_DELETED'),
+        description: t('COLUMN_HAS_DELETED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
-      handleError(error, {
-        title: t('common.errors.somethingWentWrong'),
-        defaultMessage: t('taskManager.errors.failedToDeleteSection'),
-      });
+      handleError(error);
     },
   });
 };

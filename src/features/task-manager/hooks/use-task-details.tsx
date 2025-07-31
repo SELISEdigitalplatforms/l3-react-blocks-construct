@@ -1,4 +1,4 @@
-import { useTaskContext } from '../contexts/task-context';
+import { useState } from 'react';
 import { TaskDetails } from '../services/task-service';
 
 /**
@@ -40,88 +40,181 @@ import { TaskDetails } from '../services/task-service';
  */
 
 export function useTaskDetails(taskId?: string) {
-  const {
-    taskDetails,
-    updateTask,
-    deleteTask,
-    updateTaskStatus,
-    addComment,
-    addAttachment,
-    addAssignee,
-    addTag,
-    removeComment,
-    removeAttachment,
-    removeAssignee,
-    removeTag,
-  } = useTaskContext();
+  // Local state for all tasks (empty for now, ready for API integration)
+  const [taskDetails, setTaskDetails] = useState<TaskDetails[]>([]);
 
+  // Find the task by id
   const task = taskId ? taskDetails.find((task) => task.id === taskId) : null;
 
+  // Get all tasks
   const getAllTasks = () => taskDetails;
 
+  // Update a task's details
   const updateTaskDetails = (updates: Partial<TaskDetails>) => {
     if (taskId) {
-      updateTask(taskId, updates);
+      setTaskDetails((prev) =>
+        prev.map((task) => (task.id === taskId ? { ...task, ...updates } : task))
+      );
     }
   };
 
+  // Remove a task
   const removeTask = () => {
     if (taskId) {
-      deleteTask(taskId);
+      setTaskDetails((prev) => prev.filter((task) => task.id !== taskId));
     }
   };
 
+  // Toggle task completion
   const toggleTaskCompletion = (isCompleted: boolean) => {
     if (taskId) {
-      updateTaskStatus(taskId, isCompleted);
+      setTaskDetails((prev) =>
+        prev.map((task) => (task.id === taskId ? { ...task, isCompleted } : task))
+      );
     }
   };
 
+  // Add a new comment
   const addNewComment = (author: string, text: string) => {
     if (taskId) {
-      addComment(taskId, author, text);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                comments: [
+                  ...task.comments,
+                  {
+                    id: Date.now().toString(),
+                    author,
+                    timestamp: new Date().toISOString(),
+                    text,
+                  },
+                ],
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Delete a comment
   const deleteComment = (commentId: string) => {
     if (taskId) {
-      removeComment(taskId, commentId);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                comments: task.comments.filter((comment) => comment.id !== commentId),
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Add a new attachment
   const addNewAttachment = (name: string, size: string, type: 'pdf' | 'image' | 'other') => {
     if (taskId) {
-      addAttachment(taskId, name, size, type);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                attachments: [
+                  ...task.attachments,
+                  {
+                    id: Date.now().toString(),
+                    name,
+                    size,
+                    type,
+                  },
+                ],
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Delete an attachment
   const deleteAttachment = (attachmentId: string) => {
     if (taskId) {
-      removeAttachment(taskId, attachmentId);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                attachments: task.attachments.filter((att) => att.id !== attachmentId),
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Add a new assignee
   const addNewAssignee = (name: string, avatar: string) => {
     if (taskId) {
-      addAssignee(taskId, name, avatar);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                assignees: [...task.assignees, { id: Date.now().toString(), name, avatar }],
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Delete an assignee
   const deleteAssignee = (assigneeId: string) => {
     if (taskId) {
-      removeAssignee(taskId, assigneeId);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                assignees: task.assignees.filter((a) => a.id !== assigneeId),
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Add a new tag
   const addNewTag = (label: string) => {
     if (taskId) {
-      addTag(taskId, label);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                tags: [...task.tags, { id: Date.now().toString(), label }],
+              }
+            : task
+        )
+      );
     }
   };
 
+  // Delete a tag
   const deleteTag = (tagId: string) => {
     if (taskId) {
-      removeTag(taskId, tagId);
+      setTaskDetails((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                tags: task.tags.filter((tag) => tag.id !== tagId),
+              }
+            : task
+        )
+      );
     }
   };
 

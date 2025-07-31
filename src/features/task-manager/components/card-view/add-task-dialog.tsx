@@ -18,7 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
-import { ITaskManagerColumn } from '../../types/task';
+import { TaskItem, TaskSection } from '../../types/task-manager.types';
+
+interface TaskSectionWithTasks extends TaskSection {
+  tasks: TaskItem[];
+}
 
 /**
  * AddTaskDialog Component
@@ -51,7 +55,7 @@ import { ITaskManagerColumn } from '../../types/task';
 
 interface AddTaskDialogProps {
   activeColumn: string | null;
-  columns: ITaskManagerColumn[];
+  columns: TaskSectionWithTasks[];
   onAddTask: (columnId: string, content: string) => void;
 }
 
@@ -102,8 +106,8 @@ export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<Add
               <SelectContent>
                 <SelectGroup>
                   {columns.map((column) => (
-                    <SelectItem key={column.id} value={column.id}>
-                      {column.title}
+                    <SelectItem key={column.ItemId} value={column.ItemId}>
+                      {column.Title}
                     </SelectItem>
                   ))}
                 </SelectGroup>
