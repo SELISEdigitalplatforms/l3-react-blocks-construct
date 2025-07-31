@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
-import { TaskPriority } from '../../types/task-manager.types';
+import { TaskPriority, TaskComments, TaskAttachments } from '../../types/task-manager.types';
 import { format } from 'date-fns';
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
@@ -75,15 +75,11 @@ interface Assignee {
 }
 
 type TaskDetailsViewProps = {
-  readonly onClose: () => void;
-  readonly taskId?: string;
-  readonly isNewTaskModalOpen?: boolean;
-  readonly onTaskAddedList?: () => void;
-  readonly addTask?: (task: Partial<TaskDetails>) => string | undefined;
-};
-
-const toTranslationKey = (title: string): string => {
-  return title.replace(/\s+/g, '_').toUpperCase();
+  onClose: () => void;
+  taskId?: string;
+  isNewTaskModalOpen?: boolean;
+  onTaskAddedList?: () => void;
+  addTask?: (task: Partial<TaskDetails>) => string | undefined;
 };
 
 export default function TaskDetailsView({
@@ -92,7 +88,7 @@ export default function TaskDetailsView({
   isNewTaskModalOpen,
   onTaskAddedList,
   addTask,
-}: TaskDetailsViewProps) {
+}: Readonly<TaskDetailsViewProps>) {
   const { t } = useTranslation();
   // Use local state for tags and assignees (empty for now, ready for API integration)
   const tags = useMemo<Tag[]>(() => [], []);
@@ -100,26 +96,61 @@ export default function TaskDetailsView({
   const { columns } = useCardTasks();
   const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
   const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
-  const { task, toggleTaskCompletion, removeTask, updateTaskDetails } =
-    useTaskDetails(currentTaskId);
-  const [date, setDate] = useState<Date | undefined>(task?.dueDate ?? undefined);
-  const [title, setTitle] = useState<string>(task?.title ?? '');
-  const [mark, setMark] = useState<boolean>(task?.isCompleted ?? false);
-  const [section, setSection] = useState<string>(task?.section ?? 'To Do');
-  const [attachments, setAttachments] = useState<Attachment[]>(task?.attachments || []);
-  const getInitialPriority = (): TaskPriority => {
-    if (task?.priority && Object.values(TaskPriority).includes(task.priority as TaskPriority)) {
-      return task.priority as TaskPriority;
-    }
-    return TaskPriority.HIGH;
-  };
+  const {
+    task,
+    toggleTaskCompletion,
+    removeTask,
+    updateTaskDetails,
+    addNewComment: addComment,
+    deleteComment: removeComment,
+    addNewAttachment: addAttachment,
+    deleteAttachment: removeAttachment,
+    addNewAssignee: addAssignee,
+    deleteAssignee: removeAssignee,
+    addNewTag: addTag,
+    deleteTag: removeTag,
+  } = useTaskDetails(currentTaskId);
 
-  const [priority, setPriority] = useState<TaskPriority>(getInitialPriority());
+  // Initialize state from task
+  const [date, setDate] = useState<Date | undefined>(
+    task?.DueDate ? new Date(task.DueDate) : undefined
+  );
+  const [title, setTitle] = useState<string>(task?.Title || '');
+  const [mark, setMark] = useState<boolean>(task?.IsCompleted || false);
+  const [section, setSection] = useState<string>(task?.Section || '');
+  const [attachments, setAttachments] = useState<Attachment[]>(
+    task?.Attachments?.map((attachment) => ({
+      id: attachment.ItemId,
+      name: attachment.FileName,
+      size: attachment.FileSize,
+      type: attachment.FileType,
+    })) || []
+  );
+  const [priority, setPriority] = useState<TaskPriority>(
+    task?.Priority && Object.values(TaskPriority).includes(task.Priority as TaskPriority)
+      ? (task.Priority as TaskPriority)
+      : TaskPriority.MEDIUM
+  );
+  const [description, setDescription] = useState<string>(task?.Description || '');
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
-  const initialTags = useMemo(() => task?.tags?.map((tag) => tag.id) || [], [task?.tags]);
-  const [selectedTags, setSelectedTags] = useState<string[]>(initialTags);
-  const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>(task?.assignees || []);
+  const [selectedTags, setSelectedTags] = useState<Array<{ id: string; label: string }>>(
+    task?.Tags?.map((tag) => ({
+      id: tag.toLowerCase().replace(/\s+/g, '-'),
+      label: tag,
+    })) || []
+  );
+  const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>(
+    task?.Assignee
+      ? [
+          {
+            id: task.Assignee.toLowerCase().replace(/\\s+/g, '-'),
+            name: task.Assignee,
+            avatar: '', // Default empty avatar, you might want to set a proper avatar URL
+          },
+        ]
+      : []
+  );
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const badgeArray = useMemo(() => [TaskPriority.HIGH, TaskPriority.MEDIUM, TaskPriority.LOW], []);
@@ -127,46 +158,131 @@ export default function TaskDetailsView({
   const inputRef = useRef<HTMLInputElement>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
 
+  // Handle calendar focus management
   useEffect(() => {
     if (calendarOpen && !date) {
-      // Slight delay allows the popover to fully render
       setTimeout(() => {
         inputRef.current?.focus();
       }, 0);
     }
   }, [calendarOpen, date]);
 
-  const [description, setDescription] = useState(task?.description);
-  const [comments, setComments] = useState(
-    task?.comments || [
-      {
-        id: '1',
-        author: 'Block Smith',
-        timestamp: '20.03.2025, 12:00',
-        text: 'Please check, review & verify.',
-      },
-      {
-        id: '2',
-        author: 'Jane Doe',
-        timestamp: '20.03.2025, 13:15',
-        text: 'Looks good to me. Ready for deployment.',
-      },
-    ]
-  );
+  // Initialize comments with task comments or default values
+  const [comments, setComments] = useState<TaskComments[]>(task?.Comments || []);
 
-  const handleEditComment = (id: string, newText: string) => {
-    setComments(
-      comments.map((comment) => (comment.id === id ? { ...comment, text: newText } : comment))
-    );
+  // Handle comment editing
+  const handleEditComment = async (id: string, newText: string) => {
+    try {
+      // Update the comment in the task
+      await updateTaskDetails({
+        Comments: comments.map((comment) => ({
+          ...comment,
+          Content: comment.ItemId === id ? newText : comment.Content,
+        })),
+      });
+
+      // Update the UI
+      setComments((prev) =>
+        prev.map((comment) => ({
+          ...comment,
+          Content: comment.ItemId === id ? newText : comment.Content,
+        }))
+      );
+
+      toast({
+        title: t('SUCCESS'),
+        description: t('COMMENT_UPDATED_SUCCESSFULLY'),
+      });
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+      toast({
+        title: t('ERROR'),
+        description: t('FAILED_TO_UPDATE_COMMENT'),
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleDeleteComment = (id: string) => {
-    setComments(comments.filter((comment) => comment.id !== id));
+  // Update local state when task changes
+  useEffect(() => {
+    if (task) {
+      setTitle(task.Title || '');
+      setMark(!!task.IsCompleted);
+      setSection(task.Section || 'To Do');
+      setAttachments(
+        (task.Attachments || []).map((attachment) => ({
+          id: attachment.ItemId,
+          name: attachment.FileName,
+          size: attachment.FileSize,
+          type: attachment.FileType,
+        }))
+      );
+      setDate(task.DueDate ? new Date(task.DueDate) : undefined);
+      setDescription(task.Description || '');
+      // Convert string[] to Tag[] format
+      setSelectedTags(
+        (task.Tags || []).map((tag) => ({
+          id: tag.toLowerCase().replace(/\s+/g, '-'),
+          label: tag,
+        }))
+      );
+
+      // Convert string | undefined to Assignee[] format
+      setSelectedAssignees(
+        task.Assignee
+          ? [
+              {
+                id: task.Assignee.toLowerCase().replace(/\s+/g, '-'),
+                name: task.Assignee,
+                avatar: '', // Default empty avatar, you might want to set a proper avatar URL
+              },
+            ]
+          : []
+      );
+
+      // Set priority from task or default to MEDIUM
+      if (task.Priority && Object.values(TaskPriority).includes(task.Priority as TaskPriority)) {
+        setPriority(task.Priority as TaskPriority);
+      } else {
+        setPriority(TaskPriority.MEDIUM);
+      }
+    } else {
+      // Reset to defaults when no task is selected
+      setTitle('');
+      setMark(false);
+      setSection('To Do');
+      setAttachments([]);
+      setDate(undefined);
+      setDescription('');
+      setSelectedTags([]);
+      setSelectedAssignees([]);
+      setPriority(TaskPriority.MEDIUM);
+    }
+  }, [
+    task,
+    setTitle,
+    setMark,
+    setSection,
+    setAttachments,
+    setDate,
+    setDescription,
+    setSelectedTags,
+    setSelectedAssignees,
+    setPriority,
+  ]);
+
+  const handleTitleChange = async (newTitle: string) => {
+    setTitle(newTitle);
+    if (currentTaskId) {
+      await updateTaskDetails({ Title: newTitle });
+    }
   };
 
-  const handlePriorityChange = (newPriority: TaskPriority) => {
+  const handlePriorityChange = async (newPriority: TaskPriority) => {
     setPriority(newPriority);
-    updateTaskDetails({ priority: newPriority });
+    if (currentTaskId) {
+      await updateTaskDetails({ Priority: newPriority });
+    }
   };
 
   const handleStartWritingComment = () => {
@@ -178,21 +294,64 @@ export default function TaskDetailsView({
     setNewCommentContent('');
   };
 
-  const handleSubmitComment = (content: string) => {
-    if (content.trim()) {
-      const now = new Date();
-      const timestamp = format(now, 'dd.MM.yyyy, HH:mm');
+  const handleSubmitComment = async (content: string) => {
+    if (content.trim() && currentTaskId) {
+      try {
+        const now = new Date();
+        const timestamp = format(now, 'dd.MM.yyyy, HH:mm');
 
-      const newComment = {
-        id: Date.now().toString(),
-        author: 'Block Smith',
-        timestamp,
-        text: content,
-      };
+        const newComment: TaskComments = {
+          ItemId: Date.now().toString(),
+          Author: 'Current User',
+          Timestamp: timestamp,
+          Content: content,
+        };
 
-      setComments([...comments, newComment]);
-      setNewCommentContent('');
-      setIsWritingComment(false);
+        // Add the comment to the task
+        await addComment(content);
+
+        // Update the UI
+        setComments((prev) => [...prev, newComment]);
+        setNewCommentContent('');
+        setIsWritingComment(false);
+
+        toast({
+          title: t('SUCCESS'),
+          description: t('COMMENT_ADDED_SUCCESSFULLY'),
+        });
+      } catch (error) {
+        console.error('Failed to add comment:', error);
+        toast({
+          title: t('ERROR'),
+          description: t('FAILED_TO_ADD_COMMENT'),
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  // Handle comment deletion
+  const handleDeleteComment = async (commentId: string) => {
+    if (!currentTaskId) return;
+
+    try {
+      // Remove the comment from the task
+      await removeComment(commentId);
+
+      // Update the UI
+      setComments((prev) => prev.filter((comment) => comment.ItemId !== commentId));
+
+      toast({
+        title: t('SUCCESS'),
+        description: t('COMMENT_DELETED_SUCCESSFULLY'),
+      });
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+      toast({
+        title: t('ERROR'),
+        description: t('FAILED_TO_DELETE_COMMENT'),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -201,10 +360,7 @@ export default function TaskDetailsView({
 
   const handleAddItem = () => {
     if (isNewTaskModalOpen === true && !newTaskAdded) {
-      const newTags: Tag[] = selectedTags
-        .map((tagId) => tags.find((tag) => tag.id === tagId))
-        .filter((tag): tag is Tag => tag !== undefined);
-
+      // Since selectedTags is already an array of Tag objects, we can use it directly
       const newTask: Partial<TaskDetails> = {
         section: section,
         isCompleted: mark,
@@ -214,7 +370,7 @@ export default function TaskDetailsView({
         dueDate: date ?? null,
         assignees: selectedAssignees,
         description: description ?? '',
-        tags: newTags,
+        tags: selectedTags, // Directly use selectedTags as it's already in the correct format
         attachments: attachments,
         comments: [],
       };
@@ -225,9 +381,13 @@ export default function TaskDetailsView({
     }
   };
 
-  const handleUpdateStatus = () => {
-    setMark(!mark);
-    toggleTaskCompletion(!mark);
+  const handleUpdateStatus = async () => {
+    const newStatus = !mark;
+    setMark(newStatus);
+    if (currentTaskId) {
+      await updateTaskDetails({ IsCompleted: newStatus });
+      await toggleTaskCompletion(newStatus);
+    }
   };
 
   const handleClose = () => {
@@ -237,44 +397,166 @@ export default function TaskDetailsView({
     }
   };
 
-  useEffect(() => {
-    if (task && section !== task.section) {
-      updateTaskDetails({ section });
+  // Handle section changes
+  const handleSectionChange = async (newSection: string) => {
+    setSection(newSection);
+    if (currentTaskId) {
+      await updateTaskDetails({ Section: newSection });
     }
-  }, [section, task, updateTaskDetails]);
-
-  useEffect(() => {
-    if (task && selectedAssignees !== task.assignees) {
-      updateTaskDetails({ assignees: selectedAssignees });
-    }
-  }, [selectedAssignees, task, updateTaskDetails]);
-
-  useEffect(() => {
-    if (task && selectedTags !== task.tags.map((tag) => tag.id)) {
-      const updatedTags = tags.filter((tag) => selectedTags.includes(tag.id));
-      updateTaskDetails({ tags: updatedTags });
-    }
-  }, [selectedTags, task, tags, updateTaskDetails]);
-
-  useEffect(() => {
-    if (task && attachments !== task.attachments) {
-      updateTaskDetails({ attachments: attachments });
-    }
-  }, [attachments, task, updateTaskDetails]);
-
-  const handleDeleteTask = () => {
-    removeTask();
-    onClose();
   };
 
-  const handleConfirm = () => {
-    handleDeleteTask();
-    setOpen(false);
-    toast({
-      variant: 'success',
-      title: t('TASK_REMOVED'),
-      description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
+  // Handle assignee changes
+  const handleAssigneeChange = async (newAssignees: Assignee[]) => {
+    setSelectedAssignees(newAssignees);
+    if (currentTaskId) {
+      // Update the task with the first assignee's name (or undefined if no assignees)
+      const assigneeName = newAssignees.length > 0 ? newAssignees[0].name : undefined;
+      await updateTaskDetails({ Assignee: assigneeName });
+
+      // Handle added assignees
+      const addedAssignees = newAssignees.filter(
+        (newAssign) => !selectedAssignees.some((prevAssign) => prevAssign.id === newAssign.id)
+      );
+
+      // Handle removed assignees
+      const removedAssignees = selectedAssignees.filter(
+        (prevAssign) => !newAssignees.some((newAssign) => newAssign.id === prevAssign.id)
+      );
+
+      // Process added assignees
+      for (const assignee of addedAssignees) {
+        await addAssignee(assignee.name);
+      }
+
+      // Process removed assignees
+      // Since deleteAssignee removes all assignees (as per TaskItem interface),
+      // we only need to call it once if there are any assignees to remove
+      if (removedAssignees.length > 0) {
+        await removeAssignee();
+      }
+    }
+  };
+
+  // Handle tag changes
+  const handleTagChange = async (newTags: Array<string | { id: string; label: string }>) => {
+    // Convert all tags to the correct format
+    const normalizedNewTags = newTags.map((tag) =>
+      typeof tag === 'string' ? { id: tag, label: tag } : tag
+    );
+
+    setSelectedTags(normalizedNewTags);
+
+    if (currentTaskId) {
+      // Update the task with the new tags (using just the labels as per TaskItem interface)
+      await updateTaskDetails({
+        Tags: normalizedNewTags.map((tag) => tag.label),
+      });
+
+      // Get the IDs for comparison
+      const currentTagIds = selectedTags.map((tag) => tag.id);
+      const newTagIds = normalizedNewTags.map((tag) => tag.id);
+
+      // Handle added tags
+      const addedTags = normalizedNewTags.filter((tag) => !currentTagIds.includes(tag.id));
+
+      // Handle removed tags
+      const removedTagIds = selectedTags
+        .filter((tag) => !newTagIds.includes(tag.id))
+        .map((tag) => tag.id);
+
+      // Process added tags
+      for (const tag of addedTags) {
+        await addTag(tag.label);
+      }
+
+      // Process removed tags
+      for (const tagId of removedTagIds) {
+        await removeTag(tagId);
+      }
+    }
+  };
+
+  // Handle attachment changes
+  const handleAttachmentChange = async (newAttachments: SetStateAction<Attachment[]>) => {
+    setAttachments((prev) => {
+      const updatedAttachments =
+        typeof newAttachments === 'function' ? newAttachments(prev) : newAttachments;
+
+      if (currentTaskId) {
+        // Map Attachment[] to TaskAttachments[] for the update
+        const taskAttachments: TaskAttachments[] = updatedAttachments.map((attachment) => ({
+          ItemId: attachment.id,
+          FileName: attachment.name,
+          FileSize: attachment.size,
+          FileType: attachment.type,
+        }));
+
+        // Update the task with the new attachments
+        updateTaskDetails({ Attachments: taskAttachments });
+
+        // Handle new attachments
+        const addedAttachments = updatedAttachments.filter(
+          (newAtt) => !prev.some((prevAtt) => prevAtt.id === newAtt.id)
+        );
+
+        // Handle removed attachments
+        const removedAttachments = prev.filter(
+          (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.id === prevAtt.id)
+        );
+
+        // Process added attachments
+        addedAttachments.forEach((attachment) => {
+          addAttachment(attachment);
+        });
+
+        // Process removed attachments
+        removedAttachments.forEach((attachment) => {
+          removeAttachment(attachment.id);
+        });
+      }
+
+      return updatedAttachments;
     });
+  };
+
+  const handleDeleteTask = async (): Promise<boolean> => {
+    if (!currentTaskId) return false;
+
+    try {
+      const success = await removeTask();
+      if (success) {
+        onClose();
+        toast({
+          title: t('SUCCESS'),
+          description: t('TASK_DELETED_SUCCESSFULLY'),
+        });
+        return true;
+      } else {
+        throw new Error('Failed to delete task');
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: t('ERROR'),
+        description: t('FAILED_TO_DELETE_TASK'),
+        variant: 'destructive',
+      });
+      return false;
+    }
+  };
+
+  const handleConfirm = async () => {
+    const success = await handleDeleteTask();
+    setOpen(false);
+
+    if (success) {
+      toast({
+        variant: 'default',
+        title: t('TASK_REMOVED'),
+        description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
+      });
+      onClose();
+    }
   };
 
   return (
@@ -282,7 +564,7 @@ export default function TaskDetailsView({
       <DialogTitle />
       <DialogDescription />
       <DialogContent
-        className="rounded-md sm:max-w-[720px] xl:max-h-[800px] max-h-screen flex flex-col p-0"
+        className="rounded-md sm:max-w-[720px] xl:max-h-[750px] max-h-screen flex flex-col p-0"
         onInteractOutside={() => handleAddItem()}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
@@ -292,7 +574,7 @@ export default function TaskDetailsView({
               taskId={taskId}
               isNewTaskModalOpen={isNewTaskModalOpen}
               initialValue={title}
-              onValueChange={setTitle}
+              onValueChange={handleTitleChange}
               className="mb-2 mt-3"
             />
             <div className="flex h-7">
@@ -314,14 +596,14 @@ export default function TaskDetailsView({
           <div className="grid grid-cols-2 gap-4 mt-6">
             <div>
               <Label className="text-high-emphasis text-base font-semibold">{t('SECTION')}</Label>
-              <Select value={section} onValueChange={setSection}>
+              <Select value={section} onValueChange={handleSectionChange}>
                 <SelectTrigger className="mt-2 w-full h-[28px] px-2 py-1">
                   <SelectValue placeholder={t('SELECT')} />
                 </SelectTrigger>
                 <SelectContent>
                   {columns.map((column) => (
                     <SelectItem key={column.ItemId} value={column.Title}>
-                      {t(toTranslationKey(column.Title))}
+                      {t(column.Title)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -333,10 +615,9 @@ export default function TaskDetailsView({
                 {badgeArray.map((item) => (
                   <TaskManagerBadge
                     key={item}
-                    {...(task?.priority === item && { priority: task.priority as TaskPriority })}
-                    {...(priority === item && { priority: priority })}
+                    priority={item}
                     withBorder
-                    className="px-3 py-1 cursor-pointer"
+                    className={`px-3 py-1 cursor-pointer ${priority === item ? 'opacity-100' : 'opacity-60'}`}
                     onClick={() => handlePriorityChange(item)}
                   >
                     {item}
@@ -365,13 +646,22 @@ export default function TaskDetailsView({
                   <div className="absolute z-10 mt-1 bg-white border rounded-md shadow-md">
                     <Calendar
                       mode="single"
-                      selected={date}
-                      onSelect={(newDate) => {
-                        if (newDate instanceof Date && !isNaN(newDate.getTime())) {
+                      selected={date || undefined}
+                      onSelect={(newDate: Date | undefined) => {
+                        if (newDate && !isNaN(newDate.getTime())) {
                           setDate(newDate);
-                          updateTaskDetails({ dueDate: newDate });
+                          // Convert Date to ISO string for the API
+                          updateTaskDetails({ DueDate: newDate.toISOString() });
+                        } else if (newDate === undefined) {
+                          setDate(undefined);
+                          updateTaskDetails({ DueDate: undefined });
                         } else {
                           console.error('Invalid date selected:', newDate);
+                          toast({
+                            title: t('ERROR'),
+                            description: t('INVALID_DATE_SELECTED'),
+                            variant: 'destructive',
+                          });
                         }
                       }}
                       initialFocus
@@ -381,7 +671,7 @@ export default function TaskDetailsView({
                         variant="ghost"
                         onClick={() => {
                           setDate(undefined);
-                          updateTaskDetails({ dueDate: null });
+                          updateTaskDetails({ DueDate: undefined });
                         }}
                         className="w-full"
                         size="sm"
@@ -398,7 +688,7 @@ export default function TaskDetailsView({
               <AssigneeSelector
                 availableAssignees={availableAssignees}
                 selectedAssignees={selectedAssignees}
-                onChange={setSelectedAssignees}
+                onChange={handleAssigneeChange}
               />
             </div>
           </div>
@@ -412,10 +702,14 @@ export default function TaskDetailsView({
             />
           </div>
           <div className="mt-6">
-            <Tags availableTags={tags} selectedTags={selectedTags} onChange={setSelectedTags} />
+            <Tags
+              availableTags={tags}
+              selectedTags={selectedTags.map((tag) => (typeof tag === 'string' ? tag : tag.id))}
+              onChange={handleTagChange}
+            />
           </div>
           <div className="mt-6">
-            <AttachmentsSection attachments={attachments} setAttachments={setAttachments} />
+            <AttachmentsSection attachments={attachments} setAttachments={handleAttachmentChange} />
           </div>
           <Separator className="my-6" />
           {!isNewTaskModalOpen && (
@@ -465,12 +759,12 @@ export default function TaskDetailsView({
 
                 {comments.map((comment) => (
                   <EditableComment
-                    key={comment.id}
-                    author={comment.author}
-                    timestamp={comment.timestamp}
-                    initialComment={comment.text}
-                    onEdit={(newText) => handleEditComment(comment.id, newText)}
-                    onDelete={() => handleDeleteComment(comment.id)}
+                    key={comment.ItemId}
+                    author={comment.Author}
+                    timestamp={comment.Timestamp}
+                    initialComment={comment.Content}
+                    onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
+                    onDelete={() => handleDeleteComment(comment.ItemId)}
                   />
                 ))}
               </div>

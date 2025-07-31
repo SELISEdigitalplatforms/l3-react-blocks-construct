@@ -19,22 +19,36 @@ export const priorityColors: Record<TaskPriority, string> = {
 
 export const priorityOptions = [TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH];
 
+export interface TaskComments {
+  ItemId: string;
+  Author: string;
+  Timestamp: string;
+  Content: string;
+}
+
+export interface TaskAttachments {
+  ItemId: string;
+  FileName: string;
+  FileSize: string;
+  FileType: 'pdf' | 'image' | 'other';
+}
+
 export interface TaskItem {
   ItemId: string;
   Title: string;
-  CreatedBy: string;
-  CreatedDate: string;
-  IsDeleted: boolean;
+  CreatedBy?: string;
+  CreatedDate?: string;
+  IsDeleted?: boolean;
   IsCompleted: boolean;
-  Language: string;
+  Language?: string;
   Description?: string;
   Assignee?: string;
-  Attachments?: string[];
-  Comments?: string[];
+  Attachments?: TaskAttachments[];
+  Comments?: TaskComments[];
   DueDate?: string;
   LastUpdatedBy?: string;
   LastUpdatedDate?: string;
-  OrganizationIds: string[];
+  OrganizationIds?: string[];
   Priority?: TaskPriority;
   Section?: string;
   Tags?: string[];
@@ -121,4 +135,35 @@ export interface PaginationParams {
   pageSize: number;
   filter?: Record<string, unknown>;
   sort?: Record<string, 'asc' | 'desc'>;
+}
+
+//Get IAM Users type for REST API
+export interface IamData {
+  itemId: string;
+  createdDate: string;
+  lastUpdatedDate: string;
+  lastLoggedInTime: string;
+  language: string;
+  salutation: string;
+  firstName: string;
+  lastName: string | null;
+  email: string;
+  userName: string;
+  phoneNumber: string | null;
+  roles: string[];
+  permissions: string[];
+  active: boolean;
+  isVarified: boolean;
+  profileImageUrl: string | null;
+  mfaEnabled: boolean;
+}
+export interface UserFilter {
+  email?: string;
+  name?: string;
+}
+
+export interface GetUsersPayload {
+  page: number;
+  pageSize: number;
+  filter?: UserFilter;
 }

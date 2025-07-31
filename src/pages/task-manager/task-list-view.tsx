@@ -50,7 +50,8 @@ import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
 
 export function TaskListView() {
   const { t } = useTranslation();
-  const { tasks, createTask, updateTaskOrder, getFilteredTasks } = useListTasks();
+  const { tasks, createTask, updateTaskOrder, getFilteredTasks, isLoading } = useListTasks();
+
   const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
@@ -143,7 +144,11 @@ export function TaskListView() {
                   <NewTaskRow onAdd={handleAddTask} onCancel={() => setShowNewTaskInput(false)} />
                 )}
 
-                {filteredTasks.length > 0 ? (
+                {isLoading ? (
+                  <div className="flex justify-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                  </div>
+                ) : filteredTasks.length > 0 ? (
                   filteredTasks.map((task) => (
                     <SortableTaskItem
                       handleTaskClick={handleTaskClick}

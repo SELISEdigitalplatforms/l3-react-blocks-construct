@@ -1,5 +1,9 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
-import type { GetSectionsResponse, GetTasksResponse } from '../types/task-manager.types';
+import type {
+  GetSectionsResponse,
+  GetTasksResponse,
+  GetUsersPayload,
+} from '../types/task-manager.types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +31,7 @@ import {
   createTaskSection,
   updateTaskSection,
   deleteTaskSection,
+  getUsers,
 } from '../services/task-manager.service';
 
 interface TaskSectionsQueryParams {
@@ -277,5 +282,26 @@ export const useDeleteTaskSection = () => {
     onError: (error: Error) => {
       handleError(error);
     },
+  });
+};
+
+/**
+ * Custom hook of Rest API to fetch users from the API with pagination and optional filters.
+ *
+ * @param {GetUsersPayload} payload - The payload for the query containing pagination and filter options.
+ * @returns {UseQueryResult<GetUsersResponse>} - The result of the query, including the fetched user data and loading state.
+ *
+ * @example
+ * const { data, isLoading } = useGetUsersQuery({ page: 1, pageSize: 10 });
+ */
+
+export const useGetUsersQuery = (payload: GetUsersPayload) => {
+  return useGlobalQuery({
+    queryKey: ['getUsers', payload.page, payload.pageSize, payload.filter],
+    queryFn: () => getUsers(payload),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    placeholderData: (previousData) => previousData,
   });
 };

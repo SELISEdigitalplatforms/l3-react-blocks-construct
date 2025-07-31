@@ -54,12 +54,12 @@ interface Tag {
 }
 
 interface TagsSelectorProps {
-  readonly availableTags: Tag[];
-  readonly selectedTags: string[];
-  readonly onChange: (selectedTagIds: string[]) => void;
+  availableTags: Tag[];
+  selectedTags: string[];
+  onChange: (selectedTagIds: string[]) => void;
 }
 
-export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProps) {
+export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSelectorProps>) {
   const { t } = useTranslation();
   const [selectedValues, setSelectedValues] = React.useState<Set<string>>(new Set(selectedTags));
 

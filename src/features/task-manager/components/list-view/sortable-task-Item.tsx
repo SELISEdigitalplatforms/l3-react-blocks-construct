@@ -103,10 +103,11 @@ export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTas
         <StatusCircle isCompleted={isCompleted} />
       </div>
 
-      <div className="w-64 pl-2 mr-4">
+      <div className="w-72 pl-2 mr-4">
         <button
           onClick={() => handleTaskClick(taskId)}
-          className="text-sm text-high-emphasis cursor-pointer hover:underline truncate"
+          className="w-full text-left text-sm text-high-emphasis cursor-pointer hover:underline truncate"
+          title={taskTitle}
         >
           {taskTitle}
         </button>
@@ -117,14 +118,14 @@ export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTas
       </div>
 
       {priority && (
-        <div className="w-24 flex-shrink-0 flex items-center">
+        <div className="w-32 flex-shrink-0 flex items-center">
           <TaskManagerBadge className="px-2 py-0.5" priority={priority}>
             {priority}
           </TaskManagerBadge>
         </div>
       )}
 
-      <div className="w-28 flex-shrink-0">
+      <div className="w-32 flex-shrink-0">
         {dueDate && (
           <span className="text-sm text-high-emphasis">
             {new Date(dueDate).toLocaleDateString('en-GB', {
@@ -167,7 +168,7 @@ export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTas
             columns={[]}
             onToggleComplete={() => toggleTaskCompletion(!isCompleted)}
             onDelete={removeTask}
-            onMoveToColumn={(title: string) => updateTaskDetails({ section: title })}
+            onMoveToColumn={(title: string) => updateTaskDetails({ Section: title })}
           />
         </button>
       </div>

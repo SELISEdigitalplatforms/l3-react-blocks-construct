@@ -26,14 +26,14 @@ export function TableHeader() {
       <div className="flex items-center h-14 font-medium text-sm text-gray-500">
         <div className="w-12" />
         <div className="w-6" />
-        <div className="w-64 pl-2 mr-4 text-high-emphasis text-sm font-semibold">{t('TITLE')}</div>
-        <div className="w-24 flex-shrink-0 text-high-emphasis text-sm font-semibold">
+        <div className="w-72 pl-2 mr-4 text-high-emphasis text-sm font-semibold">{t('TITLE')}</div>
+        <div className="w-32 flex-shrink-0 text-high-emphasis text-sm font-semibold">
           {t('LIST')}
         </div>
-        <div className="w-24 flex-shrink-0 text-high-emphasis text-sm font-semibold">
+        <div className="w-32 flex-shrink-0 text-high-emphasis text-sm font-semibold">
           {t('PRIORITY')}
         </div>
-        <div className="w-28 flex-shrink-0 text-high-emphasis text-sm font-semibold">
+        <div className="w-32 flex-shrink-0 text-high-emphasis text-sm font-semibold">
           {t('DUE_DATE')}
         </div>
         <div className="w-32 flex-shrink-0 text-high-emphasis text-sm font-semibold">

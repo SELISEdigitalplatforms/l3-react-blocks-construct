@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TaskItem } from '../types/task-manager.types';
+import { useGetTasks } from './use-task-manager';
 
 /**
  * useListTasks Hook
@@ -33,10 +34,18 @@ import { TaskItem } from '../types/task-manager.types';
  */
 
 export function useListTasks() {
-  // Local state for tasks (empty for now, ready for API integration)
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const { data: tasksData, isLoading } = useGetTasks({
+    pageNo: 1,
+    pageSize: 100,
+  });
 
-  // Create a new task
+  useEffect(() => {
+    if (tasksData?.TaskManagerItems?.items) {
+      setTasks(tasksData.TaskManagerItems.items);
+    }
+  }, [tasksData]);
+
   const createTask = (title: string, status: string) => {
     if (title.trim()) {
       const newTask: TaskItem = {
@@ -45,10 +54,7 @@ export function useListTasks() {
         Section: status,
         IsCompleted: false,
         IsDeleted: false,
-        CreatedBy: 'current-user', // TODO: Replace with actual user
         CreatedDate: new Date().toISOString(),
-        Language: 'en', // Default language
-        OrganizationIds: [], // Default empty array
       };
       setTasks((prev) => [newTask, ...prev]);
       return newTask.ItemId;
@@ -56,21 +62,16 @@ export function useListTasks() {
     return null;
   };
 
-  // Remove a task
   const removeTask = (id: string) => {
     setTasks((prev) => prev.filter((task) => task.ItemId !== id));
   };
 
-  // Toggle task completion
   const toggleTaskCompletion = (id: string, isCompleted: boolean) => {
-    setTasks((prev) => 
-      prev.map((task) => 
-        task.ItemId === id ? { ...task, IsCompleted: isCompleted } : task
-      )
+    setTasks((prev) =>
+      prev.map((task) => (task.ItemId === id ? { ...task, IsCompleted: isCompleted } : task))
     );
   };
 
-  // Update task order
   const updateTaskOrder = (activeIndex: number, overIndex: number) => {
     setTasks((prev) => {
       const updated = [...prev];
@@ -80,31 +81,25 @@ export function useListTasks() {
     });
   };
 
-  // Get filtered tasks
   const getFilteredTasks = (statusFilter: 'todo' | 'inprogress' | 'done' | null) => {
     return statusFilter ? tasks.filter((task) => task.Section === statusFilter) : tasks;
   };
 
-  // Change task status
   const changeTaskStatus = (taskId: string, newStatus: 'todo' | 'inprogress' | 'done') => {
     setTasks((prev) =>
-      prev.map((task) => 
-        task.ItemId === taskId ? { ...task, Section: newStatus } : task
-      )
+      prev.map((task) => (task.ItemId === taskId ? { ...task, Section: newStatus } : task))
     );
   };
 
-  // Update task properties
   const updateTaskProperties = (taskId: string, updates: Partial<TaskItem>) => {
-    setTasks((prev) => 
-      prev.map((task) => 
-        task.ItemId === taskId ? { ...task, ...updates } : task
-      )
+    setTasks((prev) =>
+      prev.map((task) => (task.ItemId === taskId ? { ...task, ...updates } : task))
     );
   };
 
   return {
     tasks,
+    isLoading,
     createTask,
     removeTask,
     toggleTaskCompletion,

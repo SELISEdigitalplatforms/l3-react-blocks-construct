@@ -102,7 +102,7 @@ export function TaskCard({ task, index, handleTaskClick }: Readonly<ITaskCardPro
             <div className="mt-0.5 flex-shrink-0">
               <button
                 onClick={(e) => {
-                  updateTaskDetails({ isCompleted: !task.IsCompleted });
+                  updateTaskDetails({ IsCompleted: !task.IsCompleted });
                   handleInteractiveElementClick(e);
                 }}
                 aria-label={task.IsCompleted ? 'Mark task as incomplete' : 'Mark task as complete'}
@@ -128,11 +128,11 @@ export function TaskCard({ task, index, handleTaskClick }: Readonly<ITaskCardPro
             <TaskManagerDropdownMenu
               task={task}
               columns={[]} // TODO: Pass actual columns if needed
-              onToggleComplete={() => updateTaskDetails({ isCompleted: !task.IsCompleted })}
+              onToggleComplete={() => updateTaskDetails({ IsCompleted: !task.IsCompleted })}
               onDelete={() => {
                 console.warn('Delete functionality not implemented');
               }}
-              onMoveToColumn={(title) => updateTaskDetails({ section: title })}
+              onMoveToColumn={(title) => updateTaskDetails({ Section: title })}
             />
           </div>
         </div>

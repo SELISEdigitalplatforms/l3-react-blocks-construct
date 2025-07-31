@@ -9,7 +9,18 @@ import type {
   GetTasksResponse,
   GetSectionsResponse,
   UpdateTaskManagerSectionResponse,
+  IamData,
+  GetUsersPayload,
 } from '../types/task-manager.types';
+import {
+  INSERT_TASK_MANAGER_ITEM_MUTATION,
+  UPDATE_TASK_MANAGER_ITEM_MUTATION,
+  DELETE_TASK_MANAGER_ITEM_MUTATION,
+  INSERT_TASK_MANAGER_SECTION_MUTATION,
+  UPDATE_TASK_MANAGER_SECTION_MUTATION,
+  DELETE_TASK_MANAGER_SECTION_MUTATION,
+} from '../graphql/mutations';
+import { clients } from 'lib/https';
 
 export interface BaseMutationResponse {
   itemId: string;
@@ -40,15 +51,6 @@ export interface UpdateTaskSectionResponse {
 export interface DeleteTaskSectionResponse {
   deleteTaskManagerSection: BaseMutationResponse;
 }
-
-import {
-  INSERT_TASK_MANAGER_ITEM_MUTATION,
-  UPDATE_TASK_MANAGER_ITEM_MUTATION,
-  DELETE_TASK_MANAGER_ITEM_MUTATION,
-  INSERT_TASK_MANAGER_SECTION_MUTATION,
-  UPDATE_TASK_MANAGER_SECTION_MUTATION,
-  DELETE_TASK_MANAGER_SECTION_MUTATION,
-} from '../graphql/mutations';
 
 /**
  * Task Manager Service
@@ -223,16 +225,16 @@ export const createTaskItem = async (
 
     // The response might be the data directly or have a data property
     const responseData = (response as any).data || response;
-    
+
     if (!responseData) {
       throw new Error('No response data received from server');
     }
-    
+
     // Check if we have the expected response structure
     if (!responseData.insertTaskManagerItem?.itemId) {
       throw new Error('No task ID in response');
     }
-    
+
     return responseData;
   } catch (error) {
     console.error('Error in createTaskItem:', error);
@@ -305,7 +307,7 @@ export const createTaskSection = async (
     }
 
     return {
-      insertTaskManagerSection: responseData.insertTaskManagerSection
+      insertTaskManagerSection: responseData.insertTaskManagerSection,
     };
   } catch (error) {
     console.error('Error in createTaskSection:', error);
@@ -389,4 +391,20 @@ export const deleteTaskSection = async (
   });
 
   return (response as any).data as DeleteTaskSectionResponse;
+};
+
+export const getUsers = (payload: GetUsersPayload) => {
+  const requestBody = {
+    page: payload.page,
+    pageSize: payload.pageSize,
+    filter: {
+      email: payload.filter?.email ?? '',
+      name: payload.filter?.name ?? '',
+    },
+  };
+
+  return clients.post<{
+    data: IamData[];
+    totalCount: number;
+  }>('/iam/v1/User/GetUsers', JSON.stringify(requestBody));
 };

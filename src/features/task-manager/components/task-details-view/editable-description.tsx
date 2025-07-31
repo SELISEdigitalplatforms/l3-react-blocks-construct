@@ -85,7 +85,7 @@ export function EditableDescription({
     }
 
     if (content && task) {
-      updateTaskDetails({ description: content });
+      updateTaskDetails({ Description: content });
     }
 
     setEditorComponent(null);
@@ -179,7 +179,6 @@ export function EditableDescription({
     }
   }, [isEditing, forceRender]);
 
-  // Extract the editor content rendering into a separate function
   const renderEditorContent = () => {
     if (!isMounted || !editorComponent) {
       return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;
