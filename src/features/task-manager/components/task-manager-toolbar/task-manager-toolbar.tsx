@@ -58,11 +58,8 @@ export default function TaskManagerToolbar({
   const isMobile = useIsMobile();
   const { t } = useTranslation();
 
-  // Local state for search query
   const [searchQuery, setSearchQuery] = useState('');
   const [openSheet, setOpenSheet] = useState(false);
-
-  // Search query is now handled directly with debounced callback in parent
 
   useEffect(() => {
     if (openSheet) {
@@ -76,7 +73,6 @@ export default function TaskManagerToolbar({
     };
   }, [openSheet]);
 
-  // Call onSearch callback when search query changes
   useEffect(() => {
     if (onSearch && typeof onSearch === 'function') {
       const query = searchQuery.trim().toLowerCase();

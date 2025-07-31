@@ -1,5 +1,5 @@
 import { Card } from 'components/ui/card';
-import { TaskItem, TaskPriority } from '../../types/task-manager.types';
+import { TaskItem, priorityStyle } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 
@@ -44,10 +44,7 @@ export function TaskDragOverlay({ activeTask }: Readonly<TaskDragOverlayProps>) 
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {activeTask.Priority && (
-          <TaskManagerBadge
-            priority={activeTask.Priority || TaskPriority.MEDIUM}
-            className="px-2 py-0.5"
-          >
+          <TaskManagerBadge className={`px-2 py-0.5 ${priorityStyle[activeTask.Priority]}`}>
             {activeTask.Priority}
           </TaskManagerBadge>
         )}

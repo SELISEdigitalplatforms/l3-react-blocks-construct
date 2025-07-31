@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar } from 'lucide-react';
 import { Card } from 'components/ui/card';
-import { TaskItem, TaskPriority, TaskSection } from '../../types/task-manager.types';
+import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
@@ -143,8 +143,7 @@ export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITa
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {task.Priority && (
             <TaskManagerBadge
-              className="px-2 py-0.5"
-              priority={task.Priority ?? TaskPriority.MEDIUM}
+              className={`px-2 py-0.5 ${priorityStyle[task.Priority]}`}
               onClick={handleInteractiveElementClick}
               asButton={false}
             >

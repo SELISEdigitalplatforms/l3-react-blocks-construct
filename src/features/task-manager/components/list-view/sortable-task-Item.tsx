@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
-import { TaskItem, TaskSection } from '../../types/task-manager.types';
+import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
 import { useTaskDetails } from '../../hooks/use-task-details';
@@ -110,7 +110,7 @@ export function SortableTaskItem({
 
       {task.Priority && (
         <div className="w-32 flex-shrink-0 flex items-center">
-          <TaskManagerBadge className="px-2 py-0.5" priority={task.Priority}>
+          <TaskManagerBadge className={`px-2 py-0.5 ${priorityStyle[task.Priority]}`}>
             {task.Priority}
           </TaskManagerBadge>
         </div>

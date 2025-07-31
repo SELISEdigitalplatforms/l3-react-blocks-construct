@@ -5,7 +5,6 @@ import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager
 import { useToast } from 'hooks/use-toast';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { Skeleton } from 'components/ui/skeleton';
-import * as Dialog from '@radix-ui/react-dialog';
 import {
   TaskSection,
   TaskSectionWithTasks,
@@ -16,6 +15,7 @@ import { AddColumnDialog } from 'features/task-manager/components/card-view/add-
 import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
 import { AddTaskDialog } from 'features/task-manager/components/card-view/add-task-dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
+import { Dialog } from 'components/ui/dialog';
 
 /**
  * TaskCardView Component
@@ -84,7 +84,6 @@ export function TaskCardView({
     sensors,
   } = useCardTasks();
 
-  // Handle adding a new task to a column
   const handleAddTask = useCallback(
     async (columnId: string, content: string) => {
       try {
@@ -97,7 +96,7 @@ export function TaskCardView({
           description: 'Failed to add task. Please try again.',
         });
         console.error('Error adding task:', error);
-        throw error; // Re-throw to be handled by the TaskColumn component
+        throw error;
       }
     },
     [addTaskToColumn, toast]
@@ -107,7 +106,6 @@ export function TaskCardView({
     if (!sectionsData?.TaskManagerSections?.items) return [];
 
     return sectionsData.TaskManagerSections.items.map((section): TaskSectionWithTasks => {
-      // Filter tasks based on search query if provided
       let tasks: TaskItem[] = [];
       const sectionTasks = section.tasks || [];
 
@@ -223,7 +221,7 @@ export function TaskCardView({
               const columnTasks = columns.find((col) => col.ItemId === column.ItemId)?.tasks || [];
 
               const filteredTasks = columnTasks.filter(
-                task => task.Title?.toLowerCase().includes(searchQuery.toLowerCase()) // Apply the filtering
+                (task) => task.Title?.toLowerCase().includes(searchQuery.toLowerCase()) // Apply the filtering
               );
 
               return (
@@ -261,17 +259,12 @@ export function TaskCardView({
         }}
       />
 
-      <Dialog.Root open={isNewTaskModalOpen} onOpenChange={setNewTaskModalOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg">
-            <TaskDetailsView
-              onClose={() => setNewTaskModalOpen(false)}
-              isNewTaskModalOpen={isNewTaskModalOpen}
-            />
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <Dialog open={isNewTaskModalOpen} onOpenChange={setNewTaskModalOpen}>
+        <TaskDetailsView
+          onClose={() => setNewTaskModalOpen(false)}
+          isNewTaskModalOpen={isNewTaskModalOpen}
+        />
+      </Dialog>
     </div>
   );
 }

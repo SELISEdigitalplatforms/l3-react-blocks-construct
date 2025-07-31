@@ -1,6 +1,5 @@
 import { Badge } from 'components/ui/badge';
 import { cn } from 'lib/utils';
-import { TaskPriority } from '../../types/task-manager.types';
 
 /**
  * TaskManagerBadge Component
@@ -37,7 +36,6 @@ import { TaskPriority } from '../../types/task-manager.types';
  */
 
 interface TaskManagerBadgeProps {
-  priority?: TaskPriority | 'normal';
   withBorder?: boolean;
   children?: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;
@@ -46,33 +44,18 @@ interface TaskManagerBadgeProps {
 }
 
 export const TaskManagerBadge: React.FC<TaskManagerBadgeProps> = ({
-  priority = 'normal',
   withBorder = false,
   className,
   children,
   onClick,
   asButton = false,
 }) => {
-  const getPriorityStyles = () => {
-    switch (priority) {
-      case 'High':
-        return 'bg-error-background text-error border-error';
-      case 'Medium':
-        return 'bg-warning-background text-[#A66200] border-[#A66200]';
-      case 'Low':
-        return 'bg-secondary-50 text-secondary border-secondary';
-      default:
-        return 'bg-surface text-high-emphasis border-low-emphasis';
-    }
-  };
-
   const handleClick = (e: React.MouseEvent) => {
     onClick?.(e);
   };
 
   const badgeClasses = cn(
-    'text-xs font-normal rounded outline-none focus:border-transparent border-none',
-    getPriorityStyles(),
+    'text-xs font-normal rounded outline-none focus:border-transparent border-none bg-surface text-high-emphasis border-low-emphasis',
     withBorder && 'border',
     className
   );

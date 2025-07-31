@@ -11,13 +11,11 @@ export enum TaskPriority {
   HIGH = 'High',
 }
 
-export const priorityColors: Record<TaskPriority, string> = {
-  [TaskPriority.LOW]: 'info',
-  [TaskPriority.MEDIUM]: 'warning',
-  [TaskPriority.HIGH]: 'error',
+export const priorityStyle: Record<TaskPriority, string> = {
+  [TaskPriority.HIGH]: 'bg-error-background text-error border-error',
+  [TaskPriority.MEDIUM]: 'bg-warning-background text-warning border-warning',
+  [TaskPriority.LOW]: 'bg-secondary-50 text-secondary border-secondary',
 };
-
-export const priorityOptions = [TaskPriority.LOW, TaskPriority.MEDIUM, TaskPriority.HIGH];
 
 export interface TaskComments {
   ItemId: string;
