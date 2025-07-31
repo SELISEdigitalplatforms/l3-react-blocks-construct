@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar } from 'lucide-react';
 import { Card } from 'components/ui/card';
-import { TaskItem } from '../../types/task-manager.types';
+import { TaskItem, TaskPriority, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
@@ -10,6 +10,7 @@ import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 interface ITaskCardProps {
   task: TaskItem;
   index: number;
+  columns: TaskSection[];
   handleTaskClick: (taskId: string) => void;
 }
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
@@ -33,22 +34,24 @@ import { useCallback } from 'react';
  * Props:
  * @param {TaskItem} task - The task object to display
  * @param {number} index - The index of the task in the list
+ * @param {TaskSection[]} columns - The list of columns for moving tasks
  * @param {(id: string) => void} handleTaskClick - Callback triggered when the task title is clicked
  *
  * @returns {JSX.Element} The task card component
  *
  * @example
  * // Basic usage
- * <TaskCard task={task} index={0} handleTaskClick={(id) => console.log('Task clicked:', id)} />
+ * <TaskCard task={task} index={0} columns={columns} handleTaskClick={(id) => console.log('Task clicked:', id)} />
  */
 
 interface ITaskCardProps {
   task: TaskItem;
   index: number;
+  columns: TaskSection[];
   handleTaskClick: (id: string) => void;
 }
 
-export function TaskCard({ task, index, handleTaskClick }: Readonly<ITaskCardProps>) {
+export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITaskCardProps>) {
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -127,7 +130,7 @@ export function TaskCard({ task, index, handleTaskClick }: Readonly<ITaskCardPro
           >
             <TaskManagerDropdownMenu
               task={task}
-              columns={[]} // TODO: Pass actual columns if needed
+              columns={columns.map((column) => ({ id: column.ItemId, title: column.Title }))}
               onToggleComplete={() => updateTaskDetails({ IsCompleted: !task.IsCompleted })}
               onDelete={() => {
                 console.warn('Delete functionality not implemented');
@@ -141,7 +144,7 @@ export function TaskCard({ task, index, handleTaskClick }: Readonly<ITaskCardPro
           {task.Priority && (
             <TaskManagerBadge
               className="px-2 py-0.5"
-              priority={task.Priority || 'normal'} // Default to 'normal' if Priority is undefined
+              priority={task.Priority ?? TaskPriority.MEDIUM}
               onClick={handleInteractiveElementClick}
               asButton={false}
             >

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import {
@@ -22,6 +22,7 @@ import {
 import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
 import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
+import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
 
 /**
  * TaskListView Component
@@ -48,16 +49,25 @@ import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
  * <TaskListView taskService={new TaskService()} />
  */
 
-export function TaskListView() {
+export function TaskListView({ searchQuery = '' }: { searchQuery?: string }) {
   const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, getFilteredTasks, isLoading } = useListTasks();
+
+  // Get the task sections/columns
+  const { data: sectionsData } = useGetTaskSections({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const columns = useMemo(() => {
+    return sectionsData?.TaskManagerSections?.items || [];
+  }, [sectionsData]);
 
   const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
-
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -119,7 +129,24 @@ export function TaskListView() {
     setActiveTask(null);
   };
 
-  const filteredTasks = getFilteredTasks(statusFilter);
+  // Apply both status filter and search filter
+  const filteredTasks = useMemo(() => {
+    const tasks = getFilteredTasks(statusFilter);
+
+    if (!searchQuery) return tasks;
+
+    const query = searchQuery.toLowerCase();
+    return tasks.filter(
+      (task) =>
+        task.Title?.toLowerCase().includes(query) ||
+        false ||
+        task.Description?.toLowerCase().includes(query) ||
+        false ||
+        task.Tags?.some((tag) => tag.toLowerCase().includes(query)) ||
+        false
+    );
+  }, [getFilteredTasks, statusFilter, searchQuery]);
+
   const taskIds = filteredTasks.map((task) => `task-${task.ItemId}`);
 
   const handleTaskClick = useCallback((taskId: string) => {
@@ -154,6 +181,7 @@ export function TaskListView() {
                       handleTaskClick={handleTaskClick}
                       key={task.ItemId}
                       task={task}
+                      columns={columns}
                     />
                   ))
                 ) : (

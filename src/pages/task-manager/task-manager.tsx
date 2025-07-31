@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import TaskManagerToolbar from 'features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
+import TaskManagerToolbar, {
+  ViewMode,
+} from 'features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
 import TaskListView from './task-list-view';
 import TaskCardView from './task-card-view';
 
@@ -24,31 +26,39 @@ import TaskCardView from './task-card-view';
  */
 
 export default function TaskManager() {
-  const [viewMode, setViewMode] = useState('board');
-
+  const [viewMode, setViewMode] = useState<ViewMode>('board');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
 
   const onOpen = () => {
     setIsNewTaskModalOpen(true);
   };
 
-  const handleViewMode = (view: string) => {
-    setViewMode(view === 'list' ? 'list' : 'board');
+  const handleViewMode = (view: ViewMode) => {
+    setViewMode(view);
   };
 
   return (
     <div className="flex w-full flex-col">
       <div className="mb-4 whitespace-nowrap md:mb-8">
-        <TaskManagerToolbar viewMode={viewMode} handleViewMode={handleViewMode} onOpen={onOpen} />
+        <TaskManagerToolbar
+          viewMode={viewMode}
+          handleViewMode={handleViewMode}
+          onOpen={onOpen}
+          onSearch={(query) => {
+            setSearchQuery(query);
+          }}
+        />
       </div>
 
       {viewMode === 'board' && (
         <TaskCardView
           isNewTaskModalOpen={isNewTaskModalOpen}
           setNewTaskModalOpen={setIsNewTaskModalOpen}
+          searchQuery={searchQuery}
         />
       )}
-      {viewMode === 'list' && <TaskListView />}
+      {viewMode === 'list' && <TaskListView searchQuery={searchQuery} />}
     </div>
   );
 }

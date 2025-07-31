@@ -57,6 +57,7 @@ import { TaskSection } from '../../types/task-manager.types';
 export interface ITaskColumnProps {
   column: TaskSection;
   tasks: any[];
+  sections: TaskSection[];
   setActiveColumn: (columnId: string) => void;
   onAddTask: (columnId: string, taskTitle: string) => Promise<string | null>;
   onRenameColumn: (columnId: string, newTitle: string) => void;
@@ -68,6 +69,7 @@ export interface ITaskColumnProps {
 export function TaskColumn({
   column,
   tasks,
+  sections,
   onAddTask,
   onRenameColumn,
   onDeleteColumn,
@@ -206,8 +208,16 @@ export function TaskColumn({
           <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
             <div className="space-y-3">
               {tasks.map((task, index) => (
-                <div key={`task-${task.ItemId || task.id || `temp-${index}`}`} className="task-card-container">
-                  <TaskCard handleTaskClick={handleTaskClick} task={task} index={index} />
+                <div
+                  key={`task-${task.ItemId || task.id || `temp-${index}`}`}
+                  className="task-card-container"
+                >
+                  <TaskCard
+                    handleTaskClick={handleTaskClick}
+                    task={task}
+                    index={index}
+                    columns={sections}
+                  />
                 </div>
               ))}
             </div>

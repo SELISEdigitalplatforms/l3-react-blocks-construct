@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
-import { TaskItem } from '../../types/task-manager.types';
+import { TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
 import { useTaskDetails } from '../../hooks/use-task-details';
@@ -35,47 +35,38 @@ import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdow
 
 interface SortableTaskItemProps {
   task: TaskItem;
+  columns: TaskSection[];
   handleTaskClick: (id: string) => void;
 }
 
-export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTaskItemProps>) {
-  const {
-    ItemId: taskId,
-    Title: taskTitle,
-    IsCompleted: isCompleted,
-    Priority: priority,
-    DueDate: dueDate,
-    Tags: tags = [],
-    Assignee: assignee,
-    Comments: comments = [],
-    Attachments: attachments = [],
-    Section: taskSection = '',
-  } = task;
-
-  const commentsCount = Array.isArray(comments) ? comments.length : 0;
-  const attachmentsCount = Array.isArray(attachments) ? attachments.length : 0;
-  const assignees = assignee ? [assignee] : [];
+export function SortableTaskItem({
+  task,
+  columns,
+  handleTaskClick,
+}: Readonly<SortableTaskItemProps>) {
+  const commentsCount = Array.isArray(task?.Comments) ? task.Comments.length : 0;
+  const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
+  const assignees = task?.Assignee ? [task.Assignee] : [];
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: `task-${taskId}`,
+    id: `task-${task.ItemId}`,
     data: {
       task: {
-        id: taskId,
-        content: taskTitle,
-        isCompleted,
-        priority,
-        dueDate,
-        tags,
+        id: task.ItemId,
+        content: task.Title,
+        isCompleted: task.IsCompleted,
+        priority: task.Priority,
+        dueDate: task.DueDate,
+        tags: task.Tags,
         comments: commentsCount,
         attachments: attachmentsCount,
-        assignees,
-        status: taskSection,
+        assignees: assignees,
+        status: task.Section,
       },
     },
   });
 
-  // Remove unused columns variable to fix lint warning
-  const { removeTask, toggleTaskCompletion, updateTaskDetails } = useTaskDetails(taskId);
+  const { removeTask, toggleTaskCompletion, updateTaskDetails } = useTaskDetails(task.ItemId);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -100,35 +91,35 @@ export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTas
       </div>
 
       <div className="w-6 flex-shrink-0 flex items-center justify-center">
-        <StatusCircle isCompleted={isCompleted} />
+        <StatusCircle isCompleted={task.IsCompleted} />
       </div>
 
       <div className="w-72 pl-2 mr-4">
         <button
-          onClick={() => handleTaskClick(taskId)}
+          onClick={() => handleTaskClick(task.ItemId)}
           className="w-full text-left text-sm text-high-emphasis cursor-pointer hover:underline truncate"
-          title={taskTitle}
+          title={task.Title}
         >
-          {taskTitle}
+          {task.Title}
         </button>
       </div>
 
       <div className="w-32 flex-shrink-0">
-        <span className="text-sm text-high-emphasis">{taskSection}</span>
+        <span className="text-sm text-high-emphasis">{task.Section}</span>
       </div>
 
-      {priority && (
+      {task.Priority && (
         <div className="w-32 flex-shrink-0 flex items-center">
-          <TaskManagerBadge className="px-2 py-0.5" priority={priority}>
-            {priority}
+          <TaskManagerBadge className="px-2 py-0.5" priority={task.Priority}>
+            {task.Priority}
           </TaskManagerBadge>
         </div>
       )}
 
       <div className="w-32 flex-shrink-0">
-        {dueDate && (
+        {task.DueDate && (
           <span className="text-sm text-high-emphasis">
-            {new Date(dueDate).toLocaleDateString('en-GB', {
+            {new Date(task.DueDate).toLocaleDateString('en-GB', {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',
@@ -142,8 +133,8 @@ export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTas
       </div>
 
       <div className="w-32 flex-shrink-0">
-        {tags && tags.length > 0 && (
-          <TaskManagerBadge className="px-2 py-0.5">{tags[0]}</TaskManagerBadge>
+        {task.Tags && task.Tags.length > 0 && (
+          <TaskManagerBadge className="px-2 py-0.5">{task.Tags[0]}</TaskManagerBadge>
         )}
       </div>
 
@@ -164,9 +155,9 @@ export function SortableTaskItem({ task, handleTaskClick }: Readonly<SortableTas
 
         <button className="p-4 text-medium-emphasis hover:text-high-emphasis">
           <TaskManagerDropdownMenu
-            task={task as TaskItem}
-            columns={[]}
-            onToggleComplete={() => toggleTaskCompletion(!isCompleted)}
+            task={task}
+            columns={columns.map((column) => ({ id: column.ItemId, title: column.Title }))}
+            onToggleComplete={() => toggleTaskCompletion(!task.IsCompleted)}
             onDelete={removeTask}
             onMoveToColumn={(title: string) => updateTaskDetails({ Section: title })}
           />

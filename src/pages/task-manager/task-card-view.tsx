@@ -6,7 +6,11 @@ import { useToast } from 'hooks/use-toast';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { Skeleton } from 'components/ui/skeleton';
 import * as Dialog from '@radix-ui/react-dialog';
-import type { TaskSection } from 'features/task-manager/types/task-manager.types';
+import {
+  TaskSection,
+  TaskSectionWithTasks,
+  TaskItem,
+} from 'features/task-manager/types/task-manager.types';
 import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
 import { AddColumnDialog } from 'features/task-manager/components/card-view/add-column-dialog';
 import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
@@ -48,11 +52,13 @@ import TaskDetailsView from 'features/task-manager/components/task-details-view/
 interface TaskCardViewProps {
   isNewTaskModalOpen?: boolean;
   setNewTaskModalOpen: (isOpen: boolean) => void;
+  searchQuery?: string;
 }
 
 export function TaskCardView({
   isNewTaskModalOpen,
   setNewTaskModalOpen,
+  searchQuery = '',
 }: Readonly<TaskCardViewProps>) {
   const { touchEnabled } = useDeviceCapabilities();
 
@@ -97,25 +103,45 @@ export function TaskCardView({
     [addTaskToColumn, toast]
   );
 
-  const apiColumns = useMemo(() => {
+  const apiColumns = useMemo<TaskSectionWithTasks[]>(() => {
     if (!sectionsData?.TaskManagerSections?.items) return [];
 
-    return sectionsData.TaskManagerSections.items.map((section) => ({
-      ...section,
-      IsDeleted: section.IsDeleted || false,
-      Language: section.Language || 'en',
-      LastUpdatedBy: section.LastUpdatedBy,
-      LastUpdatedDate: section.LastUpdatedDate,
-      OrganizationIds: section.OrganizationIds || [],
-      Tags: section.Tags || [],
-      tasks: [], // Tasks will be managed locally
-    }));
-  }, [sectionsData]);
+    return sectionsData.TaskManagerSections.items.map((section): TaskSectionWithTasks => {
+      // Filter tasks based on search query if provided
+      let tasks: TaskItem[] = [];
+      const sectionTasks = section.tasks || [];
+
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        tasks = sectionTasks.filter(
+          (task) =>
+            task.Title?.toLowerCase().includes(query) ||
+            false ||
+            task.Description?.toLowerCase().includes(query) ||
+            false ||
+            task.Tags?.some((tag: string) => tag.toLowerCase().includes(query)) ||
+            false
+        );
+      } else {
+        tasks = [...sectionTasks];
+      }
+
+      return {
+        ...section,
+        IsDeleted: section.IsDeleted || false,
+        Language: section.Language || 'en',
+        LastUpdatedBy: section.LastUpdatedBy,
+        LastUpdatedDate: section.LastUpdatedDate,
+        OrganizationIds: section.OrganizationIds || [],
+        Tags: section.Tags || [],
+        tasks: tasks,
+      };
+    });
+  }, [sectionsData, searchQuery]);
 
   const handleAddColumn = useCallback(
     async (title: string) => {
       try {
-        // Call the addColumn function from useCardTasks which handles both API and local state
         const newSectionId = await addColumn(title);
 
         if (!newSectionId) {
@@ -194,14 +220,18 @@ export function TaskCardView({
         >
           <div className="flex space-x-4 min-h-full">
             {apiColumns.map((column: TaskSection) => {
-              // Get tasks for this specific column from the local state
-              const columnTasks = columns.find(col => col.ItemId === column.ItemId)?.tasks || [];
-              
+              const columnTasks = columns.find((col) => col.ItemId === column.ItemId)?.tasks || [];
+
+              const filteredTasks = columnTasks.filter(
+                task => task.Title?.toLowerCase().includes(searchQuery.toLowerCase()) // Apply the filtering
+              );
+
               return (
                 <TaskColumn
                   key={column.ItemId}
                   column={column}
-                  tasks={columnTasks}
+                  tasks={filteredTasks}
+                  sections={apiColumns}
                   setActiveColumn={setActiveColumn}
                   onAddTask={handleAddTask}
                   onRenameColumn={(columnId, newTitle) => renameColumn(columnId, newTitle)}
@@ -226,7 +256,6 @@ export function TaskCardView({
           try {
             await handleAddTask(columnId, content);
           } catch (error) {
-            // Error is already handled by handleAddTask
             console.error('Error in AddTaskDialog:', error);
           }
         }}

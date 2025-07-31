@@ -65,6 +65,11 @@ export interface TaskSection {
   LastUpdatedDate?: string;
   OrganizationIds: string[];
   Tags?: string[];
+  tasks?: TaskItem[];
+}
+
+export interface TaskSectionWithTasks extends TaskSection {
+  tasks: TaskItem[];
 }
 
 export interface GetTasksResponse {
