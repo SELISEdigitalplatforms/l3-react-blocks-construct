@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from 'components/ui/tooltip';
 import { Skeleton } from 'components/ui/skeleton';
 import { Button } from 'components/ui/button';
 import { UpdatePassword } from '../modals/update-password/update-password';
+import { useGetMfaTemplate } from '../../hooks/use-mfa';
 
 export const SecurityCard: React.FC<{
   userInfo: any;
@@ -35,8 +36,13 @@ export const SecurityCard: React.FC<{
   isChangePasswordModalOpen,
   setIsChangePasswordModalOpen,
 }) => {
+  const { data } = useGetMfaTemplate();
   const [mfaId, setMfaId] = useState<string>('');
-  const mfaButtonText = userInfo?.mfaEnabled || userInfo?.isMfaVerified ? t('MANAGE') : t('ENABLE');
+  const mfaButtonText =
+    (userInfo?.mfaEnabled || userInfo?.isMfaVerified) &&
+    data?.userMfaType.includes(userInfo?.userMfaType)
+      ? t('MANAGE')
+      : t('ENABLE');
 
   const getTooltipText = () => {
     if (isDemoAccount) return t('NOT_AVAILABLE_DEMO_ACCOUNTS');
@@ -99,36 +105,39 @@ export const SecurityCard: React.FC<{
         <h1 className="text-xl text-high-emphasis font-semibold">{t('ACCOUNT_SECURITY')}</h1>
         <Separator orientation="horizontal" />
         <div className="flex flex-col py-2 gap-10">
-          <div className={securityCardItemClass}>
-            <div className="flex flex-col gap-1">
-              <h1 className="text-sm text-high-emphasis font-bold">
-                {t('TWO_FACTOR_AUTHENTICATION')}
-              </h1>
-              <p className="text-sm text-medium-emphasis">{t('ENHANCE_YOUR_SECURITY')}</p>
+          {data?.enableMfa && (
+            <div className={securityCardItemClass}>
+              <div className="flex flex-col gap-1">
+                <h1 className="text-sm text-high-emphasis font-bold">
+                  {t('TWO_FACTOR_AUTHENTICATION')}
+                </h1>
+                <p className="text-sm text-medium-emphasis">{t('ENHANCE_YOUR_SECURITY')}</p>
+              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {isLoading ? (
+                    <Skeleton className="w-[102px] h-8" />
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-sm font-bold text-primary hover:text-primary"
+                      onClick={() => setCurrentDialog(MfaDialogState.TWO_FACTOR_SETUP)}
+                      disabled={isDemoAccount}
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      {mfaButtonText}
+                    </Button>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent className="bg-neutral-700 text-white text-center max-w-[100px]">
+                  {getTooltipText()}
+                </TooltipContent>
+              </Tooltip>
+              {renderMfaDialogs()}
             </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {isLoading ? (
-                  <Skeleton className="w-[102px] h-8" />
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-sm font-bold text-primary hover:text-primary"
-                    onClick={() => setCurrentDialog(MfaDialogState.TWO_FACTOR_SETUP)}
-                    disabled={isDemoAccount}
-                  >
-                    <ShieldCheck className="w-4 h-4" />
-                    {mfaButtonText}
-                  </Button>
-                )}
-              </TooltipTrigger>
-              <TooltipContent className="bg-neutral-700 text-white text-center max-w-[100px]">
-                {getTooltipText()}
-              </TooltipContent>
-            </Tooltip>
-            {renderMfaDialogs()}
-          </div>
+          )}
+
           <div className={securityCardItemClass}>
             <div className="flex flex-col gap-1">
               <h1 className="text-sm text-high-emphasis font-bold">{t('CHANGE_PASSWORD')}</h1>

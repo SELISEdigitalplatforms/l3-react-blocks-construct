@@ -18,7 +18,7 @@ import { User } from 'types/user.type';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
 import { useDisableUserMfa } from '../../../hooks/use-mfa';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { ConfirmOtpVerification } from '../confirm-otp-verification/confirm-otp-verification';
+// import { ConfirmOtpVerification } from '../confirm-otp-verification/confirm-otp-verification';
 import { useTranslation } from 'react-i18next';
 
 type ManageTwoFactorAuthenticationProps = {
@@ -37,7 +37,8 @@ export const ManageTwoFactorAuthentication: React.FC<
   const disableUserMfaMutation = useDisableUserMfa();
   const [activeModal, setActiveModal] = useState<'manage' | 'delete' | 'otp' | 'temp'>('manage');
   const [isDisabling, setIsDisabling] = useState(false);
-  const [disabledMfaType, setDisabledMfaType] = useState<UserMfaType | null>(null);
+  // const [disabledMfaType, _setDisabledMfaType] = useState<UserMfaType | null>(null);
+  const [disabledMfaType] = useState<UserMfaType | null>(null);
   const { t } = useTranslation();
 
   const getMfaMethodTitle = () => {
@@ -107,14 +108,43 @@ export const ManageTwoFactorAuthentication: React.FC<
     setActiveModal('delete');
   };
 
-  const handleVerifiedOtp = () => {
+  // const handleVerifiedOtp = () => {
+  //   if (!userInfo) return;
+  //   setActiveModal('manage');
+  //   setIsDisabling(true);
+
+  //   const originalMfaType = userInfo.userMfaType;
+  //   setDisabledMfaType(originalMfaType);
+
+  //   disableUserMfaMutation.mutate(userInfo.itemId, {
+  //     onSuccess: () => {
+  //       toast({
+  //         variant: 'success',
+  //         title: t('MFA_DISABLED'),
+  //         description: t('MULTI-FACTOR-AUTH-DISABLED-SUCCESSFULLY'),
+  //       });
+  //     },
+  //     onError: (error: { error?: { message?: string } }) => {
+  //       toast({
+  //         variant: 'destructive',
+  //         title: t('FAILED_TO_DISABLE_MFA'),
+  //         description: error?.error?.message ?? t('ERROR_OCCURED_DISABLING_MULTI_FACTOR'),
+  //       });
+  //       setIsDisabling(false);
+  //     },
+  //   });
+  // };
+
+  // const onCancelOtpVerification = () => {
+  //   setActiveModal('manage');
+  // };
+
+  const handleCloseAll = () => {
+    onClose();
+  };
+
+  const disableMfaHandler = () => {
     if (!userInfo) return;
-    setActiveModal('manage');
-    setIsDisabling(true);
-
-    const originalMfaType = userInfo.userMfaType;
-    setDisabledMfaType(originalMfaType);
-
     disableUserMfaMutation.mutate(userInfo.itemId, {
       onSuccess: () => {
         toast({
@@ -122,6 +152,7 @@ export const ManageTwoFactorAuthentication: React.FC<
           title: t('MFA_DISABLED'),
           description: t('MULTI-FACTOR-AUTH-DISABLED-SUCCESSFULLY'),
         });
+        onClose();
       },
       onError: (error: { error?: { message?: string } }) => {
         toast({
@@ -132,14 +163,6 @@ export const ManageTwoFactorAuthentication: React.FC<
         setIsDisabling(false);
       },
     });
-  };
-
-  const onCancelOtpVerification = () => {
-    setActiveModal('manage');
-  };
-
-  const handleCloseAll = () => {
-    onClose();
   };
 
   return (
@@ -234,18 +257,18 @@ export const ManageTwoFactorAuthentication: React.FC<
           description={t('ARE_SURE_WANT_DISABLE_MFA')}
           preventAutoClose={true}
           onConfirm={() => {
-            setActiveModal('otp');
+            disableMfaHandler();
           }}
         />
       )}
-      {activeModal === 'otp' && (
+      {/* {activeModal === 'otp' && (
         <ConfirmOtpVerification
           onClose={onCancelOtpVerification}
           onVerified={handleVerifiedOtp}
           mfaType={userInfo?.userMfaType ?? UserMfaType.NONE}
           userInfo={userInfo}
         />
-      )}
+      )} */}
     </>
   );
 };
