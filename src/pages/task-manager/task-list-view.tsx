@@ -53,7 +53,6 @@ export function TaskListView({ searchQuery = '' }: { searchQuery?: string }) {
   const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, getFilteredTasks, isLoading } = useListTasks();
 
-  // Get the task sections/columns
   const { data: sectionsData } = useGetTaskSections({
     pageNo: 1,
     pageSize: 100,
@@ -129,7 +128,6 @@ export function TaskListView({ searchQuery = '' }: { searchQuery?: string }) {
     setActiveTask(null);
   };
 
-  // Apply both status filter and search filter
   const filteredTasks = useMemo(() => {
     const tasks = getFilteredTasks(statusFilter);
 
