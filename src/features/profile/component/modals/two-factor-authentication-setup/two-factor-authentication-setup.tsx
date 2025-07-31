@@ -51,7 +51,6 @@ export const TwoFactorAuthenticationSetup: React.FC<
   const isAuthenticatorAppEnabled = mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(1);
   const isEmailVerificationEnabled =
     mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(2);
-
   const handleAuthenticatorAppClick = () => {
     if (!isAuthenticatorAppEnabled || !userInfo) return;
 
@@ -120,18 +119,22 @@ export const TwoFactorAuthenticationSetup: React.FC<
     }
 
     if (!isAuthenticatorAppEnabled) {
-      return (
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-surface rounded-md">
-              <Smartphone className="text-secondary" size={24} />
-            </div>
-            <h3 className="text-sm font-semibold text-high-emphasis">{t('AUTHENTICATOR_APP')}</h3>
-          </div>
-          <ChevronRight className="text-primary" size={20} />
-        </div>
-      );
+      return null;
     }
+
+    // if (!isAuthenticatorAppEnabled) {
+    //   return (
+    //     <div className="flex items-center justify-between p-4">
+    //       <div className="flex items-center gap-3">
+    //         <div className="p-2 bg-surface rounded-md">
+    //           <Smartphone className="text-secondary" size={24} />
+    //         </div>
+    //         <h3 className="text-sm font-semibold text-high-emphasis">{t('AUTHENTICATOR_APP')}</h3>
+    //       </div>
+    //       <ChevronRight className="text-primary" size={20} />
+    //     </div>
+    //   );
+    // }
 
     if (isGeneratingOTP) {
       return (
@@ -181,6 +184,7 @@ export const TwoFactorAuthenticationSetup: React.FC<
         </div>
       );
     }
+    if (!isEmailVerificationEnabled) return null;
 
     if (isGeneratingOTP) {
       return (
@@ -230,7 +234,7 @@ export const TwoFactorAuthenticationSetup: React.FC<
         </DialogHeader>
         <div className="flex flex-col w-full">
           {renderAuthenticatorAppContent()}
-          <Separator />
+          {isAuthenticatorAppEnabled && isEmailVerificationEnabled && <Separator />}
           {renderEmailVerificationContent()}
         </div>
 
