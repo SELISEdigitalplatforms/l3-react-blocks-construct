@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TaskItem, TaskComments, TaskAttachments, TaskPriority } from '../types/task-manager.types';
-import { useGetTasks } from './use-task-manager';
+import { useGetTasks, useUpdateTaskItem } from './use-task-manager';
 
 /**
  * useTaskDetails Hook
@@ -90,7 +90,7 @@ export function useTaskDetails(taskId?: string) {
           Description: foundTask.Description || '',
           IsCompleted: foundTask.IsCompleted || false,
           Priority: foundTask.Priority || TaskPriority.MEDIUM,
-          Section: foundTask.Section || 'To Do',
+          Section: foundTask.Section || '',
           DueDate: foundTask.DueDate,
           Assignee: foundTask.Assignee ? foundTask.Assignee : '',
           Tags: mapToTags(foundTask.Tags),
@@ -110,27 +110,23 @@ export function useTaskDetails(taskId?: string) {
     }
   }, [taskId, tasksData]);
 
+  const { mutate: updateTask } = useUpdateTaskItem();
+
   // Update a task's details
   const updateTaskDetails = useCallback(
-    async (updates: Partial<TaskItem>) => {
+    (updates: Partial<TaskItem>) => {
       if (!taskId || !currentTask) return;
 
-      try {
-        // Optimistically update the UI
-        setCurrentTask((prev) => (prev ? { ...prev, ...updates } : null));
+      // Optimistically update the UI
+      setCurrentTask((prev) => (prev ? { ...prev, ...updates } : null));
 
-        // TODO: Call your API to update the task
-        // await updateTaskItem(taskId, updates);
-
-        // Refresh the tasks list to ensure consistency
-        await refetchTasks();
-      } catch (error) {
-        console.error('Failed to update task:', error);
-        // Revert the optimistic update on error
-        await refetchTasks();
-      }
+      // Call the API to update the task
+      updateTask({
+        itemId: taskId,
+        input: updates,
+      });
     },
-    [taskId, currentTask, refetchTasks]
+    [taskId, currentTask, updateTask]
   );
 
   // Toggle task completion status

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
@@ -5,6 +6,7 @@ import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.t
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
 import { useTaskDetails } from '../../hooks/use-task-details';
+import { useDeleteTaskItem } from '../../hooks/use-task-manager';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 
@@ -47,6 +49,8 @@ export function SortableTaskItem({
   const commentsCount = Array.isArray(task?.Comments) ? task.Comments.length : 0;
   const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
   const assignees = task?.Assignee ? [task.Assignee] : [];
+  const { updateTaskDetails } = useTaskDetails(task.ItemId);
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskItem();
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `task-${task.ItemId}`,
@@ -66,7 +70,9 @@ export function SortableTaskItem({
     },
   });
 
-  const { removeTask, toggleTaskCompletion, updateTaskDetails } = useTaskDetails(task.ItemId);
+  const handleDelete = useCallback(() => {
+    deleteTask(task.ItemId);
+  }, [deleteTask, task.ItemId]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -157,8 +163,9 @@ export function SortableTaskItem({
           <TaskManagerDropdownMenu
             task={task}
             columns={columns.map((column) => ({ id: column.ItemId, title: column.Title }))}
-            onToggleComplete={() => toggleTaskCompletion(!task.IsCompleted)}
-            onDelete={removeTask}
+            onToggleComplete={() => updateTaskDetails({ IsCompleted: !task.IsCompleted })}
+            onDelete={handleDelete}
+            isDeleting={isDeleting}
             onMoveToColumn={(title: string) => updateTaskDetails({ Section: title })}
           />
         </button>

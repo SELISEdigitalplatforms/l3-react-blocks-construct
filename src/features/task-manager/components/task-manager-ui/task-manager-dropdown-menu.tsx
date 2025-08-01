@@ -101,13 +101,13 @@ export const TaskManagerDropdownMenu = ({
           <DropdownMenuItem className="flex p-3 gap-2.5" onClick={onToggleComplete}>
             {task.IsCompleted ? (
               <>
-                <CircleCheckBig className="h-5 w-5 text-primary-400" />
-                <p className="font-normal text-high-emphasis">{t('MARK_AS_COMPLETE')}</p>
+                <CircleDashed className="h-5 w-5 text-medium-emphasis" />
+                <p className="font-normal text-high-emphasis">{t('REOPEN_TASK')}</p>
               </>
             ) : (
               <>
-                <CircleDashed className="h-5 w-5 text-medium-emphasis" />
-                <p className="font-normal text-high-emphasis">{t('REOPEN_TASK')}</p>
+                <CircleCheckBig className="h-5 w-5 text-primary-400" />
+                <p className="font-normal text-high-emphasis">{t('MARK_AS_COMPLETE')}</p>
               </>
             )}
           </DropdownMenuItem>
@@ -143,7 +143,7 @@ export const TaskManagerDropdownMenu = ({
             disabled={isDeleting}
           >
             <Trash2 className="h-4 w-4" />
-            {isDeleting ? t('DELETING...') : t('DELETE')}
+            {t('DELETE')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
