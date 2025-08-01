@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar } from 'lucide-react';
@@ -5,7 +6,10 @@ import { Card } from 'components/ui/card';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
+import { useDeleteTaskItem } from '../../hooks/use-task-manager';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
+import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
+import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 
 interface ITaskCardProps {
   task: TaskItem;
@@ -13,9 +17,6 @@ interface ITaskCardProps {
   columns: TaskSection[];
   handleTaskClick: (taskId: string) => void;
 }
-import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
-import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
-import { useCallback } from 'react';
 
 /**
  * TaskCard Component
@@ -65,6 +66,11 @@ export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITa
   });
 
   const { updateTaskDetails } = useTaskDetails(task.ItemId);
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskItem();
+
+  const handleDelete = useCallback(() => {
+    deleteTask(task.ItemId);
+  }, [deleteTask, task.ItemId]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -132,9 +138,8 @@ export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITa
               task={task}
               columns={columns.map((column) => ({ id: column.ItemId, title: column.Title }))}
               onToggleComplete={() => updateTaskDetails({ IsCompleted: !task.IsCompleted })}
-              onDelete={() => {
-                console.warn('Delete functionality not implemented');
-              }}
+              onDelete={handleDelete}
+              isDeleting={isDeleting}
               onMoveToColumn={(title) => updateTaskDetails({ Section: title })}
             />
           </div>
@@ -211,7 +216,6 @@ export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITa
 
               {task.Attachments !== undefined && task.Attachments.length > 0 && (
                 <button className="flex items-center gap-1" onClick={handleInteractiveElementClick}>
-                  {' '}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="12"

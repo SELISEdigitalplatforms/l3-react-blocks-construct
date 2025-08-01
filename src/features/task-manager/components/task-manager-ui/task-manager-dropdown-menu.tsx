@@ -19,7 +19,6 @@ import {
   Check,
 } from 'lucide-react';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { useToast } from 'hooks/use-toast';
 import { TaskItem } from 'features/task-manager/types/task-manager.types';
 
 /**
@@ -62,6 +61,7 @@ interface TaskDropdownMenuProps {
   onToggleComplete: () => void;
   onDelete: () => void;
   onMoveToColumn: (title: string) => void;
+  isDeleting?: boolean;
 }
 
 export const TaskManagerDropdownMenu = ({
@@ -70,19 +70,25 @@ export const TaskManagerDropdownMenu = ({
   onToggleComplete,
   onDelete,
   onMoveToColumn,
+  isDeleting = false,
 }: Readonly<TaskDropdownMenuProps>) => {
   const [showConfirm, setShowConfirm] = useState(false);
-  const { toast } = useToast();
   const { t } = useTranslation();
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowConfirm(true);
+  };
 
   const handleConfirmDelete = () => {
     onDelete();
     setShowConfirm(false);
-    toast({
-      variant: 'success',
-      title: t('TASK_REMOVED'),
-      description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
-    });
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!isDeleting) {
+      setShowConfirm(open);
+    }
   };
 
   return (
@@ -132,23 +138,23 @@ export const TaskManagerDropdownMenu = ({
           </DropdownMenuSub>
 
           <DropdownMenuItem
-            className="flex p-3 gap-2.5 text-high-emphasis"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowConfirm(true);
-            }}
+            className="flex items-center gap-2 text-destructive focus:text-destructive"
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
           >
-            <Trash2 className="h-5 w-5" />
-            <p className="font-normal">{t('DELETE')}</p>
+            <Trash2 className="h-4 w-4" />
+            {isDeleting ? t('DELETING...') : t('DELETE')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <ConfirmationModal
         open={showConfirm}
-        onOpenChange={setShowConfirm}
+        onOpenChange={handleOpenChange}
         title={t('ARE_YOU_SURE')}
         description={t('THIS_WILL_PERMANENTLY_DELETE_THE_TASK')}
+        confirmText={t('DELETE')}
+        cancelText={t('CANCEL')}
         onConfirm={handleConfirmDelete}
       />
     </>

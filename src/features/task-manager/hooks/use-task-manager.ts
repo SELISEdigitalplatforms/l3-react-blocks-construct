@@ -203,13 +203,13 @@ export const useDeleteTaskItem = () => {
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<DeleteTaskItemResponse, Error, string>({
-    mutationFn: (itemId) => deleteTaskItem(itemId, false),
+    mutationFn: (itemId) => deleteTaskItem(itemId, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         variant: 'success',
-        title: t('Deleted task'),
-        description: t('You have successfully deleted a task'),
+        title: t('TASK_REMOVED'),
+        description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
@@ -391,7 +391,7 @@ export const useDeleteTags = () => {
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<DeleteTaskTagResponse, Error, string>({
-    mutationFn: (itemId) => deleteTaskTag(itemId, false),
+    mutationFn: (itemId) => deleteTaskTag(itemId, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
