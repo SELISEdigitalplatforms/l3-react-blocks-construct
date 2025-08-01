@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, X } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
+import { Badge } from 'components/ui/badge';
 import {
   Command,
   CommandEmpty,
@@ -11,7 +12,11 @@ import {
   CommandItem,
   CommandList,
 } from 'components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
 import { Label } from 'components/ui/label';
 
 /**
@@ -19,7 +24,7 @@ import { Label } from 'components/ui/label';
  *
  * A reusable component for selecting and managing tags.
  * This component allows users to:
- * - View selected tags
+ * - View selected tags as badges
  * - Add or remove tags from a list of available tags
  * - Search for tags using a search input
  *
@@ -88,29 +93,36 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
   return (
     <div>
       <Label className="text-high-emphasis text-base font-semibold">{t('TAGS')}</Label>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {Array.from(selectedValues).map((tagId) => {
-          const tag = availableTags.find((t) => t.id === tagId);
-          return (
-            <div
-              key={tagId}
-              className="bg-surface text-high-emphasis font-semibold text-sm px-3 py-1 rounded flex items-center"
-            >
-              {tag?.label}
-            </div>
-          );
+      <div className="flex items-center gap-1">
+        {Array.from(selectedValues).map((value) => {
+          const tag = availableTags.find((t) => t.id === value);
+          return tag ? (
+            <Badge key={value} variant="secondary" className="flex items-center gap-1">
+              {tag.label}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSelect(value);
+                }}
+                className="ml-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ) : null;
         })}
-        <Popover>
-          <PopoverTrigger asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="h-7 w-7 border-dashed">
               <Plus className="h-3 w-3" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="sm:max-w-[200px] p-0">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="p-0 w-[200px]" align="start" sideOffset={4}>
             <Command>
-              <CommandInput placeholder={t('ENTER_TAG_NAME')} />
-              <CommandList>
-                <CommandEmpty>{t('NO_TAGS_FOUND')}</CommandEmpty>
+              <CommandInput placeholder={t('ENTER_TAG_NAME')} className="h-9" />
+              <CommandList className="max-h-[300px] overflow-y-auto">
+                <CommandEmpty className="py-2 px-3 text-sm">{t('NO_TAGS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableTags.map((tag) => {
                     const isSelected = selectedValues.has(tag.id);
@@ -118,7 +130,7 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
                       <CommandItem
                         key={tag.id}
                         onSelect={() => handleSelect(tag.id)}
-                        className="flex items-center"
+                        className="flex items-center px-2 py-1.5"
                       >
                         <div
                           className={cn(
@@ -128,7 +140,7 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
                         >
                           <Check className="h-3 w-3" />
                         </div>
-                        <span>{tag.label}</span>
+                        <span className="text-sm">{tag.label}</span>
                       </CommandItem>
                     );
                   })}
@@ -139,7 +151,7 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
                       variant="ghost"
                       size="sm"
                       onClick={handleClear}
-                      className="w-full justify-center text-center"
+                      className="w-full justify-center text-center text-sm"
                     >
                       {t('CLEAR_ALL')}
                     </Button>
@@ -147,8 +159,8 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
                 )}
               </CommandList>
             </Command>
-          </PopoverContent>
-        </Popover>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

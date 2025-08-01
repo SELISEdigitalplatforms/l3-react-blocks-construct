@@ -74,3 +74,41 @@ export const DELETE_TASK_MANAGER_SECTION_MUTATION = `
     }
   }
 `;
+
+/**
+ * GraphQL Mutations for Task Manager
+ *
+ * This file contains GraphQL mutation strings for task management operations.
+ * These mutations are used with the graphqlClient for creating, updating, and deleting
+ * task manager tags, including tracking impacted data and acknowledgments.
+ */
+
+export const INSERT_TASK_MANAGER_TAG_MUTATION = `
+  mutation InsertTaskManagerTag($input: TaskManagerTagInsertInput!) {
+    insertTaskManagerTag(input: $input) {
+      itemId
+      totalImpactedData
+      acknowledged
+    }
+  }
+`;
+
+export const UPDATE_TASK_MANAGER_TAG_MUTATION = `
+  mutation UpdateTaskManagerTag($filter: String!, $input: TaskManagerTagUpdateInput!) {
+    updateTaskManagerTag(filter: $filter, input: $input) {
+      itemId
+      totalImpactedData
+      acknowledged
+    }
+  }
+`;
+
+export const DELETE_TASK_MANAGER_TAG_MUTATION = `
+  mutation DeleteTaskManagerTag($filter: String!, $input: TaskManagerTagDeleteInput!) {
+    deleteTaskManagerTag(filter: $filter, input: $input) {
+      itemId
+      totalImpactedData
+      acknowledged
+    }
+  }
+`;

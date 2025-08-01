@@ -1,5 +1,9 @@
 import { graphqlClient } from 'lib/graphql-client';
-import { GET_TASK_MANAGER_QUERY, GET_TASK_MANAGER_SECTIONS_QUERY } from '../graphql/queries';
+import {
+  GET_TASK_MANAGER_QUERY,
+  GET_TASK_MANAGER_SECTIONS_QUERY,
+  GET_TASK_MANAGER_TAGS_QUERY,
+} from '../graphql/queries';
 import type {
   TaskItemInsertInput,
   TaskItemUpdateInput,
@@ -11,6 +15,9 @@ import type {
   UpdateTaskManagerSectionResponse,
   IamData,
   GetUsersPayload,
+  GetTagsResponse,
+  TaskTagInsertInput,
+  TaskTagUpdateInput,
 } from '../types/task-manager.types';
 import {
   INSERT_TASK_MANAGER_ITEM_MUTATION,
@@ -19,6 +26,9 @@ import {
   INSERT_TASK_MANAGER_SECTION_MUTATION,
   UPDATE_TASK_MANAGER_SECTION_MUTATION,
   DELETE_TASK_MANAGER_SECTION_MUTATION,
+  INSERT_TASK_MANAGER_TAG_MUTATION,
+  UPDATE_TASK_MANAGER_TAG_MUTATION,
+  DELETE_TASK_MANAGER_TAG_MUTATION,
 } from '../graphql/mutations';
 import { clients } from 'lib/https';
 
@@ -50,6 +60,18 @@ export interface UpdateTaskSectionResponse {
 
 export interface DeleteTaskSectionResponse {
   deleteTaskManagerSection: BaseMutationResponse;
+}
+
+export interface InsertTaskTagResponse {
+  insertTaskManagerTag: BaseMutationResponse;
+}
+
+export interface UpdateTaskTagResponse {
+  updateTaskManagerTag: BaseMutationResponse;
+}
+
+export interface DeleteTaskTagResponse {
+  deleteTaskManagerTag: BaseMutationResponse;
 }
 
 /**
@@ -194,6 +216,79 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
     console.error('Error fetching task sections:', error);
     return {
       TaskManagerSections: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  }
+};
+
+/**
+ * Fetches task sections with pagination
+ * @param params - Pagination parameters
+ * @returns Promise with task sections data
+ */
+export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResponse> => {
+  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+
+  try {
+    const response = await graphqlClient.query({
+      query: GET_TASK_MANAGER_TAGS_QUERY,
+      variables: {
+        input: {
+          filter: JSON.stringify(filter),
+          sort: JSON.stringify(sort),
+          pageNo,
+          pageSize,
+        },
+      },
+    });
+
+    const responseData = (response as any)?.data || response;
+    let taskManagerTags: GetTagsResponse['TaskManagerTags'] | null = null;
+
+    if (responseData && typeof responseData === 'object') {
+      if ('TaskManagerTags' in responseData) {
+        taskManagerTags = responseData.TaskManagerTags;
+      } else if ('items' in responseData || 'totalCount' in responseData) {
+        taskManagerTags = responseData as GetTagsResponse['TaskManagerTags'];
+      }
+    }
+
+    if (taskManagerTags) {
+      return {
+        TaskManagerTags: {
+          items: taskManagerTags.items || [],
+          totalCount: taskManagerTags.totalCount || 0,
+          hasNextPage: taskManagerTags.hasNextPage || false,
+          hasPreviousPage: taskManagerTags.hasPreviousPage || false,
+          pageSize: taskManagerTags.pageSize || pageSize,
+          pageNo: taskManagerTags.pageNo || pageNo,
+          totalPages: taskManagerTags.totalPages || 1,
+        },
+      };
+    }
+    console.warn('Unexpected response structure, returning default sections');
+    return {
+      TaskManagerTags: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching task sections:', error);
+    return {
+      TaskManagerTags: {
         items: [],
         totalCount: 0,
         hasNextPage: false,
@@ -392,6 +487,80 @@ export const deleteTaskSection = async (
 
   return (response as any).data as DeleteTaskSectionResponse;
 };
+
+/**
+ * Creates a new task tag
+ * @param input - Task tag data
+ * @returns Promise with creation result
+ */
+export const createTaskTag = async (input: TaskTagInsertInput): Promise<InsertTaskTagResponse> => {
+  try {
+    const response = await graphqlClient.mutate<{
+      insertTaskManagerTag: { itemId: string };
+    }>({
+      query: INSERT_TASK_MANAGER_TAG_MUTATION,
+      variables: { input },
+    });
+
+    const responseData = (response as any).data || response;
+
+    if (!responseData) {
+      throw new Error('No response data received from server');
+    }
+
+    if (!responseData.insertTaskManagerTag?.itemId) {
+      throw new Error('No tag ID in response');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('Error in createTaskTag:', error);
+    throw error;
+  }
+};
+
+/**
+ * Updates an existing task tag
+ * @param itemId - ID of the task tag to update
+ * @param input - Updated task data
+ * @returns Promise with update result
+ */
+export const updateTaskTag = async (
+  itemId: string,
+  input: TaskTagUpdateInput
+): Promise<UpdateTaskTagResponse> => {
+  const response = await graphqlClient.mutate({
+    query: UPDATE_TASK_MANAGER_TAG_MUTATION,
+    variables: {
+      filter: JSON.stringify({ _id: itemId }),
+      input,
+    },
+  });
+
+  return (response as any).data as UpdateTaskTagResponse;
+};
+
+/**
+ * Deletes a task tag
+ * @param itemId - ID of the task tag to delete
+ * @param isHardDelete - Whether to perform a hard delete
+ * @returns Promise with deletion result
+ */
+export const deleteTaskTag = async (
+  itemId: string,
+  isHardDelete = false
+): Promise<DeleteTaskTagResponse> => {
+  const response = await graphqlClient.mutate({
+    query: DELETE_TASK_MANAGER_TAG_MUTATION,
+    variables: {
+      filter: JSON.stringify({ _id: itemId }),
+      input: { isHardDelete },
+    },
+  });
+
+  return (response as any).data as DeleteTaskTagResponse;
+};
+
 
 export const getUsers = (payload: GetUsersPayload) => {
   const requestBody = {

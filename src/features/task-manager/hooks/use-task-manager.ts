@@ -1,8 +1,11 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
 import type {
   GetSectionsResponse,
+  GetTagsResponse,
   GetTasksResponse,
   GetUsersPayload,
+  TaskTagInsertInput,
+  TaskTagUpdateInput,
 } from '../types/task-manager.types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
@@ -21,6 +24,9 @@ import type {
   DeleteTaskItemResponse,
   InsertTaskSectionResponse,
   DeleteTaskSectionResponse,
+  InsertTaskTagResponse,
+  UpdateTaskTagResponse,
+  DeleteTaskTagResponse,
 } from '../services/task-manager.service';
 import {
   getTasks,
@@ -32,9 +38,13 @@ import {
   updateTaskSection,
   deleteTaskSection,
   getUsers,
+  getTaskTags,
+  createTaskTag,
+  updateTaskTag,
+  deleteTaskTag,
 } from '../services/task-manager.service';
 
-interface TaskSectionsQueryParams {
+interface TaskQueryParams {
   pageNo: number;
   pageSize: number;
 }
@@ -60,7 +70,7 @@ interface TaskSectionsQueryParams {
  *   isCompleted: false
  * });
  */
-export const useGetTasks = (params: TaskSectionsQueryParams) => {
+export const useGetTasks = (params: TaskQueryParams) => {
   return useGlobalQuery<GetTasksResponse>({
     queryKey: ['tasks', params],
     queryFn: () => getTasks(params),
@@ -84,10 +94,34 @@ export const useGetTasks = (params: TaskSectionsQueryParams) => {
  *   pageSize: 20
  * });
  */
-export const useGetTaskSections = (params: TaskSectionsQueryParams) => {
+export const useGetTaskSections = (params: TaskQueryParams) => {
   return useGlobalQuery<GetSectionsResponse>({
     queryKey: ['task-sections', params],
     queryFn: () => getTaskSections(params),
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    onError: (error) => {
+      throw error;
+    },
+  });
+};
+
+/**
+ * Hook to fetch task tags with pagination
+ * @param params - Pagination parameters
+ * @returns Query result with tags data
+ *
+ * @example
+ * const { data, isLoading, error } = useGetTaskTags({
+ *   pageNo: 1,
+ *   pageSize: 20
+ * });
+ */
+export const useGetTaskTags = (params: TaskQueryParams) => {
+  return useGlobalQuery<GetTagsResponse>({
+    queryKey: ['task-tags', params],
+    queryFn: () => getTaskTags(params),
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -286,16 +320,103 @@ export const useDeleteTaskSection = () => {
 };
 
 /**
+ * Hook to create a new task item
+ * @returns Mutation function to create task item with loading and error states
+ *
+ * @example
+ * const { mutate: createTask, isPending } = useCreateTaskItem();
+ * createTask({
+ *   Title: 'New Task',
+ *   Description: 'Task description',
+ *   Assignee: 'user-123',
+ *   Priority: TaskPriority.MEDIUM
+ * });
+ */
+export const useCreateTags = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+
+  return useGlobalMutation<InsertTaskTagResponse, Error, TaskTagInsertInput>({
+    mutationFn: createTaskTag,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({
+        variant: 'success',
+        title: t('Created Tag'),
+        description: t('You have successfully created the new tag!'),
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Error in useCreateTaskItem:', error);
+      handleError(error, {
+        title: t('ERROR'),
+        defaultMessage: t('Failed to create tag. Please try again.'),
+      });
+    },
+  });
+};
+
+export const useUpdateTags = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+
+  return useGlobalMutation<
+    UpdateTaskTagResponse,
+    Error,
+    { itemId: string; input: TaskTagUpdateInput }
+  >({
+    mutationFn: (variables) => updateTaskTag(variables.itemId, variables.input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({
+        variant: 'success',
+        title: t('Updated Tag'),
+        description: t('You have updated the tag successfully'),
+      });
+    },
+    onError: (error: Error) => {
+      handleError(error);
+    },
+  });
+};
+
+export const useDeleteTags = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+
+  return useGlobalMutation<DeleteTaskTagResponse, Error, string>({
+    mutationFn: (itemId) => deleteTaskTag(itemId, false),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({
+        variant: 'success',
+        title: t('Deleted Tag'),
+        description: t('You have successfully deleted a tag'),
+      });
+    },
+    onError: (error: Error) => {
+      handleError(error);
+    },
+  });
+};
+
+/**
  * Custom hook of Rest API to fetch users from the API with pagination and optional filters.
  *
  * @param {GetUsersPayload} payload - The payload for the query containing pagination and filter options.
  * @returns {UseQueryResult<GetUsersResponse>} - The result of the query, including the fetched user data and loading state.
  *
  * @example
- * const { data, isLoading } = useGetUsersQuery({ page: 1, pageSize: 10 });
+ * const { data, isLoading } = useGetUsers({ page: 1, pageSize: 10 });
  */
 
-export const useGetUsersQuery = (payload: GetUsersPayload) => {
+export const useGetUsers = (payload: GetUsersPayload) => {
   return useGlobalQuery({
     queryKey: ['getUsers', payload.page, payload.pageSize, payload.filter],
     queryFn: () => getUsers(payload),

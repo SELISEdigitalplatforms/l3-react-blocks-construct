@@ -53,13 +53,13 @@ interface TaskSectionWithTasks extends TaskSection {
  * />
  */
 
-interface AddTaskDialogProps {
+interface AddTaskProps {
   activeColumn: string | null;
   columns: TaskSectionWithTasks[];
   onAddTask: (columnId: string, content: string) => void;
 }
 
-export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<AddTaskDialogProps>) {
+export function AddTask({ activeColumn, columns, onAddTask }: Readonly<AddTaskProps>) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [selectedColumnId, setSelectedColumnId] = useState(activeColumn ?? '1');
   const { t } = useTranslation();

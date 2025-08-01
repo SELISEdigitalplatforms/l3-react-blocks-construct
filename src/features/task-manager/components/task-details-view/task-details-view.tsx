@@ -1,6 +1,9 @@
 import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+import { useCreateTags, useGetTaskTags, useGetUsers } from '../../hooks/use-task-manager';
+import { Assignee, Tag, TaskItem, TaskTagInsertInput } from '../../types/task-manager.types';
 import {
   TaskPriority,
   TaskComments,
@@ -27,13 +30,13 @@ import { AttachmentsSection } from './attachment-section';
 import { Separator } from 'components/ui/separator';
 import { Tags } from './tag-selector';
 import { AssigneeSelector } from './assignee-selector';
-import { Attachment, Tag, TaskDetails } from '../../services/task-service';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import { AddTag } from '../modals/add-tag';
 
 /**
  * TaskDetailsView Component
@@ -67,24 +70,18 @@ import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
  * @example
  * // Basic usage
  * <TaskDetailsView
- *   onClose={() => console.log('Closed')}
+ *   onClose={() => {}}
  *   taskId="123"
  *   taskService={taskServiceInstance}
  * />
  */
-
-interface Assignee {
-  id: string;
-  name: string;
-  avatar: string;
-}
 
 type TaskDetailsViewProps = {
   onClose: () => void;
   taskId?: string;
   isNewTaskModalOpen?: boolean;
   onTaskAddedList?: () => void;
-  addTask?: (task: Partial<TaskDetails>) => string | undefined;
+  addTask?: (task: Partial<TaskItem>) => string | undefined;
 };
 
 export default function TaskDetailsView({
@@ -95,8 +92,32 @@ export default function TaskDetailsView({
   addTask,
 }: Readonly<TaskDetailsViewProps>) {
   const { t } = useTranslation();
-  const tags = useMemo<Tag[]>(() => [], []);
-  const availableAssignees = useMemo<Assignee[]>(() => [], []);
+  const { data: tagsResponse } = useGetTaskTags({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const { data: usersResponse } = useGetUsers({
+    page: 0,
+    pageSize: 100,
+  });
+
+  const tags = useMemo<Tag[]>(() => {
+    if (!tagsResponse?.TaskManagerTags?.items) return [];
+    return tagsResponse.TaskManagerTags.items.map((tag: { ItemId: string; Label: string }) => ({
+      id: tag.ItemId,
+      label: tag.Label,
+    }));
+  }, [tagsResponse]);
+
+  const availableAssignees = useMemo<Assignee[]>(() => {
+    if (!usersResponse?.data) return [];
+    return usersResponse.data.map((user) => ({
+      id: user.itemId,
+      name: `${user.firstName} ${user.lastName || ''}`.trim(),
+      avatar: user.profileImageUrl || '',
+    }));
+  }, [usersResponse]);
   const { columns } = useCardTasks();
   const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
   const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
@@ -111,23 +132,24 @@ export default function TaskDetailsView({
     deleteAttachment: removeAttachment,
     addNewAssignee: addAssignee,
     deleteAssignee: removeAssignee,
-    addNewTag: addTag,
+    addNewTag: addTagToTask,
     deleteTag: removeTag,
   } = useTaskDetails(currentTaskId);
 
-  // Initialize state from task
+  const { mutate: createTag, isPending: isCreatingTag } = useCreateTags();
+
   const [date, setDate] = useState<Date | undefined>(
     task?.DueDate ? new Date(task.DueDate) : undefined
   );
   const [title, setTitle] = useState<string>(task?.Title || '');
   const [mark, setMark] = useState<boolean>(task?.IsCompleted || false);
   const [section, setSection] = useState<string>(task?.Section || '');
-  const [attachments, setAttachments] = useState<Attachment[]>(
+  const [attachments, setAttachments] = useState<TaskAttachments[]>(
     task?.Attachments?.map((attachment) => ({
-      id: attachment.ItemId,
-      name: attachment.FileName,
-      size: attachment.FileSize,
-      type: attachment.FileType,
+      ItemId: attachment.ItemId,
+      FileName: attachment.FileName,
+      FileSize: attachment.FileSize,
+      FileType: attachment.FileType,
     })) || []
   );
   const [priority, setPriority] = useState<TaskPriority>(
@@ -150,7 +172,7 @@ export default function TaskDetailsView({
           {
             id: task.Assignee.toLowerCase().replace(/\\s+/g, '-'),
             name: task.Assignee,
-            avatar: '', // Default empty avatar, you might want to set a proper avatar URL
+            avatar: '',
           },
         ]
       : []
@@ -193,7 +215,6 @@ export default function TaskDetailsView({
         description: t('COMMENT_UPDATED_SUCCESSFULLY'),
       });
     } catch (error) {
-      console.error('Failed to update comment:', error);
       toast({
         title: t('ERROR'),
         description: t('FAILED_TO_UPDATE_COMMENT'),
@@ -209,10 +230,10 @@ export default function TaskDetailsView({
       setSection(task.Section || 'To Do');
       setAttachments(
         (task.Attachments || []).map((attachment) => ({
-          id: attachment.ItemId,
-          name: attachment.FileName,
-          size: attachment.FileSize,
-          type: attachment.FileType,
+          ItemId: attachment.ItemId,
+          FileName: attachment.FileName,
+          FileSize: attachment.FileSize,
+          FileType: attachment.FileType,
         }))
       );
       setDate(task.DueDate ? new Date(task.DueDate) : undefined);
@@ -312,7 +333,6 @@ export default function TaskDetailsView({
           description: t('COMMENT_ADDED_SUCCESSFULLY'),
         });
       } catch (error) {
-        console.error('Failed to add comment:', error);
         toast({
           title: t('ERROR'),
           description: t('FAILED_TO_ADD_COMMENT'),
@@ -335,7 +355,6 @@ export default function TaskDetailsView({
         description: t('COMMENT_DELETED_SUCCESSFULLY'),
       });
     } catch (error) {
-      console.error('Failed to delete comment:', error);
       toast({
         title: t('ERROR'),
         description: t('FAILED_TO_DELETE_COMMENT'),
@@ -346,25 +365,62 @@ export default function TaskDetailsView({
 
   const safeAddTask = addTask ?? (() => undefined);
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (isNewTaskModalOpen === true && !newTaskAdded) {
-      const newTask: Partial<TaskDetails> = {
-        section: section,
-        isCompleted: mark,
-        title: title,
-        mark: false,
-        priority: priority,
-        dueDate: date ?? null,
-        assignees: selectedAssignees,
-        description: description ?? '',
-        tags: selectedTags,
-        attachments: attachments,
-        comments: [],
+      const tagsToCreate = [...selectedTags];
+
+      setSelectedTags([]);
+
+      const newTask: Partial<TaskItem> = {
+        Section: section,
+        IsCompleted: mark,
+        Title: title,
+        Priority: priority,
+        DueDate: date ? format(date, 'yyyy-MM-dd') : undefined,
+        Assignee: selectedAssignees.length > 0 ? selectedAssignees[0].name : undefined,
+        Description: description ?? '',
+        Tags: selectedTags.map((tag) => tag.label),
+        Attachments: attachments,
+        Comments: [],
       };
-      const newTaskId = title && safeAddTask(newTask);
-      setCurrentTaskId(newTaskId);
-      setNewTaskAdded(true);
-      onTaskAddedList && onTaskAddedList();
+
+      try {
+        const newTaskId = title && safeAddTask(newTask);
+
+        if (!newTaskId) {
+          throw new Error('Failed to create task');
+        }
+
+        setCurrentTaskId(newTaskId);
+        setNewTaskAdded(true);
+
+        if (tagsToCreate.length > 0) {
+          const now = new Date().toISOString();
+          const tagPromises = tagsToCreate.map((tag) => {
+            const tagLabel = typeof tag === 'string' ? tag : tag.label;
+
+            return createTag({
+              ItemId: newTaskId,
+              Label: tagLabel,
+              CreatedDate: now,
+              IsDeleted: false,
+              LastUpdatedDate: now,
+            } as TaskTagInsertInput);
+          });
+
+          await Promise.all(tagPromises);
+        }
+
+        onTaskAddedList && onTaskAddedList();
+      } catch (error) {
+        toast({
+          title: t('ERROR'),
+          description: t('Failed to create task or tags'),
+          variant: 'destructive',
+        });
+
+        setSelectedTags(tagsToCreate);
+      }
     }
   };
 
@@ -432,7 +488,7 @@ export default function TaskDetailsView({
         .map((tag) => tag.id);
 
       for (const tag of addedTags) {
-        await addTag(tag.label);
+        await addTagToTask(tag.label);
       }
 
       for (const tagId of removedTagIds) {
@@ -441,33 +497,33 @@ export default function TaskDetailsView({
     }
   };
 
-  const handleAttachmentChange = async (newAttachments: SetStateAction<Attachment[]>) => {
+  const handleAttachmentChange = async (newAttachments: SetStateAction<TaskAttachments[]>) => {
     setAttachments((prev) => {
       const updatedAttachments =
         typeof newAttachments === 'function' ? newAttachments(prev) : newAttachments;
 
       if (currentTaskId) {
         const taskAttachments: TaskAttachments[] = updatedAttachments.map((attachment) => ({
-          ItemId: attachment.id,
-          FileName: attachment.name,
-          FileSize: attachment.size,
-          FileType: attachment.type,
+          ItemId: attachment.ItemId,
+          FileName: attachment.FileName,
+          FileSize: attachment.FileSize,
+          FileType: attachment.FileType,
         }));
 
         updateTaskDetails({ Attachments: taskAttachments });
 
         const addedAttachments = updatedAttachments.filter(
-          (newAtt) => !prev.some((prevAtt) => prevAtt.id === newAtt.id)
+          (newAtt) => !prev.some((prevAtt) => prevAtt.ItemId === newAtt.ItemId)
         );
         const removedAttachments = prev.filter(
-          (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.id === prevAtt.id)
+          (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
         );
 
         addedAttachments.forEach((attachment) => {
           addAttachment(attachment);
         });
         removedAttachments.forEach((attachment) => {
-          removeAttachment(attachment.id);
+          removeAttachment(attachment.ItemId);
         });
       }
 
@@ -491,7 +547,6 @@ export default function TaskDetailsView({
         throw new Error('Failed to delete task');
       }
     } catch (error) {
-      console.error('Error deleting task:', error);
       toast({
         title: t('ERROR'),
         description: t('FAILED_TO_DELETE_TASK'),
@@ -512,6 +567,59 @@ export default function TaskDetailsView({
         description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
       });
       onClose();
+    }
+  };
+
+  const createTagMutation = useCreateTags();
+
+  const handleTagAdd = async (label: string) => {
+    if (!label.trim()) return;
+
+    // Generate a temporary ID with uuidv4 and 'temp-' prefix
+    const tempId = uuidv4();
+
+    try {
+      // Create the tag with a temporary ID
+      const newTag: TaskTagInsertInput = {
+        ItemId: tempId,
+        Label: label,
+        CreatedBy: 'current-user', // TODO: Replace with actual user ID from auth context
+        CreatedDate: new Date().toISOString(),
+        IsDeleted: false,
+      };
+
+      // Create a simplified tag for the UI
+      const uiTag = {
+        id: tempId,
+        label: label,
+      };
+
+      // Add to local state immediately for better UX
+      setSelectedTags((prev) => [...prev, uiTag]);
+
+      // Create the tag on the server
+
+      const result = await createTagMutation.mutateAsync(newTag);
+
+      // If the server returned a different ID, update our local state
+      if (result?.insertTaskManagerTag?.itemId && result.insertTaskManagerTag.itemId !== tempId) {
+        setSelectedTags((prev) =>
+          prev.map((tag) =>
+            tag.id === tempId ? { ...tag, id: result.insertTaskManagerTag.itemId } : tag
+          )
+        );
+      }
+
+      // If we have a task ID, associate the tag with the task
+      if (currentTaskId) {
+        // TODO: Add code to associate the tag with the task if needed
+        // This might involve another mutation to update the task's tags
+      }
+    } catch (error) {
+      // Remove the tag from local state if creation failed
+      setSelectedTags((prev) => prev.filter((tag) => tag.id !== tempId));
+      // Re-throw the error to be handled by the AddTag component
+      throw error;
     }
   };
 
@@ -612,7 +720,6 @@ export default function TaskDetailsView({
                         setDate(undefined);
                         updateTaskDetails({ DueDate: undefined });
                       } else {
-                        console.error('Invalid date selected:', newDate);
                         toast({
                           title: t('ERROR'),
                           description: t('INVALID_DATE_SELECTED'),
@@ -657,12 +764,13 @@ export default function TaskDetailsView({
             }}
           />
         </div>
-        <div className="mt-6">
+        <div className="flex items-center w-full justify-between mt-6">
           <Tags
             availableTags={tags}
             selectedTags={selectedTags.map((tag) => (typeof tag === 'string' ? tag : tag.id))}
             onChange={handleTagChange}
           />
+          <AddTag onAddTag={handleTagAdd} isLoading={isCreatingTag} />
         </div>
         <div className="mt-6">
           <AttachmentsSection attachments={attachments} setAttachments={handleAttachmentChange} />

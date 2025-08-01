@@ -139,3 +139,35 @@ export const GET_TASK_MANAGER_SECTIONS_QUERY = `
     }
   }
 `;
+
+/**
+ * Query to fetch task manager sections with pagination support.
+ *
+ * This query retrieves a paginated list of task sections with their metadata,
+ * including creation/update timestamps, active status, and organizational associations.
+ */
+
+export const GET_TASK_MANAGER_TAGS_QUERY = `
+  query TaskManagerTags($input: DynamicQueryInput) {
+    TaskManagerTags(input: $input) {
+      hasNextPage
+      hasPreviousPage
+      totalCount
+      totalPages
+      pageSize
+      pageNo
+      items {
+        CreatedBy
+        CreatedDate
+        IsDeleted
+        ItemId
+        Label
+        Language
+        LastUpdatedBy
+        LastUpdatedDate
+        OrganizationIds
+        Tags
+      }
+    }
+  }
+`;

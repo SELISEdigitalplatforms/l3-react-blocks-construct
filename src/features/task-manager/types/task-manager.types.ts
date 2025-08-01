@@ -17,6 +17,17 @@ export const priorityStyle: Record<TaskPriority, string> = {
   [TaskPriority.LOW]: 'bg-secondary-50 text-secondary border-secondary',
 };
 
+export interface Tag {
+  id: string;
+  label: string;
+}
+
+export interface Assignee {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
 export interface TaskComments {
   ItemId: string;
   Author: string;
@@ -66,6 +77,20 @@ export interface TaskSection {
   tasks?: TaskItem[];
 }
 
+export interface TaskTag {
+  ItemId: string;
+  Label: string;
+  CreatedBy: string;
+  CreatedDate: string;
+  DeleteDate: string;
+  IsDeleted: boolean;
+  Language: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
+  OrganizationIds: string[];
+  Tags?: string[];
+}
+
 export interface TaskSectionWithTasks extends TaskSection {
   tasks: TaskItem[];
 }
@@ -94,6 +119,18 @@ export interface GetSectionsResponse {
   };
 }
 
+export interface GetTagsResponse {
+  TaskManagerTags: {
+    items: TaskTag[];
+    totalCount: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    pageNo: number;
+    totalPages: number;
+  };
+}
+
 export interface TaskItemInsertInput {
   Title: string;
   Description?: string;
@@ -108,6 +145,24 @@ export interface TaskItemInsertInput {
 }
 
 export interface TaskItemUpdateInput extends Partial<TaskItemInsertInput> {
+  IsDeleted?: boolean;
+}
+
+export interface TaskTagInsertInput {
+  CreatedBy?: string;
+  CreatedDate?: string;
+  DeleteDate?: string;
+  IsDeleted?: boolean;
+  ItemId?: string;
+  Label: string;
+  Language?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
+  OrganizationIds?: string[];
+  Tags?: string[];
+}
+
+export interface TaskTagUpdateInput extends Partial<TaskTagInsertInput> {
   IsDeleted?: boolean;
 }
 

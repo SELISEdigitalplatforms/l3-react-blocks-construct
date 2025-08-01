@@ -11,9 +11,9 @@ import {
   TaskItem,
 } from 'features/task-manager/types/task-manager.types';
 import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
-import { AddColumnDialog } from 'features/task-manager/components/card-view/add-column-dialog';
+import { AddColumn } from '../../features/task-manager/components/modals/add-column';
 import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
-import { AddTaskDialog } from 'features/task-manager/components/card-view/add-task-dialog';
+import { AddTask } from '../../features/task-manager/components/modals/add-task';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
 import { Dialog } from 'components/ui/dialog';
 
@@ -239,7 +239,7 @@ export function TaskCardView({
             })}
 
             <div className="flex items-start pt-10 px-2">
-              <AddColumnDialog onAddColumn={handleAddColumn} />
+              <AddColumn onAddColumn={handleAddColumn} />
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@ export function TaskCardView({
         <DragOverlay>{activeTask && <TaskDragOverlay activeTask={activeTask} />}</DragOverlay>
       </DndContext>
 
-      <AddTaskDialog
+      <AddTask
         activeColumn={activeColumn}
         columns={columns}
         onAddTask={async (columnId, content) => {
