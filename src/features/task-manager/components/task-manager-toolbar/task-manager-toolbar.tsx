@@ -5,7 +5,7 @@ import { useIsMobile } from 'hooks/use-mobile';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-import { useTaskContext } from '../../contexts/task-context';
+// import { useTaskContext } from '../../contexts/task-context';
 import { TaskManagerFilterSheet } from '../task-manager-filters-sheet/task-manager-filters-sheet';
 
 /**
@@ -40,22 +40,25 @@ import { TaskManagerFilterSheet } from '../task-manager-filters-sheet/task-manag
  * />
  */
 
+export type ViewMode = 'board' | 'list';
+
 interface TaskManagerToolbarProps {
+  viewMode: ViewMode;
+  handleViewMode: (view: ViewMode) => void;
   onOpen: () => void;
-  viewMode?: string;
-  handleViewMode: (view: string) => void;
+  onSearch?: (query: string) => void;
 }
 
 export default function TaskManagerToolbar({
   onOpen,
   viewMode = 'board',
   handleViewMode,
+  onSearch,
 }: Readonly<TaskManagerToolbarProps>) {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
 
-  const { searchQuery, setSearchQuery } = useTaskContext();
-
+  const [searchQuery, setSearchQuery] = useState('');
   const [openSheet, setOpenSheet] = useState(false);
 
   useEffect(() => {
@@ -70,8 +73,23 @@ export default function TaskManagerToolbar({
     };
   }, [openSheet]);
 
+  useEffect(() => {
+    if (onSearch && typeof onSearch === 'function') {
+      const query = searchQuery.trim().toLowerCase();
+      onSearch(query);
+    }
+  }, [searchQuery, onSearch]);
+
   const handleTaskModalOpen = () => {
     viewMode === 'board' && onOpen();
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
   };
 
   // mobile view
@@ -95,15 +113,14 @@ export default function TaskManagerToolbar({
             <Input
               placeholder={t('SEARCH')}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="h-8 w-full rounded-lg bg-background pl-8"
             />
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label="Clear search"
+                onClick={handleClearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
                 ✕
               </button>
@@ -120,7 +137,14 @@ export default function TaskManagerToolbar({
               <ListFilter className="h-4 w-4" />
             </Button>
 
-            <Tabs value={viewMode} onValueChange={(value) => handleViewMode(value)}>
+            <Tabs
+              value={viewMode}
+              onValueChange={(value) => {
+                if (value === 'board' || value === 'list') {
+                  handleViewMode(value);
+                }
+              }}
+            >
               <TabsList className="border rounded-lg flex h-8">
                 <TabsTrigger value="board">
                   <Columns3 className="h-3 w-4" />
@@ -151,15 +175,14 @@ export default function TaskManagerToolbar({
           <Input
             placeholder={t('SEARCH')}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="h-8 w-full rounded-lg bg-background pl-8"
           />
           {searchQuery && (
             <button
               type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              aria-label="Clear search"
+              onClick={handleClearSearch}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
             >
               ✕
             </button>
@@ -168,7 +191,14 @@ export default function TaskManagerToolbar({
         <Button onClick={() => setOpenSheet(true)} variant="outline" size="sm" className="h-8 px-3">
           <ListFilter className="h-4 w-4" />
         </Button>
-        <Tabs value={viewMode} onValueChange={(value) => handleViewMode(value)}>
+        <Tabs
+          value={viewMode}
+          onValueChange={(value) => {
+            if (value === 'board' || value === 'list') {
+              handleViewMode(value);
+            }
+          }}
+        >
           <TabsList className="border rounded-lg flex h-8">
             <TabsTrigger value="board">
               <Columns3 className="h-3 w-4" />

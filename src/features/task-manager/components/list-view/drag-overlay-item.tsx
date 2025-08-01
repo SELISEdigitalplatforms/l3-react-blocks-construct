@@ -1,6 +1,5 @@
-import React from 'react';
-import { ITask } from '../../types/task';
 import { StatusCircle } from '../status-circle/status-circle';
+import { TaskItem } from '../../types/task-manager.types';
 
 /**
  * DragOverlayItem Component
@@ -14,7 +13,7 @@ import { StatusCircle } from '../status-circle/status-circle';
  * - Displays the task's status circle and content
  *
  * Props:
- * @param {ITask} task - The task object to display in the overlay
+ * @param {TaskItem} task - The task object to display in the overlay
  *
  * @returns {JSX.Element} The drag overlay item component
  *
@@ -24,17 +23,17 @@ import { StatusCircle } from '../status-circle/status-circle';
  */
 
 interface DragOverlayItemProps {
-  task: ITask;
+  task: TaskItem;
 }
 
 export function DragOverlayItem({ task }: Readonly<DragOverlayItemProps>) {
   return (
     <div className="flex items-center bg-white shadow-lg border border-gray-200 p-4 rounded-lg w-full">
       <div className="flex-shrink-0 mr-3">
-        <StatusCircle isCompleted={task.isCompleted} />
+        <StatusCircle isCompleted={task.IsCompleted} />
       </div>
       <div className="flex-grow">
-        <p className="text-sm font-medium text-gray-900">{task.content}</p>
+        <p className="text-sm font-medium text-gray-900">{task.Title}</p>
       </div>
     </div>
   );

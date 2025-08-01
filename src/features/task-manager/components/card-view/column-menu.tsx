@@ -1,14 +1,8 @@
-import React, { useState, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { EllipsisVertical, SquarePen, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from 'components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'components/ui/dialog';
 import { Input } from 'components/ui/input';
 import {
   DropdownMenu,
@@ -16,8 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
-import { useToast } from 'hooks/use-toast';
+
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import {
+  useUpdateTaskSection,
+  useDeleteTaskSection,
+} from 'features/task-manager/hooks/use-task-manager';
 
 /**
  * ColumnMenu Component
@@ -63,86 +61,104 @@ export function ColumnMenu({
   onRename,
   onDelete,
 }: Readonly<ColumnMenuProps>) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState(columnTitle);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { t } = useTranslation();
+  const { mutate: updateSection } = useUpdateTaskSection();
+  const { mutate: deleteSection } = useDeleteTaskSection();
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      setIsMenuOpen(false);
+  const handleRenameSubmit = useCallback(() => {
+    if (!newTitle.trim() || newTitle === columnTitle) {
+      setIsRenameDialogOpen(false);
+      return;
     }
-  };
 
-  React.useEffect(() => {
-    if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isMenuOpen]);
+    setIsSubmitting(true);
 
-  const handleRenameSubmit = () => {
-    if (newTitle.trim() && newTitle !== columnTitle) {
-      onRename(columnId, newTitle);
-    }
-    setIsRenameDialogOpen(false);
-  };
+    updateSection(
+      {
+        sectionId: columnId,
+        input: {
+          ItemId: columnId,
+          Title: newTitle,
+        },
+      },
+      {
+        onSuccess: (data) => {
+          if (data?.updateTaskManagerSection?.acknowledged) {
+            onRename(columnId, newTitle);
+          }
+          setIsSubmitting(false);
+          setIsRenameDialogOpen(false);
+        },
+        onError: (error) => {
+          const isValidationError = [
+            'No records were updated',
+            'No response received',
+            'Invalid response format',
+          ].some((msg) => error.message.includes(msg));
 
-  const handleDeleteClick = () => {
-    onDelete(columnId);
-    setIsMenuOpen(false);
-  };
+          if (!isValidationError) {
+            setNewTitle(columnTitle);
+          }
+          setIsSubmitting(false);
+        },
+      }
+    );
+  }, [columnId, newTitle, columnTitle, onRename, updateSection]);
 
-  const handleConfirm = () => {
-    handleDeleteClick();
-    setOpen(false);
-    toast({
-      variant: 'success',
-      title: t('COLUMN_DELETED'),
-      description: t('COLUMN_HAS_DELETED_SUCCESSFULLY'),
+  const handleDeleteClick = useCallback(() => {
+    deleteSection(columnId, {
+      onSuccess: () => {
+        onDelete(columnId);
+        setIsDeleteModalOpen(false);
+      },
     });
-  };
+  }, [columnId, deleteSection, onDelete]);
+
+  useEffect(() => {
+    if (isRenameDialogOpen) {
+      setNewTitle(columnTitle);
+    }
+  }, [isRenameDialogOpen, columnTitle]);
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <EllipsisVertical
-            className="h-5 w-5 text-high-emphasis cursor-pointer"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          />
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <EllipsisVertical className="h-4 w-4" />
+          </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="min-w-56">
+        <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem
-            className="flex p-3 gap-2.5"
             onClick={() => {
-              setIsMenuOpen(false);
               setIsRenameDialogOpen(true);
             }}
           >
-            <SquarePen className="h-5 w-5 text-medium-emphasis" />
-            <p className="font-normal text-high-emphasis">{t('RENAME_LIST')}</p>
+            <SquarePen className="mr-2 h-4 w-4" />
+            <span>{t('RENAME_LIST')}</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="flex p-3 gap-2.5" onClick={() => setOpen(true)}>
-            <Trash2 className="h-5 w-5 text-medium-emphasis" />
-            <p className="font-normal text-high-emphasis">{t('DELETE')}</p>
+          <DropdownMenuItem
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            <span>{t('DELETE')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <ConfirmationModal
-        open={open}
-        onOpenChange={setOpen}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
         title={t('ARE_YOU_SURE')}
         description={t('THIS_WILL_PERMANENTLY_DELETE_THE_TASK')}
-        onConfirm={handleConfirm}
+        onConfirm={handleDeleteClick}
+        confirmText={t('DELETE')}
       />
 
       <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
@@ -159,15 +175,21 @@ export function ColumnMenu({
               className="col-span-3"
             />
           </div>
-          <div className="flex justify-end">
-            <DialogClose asChild>
-              <Button type="button" variant="outline" className="mr-2">
-                {t('CANCEL')}
-              </Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button onClick={handleRenameSubmit}>{t('SAVE')}</Button>
-            </DialogClose>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsRenameDialogOpen(false)}
+              disabled={isSubmitting}
+            >
+              {t('CANCEL')}
+            </Button>
+            <Button
+              onClick={handleRenameSubmit}
+              disabled={isSubmitting || !newTitle.trim() || newTitle === columnTitle}
+              className="min-w-20"
+            >
+              {t('SAVE')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

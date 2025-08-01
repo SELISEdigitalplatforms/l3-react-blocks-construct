@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import TaskManagerToolbar from 'features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
+import TaskManagerToolbar, {
+  ViewMode,
+} from 'features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
 import TaskListView from './task-list-view';
 import TaskCardView from './task-card-view';
-import { TasksProvider } from 'features/task-manager/hooks/use-task-context';
-import { TaskProvider } from 'features/task-manager/contexts/task-context';
 
 /**
  * TaskManager Component
@@ -26,39 +26,39 @@ import { TaskProvider } from 'features/task-manager/contexts/task-context';
  */
 
 export default function TaskManager() {
-  const [viewMode, setViewMode] = useState('board');
-
+  const [viewMode, setViewMode] = useState<ViewMode>('board');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
 
   const onOpen = () => {
     setIsNewTaskModalOpen(true);
   };
 
-  const handleViewMode = (view: string) => {
-    setViewMode(view === 'list' ? 'list' : 'board');
+  const handleViewMode = (view: ViewMode) => {
+    setViewMode(view);
   };
 
   return (
-    <TaskProvider>
-      <TasksProvider>
-        <div className="flex w-full flex-col">
-          <div className="mb-4 whitespace-nowrap md:mb-8">
-            <TaskManagerToolbar
-              viewMode={viewMode}
-              handleViewMode={handleViewMode}
-              onOpen={onOpen}
-            />
-          </div>
+    <div className="flex w-full flex-col">
+      <div className="mb-4 whitespace-nowrap md:mb-8">
+        <TaskManagerToolbar
+          viewMode={viewMode}
+          handleViewMode={handleViewMode}
+          onOpen={onOpen}
+          onSearch={(query) => {
+            setSearchQuery(query);
+          }}
+        />
+      </div>
 
-          {viewMode === 'board' && (
-            <TaskCardView
-              isNewTaskModalOpen={isNewTaskModalOpen}
-              setNewTaskModalOpen={setIsNewTaskModalOpen}
-            />
-          )}
-          {viewMode === 'list' && <TaskListView />}
-        </div>
-      </TasksProvider>
-    </TaskProvider>
+      {viewMode === 'board' && (
+        <TaskCardView
+          isNewTaskModalOpen={isNewTaskModalOpen}
+          setNewTaskModalOpen={setIsNewTaskModalOpen}
+          searchQuery={searchQuery}
+        />
+      )}
+      {viewMode === 'list' && <TaskListView searchQuery={searchQuery} />}
+    </div>
   );
 }
