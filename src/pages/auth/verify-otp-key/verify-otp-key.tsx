@@ -91,7 +91,7 @@ export function VerifyOtpKey() {
               })}
         </p>
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 h-10">
         <UIOtpInput
           numInputs={mfaType === UserMfaType.AUTHENTICATOR_APP ? 6 : 5}
           value={otpValue}
@@ -101,7 +101,7 @@ export function VerifyOtpKey() {
             setOtpError('');
           }}
         />
-        {otpError && <span className="text-destructive text-sm">{otpError}</span>}
+        {otpError && <span className="text-destructive text-sm h-10">{otpError}</span>}
       </div>
       <div className="flex w-full flex-col gap-6">
         <Button
