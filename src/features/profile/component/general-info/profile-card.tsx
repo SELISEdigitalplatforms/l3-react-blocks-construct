@@ -8,6 +8,7 @@ import { Dialog } from 'components/ui/dialog';
 import { Separator } from 'components/ui/separator';
 import { Skeleton } from 'components/ui/skeleton';
 import { EditProfile } from '../modals/edit-profile/edit-profile';
+import React, { useMemo, useState } from 'react';
 
 export const ProfileCard: React.FC<{
   userInfo: any;
@@ -27,6 +28,30 @@ export const ProfileCard: React.FC<{
   handleEditProfileClose,
 }) => {
   const { t } = useTranslation();
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const profileImageSrc = useMemo(() => {
+    if (!userInfo?.profileImageUrl || userInfo.profileImageUrl === '') {
+      return DummyProfile;
+    }
+    return userInfo.profileImageUrl;
+  }, [userInfo?.profileImageUrl]);
+
+  React.useEffect(() => {
+    setImageLoaded(false);
+    setImageError(false);
+  }, [profileImageSrc]);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
+  const handleImageError = () => {
+    setImageLoaded(true);
+    setImageError(true);
+  };
 
   return (
     <Card className="w-full border-none rounded-[8px] shadow-sm">
@@ -41,16 +66,21 @@ export const ProfileCard: React.FC<{
               {isLoading ? (
                 <Skeleton className="w-16 h-16 rounded-full" />
               ) : (
-                <img
-                  src={
-                    userInfo?.profileImageUrl !== ''
-                      ? (userInfo?.profileImageUrl ?? DummyProfile)
-                      : DummyProfile
-                  }
-                  alt="Profile"
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  {!imageLoaded && (
+                    <Skeleton className="w-16 h-16 rounded-full absolute inset-0 z-10" />
+                  )}
+                  <img
+                    key={profileImageSrc}
+                    src={imageError ? DummyProfile : profileImageSrc}
+                    alt="Profile"
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                    style={{ display: imageLoaded ? 'block' : 'none' }}
+                  />
+                </>
               )}
             </div>
             <div className="flex flex-col gap-1 ml-3 sm:ml-9">
