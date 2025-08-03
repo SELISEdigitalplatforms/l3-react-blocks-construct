@@ -23,9 +23,9 @@ export interface Tag {
 }
 
 export interface Assignee {
-  id: string;
-  name: string;
-  avatar: string;
+  ItemId: string;
+  Name: string;
+  ImageUrl: string;
 }
 
 export interface TaskComments {
@@ -51,7 +51,7 @@ export interface TaskItem {
   IsCompleted: boolean;
   Language?: string;
   Description?: string;
-  Assignee?: string;
+  Assignee?: Assignee[];
   Attachments?: TaskAttachments[];
   Comments?: TaskComments[];
   DueDate?: string;
@@ -134,7 +134,7 @@ export interface GetTagsResponse {
 export interface TaskItemInsertInput {
   Title: string;
   Description?: string;
-  Assignee?: string;
+  Assignee?: Assignee[];
   DueDate?: string;
   Priority?: TaskPriority;
   Section?: string;
@@ -145,6 +145,7 @@ export interface TaskItemInsertInput {
 }
 
 export interface TaskItemUpdateInput extends Partial<TaskItemInsertInput> {
+  Assignee?: Assignee[];
   IsDeleted?: boolean;
 }
 

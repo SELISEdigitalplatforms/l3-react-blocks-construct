@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
@@ -42,13 +42,40 @@ interface SortableTaskItemProps {
 }
 
 export function SortableTaskItem({
-  task,
+  task: initialTask,
   columns,
   handleTaskClick,
 }: Readonly<SortableTaskItemProps>) {
+  const [task, setTask] = useState(initialTask);
+
+  // Update the task when it changes in the parent
+  useEffect(() => {
+    setTask(initialTask);
+  }, [initialTask]);
+
+  // Listen for task updates from other components
+  useEffect(() => {
+    const handleTaskUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<TaskItem>;
+      if (customEvent.detail?.ItemId === task.ItemId) {
+        setTask(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('task-updated', handleTaskUpdated as EventListener);
+    return () => {
+      window.removeEventListener('task-updated', handleTaskUpdated as EventListener);
+    };
+  }, [task.ItemId]);
   const commentsCount = Array.isArray(task?.Comments) ? task.Comments.length : 0;
   const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
-  const assignees = task?.Assignee ? [task.Assignee] : [];
+  const assignees = (() => {
+    if (!task?.Assignee) return [];
+    const assigneeList = Array.isArray(task.Assignee) ? task.Assignee : [task.Assignee];
+    return assigneeList.map(assignee => 
+      typeof assignee === 'string' ? assignee : assignee.Name || ''
+    ).filter(Boolean);
+  })();
   const { updateTaskDetails } = useTaskDetails(task.ItemId);
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskItem();
 

@@ -32,76 +32,10 @@ export const GET_TASK_MANAGER_QUERY = `
         Priority
         Section
         Tags
-      }
-    }
-  }
-`;
-
-// Let's add a separate query to get the schema for the complex types
-export const INTROSPECTION_QUERY = `
-  query IntrospectionQuery {
-    __schema {
-      types {
-        kind
-        name
-        description
-        fields {
-          name
-          description
-          type {
-            kind
-            name
-            ofType {
-              kind
-              name
-              ofType {
-                kind
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-// Query to get the schema for AssigneeMember type
-export const GET_ASSIGNEE_SCHEMA = `
-  query GetAssigneeSchema {
-    __type(name: "AssigneeMember") {
-      name
-      kind
-      fields {
-        name
-        type {
-          name
-          kind
-          ofType {
-            name
-            kind
-          }
-        }
-      }
-    }
-  }
-`;
-
-// Query to get the schema for Attachment type
-export const GET_ATTACHMENT_SCHEMA = `
-  query GetAttachmentSchema {
-    __type(name: "Attachment") {
-      name
-      kind
-      fields {
-        name
-        type {
-          name
-          kind
-          ofType {
-            name
-            kind
-          }
+        Assignee {
+          ItemId
+          Name
+          ImageUrl
         }
       }
     }

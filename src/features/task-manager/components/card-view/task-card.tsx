@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar } from 'lucide-react';
@@ -52,7 +53,31 @@ interface ITaskCardProps {
   handleTaskClick: (id: string) => void;
 }
 
-export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITaskCardProps>) {
+export function TaskCard({
+  task: initialTask,
+  index,
+  columns,
+  handleTaskClick,
+}: Readonly<ITaskCardProps>) {
+  const [task, setTask] = useState(initialTask);
+
+  useEffect(() => {
+    setTask(initialTask);
+  }, [initialTask]);
+
+  useEffect(() => {
+    const handleTaskUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<TaskItem>;
+      if (customEvent.detail?.ItemId === task.ItemId) {
+        setTask(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('task-updated', handleTaskUpdated as EventListener);
+    return () => {
+      window.removeEventListener('task-updated', handleTaskUpdated as EventListener);
+    };
+  }, [task.ItemId]);
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -234,15 +259,26 @@ export function TaskCard({ task, index, columns, handleTaskClick }: Readonly<ITa
               )}
             </div>
 
-            {task.Assignee && (
-              <button className="flex -space-x-2" onClick={handleInteractiveElementClick}>
-                <div
-                  key={task.Assignee}
-                  className="h-6 w-6 rounded-full bg-gray-300 border-2 border-white flex items-center justify-center text-xs"
-                >
-                  {task.Assignee.charAt(0).toUpperCase()}
-                </div>
-              </button>
+            {task.Assignee && task.Assignee.length > 0 && (
+              <div className="flex -space-x-2" onClick={handleInteractiveElementClick}>
+                {task.Assignee.map((assignee, idx) => {
+                  const displayName = assignee?.Name || '';
+                  const imageUrl = assignee?.ImageUrl;
+                  const initial = displayName ? displayName.charAt(0).toUpperCase() : '';
+
+                  return (
+                    <Avatar
+                      key={assignee?.ItemId || idx}
+                      className="h-6 w-6 border-2 border-background"
+                    >
+                      <AvatarImage src={imageUrl} alt={displayName} />
+                      <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+                        {initial}
+                      </AvatarFallback>
+                    </Avatar>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}

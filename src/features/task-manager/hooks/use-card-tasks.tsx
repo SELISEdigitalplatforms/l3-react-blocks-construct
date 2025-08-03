@@ -100,11 +100,9 @@ export function useCardTasks() {
           tasksBySectionId[section.ItemId] = [];
         });
 
-        // Assign tasks to their respective sections based on the Section field (which contains the section title)
         if (tasksData?.TaskManagerItems?.items) {
           tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
             if (task.Section) {
-              // Find the section with a matching title
               const section = Array.from(sectionsByTitle.values()).find(
                 (s) => s.Title === task.Section
               );
@@ -118,7 +116,6 @@ export function useCardTasks() {
           });
         }
 
-        // Create the final columns with their tasks
         const newColumns = sectionsData.TaskManagerSections.items.map((section: TaskSection) => ({
           ...section,
           tasks: tasksBySectionId[section.ItemId] || [],
@@ -131,13 +128,21 @@ export function useCardTasks() {
 
   const ensureTaskItem = (task: TaskItem): TaskItem => {
     return {
-      ...task,
+      ItemId: task.ItemId || '',
       Title: task.Title || '',
+      Description: task.Description || '',
       IsCompleted: task.IsCompleted || false,
       Priority: task.Priority || TaskPriority.MEDIUM,
+      Section: task.Section || '',
       Tags: task.Tags || [],
+      Assignee: task.Assignee || [],
+      Comments: task.Comments || [],
+      Attachments: task.Attachments || [],
       CreatedBy: task.CreatedBy || '',
       CreatedDate: task.CreatedDate || new Date().toISOString(),
+      LastUpdatedBy: task.LastUpdatedBy || '',
+      LastUpdatedDate: task.LastUpdatedDate || new Date().toISOString(),
+      DueDate: task.DueDate || '',
       IsDeleted: task.IsDeleted || false,
       Language: task.Language || 'en',
       OrganizationIds: task.OrganizationIds || [],

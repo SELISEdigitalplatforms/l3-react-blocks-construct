@@ -63,10 +63,14 @@ export function AssigneeSelector({
 }: Readonly<AssigneeSelectorProps>) {
   const { t } = useTranslation();
   const handleAssigneeToggle = (assignee: Assignee) => {
-    if (selectedAssignees.some((a) => a.id === assignee.id)) {
-      onChange(selectedAssignees.filter((a) => a.id !== assignee.id));
+    const isSelected = selectedAssignees.some((a) => a.ItemId === assignee.ItemId);
+
+    if (isSelected) {
+      const newAssignees = selectedAssignees.filter((a) => a.ItemId !== assignee.ItemId);
+      onChange(newAssignees);
     } else {
-      onChange([...selectedAssignees, assignee]);
+      const newAssignees = [...selectedAssignees, assignee];
+      onChange(newAssignees);
     }
   };
 
@@ -75,12 +79,11 @@ export function AssigneeSelector({
       <div className="flex items-center gap-2">
         <div className="flex -space-x-2">
           {selectedAssignees.slice(0, 3).map((assignee) => (
-            <Avatar key={assignee.id} className="h-8 w-8 border-2 border-background">
-              <AvatarImage src={assignee.avatar} alt={assignee.name} />
+            <Avatar key={assignee.ItemId} className="h-8 w-8 border-2 border-background">
+              <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
               <AvatarFallback className="bg-gray-300 text-foreground text-xs">
-                {assignee.name
-                  .split(' ')
-                  .map((n) => n[0])
+                {assignee.Name.split(' ')
+                  .map((n: string) => n[0])
                   .join('')
                   .toUpperCase()
                   .substring(0, 2)}
@@ -106,10 +109,10 @@ export function AssigneeSelector({
                 <CommandEmpty className="py-2 px-3 text-sm">{t('NO_MEMBERS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableAssignees.map((assignee) => {
-                    const isSelected = selectedAssignees.some((a) => a.id === assignee.id);
+                    const isSelected = selectedAssignees.some((a) => a.ItemId === assignee.ItemId);
                     return (
                       <CommandItem
-                        key={assignee.id}
+                        key={assignee.ItemId}
                         onSelect={() => handleAssigneeToggle(assignee)}
                         className="flex items-center gap-2 px-2 py-1.5"
                       >
@@ -119,22 +122,21 @@ export function AssigneeSelector({
                           className="h-4 w-4 rounded"
                         />
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={assignee.avatar} alt={assignee.name} />
+                          <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
                           <AvatarFallback
                             className={cn(
                               'bg-gray-200 text-foreground text-xs',
                               isSelected && 'bg-primary text-primary-foreground'
                             )}
                           >
-                            {assignee.name
-                              .split(' ')
-                              .map((n) => n[0])
+                            {assignee.Name.split(' ')
+                              .map((n: string) => n[0])
                               .join('')
                               .toUpperCase()
                               .substring(0, 2)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm">{assignee.name}</span>
+                        <span className="text-sm">{assignee.Name}</span>
                       </CommandItem>
                     );
                   })}

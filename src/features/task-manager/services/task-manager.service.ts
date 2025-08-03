@@ -115,9 +115,17 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
     }
 
     if (taskManagerItems) {
+      // Ensure each task has an Assignee array, even if it's empty
+      const items = (taskManagerItems.items || []).map((task) => ({
+        ...task,
+        Assignee: task.Assignee || [],
+        Tags: task.Tags || [],
+        OrganizationIds: task.OrganizationIds || [],
+      }));
+
       return {
         TaskManagerItems: {
-          items: taskManagerItems.items || [],
+          items,
           totalCount: taskManagerItems.totalCount || 0,
           hasNextPage: taskManagerItems.hasNextPage || false,
           hasPreviousPage: taskManagerItems.hasPreviousPage || false,
@@ -560,7 +568,6 @@ export const deleteTaskTag = async (
 
   return (response as any).data as DeleteTaskTagResponse;
 };
-
 
 export const getUsers = (payload: GetUsersPayload) => {
   const requestBody = {
