@@ -1,8 +1,9 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Plus } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
+import { Badge } from 'components/ui/badge';
 import {
   Command,
   CommandEmpty,
@@ -11,15 +12,20 @@ import {
   CommandItem,
   CommandList,
 } from 'components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
 import { Label } from 'components/ui/label';
+import { ItemTag } from '../../types/task-manager.types';
 
 /**
  * TagSelector Component
  *
  * A reusable component for selecting and managing tags.
  * This component allows users to:
- * - View selected tags
+ * - View selected tags as badges
  * - Add or remove tags from a list of available tags
  * - Search for tags using a search input
  *
@@ -30,9 +36,9 @@ import { Label } from 'components/ui/label';
  * - Uses a popover for a compact and user-friendly UI
  *
  * Props:
- * @param {Tag[]} availableTags - The list of all available tags
- * @param {string[]} selectedTags - The list of currently selected tag IDs
- * @param {(selectedTagIds: string[]) => void} onChange - Callback triggered when the selected tags change
+ * @param {ItemTag[]} availableTags - The list of all available tags
+ * @param {ItemTag[]} selectedTags - The list of currently selected tags
+ * @param {(selectedTags: ItemTag[]) => void} onChange - Callback triggered when the selected tags change
  *
  * @returns {JSX.Element} The tag selector component
  *
@@ -48,36 +54,63 @@ import { Label } from 'components/ui/label';
  * />
  */
 
-interface Tag {
-  id: string;
-  label: string;
-}
-
 interface TagsSelectorProps {
-  readonly availableTags: Tag[];
-  readonly selectedTags: string[];
-  readonly onChange: (selectedTagIds: string[]) => void;
+  availableTags: ItemTag[];
+  selectedTags: ItemTag[];
+  onChange: (selectedTags: ItemTag[]) => void;
 }
 
-export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProps) {
+export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSelectorProps>) {
   const { t } = useTranslation();
-  const [selectedValues, setSelectedValues] = React.useState<Set<string>>(new Set(selectedTags));
+  const [selectedValues, setSelectedValues] = useState<Set<string>>(
+    new Set(selectedTags.map((tag) => tag.ItemId))
+  );
 
-  React.useEffect(() => {
-    setSelectedValues(new Set(selectedTags));
+  useEffect(() => {
+    setSelectedValues(new Set(selectedTags.map((tag) => tag.ItemId)));
   }, [selectedTags]);
 
-  const handleSelect = (value: string) => {
-    const newSelectedValues = new Set(selectedValues);
+  const handleSelect = (itemId: string, e?: React.MouseEvent) => {
+    // Prevent event propagation to avoid immediate dropdown close
+    e?.preventDefault();
+    e?.stopPropagation();
+    
+    const tag = availableTags.find((t: ItemTag) => t.ItemId === itemId);
+    if (!tag) return;
 
-    if (newSelectedValues.has(value)) {
-      newSelectedValues.delete(value);
+    // Create a new Set to ensure we trigger a state update
+    const newSelectedValues = new Set(selectedValues);
+    const isSelected = newSelectedValues.has(itemId);
+
+    if (isSelected) {
+      newSelectedValues.delete(itemId);
     } else {
-      newSelectedValues.add(value);
+      newSelectedValues.add(itemId);
     }
 
-    setSelectedValues(newSelectedValues);
-    onChange(Array.from(newSelectedValues));
+    // Convert selected IDs back to ItemTag objects
+    const updatedSelectedTags: ItemTag[] = [];
+    
+    // First add all currently selected tags that are still selected
+    selectedTags.forEach(tag => {
+      if (newSelectedValues.has(tag.ItemId)) {
+        updatedSelectedTags.push(tag);
+        newSelectedValues.delete(tag.ItemId);
+      }
+    });
+    
+    // Then add any newly selected tags from availableTags
+    availableTags.forEach(tag => {
+      if (newSelectedValues.has(tag.ItemId)) {
+        updatedSelectedTags.push(tag);
+        newSelectedValues.delete(tag.ItemId);
+      }
+    });
+
+    // Update local state
+    setSelectedValues(new Set(updatedSelectedTags.map(t => t.ItemId)));
+    // Propagate changes to parent
+    onChange(updatedSelectedTags);
   };
 
   const handleClear = () => {
@@ -85,50 +118,76 @@ export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProp
     onChange([]);
   };
 
+  const isSelected = (itemId: string): boolean => selectedValues.has(itemId);
+
   return (
     <div>
       <Label className="text-high-emphasis text-base font-semibold">{t('TAGS')}</Label>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {Array.from(selectedValues).map((tagId) => {
-          const tag = availableTags.find((t) => t.id === tagId);
-          return (
-            <div
-              key={tagId}
-              className="bg-surface text-high-emphasis font-semibold text-sm px-3 py-1 rounded flex items-center"
+      <div className="flex items-center gap-1">
+        {selectedTags
+          .filter((tag) => selectedValues.has(tag.ItemId))
+          .map((tag) => (
+            <Badge
+              key={tag.ItemId}
+              className="bg-surface hover:bg-surface text-high-emphasis font-semibold text-sm px-3 py-1 rounded flex items-center"
             >
-              {tag?.label}
-            </div>
-          );
-        })}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="h-7 w-7 border-dashed">
+              {tag.TagLabel}
+            </Badge>
+          ))}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-7 w-7 border-dashed"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Plus className="h-3 w-3" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="sm:max-w-[200px] p-0">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="p-0 w-[200px]" align="start" sideOffset={4}>
             <Command>
-              <CommandInput placeholder={t('ENTER_TAG_NAME')} />
-              <CommandList>
-                <CommandEmpty>{t('NO_TAGS_FOUND')}</CommandEmpty>
+              <CommandInput placeholder={t('ENTER_TAG_NAME')} className="h-9" />
+              <CommandList className="max-h-[300px] overflow-y-auto">
+                <CommandEmpty className="py-2 px-3 text-sm">{t('NO_TAGS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableTags.map((tag) => {
-                    const isSelected = selectedValues.has(tag.id);
+                    const selected = isSelected(tag.ItemId);
                     return (
                       <CommandItem
-                        key={tag.id}
-                        onSelect={() => handleSelect(tag.id)}
-                        className="flex items-center"
+                        key={tag.ItemId}
+                        value={tag.ItemId}
+                        onSelect={(value) => {
+                          // This will be called when the item is selected via keyboard
+                          if (value !== tag.ItemId) return;
+                          handleSelect(tag.ItemId);
+                          return false; // Prevent default behavior
+                        }}
+                        className="flex items-center px-2 py-1.5 cursor-pointer"
+                        onMouseDown={(e) => {
+                          // Use onMouseDown instead of onClick to ensure it fires before the dropdown closes
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSelect(tag.ItemId, e);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSelect(tag.ItemId, e as any);
+                          }
+                        }}
                       >
                         <div
                           className={cn(
                             'mr-2 flex h-4 w-4 items-center justify-center rounded-md border border-primary',
-                            isSelected ? 'bg-primary text-white' : 'opacity-50 [&_svg]:invisible'
+                            selected ? 'bg-primary text-white' : 'opacity-50 [&_svg]:invisible'
                           )}
+                          aria-hidden="true"
                         >
                           <Check className="h-3 w-3" />
                         </div>
-                        <span>{tag.label}</span>
+                        <span className="text-sm">{tag.TagLabel}</span>
                       </CommandItem>
                     );
                   })}
@@ -139,7 +198,7 @@ export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProp
                       variant="ghost"
                       size="sm"
                       onClick={handleClear}
-                      className="w-full justify-center text-center"
+                      className="w-full justify-center text-center text-sm"
                     >
                       {t('CLEAR_ALL')}
                     </Button>
@@ -147,8 +206,8 @@ export function Tags({ availableTags, selectedTags, onChange }: TagsSelectorProp
                 )}
               </CommandList>
             </Command>
-          </PopoverContent>
-        </Popover>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

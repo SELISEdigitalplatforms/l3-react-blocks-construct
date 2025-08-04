@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -6,12 +6,12 @@ import { Plus, X } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import { TaskCard } from './task-card';
-import { ITaskColumnProps } from '../../types/task';
 import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from '../task-details-view/task-details-view';
 import { ColumnMenu } from './column-menu';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { getResponsiveContainerHeight } from 'lib/mobile-responsiveness';
+import { TaskSection } from '../../types/task-manager.types';
 
 /**
  * TaskColumn Component
@@ -54,30 +54,33 @@ import { getResponsiveContainerHeight } from 'lib/mobile-responsiveness';
  * />
  */
 
-const toTranslationKey = (title: string): string => {
-  return title.replace(/\s+/g, '_').toUpperCase();
-};
+export interface ITaskColumnProps {
+  column: TaskSection;
+  tasks: any[];
+  sections: TaskSection[];
+  setActiveColumn: (columnId: string) => void;
+  onAddTask: (columnId: string, taskTitle: string) => Promise<string | null>;
+  onRenameColumn: (columnId: string, newTitle: string) => void;
+  onDeleteColumn: (columnId: string) => void;
+  onTaskAdded?: () => void;
+  isNewColumn?: boolean;
+}
 
 export function TaskColumn({
   column,
   tasks,
-  setActiveColumn,
+  sections,
   onAddTask,
   onRenameColumn,
   onDeleteColumn,
   onTaskAdded,
   isNewColumn,
-}: ITaskColumnProps & {
-  onTaskAdded?: () => void;
-  onRenameColumn: (columnId: string, newTitle: string) => void;
-  onDeleteColumn: (columnId: string) => void;
-  isNewColumn?: boolean;
-}) {
+}: ITaskColumnProps) {
   const { touchEnabled, screenSize } = useDeviceCapabilities();
   const { t } = useTranslation();
 
   const { isOver, setNodeRef } = useDroppable({
-    id: `column-${column.id}`,
+    id: `column-${column.ItemId}`,
     data: {
       column,
       touchEnabled,
@@ -89,7 +92,7 @@ export function TaskColumn({
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const [showAddInput, setShowAddInput] = useState<boolean>(false);
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
-  const [lastAddedTaskId, setLastAddedTaskId] = useState<string | null>(null);
+  const [isAddingTask, setIsAddingTask] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const addButtonRef = useRef<HTMLDivElement>(null);
@@ -98,37 +101,43 @@ export function TaskColumn({
 
   const taskIds = useMemo(() => tasks.map((task) => `task-${task.id}`), [tasks]);
 
-  useEffect(() => {
-    if (lastAddedTaskId && scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-    }
-  }, [lastAddedTaskId]);
-
   const handleAddTaskClick = () => {
     if (showAddInput) return;
     setShowAddInput(true);
   };
 
-  const handleAddTask = () => {
-    if (newTaskTitle.trim()) {
-      const newTaskId = onAddTask(column.id, newTaskTitle);
-      setActiveColumn(column.id);
+  const handleAddTask = async () => {
+    if (!newTaskTitle.trim() || isAddingTask) return;
 
-      setNewTaskTitle('');
-      setLastAddedTaskId(newTaskId);
+    setIsAddingTask(true);
+    try {
+      const taskId = await onAddTask(column.ItemId, newTaskTitle);
 
-      setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      if (taskId) {
+        setNewTaskTitle('');
+        setShowAddInput(false);
+
+        if (onTaskAdded) {
+          onTaskAdded();
         }
-      }, 100);
+
+        setTimeout(() => {
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+          }
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error adding task:', error);
+    } finally {
+      setIsAddingTask(false);
     }
-    setShowAddInput(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleAddTask();
+      e.preventDefault();
+      await handleAddTask();
     } else if (e.key === 'Escape') {
       setShowAddInput(false);
       setNewTaskTitle('');
@@ -159,14 +168,12 @@ export function TaskColumn({
     <div className="w-80 shrink-0 flex flex-col">
       <div className="flex justify-between items-center mb-3 px-1">
         <div className="flex items-center gap-3">
-          <h2 className="text-high-emphasis text-base font-bold">
-            {t(toTranslationKey(column.title))}
-          </h2>
+          <h2 className="text-high-emphasis text-base font-bold">{column.Title}</h2>
           <span className="text-sm text-medium-emphasis font-semibold">{tasks.length}</span>
         </div>
         <ColumnMenu
-          columnId={column.id}
-          columnTitle={column.title}
+          columnId={column.ItemId}
+          columnTitle={column.Title}
           onRename={onRenameColumn}
           onDelete={onDeleteColumn}
         />
@@ -201,8 +208,16 @@ export function TaskColumn({
           <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
             <div className="space-y-3">
               {tasks.map((task, index) => (
-                <div key={task.id} className={`task-card-container`}>
-                  <TaskCard handleTaskClick={handleTaskClick} task={task} index={index} />
+                <div
+                  key={`task-${task.ItemId || task.id || `temp-${index}`}`}
+                  className="task-card-container"
+                >
+                  <TaskCard
+                    handleTaskClick={handleTaskClick}
+                    task={task}
+                    index={index}
+                    columns={sections}
+                  />
                 </div>
               ))}
             </div>
@@ -210,7 +225,7 @@ export function TaskColumn({
 
           {tasks.length === 0 && !showAddInput && (
             <div className="text-center py-8">
-              <p className="text-sm text-gray-500">{t('NO_TASKS_IN_THIS_LIST')}</p>
+              <p className="text-sm text-medium-emphasis">{t('NO_TASKS_IN_THIS_LIST')}</p>
             </div>
           )}
         </div>
@@ -227,7 +242,12 @@ export function TaskColumn({
                 className="w-full bg-white border-0 focus:ring-0 text-sm px-2"
               />
               <div className="flex space-x-2">
-                <Button size="sm" onClick={handleAddTask} className="min-w-20">
+                <Button
+                  size="sm"
+                  onClick={handleAddTask}
+                  className="min-w-20"
+                  disabled={isAddingTask}
+                >
                   <Plus className="h-4 w-4" />
                   {t('ADD')}
                 </Button>

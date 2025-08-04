@@ -47,11 +47,11 @@ import { useTaskDetails } from '../../hooks/use-task-details';
  */
 
 interface EditableHeadingProps {
-  readonly taskId?: string;
-  readonly initialValue?: string;
-  readonly className?: string;
-  readonly onValueChange?: (value: string) => void;
-  readonly isNewTaskModalOpen?: boolean;
+  taskId?: string;
+  initialValue?: string;
+  className?: string;
+  onValueChange?: (value: string) => void;
+  isNewTaskModalOpen?: boolean;
 }
 
 export function EditableHeading({
@@ -60,13 +60,19 @@ export function EditableHeading({
   className = '',
   onValueChange,
   isNewTaskModalOpen,
-}: EditableHeadingProps) {
+}: Readonly<EditableHeadingProps>) {
   const { task, updateTaskDetails } = useTaskDetails(taskId);
   const [value, setValue] = useState(initialValue);
   const [isEditing, setIsEditing] = useState(isNewTaskModalOpen);
   const [isHovering, setIsHovering] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!initialValue && task?.Title) {
+      setValue(task.Title);
+    }
+  }, [task, initialValue]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -101,7 +107,7 @@ export function EditableHeading({
     }
 
     if (task) {
-      const updatedTask = { ...task, title: value };
+      const updatedTask = { ...task, Title: value };
       updateTaskDetails(updatedTask);
     }
   };

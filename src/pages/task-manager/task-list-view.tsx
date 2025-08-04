@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verticalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import {
@@ -12,7 +12,7 @@ import {
   DragEndEvent,
   DragOverlay,
 } from '@dnd-kit/core';
-import { ITask } from 'features/task-manager/types/task';
+import { TaskItem } from '../../features/task-manager/types/task-manager.types';
 import {
   NewTaskRow,
   SortableTaskItem,
@@ -22,6 +22,7 @@ import {
 import { Dialog } from 'components/ui/dialog';
 import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
 import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
+import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
 
 /**
  * TaskListView Component
@@ -48,15 +49,95 @@ import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
  * <TaskListView taskService={new TaskService()} />
  */
 
-export function TaskListView() {
+import { ItemTag } from 'features/task-manager/types/task-manager.types';
+
+interface TaskListViewProps {
+  searchQuery?: string;
+  filters: {
+    priorities: string[];
+    statuses: string[];
+    assignees: string[];
+    tags: ItemTag[];
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+}
+
+export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
   const { t } = useTranslation();
-  const { tasks, createTask, updateTaskOrder, getFilteredTasks } = useListTasks();
-  const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
-  const [activeTask, setActiveTask] = useState<ITask | null>(null);
+  const { tasks, createTask, updateTaskOrder, isLoading } = useListTasks();
+
+  const filteredTasks = useMemo(() => {
+    let result = [...tasks];
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (task: TaskItem) =>
+          task.Title?.toLowerCase().includes(query) ||
+          task.Description?.toLowerCase().includes(query) ||
+          task.ItemTag?.some((tag: ItemTag) => 
+            tag.TagLabel?.toLowerCase().includes(query) || 
+            tag.ItemId?.toLowerCase().includes(query)
+          )
+      );
+    }
+
+    if (filters.priorities.length) {
+      result = result.filter(
+        (task: TaskItem) => task.Priority && filters.priorities.includes(task.Priority)
+      );
+    }
+
+    if (filters.statuses.length) {
+      result = result.filter(
+        (task: TaskItem) => task.Section && filters.statuses.includes(task.Section)
+      );
+    }
+
+    if (filters.assignees.length) {
+      result = result.filter((task: TaskItem) =>
+        task.Assignee?.some(
+          (assignee) => assignee.ItemId && filters.assignees.includes(assignee.ItemId)
+        )
+      );
+    }
+
+    if (filters.tags.length) {
+      const tagIds = new Set(filters.tags.map(tag => tag.ItemId));
+      result = result.filter((task: TaskItem) =>
+        task.ItemTag?.some(tag => tagIds.has(tag.ItemId))
+      );
+    }
+
+    if (filters.dueDate?.from || filters.dueDate?.to) {
+      result = result.filter((task: TaskItem) => {
+        if (!task.DueDate) return false;
+        const dueDate = new Date(task.DueDate);
+        if (filters.dueDate?.from && dueDate < filters.dueDate.from) return false;
+        if (filters.dueDate?.to && dueDate > filters.dueDate.to) return false;
+        return true;
+      });
+    }
+
+    return result;
+  }, [tasks, searchQuery, filters]);
+
+  const { data: sectionsData } = useGetTaskSections({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const columns = useMemo(() => {
+    return sectionsData?.TaskManagerSections?.items || [];
+  }, [sectionsData]);
+
+  const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
-
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -102,42 +183,28 @@ export function TaskListView() {
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const activeId = active.id.toString();
-
-    if (activeId.startsWith('task-')) {
-      const taskId = activeId.replace('task-', '');
-      const task = tasks.find((t) => t.id === taskId);
-      if (task) {
-        setActiveTask(task);
-      }
-    }
+    setActiveTask(tasks.find((task) => `task-${task.ItemId}` === active.id) || null);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    if (!over) return;
 
-    if (!over) {
-      setActiveTask(null);
-      return;
-    }
+    const activeIndex = tasks.findIndex((task) => `task-${task.ItemId}` === active.id);
+    const overIndex = tasks.findIndex((task) => `task-${task.ItemId}` === over.id);
 
-    if (active.id !== over.id) {
-      const activeIndex = tasks.findIndex((task) => `task-${task.id}` === active.id);
-      const overIndex = tasks.findIndex((task) => `task-${task.id}` === over.id);
-
+    if (activeIndex !== overIndex) {
       updateTaskOrder(activeIndex, overIndex);
     }
-
     setActiveTask(null);
   };
 
-  const filteredTasks = getFilteredTasks(statusFilter);
-  const taskIds = filteredTasks.map((task) => `task-${task.id}`);
+  const taskIds = filteredTasks.map((task) => `task-${task.ItemId}`);
 
-  const handleTaskClick = (id: string) => {
-    setSelectedTaskId(id);
+  const handleTaskClick = useCallback((taskId: string) => {
+    setSelectedTaskId(taskId);
     setIsTaskDetailsModalOpen(true);
-  };
+  }, []);
 
   return (
     <div className="mt-4">
@@ -156,9 +223,18 @@ export function TaskListView() {
                   <NewTaskRow onAdd={handleAddTask} onCancel={() => setShowNewTaskInput(false)} />
                 )}
 
-                {filteredTasks.length > 0 ? (
+                {isLoading ? (
+                  <div className="flex justify-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                  </div>
+                ) : filteredTasks.length > 0 ? (
                   filteredTasks.map((task) => (
-                    <SortableTaskItem handleTaskClick={handleTaskClick} key={task.id} task={task} />
+                    <SortableTaskItem
+                      handleTaskClick={handleTaskClick}
+                      key={task.ItemId}
+                      task={task}
+                      columns={columns}
+                    />
                   ))
                 ) : (
                   <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
@@ -169,10 +245,10 @@ export function TaskListView() {
                 {activeTask && (
                   <div className="flex items-center bg-white shadow-lg border border-gray-200 p-4 rounded-lg w-full">
                     <div className="flex-shrink-0 mr-3">
-                      <StatusCircle isCompleted={true} />
+                      <StatusCircle isCompleted={activeTask.IsCompleted} />
                     </div>
                     <div className="flex-grow">
-                      <p className="font-medium text-sm text-high-emphasis">{activeTask.content}</p>
+                      <p className="font-medium text-sm text-high-emphasis">{activeTask.Title}</p>
                     </div>
                   </div>
                 )}

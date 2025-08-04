@@ -58,8 +58,17 @@ export function EditableDescription({
   const [isMounted, setIsMounted] = useState(false);
   const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
   const { t } = useTranslation();
-
   const [forceRender, setForceRender] = useState(0);
+
+  useEffect(() => {
+    if (initialContent && !content) {
+      setContent(initialContent);
+      setIsEditing(false);
+    } else if (!isEditing) {
+      setContent(initialContent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialContent]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -85,7 +94,7 @@ export function EditableDescription({
     }
 
     if (content && task) {
-      updateTaskDetails({ description: content });
+      updateTaskDetails({ Description: content });
     }
 
     setEditorComponent(null);
@@ -168,6 +177,7 @@ export function EditableDescription({
     if (!isEditing) {
       const styleTag = document.createElement('style');
       styleTag.id = 'hide-quill-toolbar';
+      styleTag.innerHTML = '.ql-toolbar { display: none !important; }';
       document.head.appendChild(styleTag);
 
       return () => {
@@ -179,7 +189,6 @@ export function EditableDescription({
     }
   }, [isEditing, forceRender]);
 
-  // Extract the editor content rendering into a separate function
   const renderEditorContent = () => {
     if (!isMounted || !editorComponent) {
       return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;
@@ -219,24 +228,29 @@ export function EditableDescription({
   };
 
   return (
-    <section className="relative" key={`editor-container-${forceRender}`}>
-      <button
-        type="button"
-        className="flex items-center gap-1 h-9 focus:outline-none"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
+    <section 
+      className="relative" 
+      key={`editor-container-${forceRender}`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <div className="flex items-center gap-1 h-9">
         <Label className="text-high-emphasis text-base font-semibold">{t('DESCRIPTION')}</Label>
         {isHovering && !isEditing && (
-          <Button
-            onClick={() => setIsEditing(true)}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
             aria-label={t('EDIT_DESCRIPTION')}
-            variant="ghost"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
           >
             <PenLine className="h-4 w-4 text-primary" />
-          </Button>
+          </button>
         )}
-      </button>
+      </div>
 
       {isEditing ? renderEditorContent() : <div className="text-sm">{renderContent()}</div>}
     </section>
