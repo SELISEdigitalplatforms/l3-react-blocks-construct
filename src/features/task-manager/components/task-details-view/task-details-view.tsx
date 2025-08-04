@@ -2,7 +2,12 @@ import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
-import { useCreateTags, useGetTaskTags, useGetUsers } from '../../hooks/use-task-manager';
+import {
+  useCreateTags,
+  useGetTaskTags,
+  useGetUsers,
+  useCreateTaskItem,
+} from '../../hooks/use-task-manager';
 import { Assignee, Tag, TaskItem, TaskTagInsertInput } from '../../types/task-manager.types';
 import {
   TaskPriority,
@@ -59,7 +64,6 @@ import { AddTag } from '../modals/add-tag';
  * Props:
  * @param {() => void} onClose - Callback to close the task details view
  * @param {string} [taskId] - The ID of the task being viewed
- * @param {TaskService} taskService - Service for managing task-related operations
  * @param {boolean} [isNewTaskModalOpen] - Whether the modal is open for creating a new task
  * @param {() => void} [onTaskAddedList] - Callback triggered when a task is added to the list
  * @param {(columnId: string, taskTitle: string) => void} [onTaskAddedCard] - Callback for adding a task to a specific column
@@ -72,7 +76,6 @@ import { AddTag } from '../modals/add-tag';
  * <TaskDetailsView
  *   onClose={() => {}}
  *   taskId="123"
- *   taskService={taskServiceInstance}
  * />
  */
 
@@ -139,7 +142,7 @@ export default function TaskDetailsView({
     task?.DueDate ? new Date(task.DueDate) : undefined
   );
   const [title, setTitle] = useState<string>(task?.Title || '');
-  const [mark, setMark] = useState<boolean>(task?.IsCompleted || false);
+  const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted || false);
   const [section, setSection] = useState<string>(task?.Section || '');
   const [attachments, setAttachments] = useState<TaskAttachments[]>(
     task?.Attachments?.map((attachment) => ({
@@ -165,13 +168,9 @@ export default function TaskDetailsView({
   );
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
 
-  // Update selectedAssignees when task data changes
   useEffect(() => {
-    // Only update if task data exists and has changed
     if (!task) return;
 
-    // Only update if we don't have any selected assignees yet
-    // or if the task.Assignee is different from our current selection
     const currentAssigneeIds = selectedAssignees
       .map((a) => a.ItemId)
       .sort()
@@ -244,7 +243,7 @@ export default function TaskDetailsView({
   useEffect(() => {
     if (task) {
       setTitle(task.Title || '');
-      setMark(!!task.IsCompleted);
+      setIsMarkComplete(!!task.IsCompleted);
       setSection(task.Section || 'To Do');
       setAttachments(
         (task.Attachments || []).map((attachment) => ({
@@ -263,7 +262,6 @@ export default function TaskDetailsView({
         }))
       );
 
-      // Handle both array and single assignee cases
       if (task.Assignee) {
         if (Array.isArray(task.Assignee)) {
           setSelectedAssignees(
@@ -276,7 +274,6 @@ export default function TaskDetailsView({
               : []
           );
         } else if (typeof task.Assignee === 'object' && task.Assignee !== null) {
-          // Handle case where Assignee is a single object
           const assignee = task.Assignee as Assignee;
           setSelectedAssignees([
             {
@@ -299,7 +296,7 @@ export default function TaskDetailsView({
       }
     } else {
       setTitle('');
-      setMark(false);
+      setIsMarkComplete(false);
       setSection('To Do');
       setAttachments([]);
       setDate(undefined);
@@ -311,7 +308,7 @@ export default function TaskDetailsView({
   }, [
     task,
     setTitle,
-    setMark,
+    setIsMarkComplete,
     setSection,
     setAttachments,
     setDate,
@@ -398,45 +395,61 @@ export default function TaskDetailsView({
     }
   };
 
-  // Create a type that matches what the API expects for creating a new task
-  type NewTaskInput = Omit<Partial<TaskItem>, 'Assignee'> & { Assignee?: string };
+  type NewTaskInput = Omit<Partial<TaskItem>, 'Assignee'> & { Assignee?: string[] };
 
-  const safeAddTask = addTask
-    ? (task: NewTaskInput) => {
-        // Convert the task to match the expected TaskItem type
-        const taskForApi: Partial<TaskItem> = {
-          ...task,
-          // Convert the Assignee string back to an array of Assignee objects for the frontend
-          Assignee: task.Assignee
-            ? [
-                {
-                  ItemId: task.Assignee,
-                  Name: selectedAssignees.find((a) => a.ItemId === task.Assignee)?.Name || '',
-                  ImageUrl:
-                    selectedAssignees.find((a) => a.ItemId === task.Assignee)?.ImageUrl || '',
-                },
-              ]
-            : undefined,
-        };
-        return addTask(taskForApi);
+  const { mutateAsync: createTaskItem } = useCreateTaskItem();
+
+  const safeAddTask = async (task: NewTaskInput): Promise<string | undefined> => {
+    try {
+      const taskForApi: Partial<TaskItem> = {
+        ...task,
+        Attachments: task.Attachments?.map(({ ItemId, FileName, FileSize, FileType }) => ({
+          ItemId,
+          FileName,
+          FileType,
+          FileSize: typeof FileSize === 'string' ? parseInt(FileSize, 10) : FileSize,
+        })) as any,
+        Assignee: Array.isArray(task.Assignee)
+          ? task.Assignee.map((id) => ({
+              ItemId: id,
+              Name: selectedAssignees.find((a) => a.ItemId === id)?.Name || '',
+              ImageUrl: selectedAssignees.find((a) => a.ItemId === id)?.ImageUrl || '',
+            }))
+          : undefined,
+      };
+
+      if (addTask) {
+        const result = await addTask(taskForApi);
+        if (!result) {
+          throw new Error('No task ID returned from addTask');
+        }
+        return result;
       }
-    : () => undefined;
+
+      const response = await createTaskItem(taskForApi as any);
+      const taskId = (response as any)?.insertTaskManagerItem?.itemId;
+      if (!taskId) {
+        throw new Error('No task ID returned from API response');
+      }
+      return taskId;
+    } catch (error) {
+      console.error('Error in safeAddTask:', error);
+      throw error;
+    }
+  };
 
   const handleAddItem = async () => {
     if (isNewTaskModalOpen === true && !newTaskAdded) {
       const tagsToCreate = [...selectedTags];
-
       setSelectedTags([]);
 
-      // Create a new task object that matches the API's expected input
       const newTask: NewTaskInput = {
         Section: section,
-        IsCompleted: mark,
+        IsCompleted: isMarkComplete,
         Title: title,
         Priority: priority,
-        DueDate: date ? format(date, 'yyyy-MM-dd') : undefined,
-        // Use the first assignee's ItemId as a string for the API
-        Assignee: selectedAssignees.length > 0 ? selectedAssignees[0].ItemId : undefined,
+        DueDate: date ? new Date(date).toISOString() : undefined,
+        Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
         Description: description ?? '',
         Tags: selectedTags.map((tag) => tag.label),
         Attachments: attachments,
@@ -444,10 +457,14 @@ export default function TaskDetailsView({
       };
 
       try {
-        const newTaskId = title && safeAddTask(newTask);
+        if (!title) {
+          throw new Error('Task title is required');
+        }
+
+        const newTaskId = await safeAddTask(newTask);
 
         if (!newTaskId) {
-          throw new Error('Failed to create task');
+          throw new Error('Failed to create task: No task ID returned');
         }
 
         setCurrentTaskId(newTaskId);
@@ -455,26 +472,37 @@ export default function TaskDetailsView({
 
         if (tagsToCreate.length > 0) {
           const now = new Date().toISOString();
-          const tagPromises = tagsToCreate.map((tag) => {
-            const tagLabel = typeof tag === 'string' ? tag : tag.label;
-
-            return createTag({
-              ItemId: newTaskId,
-              Label: tagLabel,
-              CreatedDate: now,
-              IsDeleted: false,
-              LastUpdatedDate: now,
-            } as TaskTagInsertInput);
-          });
+          const existingTagLabels = tags.map((tg) => tg.label.toLowerCase());
+          const tagPromises = tagsToCreate
+            .filter((tg) => {
+              const lbl = typeof tg === 'string' ? tg : tg.label;
+              return !existingTagLabels.includes(lbl.toLowerCase());
+            })
+            .map((tag) => {
+              const tagLabel = typeof tag === 'string' ? tag : tag.label;
+              return createTag({
+                ItemId: uuidv4(),
+                Label: tagLabel,
+                CreatedDate: now,
+                IsDeleted: false,
+                LastUpdatedDate: now,
+              } as TaskTagInsertInput);
+            });
 
           await Promise.all(tagPromises);
         }
 
-        onTaskAddedList && onTaskAddedList();
+        toast({
+          title: t('SUCCESS'),
+          description: t('TASK_CREATED_SUCCESSFULLY'),
+        });
+        onTaskAddedList?.();
+        onClose();
       } catch (error) {
+        console.error('Error in handleAddItem:', error);
         toast({
           title: t('ERROR'),
-          description: t('Failed to create task or tags'),
+          description: error instanceof Error ? error.message : t('Failed to create task or tags'),
           variant: 'destructive',
         });
 
@@ -484,14 +512,10 @@ export default function TaskDetailsView({
   };
 
   const handleUpdateStatus = async () => {
-    const newStatus = !mark;
-    setMark(newStatus);
+    const newStatus = !isMarkComplete;
+    setIsMarkComplete(newStatus);
     if (currentTaskId) {
-      // Update the task details with the new status
       await updateTaskDetails({ IsCompleted: newStatus });
-      // The toggleTaskCompletion call is redundant since updateTaskDetails already handles the update
-      // Remove the line below to avoid duplicate updates
-      // await toggleTaskCompletion(newStatus);
     }
   };
 
@@ -661,7 +685,6 @@ export default function TaskDetailsView({
         );
       }
 
-      // If we have a task ID, associate the tag with the task
       if (currentTaskId) {
         // TODO: Add code to associate the tag with the task if needed
         // This might involve another mutation to update the task's tags
@@ -695,7 +718,7 @@ export default function TaskDetailsView({
           />
           <div className="flex h-7">
             <div className="bg-surface rounded px-2 py-1 gap-2 flex items-center">
-              {mark ? (
+              {isMarkComplete ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-secondary" />
                   <span className="text-xs font-semibold text-secondary">{t('COMPLETED')}</span>
@@ -887,15 +910,17 @@ export default function TaskDetailsView({
       </div>
       <div className="fixed bottom-0 left-0 right-0 h-16 bg-background">
         <Separator className="mb-3" />
-        <div className="flex justify-between items-center px-6">
-          <Button
-            onClick={() => setOpen(true)}
-            variant="ghost"
-            size="icon"
-            className="text-error bg-white w-12 h-10 border"
-          >
-            <Trash className="h-3 w-3" />
-          </Button>
+        <div className="flex w-full justify-between items-center px-6">
+          {!isNewTaskModalOpen && (
+            <Button
+              onClick={() => setOpen(true)}
+              variant="ghost"
+              size="icon"
+              className="text-error bg-white w-12 h-10 border"
+            >
+              <Trash className="h-3 w-3" />
+            </Button>
+          )}
           <ConfirmationModal
             open={open}
             onOpenChange={setOpen}
@@ -903,24 +928,36 @@ export default function TaskDetailsView({
             description={t('THIS_WILL_PERMANENTLY_DELETE_THE_TASK')}
             onConfirm={handleConfirm}
           />
-          <div className="flex gap-2">
-            {mark ? (
-              <Button variant="ghost" className="h-10 border" onClick={handleUpdateStatus}>
-                <CircleDashed className="h-4 w-4 text-primary" />
-                <span className="text-sm font-bold text-high-emphasis">{t('REOPEN_TASK')}</span>
+          <div className={`${isNewTaskModalOpen && 'justify-end w-full'} flex gap-2`}>
+            <div className="flex gap-2">
+              {isMarkComplete ? (
+                <Button variant="ghost" className="h-10 border" onClick={handleUpdateStatus}>
+                  <CircleDashed className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-bold text-high-emphasis">{t('REOPEN_TASK')}</span>
+                </Button>
+              ) : (
+                <Button variant="ghost" className="h-10 border" onClick={handleUpdateStatus}>
+                  <CheckCircle className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-bold text-high-emphasis">
+                    {t('MARK_AS_COMPLETE')}
+                  </span>
+                </Button>
+              )}
+            </div>
+            {isNewTaskModalOpen && !newTaskAdded ? (
+              <Button
+                onClick={handleAddItem}
+                variant="default"
+                className="h-10 px-6"
+                disabled={!title?.trim()}
+              >
+                {t('ADD_TASK')}
               </Button>
             ) : (
-              <Button variant="ghost" className="h-10 border" onClick={handleUpdateStatus}>
-                <CheckCircle className="h-4 w-4 text-primary" />
-                <span className="text-sm font-bold text-high-emphasis">
-                  {t('MARK_AS_COMPLETE')}
-                </span>
+              <Button variant="ghost" className="h-10 border" onClick={handleClose}>
+                <span className="text-sm font-bold text-high-emphasis">{t('CLOSE')}</span>
               </Button>
             )}
-
-            <Button variant="ghost" className="h-10 border" onClick={handleClose}>
-              <span className="text-sm font-bold text-high-emphasis">{t('CLOSE')}</span>
-            </Button>
           </div>
         </div>
       </div>

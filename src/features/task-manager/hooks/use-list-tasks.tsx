@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { TaskItem } from '../types/task-manager.types';
-import { useGetTasks } from './use-task-manager';
+import { v4 as uuidv4 } from 'uuid';
+import { TaskItem, TaskPriority } from '../types/task-manager.types';
+import { useGetTasks, useCreateTaskItem } from './use-task-manager';
 
 /**
  * useListTasks Hook
@@ -46,20 +47,46 @@ export function useListTasks() {
     }
   }, [tasksData]);
 
+  const { mutateAsync: createTaskItem } = useCreateTaskItem();
+
   const createTask = (title: string, status: string) => {
-    if (title.trim()) {
-      const newTask: TaskItem = {
-        ItemId: Date.now().toString(),
-        Title: title,
-        Section: status,
-        IsCompleted: false,
-        IsDeleted: false,
-        CreatedDate: new Date().toISOString(),
-      };
-      setTasks((prev) => [newTask, ...prev]);
-      return newTask.ItemId;
-    }
-    return null;
+    if (!title.trim()) return null;
+
+    const tempId = uuidv4();
+    const newTask: TaskItem = {
+      ItemId: tempId,
+      Title: title,
+      Section: status || 'todo',
+      IsCompleted: false,
+      IsDeleted: false,
+      CreatedDate: new Date().toISOString(),
+      Priority: TaskPriority.MEDIUM,
+    } as TaskItem;
+
+    // Optimistically update UI
+    setTasks((prev) => [newTask, ...prev]);
+
+    // Persist to backend
+    createTaskItem({
+      Title: title,
+      Section: status || '',
+      IsCompleted: false,
+    })
+      .then((response: any) => {
+        const realId = response?.insertTaskManagerItem?.itemId;
+        if (realId) {
+          // Replace tempId with realId
+          setTasks((prev) =>
+            prev.map((task) => (task.ItemId === tempId ? { ...task, ItemId: realId } : task))
+          );
+        }
+      })
+      .catch(() => {
+        // Rollback on failure
+        setTasks((prev) => prev.filter((task) => task.ItemId !== tempId));
+      });
+
+    return tempId;
   };
 
   const removeTask = (id: string) => {

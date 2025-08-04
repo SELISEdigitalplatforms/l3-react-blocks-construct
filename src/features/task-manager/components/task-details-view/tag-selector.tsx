@@ -97,7 +97,10 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
         {Array.from(selectedValues).map((value) => {
           const tag = availableTags.find((t) => t.id === value);
           return tag ? (
-            <Badge key={value} variant="secondary" className="flex items-center gap-1">
+            <Badge
+              key={value}
+              className="bg-surface hover:bg-surface text-high-emphasis font-semibold text-sm px-3 py-1 rounded flex items-center"
+            >
               {tag.label}
               <button
                 type="button"
