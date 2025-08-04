@@ -228,11 +228,24 @@ export function EditableDescription({
   };
 
   return (
-    <section 
-      className="relative" 
+    <section
+      className="relative focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md"
       key={`editor-container-${forceRender}`}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
+      onFocus={() => setIsHovering(true)}
+      onBlur={() => setIsHovering(false)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!isEditing) {
+            setIsEditing(true);
+          }
+        }
+      }}
+      role="region"
+      aria-label={t('TASK_DESCRIPTION')}
+      tabIndex={0}
     >
       <div className="flex items-center gap-1 h-9">
         <Label className="text-high-emphasis text-base font-semibold">{t('DESCRIPTION')}</Label>

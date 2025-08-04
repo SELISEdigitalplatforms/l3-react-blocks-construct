@@ -120,7 +120,7 @@ export default function TaskDetailsView({
     if (!usersResponse?.data) return [];
     return usersResponse.data.map((user) => ({
       ItemId: user.itemId,
-      Name: `${user.firstName} ${user.lastName || ''}`.trim(),
+      Name: `${user.firstName} ${user.lastName ?? ''}`.trim(),
       ImageUrl: user.profileImageUrl ?? '',
     }));
   }, [usersResponse]);
@@ -156,8 +156,8 @@ export default function TaskDetailsView({
     })) || []
   );
   const [priority, setPriority] = useState<TaskPriority>(
-    task?.Priority && Object.values(TaskPriority).includes(task.Priority as TaskPriority)
-      ? (task.Priority as TaskPriority)
+    task?.Priority && Object.values(TaskPriority).includes(task.Priority)
+      ? task.Priority
       : TaskPriority.MEDIUM
   );
   const [description, setDescription] = useState<string>(task?.Description ?? '');
@@ -193,11 +193,11 @@ export default function TaskDetailsView({
 
     const currentAssigneeIds = selectedAssignees
       .map((a) => a.ItemId)
-      .sort()
+      .sort((a, b) => (a ?? '').localeCompare(b ?? ''))
       .join(',');
     const newAssigneeIds = (task.Assignee ?? [])
       .map((a) => a.ItemId)
-      .sort()
+      .sort((a, b) => (a ?? '').localeCompare(b ?? ''))
       .join(',');
 
     if (currentAssigneeIds !== newAssigneeIds) {
@@ -303,8 +303,8 @@ export default function TaskDetailsView({
         setSelectedAssignees([]);
       }
 
-      if (task.Priority && Object.values(TaskPriority).includes(task.Priority as TaskPriority)) {
-        setPriority(task.Priority as TaskPriority);
+      if (task.Priority && Object.values(TaskPriority).includes(task.Priority)) {
+        setPriority(task.Priority);
       } else {
         setPriority(TaskPriority.MEDIUM);
       }
@@ -573,7 +573,7 @@ export default function TaskDetailsView({
   const handleTagChange = async (newTags: Array<string | ItemTag>) => {
     const normalizedNewTags = newTags.map((tag) =>
       typeof tag === 'string' ? { ItemId: uuidv4(), TagLabel: tag } : tag
-    ) as ItemTag[];
+    );
 
     const existingTagsMap = new Map(tags.map((tag) => [tag.TagLabel.toLowerCase(), tag]));
 

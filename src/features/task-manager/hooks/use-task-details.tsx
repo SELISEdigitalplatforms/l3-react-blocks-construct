@@ -90,19 +90,15 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     pageSize: 100,
   });
 
-  // Find and set the current task when taskId or tasksData changes
   useEffect(() => {
     if (taskId && tasksData?.TaskManagerItems?.items) {
-      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId) as
-        | TaskItem
-        | undefined;
+      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId);
 
       if (foundTask) {
         const mapToItemTags = (tags?: ItemTag[]): ItemTag[] => {
           return tags || [];
         };
 
-        // Helper function to convert TaskAttachments to Attachment[]
         const mapToAttachments = (attachments?: TaskAttachments[]): TaskAttachments[] => {
           if (!attachments) return [];
           return attachments.map((att) => ({
@@ -113,7 +109,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           }));
         };
 
-        // Helper function to convert TaskComments to Comment[]
         const mapToComments = (comments?: TaskComments[]): TaskComments[] => {
           if (!comments) return [];
           return comments.map((comment) => ({
@@ -160,8 +155,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   const { mutate: updateTask } = useUpdateTaskItem();
 
-  // Update a task's details
-  // This function accepts Partial<TaskItem> but converts it to TaskItemUpdateInput for the API
   const updateTaskDetails = useCallback(
     async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
       if (!taskId || !currentTask) return;
@@ -200,8 +193,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
-        // Call the API to update the task with the sanitized updates
-        await updateTask({
+        updateTask({
           itemId: taskId,
           input: sanitizedUpdates,
         });
@@ -220,7 +212,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, updateTask, refetchTasks]
   );
 
-  // Toggle task completion status
   const toggleTaskCompletion = useCallback(
     async (isCompleted: boolean) => {
       if (!taskId) return;
@@ -228,7 +219,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         setCurrentTask((prev) => (prev ? { ...prev, isCompleted } : null));
 
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to toggle task status:', error);
@@ -238,18 +228,14 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, refetchTasks]
   );
 
-  // Get the delete task mutation
   const { mutateAsync: deleteTask } = useDeleteTaskItem();
 
-  // Remove a task
   const removeTask = useCallback(async () => {
     if (!taskId) return false;
 
     try {
-      // Call the API to delete the task
       await deleteTask(taskId);
 
-      // Refresh the tasks list
       await refetchTasks();
       return true;
     } catch (error) {
@@ -263,7 +249,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     }
   }, [taskId, refetchTasks, deleteTask, t, toast]);
 
-  // Add a new comment to a task
   const addNewComment = useCallback(
     async (comment: string) => {
       if (!taskId || !currentTask) return;
@@ -271,7 +256,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         const newComment = {
           id: Date.now().toString(),
-          author: 'Current User', // Replace with actual user
+          author: 'Current User',
           timestamp: new Date().toISOString(),
           text: comment,
         };
@@ -318,7 +303,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks]
   );
 
-  // Add a new attachment to a task
   const addNewAttachment = useCallback(
     async (attachment: any) => {
       if (!taskId || !currentTask) return;
@@ -343,7 +327,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks]
   );
 
-  // Delete an attachment from a task
   const deleteAttachment = useCallback(
     async (attachmentId: string) => {
       if (!taskId || !currentTask) return;
@@ -390,7 +373,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks]
   );
 
-  // Delete an assignee from a task
   const deleteAssignee = useCallback(
     async (assigneeId: string) => {
       if (!taskId || !currentTask) return;
@@ -399,14 +381,13 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const updatedAssignees = currentTask.Assignee?.filter(
           (assignee) => assignee.ItemId !== assigneeId
         );
-        await updateTask({
+        updateTask({
           itemId: taskId,
           input: {
             Assignee: updatedAssignees,
           },
         });
 
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to delete assignee:', error);
@@ -416,7 +397,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks, updateTask]
   );
 
-  // Add a new tag to the current task
   const addNewTag = useCallback(
     async (tag: string) => {
       if (!taskId || !currentTask) return;
@@ -459,7 +439,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks, t, toast, updateTaskDetails]
   );
 
-  // Remove a tag from the current task
   const deleteTag = useCallback(
     async (tagId: string) => {
       if (!taskId || !currentTask) return;

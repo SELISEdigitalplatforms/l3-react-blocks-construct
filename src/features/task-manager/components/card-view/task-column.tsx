@@ -209,7 +209,7 @@ export function TaskColumn({
             <div className="space-y-3">
               {tasks.map((task, index) => (
                 <div
-                  key={`task-${task.ItemId || task.id || `temp-${index}`}`}
+                  key={`task-${task.ItemId || task.id || 'temp-' + index}`}
                   className="task-card-container"
                 >
                   <TaskCard
