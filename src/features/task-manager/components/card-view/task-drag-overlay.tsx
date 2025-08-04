@@ -1,7 +1,8 @@
 import { Card } from 'components/ui/card';
-import { TaskItem, priorityStyle } from '../../types/task-manager.types';
+import { ItemTag, TaskItem } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
+import { priorityStyle } from '../../types/task-manager.types';
 
 /**
  * TaskDragOverlay Component
@@ -48,9 +49,9 @@ export function TaskDragOverlay({ activeTask }: Readonly<TaskDragOverlayProps>) 
             {activeTask.Priority}
           </TaskManagerBadge>
         )}
-        {activeTask.Tags?.map((tag) => (
-          <TaskManagerBadge key={tag} className="px-2 py-0.5">
-            {tag}
+        {activeTask.ItemTag?.map((tag: ItemTag) => (
+          <TaskManagerBadge key={tag.ItemId} className="px-2 py-0.5">
+            {tag.TagLabel}
           </TaskManagerBadge>
         ))}
       </div>

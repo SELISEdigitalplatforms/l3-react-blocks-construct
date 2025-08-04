@@ -1,6 +1,6 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Plus, X } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
 import { Badge } from 'components/ui/badge';
@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 import { Label } from 'components/ui/label';
+import { ItemTag } from '../../types/task-manager.types';
 
 /**
  * TagSelector Component
@@ -35,9 +36,9 @@ import { Label } from 'components/ui/label';
  * - Uses a popover for a compact and user-friendly UI
  *
  * Props:
- * @param {Tag[]} availableTags - The list of all available tags
- * @param {string[]} selectedTags - The list of currently selected tag IDs
- * @param {(selectedTagIds: string[]) => void} onChange - Callback triggered when the selected tags change
+ * @param {ItemTag[]} availableTags - The list of all available tags
+ * @param {ItemTag[]} selectedTags - The list of currently selected tags
+ * @param {(selectedTags: ItemTag[]) => void} onChange - Callback triggered when the selected tags change
  *
  * @returns {JSX.Element} The tag selector component
  *
@@ -53,36 +54,63 @@ import { Label } from 'components/ui/label';
  * />
  */
 
-interface Tag {
-  id: string;
-  label: string;
-}
-
 interface TagsSelectorProps {
-  availableTags: Tag[];
-  selectedTags: string[];
-  onChange: (selectedTagIds: string[]) => void;
+  availableTags: ItemTag[];
+  selectedTags: ItemTag[];
+  onChange: (selectedTags: ItemTag[]) => void;
 }
 
 export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSelectorProps>) {
   const { t } = useTranslation();
-  const [selectedValues, setSelectedValues] = React.useState<Set<string>>(new Set(selectedTags));
+  const [selectedValues, setSelectedValues] = useState<Set<string>>(
+    new Set(selectedTags.map((tag) => tag.ItemId))
+  );
 
-  React.useEffect(() => {
-    setSelectedValues(new Set(selectedTags));
+  useEffect(() => {
+    setSelectedValues(new Set(selectedTags.map((tag) => tag.ItemId)));
   }, [selectedTags]);
 
-  const handleSelect = (value: string) => {
-    const newSelectedValues = new Set(selectedValues);
+  const handleSelect = (itemId: string, e?: React.MouseEvent) => {
+    // Prevent event propagation to avoid immediate dropdown close
+    e?.preventDefault();
+    e?.stopPropagation();
+    
+    const tag = availableTags.find((t: ItemTag) => t.ItemId === itemId);
+    if (!tag) return;
 
-    if (newSelectedValues.has(value)) {
-      newSelectedValues.delete(value);
+    // Create a new Set to ensure we trigger a state update
+    const newSelectedValues = new Set(selectedValues);
+    const isSelected = newSelectedValues.has(itemId);
+
+    if (isSelected) {
+      newSelectedValues.delete(itemId);
     } else {
-      newSelectedValues.add(value);
+      newSelectedValues.add(itemId);
     }
 
-    setSelectedValues(newSelectedValues);
-    onChange(Array.from(newSelectedValues));
+    // Convert selected IDs back to ItemTag objects
+    const updatedSelectedTags: ItemTag[] = [];
+    
+    // First add all currently selected tags that are still selected
+    selectedTags.forEach(tag => {
+      if (newSelectedValues.has(tag.ItemId)) {
+        updatedSelectedTags.push(tag);
+        newSelectedValues.delete(tag.ItemId);
+      }
+    });
+    
+    // Then add any newly selected tags from availableTags
+    availableTags.forEach(tag => {
+      if (newSelectedValues.has(tag.ItemId)) {
+        updatedSelectedTags.push(tag);
+        newSelectedValues.delete(tag.ItemId);
+      }
+    });
+
+    // Update local state
+    setSelectedValues(new Set(updatedSelectedTags.map(t => t.ItemId)));
+    // Propagate changes to parent
+    onChange(updatedSelectedTags);
   };
 
   const handleClear = () => {
@@ -90,34 +118,30 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
     onChange([]);
   };
 
+  const isSelected = (itemId: string): boolean => selectedValues.has(itemId);
+
   return (
     <div>
       <Label className="text-high-emphasis text-base font-semibold">{t('TAGS')}</Label>
       <div className="flex items-center gap-1">
-        {Array.from(selectedValues).map((value) => {
-          const tag = availableTags.find((t) => t.id === value);
-          return tag ? (
+        {selectedTags
+          .filter((tag) => selectedValues.has(tag.ItemId))
+          .map((tag) => (
             <Badge
-              key={value}
+              key={tag.ItemId}
               className="bg-surface hover:bg-surface text-high-emphasis font-semibold text-sm px-3 py-1 rounded flex items-center"
             >
-              {tag.label}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSelect(value);
-                }}
-                className="ml-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              {tag.TagLabel}
             </Badge>
-          ) : null;
-        })}
+          ))}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="h-7 w-7 border-dashed">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="h-7 w-7 border-dashed"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Plus className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
@@ -128,22 +152,42 @@ export function Tags({ availableTags, selectedTags, onChange }: Readonly<TagsSel
                 <CommandEmpty className="py-2 px-3 text-sm">{t('NO_TAGS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableTags.map((tag) => {
-                    const isSelected = selectedValues.has(tag.id);
+                    const selected = isSelected(tag.ItemId);
                     return (
                       <CommandItem
-                        key={tag.id}
-                        onSelect={() => handleSelect(tag.id)}
-                        className="flex items-center px-2 py-1.5"
+                        key={tag.ItemId}
+                        value={tag.ItemId}
+                        onSelect={(value) => {
+                          // This will be called when the item is selected via keyboard
+                          if (value !== tag.ItemId) return;
+                          handleSelect(tag.ItemId);
+                          return false; // Prevent default behavior
+                        }}
+                        className="flex items-center px-2 py-1.5 cursor-pointer"
+                        onMouseDown={(e) => {
+                          // Use onMouseDown instead of onClick to ensure it fires before the dropdown closes
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSelect(tag.ItemId, e);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSelect(tag.ItemId, e as any);
+                          }
+                        }}
                       >
                         <div
                           className={cn(
                             'mr-2 flex h-4 w-4 items-center justify-center rounded-md border border-primary',
-                            isSelected ? 'bg-primary text-white' : 'opacity-50 [&_svg]:invisible'
+                            selected ? 'bg-primary text-white' : 'opacity-50 [&_svg]:invisible'
                           )}
+                          aria-hidden="true"
                         >
                           <Check className="h-3 w-3" />
                         </div>
-                        <span className="text-sm">{tag.label}</span>
+                        <span className="text-sm">{tag.TagLabel}</span>
                       </CommandItem>
                     );
                   })}

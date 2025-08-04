@@ -181,16 +181,16 @@ export function TaskCard({
             </TaskManagerBadge>
           )}
 
-          {task.Tags &&
-            task.Tags.length > 0 &&
-            task.Tags.map((tag) => (
+          {task.ItemTag &&
+            task.ItemTag.length > 0 &&
+            task.ItemTag.map((tag) => (
               <TaskManagerBadge
                 className="px-2 py-0.5"
-                key={tag}
+                key={tag.ItemId}
                 asButton={false}
                 onClick={handleInteractiveElementClick}
               >
-                {tag}
+                {tag.TagLabel}
               </TaskManagerBadge>
             ))}
         </div>
@@ -262,7 +262,7 @@ export function TaskCard({
             {task.Assignee && task.Assignee.length > 0 && (
               <div className="flex -space-x-2" onClick={handleInteractiveElementClick}>
                 {task.Assignee.map((assignee, idx) => {
-                  const displayName = assignee?.Name || '';
+                  const displayName = assignee?.Name ?? '';
                   const imageUrl = assignee?.ImageUrl;
                   const initial = displayName ? displayName.charAt(0).toUpperCase() : '';
 

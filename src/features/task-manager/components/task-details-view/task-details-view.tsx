@@ -8,7 +8,7 @@ import {
   useGetUsers,
   useCreateTaskItem,
 } from '../../hooks/use-task-manager';
-import { Assignee, Tag, TaskItem, TaskTagInsertInput } from '../../types/task-manager.types';
+import { Assignee, ItemTag, TaskItem, TaskTagInsertInput } from '../../types/task-manager.types';
 import {
   TaskPriority,
   TaskComments,
@@ -105,11 +105,11 @@ export default function TaskDetailsView({
     pageSize: 100,
   });
 
-  const tags = useMemo<Tag[]>(() => {
+  const tags = useMemo<ItemTag[]>(() => {
     if (!tagsResponse?.TaskManagerTags?.items) return [];
     return tagsResponse.TaskManagerTags.items.map((tag: { ItemId: string; Label: string }) => ({
-      id: tag.ItemId,
-      label: tag.Label,
+      ItemId: tag.ItemId,
+      TagLabel: tag.Label,
     }));
   }, [tagsResponse]);
 
@@ -160,13 +160,30 @@ export default function TaskDetailsView({
   const [description, setDescription] = useState<string>(task?.Description || '');
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<Array<{ id: string; label: string }>>(
-    task?.Tags?.map((tag) => ({
-      id: tag.toLowerCase().replace(/\s+/g, '-'),
-      label: tag,
-    })) || []
-  );
+  const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag || []);
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
+
+  useEffect(() => {
+    if (!task?.ItemTag) {
+      if (selectedTags.length > 0 && !isNewTaskModalOpen) {
+        setSelectedTags([]);
+      }
+      return;
+    }
+
+    const localTagSet = new Map(selectedTags.map((tag) => [tag.TagLabel.toLowerCase(), tag]));
+
+    const serverTagSet = new Map(task.ItemTag.map((tag) => [tag.TagLabel.toLowerCase(), tag]));
+
+    const hasDifference =
+      selectedTags.length !== task.ItemTag.length ||
+      selectedTags.some((tag) => !serverTagSet.has(tag.TagLabel.toLowerCase())) ||
+      task.ItemTag.some((tag) => !localTagSet.has(tag.TagLabel.toLowerCase()));
+
+    if (hasDifference) {
+      setSelectedTags(task.ItemTag);
+    }
+  }, [task?.ItemTag, selectedTags, isNewTaskModalOpen, setSelectedTags]);
 
   useEffect(() => {
     if (!task) return;
@@ -189,7 +206,6 @@ export default function TaskDetailsView({
         }));
         setSelectedAssignees(newAssignees);
       } else if (selectedAssignees.length > 0) {
-        // Only reset to empty if we have selected assignees but the task has none
         setSelectedAssignees([]);
       }
     }
@@ -255,12 +271,7 @@ export default function TaskDetailsView({
       );
       setDate(task.DueDate ? new Date(task.DueDate) : undefined);
       setDescription(task.Description || '');
-      setSelectedTags(
-        (task.Tags || []).map((tag) => ({
-          id: tag.toLowerCase().replace(/\s+/g, '-'),
-          label: tag,
-        }))
-      );
+      setSelectedTags(task.ItemTag || []);
 
       if (task.Assignee) {
         if (Array.isArray(task.Assignee)) {
@@ -451,7 +462,7 @@ export default function TaskDetailsView({
         DueDate: date ? new Date(date).toISOString() : undefined,
         Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
         Description: description ?? '',
-        Tags: selectedTags.map((tag) => tag.label),
+        ItemTag: selectedTags,
         Attachments: attachments,
         Comments: [],
       };
@@ -472,14 +483,14 @@ export default function TaskDetailsView({
 
         if (tagsToCreate.length > 0) {
           const now = new Date().toISOString();
-          const existingTagLabels = tags.map((tg) => tg.label.toLowerCase());
+          const existingTagLabels = tags.map((tag) => tag.TagLabel.toLowerCase());
           const tagPromises = tagsToCreate
-            .filter((tg) => {
-              const lbl = typeof tg === 'string' ? tg : tg.label;
-              return !existingTagLabels.includes(lbl.toLowerCase());
+            .filter((tag) => {
+              const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
+              return !existingTagLabels.includes(tagLabel.toLowerCase());
             })
             .map((tag) => {
-              const tagLabel = typeof tag === 'string' ? tag : tag.label;
+              const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
               return createTag({
                 ItemId: uuidv4(),
                 Label: tagLabel,
@@ -534,25 +545,20 @@ export default function TaskDetailsView({
   };
 
   const handleAssigneeChange = async (newAssignees: Assignee[]) => {
-    // Store the previous state in case we need to revert
     const previousAssignees = [...selectedAssignees];
 
     try {
-      // Optimistically update the local state for immediate UI feedback
       setSelectedAssignees(newAssignees);
 
       if (currentTaskId) {
-        // Update the task with the new assignees
         await updateTaskDetails({
           Assignee: newAssignees,
         });
       }
     } catch (error) {
-      // If there's an error, revert to the previous state
       console.error('Failed to update assignees:', error);
       setSelectedAssignees(previousAssignees);
 
-      // Show error toast to the user
       toast({
         variant: 'destructive',
         title: t('ERROR'),
@@ -561,31 +567,58 @@ export default function TaskDetailsView({
     }
   };
 
-  const handleTagChange = async (newTags: Array<string | { id: string; label: string }>) => {
+  const handleTagChange = async (newTags: Array<string | ItemTag>) => {
     const normalizedNewTags = newTags.map((tag) =>
-      typeof tag === 'string' ? { id: tag, label: tag } : tag
+      typeof tag === 'string' ? { ItemId: uuidv4(), TagLabel: tag } : tag
+    ) as ItemTag[];
+
+    const existingTagsMap = new Map(tags.map((tag) => [tag.TagLabel.toLowerCase(), tag]));
+
+    const processedTags = normalizedNewTags.map((tag) => {
+      const existingTag = existingTagsMap.get(tag.TagLabel.toLowerCase());
+      return existingTag || tag;
+    });
+
+    const uniqueTags = Array.from(
+      new Map(processedTags.map((tag) => [tag.TagLabel.toLowerCase(), tag])).values()
     );
 
-    setSelectedTags(normalizedNewTags);
+    const previousTags = [...selectedTags];
 
-    if (currentTaskId) {
+    setSelectedTags(uniqueTags);
+
+    if (!currentTaskId) {
+      return;
+    }
+
+    try {
       await updateTaskDetails({
-        Tags: normalizedNewTags.map((tag) => tag.label),
+        ItemTag: uniqueTags,
       });
-      const currentTagIds = selectedTags.map((tag) => tag.id);
-      const newTagIds = normalizedNewTags.map((tag) => tag.id);
-      const addedTags = normalizedNewTags.filter((tag) => !currentTagIds.includes(tag.id));
-      const removedTagIds = selectedTags
-        .filter((tag) => !newTagIds.includes(tag.id))
-        .map((tag) => tag.id);
 
-      for (const tag of addedTags) {
-        await addTagToTask(tag.label);
-      }
+      const currentTagLabels = new Set(previousTags.map((tag) => tag.TagLabel.toLowerCase()));
+      const newTagLabels = new Set(uniqueTags.map((tag) => tag.TagLabel.toLowerCase()));
 
-      for (const tagId of removedTagIds) {
-        await removeTag(tagId);
-      }
+      const tagsToAdd = uniqueTags.filter(
+        (tag) => !currentTagLabels.has(tag.TagLabel.toLowerCase())
+      );
+      const tagsToRemove = previousTags.filter(
+        (tag) => !newTagLabels.has(tag.TagLabel.toLowerCase())
+      );
+
+      await Promise.all([
+        ...tagsToAdd.map((tag) => addTagToTask(tag.TagLabel).catch(console.error)),
+        ...tagsToRemove.map((tag) => removeTag(tag.ItemId).catch(console.error)),
+      ]);
+    } catch (error) {
+      console.error('Failed to update tags:', error);
+      setSelectedTags(previousTags);
+
+      toast({
+        variant: 'destructive',
+        title: t('ERROR'),
+        description: t('Failed to update tags. Please try again.'),
+      });
     }
   };
 
@@ -656,44 +689,57 @@ export default function TaskDetailsView({
   const createTagMutation = useCreateTags();
 
   const handleTagAdd = async (label: string) => {
-    if (!label.trim()) return;
-    const tempId = uuidv4();
+    const trimmedLabel = label.trim();
+    if (!trimmedLabel) return;
+
+    const normalizedLabel = trimmedLabel.toLowerCase();
+    const tagExists = selectedTags.some((tag) => tag.TagLabel.toLowerCase() === normalizedLabel);
+
+    if (tagExists) {
+      toast({
+        title: t('TAG_EXISTS'),
+        description: t('TAG_ALREADY_ADDED'),
+        variant: 'default',
+      });
+      return;
+    }
 
     try {
-      const newTag: TaskTagInsertInput = {
-        ItemId: tempId,
-        Label: label,
-        CreatedBy: 'current-user',
-        CreatedDate: new Date().toISOString(),
-        IsDeleted: false,
-      };
+      let tagToAdd: ItemTag;
+      const existingTag = tags.find((t) => t.TagLabel.toLowerCase() === normalizedLabel);
 
-      const uiTag = {
-        id: tempId,
-        label: label,
-      };
+      if (existingTag) {
+        tagToAdd = existingTag;
+      } else {
+        const newTagId = uuidv4();
+        const tagCreateInput: TaskTagInsertInput = {
+          ItemId: newTagId,
+          Label: trimmedLabel,
+          CreatedBy: 'current-user',
+          CreatedDate: new Date().toISOString(),
+          IsDeleted: false,
+        };
 
-      setSelectedTags((prev) => [...prev, uiTag]);
-
-      const result = await createTagMutation.mutateAsync(newTag);
-
-      if (result?.insertTaskManagerTag?.itemId && result.insertTaskManagerTag.itemId !== tempId) {
-        setSelectedTags((prev) =>
-          prev.map((tag) =>
-            tag.id === tempId ? { ...tag, id: result.insertTaskManagerTag.itemId } : tag
-          )
-        );
+        await createTagMutation.mutateAsync(tagCreateInput);
+        tagToAdd = { ItemId: newTagId, TagLabel: trimmedLabel };
       }
+
+      const updatedTags = [...selectedTags, tagToAdd];
 
       if (currentTaskId) {
-        // TODO: Add code to associate the tag with the task if needed
-        // This might involve another mutation to update the task's tags
+        await updateTaskDetails({
+          ItemTag: updatedTags,
+        });
       }
+
+      setSelectedTags(updatedTags);
     } catch (error) {
-      // Remove the tag from local state if creation failed
-      setSelectedTags((prev) => prev.filter((tag) => tag.id !== tempId));
-      // Re-throw the error to be handled by the AddTag component
-      throw error;
+      console.error('Error adding tag:', error);
+      toast({
+        title: t('ERROR'),
+        description: t('FAILED_TO_ADD_TAG'),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -838,11 +884,7 @@ export default function TaskDetailsView({
           />
         </div>
         <div className="flex items-center w-full justify-between mt-6">
-          <Tags
-            availableTags={tags}
-            selectedTags={selectedTags.map((tag) => (typeof tag === 'string' ? tag : tag.id))}
-            onChange={handleTagChange}
-          />
+          <Tags availableTags={tags} selectedTags={selectedTags} onChange={handleTagChange} />
           <AddTag onAddTag={handleTagAdd} isLoading={isCreatingTag} />
         </div>
         <div className="mt-6">

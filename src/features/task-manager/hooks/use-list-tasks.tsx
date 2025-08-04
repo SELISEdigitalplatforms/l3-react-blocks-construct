@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { TaskItem, TaskPriority } from '../types/task-manager.types';
+import { TaskItem, TaskPriority, ItemTag } from '../types/task-manager.types';
 import { useGetTasks, useCreateTaskItem } from './use-task-manager';
 
 /**
@@ -40,7 +40,7 @@ interface UseListTasksProps {
     priorities?: string[];
     statuses?: string[];
     assignees?: string[];
-    tags?: string[];
+    tags?: ItemTag[];
     dueDate?: {
       from?: Date;
       to?: Date;
@@ -75,6 +75,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
       IsDeleted: false,
       CreatedDate: new Date().toISOString(),
       Priority: TaskPriority.MEDIUM,
+      ItemTag: [],
     } as TaskItem;
 
     // Optimistically update UI
@@ -127,16 +128,16 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
       // Filter by search query
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           task.Title?.toLowerCase().includes(searchLower) ||
           task.Description?.toLowerCase().includes(searchLower) ||
-          task.Tags?.some(tag => tag.toLowerCase().includes(searchLower));
-        
+          task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(searchLower));
+
         if (!matchesSearch) return false;
       }
 
       // Filter by priorities
-      if (filters.priorities?.length && !filters.priorities.some(p => p === task.Priority)) {
+      if (filters.priorities?.length && !filters.priorities.some((p) => p === task.Priority)) {
         return false;
       }
 
@@ -147,16 +148,16 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
 
       // Filter by assignees
       if (filters.assignees?.length && task.Assignee?.length) {
-        const hasMatchingAssignee = task.Assignee.some(assignee => 
+        const hasMatchingAssignee = task.Assignee.some((assignee) =>
           filters.assignees?.includes(assignee.ItemId)
         );
         if (!hasMatchingAssignee) return false;
       }
 
       // Filter by tags
-      if (filters.tags?.length && task.Tags?.length) {
-        const hasMatchingTag = task.Tags.some(tag => 
-          filters.tags?.includes(tag)
+      if (filters.tags?.length && task.ItemTag?.length) {
+        const hasMatchingTag = task.ItemTag.some((tag) =>
+          filters.tags?.some((t) => t.ItemId === tag.ItemId)
         );
         if (!hasMatchingTag) return false;
       }
@@ -164,7 +165,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
       // Filter by due date
       if (filters.dueDate?.from || filters.dueDate?.to) {
         const taskDueDate = task.DueDate ? new Date(task.DueDate) : null;
-        
+
         if (filters.dueDate.from && taskDueDate && taskDueDate < filters.dueDate.from) {
           return false;
         }

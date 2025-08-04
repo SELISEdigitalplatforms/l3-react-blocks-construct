@@ -62,7 +62,7 @@ interface UseCardTasksProps {
     priorities?: string[];
     statuses?: string[];
     assignees?: string[];
-    tags?: string[];
+    tags?: Array<{ ItemId: string; TagLabel: string }>;
     dueDate?: {
       from?: Date;
       to?: Date;
@@ -95,7 +95,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       IsCompleted: task.IsCompleted || false,
       Priority: task.Priority || TaskPriority.MEDIUM,
       Section: task.Section || '',
-      Tags: task.Tags || [],
+      ItemTag: task.ItemTag || [],
       Assignee: task.Assignee || [],
       Comments: task.Comments || [],
       Attachments: task.Attachments || [],
@@ -124,7 +124,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
   // Initialize columns with sections data and tasks
   useEffect(() => {
     if (!sectionsData?.TaskManagerSections?.items) return;
-    
+
     // Create a stable reference to the filters object
     const currentFilters = {
       priorities: filters.priorities || [],
@@ -133,12 +133,12 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       tags: filters.tags || [],
       dueDate: filters.dueDate || {},
     };
-    
+
     setColumnTasks(() => {
       // Filter sections if status filter is applied
       const filteredSections = sectionsData.TaskManagerSections.items.filter(
-        (section: TaskSection) => 
-          !currentFilters.statuses.length || 
+        (section: TaskSection) =>
+          !currentFilters.statuses.length ||
           (section.Title && currentFilters.statuses.includes(section.Title))
       );
 
@@ -161,31 +161,35 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           // Skip if task doesn't match search query
           if (searchQuery) {
             const query = searchQuery.toLowerCase();
-            const matchesSearch = 
+            const matchesSearch =
               task.Title?.toLowerCase().includes(query) ||
               task.Description?.toLowerCase().includes(query) ||
-              task.Tags?.some(tag => tag.toLowerCase().includes(query));
-            
+              task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(query));
+
             if (!matchesSearch) return;
           }
 
           // Skip if task doesn't match priority filter
-          if (currentFilters.priorities.length && task.Priority && !currentFilters.priorities.includes(task.Priority)) {
+          if (
+            currentFilters.priorities.length &&
+            task.Priority &&
+            !currentFilters.priorities.includes(task.Priority)
+          ) {
             return;
           }
 
           // Skip if task doesn't match assignee filter
           if (currentFilters.assignees.length && task.Assignee?.length) {
-            const hasMatchingAssignee = task.Assignee.some(assignee => 
-              assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId)
+            const hasMatchingAssignee = task.Assignee.some(
+              (assignee) => assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId)
             );
             if (!hasMatchingAssignee) return;
           }
 
           // Skip if task doesn't match tags filter
-          if (currentFilters.tags.length && task.Tags?.length) {
-            const hasMatchingTag = task.Tags.some(tag => 
-              currentFilters.tags.includes(tag)
+          if (currentFilters.tags.length && task.ItemTag?.length) {
+            const hasMatchingTag = task.ItemTag.some((tag) =>
+              currentFilters.tags.some((t) => t.ItemId === tag.ItemId)
             );
             if (!hasMatchingTag) return;
           }
@@ -219,15 +223,15 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       return newColumns;
     });
   }, [
-    sectionsData, 
-    tasksData, 
-    searchQuery, 
-    filters.priorities, 
-    filters.statuses, 
-    filters.assignees, 
-    filters.tags, 
-    filters.dueDate, 
-    ensureTaskItem
+    sectionsData,
+    tasksData,
+    searchQuery,
+    filters.priorities,
+    filters.statuses,
+    filters.assignees,
+    filters.tags,
+    filters.dueDate,
+    ensureTaskItem,
   ]);
 
   const getColumnCount = (size: string) => {
@@ -365,7 +369,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           Language: 'en',
           OrganizationIds: [],
           Priority: TaskPriority.MEDIUM,
-          Tags: [],
+          ItemTag: [],
           CreatedBy: '',
           CreatedDate: new Date().toISOString(),
           IsDeleted: false,
@@ -388,7 +392,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             Language: 'en',
             OrganizationIds: [],
             Priority: TaskPriority.MEDIUM,
-            Tags: [],
+            ItemTag: [],
           };
 
           const response = await createTask(taskData);

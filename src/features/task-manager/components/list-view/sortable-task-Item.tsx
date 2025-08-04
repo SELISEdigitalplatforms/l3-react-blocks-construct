@@ -72,9 +72,9 @@ export function SortableTaskItem({
   const assignees = (() => {
     if (!task?.Assignee) return [];
     const assigneeList = Array.isArray(task.Assignee) ? task.Assignee : [task.Assignee];
-    return assigneeList.map(assignee => 
-      typeof assignee === 'string' ? assignee : assignee.Name || ''
-    ).filter(Boolean);
+    return assigneeList
+      .map((assignee) => (typeof assignee === 'string' ? assignee : assignee.Name || ''))
+      .filter(Boolean);
   })();
   const { updateTaskDetails } = useTaskDetails(task.ItemId);
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskItem();
@@ -88,11 +88,12 @@ export function SortableTaskItem({
         isCompleted: task.IsCompleted,
         priority: task.Priority,
         dueDate: task.DueDate,
-        tags: task.Tags,
+        itemTag: task.ItemTag,
         comments: commentsCount,
         attachments: attachmentsCount,
         assignees: assignees,
         status: task.Section,
+        tags: task.Tags,
       },
     },
   });
@@ -166,8 +167,8 @@ export function SortableTaskItem({
       </div>
 
       <div className="w-32 flex-shrink-0">
-        {task.Tags && task.Tags.length > 0 && (
-          <TaskManagerBadge className="px-2 py-0.5">{task.Tags[0]}</TaskManagerBadge>
+        {task.ItemTag && task.ItemTag.length > 0 && (
+          <TaskManagerBadge className="px-2 py-0.5">{task.ItemTag[0].TagLabel}</TaskManagerBadge>
         )}
       </div>
 

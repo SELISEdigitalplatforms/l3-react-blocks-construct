@@ -5,7 +5,7 @@ import { useIsMobile } from 'hooks/use-mobile';
 import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
-// import { useTaskContext } from '../../contexts/task-context';
+import { ItemTag } from 'features/task-manager/types/task-manager.types';
 import {
   TaskManagerFilterSheet,
   TaskFilters,
@@ -50,11 +50,10 @@ interface TaskManagerToolbarProps {
   handleViewMode: (view: ViewMode) => void;
   onOpen: () => void;
   onSearch?: (query: string) => void;
-  // filter related (optional)
   priorities?: string[];
   statuses?: string[];
   assignees?: { id: string; name: string }[];
-  tags?: { id: string; label: string }[];
+  tags: ItemTag[];
   filters?: TaskFilters;
   onApplyFilters?: (filters: TaskFilters) => void;
   onResetFilters?: () => void;

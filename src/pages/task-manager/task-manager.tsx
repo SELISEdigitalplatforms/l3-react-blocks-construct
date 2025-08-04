@@ -10,6 +10,7 @@ import {
   useGetTaskTags,
   useGetUsers,
 } from 'features/task-manager/hooks/use-task-manager';
+import { ItemTag } from 'features/task-manager/types/task-manager.types';
 import { TaskFilters } from 'features/task-manager/components/task-manager-filters-sheet/task-manager-filters-sheet';
 import TaskCardView from './task-card-view';
 
@@ -91,11 +92,11 @@ export default function TaskManager() {
     return Array.from(assigneeMap.entries()).map(([id, name]) => ({ id, name }));
   }, [tasks, usersData]);
 
-  const tags = useMemo(() => {
+  const tags = useMemo<ItemTag[]>(() => {
     if (tagsData?.TaskManagerTags?.items?.length) {
       return tagsData.TaskManagerTags.items.map((tag: { ItemId: string; Label: string }) => ({
-        id: tag.ItemId,
-        label: tag.Label,
+        ItemId: tag.ItemId,
+        TagLabel: tag.Label,
       }));
     }
     const tagMap = new Map<string, string>();
@@ -104,7 +105,7 @@ export default function TaskManager() {
         tagMap.set(tag, tag);
       });
     });
-    return Array.from(tagMap.entries()).map(([id, label]) => ({ id, label }));
+    return Array.from(tagMap.entries()).map(([ItemId, TagLabel]) => ({ ItemId, TagLabel }));
   }, [tasks, tagsData]);
 
   const handleApplyFilters = (f: TaskFilters) => {

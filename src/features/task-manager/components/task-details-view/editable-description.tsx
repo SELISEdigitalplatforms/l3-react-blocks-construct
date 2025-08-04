@@ -228,24 +228,29 @@ export function EditableDescription({
   };
 
   return (
-    <section className="relative" key={`editor-container-${forceRender}`}>
-      <button
-        type="button"
-        className="flex items-center gap-1 h-9 focus:outline-none"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
+    <section 
+      className="relative" 
+      key={`editor-container-${forceRender}`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <div className="flex items-center gap-1 h-9">
         <Label className="text-high-emphasis text-base font-semibold">{t('DESCRIPTION')}</Label>
         {isHovering && !isEditing && (
-          <Button
-            onClick={() => setIsEditing(true)}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
             aria-label={t('EDIT_DESCRIPTION')}
-            variant="ghost"
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
           >
             <PenLine className="h-4 w-4 text-primary" />
-          </Button>
+          </button>
         )}
-      </button>
+      </div>
 
       {isEditing ? renderEditorContent() : <div className="text-sm">{renderContent()}</div>}
     </section>

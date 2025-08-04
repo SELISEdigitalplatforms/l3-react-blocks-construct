@@ -1,4 +1,5 @@
 import { graphqlClient } from 'lib/graphql-client';
+import type { TaskItem, ItemTag } from '../types/task-manager.types';
 import {
   GET_TASK_MANAGER_QUERY,
   GET_TASK_MANAGER_SECTIONS_QUERY,
@@ -115,13 +116,37 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
     }
 
     if (taskManagerItems) {
-      // Ensure each task has an Assignee array, even if it's empty
-      const items = (taskManagerItems.items || []).map((task) => ({
-        ...task,
-        Assignee: task.Assignee || [],
-        Tags: task.Tags || [],
-        OrganizationIds: task.OrganizationIds || [],
-      }));
+      // Ensure each task has required arrays, even if empty, and handle ItemTag/Tags compatibility
+      const items = (taskManagerItems.items || []).map((task) => {
+        // Helper type guard for ItemTag
+        const isItemTag = (tag: any): tag is ItemTag =>
+          tag && typeof tag === 'object' && 'ItemId' in tag && 'TagLabel' in tag;
+
+        // Convert legacy Tags to ItemTag format if needed
+        const itemTags: ItemTag[] = Array.isArray(task.ItemTag)
+          ? task.ItemTag.filter(isItemTag)
+          : [];
+
+        const legacyTags = Array.isArray(task.Tags) ? task.Tags : [];
+
+        // If we have legacy tags but no ItemTag, convert them
+        const convertedTags =
+          itemTags.length > 0
+            ? itemTags
+            : legacyTags.map((tag) => ({
+                ItemId: typeof tag === 'string' ? tag : (tag as ItemTag).ItemId || '',
+                TagLabel: typeof tag === 'string' ? tag : (tag as ItemTag).TagLabel || '',
+              }));
+
+        return {
+          ...task,
+          Assignee: Array.isArray(task.Assignee) ? task.Assignee : [],
+          ItemTag: convertedTags,
+          // Keep Tags for backward compatibility
+          ItemTags: convertedTags.map((tag) => tag.TagLabel || tag.ItemId),
+          OrganizationIds: Array.isArray(task.OrganizationIds) ? task.OrganizationIds : [],
+        } as TaskItem;
+      });
 
       return {
         TaskManagerItems: {
@@ -318,12 +343,36 @@ export const createTaskItem = async (
   input: TaskItemInsertInput
 ): Promise<InsertTaskItemResponse> => {
   try {
+    // Helper function to normalize tags to ItemTag format
+    const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
+      if (typeof tag === 'string') {
+        return { ItemId: tag, TagLabel: tag };
+      }
+      return {
+        ItemId: tag.ItemId || '',
+        TagLabel: tag.TagLabel || tag.ItemId || '',
+      };
+    };
+
+    // Convert input to ensure ItemTag is properly formatted
+    const formattedInput = {
+      ...input,
+      // Convert Tags to ItemTag format if needed
+      ItemTag: input.ItemTag
+        ? input.ItemTag.map(normalizeToItemTag)
+        : input.Tags
+          ? input.Tags.map(normalizeToItemTag)
+          : [],
+      // Remove the legacy Tags field to avoid confusion
+      Tags: undefined,
+    };
+
     // Execute the mutation with proper typing
     const response = await graphqlClient.mutate<{
       insertTaskManagerItem: { itemId: string };
     }>({
       query: INSERT_TASK_MANAGER_ITEM_MUTATION,
-      variables: { input },
+      variables: { input: formattedInput },
     });
 
     // The response might be the data directly or have a data property
@@ -355,11 +404,32 @@ export const updateTaskItem = async (
   itemId: string,
   input: TaskItemUpdateInput
 ): Promise<UpdateTaskItemResponse> => {
+  // Helper function to normalize tags to ItemTag format
+  const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
+    if (typeof tag === 'string') {
+      return { ItemId: tag, TagLabel: tag };
+    }
+    return {
+      ItemId: tag.ItemId || '',
+      TagLabel: tag.TagLabel || tag.ItemId || '',
+    };
+  };
+
+  // Convert input to ensure ItemTag is properly formatted
+  const formattedInput = {
+    ...input,
+    // If Tags is provided but ItemTag is not, convert Tags to ItemTag format
+    ...(input.ItemTag === undefined &&
+      input.Tags && {
+        ItemTag: input.Tags.map(normalizeToItemTag),
+      }),
+  };
+
   const response = await graphqlClient.mutate({
     query: UPDATE_TASK_MANAGER_ITEM_MUTATION,
     variables: {
       filter: JSON.stringify({ _id: itemId }),
-      input,
+      input: formattedInput,
     },
   });
 

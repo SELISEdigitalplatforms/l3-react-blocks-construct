@@ -23,6 +23,7 @@ import { Label } from 'components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { Calendar } from 'components/ui/calendar';
 import { Badge } from 'components/ui/badge';
+import { ItemTag } from '../../types/task-manager.types';
 
 /**
  * TaskManagerFilterSheet Component
@@ -53,14 +54,14 @@ import { Badge } from 'components/ui/badge';
  * />
  */
 export interface TaskFilters {
+  priorities: string[];
+  statuses: string[];
+  assignees: string[];
+  tags: ItemTag[];
   dueDate?: {
     from?: Date;
     to?: Date;
   };
-  priorities: string[];
-  statuses: string[];
-  assignees: string[];
-  tags: string[];
 }
 
 interface TaskManagerFiltersSheetProps {
@@ -69,7 +70,7 @@ interface TaskManagerFiltersSheetProps {
   priorities: string[];
   statuses: string[];
   assignees: { id: string; name: string }[];
-  tags: { id: string; label: string }[];
+  tags: ItemTag[];
   value: TaskFilters;
   onApply: (filters: TaskFilters) => void;
   onReset: () => void;
@@ -95,10 +96,10 @@ export const TaskManagerFilterSheet = ({
       }
     : undefined;
   const [selectedDueDate, setSelectedDueDate] = useState<DateRange | undefined>(initialRange);
-  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(value.priorities);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(value.statuses);
-  const [selectedAssignees, setSelectedAssignees] = useState<string[]>(value.assignees);
-  const [selectedTags, setSelectedTags] = useState<string[]>(value.tags);
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(value.priorities || []);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(value.statuses || []);
+  const [selectedAssignees, setSelectedAssignees] = useState<string[]>(value.assignees || []);
+  const [selectedTags, setSelectedTags] = useState<ItemTag[]>(value.tags || []);
 
   const applyFilters = () => {
     onApply({
@@ -144,10 +145,13 @@ export const TaskManagerFilterSheet = ({
     );
   };
 
-  const handleTagSelect = (tagId: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId]
-    );
+  const handleTagSelect = (tag: ItemTag) => {
+    setSelectedTags((prev) => {
+      const tagExists = prev.some((t) => t.ItemId === tag.ItemId);
+      return tagExists
+        ? prev.filter((t) => t.ItemId !== tag.ItemId)
+        : [...prev, { ItemId: tag.ItemId, TagLabel: tag.TagLabel }];
+    });
   };
 
   return (
@@ -293,12 +297,12 @@ export const TaskManagerFilterSheet = ({
                     <CommandGroup>
                       {tags.map((tag) => (
                         <CommandItem
-                          key={tag.id}
-                          onSelect={() => handleTagSelect(tag.id)}
+                          key={tag.ItemId}
+                          onSelect={() => handleTagSelect(tag)}
                           className="flex items-center gap-2"
                         >
-                          <Checkbox checked={selectedTags.includes(tag.id)} />
-                          <span>{tag.label}</span>
+                          <Checkbox checked={selectedTags.some((t) => t.ItemId === tag.ItemId)} />
+                          <span>{tag.TagLabel}</span>
                         </CommandItem>
                       ))}
                     </CommandGroup>

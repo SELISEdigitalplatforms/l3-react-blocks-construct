@@ -8,6 +8,7 @@ import {
   TaskComments,
   Assignee,
   TaskPriority,
+  ItemTag,
 } from '../types/task-manager.types';
 
 // Simple toast utility with proper types
@@ -63,7 +64,7 @@ const useToast = () => ({
  * } = useTaskDetails(taskId);
  */
 
-// Using string[] for tags as per TaskItem type
+// Using ItemTag[] for ItemTag as per TaskItem type
 
 interface UseTaskDetailsReturn {
   task: TaskItem | null;
@@ -97,8 +98,8 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         | undefined;
 
       if (foundTask) {
-        const mapToTags = (tagStrings?: string[]): string[] => {
-          return tagStrings || [];
+        const mapToItemTags = (tags?: ItemTag[]): ItemTag[] => {
+          return tags || [];
         };
 
         // Helper function to convert TaskAttachments to Attachment[]
@@ -136,7 +137,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             Array.isArray(foundTask.Assignee) && foundTask.Assignee.length > 0
               ? foundTask.Assignee
               : currentTask?.Assignee || [],
-          Tags: mapToTags(foundTask.Tags),
+          ItemTag: mapToItemTags(foundTask.ItemTag),
           Attachments: mapToAttachments(
             foundTask.Attachments && foundTask.Attachments.length > 0
               ? foundTask.Attachments
@@ -163,7 +164,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
   // Update a task's details
   // This function accepts Partial<TaskItem> but converts it to TaskItemUpdateInput for the API
   const updateTaskDetails = useCallback(
-    async (updates: Partial<TaskItem>) => {
+    async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
       if (!taskId || !currentTask) return;
 
       const previousTask = { ...currentTask };
@@ -171,17 +172,30 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         const sanitizedUpdates: TaskItemUpdateInput = {};
 
-        if ('Title' in updates) sanitizedUpdates.Title = updates.Title;
-        if ('Description' in updates) sanitizedUpdates.Description = updates.Description;
-        if ('DueDate' in updates) sanitizedUpdates.DueDate = updates.DueDate;
-        if ('Priority' in updates) sanitizedUpdates.Priority = updates.Priority;
-        if ('Section' in updates) sanitizedUpdates.Section = updates.Section;
-        if ('Tags' in updates) sanitizedUpdates.Tags = updates.Tags;
-        if ('IsCompleted' in updates) sanitizedUpdates.IsCompleted = updates.IsCompleted;
-        if ('Language' in updates) sanitizedUpdates.Language = updates.Language;
-        if ('OrganizationIds' in updates)
-          sanitizedUpdates.OrganizationIds = updates.OrganizationIds;
-        if ('IsDeleted' in updates) sanitizedUpdates.IsDeleted = updates.IsDeleted;
+        // Handle standard fields
+        if ('Title' in updates) sanitizedUpdates.Title = updates.Title as string;
+        if ('Description' in updates) sanitizedUpdates.Description = updates.Description as string;
+        if ('DueDate' in updates) sanitizedUpdates.DueDate = updates.DueDate as string;
+        if ('Priority' in updates) sanitizedUpdates.Priority = updates.Priority as TaskPriority;
+        if ('Section' in updates) sanitizedUpdates.Section = updates.Section as string;
+        if ('IsCompleted' in updates) sanitizedUpdates.IsCompleted = updates.IsCompleted as boolean;
+        if ('Language' in updates) sanitizedUpdates.Language = updates.Language as string;
+        if ('OrganizationIds' in updates) sanitizedUpdates.OrganizationIds = updates.OrganizationIds as string[];
+        if ('IsDeleted' in updates) sanitizedUpdates.IsDeleted = updates.IsDeleted as boolean;
+
+        // Handle ItemTag and Tags
+        if ('ItemTag' in updates) {
+          sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
+        } else if ('Tags' in updates) {
+          // Convert legacy Tags to ItemTag format if needed
+          const tags = updates.Tags as (string | ItemTag)[] | undefined;
+          if (Array.isArray(tags)) {
+            sanitizedUpdates.ItemTag = tags.map(tag => ({
+              ItemId: typeof tag === 'string' ? tag : tag.ItemId,
+              TagLabel: typeof tag === 'string' ? tag : tag.TagLabel
+            }));
+          }
+        }
 
         // Handle Assignee - ensure it's always an array
         if ('Assignee' in updates) {
@@ -190,7 +204,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
         // Optimistically update the UI with the original updates
         const updatedTask = { ...currentTask, ...updates };
-        setCurrentTask(updatedTask);
+        setCurrentTask(updatedTask as TaskItem);
 
         // Call the API to update the task with the sanitized updates
         await updateTask({
@@ -448,21 +462,25 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId || !currentTask) return;
 
       try {
-        const updatedTags = [...(currentTask.Tags || []), tag];
+        const newTag: ItemTag = {
+          ItemId: Date.now().toString(),
+          TagLabel: tag,
+        };
+        const updatedTags = [...(currentTask.ItemTag || []), newTag];
 
         // Optimistic update
         setCurrentTask((prev: TaskItem | null) =>
           prev
             ? {
                 ...prev,
-                Tags: updatedTags,
+                ItemTag: updatedTags,
               }
             : null
         );
 
         // Create a properly typed update object
         const update: Partial<TaskItem> = {
-          Tags: updatedTags,
+          ItemTag: updatedTags,
         };
 
         // Call API to add tag
@@ -492,7 +510,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   // Remove a tag from the current task
   const deleteTag = useCallback(
-    async (tag: string) => {
+    async (tagId: string) => {
       if (!taskId || !currentTask) return;
 
       try {
@@ -501,13 +519,18 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           prev
             ? {
                 ...prev,
-                Tags: (prev.Tags || []).filter((t) => t !== tag),
+                ItemTag: (prev.ItemTag || []).filter((t) => t.ItemId !== tagId),
               }
             : null
         );
 
-        // TODO: Call API to remove tag
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Create update object with filtered tags
+        const update: TaskItemUpdateInput = {
+          ItemTag: (currentTask.ItemTag || []).filter((t) => t.ItemId !== tagId),
+        };
+
+        // Call API to update task with new tags
+        await updateTaskDetails(update);
 
         // Refetch to ensure data is in sync
         await refetchTasks();
@@ -517,6 +540,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         await refetchTasks();
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [taskId, currentTask, refetchTasks]
   );
 
@@ -531,7 +555,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     deleteAttachment,
     addNewAssignee,
     deleteAssignee,
-    addNewTag,
-    deleteTag,
+    addNewTag: addNewTag,
+    deleteTag: deleteTag,
   };
 }

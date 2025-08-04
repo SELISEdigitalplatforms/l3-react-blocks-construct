@@ -17,9 +17,9 @@ export const priorityStyle: Record<TaskPriority, string> = {
   [TaskPriority.LOW]: 'bg-secondary-50 text-secondary border-secondary',
 };
 
-export interface Tag {
-  id: string;
-  label: string;
+export interface ItemTag {
+  ItemId: string;
+  TagLabel: string;
 }
 
 export interface Assignee {
@@ -61,6 +61,7 @@ export interface TaskItem {
   Priority?: TaskPriority;
   Section?: string;
   Tags?: string[];
+  ItemTag?: ItemTag[];
 }
 
 export interface TaskSection {
@@ -139,14 +140,25 @@ export interface TaskItemInsertInput {
   Priority?: TaskPriority;
   Section?: string;
   Tags?: string[];
+  ItemTag?: ItemTag[];
   IsCompleted?: boolean;
   Language?: string;
   OrganizationIds?: string[];
 }
 
-export interface TaskItemUpdateInput extends Partial<TaskItemInsertInput> {
+export interface TaskItemUpdateInput {
+  Title?: string;
+  Description?: string;
   Assignee?: Assignee[];
+  ItemTag?: ItemTag[];
+  DueDate?: string;
+  Priority?: TaskPriority;
+  Section?: string;
+  IsCompleted?: boolean;
   IsDeleted?: boolean;
+  Language?: string;
+  OrganizationIds?: string[];
+  Tags?: string[];
 }
 
 export interface TaskTagInsertInput {

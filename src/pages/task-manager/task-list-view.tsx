@@ -49,13 +49,15 @@ import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager
  * <TaskListView taskService={new TaskService()} />
  */
 
+import { ItemTag } from 'features/task-manager/types/task-manager.types';
+
 interface TaskListViewProps {
   searchQuery?: string;
   filters: {
     priorities: string[];
     statuses: string[];
     assignees: string[];
-    tags: string[];
+    tags: ItemTag[];
     dueDate?: {
       from?: Date;
       to?: Date;
@@ -76,7 +78,10 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
         (task: TaskItem) =>
           task.Title?.toLowerCase().includes(query) ||
           task.Description?.toLowerCase().includes(query) ||
-          task.Tags?.some((tag: string) => tag.toLowerCase().includes(query))
+          task.ItemTag?.some((tag: ItemTag) => 
+            tag.TagLabel?.toLowerCase().includes(query) || 
+            tag.ItemId?.toLowerCase().includes(query)
+          )
       );
     }
 
@@ -101,8 +106,9 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
     }
 
     if (filters.tags.length) {
+      const tagIds = new Set(filters.tags.map(tag => tag.ItemId));
       result = result.filter((task: TaskItem) =>
-        task.Tags?.some((tag) => filters.tags.includes(tag))
+        task.ItemTag?.some(tag => tagIds.has(tag.ItemId))
       );
     }
 

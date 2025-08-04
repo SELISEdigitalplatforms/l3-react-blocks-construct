@@ -9,6 +9,7 @@ import {
   TaskSection,
   TaskSectionWithTasks,
   TaskItem,
+  ItemTag,
 } from 'features/task-manager/types/task-manager.types';
 import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
 import { AddColumn } from '../../features/task-manager/components/modals/add-column';
@@ -57,7 +58,7 @@ interface TaskCardViewProps {
     priorities: string[];
     statuses: string[];
     assignees: string[];
-    tags: string[];
+    tags: ItemTag[];
     dueDate?: {
       from?: Date;
       to?: Date;
@@ -134,14 +135,28 @@ export function TaskCardView({
         tasks = sectionTasks.filter(
           (task) =>
             task.Title?.toLowerCase().includes(query) ||
-            false ||
             task.Description?.toLowerCase().includes(query) ||
-            false ||
-            task.Tags?.some((tag: string) => tag.toLowerCase().includes(query)) ||
-            false
+            task.ItemTag?.some(tag => 
+              tag.TagLabel?.toLowerCase().includes(query) || 
+              tag.ItemId?.toLowerCase().includes(query)
+            ) ||
+            task.Tags?.some((tag: string) => tag.toLowerCase().includes(query))
         );
       } else {
         tasks = [...sectionTasks];
+      }
+
+      // Apply tag filters if any
+      if (filters.tags.length > 0) {
+        tasks = tasks.filter(task => 
+          task.ItemTag?.some(tag => 
+            filters.tags.some(filterTag => 
+              typeof filterTag === 'string' 
+                ? tag.ItemId === filterTag || tag.TagLabel === filterTag
+                : tag.ItemId === filterTag.ItemId
+            )
+          )
+        );
       }
 
       return {
@@ -155,7 +170,7 @@ export function TaskCardView({
         tasks: tasks,
       };
     });
-  }, [sectionsData, searchQuery]);
+  }, [sectionsData, searchQuery, filters.tags]);
 
   const handleAddColumn = useCallback(
     async (title: string) => {
