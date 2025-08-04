@@ -56,7 +56,21 @@ interface TaskSectionWithTasks extends TaskSection {
  * } = useCardTasks();
  */
 
-export function useCardTasks() {
+interface UseCardTasksProps {
+  searchQuery?: string;
+  filters?: {
+    priorities?: string[];
+    statuses?: string[];
+    assignees?: string[];
+    tags?: string[];
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+}
+
+export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksProps = {}) {
   const { toast } = useToast();
   const [columnTasks, setColumnTasks] = useState<TaskSectionWithTasks[]>([]);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
@@ -73,60 +87,7 @@ export function useCardTasks() {
     pageSize: 100,
   });
 
-  const {
-    data: tasksData,
-    isLoading: isLoadingTasks,
-    refetch: refetchTasks,
-  } = useGetTasks({
-    pageNo: 1,
-    pageSize: 100,
-  });
-
-  // Initialize columns with sections data and tasks
-  useEffect(() => {
-    if (sectionsData?.TaskManagerSections?.items) {
-      setColumnTasks(() => {
-        // Create a map of section titles to their corresponding section
-        const sectionsByTitle = new Map<string, TaskSection>();
-        sectionsData.TaskManagerSections.items.forEach((section: TaskSection) => {
-          if (section.Title) {
-            sectionsByTitle.set(section.Title, section);
-          }
-        });
-
-        // Create a map of section IDs to their tasks
-        const tasksBySectionId: Record<string, TaskItem[]> = {};
-        sectionsData.TaskManagerSections.items.forEach((section: TaskSection) => {
-          tasksBySectionId[section.ItemId] = [];
-        });
-
-        if (tasksData?.TaskManagerItems?.items) {
-          tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
-            if (task.Section) {
-              const section = Array.from(sectionsByTitle.values()).find(
-                (s) => s.Title === task.Section
-              );
-              if (section) {
-                if (!tasksBySectionId[section.ItemId]) {
-                  tasksBySectionId[section.ItemId] = [];
-                }
-                tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
-              }
-            }
-          });
-        }
-
-        const newColumns = sectionsData.TaskManagerSections.items.map((section: TaskSection) => ({
-          ...section,
-          tasks: tasksBySectionId[section.ItemId] || [],
-        }));
-
-        return newColumns;
-      });
-    }
-  }, [sectionsData, tasksData]);
-
-  const ensureTaskItem = (task: TaskItem): TaskItem => {
+  const ensureTaskItem = useCallback((task: TaskItem): TaskItem => {
     return {
       ItemId: task.ItemId || '',
       Title: task.Title || '',
@@ -147,9 +108,127 @@ export function useCardTasks() {
       Language: task.Language || 'en',
       OrganizationIds: task.OrganizationIds || [],
     };
-  };
+  }, []);
+
+  const {
+    data: tasksData,
+    isLoading: isLoadingTasks,
+    refetch: refetchTasks,
+  } = useGetTasks({
+    pageNo: 1,
+    pageSize: 100,
+  });
 
   const { touchEnabled, screenSize } = useDeviceCapabilities();
+
+  // Initialize columns with sections data and tasks
+  useEffect(() => {
+    if (!sectionsData?.TaskManagerSections?.items) return;
+    
+    // Create a stable reference to the filters object
+    const currentFilters = {
+      priorities: filters.priorities || [],
+      statuses: filters.statuses || [],
+      assignees: filters.assignees || [],
+      tags: filters.tags || [],
+      dueDate: filters.dueDate || {},
+    };
+    
+    setColumnTasks(() => {
+      // Filter sections if status filter is applied
+      const filteredSections = sectionsData.TaskManagerSections.items.filter(
+        (section: TaskSection) => 
+          !currentFilters.statuses.length || 
+          (section.Title && currentFilters.statuses.includes(section.Title))
+      );
+
+      // Create a map of section titles to their corresponding section
+      const sectionsByTitle = new Map<string, TaskSection>();
+      filteredSections.forEach((section: TaskSection) => {
+        if (section.Title) {
+          sectionsByTitle.set(section.Title, section);
+        }
+      });
+
+      // Create a map of section IDs to their tasks
+      const tasksBySectionId: Record<string, TaskItem[]> = {};
+      filteredSections.forEach((section: TaskSection) => {
+        tasksBySectionId[section.ItemId] = [];
+      });
+
+      if (tasksData?.TaskManagerItems?.items) {
+        tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
+          // Skip if task doesn't match search query
+          if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            const matchesSearch = 
+              task.Title?.toLowerCase().includes(query) ||
+              task.Description?.toLowerCase().includes(query) ||
+              task.Tags?.some(tag => tag.toLowerCase().includes(query));
+            
+            if (!matchesSearch) return;
+          }
+
+          // Skip if task doesn't match priority filter
+          if (currentFilters.priorities.length && task.Priority && !currentFilters.priorities.includes(task.Priority)) {
+            return;
+          }
+
+          // Skip if task doesn't match assignee filter
+          if (currentFilters.assignees.length && task.Assignee?.length) {
+            const hasMatchingAssignee = task.Assignee.some(assignee => 
+              assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId)
+            );
+            if (!hasMatchingAssignee) return;
+          }
+
+          // Skip if task doesn't match tags filter
+          if (currentFilters.tags.length && task.Tags?.length) {
+            const hasMatchingTag = task.Tags.some(tag => 
+              currentFilters.tags.includes(tag)
+            );
+            if (!hasMatchingTag) return;
+          }
+
+          // Skip if task doesn't match due date filter
+          if ((currentFilters.dueDate?.from || currentFilters.dueDate?.to) && task.DueDate) {
+            const dueDate = new Date(task.DueDate);
+            if (currentFilters.dueDate?.from && dueDate < currentFilters.dueDate.from) return;
+            if (currentFilters.dueDate?.to && dueDate > currentFilters.dueDate.to) return;
+          }
+
+          if (task.Section) {
+            const section = Array.from(sectionsByTitle.values()).find(
+              (s) => s.Title === task.Section
+            );
+            if (section) {
+              if (!tasksBySectionId[section.ItemId]) {
+                tasksBySectionId[section.ItemId] = [];
+              }
+              tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
+            }
+          }
+        });
+      }
+
+      const newColumns = filteredSections.map((section: TaskSection) => ({
+        ...section,
+        tasks: tasksBySectionId[section.ItemId] || [],
+      }));
+
+      return newColumns;
+    });
+  }, [
+    sectionsData, 
+    tasksData, 
+    searchQuery, 
+    filters.priorities, 
+    filters.statuses, 
+    filters.assignees, 
+    filters.tags, 
+    filters.dueDate, 
+    ensureTaskItem
+  ]);
 
   const getColumnCount = (size: string) => {
     return size === 'tablet' ? 5 : 3;

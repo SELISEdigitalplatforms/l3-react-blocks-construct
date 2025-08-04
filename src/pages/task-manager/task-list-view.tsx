@@ -49,9 +49,75 @@ import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager
  * <TaskListView taskService={new TaskService()} />
  */
 
-export function TaskListView({ searchQuery = '' }: { searchQuery?: string }) {
+interface TaskListViewProps {
+  searchQuery?: string;
+  filters: {
+    priorities: string[];
+    statuses: string[];
+    assignees: string[];
+    tags: string[];
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+}
+
+export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
   const { t } = useTranslation();
-  const { tasks, createTask, updateTaskOrder, getFilteredTasks, isLoading } = useListTasks();
+  const { tasks, createTask, updateTaskOrder, isLoading } = useListTasks();
+
+  const filteredTasks = useMemo(() => {
+    let result = [...tasks];
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (task: TaskItem) =>
+          task.Title?.toLowerCase().includes(query) ||
+          task.Description?.toLowerCase().includes(query) ||
+          task.Tags?.some((tag: string) => tag.toLowerCase().includes(query))
+      );
+    }
+
+    if (filters.priorities.length) {
+      result = result.filter(
+        (task: TaskItem) => task.Priority && filters.priorities.includes(task.Priority)
+      );
+    }
+
+    if (filters.statuses.length) {
+      result = result.filter(
+        (task: TaskItem) => task.Section && filters.statuses.includes(task.Section)
+      );
+    }
+
+    if (filters.assignees.length) {
+      result = result.filter((task: TaskItem) =>
+        task.Assignee?.some(
+          (assignee) => assignee.ItemId && filters.assignees.includes(assignee.ItemId)
+        )
+      );
+    }
+
+    if (filters.tags.length) {
+      result = result.filter((task: TaskItem) =>
+        task.Tags?.some((tag) => filters.tags.includes(tag))
+      );
+    }
+
+    if (filters.dueDate?.from || filters.dueDate?.to) {
+      result = result.filter((task: TaskItem) => {
+        if (!task.DueDate) return false;
+        const dueDate = new Date(task.DueDate);
+        if (filters.dueDate?.from && dueDate < filters.dueDate.from) return false;
+        if (filters.dueDate?.to && dueDate > filters.dueDate.to) return false;
+        return true;
+      });
+    }
+
+    return result;
+  }, [tasks, searchQuery, filters]);
 
   const { data: sectionsData } = useGetTaskSections({
     pageNo: 1,
@@ -62,7 +128,6 @@ export function TaskListView({ searchQuery = '' }: { searchQuery?: string }) {
     return sectionsData?.TaskManagerSections?.items || [];
   }, [sectionsData]);
 
-  const [statusFilter] = useState<'todo' | 'inprogress' | 'done' | null>(null);
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
   const [showNewTaskInput, setShowNewTaskInput] = useState<boolean>(false);
   const [isTaskDetailsModalOpen, setIsTaskDetailsModalOpen] = useState(false);
@@ -127,23 +192,6 @@ export function TaskListView({ searchQuery = '' }: { searchQuery?: string }) {
     }
     setActiveTask(null);
   };
-
-  const filteredTasks = useMemo(() => {
-    const tasks = getFilteredTasks(statusFilter);
-
-    if (!searchQuery) return tasks;
-
-    const query = searchQuery.toLowerCase();
-    return tasks.filter(
-      (task) =>
-        task.Title?.toLowerCase().includes(query) ||
-        false ||
-        task.Description?.toLowerCase().includes(query) ||
-        false ||
-        task.Tags?.some((tag) => tag.toLowerCase().includes(query)) ||
-        false
-    );
-  }, [getFilteredTasks, statusFilter, searchQuery]);
 
   const taskIds = filteredTasks.map((task) => `task-${task.ItemId}`);
 

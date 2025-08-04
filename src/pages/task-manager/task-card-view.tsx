@@ -53,12 +53,23 @@ interface TaskCardViewProps {
   isNewTaskModalOpen?: boolean;
   setNewTaskModalOpen: (isOpen: boolean) => void;
   searchQuery?: string;
+  filters: {
+    priorities: string[];
+    statuses: string[];
+    assignees: string[];
+    tags: string[];
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
 }
 
 export function TaskCardView({
   isNewTaskModalOpen,
   setNewTaskModalOpen,
   searchQuery = '',
+  filters,
 }: Readonly<TaskCardViewProps>) {
   const { touchEnabled } = useDeviceCapabilities();
 
@@ -82,7 +93,16 @@ export function TaskCardView({
     handleDragOver,
     handleDragEnd,
     sensors,
-  } = useCardTasks();
+  } = useCardTasks({
+    searchQuery,
+    filters: {
+      priorities: filters.priorities,
+      statuses: filters.statuses,
+      assignees: filters.assignees,
+      tags: filters.tags,
+      dueDate: filters.dueDate,
+    },
+  });
 
   const handleAddTask = useCallback(
     async (columnId: string, content: string) => {

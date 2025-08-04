@@ -6,7 +6,10 @@ import { Input } from 'components/ui/input';
 import { Button } from 'components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
 // import { useTaskContext } from '../../contexts/task-context';
-import { TaskManagerFilterSheet } from '../task-manager-filters-sheet/task-manager-filters-sheet';
+import {
+  TaskManagerFilterSheet,
+  TaskFilters,
+} from '../task-manager-filters-sheet/task-manager-filters-sheet';
 
 /**
  * TaskManagerToolbar Component
@@ -47,6 +50,14 @@ interface TaskManagerToolbarProps {
   handleViewMode: (view: ViewMode) => void;
   onOpen: () => void;
   onSearch?: (query: string) => void;
+  // filter related (optional)
+  priorities?: string[];
+  statuses?: string[];
+  assignees?: { id: string; name: string }[];
+  tags?: { id: string; label: string }[];
+  filters?: TaskFilters;
+  onApplyFilters?: (filters: TaskFilters) => void;
+  onResetFilters?: () => void;
 }
 
 export default function TaskManagerToolbar({
@@ -54,12 +65,25 @@ export default function TaskManagerToolbar({
   viewMode = 'board',
   handleViewMode,
   onSearch,
+  priorities = [],
+  statuses = [],
+  assignees = [],
+  tags = [],
+  filters = { priorities: [], statuses: [], assignees: [], tags: [] },
+  onApplyFilters,
+  onResetFilters,
 }: Readonly<TaskManagerToolbarProps>) {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [openSheet, setOpenSheet] = useState(false);
+
+  // fallback handlers when not provided
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const noop = () => {};
+  const applyFiltersHandler = onApplyFilters ?? noop;
+  const resetFiltersHandler = onResetFilters ?? noop;
 
   useEffect(() => {
     if (openSheet) {
@@ -156,7 +180,17 @@ export default function TaskManagerToolbar({
             </Tabs>
           </div>
         </div>
-        <TaskManagerFilterSheet open={openSheet} onOpenChange={setOpenSheet} />
+        <TaskManagerFilterSheet
+          open={openSheet}
+          onOpenChange={setOpenSheet}
+          priorities={priorities}
+          statuses={statuses}
+          assignees={assignees}
+          tags={tags}
+          value={filters}
+          onApply={applyFiltersHandler}
+          onReset={resetFiltersHandler}
+        />
       </div>
     );
   }
@@ -213,7 +247,17 @@ export default function TaskManagerToolbar({
           {t('ADD_ITEM')}
         </Button>
       </div>
-      <TaskManagerFilterSheet open={openSheet} onOpenChange={setOpenSheet} />
+      <TaskManagerFilterSheet
+        open={openSheet}
+        onOpenChange={setOpenSheet}
+        priorities={priorities}
+        statuses={statuses}
+        assignees={assignees}
+        tags={tags}
+        value={filters}
+        onApply={applyFiltersHandler}
+        onReset={resetFiltersHandler}
+      />
     </div>
   );
 }

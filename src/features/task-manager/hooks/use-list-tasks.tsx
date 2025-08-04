@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { TaskItem, TaskPriority } from '../types/task-manager.types';
 import { useGetTasks, useCreateTaskItem } from './use-task-manager';
@@ -34,7 +34,21 @@ import { useGetTasks, useCreateTaskItem } from './use-task-manager';
  * } = useListTasks();
  */
 
-export function useListTasks() {
+interface UseListTasksProps {
+  searchQuery?: string;
+  filters?: {
+    priorities?: string[];
+    statuses?: string[];
+    assignees?: string[];
+    tags?: string[];
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+}
+
+export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksProps = {}) {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const { data: tasksData, isLoading } = useGetTasks({
     pageNo: 1,
@@ -108,9 +122,60 @@ export function useListTasks() {
     });
   };
 
-  const getFilteredTasks = (statusFilter: 'todo' | 'inprogress' | 'done' | null) => {
-    return statusFilter ? tasks.filter((task) => task.Section === statusFilter) : tasks;
-  };
+  const getFilteredTasks = useCallback(() => {
+    return tasks.filter((task) => {
+      // Filter by search query
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        const matchesSearch = 
+          task.Title?.toLowerCase().includes(searchLower) ||
+          task.Description?.toLowerCase().includes(searchLower) ||
+          task.Tags?.some(tag => tag.toLowerCase().includes(searchLower));
+        
+        if (!matchesSearch) return false;
+      }
+
+      // Filter by priorities
+      if (filters.priorities?.length && !filters.priorities.some(p => p === task.Priority)) {
+        return false;
+      }
+
+      // Filter by statuses (sections)
+      if (filters.statuses?.length && task.Section && !filters.statuses.includes(task.Section)) {
+        return false;
+      }
+
+      // Filter by assignees
+      if (filters.assignees?.length && task.Assignee?.length) {
+        const hasMatchingAssignee = task.Assignee.some(assignee => 
+          filters.assignees?.includes(assignee.ItemId)
+        );
+        if (!hasMatchingAssignee) return false;
+      }
+
+      // Filter by tags
+      if (filters.tags?.length && task.Tags?.length) {
+        const hasMatchingTag = task.Tags.some(tag => 
+          filters.tags?.includes(tag)
+        );
+        if (!hasMatchingTag) return false;
+      }
+
+      // Filter by due date
+      if (filters.dueDate?.from || filters.dueDate?.to) {
+        const taskDueDate = task.DueDate ? new Date(task.DueDate) : null;
+        
+        if (filters.dueDate.from && taskDueDate && taskDueDate < filters.dueDate.from) {
+          return false;
+        }
+        if (filters.dueDate.to && taskDueDate && taskDueDate > filters.dueDate.to) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [tasks, searchQuery, filters]);
 
   const changeTaskStatus = (taskId: string, newStatus: 'todo' | 'inprogress' | 'done') => {
     setTasks((prev) =>

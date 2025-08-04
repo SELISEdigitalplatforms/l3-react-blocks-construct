@@ -138,7 +138,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               : currentTask?.Assignee || [],
           Tags: mapToTags(foundTask.Tags),
           Attachments: mapToAttachments(
-            (foundTask.Attachments && foundTask.Attachments.length > 0)
+            foundTask.Attachments && foundTask.Attachments.length > 0
               ? foundTask.Attachments
               : currentTask?.Attachments
           ),
@@ -155,6 +155,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     } else {
       setCurrentTask(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskId, tasksData, currentTask?.Assignee]);
 
   const { mutate: updateTask } = useUpdateTaskItem();
