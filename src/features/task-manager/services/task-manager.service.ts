@@ -1,11 +1,12 @@
 import { graphqlClient } from 'lib/graphql-client';
-import type { TaskItem, ItemTag } from '../types/task-manager.types';
 import {
   GET_TASK_MANAGER_QUERY,
   GET_TASK_MANAGER_SECTIONS_QUERY,
   GET_TASK_MANAGER_TAGS_QUERY,
 } from '../graphql/queries';
 import type {
+  TaskItem,
+  ItemTag,
   TaskItemInsertInput,
   TaskItemUpdateInput,
   TaskSectionInsertInput,

@@ -50,8 +50,10 @@ interface AttachmentsSectionProps {
   setAttachments: React.Dispatch<React.SetStateAction<TaskAttachments[]>>;
 }
 
-export function AttachmentsSection({ attachments, setAttachments }: AttachmentsSectionProps) {
-  
+export function AttachmentsSection({
+  attachments,
+  setAttachments,
+}: Readonly<AttachmentsSectionProps>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();

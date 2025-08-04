@@ -8,8 +8,11 @@ import {
   useGetUsers,
   useCreateTaskItem,
 } from '../../hooks/use-task-manager';
-import { Assignee, ItemTag, TaskItem, TaskTagInsertInput } from '../../types/task-manager.types';
 import {
+  Assignee,
+  ItemTag,
+  TaskItem,
+  TaskTagInsertInput,
   TaskPriority,
   TaskComments,
   TaskAttachments,
@@ -118,7 +121,7 @@ export default function TaskDetailsView({
     return usersResponse.data.map((user) => ({
       ItemId: user.itemId,
       Name: `${user.firstName} ${user.lastName || ''}`.trim(),
-      ImageUrl: user.profileImageUrl || '',
+      ImageUrl: user.profileImageUrl ?? '',
     }));
   }, [usersResponse]);
   const { columns } = useCardTasks();
@@ -141,9 +144,9 @@ export default function TaskDetailsView({
   const [date, setDate] = useState<Date | undefined>(
     task?.DueDate ? new Date(task.DueDate) : undefined
   );
-  const [title, setTitle] = useState<string>(task?.Title || '');
+  const [title, setTitle] = useState<string>(task?.Title ?? '');
   const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted || false);
-  const [section, setSection] = useState<string>(task?.Section || '');
+  const [section, setSection] = useState<string>(task?.Section ?? '');
   const [attachments, setAttachments] = useState<TaskAttachments[]>(
     task?.Attachments?.map((attachment) => ({
       ItemId: attachment.ItemId,
@@ -157,10 +160,10 @@ export default function TaskDetailsView({
       ? (task.Priority as TaskPriority)
       : TaskPriority.MEDIUM
   );
-  const [description, setDescription] = useState<string>(task?.Description || '');
+  const [description, setDescription] = useState<string>(task?.Description ?? '');
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag || []);
+  const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag ?? []);
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
 
   useEffect(() => {
@@ -192,7 +195,7 @@ export default function TaskDetailsView({
       .map((a) => a.ItemId)
       .sort()
       .join(',');
-    const newAssigneeIds = (task.Assignee || [])
+    const newAssigneeIds = (task.Assignee ?? [])
       .map((a) => a.ItemId)
       .sort()
       .join(',');
@@ -225,7 +228,7 @@ export default function TaskDetailsView({
     }
   }, [calendarOpen, date]);
 
-  const [comments, setComments] = useState<TaskComments[]>(task?.Comments || []);
+  const [comments, setComments] = useState<TaskComments[]>(task?.Comments ?? []);
 
   const handleEditComment = async (id: string, newText: string) => {
     try {
@@ -258,11 +261,11 @@ export default function TaskDetailsView({
 
   useEffect(() => {
     if (task) {
-      setTitle(task.Title || '');
+      setTitle(task.Title ?? '');
       setIsMarkComplete(!!task.IsCompleted);
-      setSection(task.Section || 'To Do');
+      setSection(task.Section ?? '');
       setAttachments(
-        (task.Attachments || []).map((attachment) => ({
+        (task.Attachments ?? []).map((attachment) => ({
           ItemId: attachment.ItemId,
           FileName: attachment.FileName,
           FileSize: attachment.FileSize,
@@ -270,8 +273,8 @@ export default function TaskDetailsView({
         }))
       );
       setDate(task.DueDate ? new Date(task.DueDate) : undefined);
-      setDescription(task.Description || '');
-      setSelectedTags(task.ItemTag || []);
+      setDescription(task.Description ?? '');
+      setSelectedTags(task.ItemTag ?? []);
 
       if (task.Assignee) {
         if (Array.isArray(task.Assignee)) {
@@ -308,7 +311,7 @@ export default function TaskDetailsView({
     } else {
       setTitle('');
       setIsMarkComplete(false);
-      setSection('To Do');
+      setSection('');
       setAttachments([]);
       setDate(undefined);
       setDescription('');
@@ -423,8 +426,8 @@ export default function TaskDetailsView({
         Assignee: Array.isArray(task.Assignee)
           ? task.Assignee.map((id) => ({
               ItemId: id,
-              Name: selectedAssignees.find((a) => a.ItemId === id)?.Name || '',
-              ImageUrl: selectedAssignees.find((a) => a.ItemId === id)?.ImageUrl || '',
+              Name: selectedAssignees.find((a) => a.ItemId === id)?.Name ?? '',
+              ImageUrl: selectedAssignees.find((a) => a.ItemId === id)?.ImageUrl ?? '',
             }))
           : undefined,
       };

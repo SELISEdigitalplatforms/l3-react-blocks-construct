@@ -54,11 +54,11 @@ import { TaskSection } from '../../types/task-manager.types';
  * />
  */
 
-export interface ITaskColumnProps {
+export interface TaskColumnProps {
   column: TaskSection;
   tasks: any[];
   sections: TaskSection[];
-  setActiveColumn: (columnId: string) => void;
+  setActiveColumn: (columnId: string | null) => void;
   onAddTask: (columnId: string, taskTitle: string) => Promise<string | null>;
   onRenameColumn: (columnId: string, newTitle: string) => void;
   onDeleteColumn: (columnId: string) => void;
@@ -75,7 +75,7 @@ export function TaskColumn({
   onDeleteColumn,
   onTaskAdded,
   isNewColumn,
-}: ITaskColumnProps) {
+}: Readonly<TaskColumnProps>) {
   const { touchEnabled, screenSize } = useDeviceCapabilities();
   const { t } = useTranslation();
 
@@ -187,7 +187,7 @@ export function TaskColumn({
         style={{
           height: getColumnHeight(),
           minHeight: isNewColumn && tasks.length === 0 ? MIN_COLUMN_HEIGHT : 'auto',
-          touchAction: 'none', // Prevent scrolling when dragging
+          touchAction: 'none',
         }}
         data-touch-enabled={touchEnabled ? 'true' : 'false'}
         data-screen-size={screenSize}
@@ -202,7 +202,7 @@ export function TaskColumn({
             }),
             scrollbarWidth: 'thin',
             scrollbarColor: '#CBD5E0 transparent',
-            touchAction: 'pan-y', // Allow vertical scrolling
+            touchAction: 'pan-y',
           }}
         >
           <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>

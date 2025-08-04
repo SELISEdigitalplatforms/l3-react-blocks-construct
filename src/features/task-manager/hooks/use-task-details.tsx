@@ -127,12 +127,11 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const mappedTask: TaskItem = {
           ItemId: foundTask.ItemId,
           Title: foundTask.Title,
-          Description: foundTask.Description || '',
-          IsCompleted: foundTask.IsCompleted || false,
-          Priority: foundTask.Priority || TaskPriority.MEDIUM,
-          Section: foundTask.Section || '',
+          Description: foundTask.Description ?? '',
+          IsCompleted: foundTask.IsCompleted ?? false,
+          Priority: foundTask.Priority ?? TaskPriority.MEDIUM,
+          Section: foundTask.Section ?? '',
           DueDate: foundTask.DueDate,
-          // Preserve the existing Assignee array if the new one is empty
           Assignee:
             Array.isArray(foundTask.Assignee) && foundTask.Assignee.length > 0
               ? foundTask.Assignee
@@ -144,11 +143,11 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               : currentTask?.Attachments
           ),
           Comments: mapToComments(foundTask.Comments),
-          CreatedBy: foundTask.CreatedBy || '',
-          CreatedDate: foundTask.CreatedDate || new Date().toISOString(),
-          IsDeleted: foundTask.IsDeleted || false,
-          Language: foundTask.Language || 'en',
-          OrganizationIds: foundTask.OrganizationIds || [],
+          CreatedBy: foundTask.CreatedBy ?? '',
+          CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
+          IsDeleted: foundTask.IsDeleted ?? false,
+          Language: foundTask.Language ?? 'en',
+          OrganizationIds: foundTask.OrganizationIds ?? [],
         };
 
         setCurrentTask(mappedTask);
@@ -172,7 +171,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         const sanitizedUpdates: TaskItemUpdateInput = {};
 
-        // Handle standard fields
         if ('Title' in updates) sanitizedUpdates.Title = updates.Title as string;
         if ('Description' in updates) sanitizedUpdates.Description = updates.Description as string;
         if ('DueDate' in updates) sanitizedUpdates.DueDate = updates.DueDate as string;
@@ -180,29 +178,25 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         if ('Section' in updates) sanitizedUpdates.Section = updates.Section as string;
         if ('IsCompleted' in updates) sanitizedUpdates.IsCompleted = updates.IsCompleted as boolean;
         if ('Language' in updates) sanitizedUpdates.Language = updates.Language as string;
-        if ('OrganizationIds' in updates) sanitizedUpdates.OrganizationIds = updates.OrganizationIds as string[];
+        if ('OrganizationIds' in updates)
+          sanitizedUpdates.OrganizationIds = updates.OrganizationIds as string[];
         if ('IsDeleted' in updates) sanitizedUpdates.IsDeleted = updates.IsDeleted as boolean;
 
-        // Handle ItemTag and Tags
         if ('ItemTag' in updates) {
           sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
         } else if ('Tags' in updates) {
-          // Convert legacy Tags to ItemTag format if needed
           const tags = updates.Tags as (string | ItemTag)[] | undefined;
           if (Array.isArray(tags)) {
-            sanitizedUpdates.ItemTag = tags.map(tag => ({
+            sanitizedUpdates.ItemTag = tags.map((tag) => ({
               ItemId: typeof tag === 'string' ? tag : tag.ItemId,
-              TagLabel: typeof tag === 'string' ? tag : tag.TagLabel
+              TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
             }));
           }
         }
 
-        // Handle Assignee - ensure it's always an array
         if ('Assignee' in updates) {
           sanitizedUpdates.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
         }
-
-        // Optimistically update the UI with the original updates
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
@@ -212,19 +206,15 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           input: sanitizedUpdates,
         });
 
-        // Force refresh the tasks list to ensure we have the latest data
         await refetchTasks();
 
-        // Update the task in the parent component's task list
-        // This ensures the parent component is aware of the changes
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('task-updated', { detail: updatedTask }));
         }
       } catch (error) {
-        // If there's an error, revert to the previous task data
         console.error('Failed to update task:', error);
         setCurrentTask(previousTask);
-        throw error; // Re-throw the error to be handled by the caller
+        throw error;
       }
     },
     [taskId, currentTask, updateTask, refetchTasks]
@@ -236,11 +226,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId) return;
 
       try {
-        // Optimistically update the UI
         setCurrentTask((prev) => (prev ? { ...prev, isCompleted } : null));
-
-        // TODO: Call your API to update the task status
-        // await updateTaskItem(taskId, { isCompleted });
 
         // Refresh the tasks list
         await refetchTasks();
@@ -290,7 +276,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           text: comment,
         };
 
-        // Optimistically update the UI
         setCurrentTask((prev) =>
           prev
             ? {
@@ -300,10 +285,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // TODO: Call your API to add the comment
-        // await addCommentToTask(taskId, newComment);
-
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to add comment:', error);
@@ -319,7 +300,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId || !currentTask) return;
 
       try {
-        // Optimistically update the UI
         setCurrentTask((prev) =>
           prev
             ? {
@@ -329,10 +309,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // TODO: Call your API to delete the comment
-        // await deleteCommentFromTask(taskId, commentId);
-
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to delete comment:', error);
@@ -348,7 +324,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId || !currentTask) return;
 
       try {
-        // Optimistically update the UI
         setCurrentTask((prev) =>
           prev
             ? {
@@ -358,10 +333,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // TODO: Call your API to add the attachment
-        // await addAttachmentToTask(taskId, attachment);
-
-        // Refresh the tasks list
+        await refetchTasks();
         await refetchTasks();
       } catch (error) {
         console.error('Failed to add attachment:', error);
@@ -377,7 +349,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId || !currentTask) return;
 
       try {
-        // Optimistically update the UI
         setCurrentTask((prev) =>
           prev
             ? {
@@ -387,10 +358,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // TODO: Call your API to delete the attachment
-        // await deleteAttachmentFromTask(taskId, attachmentId);
-
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to delete attachment:', error);
@@ -414,10 +381,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // TODO: Call your API to add the assignee
-        // await addAssigneeToTask(taskId, assignee);
-
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to add assignee:', error);
@@ -433,12 +396,9 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId || !currentTask) return;
 
       try {
-        // Remove the assignee from the current task
         const updatedAssignees = currentTask.Assignee?.filter(
           (assignee) => assignee.ItemId !== assigneeId
         );
-
-        // Update the task with the new assignees
         await updateTask({
           itemId: taskId,
           input: {
@@ -468,7 +428,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         };
         const updatedTags = [...(currentTask.ItemTag || []), newTag];
 
-        // Optimistic update
         setCurrentTask((prev: TaskItem | null) =>
           prev
             ? {
@@ -478,24 +437,16 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // Create a properly typed update object
         const update: Partial<TaskItem> = {
           ItemTag: updatedTags,
         };
 
-        // Call API to add tag
         await updateTaskDetails(update);
-
-        // Refetch to ensure data is in sync
         await refetchTasks();
       } catch (error) {
-        // Using console.error for error logging
-        // eslint-disable-next-line no-console
         console.error('Error adding tag:', error);
-        // Revert on error by refetching the latest data
         await refetchTasks();
 
-        // Show error toast
         toast({
           variant: 'destructive',
           title: t ? t('Error adding tag') : 'Error adding tag',
@@ -514,7 +465,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId || !currentTask) return;
 
       try {
-        // Optimistic update
         setCurrentTask((prev) =>
           prev
             ? {
@@ -524,19 +474,13 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        // Create update object with filtered tags
         const update: TaskItemUpdateInput = {
           ItemTag: (currentTask.ItemTag || []).filter((t) => t.ItemId !== tagId),
         };
-
-        // Call API to update task with new tags
         await updateTaskDetails(update);
-
-        // Refetch to ensure data is in sync
         await refetchTasks();
       } catch (error) {
         console.error('Error removing tag:', error);
-        // Revert on error
         await refetchTasks();
       }
     },

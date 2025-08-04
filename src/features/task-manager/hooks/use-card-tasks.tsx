@@ -89,24 +89,24 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
   const ensureTaskItem = useCallback((task: TaskItem): TaskItem => {
     return {
-      ItemId: task.ItemId || '',
-      Title: task.Title || '',
-      Description: task.Description || '',
-      IsCompleted: task.IsCompleted || false,
-      Priority: task.Priority || TaskPriority.MEDIUM,
-      Section: task.Section || '',
-      ItemTag: task.ItemTag || [],
-      Assignee: task.Assignee || [],
-      Comments: task.Comments || [],
-      Attachments: task.Attachments || [],
-      CreatedBy: task.CreatedBy || '',
-      CreatedDate: task.CreatedDate || new Date().toISOString(),
-      LastUpdatedBy: task.LastUpdatedBy || '',
-      LastUpdatedDate: task.LastUpdatedDate || new Date().toISOString(),
-      DueDate: task.DueDate || '',
-      IsDeleted: task.IsDeleted || false,
-      Language: task.Language || 'en',
-      OrganizationIds: task.OrganizationIds || [],
+      ItemId: task.ItemId ?? '',
+      Title: task.Title ?? '',
+      Description: task.Description ?? '',
+      IsCompleted: task.IsCompleted ?? false,
+      Priority: task.Priority ?? TaskPriority.MEDIUM,
+      Section: task.Section ?? '',
+      ItemTag: task.ItemTag ?? [],
+      Assignee: task.Assignee ?? [],
+      Comments: task.Comments ?? [],
+      Attachments: task.Attachments ?? [],
+      CreatedBy: task.CreatedBy ?? '',
+      CreatedDate: task.CreatedDate ?? new Date().toISOString(),
+      LastUpdatedBy: task.LastUpdatedBy ?? '',
+      LastUpdatedDate: task.LastUpdatedDate ?? new Date().toISOString(),
+      DueDate: task.DueDate ?? '',
+      IsDeleted: task.IsDeleted ?? false,
+      Language: task.Language ?? 'en',
+      OrganizationIds: task.OrganizationIds ?? [],
     };
   }, []);
 
@@ -127,11 +127,11 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
     // Create a stable reference to the filters object
     const currentFilters = {
-      priorities: filters.priorities || [],
-      statuses: filters.statuses || [],
-      assignees: filters.assignees || [],
-      tags: filters.tags || [],
-      dueDate: filters.dueDate || {},
+      priorities: filters.priorities ?? [],
+      statuses: filters.statuses ?? [],
+      assignees: filters.assignees ?? [],
+      tags: filters.tags ?? [],
+      dueDate: filters.dueDate ?? {},
     };
 
     setColumnTasks(() => {
@@ -158,7 +158,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
       if (tasksData?.TaskManagerItems?.items) {
         tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
-          // Skip if task doesn't match search query
           if (searchQuery) {
             const query = searchQuery.toLowerCase();
             const matchesSearch =
@@ -169,7 +168,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             if (!matchesSearch) return;
           }
 
-          // Skip if task doesn't match priority filter
           if (
             currentFilters.priorities.length &&
             task.Priority &&
@@ -178,7 +176,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             return;
           }
 
-          // Skip if task doesn't match assignee filter
           if (currentFilters.assignees.length && task.Assignee?.length) {
             const hasMatchingAssignee = task.Assignee.some(
               (assignee) => assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId)
@@ -186,15 +183,12 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             if (!hasMatchingAssignee) return;
           }
 
-          // Skip if task doesn't match tags filter
           if (currentFilters.tags.length && task.ItemTag?.length) {
             const hasMatchingTag = task.ItemTag.some((tag) =>
               currentFilters.tags.some((t) => t.ItemId === tag.ItemId)
             );
             if (!hasMatchingTag) return;
           }
-
-          // Skip if task doesn't match due date filter
           if ((currentFilters.dueDate?.from || currentFilters.dueDate?.to) && task.DueDate) {
             const dueDate = new Date(task.DueDate);
             if (currentFilters.dueDate?.from && dueDate < currentFilters.dueDate.from) return;
@@ -397,11 +391,9 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
           const response = await createTask(taskData);
 
-          // The response structure is { insertTaskManagerItem: { itemId: string, ... } }
           const taskId = response?.insertTaskManagerItem?.itemId;
 
           if (!taskId) {
-            // Remove the temporary task if no task ID was returned
             setColumnTasks((prev) =>
               prev.map((column) =>
                 column.ItemId === columnId
@@ -415,7 +407,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             throw new Error('Failed to create task: No task ID returned from server');
           }
 
-          // Update the task with the real ID from the server
           setColumnTasks((prev) =>
             prev.map((column) =>
               column.ItemId === columnId
@@ -429,13 +420,11 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             )
           );
 
-          // Still refetch to ensure everything is in sync
           await refetchTasks();
 
           return taskId;
         } catch (error) {
           console.error('Error in createTask mutation:', error);
-          // Remove the temporary task if creation failed
           setColumnTasks((prev) =>
             prev.map((column) =>
               column.ItemId === columnId
@@ -458,7 +447,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             error instanceof Error ? error.message : 'Failed to create the task. Please try again.',
           variant: 'destructive',
         });
-        throw error; // Re-throw to be handled by the caller
+        throw error;
       }
     },
     [createTask, toast, columnTasks, refetchTasks]
@@ -491,22 +480,18 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
       if (targetColumnIndex === -1 || sourceColumnIndex === targetColumnIndex) return;
 
-      // Create a deep copy of the columns to avoid reference issues
       const newColumns = JSON.parse(JSON.stringify(columnTasks));
       const sourceTasks = [...newColumns[sourceColumnIndex].tasks];
       const activeTaskIndex = sourceTasks.findIndex((task) => task.ItemId === activeTaskId);
 
       if (activeTaskIndex === -1) return;
 
-      // Remove the task from the source column
       const [movedTask] = sourceTasks.splice(activeTaskIndex, 1);
       if (!movedTask) return;
 
-      // Get the target column's title
       const targetSectionTitle = newColumns[targetColumnIndex].Title;
 
       try {
-        // Update the task on the server first
         await updateTask({
           itemId: movedTask.ItemId,
           input: {
@@ -514,23 +499,19 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           },
         });
 
-        // Get the target tasks and remove any existing task with the same ID
         const targetTasks = [...(newColumns[targetColumnIndex].tasks || [])];
         const existingTaskIndex = targetTasks.findIndex((task) => task.ItemId === movedTask.ItemId);
         if (existingTaskIndex !== -1) {
           targetTasks.splice(existingTaskIndex, 1);
         }
 
-        // Create the updated task with the new section
         const updatedTask = {
           ...movedTask,
           Section: targetSectionTitle,
         };
 
-        // Add the task to the target column
         targetTasks.push(updatedTask);
 
-        // Update the state
         setColumnTasks((prevColumns) => {
           const newState = [...prevColumns];
           newState[sourceColumnIndex] = {
@@ -544,7 +525,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           return newState;
         });
 
-        // Refetch tasks to ensure everything is in sync
         await refetchTasks();
       } catch (error) {
         console.error('Error moving task to column:', error);
@@ -553,7 +533,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           description: 'Failed to move the task. Please try again.',
           variant: 'destructive',
         });
-        // Refetch to reset to server state
         refetchTasks();
       }
     },
@@ -562,29 +541,24 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
   const handleTaskDrag = useCallback(
     async (activeTaskId: string, overTaskId: string, sourceColumnIndex: number) => {
-      // Find the target column index by checking which column contains the task we're over
       const targetColumnIndex = columnTasks.findIndex((col) =>
         col.tasks.some((task) => task.ItemId === overTaskId)
       );
 
       if (targetColumnIndex === -1 || sourceColumnIndex === -1) return;
 
-      // Create a deep copy of the columns to avoid reference issues
       const newColumns = JSON.parse(JSON.stringify(columnTasks));
       const sourceTasks = [...newColumns[sourceColumnIndex].tasks];
       const sourceTaskIndex = sourceTasks.findIndex((task) => task.ItemId === activeTaskId);
 
       if (sourceTaskIndex === -1) return;
 
-      // Remove the task from the source column
       const [movedTask] = sourceTasks.splice(sourceTaskIndex, 1);
       if (!movedTask) return;
 
-      // Get the target column's title
       const targetSectionTitle = newColumns[targetColumnIndex].Title;
 
       try {
-        // Update the task on the server first
         await updateTask({
           itemId: movedTask.ItemId,
           input: {
@@ -592,7 +566,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           },
         });
 
-        // Get the target tasks and remove any existing task with the same ID
         const targetTasks = [...(newColumns[targetColumnIndex].tasks || [])];
         const existingTaskIndex = targetTasks.findIndex((task) => task.ItemId === movedTask.ItemId);
         if (existingTaskIndex !== -1) {
@@ -603,16 +576,13 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         const overTaskIndex = targetTasks.findIndex((task) => task.ItemId === overTaskId);
         const insertIndex = overTaskIndex !== -1 ? overTaskIndex : targetTasks.length;
 
-        // Create the updated task with the new section
         const updatedTask = {
           ...movedTask,
           Section: targetSectionTitle,
         };
 
-        // Insert the task at the correct position
         targetTasks.splice(insertIndex, 0, updatedTask);
 
-        // Update the state
         setColumnTasks((prevColumns) => {
           const newState = [...prevColumns];
           newState[sourceColumnIndex] = {
@@ -635,7 +605,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           description: 'Failed to move the task. Please try again.',
           variant: 'destructive',
         });
-        // Refetch to reset to server state
         refetchTasks();
       }
     },
@@ -658,7 +627,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
     if (!isActiveATask) return;
 
-    // Find the task being dragged
     const activeTaskId = activeId.replace('task-', '');
     const sourceColumnIndex = columnTasks.findIndex((col) =>
       col.tasks.some((task) => task.ItemId === activeTaskId)
