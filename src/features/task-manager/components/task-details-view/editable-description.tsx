@@ -58,8 +58,17 @@ export function EditableDescription({
   const [isMounted, setIsMounted] = useState(false);
   const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
   const { t } = useTranslation();
-
   const [forceRender, setForceRender] = useState(0);
+
+  useEffect(() => {
+    if (initialContent && !content) {
+      setContent(initialContent);
+      setIsEditing(false);
+    } else if (!isEditing) {
+      setContent(initialContent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialContent]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -168,6 +177,7 @@ export function EditableDescription({
     if (!isEditing) {
       const styleTag = document.createElement('style');
       styleTag.id = 'hide-quill-toolbar';
+      styleTag.innerHTML = '.ql-toolbar { display: none !important; }';
       document.head.appendChild(styleTag);
 
       return () => {

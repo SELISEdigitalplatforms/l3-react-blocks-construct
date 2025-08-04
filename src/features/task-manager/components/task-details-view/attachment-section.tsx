@@ -51,6 +51,7 @@ interface AttachmentsSectionProps {
 }
 
 export function AttachmentsSection({ attachments, setAttachments }: AttachmentsSectionProps) {
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();

@@ -137,7 +137,11 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Assignee
               : currentTask?.Assignee || [],
           Tags: mapToTags(foundTask.Tags),
-          Attachments: mapToAttachments(foundTask.Attachments),
+          Attachments: mapToAttachments(
+            (foundTask.Attachments && foundTask.Attachments.length > 0)
+              ? foundTask.Attachments
+              : currentTask?.Attachments
+          ),
           Comments: mapToComments(foundTask.Comments),
           CreatedBy: foundTask.CreatedBy || '',
           CreatedDate: foundTask.CreatedDate || new Date().toISOString(),
