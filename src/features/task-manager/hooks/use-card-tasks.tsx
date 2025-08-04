@@ -156,56 +156,71 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         tasksBySectionId[section.ItemId] = [];
       });
 
+      const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
+        if (!query) return true;
+
+        const searchTerm = query.toLowerCase();
+        return (
+          task.Title?.toLowerCase().includes(searchTerm) ||
+          task.Description?.toLowerCase().includes(searchTerm) ||
+          !!task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(searchTerm))
+        );
+      };
+
+      const matchesPriority = (task: TaskItem): boolean => {
+        const { priorities } = currentFilters;
+        return !priorities.length || !task.Priority || priorities.includes(task.Priority);
+      };
+
+      const matchesAssignees = (task: TaskItem): boolean => {
+        const { assignees } = currentFilters;
+        if (!assignees.length || !task.Assignee?.length) return true;
+
+        return task.Assignee.some(
+          (assignee) => assignee.ItemId && assignees.includes(assignee.ItemId)
+        );
+      };
+
+      const matchesTags = (task: TaskItem): boolean => {
+        const { tags } = currentFilters;
+        if (!tags.length || !task.ItemTag?.length) return true;
+
+        return task.ItemTag.some((tag) => tags.some((t) => t.ItemId === tag.ItemId));
+      };
+
+      const matchesDueDate = (task: TaskItem): boolean => {
+        const { dueDate } = currentFilters;
+        if ((!dueDate?.from && !dueDate?.to) || !task.DueDate) return true;
+
+        const taskDueDate = new Date(task.DueDate);
+        const afterStart = !dueDate.from || taskDueDate >= dueDate.from;
+        const beforeEnd = !dueDate.to || taskDueDate <= dueDate.to;
+
+        return afterStart && beforeEnd;
+      };
+
+      const addTaskToSection = (task: TaskItem) => {
+        if (!task.Section) return;
+
+        const section = Array.from(sectionsByTitle.values()).find((s) => s.Title === task.Section);
+
+        if (!section) return;
+
+        if (!tasksBySectionId[section.ItemId]) {
+          tasksBySectionId[section.ItemId] = [];
+        }
+        tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
+      };
+
       if (tasksData?.TaskManagerItems?.items) {
         tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
-          if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            const matchesSearch =
-              task.Title?.toLowerCase().includes(query) ||
-              task.Description?.toLowerCase().includes(query) ||
-              task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(query));
+          if (!matchesSearchQuery(task, searchQuery)) return;
+          if (!matchesPriority(task)) return;
+          if (!matchesAssignees(task)) return;
+          if (!matchesTags(task)) return;
+          if (!matchesDueDate(task)) return;
 
-            if (!matchesSearch) return;
-          }
-
-          if (
-            currentFilters.priorities.length &&
-            task.Priority &&
-            !currentFilters.priorities.includes(task.Priority)
-          ) {
-            return;
-          }
-
-          if (currentFilters.assignees.length && task.Assignee?.length) {
-            const hasMatchingAssignee = task.Assignee.some(
-              (assignee) => assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId)
-            );
-            if (!hasMatchingAssignee) return;
-          }
-
-          if (currentFilters.tags.length && task.ItemTag?.length) {
-            const hasMatchingTag = task.ItemTag.some((tag) =>
-              currentFilters.tags.some((t) => t.ItemId === tag.ItemId)
-            );
-            if (!hasMatchingTag) return;
-          }
-          if ((currentFilters.dueDate?.from || currentFilters.dueDate?.to) && task.DueDate) {
-            const dueDate = new Date(task.DueDate);
-            if (currentFilters.dueDate?.from && dueDate < currentFilters.dueDate.from) return;
-            if (currentFilters.dueDate?.to && dueDate > currentFilters.dueDate.to) return;
-          }
-
-          if (task.Section) {
-            const section = Array.from(sectionsByTitle.values()).find(
-              (s) => s.Title === task.Section
-            );
-            if (section) {
-              if (!tasksBySectionId[section.ItemId]) {
-                tasksBySectionId[section.ItemId] = [];
-              }
-              tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
-            }
-          }
+          addTaskToSection(task);
         });
       }
 
@@ -335,109 +350,130 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
     [deleteSection, toast]
   );
 
+  const createTempTask = useCallback(
+    (content: string, sectionTitle: string): TaskItem => ({
+      ItemId: `temp-${Date.now()}`,
+      Title: content,
+      Description: '',
+      Section: sectionTitle,
+      IsCompleted: false,
+      Language: 'en',
+      OrganizationIds: [],
+      Priority: TaskPriority.MEDIUM,
+      ItemTag: [],
+      CreatedBy: '',
+      CreatedDate: new Date().toISOString(),
+      IsDeleted: false,
+    }),
+    []
+  );
+
+  const createTaskData = useCallback(
+    (content: string, sectionTitle: string) => ({
+      Title: content,
+      Description: '',
+      Section: sectionTitle,
+      IsCompleted: false,
+      Language: 'en',
+      OrganizationIds: [],
+      Priority: TaskPriority.MEDIUM,
+      ItemTag: [],
+    }),
+    []
+  );
+
+  const removeTempTask = useCallback(
+    (prev: TaskSectionWithTasks[], columnId: string, tempTaskId: string) =>
+      prev.map((column) =>
+        column.ItemId === columnId
+          ? {
+              ...column,
+              tasks: column.tasks.filter((t) => t.ItemId !== tempTaskId),
+            }
+          : column
+      ),
+    []
+  );
+
+  const updateTaskId = useCallback(
+    (prev: TaskSectionWithTasks[], columnId: string, tempTaskId: string, newTaskId: string) =>
+      prev.map((column) =>
+        column.ItemId === columnId
+          ? {
+              ...column,
+              tasks: column.tasks.map((t) =>
+                t.ItemId === tempTaskId ? { ...t, ItemId: newTaskId } : t
+              ),
+            }
+          : column
+      ),
+    []
+  );
+
+  const validateSection = useCallback(
+    (columnId: string) => {
+      const section = columnTasks.find((col: TaskSection) => col.ItemId === columnId);
+      if (!section) {
+        const errorMessage = `Section not found for column ${columnId}`;
+        console.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      if (!section.Title) {
+        throw new Error(`Section title is empty for column ${columnId}`);
+      }
+
+      return section;
+    },
+    [columnTasks]
+  );
+
+  const addTempTask = useCallback((columnId: string, task: TaskItem) => {
+    setColumnTasks((prev) =>
+      prev.map((column) =>
+        column.ItemId === columnId ? { ...column, tasks: [...column.tasks, task] } : column
+      )
+    );
+  }, []);
+
+  const handleTaskCreationError = useCallback(
+    (error: unknown, columnId: string, tempTaskId: string) => {
+      console.error('Error in createTask mutation:', error);
+      setColumnTasks((prev) => removeTempTask(prev, columnId, tempTaskId));
+      throw new Error(
+        error instanceof Error ? error.message : 'Failed to create task on the server'
+      );
+    },
+    [removeTempTask]
+  );
+
   const addTaskToColumn = useCallback(
     async (columnId: string, content: string): Promise<string | null> => {
       if (!content.trim()) return null;
 
       try {
-        // Find the section and ensure it has a title
-        const section = columnTasks.find((col: TaskSection) => col.ItemId === columnId);
-        if (!section) {
-          const errorMessage = `Section not found for column ${columnId}`;
-          console.error(errorMessage);
-          throw new Error(errorMessage);
-        }
-
-        const sectionTitle = section.Title;
-        if (!sectionTitle) {
-          throw new Error(`Section title is empty for column ${columnId}`);
-        }
-
-        // Create a temporary task with a temporary ID
-        const tempTask: TaskItem = {
-          ItemId: `temp-${Date.now()}`,
-          Title: content,
-          Description: '',
-          Section: sectionTitle,
-          IsCompleted: false,
-          Language: 'en',
-          OrganizationIds: [],
-          Priority: TaskPriority.MEDIUM,
-          ItemTag: [],
-          CreatedBy: '',
-          CreatedDate: new Date().toISOString(),
-          IsDeleted: false,
-        };
+        const section = validateSection(columnId);
+        const sectionTitle = section.Title as string;
+        const tempTask = createTempTask(content, sectionTitle);
 
         // Add the temporary task to the local state immediately
-        setColumnTasks((prev) =>
-          prev.map((column) =>
-            column.ItemId === columnId ? { ...column, tasks: [...column.tasks, tempTask] } : column
-          )
-        );
+        addTempTask(columnId, tempTask);
 
-        // Execute the create task mutation
         try {
-          const taskData = {
-            Title: content,
-            Description: '',
-            Section: sectionTitle,
-            IsCompleted: false,
-            Language: 'en',
-            OrganizationIds: [],
-            Priority: TaskPriority.MEDIUM,
-            ItemTag: [],
-          };
-
+          const taskData = createTaskData(content, sectionTitle);
           const response = await createTask(taskData);
-
           const taskId = response?.insertTaskManagerItem?.itemId;
 
           if (!taskId) {
-            setColumnTasks((prev) =>
-              prev.map((column) =>
-                column.ItemId === columnId
-                  ? {
-                      ...column,
-                      tasks: column.tasks.filter((t) => t.ItemId !== tempTask.ItemId),
-                    }
-                  : column
-              )
-            );
             throw new Error('Failed to create task: No task ID returned from server');
           }
 
-          setColumnTasks((prev) =>
-            prev.map((column) =>
-              column.ItemId === columnId
-                ? {
-                    ...column,
-                    tasks: column.tasks.map((t) =>
-                      t.ItemId === tempTask.ItemId ? { ...t, ItemId: taskId } : t
-                    ),
-                  }
-                : column
-            )
-          );
-
+          // Update the task with the real ID from the server
+          setColumnTasks((prev) => updateTaskId(prev, columnId, tempTask.ItemId, taskId));
           await refetchTasks();
-
           return taskId;
         } catch (error) {
-          console.error('Error in createTask mutation:', error);
-          setColumnTasks((prev) =>
-            prev.map((column) =>
-              column.ItemId === columnId
-                ? {
-                    ...column,
-                    tasks: column.tasks.filter((t) => t.ItemId !== tempTask.ItemId),
-                  }
-                : column
-            )
-          );
-          throw new Error(
-            error instanceof Error ? error.message : 'Failed to create task on the server'
-          );
+          return handleTaskCreationError(error, columnId, tempTask.ItemId);
         }
       } catch (error) {
         console.error('Error in addTaskToColumn:', error);
@@ -450,7 +486,17 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         throw error;
       }
     },
-    [createTask, toast, columnTasks, refetchTasks]
+    [
+      createTask,
+      toast,
+      refetchTasks,
+      validateSection,
+      createTempTask,
+      addTempTask,
+      createTaskData,
+      updateTaskId,
+      handleTaskCreationError,
+    ]
   );
 
   const handleDragStart = (event: DragStartEvent) => {
