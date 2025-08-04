@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
@@ -31,14 +31,14 @@ import {
  *
  * @example
  * // Basic usage
- * <AddColumnDialog onAddColumn={(title) => console.log('Column added:', title)} />
+ * <AddColumn onAddColumn={(title) => console.log('Column added:', title)} />
  */
 
-interface AddColumnDialogProps {
+interface AddColumnProps {
   onAddColumn: (title: string) => void;
 }
 
-export function AddColumnDialog({ onAddColumn }: Readonly<AddColumnDialogProps>) {
+export function AddColumn({ onAddColumn }: Readonly<AddColumnProps>) {
   const { t } = useTranslation();
   const [newColumnTitle, setNewColumnTitle] = useState<string>('');
 

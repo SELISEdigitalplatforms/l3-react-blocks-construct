@@ -1,7 +1,11 @@
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
 import {
   Command,
   CommandEmpty,
@@ -11,6 +15,9 @@ import {
   CommandList,
 } from 'components/ui/command';
 import { Checkbox } from 'components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
+import { Assignee } from '../../types/task-manager.types';
+import { cn } from 'lib/utils';
 
 /**
  * AssigneeSelector Component
@@ -43,86 +50,101 @@ import { Checkbox } from 'components/ui/checkbox';
  * />
  */
 
-interface Assignee {
-  id: string;
-  name: string;
-  avatar: string;
-}
-
 interface AssigneeSelectorProps {
-  readonly availableAssignees: readonly Assignee[];
-  readonly selectedAssignees: readonly Assignee[];
-  readonly onChange: (selected: Assignee[]) => void;
+  availableAssignees: Assignee[];
+  selectedAssignees: Assignee[];
+  onChange: (selected: Assignee[]) => void;
 }
 
 export function AssigneeSelector({
   availableAssignees,
   selectedAssignees,
   onChange,
-}: AssigneeSelectorProps) {
+}: Readonly<AssigneeSelectorProps>) {
   const { t } = useTranslation();
   const handleAssigneeToggle = (assignee: Assignee) => {
-    if (selectedAssignees.some((a) => a.id === assignee.id)) {
-      onChange(selectedAssignees.filter((a) => a.id !== assignee.id));
+    const isSelected = selectedAssignees.some((a) => a.ItemId === assignee.ItemId);
+
+    if (isSelected) {
+      const newAssignees = selectedAssignees.filter((a) => a.ItemId !== assignee.ItemId);
+      onChange(newAssignees);
     } else {
-      onChange([...selectedAssignees, assignee]);
+      const newAssignees = [...selectedAssignees, assignee];
+      onChange(newAssignees);
     }
   };
 
   return (
     <div>
-      <div className="flex items-center gap-2 mt-2">
-        <div className="flex -space-x-3">
+      <div className="flex items-center gap-2">
+        <div className="flex -space-x-2">
           {selectedAssignees.slice(0, 3).map((assignee) => (
-            <div
-              key={assignee.id}
-              className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm border-2 border-white"
-            >
-              {assignee.name[0]}
-            </div>
+            <Avatar key={assignee.ItemId} className="h-8 w-8 border-2 border-background">
+              <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
+              <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+                {assignee.Name.split(' ')
+                  .map((n: string) => n[0])
+                  .join('')
+                  .toUpperCase()
+                  .substring(0, 2)}
+              </AvatarFallback>
+            </Avatar>
           ))}
           {selectedAssignees.length > 3 && (
-            <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm border-2 border-white">
+            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-600 border-2 border-background">
               +{selectedAssignees.length - 3}
             </div>
           )}
         </div>
-        <Popover>
-          <PopoverTrigger asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="h-7 w-7 border-dashed">
               <Plus className="h-4 w-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="sm:max-w-[200px] p-0">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="p-0 w-[240px]" align="start" sideOffset={4}>
             <Command>
-              <CommandInput placeholder={t('SEARCH_MEMBERS')} />
-              <CommandList>
-                <CommandEmpty>{t('NO_MEMBERS_FOUND')}</CommandEmpty>
+              <CommandInput placeholder={t('SEARCH_MEMBERS')} className="h-9" />
+              <CommandList className="max-h-[300px] overflow-y-auto">
+                <CommandEmpty className="py-2 px-3 text-sm">{t('NO_MEMBERS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableAssignees.map((assignee) => {
-                    const isSelected = selectedAssignees.some((a) => a.id === assignee.id);
+                    const isSelected = selectedAssignees.some((a) => a.ItemId === assignee.ItemId);
                     return (
                       <CommandItem
-                        key={assignee.id}
+                        key={assignee.ItemId}
                         onSelect={() => handleAssigneeToggle(assignee)}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 px-2 py-1.5"
                       >
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleAssigneeToggle(assignee)}
+                          className="h-4 w-4 rounded"
                         />
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm border-2 border-white">
-                          {assignee.name[0]}
-                        </div>
-                        <span>{assignee.name}</span>
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
+                          <AvatarFallback
+                            className={cn(
+                              'bg-gray-200 text-foreground text-xs',
+                              isSelected && 'bg-primary text-primary-foreground'
+                            )}
+                          >
+                            {assignee.Name.split(' ')
+                              .map((n: string) => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .substring(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">{assignee.Name}</span>
                       </CommandItem>
                     );
                   })}
                 </CommandGroup>
               </CommandList>
             </Command>
-          </PopoverContent>
-        </Popover>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
