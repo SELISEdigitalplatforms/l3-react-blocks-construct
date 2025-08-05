@@ -372,6 +372,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           ItemTag: [],
           CreatedBy: '',
           CreatedDate: new Date().toISOString(),
+          DueDate: new Date().toISOString(), // Set default due date to today
           IsDeleted: false,
         };
 
@@ -393,6 +394,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             OrganizationIds: [],
             Priority: TaskPriority.MEDIUM,
             ItemTag: [],
+            DueDate: new Date().toISOString(), // Set default due date to today
           };
 
           const response = await createTask(taskData);

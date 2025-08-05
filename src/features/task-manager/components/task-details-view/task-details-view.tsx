@@ -639,25 +639,27 @@ export default function TaskDetailsView({
         typeof newAttachments === 'function' ? newAttachments(prev) : newAttachments;
 
       if (currentTaskId) {
-        const taskAttachments: TaskAttachments[] = updatedAttachments.map((attachment) => ({
-          ItemId: attachment.ItemId,
-          FileName: attachment.FileName,
-          FileSize: attachment.FileSize,
-          FileType: attachment.FileType,
-        }));
+        updateTaskDetails({
+          Attachments: updatedAttachments.map((attachment) => ({
+            ItemId: attachment.ItemId,
+            FileName: attachment.FileName,
+            FileSize: attachment.FileSize,
+            FileType: attachment.FileType,
+          })),
+        });
 
-        updateTaskDetails({ Attachments: taskAttachments });
+        const removedAttachments = prev.filter(
+          (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
+        );
 
         const addedAttachments = updatedAttachments.filter(
           (newAtt) => !prev.some((prevAtt) => prevAtt.ItemId === newAtt.ItemId)
-        );
-        const removedAttachments = prev.filter(
-          (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
         );
 
         addedAttachments.forEach((attachment) => {
           addAttachment(attachment);
         });
+
         removedAttachments.forEach((attachment) => {
           removeAttachment(attachment.ItemId);
         });

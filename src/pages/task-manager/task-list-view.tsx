@@ -78,9 +78,10 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
         (task: TaskItem) =>
           task.Title?.toLowerCase().includes(query) ||
           task.Description?.toLowerCase().includes(query) ||
-          task.ItemTag?.some((tag: ItemTag) => 
-            tag.TagLabel?.toLowerCase().includes(query) || 
-            tag.ItemId?.toLowerCase().includes(query)
+          task.ItemTag?.some(
+            (tag: ItemTag) =>
+              tag.TagLabel?.toLowerCase().includes(query) ||
+              tag.ItemId?.toLowerCase().includes(query)
           )
       );
     }
@@ -106,9 +107,9 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
     }
 
     if (filters.tags.length) {
-      const tagIds = new Set(filters.tags.map(tag => tag.ItemId));
+      const tagIds = new Set(filters.tags.map((tag) => tag.ItemId));
       result = result.filter((task: TaskItem) =>
-        task.ItemTag?.some(tag => tagIds.has(tag.ItemId))
+        task.ItemTag?.some((tag) => tagIds.has(tag.ItemId))
       );
     }
 

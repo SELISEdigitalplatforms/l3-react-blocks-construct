@@ -74,30 +74,28 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
       IsCompleted: false,
       IsDeleted: false,
       CreatedDate: new Date().toISOString(),
+      DueDate: new Date().toISOString(),
       Priority: TaskPriority.MEDIUM,
       ItemTag: [],
     } as TaskItem;
 
-    // Optimistically update UI
     setTasks((prev) => [newTask, ...prev]);
 
-    // Persist to backend
     createTaskItem({
       Title: title,
       Section: status || '',
       IsCompleted: false,
+      DueDate: new Date().toISOString(),
     })
       .then((response: any) => {
         const realId = response?.insertTaskManagerItem?.itemId;
         if (realId) {
-          // Replace tempId with realId
           setTasks((prev) =>
             prev.map((task) => (task.ItemId === tempId ? { ...task, ItemId: realId } : task))
           );
         }
       })
       .catch(() => {
-        // Rollback on failure
         setTasks((prev) => prev.filter((task) => task.ItemId !== tempId));
       });
 

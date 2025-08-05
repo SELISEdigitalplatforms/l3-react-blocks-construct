@@ -50,8 +50,10 @@ interface AttachmentsSectionProps {
   setAttachments: React.Dispatch<React.SetStateAction<TaskAttachments[]>>;
 }
 
-export function AttachmentsSection({ attachments, setAttachments }: AttachmentsSectionProps) {
-  
+export function AttachmentsSection({
+  attachments,
+  setAttachments,
+}: Readonly<AttachmentsSectionProps>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -99,6 +101,23 @@ export function AttachmentsSection({ attachments, setAttachments }: AttachmentsS
 
   const handleDeleteAttachment = (id: string) => {
     setAttachments(attachments.filter((attachment) => attachment.ItemId !== id));
+  };
+
+  const handleDownload = async (attachment: TaskAttachments) => {
+    try {
+      const content = `File: ${attachment.FileName}\nSize: ${attachment.FileSize}`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.FileName || 'attachment.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error creating download:', error);
+    }
   };
 
   const getFileIcon = (type: string) => {
@@ -201,7 +220,15 @@ export function AttachmentsSection({ attachments, setAttachments }: AttachmentsS
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-500 hover:text-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(attachment);
+                      }}
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                     <Button
