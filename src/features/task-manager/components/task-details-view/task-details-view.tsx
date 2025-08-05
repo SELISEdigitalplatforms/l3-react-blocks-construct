@@ -1,5 +1,6 @@
 import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -7,15 +8,20 @@ import {
   useGetTaskTags,
   useGetUsers,
   useCreateTaskItem,
+  useCreateTaskComment,
+  useGetTaskComments,
+  useUpdateTaskComment,
+  useDeleteTaskComment,
 } from '../../hooks/use-task-manager';
-import { Assignee, ItemTag, TaskItem, TaskTagInsertInput } from '../../types/task-manager.types';
 import {
-  TaskPriority,
-  TaskComments,
-  TaskAttachments,
-  priorityStyle,
+  Assignee,
+  ItemTag,
+  TaskItem,
+  TaskTagInsertInput,
+  TaskCommentInsertInput,
 } from '../../types/task-manager.types';
-import { format } from 'date-fns';
+import { TaskPriority, TaskAttachments, priorityStyle } from '../../types/task-manager.types';
+
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -128,8 +134,6 @@ export default function TaskDetailsView({
     task,
     removeTask,
     updateTaskDetails,
-    addNewComment: addComment,
-    deleteComment: removeComment,
     addNewAttachment: addAttachment,
     deleteAttachment: removeAttachment,
     addNewTag: addTagToTask,
@@ -160,8 +164,18 @@ export default function TaskDetailsView({
   const [description, setDescription] = useState<string>(task?.Description || '');
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
+  const [userProfile, setUserProfile] = useState<{ fullName?: string; profileImageUrl?: string }>(
+    {}
+  );
   const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag || []);
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
+
+  useEffect(() => {
+    const profile = localStorage.getItem('userProfile');
+    if (profile) {
+      setUserProfile(JSON.parse(profile));
+    }
+  }, []);
 
   useEffect(() => {
     if (!task?.ItemTag) {
@@ -225,29 +239,36 @@ export default function TaskDetailsView({
     }
   }, [calendarOpen, date]);
 
-  const [comments, setComments] = useState<TaskComments[]>(task?.Comments || []);
+  // Fetch all comments and filter by current task ID on the frontend
+  const { data: commentsData, isLoading: isLoadingComments } = useGetTaskComments({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  // Filter comments to only show those for the current task
+  const comments = useMemo(() => {
+    if (!commentsData?.TaskManagerComments?.items) return [];
+    return commentsData.TaskManagerComments.items.filter(
+      (comment) => comment.TaskId === currentTaskId
+    );
+  }, [commentsData, currentTaskId]);
+
+  const { mutateAsync: updateComment } = useUpdateTaskComment();
+  const { mutateAsync: deleteComment } = useDeleteTaskComment();
 
   const handleEditComment = async (id: string, newText: string) => {
+    if (!currentTaskId) return;
+
     try {
-      await updateTaskDetails({
-        Comments: comments.map((comment) => ({
-          ...comment,
-          Content: comment.ItemId === id ? newText : comment.Content,
-        })),
-      });
-
-      setComments((prev) =>
-        prev.map((comment) => ({
-          ...comment,
-          Content: comment.ItemId === id ? newText : comment.Content,
-        }))
-      );
-
-      toast({
-        title: t('SUCCESS'),
-        description: t('COMMENT_UPDATED_SUCCESSFULLY'),
+      await updateComment({
+        itemId: id,
+        input: {
+          ItemId: id,
+          Content: newText,
+        },
       });
     } catch (error) {
+      console.error('Error updating comment:', error);
       toast({
         title: t('ERROR'),
         description: t('FAILED_TO_UPDATE_COMMENT'),
@@ -352,30 +373,26 @@ export default function TaskDetailsView({
     setNewCommentContent('');
   };
 
+  const { mutate: createComment, isPending: isCreatingComment } = useCreateTaskComment();
+
   const handleSubmitComment = async (content: string) => {
     if (content.trim() && currentTaskId) {
       try {
-        const now = new Date();
-        const timestamp = format(now, 'dd.MM.yyyy, HH:mm');
-
-        const newComment: TaskComments = {
-          ItemId: Date.now().toString(),
-          Author: 'Current User',
-          Timestamp: timestamp,
+        const commentInput: TaskCommentInsertInput = {
+          ItemId: uuidv4(),
+          TaskId: currentTaskId,
           Content: content,
+          Author: userProfile.fullName || 'Anonymous',
+          IsDeleted: false,
+          Language: 'en',
         };
 
-        await addComment(content);
-
-        setComments((prev) => [...prev, newComment]);
         setNewCommentContent('');
         setIsWritingComment(false);
 
-        toast({
-          title: t('SUCCESS'),
-          description: t('COMMENT_ADDED_SUCCESSFULLY'),
-        });
+        await createComment(commentInput);
       } catch (error) {
+        console.error('Error adding comment:', error);
         toast({
           title: t('ERROR'),
           description: t('FAILED_TO_ADD_COMMENT'),
@@ -389,15 +406,9 @@ export default function TaskDetailsView({
     if (!currentTaskId) return;
 
     try {
-      await removeComment(commentId);
-
-      setComments((prev) => prev.filter((comment) => comment.ItemId !== commentId));
-
-      toast({
-        title: t('SUCCESS'),
-        description: t('COMMENT_DELETED_SUCCESSFULLY'),
-      });
+      await deleteComment(commentId);
     } catch (error) {
+      console.error('Error deleting comment:', error);
       toast({
         title: t('ERROR'),
         description: t('FAILED_TO_DELETE_COMMENT'),
@@ -897,9 +908,12 @@ export default function TaskDetailsView({
             <div className="space-y-4 mt-3">
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
-                  <div className="h-10 w-10 rounded-full bg-gray-300 text-xs flex items-center justify-center border-2 border-white">
-                    {'B'}
-                  </div>
+                  <Avatar className="h-10 w-10 border-2 border-white">
+                    <AvatarImage src={userProfile.profileImageUrl} alt={userProfile.fullName} />
+                    <AvatarFallback className="bg-gray-300 text-xs">
+                      {userProfile.fullName?.charAt(0) ?? ''}
+                    </AvatarFallback>
+                  </Avatar>
                   <Input
                     value={newCommentContent}
                     placeholder={t('WRITE_A_COMMENT')}
@@ -924,28 +938,32 @@ export default function TaskDetailsView({
                         variant="default"
                         size="sm"
                         className="text-sm font-semibold ml-2"
-                        onClick={() => {
-                          handleSubmitComment(newCommentContent);
-                          setIsWritingComment(false);
-                        }}
+                        onClick={() => handleSubmitComment(newCommentContent)}
+                        disabled={isCreatingComment || !newCommentContent.trim()}
                       >
-                        {t('SAVE')}
+                        {isCreatingComment ? t('SAVING') : t('SAVE')}
                       </Button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {comments.map((comment) => (
-                <EditableComment
-                  key={comment.ItemId}
-                  author={comment.Author}
-                  timestamp={comment.Timestamp}
-                  initialComment={comment.Content}
-                  onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
-                  onDelete={() => handleDeleteComment(comment.ItemId)}
-                />
-              ))}
+              {isLoadingComments ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : comments.length > 0 ? (
+                comments.map((comment) => (
+                  <EditableComment
+                    key={comment.ItemId}
+                    author={comment.Author}
+                    timestamp={comment.CreatedDate || comment.Timestamp}
+                    initialComment={comment.Content}
+                    onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
+                    onDelete={() => handleDeleteComment(comment.ItemId)}
+                  />
+                ))
+              ) : null}
             </div>
           </div>
         )}
