@@ -30,9 +30,18 @@ export interface Assignee {
 
 export interface TaskComments {
   ItemId: string;
-  Author: string;
-  Timestamp: string;
+  TaskId?: string;
   Content: string;
+  Timestamp: string;
+  Author: string;
+  IsDeleted?: boolean;
+  Tags?: string[];
+  Language?: string;
+  OrganizationIds?: string[];
+  CreatedBy?: string;
+  CreatedDate?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
 }
 
 export interface TaskAttachments {
@@ -132,6 +141,18 @@ export interface GetTagsResponse {
   };
 }
 
+export interface GetCommentsResponse {
+  TaskManagerComments: {
+    items: TaskComments[];
+    totalCount: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    pageNo: number;
+    totalPages: number;
+  };
+}
+
 export interface TaskItemInsertInput {
   Title: string;
   Description?: string;
@@ -151,6 +172,7 @@ export interface TaskItemUpdateInput {
   Description?: string;
   Assignee?: Assignee[];
   ItemTag?: ItemTag[];
+  Comments?: TaskComments[];
   DueDate?: string;
   Priority?: TaskPriority;
   Section?: string;
@@ -159,6 +181,8 @@ export interface TaskItemUpdateInput {
   Language?: string;
   OrganizationIds?: string[];
   Tags?: string[];
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
 }
 
 export interface TaskTagInsertInput {
@@ -237,4 +261,25 @@ export interface GetUsersPayload {
   page: number;
   pageSize: number;
   filter?: UserFilter;
+}
+
+export interface TaskCommentInsertInput {
+  ItemId: string;
+  TaskId: string;
+  Content: string;
+  Timestamp?: string;
+  Author?: string;
+  IsDeleted?: boolean;
+  Tags?: string[];
+  Language?: string;
+  OrganizationIds?: string[];
+}
+
+export interface TaskCommentUpdateInput {
+  ItemId: string;
+  TaskId?: string;
+  Content?: string;
+  Timestamp?: string;
+  Author?: string;
+  IsDeleted?: boolean;
 }
