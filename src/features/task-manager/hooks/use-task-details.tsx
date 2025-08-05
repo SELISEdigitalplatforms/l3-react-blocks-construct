@@ -155,20 +155,33 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   const { mutate: updateTask } = useUpdateTaskItem();
 
-  const sanitizeBasicFields = (updates: Partial<TaskItem> | TaskItemUpdateInput, sanitized: TaskItemUpdateInput) => {
+  const sanitizeBasicFields = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitized: TaskItemUpdateInput
+  ) => {
     const fields = [
-      'Title', 'Description', 'DueDate', 'Priority', 'Section', 
-      'IsCompleted', 'Language', 'IsDeleted', 'OrganizationIds'
+      'Title',
+      'Description',
+      'DueDate',
+      'Priority',
+      'Section',
+      'IsCompleted',
+      'Language',
+      'IsDeleted',
+      'OrganizationIds',
     ] as const;
 
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (field in updates) {
         sanitized[field] = updates[field] as any;
       }
     });
   };
 
-  const sanitizeTags = (updates: Partial<TaskItem> | TaskItemUpdateInput, sanitized: TaskItemUpdateInput) => {
+  const sanitizeTags = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitized: TaskItemUpdateInput
+  ) => {
     if ('ItemTag' in updates) {
       sanitized.ItemTag = updates.ItemTag as ItemTag[];
       return;
@@ -177,7 +190,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     if ('Tags' in updates) {
       const tags = updates.Tags as (string | ItemTag)[] | undefined;
       if (Array.isArray(tags)) {
-        sanitized.ItemTag = tags.map(tag => ({
+        sanitized.ItemTag = tags.map((tag) => ({
           ItemId: typeof tag === 'string' ? tag : tag.ItemId,
           TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
         }));
@@ -185,7 +198,10 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     }
   };
 
-  const sanitizeAssignee = (updates: Partial<TaskItem> | TaskItemUpdateInput, sanitized: TaskItemUpdateInput) => {
+  const sanitizeAssignee = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitized: TaskItemUpdateInput
+  ) => {
     if ('Assignee' in updates) {
       sanitized.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
     }
@@ -208,7 +224,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
-        await updateTask({
+        updateTask({
           itemId: taskId,
           input: sanitizedUpdates,
         });

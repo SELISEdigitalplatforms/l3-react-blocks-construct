@@ -121,24 +121,81 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
-  useEffect(() => {
-    if (!sectionsData?.TaskManagerSections?.items) return;
-
-    const currentFilters = {
-      priorities: filters.priorities ?? [],
-      statuses: filters.statuses ?? [],
-      assignees: filters.assignees ?? [],
-      tags: filters.tags ?? [],
-      dueDate: filters.dueDate ?? {},
-    };
-
-    setColumnTasks(() => {
-      const filteredSections = sectionsData.TaskManagerSections.items.filter(
-        (section: TaskSection) =>
-          !currentFilters.statuses.length ||
-          (section.Title && currentFilters.statuses.includes(section.Title))
+  // Filter functions
+  const hasMatchingTagLabel = useCallback(
+    (tags: TaskItem['ItemTag'], searchTerm: string): boolean => {
+      if (!tags?.length) return false;
+      return tags.some((tag: { TagLabel: string }) =>
+        tag.TagLabel.toLowerCase().includes(searchTerm)
       );
+    },
+    []
+  );
 
+  const matchesSearchQuery = useCallback(
+    (task: TaskItem, query: string): boolean => {
+      if (!query) return true;
+
+      const searchTerm = query.toLowerCase();
+      const lowerTitle = task.Title?.toLowerCase() || '';
+      const lowerDescription = task.Description?.toLowerCase() ?? '';
+
+      return (
+        lowerTitle.includes(searchTerm) ||
+        lowerDescription.includes(searchTerm) ||
+        hasMatchingTagLabel(task.ItemTag, searchTerm)
+      );
+    },
+    [hasMatchingTagLabel]
+  );
+
+  const matchesPriority = useCallback((task: TaskItem, priorities: string[]): boolean => {
+    return !priorities.length || !task.Priority || priorities.includes(task.Priority);
+  }, []);
+
+  const hasMatchingAssignee = useCallback(
+    (assignee: { ItemId?: string }, assignees: string[]): boolean => {
+      return Boolean(assignee.ItemId && assignees.includes(assignee.ItemId));
+    },
+    []
+  );
+
+  const matchesAssignees = useCallback(
+    (task: TaskItem, assignees: string[]): boolean => {
+      if (!assignees.length || !task.Assignee?.length) return true;
+      return task.Assignee.some((assignee) => hasMatchingAssignee(assignee, assignees));
+    },
+    [hasMatchingAssignee]
+  );
+
+  const hasMatchingTagId = useCallback((tag: { ItemId: string }, tagIds: string[]): boolean => {
+    return tagIds.includes(tag.ItemId);
+  }, []);
+
+  const matchesTags = useCallback(
+    (task: TaskItem, tags: any[]): boolean => {
+      if (!tags.length || !task.ItemTag?.length) return true;
+      const tagIds = tags.map((t) => t.ItemId);
+      return task.ItemTag.some((tag) => tag.ItemId && hasMatchingTagId(tag, tagIds));
+    },
+    [hasMatchingTagId]
+  );
+
+  const matchesDueDate = useCallback((task: TaskItem, dueDate: any): boolean => {
+    if ((!dueDate?.from && !dueDate?.to) || !task.DueDate) return true;
+    const taskDueDate = new Date(task.DueDate);
+    const afterStart = !dueDate.from || taskDueDate >= dueDate.from;
+    const beforeEnd = !dueDate.to || taskDueDate <= dueDate.to;
+    return afterStart && beforeEnd;
+  }, []);
+
+  const processTasks = useCallback(
+    (
+      tasks: TaskItem[],
+      filteredSections: TaskSection[],
+      currentFilters: any,
+      searchQuery: string
+    ) => {
       const sectionsByTitle = new Map<string, TaskSection>();
       filteredSections.forEach((section: TaskSection) => {
         if (section.Title) {
@@ -150,66 +207,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       filteredSections.forEach((section: TaskSection) => {
         tasksBySectionId[section.ItemId] = [];
       });
-
-      const hasMatchingTagLabel = (tags: TaskItem['ItemTag'], searchTerm: string): boolean => {
-        if (!tags || !tags.length) return false;
-        return tags.some((tag: { TagLabel: string }) =>
-          tag.TagLabel.toLowerCase().includes(searchTerm)
-        );
-      };
-
-      const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
-        if (!query) return true;
-
-        const searchTerm = query.toLowerCase();
-        const lowerTitle = task.Title?.toLowerCase() || '';
-        const lowerDescription = task.Description?.toLowerCase() || '';
-
-        return (
-          lowerTitle.includes(searchTerm) ||
-          lowerDescription.includes(searchTerm) ||
-          hasMatchingTagLabel(task.ItemTag, searchTerm)
-        );
-      };
-
-      const matchesPriority = (task: TaskItem): boolean => {
-        const { priorities } = currentFilters;
-        return !priorities.length || !task.Priority || priorities.includes(task.Priority);
-      };
-
-      const hasMatchingAssignee = (assignee: { ItemId?: string }, assignees: string[]): boolean => {
-        return Boolean(assignee.ItemId && assignees.includes(assignee.ItemId));
-      };
-
-      const matchesAssignees = (task: TaskItem): boolean => {
-        const { assignees } = currentFilters;
-        if (!assignees.length || !task.Assignee?.length) return true;
-
-        return task.Assignee.some((assignee) => hasMatchingAssignee(assignee, assignees));
-      };
-
-      const hasMatchingTagId = (tag: { ItemId: string }, tagIds: string[]): boolean => {
-        return tagIds.includes(tag.ItemId);
-      };
-
-      const matchesTags = (task: TaskItem): boolean => {
-        const { tags } = currentFilters;
-        if (!tags.length || !task.ItemTag?.length) return true;
-
-        const tagIds = tags.map((t) => t.ItemId);
-        return task.ItemTag.some((tag) => tag.ItemId && hasMatchingTagId(tag, tagIds));
-      };
-
-      const matchesDueDate = (task: TaskItem): boolean => {
-        const { dueDate } = currentFilters;
-        if ((!dueDate?.from && !dueDate?.to) || !task.DueDate) return true;
-
-        const taskDueDate = new Date(task.DueDate);
-        const afterStart = !dueDate.from || taskDueDate >= dueDate.from;
-        const beforeEnd = !dueDate.to || taskDueDate <= dueDate.to;
-
-        return afterStart && beforeEnd;
-      };
 
       const getSectionByTitle = (title: string): TaskSection | undefined => {
         return Array.from(sectionsByTitle.values()).find((s) => s.Title === title);
@@ -231,25 +228,75 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
       };
 
-      if (tasksData?.TaskManagerItems?.items) {
-        tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
-          if (!matchesSearchQuery(task, searchQuery)) return;
-          if (!matchesPriority(task)) return;
-          if (!matchesAssignees(task)) return;
-          if (!matchesTags(task)) return;
-          if (!matchesDueDate(task)) return;
+      tasks.forEach((task: TaskItem) => {
+        if (!matchesSearchQuery(task, searchQuery)) return;
+        if (!matchesPriority(task, currentFilters.priorities)) return;
+        if (!matchesAssignees(task, currentFilters.assignees)) return;
+        if (!matchesTags(task, currentFilters.tags)) return;
+        if (!matchesDueDate(task, currentFilters.dueDate)) return;
 
-          addTaskToSection(task);
-        });
-      }
+        addTaskToSection(task);
+      });
 
-      const newColumns = filteredSections.map((section: TaskSection) => ({
+      return filteredSections.map((section: TaskSection) => ({
         ...section,
         tasks: tasksBySectionId[section.ItemId] || [],
       }));
+    },
+    [
+      ensureTaskItem,
+      matchesSearchQuery,
+      matchesPriority,
+      matchesAssignees,
+      matchesTags,
+      matchesDueDate,
+    ]
+  );
 
-      return newColumns;
-    });
+  const getFilteredSections = useCallback((sections: TaskSection[], statuses: string[]) => {
+    return sections.filter(
+      (section: TaskSection) =>
+        !statuses.length || (section.Title && statuses.includes(section.Title))
+    );
+  }, []);
+
+  const getEmptySections = useCallback((sections: TaskSection[]) => {
+    return sections.map((section: TaskSection) => ({
+      ...section,
+      tasks: [],
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (!sectionsData?.TaskManagerSections?.items) return;
+
+    const currentFilters = {
+      priorities: filters.priorities ?? [],
+      statuses: filters.statuses ?? [],
+      assignees: filters.assignees ?? [],
+      tags: filters.tags ?? [],
+      dueDate: filters.dueDate ?? {},
+    };
+
+    const filteredSections = getFilteredSections(
+      sectionsData.TaskManagerSections.items,
+      currentFilters.statuses
+    );
+
+    const updateTasks = () => {
+      if (!tasksData?.TaskManagerItems?.items) {
+        return getEmptySections(filteredSections);
+      }
+
+      return processTasks(
+        tasksData.TaskManagerItems.items,
+        filteredSections,
+        currentFilters,
+        searchQuery
+      );
+    };
+
+    setColumnTasks(updateTasks);
   }, [
     sectionsData,
     tasksData,
@@ -259,7 +306,9 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
     filters.assignees,
     filters.tags,
     filters.dueDate,
-    ensureTaskItem,
+    processTasks,
+    getFilteredSections,
+    getEmptySections,
   ]);
 
   const getColumnCount = (size: string) => {
