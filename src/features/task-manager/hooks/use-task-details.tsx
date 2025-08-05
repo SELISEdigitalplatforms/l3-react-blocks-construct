@@ -88,9 +88,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   useEffect(() => {
     if (taskId && tasksData?.TaskManagerItems?.items) {
-      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId) as
-        | TaskItem
-        | undefined;
+      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId);
 
       if (foundTask) {
         const mapToItemTags = (tags?: ItemTag[]): ItemTag[] => {
@@ -112,11 +110,11 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const mappedTask: TaskItem = {
           ItemId: foundTask.ItemId,
           Title: foundTask.Title,
-          Description: foundTask.Description || '',
-          IsCompleted: foundTask.IsCompleted || false,
-          Priority: foundTask.Priority || TaskPriority.MEDIUM,
-          Section: foundTask.Section || '',
-          DueDate: foundTask.DueDate,
+          Description: foundTask.Description ?? '',
+          IsCompleted: foundTask.IsCompleted ?? false,
+          Priority: foundTask.Priority ?? TaskPriority.MEDIUM,
+          Section: foundTask.Section ?? '',
+          DueDate: foundTask.DueDate ?? '',
           Assignee:
             Array.isArray(foundTask.Assignee) && foundTask.Assignee.length > 0
               ? foundTask.Assignee
@@ -127,12 +125,12 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Attachments
               : currentTask?.Attachments
           ),
-          Comments: foundTask.Comments || [],
-          CreatedBy: foundTask.CreatedBy || '',
-          CreatedDate: foundTask.CreatedDate || new Date().toISOString(),
-          IsDeleted: foundTask.IsDeleted || false,
-          Language: foundTask.Language || 'en',
-          OrganizationIds: foundTask.OrganizationIds || [],
+          Comments: foundTask.Comments ?? [],
+          CreatedBy: foundTask.CreatedBy ?? '',
+          CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
+          IsDeleted: foundTask.IsDeleted ?? false,
+          Language: foundTask.Language ?? 'en',
+          OrganizationIds: foundTask.OrganizationIds ?? [],
         };
 
         setCurrentTask(mappedTask);
@@ -213,13 +211,8 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       if (!taskId) return;
 
       try {
-        // Optimistically update the UI
         setCurrentTask((prev) => (prev ? { ...prev, isCompleted } : null));
 
-        // TODO: Call your API to update the task status
-        // await updateTaskItem(taskId, { isCompleted });
-
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to toggle task status:', error);
@@ -332,7 +325,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           (assignee) => assignee.ItemId !== assigneeId
         );
 
-        await updateTask({
+        updateTask({
           itemId: taskId,
           input: {
             Assignee: updatedAssignees,

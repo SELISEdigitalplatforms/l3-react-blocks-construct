@@ -1,11 +1,4 @@
 import { graphqlClient } from 'lib/graphql-client';
-import type {
-  TaskItem,
-  ItemTag,
-  GetCommentsResponse,
-  TaskCommentUpdateInput,
-  TaskCommentInsertInput,
-} from '../types/task-manager.types';
 import {
   GET_TASK_COMMENTS_QUERY,
   GET_TASK_MANAGER_QUERY,
@@ -13,6 +6,11 @@ import {
   GET_TASK_MANAGER_TAGS_QUERY,
 } from '../graphql/queries';
 import type {
+  TaskItem,
+  ItemTag,
+  GetCommentsResponse,
+  TaskCommentUpdateInput,
+  TaskCommentInsertInput,
   TaskItemInsertInput,
   TaskItemUpdateInput,
   TaskSectionInsertInput,
@@ -754,7 +752,7 @@ export const createTaskComment = async (
 ): Promise<InsertTaskCommentResponse> => {
   try {
     const now = new Date().toISOString();
-    const taskId = input.TaskId || input.taskId;
+    const taskId = input.TaskId ?? input.taskId;
 
     if (!taskId) {
       throw new Error('Task ID is required to create a comment');
@@ -763,7 +761,7 @@ export const createTaskComment = async (
     const mutationInput = {
       ...input,
       TaskId: taskId,
-      Timestamp: input.Timestamp || now,
+      Timestamp: input.Timestamp ?? now,
       Author: input.Author ?? '',
     };
 

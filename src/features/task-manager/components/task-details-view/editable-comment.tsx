@@ -80,11 +80,14 @@ export function EditableComment({
     }
   }, [isEditing]);
 
-  const parsedTime = timestamp
-    ? timestamp.includes('T')
-      ? new Date(timestamp)
-      : parse(timestamp, 'dd.MM.yyyy, HH:mm', new Date())
-    : new Date();
+  const parseTimestamp = (timeStr: string | undefined): Date => {
+    if (!timeStr) return new Date();
+    return timeStr.includes('T')
+      ? new Date(timeStr)
+      : parse(timeStr, 'dd.MM.yyyy, HH:mm', new Date());
+  };
+
+  const parsedTime = parseTimestamp(timestamp);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
