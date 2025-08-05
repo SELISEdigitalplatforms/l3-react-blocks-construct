@@ -65,7 +65,7 @@ interface TaskListViewProps {
   };
 }
 
-export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
+export function TaskListView({ searchQuery = '', filters }: Readonly<TaskListViewProps>) {
   const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, isLoading } = useListTasks();
 
@@ -224,22 +224,30 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
                   <NewTaskRow onAdd={handleAddTask} onCancel={() => setShowNewTaskInput(false)} />
                 )}
 
-                {isLoading ? (
-                  <div className="flex justify-center p-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                  </div>
-                ) : filteredTasks.length > 0 ? (
-                  filteredTasks.map((task) => (
-                    <SortableTaskItem
-                      handleTaskClick={handleTaskClick}
-                      key={task.ItemId}
-                      task={task}
-                      columns={columns}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
-                )}
+                {(() => {
+                  if (isLoading) {
+                    return (
+                      <div className="flex justify-center p-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                      </div>
+                    );
+                  }
+
+                  if (filteredTasks.length > 0) {
+                    return filteredTasks.map((task) => (
+                      <SortableTaskItem
+                        handleTaskClick={handleTaskClick}
+                        key={task.ItemId}
+                        task={task}
+                        columns={columns}
+                      />
+                    ));
+                  }
+
+                  return (
+                    <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
+                  );
+                })()}
               </SortableContext>
 
               <DragOverlay>

@@ -51,7 +51,7 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      onAdd(newTaskTitle, newTaskStatus || '');
+      onAdd(newTaskTitle, newTaskStatus ?? '');
     } else if (e.key === 'Escape') {
       onCancel();
     }
@@ -102,7 +102,7 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
 
       <div className="flex items-center gap-2 ml-auto pr-4">
         <Button
-          onClick={() => onAdd(newTaskTitle, newTaskStatus || 'To Do')}
+          onClick={() => onAdd(newTaskTitle, newTaskStatus ?? '')}
           className="h-8 bg-primary hover:bg-primary-700 text-white px-4"
         >
           <Plus className="h-4 w-4 mr-1" /> {t('ADD')}

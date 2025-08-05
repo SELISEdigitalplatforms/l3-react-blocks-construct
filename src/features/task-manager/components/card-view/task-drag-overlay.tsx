@@ -1,8 +1,7 @@
 import { Card } from 'components/ui/card';
-import { ItemTag, TaskItem } from '../../types/task-manager.types';
+import { ItemTag, TaskItem, priorityStyle } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
-import { priorityStyle } from '../../types/task-manager.types';
 
 /**
  * TaskDragOverlay Component

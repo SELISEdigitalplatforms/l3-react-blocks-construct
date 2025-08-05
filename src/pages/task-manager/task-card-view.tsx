@@ -123,40 +123,53 @@ export function TaskCardView({
     [addTaskToColumn, toast]
   );
 
+  const taskMatchesSearchQuery = (task: TaskItem, query: string): boolean => {
+    const lowerQuery = query.toLowerCase();
+    const matchesBasicFields =
+      task.Title?.toLowerCase().includes(lowerQuery) ||
+      task.Description?.toLowerCase().includes(lowerQuery);
+
+    const matchesItemTag = task.ItemTag?.some(
+      (tag) =>
+        tag.TagLabel?.toLowerCase().includes(lowerQuery) ||
+        tag.ItemId?.toLowerCase().includes(lowerQuery)
+    );
+
+    const matchesTags = task.Tags?.some(
+      (tag) => typeof tag === 'string' && tag.toLowerCase().includes(lowerQuery)
+    );
+
+    return matchesBasicFields || matchesItemTag || matchesTags || false;
+  };
+
+  const taskMatchesTagFilter = (
+    task: TaskItem,
+    filterTags: Array<string | { ItemId: string }>
+  ): boolean => {
+    if (!task.ItemTag) return false;
+
+    return task.ItemTag.some((tag) =>
+      filterTags.some((filterTag) => {
+        if (typeof filterTag === 'string') {
+          return tag.ItemId === filterTag || tag.TagLabel === filterTag;
+        }
+        return tag.ItemId === filterTag.ItemId;
+      })
+    );
+  };
+
   const apiColumns = useMemo<TaskSectionWithTasks[]>(() => {
     if (!sectionsData?.TaskManagerSections?.items) return [];
 
     return sectionsData.TaskManagerSections.items.map((section): TaskSectionWithTasks => {
-      let tasks: TaskItem[] = [];
       const sectionTasks = section.tasks || [];
-
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        tasks = sectionTasks.filter(
-          (task) =>
-            task.Title?.toLowerCase().includes(query) ||
-            task.Description?.toLowerCase().includes(query) ||
-            task.ItemTag?.some(tag => 
-              tag.TagLabel?.toLowerCase().includes(query) || 
-              tag.ItemId?.toLowerCase().includes(query)
-            ) ||
-            task.Tags?.some((tag: string) => tag.toLowerCase().includes(query))
-        );
-      } else {
-        tasks = [...sectionTasks];
-      }
+      let tasks = searchQuery
+        ? sectionTasks.filter((task) => taskMatchesSearchQuery(task, searchQuery))
+        : [...sectionTasks];
 
       // Apply tag filters if any
       if (filters.tags.length > 0) {
-        tasks = tasks.filter(task => 
-          task.ItemTag?.some(tag => 
-            filters.tags.some(filterTag => 
-              typeof filterTag === 'string' 
-                ? tag.ItemId === filterTag || tag.TagLabel === filterTag
-                : tag.ItemId === filterTag.ItemId
-            )
-          )
-        );
+        tasks = tasks.filter((task) => taskMatchesTagFilter(task, filters.tags));
       }
 
       return {

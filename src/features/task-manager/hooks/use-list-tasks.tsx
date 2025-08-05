@@ -70,7 +70,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
     const newTask: TaskItem = {
       ItemId: tempId,
       Title: title,
-      Section: status || 'todo',
+      Section: status ?? '',
       IsCompleted: false,
       IsDeleted: false,
       CreatedDate: new Date().toISOString(),
@@ -83,7 +83,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
 
     createTaskItem({
       Title: title,
-      Section: status || '',
+      Section: status ?? '',
       IsCompleted: false,
       DueDate: new Date().toISOString(),
     })

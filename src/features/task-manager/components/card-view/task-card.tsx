@@ -272,22 +272,34 @@ export function TaskCard({
             </div>
 
             {task.Assignee && task.Assignee.length > 0 && (
-              <div className="flex -space-x-2" onClick={handleInteractiveElementClick}>
+              <div className="flex -space-x-2">
                 {task.Assignee.map((assignee, idx) => {
                   const displayName = assignee?.Name ?? '';
                   const imageUrl = assignee?.ImageUrl;
                   const initial = displayName ? displayName.charAt(0).toUpperCase() : '';
+                  const assigneeId = assignee?.ItemId || `assignee-${idx}`;
 
                   return (
-                    <Avatar
-                      key={assignee?.ItemId || idx}
-                      className="h-6 w-6 border-2 border-background"
+                    <button
+                      key={assigneeId}
+                      onClick={handleInteractiveElementClick}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleInteractiveElementClick(e as any);
+                        }
+                      }}
+                      className="focus:outline-none rounded-full"
+                      aria-label={`View ${displayName || 'assignee'}`}
+                      tabIndex={0}
                     >
-                      <AvatarImage src={imageUrl} alt={displayName} />
-                      <AvatarFallback className="bg-gray-300 text-foreground text-xs">
-                        {initial}
-                      </AvatarFallback>
-                    </Avatar>
+                      <Avatar className="h-6 w-6 border-2 border-background">
+                        <AvatarImage src={imageUrl} alt={displayName} />
+                        <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+                          {initial}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
                   );
                 })}
               </div>
