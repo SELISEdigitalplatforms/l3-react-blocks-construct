@@ -5,7 +5,6 @@ import {
   TaskItem,
   TaskItemUpdateInput,
   TaskAttachments,
-  TaskComments,
   Assignee,
   TaskPriority,
   ItemTag,
@@ -20,7 +19,6 @@ interface ToastOptions {
 
 const useToast = () => ({
   toast: (options: ToastOptions) => {
-    // Using console.info for better visibility in development
     // eslint-disable-next-line no-console
     console.info(`[${options.variant}] ${options.title}: ${options.description}`);
   },
@@ -71,8 +69,6 @@ interface UseTaskDetailsReturn {
   toggleTaskCompletion: (isCompleted: boolean) => Promise<void>;
   removeTask: () => Promise<boolean>;
   updateTaskDetails: (updates: Partial<TaskItem>) => Promise<void>;
-  addNewComment: (comment: string) => Promise<void>;
-  deleteComment: (commentId: string) => Promise<void>;
   addNewAttachment: (attachment: TaskAttachments) => Promise<void>;
   deleteAttachment: (attachmentId: string) => Promise<void>;
   addNewTag: (tag: string) => Promise<void>;
@@ -92,7 +88,9 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   useEffect(() => {
     if (taskId && tasksData?.TaskManagerItems?.items) {
-      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId);
+      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId) as
+        | TaskItem
+        | undefined;
 
       if (foundTask) {
         const mapToItemTags = (tags?: ItemTag[]): ItemTag[] => {
@@ -102,30 +100,22 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const mapToAttachments = (attachments?: TaskAttachments[]): TaskAttachments[] => {
           if (!attachments) return [];
           return attachments.map((att) => ({
-            ItemId: att.ItemId || Date.now().toString(),
+            ItemId: att.ItemId || '',
             FileName: att.FileName || 'Unknown',
             FileSize: att.FileSize || '0',
             FileType: att.FileType || 'other',
           }));
         };
 
-        const mapToComments = (comments?: TaskComments[]): TaskComments[] => {
-          if (!comments) return [];
-          return comments.map((comment) => ({
-            ItemId: comment.ItemId || Date.now().toString(),
-            Author: comment.Author || 'Unknown',
-            Timestamp: comment.Timestamp || new Date().toISOString(),
-            Content: comment.Content || '',
-          }));
-        };
+        // Comments are handled directly in the view component
 
         const mappedTask: TaskItem = {
           ItemId: foundTask.ItemId,
           Title: foundTask.Title,
-          Description: foundTask.Description ?? '',
-          IsCompleted: foundTask.IsCompleted ?? false,
-          Priority: foundTask.Priority ?? TaskPriority.MEDIUM,
-          Section: foundTask.Section ?? '',
+          Description: foundTask.Description || '',
+          IsCompleted: foundTask.IsCompleted || false,
+          Priority: foundTask.Priority || TaskPriority.MEDIUM,
+          Section: foundTask.Section || '',
           DueDate: foundTask.DueDate,
           Assignee:
             Array.isArray(foundTask.Assignee) && foundTask.Assignee.length > 0
@@ -137,12 +127,12 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Attachments
               : currentTask?.Attachments
           ),
-          Comments: mapToComments(foundTask.Comments),
-          CreatedBy: foundTask.CreatedBy ?? '',
-          CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
-          IsDeleted: foundTask.IsDeleted ?? false,
-          Language: foundTask.Language ?? 'en',
-          OrganizationIds: foundTask.OrganizationIds ?? [],
+          Comments: foundTask.Comments || [],
+          CreatedBy: foundTask.CreatedBy || '',
+          CreatedDate: foundTask.CreatedDate || new Date().toISOString(),
+          IsDeleted: foundTask.IsDeleted || false,
+          Language: foundTask.Language || 'en',
+          OrganizationIds: foundTask.OrganizationIds || [],
         };
 
         setCurrentTask(mappedTask);
@@ -155,58 +145,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   const { mutate: updateTask } = useUpdateTaskItem();
 
-  const sanitizeBasicFields = (
-    updates: Partial<TaskItem> | TaskItemUpdateInput,
-    sanitized: TaskItemUpdateInput
-  ) => {
-    const fields = [
-      'Title',
-      'Description',
-      'DueDate',
-      'Priority',
-      'Section',
-      'IsCompleted',
-      'Language',
-      'IsDeleted',
-      'OrganizationIds',
-    ] as const;
-
-    fields.forEach((field) => {
-      if (field in updates) {
-        sanitized[field] = updates[field] as any;
-      }
-    });
-  };
-
-  const sanitizeTags = (
-    updates: Partial<TaskItem> | TaskItemUpdateInput,
-    sanitized: TaskItemUpdateInput
-  ) => {
-    if ('ItemTag' in updates) {
-      sanitized.ItemTag = updates.ItemTag as ItemTag[];
-      return;
-    }
-
-    if ('Tags' in updates) {
-      const tags = updates.Tags as (string | ItemTag)[] | undefined;
-      if (Array.isArray(tags)) {
-        sanitized.ItemTag = tags.map((tag) => ({
-          ItemId: typeof tag === 'string' ? tag : tag.ItemId,
-          TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
-        }));
-      }
-    }
-  };
-
-  const sanitizeAssignee = (
-    updates: Partial<TaskItem> | TaskItemUpdateInput,
-    sanitized: TaskItemUpdateInput
-  ) => {
-    if ('Assignee' in updates) {
-      sanitized.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
-    }
-  };
-
   const updateTaskDetails = useCallback(
     async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
       if (!taskId || !currentTask) return;
@@ -216,21 +154,47 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         const sanitizedUpdates: TaskItemUpdateInput = {};
 
-        // Process all updates in separate, focused functions
-        sanitizeBasicFields(updates, sanitizedUpdates);
-        sanitizeTags(updates, sanitizedUpdates);
-        sanitizeAssignee(updates, sanitizedUpdates);
+        if ('Title' in updates) sanitizedUpdates.Title = updates.Title as string;
+        if ('Description' in updates) sanitizedUpdates.Description = updates.Description as string;
+        if ('DueDate' in updates) sanitizedUpdates.DueDate = updates.DueDate as string;
+        if ('Priority' in updates) sanitizedUpdates.Priority = updates.Priority as TaskPriority;
+        if ('Section' in updates) sanitizedUpdates.Section = updates.Section as string;
+        if ('IsCompleted' in updates) sanitizedUpdates.IsCompleted = updates.IsCompleted as boolean;
+        if ('Language' in updates) sanitizedUpdates.Language = updates.Language as string;
+        if ('OrganizationIds' in updates)
+          sanitizedUpdates.OrganizationIds = updates.OrganizationIds as string[];
+        if ('IsDeleted' in updates) sanitizedUpdates.IsDeleted = updates.IsDeleted as boolean;
 
+        if ('ItemTag' in updates) {
+          sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
+        } else if ('Tags' in updates) {
+          const tags = updates.Tags as (string | ItemTag)[] | undefined;
+          if (Array.isArray(tags)) {
+            sanitizedUpdates.ItemTag = tags.map((tag) => ({
+              ItemId: typeof tag === 'string' ? tag : tag.ItemId,
+              TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
+            }));
+          }
+        }
+
+        // Handle Assignee - ensure it's always an array
+        if ('Assignee' in updates) {
+          sanitizedUpdates.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
+        }
+
+        // Optimistically update the UI with the original updates
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
-        updateTask({
+        // Call the API to update the task with the sanitized updates
+        await updateTask({
           itemId: taskId,
           input: sanitizedUpdates,
         });
 
         await refetchTasks();
 
+        // This ensures the parent component is aware of the changes
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('task-updated', { detail: updatedTask }));
         }
@@ -243,13 +207,19 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, updateTask, refetchTasks]
   );
 
+  // Toggle task completion status
   const toggleTaskCompletion = useCallback(
     async (isCompleted: boolean) => {
       if (!taskId) return;
 
       try {
+        // Optimistically update the UI
         setCurrentTask((prev) => (prev ? { ...prev, isCompleted } : null));
 
+        // TODO: Call your API to update the task status
+        // await updateTaskItem(taskId, { isCompleted });
+
+        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to toggle task status:', error);
@@ -280,60 +250,9 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     }
   }, [taskId, refetchTasks, deleteTask, t, toast]);
 
-  const addNewComment = useCallback(
-    async (comment: string) => {
-      if (!taskId || !currentTask) return;
+  // Comment functionality is handled directly in the view component
 
-      try {
-        const newComment = {
-          id: Date.now().toString(),
-          author: 'Current User',
-          timestamp: new Date().toISOString(),
-          text: comment,
-        };
-
-        setCurrentTask((prev) =>
-          prev
-            ? {
-                ...prev,
-                comments: [...(prev.Comments || []), newComment],
-              }
-            : null
-        );
-
-        await refetchTasks();
-      } catch (error) {
-        console.error('Failed to add comment:', error);
-        await refetchTasks();
-      }
-    },
-    [taskId, currentTask, refetchTasks]
-  );
-
-  // Delete a comment from a task
-  const deleteComment = useCallback(
-    async (commentId: string) => {
-      if (!taskId || !currentTask) return;
-
-      try {
-        setCurrentTask((prev) =>
-          prev
-            ? {
-                ...prev,
-                comments: (prev.Comments || []).filter((comment) => comment.ItemId !== commentId),
-              }
-            : null
-        );
-
-        await refetchTasks();
-      } catch (error) {
-        console.error('Failed to delete comment:', error);
-        await refetchTasks();
-      }
-    },
-    [taskId, currentTask, refetchTasks]
-  );
-
+  // Add a new attachment to a task
   const addNewAttachment = useCallback(
     async (attachment: any) => {
       if (!taskId || !currentTask) return;
@@ -348,7 +267,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
             : null
         );
 
-        await refetchTasks();
         await refetchTasks();
       } catch (error) {
         console.error('Failed to add attachment:', error);
@@ -404,6 +322,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks]
   );
 
+  // Delete an assignee from a task
   const deleteAssignee = useCallback(
     async (assigneeId: string) => {
       if (!taskId || !currentTask) return;
@@ -412,7 +331,8 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const updatedAssignees = currentTask.Assignee?.filter(
           (assignee) => assignee.ItemId !== assigneeId
         );
-        updateTask({
+
+        await updateTask({
           itemId: taskId,
           input: {
             Assignee: updatedAssignees,
@@ -428,6 +348,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks, updateTask]
   );
 
+  // Add a new tag to the current task
   const addNewTag = useCallback(
     async (tag: string) => {
       if (!taskId || !currentTask) return;
@@ -453,6 +374,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         };
 
         await updateTaskDetails(update);
+
         await refetchTasks();
       } catch (error) {
         console.error('Error adding tag:', error);
@@ -487,7 +409,9 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         const update: TaskItemUpdateInput = {
           ItemTag: (currentTask.ItemTag || []).filter((t) => t.ItemId !== tagId),
         };
+
         await updateTaskDetails(update);
+
         await refetchTasks();
       } catch (error) {
         console.error('Error removing tag:', error);
@@ -503,8 +427,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     updateTaskDetails,
     toggleTaskCompletion,
     removeTask,
-    addNewComment,
-    deleteComment,
     addNewAttachment,
     deleteAttachment,
     addNewAssignee,

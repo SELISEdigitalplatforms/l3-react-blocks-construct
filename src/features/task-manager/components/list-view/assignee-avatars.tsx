@@ -28,18 +28,27 @@ interface AssigneeAvatarsProps {
 export function AssigneeAvatars({ assignees }: Readonly<AssigneeAvatarsProps>) {
   if (!assignees || assignees.length === 0) return null;
 
+  const getAvatarKey = (user: string, index: number) => {
+    return `${user}-${index}`;
+  };
+
   return (
     <div className="flex -space-x-2 overflow-hidden">
-      {assignees.slice(0, 3).map((user) => (
+      {assignees.slice(0, 3).map((user, index) => (
         <div
-          key={user[0]}
+          key={getAvatarKey(user, index)}
           className="h-8 w-8 rounded-full bg-gray-300 text-xs flex items-center justify-center border-2 border-white"
+          title={user}
         >
           {user[0]}
         </div>
       ))}
       {assignees.length > 3 && (
-        <div className="h-8 w-8 rounded-full bg-gray-200 text-xs flex items-center justify-center border-2 border-white">
+        <div
+          key="more-indicator"
+          className="h-8 w-8 rounded-full bg-gray-200 text-xs flex items-center justify-center border-2 border-white"
+          title={`+${assignees.length - 3} more`}
+        >
           +{assignees.length - 3}
         </div>
       )}

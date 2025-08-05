@@ -1,9 +1,12 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
 import type {
+  GetCommentsResponse,
   GetSectionsResponse,
   GetTagsResponse,
   GetTasksResponse,
   GetUsersPayload,
+  TaskCommentInsertInput,
+  TaskCommentUpdateInput,
   TaskTagInsertInput,
   TaskTagUpdateInput,
   TaskItemInsertInput,
@@ -25,6 +28,9 @@ import type {
   InsertTaskTagResponse,
   UpdateTaskTagResponse,
   DeleteTaskTagResponse,
+  DeleteTaskCommentResponse,
+  UpdateTaskCommentResponse,
+  InsertTaskCommentResponse,
 } from '../services/task-manager.service';
 import {
   getTasks,
@@ -40,6 +46,10 @@ import {
   createTaskTag,
   updateTaskTag,
   deleteTaskTag,
+  getTaskComments,
+  deleteTaskComment,
+  updateTaskComment,
+  createTaskComment,
 } from '../services/task-manager.service';
 
 interface TaskQueryParams {
@@ -120,6 +130,30 @@ export const useGetTaskTags = (params: TaskQueryParams) => {
   return useGlobalQuery<GetTagsResponse>({
     queryKey: ['task-tags', params],
     queryFn: () => getTaskTags(params),
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    onError: (error) => {
+      throw error;
+    },
+  });
+};
+
+/**
+ * Hook to fetch task sections with pagination
+ * @param params - Pagination parameters
+ * @returns Query result with sections data
+ *
+ * @example
+ * const { data, isLoading, error } = useGetTaskComments({
+ *   pageNo: 1,
+ *   pageSize: 20
+ * });
+ */
+export const useGetTaskComments = (params: TaskQueryParams) => {
+  return useGlobalQuery<GetCommentsResponse>({
+    queryKey: ['task-comments', params],
+    queryFn: () => getTaskComments(params),
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -400,6 +434,144 @@ export const useDeleteTags = () => {
     },
     onError: (error: Error) => {
       handleError(error);
+    },
+  });
+};
+
+/**
+ * Hook to create a new task comment
+ * @returns Mutation function to create a task comment with loading and error states
+ *
+ * @example
+ * const { mutate: createTaskComment, isPending } = useCreateTaskComment();
+ * createTaskComment({
+ *   TaskId: 'task-123',
+ *   Content: 'This is a comment',
+ *   Author: 'user-123'
+ * });
+ */
+export const useCreateTaskComment = () => {
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+  const queryClient = useQueryClient();
+
+  return useGlobalMutation<
+    InsertTaskCommentResponse,
+    Error,
+    TaskCommentInsertInput & { taskId?: string }
+  >({
+    mutationFn: async (input) => {
+      const taskId = input.taskId || input.TaskId;
+      if (!taskId) {
+        throw new Error('Task ID is required to create a comment');
+      }
+
+      // Create the comment with the task ID
+      const result = await createTaskComment({
+        ...input,
+        TaskId: taskId,
+        Timestamp: new Date().toISOString(),
+        IsDeleted: false,
+      });
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['task-comments'] });
+
+      toast({
+        variant: 'success',
+        title: t('SUCCESS'),
+        description: t('COMMENT_ADDED_SUCCESSFULLY'),
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Error in useCreateTaskComment:', error);
+      handleError(error, {
+        title: t('ERROR'),
+        defaultMessage: t('FAILED_TO_ADD_COMMENT'),
+      });
+    },
+  });
+};
+
+/**
+ * Hook to update an existing task comment
+ * @returns Mutation function to update a task comment with loading and error states
+ *
+ * @example
+ * const { mutate: updateTaskComment, isPending } = useUpdateTaskComment();
+ * updateTaskComment({
+ *   itemId: 'comment-123',
+ *   input: {
+ *     Content: 'Updated comment content'
+ *   }
+ * });
+ */
+export const useUpdateTaskComment = () => {
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+  const queryClient = useQueryClient();
+
+  return useGlobalMutation<
+    UpdateTaskCommentResponse,
+    Error,
+    { itemId: string; input: TaskCommentUpdateInput }
+  >({
+    mutationFn: (variables) => updateTaskComment(variables.itemId, variables.input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task-comments'] });
+      toast({
+        variant: 'success',
+        title: t('SUCCESS'),
+        description: t('COMMENT_UPDATED_SUCCESSFULLY'),
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Error in useUpdateTaskComment:', error);
+      handleError(error, {
+        title: t('ERROR'),
+        defaultMessage: t('FAILED_TO_UPDATE_COMMENT'),
+      });
+    },
+  });
+};
+
+/**
+ * Hook to delete a task comment
+ * @returns Mutation function to delete a task comment with loading and error states
+ *
+ * @example
+ * const { mutate: deleteTaskComment, isPending } = useDeleteTaskComment();
+ * deleteTaskComment('comment-123');
+ */
+export const useDeleteTaskComment = () => {
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const { handleError } = useErrorHandler();
+  const queryClient = useQueryClient();
+
+  return useGlobalMutation<DeleteTaskCommentResponse, Error, string>({
+    mutationFn: async (itemId) => {
+      return deleteTaskComment(itemId, true);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['task-comments'] });
+      toast({
+        variant: 'success',
+        title: t('SUCCESS'),
+        description: t('COMMENT_DELETED_SUCCESSFULLY'),
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Error in useDeleteTaskComment:', error);
+      handleError(error, {
+        title: t('ERROR'),
+        defaultMessage: t('FAILED_TO_DELETE_COMMENT'),
+      });
     },
   });
 };

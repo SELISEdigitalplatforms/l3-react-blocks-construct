@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
@@ -6,7 +6,7 @@ import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.t
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import { useDeleteTaskItem } from '../../hooks/use-task-manager';
+import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 
@@ -67,7 +67,21 @@ export function SortableTaskItem({
       window.removeEventListener('task-updated', handleTaskUpdated as EventListener);
     };
   }, [task.ItemId]);
-  const commentsCount = Array.isArray(task?.Comments) ? task.Comments.length : 0;
+  // Fetch comments for this task
+  const { data: commentsData } = useGetTaskComments({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  // Filter comments to only show those for the current task
+  const taskComments = useMemo(() => {
+    if (!commentsData?.TaskManagerComments?.items) return [];
+    return commentsData.TaskManagerComments.items.filter(
+      (comment) => comment.TaskId === task.ItemId
+    );
+  }, [commentsData, task.ItemId]);
+
+  const commentsCount = taskComments.length;
   const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
   const assignees = (() => {
     if (!task?.Assignee) return [];
@@ -166,7 +180,7 @@ export function SortableTaskItem({
         <AssigneeAvatars assignees={assignees || []} />
       </div>
 
-      <div className="w-32 flex-shrink-0">
+      <div className="w-28 flex-shrink-0">
         {task.ItemTag && task.ItemTag.length > 0 && (
           <TaskManagerBadge className="px-2 py-0.5">{task.ItemTag[0].TagLabel}</TaskManagerBadge>
         )}
