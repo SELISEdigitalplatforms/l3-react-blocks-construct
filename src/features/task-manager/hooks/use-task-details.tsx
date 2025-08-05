@@ -155,6 +155,42 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   const { mutate: updateTask } = useUpdateTaskItem();
 
+  const sanitizeBasicFields = (updates: Partial<TaskItem> | TaskItemUpdateInput, sanitized: TaskItemUpdateInput) => {
+    const fields = [
+      'Title', 'Description', 'DueDate', 'Priority', 'Section', 
+      'IsCompleted', 'Language', 'IsDeleted', 'OrganizationIds'
+    ] as const;
+
+    fields.forEach(field => {
+      if (field in updates) {
+        sanitized[field] = updates[field] as any;
+      }
+    });
+  };
+
+  const sanitizeTags = (updates: Partial<TaskItem> | TaskItemUpdateInput, sanitized: TaskItemUpdateInput) => {
+    if ('ItemTag' in updates) {
+      sanitized.ItemTag = updates.ItemTag as ItemTag[];
+      return;
+    }
+
+    if ('Tags' in updates) {
+      const tags = updates.Tags as (string | ItemTag)[] | undefined;
+      if (Array.isArray(tags)) {
+        sanitized.ItemTag = tags.map(tag => ({
+          ItemId: typeof tag === 'string' ? tag : tag.ItemId,
+          TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
+        }));
+      }
+    }
+  };
+
+  const sanitizeAssignee = (updates: Partial<TaskItem> | TaskItemUpdateInput, sanitized: TaskItemUpdateInput) => {
+    if ('Assignee' in updates) {
+      sanitized.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
+    }
+  };
+
   const updateTaskDetails = useCallback(
     async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
       if (!taskId || !currentTask) return;
@@ -164,36 +200,15 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         const sanitizedUpdates: TaskItemUpdateInput = {};
 
-        if ('Title' in updates) sanitizedUpdates.Title = updates.Title as string;
-        if ('Description' in updates) sanitizedUpdates.Description = updates.Description as string;
-        if ('DueDate' in updates) sanitizedUpdates.DueDate = updates.DueDate as string;
-        if ('Priority' in updates) sanitizedUpdates.Priority = updates.Priority as TaskPriority;
-        if ('Section' in updates) sanitizedUpdates.Section = updates.Section as string;
-        if ('IsCompleted' in updates) sanitizedUpdates.IsCompleted = updates.IsCompleted as boolean;
-        if ('Language' in updates) sanitizedUpdates.Language = updates.Language as string;
-        if ('OrganizationIds' in updates)
-          sanitizedUpdates.OrganizationIds = updates.OrganizationIds as string[];
-        if ('IsDeleted' in updates) sanitizedUpdates.IsDeleted = updates.IsDeleted as boolean;
+        // Process all updates in separate, focused functions
+        sanitizeBasicFields(updates, sanitizedUpdates);
+        sanitizeTags(updates, sanitizedUpdates);
+        sanitizeAssignee(updates, sanitizedUpdates);
 
-        if ('ItemTag' in updates) {
-          sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
-        } else if ('Tags' in updates) {
-          const tags = updates.Tags as (string | ItemTag)[] | undefined;
-          if (Array.isArray(tags)) {
-            sanitizedUpdates.ItemTag = tags.map((tag) => ({
-              ItemId: typeof tag === 'string' ? tag : tag.ItemId,
-              TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
-            }));
-          }
-        }
-
-        if ('Assignee' in updates) {
-          sanitizedUpdates.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
-        }
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
-        updateTask({
+        await updateTask({
           itemId: taskId,
           input: sanitizedUpdates,
         });

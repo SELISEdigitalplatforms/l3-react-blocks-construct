@@ -568,7 +568,7 @@ export default function TaskDetailsView({
         throw new Error('Failed to create task: No task ID returned');
       }
 
-      await handleTaskCreationSuccess(newTaskId, tagsToCreate);
+      handleTaskCreationSuccess(newTaskId, tagsToCreate);
     } catch (error) {
       handleTaskCreationError(error, tagsToCreate);
     }
@@ -704,26 +704,34 @@ export default function TaskDetailsView({
     return prev.filter((prevAtt) => !updated.some((newAtt) => newAtt.ItemId === prevAtt.ItemId));
   };
 
-  const handleAttachmentChange = async (newAttachments: SetStateAction<TaskAttachments[]>) => {
-    setAttachments((prev) => {
-      const updatedAttachments = processAttachments(prev, newAttachments);
+  const updateAttachments = useCallback(
+    (newAttachments: SetStateAction<TaskAttachments[]>) => {
+      return (prev: TaskAttachments[]) => {
+        const updatedAttachments = processAttachments(prev, newAttachments);
 
-      if (!currentTaskId) {
+        if (currentTaskId) {
+          const taskAttachments = mapToTaskAttachments(updatedAttachments);
+          updateTaskDetails({ Attachments: taskAttachments });
+
+          const addedAttachments = findAddedAttachments(prev, updatedAttachments);
+          const removedAttachments = findRemovedAttachments(prev, updatedAttachments);
+
+          addedAttachments.forEach((attachment) => addAttachment(attachment));
+          removedAttachments.forEach(({ ItemId }) => removeAttachment(ItemId));
+        }
+
         return updatedAttachments;
-      }
+      };
+    },
+    [currentTaskId, addAttachment, removeAttachment, updateTaskDetails]
+  );
 
-      const taskAttachments = mapToTaskAttachments(updatedAttachments);
-      updateTaskDetails({ Attachments: taskAttachments });
-
-      const addedAttachments = findAddedAttachments(prev, updatedAttachments);
-      const removedAttachments = findRemovedAttachments(prev, updatedAttachments);
-
-      addedAttachments.forEach((attachment) => addAttachment(attachment));
-      removedAttachments.forEach(({ ItemId }) => removeAttachment(ItemId));
-
-      return updatedAttachments;
-    });
-  };
+  const handleAttachmentChange = useCallback(
+    async (newAttachments: SetStateAction<TaskAttachments[]>) => {
+      setAttachments(updateAttachments(newAttachments));
+    },
+    [updateAttachments]
+  );
 
   const handleDeleteTask = async (): Promise<boolean> => {
     if (!currentTaskId) return false;

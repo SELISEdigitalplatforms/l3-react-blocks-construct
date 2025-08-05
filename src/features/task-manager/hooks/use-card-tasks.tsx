@@ -121,11 +121,9 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
-  // Initialize columns with sections data and tasks
   useEffect(() => {
     if (!sectionsData?.TaskManagerSections?.items) return;
 
-    // Create a stable reference to the filters object
     const currentFilters = {
       priorities: filters.priorities ?? [],
       statuses: filters.statuses ?? [],
@@ -135,14 +133,12 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
     };
 
     setColumnTasks(() => {
-      // Filter sections if status filter is applied
       const filteredSections = sectionsData.TaskManagerSections.items.filter(
         (section: TaskSection) =>
           !currentFilters.statuses.length ||
           (section.Title && currentFilters.statuses.includes(section.Title))
       );
 
-      // Create a map of section titles to their corresponding section
       const sectionsByTitle = new Map<string, TaskSection>();
       filteredSections.forEach((section: TaskSection) => {
         if (section.Title) {
@@ -150,20 +146,29 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         }
       });
 
-      // Create a map of section IDs to their tasks
       const tasksBySectionId: Record<string, TaskItem[]> = {};
       filteredSections.forEach((section: TaskSection) => {
         tasksBySectionId[section.ItemId] = [];
       });
 
+      const hasMatchingTagLabel = (tags: TaskItem['ItemTag'], searchTerm: string): boolean => {
+        if (!tags || !tags.length) return false;
+        return tags.some((tag: { TagLabel: string }) =>
+          tag.TagLabel.toLowerCase().includes(searchTerm)
+        );
+      };
+
       const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
         if (!query) return true;
 
         const searchTerm = query.toLowerCase();
+        const lowerTitle = task.Title?.toLowerCase() || '';
+        const lowerDescription = task.Description?.toLowerCase() || '';
+
         return (
-          task.Title?.toLowerCase().includes(searchTerm) ||
-          task.Description?.toLowerCase().includes(searchTerm) ||
-          !!task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(searchTerm))
+          lowerTitle.includes(searchTerm) ||
+          lowerDescription.includes(searchTerm) ||
+          hasMatchingTagLabel(task.ItemTag, searchTerm)
         );
       };
 
@@ -172,20 +177,27 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return !priorities.length || !task.Priority || priorities.includes(task.Priority);
       };
 
+      const hasMatchingAssignee = (assignee: { ItemId?: string }, assignees: string[]): boolean => {
+        return Boolean(assignee.ItemId && assignees.includes(assignee.ItemId));
+      };
+
       const matchesAssignees = (task: TaskItem): boolean => {
         const { assignees } = currentFilters;
         if (!assignees.length || !task.Assignee?.length) return true;
 
-        return task.Assignee.some(
-          (assignee) => assignee.ItemId && assignees.includes(assignee.ItemId)
-        );
+        return task.Assignee.some((assignee) => hasMatchingAssignee(assignee, assignees));
+      };
+
+      const hasMatchingTagId = (tag: { ItemId: string }, tagIds: string[]): boolean => {
+        return tagIds.includes(tag.ItemId);
       };
 
       const matchesTags = (task: TaskItem): boolean => {
         const { tags } = currentFilters;
         if (!tags.length || !task.ItemTag?.length) return true;
 
-        return task.ItemTag.some((tag) => tags.some((t) => t.ItemId === tag.ItemId));
+        const tagIds = tags.map((t) => t.ItemId);
+        return task.ItemTag.some((tag) => tag.ItemId && hasMatchingTagId(tag, tagIds));
       };
 
       const matchesDueDate = (task: TaskItem): boolean => {
@@ -199,16 +211,23 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return afterStart && beforeEnd;
       };
 
+      const getSectionByTitle = (title: string): TaskSection | undefined => {
+        return Array.from(sectionsByTitle.values()).find((s) => s.Title === title);
+      };
+
+      const ensureSectionExists = (sectionId: string) => {
+        if (!tasksBySectionId[sectionId]) {
+          tasksBySectionId[sectionId] = [];
+        }
+      };
+
       const addTaskToSection = (task: TaskItem) => {
         if (!task.Section) return;
 
-        const section = Array.from(sectionsByTitle.values()).find((s) => s.Title === task.Section);
-
+        const section = getSectionByTitle(task.Section);
         if (!section) return;
 
-        if (!tasksBySectionId[section.ItemId]) {
-          tasksBySectionId[section.ItemId] = [];
-        }
+        ensureSectionExists(section.ItemId);
         tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
       };
 
@@ -453,10 +472,9 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
       try {
         const section = validateSection(columnId);
-        const sectionTitle = section.Title as string;
+        const sectionTitle = section.Title;
         const tempTask = createTempTask(content, sectionTitle);
 
-        // Add the temporary task to the local state immediately
         addTempTask(columnId, tempTask);
 
         try {
@@ -468,7 +486,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             throw new Error('Failed to create task: No task ID returned from server');
           }
 
-          // Update the task with the real ID from the server
           setColumnTasks((prev) => updateTaskId(prev, columnId, tempTask.ItemId, taskId));
           await refetchTasks();
           return taskId;

@@ -34,6 +34,17 @@ import {
 } from '../graphql/mutations';
 import { clients } from 'lib/https';
 
+// Helper function to normalize tags to ItemTag format
+const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
+  if (typeof tag === 'string') {
+    return { ItemId: tag, TagLabel: tag };
+  }
+  return {
+    ItemId: tag.ItemId || '',
+    TagLabel: tag.TagLabel || tag.ItemId || '',
+  };
+};
+
 export interface BaseMutationResponse {
   itemId: string;
   totalImpactedData: number;
@@ -344,28 +355,20 @@ export const createTaskItem = async (
   input: TaskItemInsertInput
 ): Promise<InsertTaskItemResponse> => {
   try {
-    // Helper function to normalize tags to ItemTag format
-    const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
-      if (typeof tag === 'string') {
-        return { ItemId: tag, TagLabel: tag };
+    // Convert input to ensure ItemTag is properly formatted
+    const getNormalizedTags = () => {
+      if (input.ItemTag) {
+        return input.ItemTag.map(normalizeToItemTag);
       }
-      return {
-        ItemId: tag.ItemId || '',
-        TagLabel: tag.TagLabel || tag.ItemId || '',
-      };
+      if (input.Tags) {
+        return input.Tags.map(normalizeToItemTag);
+      }
+      return [];
     };
 
-    // Convert input to ensure ItemTag is properly formatted
     const formattedInput = {
       ...input,
-      // Convert Tags to ItemTag format if needed
-      ItemTag: input.ItemTag
-        ? input.ItemTag.map(normalizeToItemTag)
-        : input.Tags
-          ? input.Tags.map(normalizeToItemTag)
-          : [],
-      // Remove the legacy Tags field to avoid confusion
-      Tags: undefined,
+      ItemTag: getNormalizedTags(),
     };
 
     // Execute the mutation with proper typing
@@ -405,17 +408,6 @@ export const updateTaskItem = async (
   itemId: string,
   input: TaskItemUpdateInput
 ): Promise<UpdateTaskItemResponse> => {
-  // Helper function to normalize tags to ItemTag format
-  const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
-    if (typeof tag === 'string') {
-      return { ItemId: tag, TagLabel: tag };
-    }
-    return {
-      ItemId: tag.ItemId || '',
-      TagLabel: tag.TagLabel || tag.ItemId || '',
-    };
-  };
-
   // Convert input to ensure ItemTag is properly formatted
   const formattedInput = {
     ...input,
