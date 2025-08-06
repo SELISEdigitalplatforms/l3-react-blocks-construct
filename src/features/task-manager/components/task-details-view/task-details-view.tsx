@@ -240,13 +240,15 @@ export default function TaskDetailsView({
     }
   }, [calendarOpen, date]);
 
-  // Fetch all comments and filter by current task ID on the frontend
-  const { data: commentsData, isLoading: isLoadingComments } = useGetTaskComments({
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    refetch: refetchComments,
+  } = useGetTaskComments({
     pageNo: 1,
     pageSize: 100,
   });
 
-  // Filter comments to only show those for the current task
   const comments = useMemo(() => {
     if (!commentsData?.TaskManagerComments?.items) return [];
     return commentsData.TaskManagerComments.items.filter(
@@ -413,30 +415,55 @@ export default function TaskDetailsView({
 
   const { mutate: createComment, isPending: isCreatingComment } = useCreateTaskComment();
 
+  const renderComments = () => {
+    if (isLoadingComments) {
+      return (
+        <div className="flex items-center justify-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      );
+    }
+
+    if (comments.length === 0) {
+      return null;
+    }
+
+    return comments.map((comment) => (
+      <EditableComment
+        key={comment.ItemId}
+        author={comment.Author}
+        timestamp={comment.CreatedDate ?? comment.Timestamp}
+        initialComment={comment.Content}
+        onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
+        onDelete={() => handleDeleteComment(comment.ItemId)}
+      />
+    ));
+  };
+
   const handleSubmitComment = async (content: string) => {
-    if (content.trim() && currentTaskId) {
-      try {
-        const commentInput: TaskCommentInsertInput = {
-          ItemId: uuidv4(),
-          TaskId: currentTaskId,
-          Content: content,
-          Author: userProfile.fullName ?? '',
-          IsDeleted: false,
-          Language: '',
-        };
+    if (!content.trim() || !currentTaskId) return;
 
-        setNewCommentContent('');
-        setIsWritingComment(false);
+    try {
+      const commentInput: TaskCommentInsertInput = {
+        ItemId: uuidv4(),
+        TaskId: currentTaskId,
+        Content: content,
+        Author: userProfile.fullName ?? '',
+        IsDeleted: false,
+        Language: '',
+      };
 
-        createComment(commentInput);
-      } catch (error) {
-        console.error('Error adding comment:', error);
-        toast({
-          title: t('ERROR'),
-          description: t('FAILED_TO_ADD_COMMENT'),
-          variant: 'destructive',
-        });
-      }
+      setNewCommentContent('');
+      setIsWritingComment(false);
+      createComment(commentInput);
+      await refetchComments();
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: t('ERROR'),
+        description: t('FAILED_TO_ADD_COMMENT'),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -1019,22 +1046,7 @@ export default function TaskDetailsView({
                 )}
               </div>
 
-              {isLoadingComments ? (
-                <div className="flex items-center justify-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : comments.length > 0 ? (
-                comments.map((comment) => (
-                  <EditableComment
-                    key={comment.ItemId}
-                    author={comment.Author}
-                    timestamp={comment.CreatedDate ?? comment.Timestamp}
-                    initialComment={comment.Content}
-                    onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
-                    onDelete={() => handleDeleteComment(comment.ItemId)}
-                  />
-                ))
-              ) : null}
+              {renderComments()}
             </div>
           </div>
         )}

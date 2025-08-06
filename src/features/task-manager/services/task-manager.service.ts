@@ -439,35 +439,41 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
  * @param input - Task item data
  * @returns Promise with creation result
  */
+// Helper function to normalize tags to ItemTag format
+const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
+  if (typeof tag === 'string') {
+    return { ItemId: tag, TagLabel: tag };
+  }
+  return {
+    ItemId: tag.ItemId || '',
+    TagLabel: tag.TagLabel || tag.ItemId || '',
+  };
+};
+
+// Helper function to get normalized tags from input
+const getNormalizedTags = (input: {
+  ItemTag?: ItemTag[];
+  Tags?: Array<string | ItemTag>;
+}): ItemTag[] => {
+  if (input.ItemTag) {
+    return input.ItemTag.map(normalizeToItemTag);
+  }
+  if (input.Tags) {
+    return input.Tags.map(normalizeToItemTag);
+  }
+  return [];
+};
+
 export const createTaskItem = async (
   input: TaskItemInsertInput
 ): Promise<InsertTaskItemResponse> => {
   try {
-    // Helper function to normalize tags to ItemTag format
-    const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
-      if (typeof tag === 'string') {
-        return { ItemId: tag, TagLabel: tag };
-      }
-      return {
-        ItemId: tag.ItemId || '',
-        TagLabel: tag.TagLabel || tag.ItemId || '',
-      };
-    };
-
-    // Convert input to ensure ItemTag is properly formatted
     const formattedInput = {
       ...input,
-      // Convert Tags to ItemTag format if needed
-      ItemTag: input.ItemTag
-        ? input.ItemTag.map(normalizeToItemTag)
-        : input.Tags
-          ? input.Tags.map(normalizeToItemTag)
-          : [],
-      // Remove the legacy Tags field to avoid confusion
+      ItemTag: getNormalizedTags(input),
       Tags: undefined,
     };
 
-    // Execute the mutation with proper typing
     const response = await graphqlClient.mutate<{
       insertTaskManagerItem: { itemId: string };
     }>({
@@ -475,14 +481,12 @@ export const createTaskItem = async (
       variables: { input: formattedInput },
     });
 
-    // The response might be the data directly or have a data property
     const responseData = (response as any).data || response;
 
     if (!responseData) {
       throw new Error('No response data received from server');
     }
 
-    // Check if we have the expected response structure
     if (!responseData.insertTaskManagerItem?.itemId) {
       throw new Error('No task ID in response');
     }
@@ -504,17 +508,6 @@ export const updateTaskItem = async (
   itemId: string,
   input: TaskItemUpdateInput
 ): Promise<UpdateTaskItemResponse> => {
-  // Helper function to normalize tags to ItemTag format
-  const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
-    if (typeof tag === 'string') {
-      return { ItemId: tag, TagLabel: tag };
-    }
-    return {
-      ItemId: tag.ItemId || '',
-      TagLabel: tag.TagLabel || tag.ItemId || '',
-    };
-  };
-
   const inputCopy = { ...input };
 
   const { ...inputWithoutComments } = inputCopy;
