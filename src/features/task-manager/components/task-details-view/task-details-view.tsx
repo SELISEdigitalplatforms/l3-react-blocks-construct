@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { SetStateAction, useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
@@ -37,7 +37,7 @@ import { Label } from 'components/ui/label';
 import { EditableHeading } from './editable-heading';
 import { EditableComment } from './editable-comment';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from 'components/ui/dialog';
-import { EditableDescription } from './editable-description';
+import { EditableDescription, EditableDescriptionRef } from './editable-description';
 import { AttachmentsSection } from './attachment-section';
 import { Separator } from 'components/ui/separator';
 import { Tags } from './tag-selector';
@@ -170,6 +170,7 @@ export default function TaskDetailsView({
   );
   const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag ?? []);
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
+  const descriptionRef = useRef<EditableDescriptionRef>(null);
 
   useEffect(() => {
     const profile = localStorage.getItem('userProfile');
@@ -856,7 +857,12 @@ export default function TaskDetailsView({
     <DialogContent
       className="rounded-md sm:max-w-[720px] xl:max-h-[750px] max-h-screen flex flex-col p-0"
       onInteractOutside={() => handleAddItem()}
-      onOpenAutoFocus={(e) => e.preventDefault()}
+      onOpenAutoFocus={(e) => {
+        e.preventDefault();
+        setTimeout(() => {
+          descriptionRef.current?.focus();
+        }, 0);
+      }}
     >
       <DialogHeader className="hidden">
         <DialogTitle />
@@ -985,9 +991,15 @@ export default function TaskDetailsView({
         </div>
         <div className="mt-6">
           <EditableDescription
+            ref={descriptionRef}
             taskId={taskId}
             initialContent={description}
-            onContentChange={(newContent) => {
+            isNewTask={isNewTaskModalOpen}
+            onContentChange={setDescription}
+            onSave={async (newContent) => {
+              if (taskId) {
+                await updateTaskDetails({ Description: newContent });
+              }
               setDescription(newContent);
             }}
           />
