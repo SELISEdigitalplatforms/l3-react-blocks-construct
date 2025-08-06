@@ -158,10 +158,11 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         tasksBySectionId[section.ItemId] = [];
       });
 
-      const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean =>
-        Boolean(
-          tags?.some(({ TagLabel }) => TagLabel?.toLowerCase().includes(query.toLowerCase()))
-        );
+      const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean => {
+        if (!tags?.length) return false;
+        const queryLower = query.toLowerCase();
+        return tags.some(({ TagLabel }) => TagLabel?.toLowerCase().includes(queryLower));
+      };
 
       const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
         if (!query) return true;
@@ -191,8 +192,10 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return task.Assignee.some(isAssigneeInFilter);
       };
 
-      const hasMatchingTagInFilter = ({ ItemId }: ItemTag): boolean =>
-        currentFilters.tags.some(({ ItemId: filterId }) => filterId === ItemId);
+      const hasMatchingTagInFilter = (tag: ItemTag): boolean => {
+        if (!tag.ItemId) return false;
+        return currentFilters.tags.some(({ ItemId: filterId }) => filterId === tag.ItemId);
+      };
 
       const matchesTagsFilter = (task: TaskItem): boolean => {
         if (!currentFilters.tags.length || !task.ItemTag?.length) return true;
@@ -209,8 +212,10 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return true;
       };
 
-      const findSectionByTitle = (title: string): TaskSection | undefined =>
-        Array.from(sectionsByTitle.values()).find(({ Title }) => Title === title);
+      const findSectionByTitle = (title: string): TaskSection | undefined => {
+        const sections = Array.from(sectionsByTitle.values());
+        return sections.find((section) => section.Title === title);
+      };
 
       const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
         if (!tasksBySectionId[sectionId]) {
