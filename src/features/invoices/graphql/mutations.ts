@@ -5,9 +5,9 @@
  * These mutations are used with the graphqlClient for data modifications.
  */
 
-export const INSERT_INVOICE_MUTATION = `
-  mutation InsertInvoice($input: InvoiceInsertInput!) {
-    insertInvoice(input: $input) {
+export const INSERT_INVOICE_ITEM_MUTATION = `
+  mutation InsertInvoiceItem($input: InvoiceItemInsertInput!) {
+    insertInvoiceItem(input: $input) {
       itemId
       totalImpactedData
       acknowledged
@@ -15,9 +15,9 @@ export const INSERT_INVOICE_MUTATION = `
   }
 `;
 
-export const UPDATE_INVOICE_MUTATION = `
-  mutation UpdateInvoice($filter: String!, $input: InvoiceUpdateInput!) {
-    updateInvoice(filter: $filter, input: $input) {
+export const UPDATE_INVOICE_ITEM_MUTATION = `
+  mutation UpdateInvoiceItem($filter: String!, $input: InvoiceItemUpdateInput!) {
+    updateInvoiceItem(filter: $filter, input: $input) {
       itemId
       totalImpactedData
       acknowledged
@@ -25,9 +25,9 @@ export const UPDATE_INVOICE_MUTATION = `
   }
 `;
 
-export const DELETE_INVOICE_MUTATION = `
-  mutation DeleteInvoice($filter: String!, $input: InvoiceDeleteInput!) {
-    deleteInvoice(filter: $filter, input: $input) {
+export const DELETE_INVOICE_ITEM_MUTATION = `
+  mutation DeleteInvoiceItem($filter: String!, $input: InvoiceItemDeleteInput!) {
+    deleteInvoiceItem(filter: $filter, input: $input) {
       itemId
       totalImpactedData
       acknowledged

@@ -5,9 +5,9 @@
  * These queries are used with the graphqlClient for data fetching.
  */
 
-export const GET_INVOICES_QUERY = `
-  query Invoice($input: DynamicQueryInput) {
-    Invoices(input: $input) {
+export const GET_INVOICE_ITEMS_QUERY = `
+  query InvoiceItems($input: DynamicQueryInput) {
+    InvoiceItems(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
@@ -31,6 +31,18 @@ export const GET_INVOICES_QUERY = `
         Amount
         DueDate
         Status
+        GeneralNote
+        ItemDetail {
+          ItemId
+          ItemName
+          Category
+          Quantity
+          UnitPrice
+          Amount
+          Note
+          Taxes
+          Discount
+        }
       }
     }
   }

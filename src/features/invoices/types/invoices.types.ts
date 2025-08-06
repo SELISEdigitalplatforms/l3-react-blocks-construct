@@ -43,6 +43,18 @@ export interface CustomerDetails {
   Phone: string;
 }
 
+export interface InvoiceItemDetail {
+  ItemId: string;
+  ItemName: string;
+  Category: number;
+  Quantity: number;
+  UnitPrice: number;
+  Amount: number;
+  Note?: string;
+  Taxes?: number;
+  Discount?: number;
+}
+
 export interface InvoiceItem {
   ItemId: string;
   CreatedBy?: string;
@@ -59,10 +71,12 @@ export interface InvoiceItem {
   Amount: number;
   Customer: CustomerDetails[];
   Status: InvoiceStatus[];
+  GeneralNote?: string;
+  ItemDetail?: InvoiceItemDetail[];
 }
 
-export interface GetInvoicesResponse {
-  invoices: {
+export interface GetInvoiceItemsResponse {
+  invoiceItems: {
     items: InvoiceItem[];
     totalCount: number;
     pageInfo: {
@@ -74,32 +88,34 @@ export interface GetInvoicesResponse {
   };
 }
 
-export interface GetInvoiceResponse {
-  invoice: InvoiceItem;
+export interface GetInvoiceItemResponse {
+  invoiceItem: InvoiceItem;
 }
 
-export interface AddInvoiceInput {
+export interface AddInvoiceItemInput {
   ItemId: string;
   DateIssued: string;
   DueDate: string;
   Amount: number;
   Customer: CustomerDetails[];
   Status: InvoiceStatus[];
+  GeneralNote?: string;
+  ItemDetail?: InvoiceItemDetail[];
 }
 
-export interface AddInvoiceParams {
-  input: AddInvoiceInput;
+export interface AddInvoiceItemParams {
+  input: AddInvoiceItemInput;
 }
 
-export interface AddInvoiceResponse {
-  insertInvoice: {
+export interface AddInvoiceItemResponse {
+  insertInvoiceItem: {
     itemId: string;
     totalImpactedData: number;
     acknowledged: boolean;
   };
 }
 
-export interface UpdateInvoiceInput {
+export interface UpdateInvoiceItemInput {
   ItemId: string;
   CreatedBy?: string;
   CreatedDate?: string;
@@ -115,23 +131,25 @@ export interface UpdateInvoiceInput {
   Amount: number;
   Customer: CustomerDetails[];
   Status: InvoiceStatus[];
+  GeneralNote?: string;
+  ItemDetail?: InvoiceItemDetail[];
 }
 
-export interface UpdateInvoiceParams {
+export interface UpdateInvoiceItemParams {
   filter: string;
-  input: UpdateInvoiceInput;
+  input: UpdateInvoiceItemInput;
 }
 
-export interface UpdateInvoiceResponse {
-  updateInvoice: {
+export interface UpdateInvoiceItemResponse {
+  updateInvoiceItem: {
     itemId: string;
     totalImpactedData: number;
     acknowledged: boolean;
   };
 }
 
-export interface DeleteInvoiceResponse {
-  deleteInvoice: {
+export interface DeleteInvoiceItemResponse {
+  deleteInvoiceItem: {
     itemId: string;
     totalImpactedData: number;
     acknowledged: boolean;

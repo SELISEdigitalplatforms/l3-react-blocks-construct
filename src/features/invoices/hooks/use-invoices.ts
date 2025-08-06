@@ -1,15 +1,15 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
-import { useTranslation } from 'react-i18next';
 import { useErrorHandler } from 'hooks/use-error-handler';
 import {
-  getInvoices,
-  addInvoice,
-  updateInvoice,
-  deleteInvoice,
+  getInvoiceItems,
+  addInvoiceItem,
+  updateInvoiceItem,
+  deleteInvoiceItem,
 } from '../services/invoices.service';
-import { AddInvoiceParams, UpdateInvoiceParams } from '../types/invoices.types';
+import { AddInvoiceItemParams, UpdateInvoiceItemParams } from '../types/invoices.types';
 
 /**
  * GraphQL Inventory Hooks
@@ -19,7 +19,7 @@ import { AddInvoiceParams, UpdateInvoiceParams } from '../types/invoices.types';
  */
 
 // Update the type for params to use pageNo and pageSize
-interface InvoiceQueryParams {
+interface InvoiceItemQueryParams {
   pageNo: number;
   pageSize: number;
 }
@@ -27,7 +27,7 @@ interface InvoiceQueryParams {
 /**
  * Hook to fetch invoices with pagination, filtering, and sorting
  * @param params - Query parameters for filtering and pagination
- * @returns Query result with invoices data
+ * @returns Query result with invoice items data
  *
  * @example
  * const { data, isLoading, error } = useGetInvoices({
@@ -36,10 +36,10 @@ interface InvoiceQueryParams {
  *   filter: { }
  * });
  */
-export const useGetInvoices = (params: InvoiceQueryParams) => {
+export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
   return useGlobalQuery({
-    queryKey: ['invoices', params],
-    queryFn: getInvoices,
+    queryKey: ['invoice-items', params],
+    queryFn: getInvoiceItems,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -54,23 +54,23 @@ export const useGetInvoices = (params: InvoiceQueryParams) => {
  * @returns Mutation function to insert invoice with loading and error states
  *
  * @example
- * const { mutate: insertItem, isPending } = useAddInvoice();
+ * const { mutate: insertItem, isPending } = useAddInvoiceItem();
  * insertItem({ input: itemData });
  */
-export const useAddInvoice = () => {
+export const useAddInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation();
 
   return useGlobalMutation({
-    mutationFn: (params: AddInvoiceParams) => addInvoice(params),
+    mutationFn: (params: AddInvoiceItemParams) => addInvoiceItem(params),
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'invoices',
+        predicate: (query) => query.queryKey[0] === 'invoice-items',
       });
 
       queryClient.refetchQueries({
-        predicate: (query) => query.queryKey[0] === 'invoices',
+        predicate: (query) => query.queryKey[0] === 'invoice-items',
         type: 'active',
       });
 
@@ -93,24 +93,24 @@ export const useAddInvoice = () => {
  * @returns Mutation function to update invoice with loading and error states
  *
  * @example
- * const { mutate: updateItem, isPending } = useUpdateInvoice();
+ * const { mutate: updateItem, isPending } = useUpdateInvoiceItem();
  * updateItem({ input: { id: 'item-123', stock: 50 } });
  */
-export const useUpdateInvoice = () => {
+export const useUpdateInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation();
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
-    mutationFn: (params: UpdateInvoiceParams) => updateInvoice(params),
+    mutationFn: (params: UpdateInvoiceItemParams) => updateInvoiceItem(params),
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'invoices',
+        predicate: (query) => query.queryKey[0] === 'invoice-items',
       });
 
       queryClient.refetchQueries({
-        predicate: (query) => query.queryKey[0] === 'invoices',
+        predicate: (query) => query.queryKey[0] === 'invoice-items',
         type: 'active',
       });
 
@@ -138,10 +138,10 @@ export const useUpdateInvoice = () => {
  * @returns Mutation function to delete invoice with loading and error states
  *
  * @example
- * const { mutate: deleteItem, isPending } = useDeleteInvoice();
+ * const { mutate: deleteItem, isPending } = useDeleteInvoiceItem();
  * deleteItem('item-123');
  */
-export const useDeleteInvoice = () => {
+export const useDeleteInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -149,14 +149,14 @@ export const useDeleteInvoice = () => {
 
   return useGlobalMutation({
     mutationFn: ({ filter, input }: { filter: string; input: { isHardDelete: boolean } }) =>
-      deleteInvoice(filter, input),
+      deleteInvoiceItem(filter, input),
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey[0] === 'invoices',
+        predicate: (query) => query.queryKey[0] === 'invoice-items',
       });
 
       queryClient.refetchQueries({
-        predicate: (query) => query.queryKey[0] === 'invoices',
+        predicate: (query) => query.queryKey[0] === 'invoice-items',
         type: 'active',
       });
 

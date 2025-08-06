@@ -1,16 +1,16 @@
 import { graphqlClient } from 'lib/graphql-client';
-import { GET_INVOICES_QUERY } from '../graphql/queries';
+import { GET_INVOICE_ITEMS_QUERY } from '../graphql/queries';
 import {
-  INSERT_INVOICE_MUTATION,
-  UPDATE_INVOICE_MUTATION,
-  DELETE_INVOICE_MUTATION,
+  INSERT_INVOICE_ITEM_MUTATION,
+  UPDATE_INVOICE_ITEM_MUTATION,
+  DELETE_INVOICE_ITEM_MUTATION,
 } from '../graphql/mutations';
 import {
-  AddInvoiceParams,
-  AddInvoiceResponse,
-  DeleteInvoiceResponse,
-  UpdateInvoiceParams,
-  UpdateInvoiceResponse,
+  AddInvoiceItemParams,
+  AddInvoiceItemResponse,
+  DeleteInvoiceItemResponse,
+  UpdateInvoiceItemParams,
+  UpdateInvoiceItemResponse,
 } from '../types/invoices.types';
 
 /**
@@ -28,16 +28,16 @@ import {
  * @example
  * // Basic usage
  * useQuery({
- *   queryKey: ['inventory', { page: 1, pageSize: 10 }],
- *   queryFn: getInventory
+ *   queryKey: ['inventory', { pageNo: 1, pageSize: 100 }],
+ *   queryFn: getInvoiceItems
  * });
  */
-export const getInvoices = async (context: {
+export const getInvoiceItems = async (context: {
   queryKey: [string, { pageNo: number; pageSize: number }];
 }) => {
   const [, { pageNo, pageSize }] = context.queryKey;
   return graphqlClient.query({
-    query: GET_INVOICES_QUERY,
+    query: GET_INVOICE_ITEMS_QUERY,
     variables: {
       input: {
         filter: '{}',
@@ -50,57 +50,57 @@ export const getInvoices = async (context: {
 };
 
 /**
- * Inserts a new inventory item (GraphQL)
- * @param params - Inventory item insert parameters
+ * Inserts a new invoices item (GraphQL)
+ * @param params - Invoice item insert parameters
  * @returns Promise with inserted item data
  * @example
  * // Basic usage
- * const result = await inventoryItemInsert({
- *   input: { itemName: 'New Item', category: 'Electronics', ... }
+ * const result = await addInvoiceItem({
+ *   input: { itemName: 'New Invoice', category: 'Electronics', ... }
  * });
  */
-export const addInvoice = async (params: AddInvoiceParams): Promise<AddInvoiceResponse> => {
-  const response = await graphqlClient.mutate<AddInvoiceResponse>({
-    query: INSERT_INVOICE_MUTATION,
+export const addInvoiceItem = async (params: AddInvoiceItemParams): Promise<AddInvoiceItemResponse> => {
+  const response = await graphqlClient.mutate<AddInvoiceItemResponse>({
+    query: INSERT_INVOICE_ITEM_MUTATION,
     variables: params,
   });
   return response;
 };
 
 /**
- * Updates an existing inventory item
- * @param params - Update inventory item parameters
+ * Updates an existing invoice item
+ * @param params - Update invoice item parameters
  * @returns Promise with updated item data
  * @example
  * // Basic usage
- * const result = await updateInventoryItem({
+ * const result = await updateInvoiceItem({
  *   input: { id: 'item-123', stock: 50, price: '100.00' }
  * });
  */
-export const updateInvoice = async (
-  params: UpdateInvoiceParams
-): Promise<UpdateInvoiceResponse> => {
-  const response = await graphqlClient.mutate<UpdateInvoiceResponse>({
-    query: UPDATE_INVOICE_MUTATION,
+export const updateInvoiceItem = async (
+  params: UpdateInvoiceItemParams
+): Promise<UpdateInvoiceItemResponse> => {
+  const response = await graphqlClient.mutate<UpdateInvoiceItemResponse>({
+    query: UPDATE_INVOICE_ITEM_MUTATION,
     variables: params,
   });
   return response;
 };
 
 /**
- * Deletes an inventory item by ID
+ * Deletes an invoice item by ID
  * @param filter - The filter string to identify the item to delete (usually the itemId)
  * @returns Promise with deletion result
  * @example
  * // Basic usage
- * const result = await deleteInventoryItem('item-123');
+ * const result = await deleteInvoiceItem('item-123');
  */
-export const deleteInvoice = async (
+export const deleteInvoiceItem = async (
   filter: string,
   input: { isHardDelete: boolean }
-): Promise<DeleteInvoiceResponse> => {
-  const response = await graphqlClient.mutate<DeleteInvoiceResponse>({
-    query: DELETE_INVOICE_MUTATION,
+): Promise<DeleteInvoiceItemResponse> => {
+  const response = await graphqlClient.mutate<DeleteInvoiceItemResponse>({
+    query: DELETE_INVOICE_ITEM_MUTATION,
     variables: { filter, input },
   });
   return response;
