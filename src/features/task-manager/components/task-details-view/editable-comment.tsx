@@ -42,11 +42,11 @@ import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
  */
 
 interface EditableCommentProps {
-  readonly author: string;
-  readonly timestamp: string;
-  readonly initialComment: string;
-  readonly onEdit?: (newComment: string) => void;
-  readonly onDelete?: () => void;
+  author: string;
+  timestamp: string;
+  initialComment: string;
+  onEdit?: (newComment: string) => void;
+  onDelete?: () => void;
 }
 
 // Get current user profile from localStorage
@@ -62,7 +62,7 @@ export function EditableComment({
   initialComment,
   onEdit,
   onDelete,
-}: EditableCommentProps) {
+}: Readonly<EditableCommentProps>) {
   const [userProfile, setUserProfile] = useState(getCurrentUser());
   const [comment, setComment] = useState(initialComment);
   const [isEditing, setIsEditing] = useState(false);
