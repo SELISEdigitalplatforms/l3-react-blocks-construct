@@ -158,16 +158,14 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         tasksBySectionId[section.ItemId] = [];
       });
 
+      const hasMatchingLabel = (label: string | undefined, query: string): boolean => {
+        if (!label) return false;
+        return label.toLowerCase().includes(query.toLowerCase());
+      };
+
       const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean => {
         if (!tags?.length || !query) return false;
-
-        const queryLower = query.toLowerCase();
-        const hasMatch = (tag: ItemTag): boolean => {
-          const label = tag.TagLabel?.toLowerCase();
-          return label ? label.includes(queryLower) : false;
-        };
-
-        return tags.some(hasMatch);
+        return tags.some((tag) => hasMatchingLabel(tag.TagLabel, query));
       };
 
       const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
@@ -202,9 +200,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         const { ItemId } = tag;
         if (!ItemId) return false;
 
-        const hasMatchingId = (filterTag: ItemTag): boolean => filterTag.ItemId === ItemId;
-
-        return currentFilters.tags.some(hasMatchingId);
+        return currentFilters.tags.some((filterTag) => filterTag.ItemId === ItemId);
       };
 
       const matchesTagsFilter = (task: TaskItem): boolean => {
@@ -226,9 +222,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         if (!title) return undefined;
 
         const sections = Array.from(sectionsByTitle.values());
-        const hasMatchingTitle = (section: TaskSection): boolean => section.Title === title;
-
-        return sections.find(hasMatchingTitle);
+        return sections.find((section) => section.Title === title);
       };
 
       const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
