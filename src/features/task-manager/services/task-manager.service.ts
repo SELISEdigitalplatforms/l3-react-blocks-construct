@@ -1,6 +1,13 @@
 import { graphqlClient } from 'lib/graphql-client';
-import type { TaskItem, ItemTag } from '../types/task-manager.types';
+import type {
+  TaskItem,
+  ItemTag,
+  GetCommentsResponse,
+  TaskCommentUpdateInput,
+  TaskCommentInsertInput,
+} from '../types/task-manager.types';
 import {
+  GET_TASK_COMMENTS_QUERY,
   GET_TASK_MANAGER_QUERY,
   GET_TASK_MANAGER_SECTIONS_QUERY,
   GET_TASK_MANAGER_TAGS_QUERY,
@@ -30,6 +37,9 @@ import {
   INSERT_TASK_MANAGER_TAG_MUTATION,
   UPDATE_TASK_MANAGER_TAG_MUTATION,
   DELETE_TASK_MANAGER_TAG_MUTATION,
+  INSERT_TASK_COMMENTS_MUTATION,
+  UPDATE_TASK_COMMENTS_MUTATION,
+  DELETE_TASK_COMMENTS_MUTATION,
 } from '../graphql/mutations';
 import { clients } from 'lib/https';
 
@@ -73,6 +83,18 @@ export interface UpdateTaskTagResponse {
 
 export interface DeleteTaskTagResponse {
   deleteTaskManagerTag: BaseMutationResponse;
+}
+
+export interface InsertTaskCommentResponse {
+  insertTaskComment: BaseMutationResponse;
+}
+
+export interface UpdateTaskCommentResponse {
+  updateTaskComment: BaseMutationResponse;
+}
+
+export interface DeleteTaskCommentResponse {
+  deleteTaskComment: BaseMutationResponse;
 }
 
 /**
@@ -335,6 +357,86 @@ export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResp
 };
 
 /**
+ * Fetches task comments with pagination
+ * @param params - Pagination parameters
+ * @returns Promise with task comments data
+ */
+export const getTaskComments = async (params: PaginationParams): Promise<GetCommentsResponse> => {
+  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+
+  try {
+    const response = await graphqlClient.query({
+      query: GET_TASK_COMMENTS_QUERY,
+      variables: {
+        input: {
+          filter: JSON.stringify(filter),
+          sort: JSON.stringify(sort),
+          pageNo,
+          pageSize,
+        },
+      },
+    });
+
+    const responseData = (response as any)?.data || response;
+    const taskComments = responseData?.TaskComments;
+
+    if (taskComments) {
+      // Process the comments
+      const processedComments = (taskComments.items || []).map((comment: any) => ({
+        ...comment,
+        ItemId: comment.ItemId || '',
+        Content: comment.Content || '',
+        Timestamp: comment.Timestamp || new Date().toISOString(),
+        Author: comment.Author || '',
+        CreatedBy: comment.CreatedBy || '',
+        CreatedDate: comment.CreatedDate || new Date().toISOString(),
+        LastUpdatedBy: comment.LastUpdatedBy || comment.CreatedBy || '',
+        LastUpdatedDate: comment.LastUpdatedDate || comment.CreatedDate || new Date().toISOString(),
+        TaskId: comment.TaskId || '',
+      }));
+
+      return {
+        TaskManagerComments: {
+          items: processedComments,
+          totalCount: taskComments.totalCount || processedComments.length,
+          hasNextPage: taskComments.hasNextPage || false,
+          hasPreviousPage: taskComments.hasPreviousPage || false,
+          pageSize: taskComments.pageSize || pageSize,
+          pageNo: taskComments.pageNo || pageNo,
+          totalPages: taskComments.totalPages || 1,
+        },
+      };
+    }
+
+    console.warn('Unexpected response structure, returning empty comments');
+    return {
+      TaskManagerComments: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching task sections:', error);
+    return {
+      TaskManagerComments: {
+        items: [],
+        totalCount: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        pageSize,
+        pageNo,
+        totalPages: 0,
+      },
+    };
+  }
+};
+
+/**
  * Creates a new task item
  * @param input - Task item data
  * @returns Promise with creation result
@@ -415,25 +517,36 @@ export const updateTaskItem = async (
     };
   };
 
-  // Convert input to ensure ItemTag is properly formatted
+  const inputCopy = { ...input };
+
+  const { ...inputWithoutComments } = inputCopy;
+
   const formattedInput = {
-    ...input,
-    // If Tags is provided but ItemTag is not, convert Tags to ItemTag format
-    ...(input.ItemTag === undefined &&
-      input.Tags && {
-        ItemTag: input.Tags.map(normalizeToItemTag),
+    ...inputWithoutComments,
+    ...(inputWithoutComments.ItemTag === undefined &&
+      inputWithoutComments.Tags && {
+        ItemTag: inputWithoutComments.Tags.map(normalizeToItemTag),
       }),
   };
 
-  const response = await graphqlClient.mutate({
-    query: UPDATE_TASK_MANAGER_ITEM_MUTATION,
-    variables: {
-      filter: JSON.stringify({ _id: itemId }),
-      input: formattedInput,
-    },
-  });
+  const cleanInput = Object.fromEntries(
+    Object.entries(formattedInput).filter(([, value]) => value !== undefined)
+  );
 
-  return (response as any).data as UpdateTaskItemResponse;
+  try {
+    const response = await graphqlClient.mutate({
+      query: UPDATE_TASK_MANAGER_ITEM_MUTATION,
+      variables: {
+        filter: JSON.stringify({ _id: itemId }),
+        input: cleanInput,
+      },
+    });
+
+    return (response as any).data as UpdateTaskItemResponse;
+  } catch (error) {
+    console.error('Error updating task item:', error);
+    throw error;
+  }
 };
 
 /**
@@ -466,13 +579,11 @@ export const createTaskSection = async (
   input: TaskSectionInsertInput
 ): Promise<InsertTaskSectionResponse> => {
   try {
-    // Apollo client's mutate returns a promise that resolves to the data
     const response = await graphqlClient.mutate({
       query: INSERT_TASK_MANAGER_SECTION_MUTATION,
       variables: { input },
     });
 
-    // The response should have the shape: { data: { insertTaskManagerSection: { itemId: string, ... } } }
     const responseData = (response as any)?.data || response;
 
     if (!responseData?.insertTaskManagerSection) {
@@ -488,12 +599,6 @@ export const createTaskSection = async (
   }
 };
 
-/**
- * Updates an existing task section
- * @param sectionId - ID of the section to update
- * @param input - Updated section data
- * @returns Promise with update result
- */
 /**
  * Updates an existing task section
  * @param sectionId - ID of the section to update
@@ -637,6 +742,144 @@ export const deleteTaskTag = async (
   });
 
   return (response as any).data as DeleteTaskTagResponse;
+};
+
+/**
+ * Creates a new comment for particular task
+ * @param input - Task comment data
+ * @returns Promise with creation result
+ */
+export const createTaskComment = async (
+  input: TaskCommentInsertInput & { taskId?: string }
+): Promise<InsertTaskCommentResponse> => {
+  try {
+    const now = new Date().toISOString();
+    const taskId = input.TaskId || input.taskId;
+
+    if (!taskId) {
+      throw new Error('Task ID is required to create a comment');
+    }
+
+    const mutationInput = {
+      ...input,
+      TaskId: taskId,
+      Timestamp: input.Timestamp || now,
+      Author: input.Author ?? '',
+    };
+
+    if (!input.TaskId && !input.taskId) {
+      throw new Error('TaskId is required to create a comment');
+    }
+    const commentResponse = await graphqlClient.mutate<{
+      insertTaskComment: { itemId: string };
+    }>({
+      query: INSERT_TASK_COMMENTS_MUTATION,
+      variables: {
+        input: {
+          ...mutationInput,
+          TaskId: input.TaskId || input.taskId,
+          ...(mutationInput.taskId && { taskId: undefined }),
+        },
+      },
+    });
+
+    const responseData = (commentResponse as any).data || commentResponse;
+
+    if (!responseData) {
+      throw new Error('No response data received from server');
+    }
+
+    if (!responseData.insertTaskComment?.itemId) {
+      throw new Error('No comment ID in response');
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('Error in createTaskComment:', error);
+    throw error;
+  }
+};
+
+/**
+ * Updates an existing particular task comment
+ * @param itemId - ID of the task comment to update
+ * @param input - Updated particular task comment data
+ * @returns Promise with update result
+ */
+export const updateTaskComment = async (
+  itemId: string,
+  input: TaskCommentUpdateInput
+): Promise<UpdateTaskCommentResponse> => {
+  const now = new Date().toISOString();
+  const mutationInput: TaskCommentUpdateInput = {
+    ...input,
+    ItemId: itemId,
+    Content: input.Content ?? '',
+    Timestamp: input.Timestamp ?? now,
+    IsDeleted: input.IsDeleted ?? false,
+  };
+
+  const cleanInput = Object.fromEntries(
+    Object.entries(mutationInput).filter(([, value]) => value !== undefined)
+  ) as TaskCommentUpdateInput;
+
+  const response = await graphqlClient.mutate({
+    query: UPDATE_TASK_COMMENTS_MUTATION,
+    variables: {
+      filter: JSON.stringify({ _id: itemId }),
+      input: cleanInput,
+    },
+  });
+
+  return (response as any).data as UpdateTaskCommentResponse;
+};
+
+/**
+ * Deletes a particular task's comment
+ * @param itemId - ID of the particular task's comment to delete
+ * @param isHardDelete - Whether to perform a hard delete
+ * @returns Promise with deletion result
+ */
+export const deleteTaskComment = async (
+  itemId: string,
+  isHardDelete = false
+): Promise<DeleteTaskCommentResponse> => {
+  try {
+    if (!isHardDelete) {
+      const updateResponse = await updateTaskComment(itemId, {
+        ItemId: itemId,
+        IsDeleted: true,
+        Timestamp: new Date().toISOString(),
+      });
+
+      return {
+        deleteTaskComment: {
+          itemId: updateResponse.updateTaskComment.itemId,
+          totalImpactedData: 1,
+          acknowledged: true,
+        },
+      };
+    }
+    const response = await graphqlClient.mutate<{
+      deleteTaskComment: { itemId: string; totalImpactedData: number; acknowledged: boolean };
+    }>({
+      query: DELETE_TASK_COMMENTS_MUTATION,
+      variables: {
+        filter: JSON.stringify({ _id: itemId }),
+        input: { isHardDelete },
+      },
+    });
+
+    const responseData = (response as any).data || response;
+    if (!responseData) {
+      throw new Error('No response data received from server');
+    }
+
+    return responseData as DeleteTaskCommentResponse;
+  } catch (error) {
+    console.error('Error in deleteTaskComment:', error);
+    throw error;
+  }
 };
 
 export const getUsers = (payload: GetUsersPayload) => {

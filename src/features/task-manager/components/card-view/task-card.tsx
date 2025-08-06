@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -7,7 +7,7 @@ import { Card } from 'components/ui/card';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import { useDeleteTaskItem } from '../../hooks/use-task-manager';
+import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
@@ -60,6 +60,18 @@ export function TaskCard({
   handleTaskClick,
 }: Readonly<ITaskCardProps>) {
   const [task, setTask] = useState(initialTask);
+
+  const { data: commentsData } = useGetTaskComments({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const taskComments = useMemo(() => {
+    if (!commentsData?.TaskManagerComments?.items) return [];
+    return commentsData.TaskManagerComments.items.filter(
+      (comment) => comment.TaskId === task.ItemId
+    );
+  }, [commentsData, task.ItemId]);
 
   useEffect(() => {
     setTask(initialTask);
@@ -220,7 +232,7 @@ export function TaskCard({
             )}
 
             <div className="flex items-center text-medium-emphasis text-xs gap-3">
-              {task.Comments !== undefined && task.Comments.length > 0 && (
+              {taskComments.length > 0 && (
                 <button className="flex items-center gap-1" onClick={handleInteractiveElementClick}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -235,7 +247,7 @@ export function TaskCard({
                   >
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                   </svg>
-                  <span>{task.Comments.length}</span>
+                  <span>{taskComments.length}</span>
                 </button>
               )}
 
@@ -260,22 +272,34 @@ export function TaskCard({
             </div>
 
             {task.Assignee && task.Assignee.length > 0 && (
-              <div className="flex -space-x-2" onClick={handleInteractiveElementClick}>
+              <div className="flex -space-x-2">
                 {task.Assignee.map((assignee, idx) => {
                   const displayName = assignee?.Name ?? '';
                   const imageUrl = assignee?.ImageUrl;
                   const initial = displayName ? displayName.charAt(0).toUpperCase() : '';
+                  const assigneeId = assignee?.ItemId || `assignee-${idx}`;
 
                   return (
-                    <Avatar
-                      key={assignee?.ItemId || idx}
-                      className="h-6 w-6 border-2 border-background"
+                    <button
+                      key={assigneeId}
+                      onClick={handleInteractiveElementClick}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleInteractiveElementClick(e as any);
+                        }
+                      }}
+                      className="focus:outline-none rounded-full"
+                      aria-label={`View ${displayName || 'assignee'}`}
+                      tabIndex={0}
                     >
-                      <AvatarImage src={imageUrl} alt={displayName} />
-                      <AvatarFallback className="bg-gray-300 text-foreground text-xs">
-                        {initial}
-                      </AvatarFallback>
-                    </Avatar>
+                      <Avatar className="h-6 w-6 border-2 border-background">
+                        <AvatarImage src={imageUrl} alt={displayName} />
+                        <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+                          {initial}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
                   );
                 })}
               </div>

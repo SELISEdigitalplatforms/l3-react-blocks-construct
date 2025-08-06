@@ -65,7 +65,7 @@ interface TaskListViewProps {
   };
 }
 
-export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
+export function TaskListView({ searchQuery = '', filters }: Readonly<TaskListViewProps>) {
   const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, isLoading } = useListTasks();
 
@@ -78,9 +78,10 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
         (task: TaskItem) =>
           task.Title?.toLowerCase().includes(query) ||
           task.Description?.toLowerCase().includes(query) ||
-          task.ItemTag?.some((tag: ItemTag) => 
-            tag.TagLabel?.toLowerCase().includes(query) || 
-            tag.ItemId?.toLowerCase().includes(query)
+          task.ItemTag?.some(
+            (tag: ItemTag) =>
+              tag.TagLabel?.toLowerCase().includes(query) ||
+              tag.ItemId?.toLowerCase().includes(query)
           )
       );
     }
@@ -106,9 +107,9 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
     }
 
     if (filters.tags.length) {
-      const tagIds = new Set(filters.tags.map(tag => tag.ItemId));
+      const tagIds = new Set(filters.tags.map((tag) => tag.ItemId));
       result = result.filter((task: TaskItem) =>
-        task.ItemTag?.some(tag => tagIds.has(tag.ItemId))
+        task.ItemTag?.some((tag) => tagIds.has(tag.ItemId))
       );
     }
 
@@ -223,22 +224,30 @@ export function TaskListView({ searchQuery = '', filters }: TaskListViewProps) {
                   <NewTaskRow onAdd={handleAddTask} onCancel={() => setShowNewTaskInput(false)} />
                 )}
 
-                {isLoading ? (
-                  <div className="flex justify-center p-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                  </div>
-                ) : filteredTasks.length > 0 ? (
-                  filteredTasks.map((task) => (
-                    <SortableTaskItem
-                      handleTaskClick={handleTaskClick}
-                      key={task.ItemId}
-                      task={task}
-                      columns={columns}
-                    />
-                  ))
-                ) : (
-                  <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
-                )}
+                {(() => {
+                  if (isLoading) {
+                    return (
+                      <div className="flex justify-center p-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                      </div>
+                    );
+                  }
+
+                  if (filteredTasks.length > 0) {
+                    return filteredTasks.map((task) => (
+                      <SortableTaskItem
+                        handleTaskClick={handleTaskClick}
+                        key={task.ItemId}
+                        task={task}
+                        columns={columns}
+                      />
+                    ));
+                  }
+
+                  return (
+                    <div className="text-center p-8 text-gray-500">{t('NO_TASKS_TO_DISPLAY')}</div>
+                  );
+                })()}
               </SortableContext>
 
               <DragOverlay>

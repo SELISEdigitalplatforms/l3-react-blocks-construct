@@ -47,6 +47,12 @@ export const GET_TASK_MANAGER_QUERY = `
           FileSize
           FileType
         }
+        Comments {
+          ItemId
+          Content
+          Timestamp
+          Author
+        }
       }
     }
   }
@@ -111,6 +117,37 @@ export const GET_TASK_MANAGER_TAGS_QUERY = `
         LastUpdatedDate
         OrganizationIds
         Tags
+      }
+    }
+  }
+`;
+
+/**
+ * Query to fetch task manager comments with pagination support.
+ *
+ * This query retrieves a paginated list of task comments with their metadata,
+ * including creation/update timestamps, active status, and organizational associations.
+ */
+
+export const GET_TASK_COMMENTS_QUERY = `
+  query TaskManagerComments($input: DynamicQueryInput) {
+    TaskComments(input: $input) {
+      hasNextPage
+      hasPreviousPage
+      totalCount
+      totalPages
+      pageSize
+      pageNo
+      items {
+        ItemId
+        Content
+        Timestamp
+        Author
+        CreatedBy
+        CreatedDate
+        LastUpdatedBy
+        LastUpdatedDate
+        TaskId
       }
     }
   }
