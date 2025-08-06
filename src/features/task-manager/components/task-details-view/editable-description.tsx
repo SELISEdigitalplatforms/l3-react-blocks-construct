@@ -124,7 +124,7 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
       const editorContainers = document.querySelectorAll('.ql-container');
       editorContainers.forEach((container) => {
         const editorRoot = container.closest('.editor-root');
-        if (editorRoot && editorRoot.parentNode) {
+        if (editorRoot?.parentNode) {
           const contentContainer = document.createElement('div');
           contentContainer.innerHTML = container.innerHTML;
           const parentNode = editorRoot.parentNode as Node;
@@ -138,7 +138,7 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
         if (onSave) {
           await onSave(content);
         } else if (onContentChange) {
-          await onContentChange(content);
+          onContentChange(content);
         } else if (task) {
           await updateTaskDetails({ Description: content });
         }
@@ -217,7 +217,7 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
     useEffect(() => {
       const cleanup = () => {
         const existingStyle = document.getElementById('hide-quill-toolbar');
-        if (existingStyle && existingStyle.parentNode) {
+        if (existingStyle?.parentNode) {
           existingStyle.parentNode.removeChild(existingStyle);
         }
 
