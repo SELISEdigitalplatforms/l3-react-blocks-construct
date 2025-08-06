@@ -154,7 +154,9 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
 
     const matchesTags = (task: TaskItem): boolean => {
       if (!filters.tags?.length || !task.ItemTag?.length) return true;
-      return task.ItemTag.some((tag) => filters.tags?.some((t) => t.ItemId === tag.ItemId));
+      
+      const tagIds = new Set(filters.tags.map(({ ItemId }) => ItemId));
+      return task.ItemTag.some(({ ItemId }) => tagIds.has(ItemId));
     };
 
     const matchesDueDate = (task: TaskItem): boolean => {

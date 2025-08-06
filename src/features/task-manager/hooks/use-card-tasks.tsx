@@ -158,10 +158,10 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         tasksBySectionId[section.ItemId] = [];
       });
 
-      const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean => {
-        if (!tags) return false;
-        return tags.some((tag) => tag.TagLabel.toLowerCase().includes(query));
-      };
+      const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean =>
+        Boolean(
+          tags?.some(({ TagLabel }) => TagLabel?.toLowerCase().includes(query.toLowerCase()))
+        );
 
       const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
         if (!query) return true;
@@ -191,9 +191,8 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return task.Assignee.some(isAssigneeInFilter);
       };
 
-      const hasMatchingTagInFilter = (tag: ItemTag): boolean => {
-        return currentFilters.tags.some((t) => t.ItemId === tag.ItemId);
-      };
+      const hasMatchingTagInFilter = ({ ItemId }: ItemTag): boolean =>
+        currentFilters.tags.some(({ ItemId: filterId }) => filterId === ItemId);
 
       const matchesTagsFilter = (task: TaskItem): boolean => {
         if (!currentFilters.tags.length || !task.ItemTag?.length) return true;
@@ -210,9 +209,8 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return true;
       };
 
-      const findSectionByTitle = (title: string): TaskSection | undefined => {
-        return Array.from(sectionsByTitle.values()).find((s) => s.Title === title);
-      };
+      const findSectionByTitle = (title: string): TaskSection | undefined =>
+        Array.from(sectionsByTitle.values()).find(({ Title }) => Title === title);
 
       const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
         if (!tasksBySectionId[sectionId]) {
