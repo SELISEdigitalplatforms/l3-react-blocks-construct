@@ -462,7 +462,7 @@ export const useCreateTaskComment = () => {
     TaskCommentInsertInput & { taskId?: string }
   >({
     mutationFn: async (input) => {
-      const taskId = input.taskId || input.TaskId;
+      const taskId = input.taskId ?? input.TaskId;
       if (!taskId) {
         throw new Error('Task ID is required to create a comment');
       }

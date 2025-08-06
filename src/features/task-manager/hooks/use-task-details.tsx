@@ -10,7 +10,6 @@ import {
   ItemTag,
 } from '../types/task-manager.types';
 
-// Simple toast utility with proper types
 interface ToastOptions {
   variant: 'default' | 'destructive' | 'success';
   title: string;
@@ -62,8 +61,6 @@ const useToast = () => ({
  * } = useTaskDetails(taskId);
  */
 
-// Using ItemTag[] for ItemTag as per TaskItem type
-
 interface UseTaskDetailsReturn {
   task: TaskItem | null;
   toggleTaskCompletion: (isCompleted: boolean) => Promise<void>;
@@ -88,9 +85,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   useEffect(() => {
     if (taskId && tasksData?.TaskManagerItems?.items) {
-      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId) as
-        | TaskItem
-        | undefined;
+      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId);
 
       if (foundTask) {
         const mapToItemTags = (tags?: ItemTag[]): ItemTag[] => {
@@ -107,16 +102,14 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           }));
         };
 
-        // Comments are handled directly in the view component
-
         const mappedTask: TaskItem = {
           ItemId: foundTask.ItemId,
           Title: foundTask.Title,
-          Description: foundTask.Description || '',
-          IsCompleted: foundTask.IsCompleted || false,
-          Priority: foundTask.Priority || TaskPriority.MEDIUM,
-          Section: foundTask.Section || '',
-          DueDate: foundTask.DueDate,
+          Description: foundTask.Description ?? '',
+          IsCompleted: foundTask.IsCompleted ?? false,
+          Priority: foundTask.Priority ?? TaskPriority.MEDIUM,
+          Section: foundTask.Section ?? '',
+          DueDate: foundTask.DueDate ?? '',
           Assignee:
             Array.isArray(foundTask.Assignee) && foundTask.Assignee.length > 0
               ? foundTask.Assignee
@@ -127,12 +120,12 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Attachments
               : currentTask?.Attachments
           ),
-          Comments: foundTask.Comments || [],
-          CreatedBy: foundTask.CreatedBy || '',
-          CreatedDate: foundTask.CreatedDate || new Date().toISOString(),
-          IsDeleted: foundTask.IsDeleted || false,
-          Language: foundTask.Language || 'en',
-          OrganizationIds: foundTask.OrganizationIds || [],
+          Comments: foundTask.Comments ?? [],
+          CreatedBy: foundTask.CreatedBy ?? '',
+          CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
+          IsDeleted: foundTask.IsDeleted ?? false,
+          Language: foundTask.Language ?? 'en',
+          OrganizationIds: foundTask.OrganizationIds ?? [],
         };
 
         setCurrentTask(mappedTask);
@@ -145,6 +138,58 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
   const { mutate: updateTask } = useUpdateTaskItem();
 
+  // Helper function to handle basic field updates
+  const handleBasicFieldUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    const fieldsToUpdate: Array<keyof TaskItemUpdateInput> = [
+      'Title',
+      'Description',
+      'DueDate',
+      'Priority',
+      'Section',
+      'IsCompleted',
+      'Language',
+      'OrganizationIds',
+      'IsDeleted',
+    ];
+
+    fieldsToUpdate.forEach((field) => {
+      if (field in updates) {
+        sanitizedUpdates[field] = updates[field] as any;
+      }
+    });
+  };
+
+  // Helper function to handle tag updates
+  const handleTagUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    if ('ItemTag' in updates) {
+      sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
+    } else if ('Tags' in updates) {
+      const tags = updates.Tags as (string | ItemTag)[] | undefined;
+      if (Array.isArray(tags)) {
+        sanitizedUpdates.ItemTag = tags.map((tag) => ({
+          ItemId: typeof tag === 'string' ? tag : tag.ItemId,
+          TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
+        }));
+      }
+    }
+  };
+
+  // Helper function to handle assignee updates
+  const handleAssigneeUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    if ('Assignee' in updates) {
+      sanitizedUpdates.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
+    }
+  };
+
   const updateTaskDetails = useCallback(
     async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
       if (!taskId || !currentTask) return;
@@ -154,47 +199,20 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       try {
         const sanitizedUpdates: TaskItemUpdateInput = {};
 
-        if ('Title' in updates) sanitizedUpdates.Title = updates.Title as string;
-        if ('Description' in updates) sanitizedUpdates.Description = updates.Description as string;
-        if ('DueDate' in updates) sanitizedUpdates.DueDate = updates.DueDate as string;
-        if ('Priority' in updates) sanitizedUpdates.Priority = updates.Priority as TaskPriority;
-        if ('Section' in updates) sanitizedUpdates.Section = updates.Section as string;
-        if ('IsCompleted' in updates) sanitizedUpdates.IsCompleted = updates.IsCompleted as boolean;
-        if ('Language' in updates) sanitizedUpdates.Language = updates.Language as string;
-        if ('OrganizationIds' in updates)
-          sanitizedUpdates.OrganizationIds = updates.OrganizationIds as string[];
-        if ('IsDeleted' in updates) sanitizedUpdates.IsDeleted = updates.IsDeleted as boolean;
+        handleBasicFieldUpdates(updates, sanitizedUpdates);
+        handleTagUpdates(updates, sanitizedUpdates);
+        handleAssigneeUpdates(updates, sanitizedUpdates);
 
-        if ('ItemTag' in updates) {
-          sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
-        } else if ('Tags' in updates) {
-          const tags = updates.Tags as (string | ItemTag)[] | undefined;
-          if (Array.isArray(tags)) {
-            sanitizedUpdates.ItemTag = tags.map((tag) => ({
-              ItemId: typeof tag === 'string' ? tag : tag.ItemId,
-              TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
-            }));
-          }
-        }
-
-        // Handle Assignee - ensure it's always an array
-        if ('Assignee' in updates) {
-          sanitizedUpdates.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
-        }
-
-        // Optimistically update the UI with the original updates
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
-        // Call the API to update the task with the sanitized updates
-        await updateTask({
+        updateTask({
           itemId: taskId,
           input: sanitizedUpdates,
         });
 
         await refetchTasks();
 
-        // This ensures the parent component is aware of the changes
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('task-updated', { detail: updatedTask }));
         }
@@ -207,19 +225,13 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, updateTask, refetchTasks]
   );
 
-  // Toggle task completion status
   const toggleTaskCompletion = useCallback(
     async (isCompleted: boolean) => {
       if (!taskId) return;
 
       try {
-        // Optimistically update the UI
         setCurrentTask((prev) => (prev ? { ...prev, isCompleted } : null));
 
-        // TODO: Call your API to update the task status
-        // await updateTaskItem(taskId, { isCompleted });
-
-        // Refresh the tasks list
         await refetchTasks();
       } catch (error) {
         console.error('Failed to toggle task status:', error);
@@ -250,9 +262,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     }
   }, [taskId, refetchTasks, deleteTask, t, toast]);
 
-  // Comment functionality is handled directly in the view component
-
-  // Add a new attachment to a task
   const addNewAttachment = useCallback(
     async (attachment: any) => {
       if (!taskId || !currentTask) return;
@@ -322,7 +331,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks]
   );
 
-  // Delete an assignee from a task
   const deleteAssignee = useCallback(
     async (assigneeId: string) => {
       if (!taskId || !currentTask) return;
@@ -332,7 +340,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           (assignee) => assignee.ItemId !== assigneeId
         );
 
-        await updateTask({
+        updateTask({
           itemId: taskId,
           input: {
             Assignee: updatedAssignees,
@@ -348,7 +356,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     [taskId, currentTask, refetchTasks, updateTask]
   );
 
-  // Add a new tag to the current task
   const addNewTag = useCallback(
     async (tag: string) => {
       if (!taskId || !currentTask) return;
