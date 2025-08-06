@@ -35,21 +35,29 @@ export const statusColors: Record<InvoiceStatus, { text: string; border: string;
   },
 };
 
+export interface CustomerDetails {
+  CustomerName: string;
+  CustomerImgUrl: string;
+  BillingAddress: string;
+  Email: string;
+  Phone: string;
+}
+
 export interface InvoiceItem {
   ItemId: string;
-  CreatedBy: string;
-  CreatedDate: string;
-  IsDeleted: boolean;
-  Language: string;
-  LastUpdatedBy: string;
-  LastUpdatedDate: string;
-  OrganizationIds: string[];
-  Tags: string[];
-  DeletedDate: string;
+  CreatedBy?: string;
+  CreatedDate?: string;
+  IsDeleted?: boolean;
+  Language?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
+  OrganizationIds?: string[];
+  Tags?: string[];
+  DeletedDate?: string;
   DateIssued: string;
   DueDate: string;
   Amount: number;
-  Customer: string;
+  Customer: CustomerDetails[];
   Status: InvoiceStatus[];
 }
 
@@ -70,26 +78,13 @@ export interface GetInvoiceResponse {
   invoice: InvoiceItem;
 }
 
-export interface GetInvoiceStatsResponse {
-  invoiceStats: {
-    totalItems: number;
-    activeItems: number;
-    discontinuedItems: number;
-    lowStockItems: number;
-    totalValue: string;
-    customers: Array<{
-      name: string;
-      count: number;
-    }>;
-  };
-}
-
 export interface AddInvoiceInput {
-  Customer: string;
+  ItemId: string;
   DateIssued: string;
   DueDate: string;
   Amount: number;
-  Status: string;
+  Customer: CustomerDetails[];
+  Status: InvoiceStatus[];
 }
 
 export interface AddInvoiceParams {
@@ -106,20 +101,20 @@ export interface AddInvoiceResponse {
 
 export interface UpdateInvoiceInput {
   ItemId: string;
-  CreatedBy: string;
-  CreatedDate: string;
-  IsDeleted: boolean;
-  Language: string;
-  LastUpdatedBy: string;
-  LastUpdatedDate: string;
-  OrganizationIds: string[];
-  Tags: string[];
-  DeletedDate: string;
+  CreatedBy?: string;
+  CreatedDate?: string;
+  IsDeleted?: boolean;
+  Language?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
+  OrganizationIds?: string[];
+  Tags?: string[];
+  DeletedDate?: string;
   DateIssued: string;
   DueDate: string;
   Amount: number;
-  Customer: string;
-  Status: string;
+  Customer: CustomerDetails[];
+  Status: InvoiceStatus[];
 }
 
 export interface UpdateInvoiceParams {
