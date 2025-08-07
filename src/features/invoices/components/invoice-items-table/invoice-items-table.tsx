@@ -21,12 +21,12 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 import { Textarea } from 'components/ui/textarea';
-import { type OrderItem } from '../base-invoice-form/base-invoice-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
+import { InvoiceItemDetails } from '../../types/invoices.types';
 
 interface InvoiceItemsTableProps {
-  items: OrderItem[];
-  onUpdateItem: (id: string, updates: Partial<OrderItem>) => void;
+  items: InvoiceItemDetails[];
+  onUpdateItem: (id: string, updates: Partial<InvoiceItemDetails>) => void;
   onRemoveItem: (id: string) => void;
   onToggleNote: (id: string) => void;
   onAddItem: () => void;
@@ -68,19 +68,19 @@ export function InvoiceItemsTable({
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <Fragment key={item.id}>
+            <Fragment key={item.ItemId}>
               <TableRow className="hover:bg-transparent">
                 <TableCell>
                   <Input
                     placeholder={`${t('ENTER_ITEM_NAME')}...`}
-                    value={item.name}
-                    onChange={(e) => onUpdateItem(item.id, { name: e.target.value })}
+                    value={item.ItemName}
+                    onChange={(e) => onUpdateItem(item.ItemId, { ItemName: e.target.value })}
                   />
                 </TableCell>
                 <TableCell>
                   <Select
-                    value={item.category}
-                    onValueChange={(value) => onUpdateItem(item.id, { category: value })}
+                    value={item.Category}
+                    onValueChange={(value) => onUpdateItem(item.ItemId, { Category: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('SELECT_CATEGORY')} />
@@ -98,10 +98,10 @@ export function InvoiceItemsTable({
                   <Input
                     type="number"
                     className="w-20"
-                    value={item.quantity}
+                    value={item.Quantity}
                     onChange={(e) => {
                       const quantity = parseInt(e.target.value) || 0;
-                      onUpdateItem(item.id, { quantity });
+                      onUpdateItem(item.ItemId, { Quantity: quantity });
                     }}
                   />
                 </TableCell>
@@ -110,10 +110,10 @@ export function InvoiceItemsTable({
                     <span className="absolute left-3 top-[12px]">{currency}</span>
                     <Input
                       className="pl-12"
-                      value={item.price.toFixed(2)}
+                      value={item.UnitPrice.toFixed(2)}
                       onChange={(e) => {
                         const price = parseFloat(e.target.value) || 0;
-                        onUpdateItem(item.id, { price });
+                        onUpdateItem(item.ItemId, { UnitPrice: price });
                       }}
                     />
                   </div>
@@ -121,7 +121,7 @@ export function InvoiceItemsTable({
                 <TableCell>
                   <div className="relative w-32">
                     <span className="absolute left-3 top-[12px]">{currency}</span>
-                    <Input className="pl-12" value={item.total.toFixed(2)} readOnly />
+                    <Input className="pl-12" value={item.Amount.toFixed(2)} readOnly />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -133,17 +133,17 @@ export function InvoiceItemsTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {item.showNote ? (
-                        <DropdownMenuItem onClick={() => onToggleNote(item.id)}>
+                        <DropdownMenuItem onClick={() => onToggleNote(item.ItemId)}>
                           <Trash className="h-4 w-4 mr-2" />
                           <span>{t('REMOVE_NOTE')}</span>
                         </DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem onClick={() => onToggleNote(item.id)}>
+                        <DropdownMenuItem onClick={() => onToggleNote(item.ItemId)}>
                           <NotebookPen className="h-4 w-4 mr-2" />
                           <span>{t('ADD_NOTE')}</span>
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onClick={() => onRemoveItem(item.id)}>
+                      <DropdownMenuItem onClick={() => onRemoveItem(item.ItemId)}>
                         <Trash className="h-4 w-4 mr-2" />
                         <span>{t('REMOVE_ITEM')}</span>
                       </DropdownMenuItem>
@@ -161,8 +161,8 @@ export function InvoiceItemsTable({
                       <Textarea
                         placeholder={`${t('WRITE_HERE')}...`}
                         className="min-h-[100px]"
-                        value={item.note}
-                        onChange={(e) => onUpdateItem(item.id, { note: e.target.value })}
+                        value={item.Note}
+                        onChange={(e) => onUpdateItem(item.ItemId, { Note: e.target.value })}
                       />
                     </div>
                   </TableCell>

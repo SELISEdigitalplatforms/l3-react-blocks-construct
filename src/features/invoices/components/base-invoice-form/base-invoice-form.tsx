@@ -29,11 +29,12 @@ import {
   FormDateInput,
   FormCurrencySelect,
 } from '../invoice-form/invoice-form';
+import { InvoiceItemDetails } from '../../types/invoices.types';
 
 interface BaseInvoiceFormProps {
   defaultValues?: Partial<InvoiceFormValues>;
-  defaultItems?: OrderItem[];
-  onSubmit: (values: InvoiceFormValues, items: OrderItem[], action: 'draft' | 'send') => void;
+  defaultItems?: InvoiceItemDetails[];
+  onSubmit: (values: InvoiceFormValues, items: InvoiceItemDetails[], action: 'draft' | 'send') => void;
   title: string;
   showSuccessToast?: (action: 'draft' | 'send') => void;
 }
@@ -42,16 +43,15 @@ export function BaseInvoiceForm({
   defaultValues = {},
   defaultItems = [
     {
-      id: uuidv4(),
-      name: '',
-      description: '',
-      category: '',
-      quantity: 0,
-      unitPrice: 0,
-      amount: 0,
-      price: 0,
-      total: 0,
-      showNote: false,
+      ItemId: uuidv4(),
+      ItemName: '',
+      Category: '',
+      Quantity: 0,
+      UnitPrice: 0,
+      Amount: 0,
+      Note: '',
+      Taxes: 0,
+      Discount: 0,
     },
   ],
   onSubmit,
@@ -63,7 +63,7 @@ export function BaseInvoiceForm({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [action, setAction] = useState<'draft' | 'send'>('send');
   const [showPreview, setShowPreview] = useState(false);
-  const [items, setItems] = useState<OrderItem[]>(defaultItems);
+  const [items, setItems] = useState<InvoiceItemDetails[]>(defaultItems);
 
   const form = useForm<InvoiceFormValues>({
     resolver: async (data, context, options) => {
@@ -103,40 +103,38 @@ export function BaseInvoiceForm({
     showSuccessToast?.(action);
   };
 
-  const handleUpdateItem = (id: string, updates: Partial<OrderItem>) => {
+  const handleUpdateItem = (id: string, updates: Partial<InvoiceItemDetails>) => {
     setItems(
       items.map((item) => {
-        if (item.id === id) {
+        if (item.ItemId === id) {
           // Get the current values with defaults
-          const currentPrice = item.price || 0;
-          const currentQuantity = item.quantity || 0;
+          const currentPrice = item.UnitPrice || 0;
+          const currentQuantity = item.Quantity || 0;
           
           // Create a new item with the updates
           const updatedItem = { ...item, ...updates };
           
           // If quantity or price is being updated, recalculate totals
-          if ('quantity' in updates || 'price' in updates || 'unitPrice' in updates) {
+          if ('Quantity' in updates || 'UnitPrice' in updates || 'Amount' in updates) {
             // Use price if available, otherwise use unitPrice, otherwise fallback to current price
-            const price = 'price' in updates && updates.price !== undefined 
-              ? updates.price 
-              : 'unitPrice' in updates && updates.unitPrice !== undefined 
-                ? updates.unitPrice 
+            const price = 'UnitPrice' in updates && updates.UnitPrice !== undefined 
+              ? updates.UnitPrice 
+              : 'Amount' in updates && updates.Amount !== undefined 
+                ? updates.Amount 
                 : currentPrice;
             
             // Use the updated quantity if available, otherwise use the existing one
-            const quantity = 'quantity' in updates && updates.quantity !== undefined 
-              ? updates.quantity 
+            const quantity = 'Quantity' in updates && updates.Quantity !== undefined 
+              ? updates.Quantity 
               : currentQuantity;
             
             // Calculate the total
             const total = price * quantity;
             
             // Update all related fields with type-safe values
-            updatedItem.price = price;
-            updatedItem.unitPrice = price;
-            updatedItem.amount = total;
-            updatedItem.total = total;
-            updatedItem.quantity = quantity;
+            updatedItem.UnitPrice = price;
+            updatedItem.Amount = total;
+            updatedItem.Quantity = quantity;
           }
           
           return updatedItem;
@@ -147,12 +145,12 @@ export function BaseInvoiceForm({
   };
 
   const handleRemoveItem = (itemId: string) => {
-    setItems(items.filter((item) => item.id !== itemId));
+    setItems(items.filter((item) => item.ItemId !== itemId));
   };
 
   const handleToggleNote = (itemId: string) => {
     setItems(
-      items.map((item) => (item.id === itemId ? { ...item, showNote: !item.showNote } : item))
+      items.map((item) => (item.ItemId === itemId ? { ...item, showNote: !item.showNote } : item))
     );
   };
 
@@ -160,16 +158,15 @@ export function BaseInvoiceForm({
     setItems([
       ...items,
       {
-        id: uuidv4(),
-        name: '',
-        description: '',
-        category: '',
-        quantity: 0,
-        unitPrice: 0,
-        amount: 0,
-        price: 0,
-        total: 0,
-        showNote: false,
+        ItemId: uuidv4(),
+        ItemName: '',
+        Category: '',
+        Quantity: 0,
+        UnitPrice: 0,
+        Amount: 0,
+        Note: '',
+        Taxes: 0,
+        Discount: 0,
       },
     ]);
   };
@@ -235,12 +232,12 @@ export function BaseInvoiceForm({
                 onToggleNote={handleToggleNote}
                 onAddItem={handleAddItem}
                 control={form.control}
-                subtotal={items.reduce((acc, item) => acc + item.total, 0)}
+                subtotal={items.reduce((acc, item) => acc + item.Amount, 0)}
                 taxRate={7.5}
                 discount={50}
                 totalAmount={
-                  items.reduce((acc, item) => acc + item.total, 0) +
-                  items.reduce((acc, item) => acc + item.total, 0) * (7.5 / 100) -
+                  items.reduce((acc, item) => acc + item.Amount, 0) +
+                  items.reduce((acc, item) => acc + item.Amount, 0) * (7.5 / 100) -
                   50
                 }
                 currency={form.watch('currency')?.toUpperCase() || 'CHF'}

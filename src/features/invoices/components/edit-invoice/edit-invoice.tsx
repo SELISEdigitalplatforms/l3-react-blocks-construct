@@ -1,18 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { useToast } from 'hooks/use-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useInvoice } from '../../store/invoice-store';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-helpers';
-import { BaseInvoiceForm, type OrderItem } from '../base-invoice-form/base-invoice-form';
+import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
+import { InvoiceItemDetails } from '../../types/invoices.types';
 
 export function EditInvoice() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { invoiceId } = useParams();
   const { invoices, updateInvoice } = useInvoice();
-  const invoice = invoices.find((inv) => inv.id === invoiceId);
+  const invoice = invoices.find((inv) => inv.ItemId === invoiceId);
   const { toast } = useToast();
 
   if (!invoice) {
@@ -20,36 +21,36 @@ export function EditInvoice() {
   }
 
   const defaultValues = {
-    customerName: invoice.customerName ?? '',
-    email: invoice.billingInfo?.email ?? '',
-    phoneNumber: formatPhoneToE164(invoice.billingInfo?.phone ?? ''),
-    billingAddress: invoice.billingInfo?.address ?? '',
+    customerName: invoice.Customer[0].CustomerName ?? '',
+    email: invoice.Customer[0].Email ?? '',
+    phoneNumber: formatPhoneToE164(invoice.Customer[0].PhoneNo ?? ''),
+    billingAddress: invoice.Customer[0].BillingAddress ?? '',
     currency: invoice.currency?.toLowerCase() ?? '',
-    dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
-    generalNote: invoice.orderDetails?.note ?? '',
+    dueDate: invoice.DueDate ? new Date(invoice.DueDate) : undefined,
+    generalNote: invoice.GeneralNote ?? '',
   };
 
   const defaultItems =
-    invoice.orderDetails?.items?.map(
+    invoice.ItemDetails?.map(
       (item) =>
         ({
-          id: crypto.randomUUID(),
-          name: item.name,
-          description: item.description,
-          category: normalizeCategoryValue(item.category) || 'General',
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          amount: item.amount,
-          price: item.unitPrice,
-          total: item.amount,
-          showNote: Boolean(item.description),
-          note: item.description,
-        }) as OrderItem
+          ItemId: item.ItemId,
+          ItemName: item.ItemName,
+          Category: normalizeCategoryValue(item.Category) ?? '',
+          Quantity: item.Quantity,
+          UnitPrice: item.UnitPrice,
+          Amount: item.Amount,
+          Note: item.Note,
+          Taxes: item.Taxes,
+          Discount: item.Discount,
+          showNote: Boolean(item.Note),
+          note: item.Note,
+        }) as InvoiceItemDetails
     ) || [];
 
   const handleSubmit = (
     values: InvoiceFormValues,
-    items: OrderItem[],
+    items: InvoiceItemDetails[],
     action: 'draft' | 'send'
   ) => {
     if (!invoiceId) return;

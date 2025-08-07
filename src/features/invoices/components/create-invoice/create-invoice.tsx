@@ -3,7 +3,7 @@ import { useInvoice } from '../../store/invoice-store';
 import { generateInvoiceId } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { useTranslation } from 'react-i18next';
-import { BaseInvoiceForm, type OrderItem } from '../base-invoice-form/base-invoice-form';
+import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
 import { useAddInvoiceItem } from '../../hooks/use-invoices';
 import { useToast } from 'hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,8 +12,9 @@ import {
   InvoiceItemDetails,
   AddInvoiceItemParams,
   InvoiceStatus as APIInvoiceStatus,
+  InvoiceItem,
+  InvoiceStatus,
 } from '../../types/invoices.types';
-import { Invoice, InvoiceStatus } from '../../data/invoice-data';
 
 export function CreateInvoice() {
   const { t } = useTranslation();
@@ -25,7 +26,7 @@ export function CreateInvoice() {
 
   const handleSubmit = async (
     values: InvoiceFormValues,
-    items: OrderItem[],
+    items: InvoiceItemDetails[],
     action: 'draft' | 'send'
   ) => {
     try {
@@ -41,26 +42,26 @@ export function CreateInvoice() {
       // Create item details for the API with proper numeric types
       const itemDetails: InvoiceItemDetails[] = items.map((item) => {
         // Ensure all numeric values are numbers
-        const quantity = Number(item.quantity) || 0;
-        const unitPrice = Number(item.unitPrice || item.price) || 0;
-        const amount = Number(item.amount || item.total) || 0;
+        const quantity = Number(item.Quantity) || 0;
+        const unitPrice = Number(item.UnitPrice) || 0;
+        const amount = Number(item.Amount) || 0;
 
         return {
-          ItemId: item.id || uuidv4(),
-          ItemName: item.name,
-          Note: item.description || item.note || '', // Changed from Description to Note
-          Category: '0',
-          Quantity: quantity,
-          UnitPrice: unitPrice,
-          Amount: amount,
-          Taxes: 0,
-          Discount: 0,
+          ItemId: item.ItemId || uuidv4(),
+          ItemName: item.ItemName || '',
+          Note: item.Note || '',
+          Category: item.Category || '0',
+          Quantity: item.Quantity || quantity,
+          UnitPrice: item.UnitPrice || unitPrice,
+          Amount: item.Amount || amount,
+          Taxes: item.Taxes || 0,
+          Discount: item.Discount || 0,
         };
       });
 
       // Calculate the total amount as a number
       const totalAmount = Number(
-        items.reduce((sum, item) => sum + (Number(item.amount || item.total) || 0), 0).toFixed(2)
+        items.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0).toFixed(2)
       );
 
       // Create the API payload with proper typing
@@ -81,34 +82,28 @@ export function CreateInvoice() {
       addInvoiceItem(apiPayload, {
         onSuccess: () => {
           // Create a local invoice object for the UI
-          const localInvoice: Invoice = {
-            id: invoiceId,
-            customerName: values.customerName,
-            customerImg: '',
-            dateIssued: new Date().toISOString(),
-            amount: totalAmount,
-            dueDate: values.dueDate?.toISOString() || new Date().toISOString(),
-            status: action === 'send' ? InvoiceStatus.Pending : InvoiceStatus.Draft,
+          const localInvoice: InvoiceItem = {
+            ItemId: invoiceId,
+            Customer: [
+              {
+                CustomerName: values.customerName,
+                CustomerImgUrl: '',
+                BillingAddress: values.billingAddress || '',
+                Email: values.email || '',
+                PhoneNo: values.phoneNumber || '',
+              },
+            ],
+            DateIssued: new Date().toISOString(),
+            Amount: totalAmount,
+            DueDate: values.dueDate?.toISOString() || new Date().toISOString(),
+            Status: [action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT],
             currency: values.currency || 'CHF',
-            billingInfo: {
-              address: values.billingAddress || '',
-              email: values.email || '',
-              phone: values.phoneNumber || '',
-            },
-            orderDetails: {
-              items: items.map((item) => ({
-                name: item.name,
-                description: item.description || item.note,
-                category: item.category,
-                quantity: item.quantity,
-                unitPrice: item.unitPrice || item.price,
-                amount: item.amount || item.total,
-              })),
-              subtotal: totalAmount,
-              taxes: 0,
-              taxRate: 0,
-              totalAmount: totalAmount,
-            },
+            GeneralNote: values.generalNote || '',
+            ItemDetails: itemDetails,
+            Subtotal: totalAmount,
+            Taxes: 0,
+            TaxRate: 0,
+            TotalAmount: totalAmount,
           };
 
           // Add to local state for immediate UI update

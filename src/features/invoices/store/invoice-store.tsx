@@ -1,28 +1,30 @@
 import * as React from 'react';
-import { Invoice, invoiceData } from '../data/invoice-data';
+import { InvoiceItem } from '../types/invoices.types';
 
 interface InvoiceContextType {
-  invoices: Invoice[];
-  addInvoice: (invoice: Invoice) => void;
-  updateInvoice: (id: string, updatedInvoice: Invoice) => void;
-  getInvoice: (id: string) => Invoice | undefined;
+  invoices: InvoiceItem[];
+  addInvoice: (invoice: InvoiceItem) => void;
+  updateInvoice: (id: string, updatedInvoice: InvoiceItem) => void;
+  getInvoice: (id: string) => InvoiceItem | undefined;
 }
 
 const InvoiceContext = React.createContext<InvoiceContextType | undefined>(undefined);
 
 export function InvoiceProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [invoices, setInvoices] = React.useState<Invoice[]>(invoiceData);
+  const [invoices, setInvoices] = React.useState<InvoiceItem[]>([]);
 
-  const addInvoice = (invoice: Invoice) => {
+  const addInvoice = (invoice: InvoiceItem) => {
     setInvoices((prev) => [...prev, invoice]);
   };
 
-  const updateInvoice = (id: string, updatedInvoice: Invoice) => {
-    setInvoices((prev) => prev.map((invoice) => (invoice.id === id ? updatedInvoice : invoice)));
+  const updateInvoice = (id: string, updatedInvoice: InvoiceItem) => {
+    setInvoices((prev) =>
+      prev.map((invoice) => (invoice.ItemId === id ? updatedInvoice : invoice))
+    );
   };
 
   const getInvoice = (id: string) => {
-    return invoices.find((invoice) => invoice.id === id);
+    return invoices.find((invoice) => invoice.ItemId === id);
   };
 
   const value = React.useMemo(

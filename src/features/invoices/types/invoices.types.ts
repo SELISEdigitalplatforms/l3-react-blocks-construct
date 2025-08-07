@@ -56,11 +56,12 @@ export interface CustomerDetails {
 export interface InvoiceItemDetails {
   ItemId: string;
   ItemName: string;
-  Category: string; // Changed from number to string
+  Category: string;
   Quantity: number;
   UnitPrice: number;
   Amount: number;
   Note?: string;
+  showNote?: boolean;
   Taxes?: number;
   Discount?: number;
 }
@@ -83,6 +84,11 @@ export interface InvoiceItem {
   Status: InvoiceStatus[];
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
+  Subtotal?: number;
+  Taxes?: number;
+  TaxRate?: number;
+  TotalAmount?: number;
+  currency?: string;
 }
 
 export interface GetInvoiceItemsResponse {
@@ -108,7 +114,7 @@ export interface AddInvoiceItemInput {
   DueDate: string;
   Amount: number;
   Customer: CustomerDetails[];
-  Status: string; // Changed from InvoiceStatus[] to string
+  Status: string;
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
 }
