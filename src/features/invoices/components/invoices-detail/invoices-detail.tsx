@@ -91,7 +91,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
-              <h1 className="text-2xl font-semibold">{invoice.ItemId}</h1>
+              <h1 className="text-2xl font-semibold uppercase">{invoice.ItemId}</h1>
             </div>
             <div className="flex flex-col md:flex-row md:items-center gap-2">
               <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
             <div className="flex flex-col gap-2 w-[50%]">
               <h1 className="text-medium-emphasis">{t('INVOICE_DETAILS')}</h1>
               <div className="flex items-center gap-2">
-                <p className="font-bold text-high-emphasis">{invoice.ItemId}</p>
+                <p className="font-bold text-high-emphasis uppercase">{invoice.ItemId}</p>
                 <Badge
                   className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status).text} ${getStatusColors(invoice.Status).border} ${getStatusColors(invoice.Status).bg} hover:${getStatusColors(invoice.Status).bg}`}
                 >
@@ -232,8 +232,8 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
             </Table>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row w-full items-end sm:justify-between">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col-reverse sm:flex-row w-full items-start sm:justify-between">
+            <div className="flex flex-col gap-2 w-[50%]">
               {invoice.GeneralNote && (
                 <>
                   <div className="flex items-cnter gap-1">

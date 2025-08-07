@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from 'hooks/use-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -7,7 +8,7 @@ import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-h
 import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
 import { CustomerDetails, InvoiceItemDetails, InvoiceStatus } from '../../types/invoices.types';
 import { useGetInvoiceItems, useUpdateInvoiceItem } from '../../hooks/use-invoices';
-import { useEffect, useMemo } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export function EditInvoice() {
   const { t } = useTranslation();
@@ -16,17 +17,15 @@ export function EditInvoice() {
   const { toast } = useToast();
   const { mutate: updateInvoiceItem } = useUpdateInvoiceItem();
 
-  // Fetch all invoices to find the one we want to edit
   const {
     data: invoicesData,
     isLoading,
     error,
   } = useGetInvoiceItems({
     pageNo: 1,
-    pageSize: 1000, // Use a large enough page size to ensure we get all invoices
+    pageSize: 100,
   });
 
-  // Find the specific invoice by ID
   const invoice = useMemo(() => {
     if (!invoicesData?.items || !invoiceId) return undefined;
     return invoicesData.items.find((item) => item.ItemId === invoiceId);
@@ -43,11 +42,19 @@ export function EditInvoice() {
   }, [error, t, toast]);
 
   if (isLoading) {
-    return <div className="p-8">{t('LOADING')}...</div>;
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   if (!invoice) {
-    return <div className="p-8">{t('INVOICE_NOT_FOUND')}</div>;
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-medium-emphasis">{t('INVOICE_NOT_FOUND')}</p>
+      </div>
+    );
   }
 
   const defaultValues = {
@@ -87,7 +94,6 @@ export function EditInvoice() {
 
     const updatedInvoice = createInvoiceFromForm(invoiceId, values, items, action);
 
-    // Prepare the customer details
     const customer: CustomerDetails = {
       CustomerName: values.customerName,
       CustomerImgUrl: invoice.Customer[0]?.CustomerImgUrl || '',
@@ -96,10 +102,8 @@ export function EditInvoice() {
       PhoneNo: values.phoneNumber || '',
     };
 
-    // Update the invoice using the mutation
     updateInvoiceItem({
       filter: `{"_id": "${invoiceId}"}`,
-      // filter: invoiceId,
       input: {
         ItemId: invoiceId,
         DateIssued: new Date().toISOString(),
@@ -124,7 +128,6 @@ export function EditInvoice() {
       },
     });
 
-    // Navigate to the invoice detail page
     navigate(`/invoices/${invoiceId}`);
   };
 

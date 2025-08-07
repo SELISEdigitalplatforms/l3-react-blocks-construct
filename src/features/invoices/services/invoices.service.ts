@@ -49,10 +49,6 @@ type GetInvoiceItemsContext = {
 export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
   try {
     const [, { pageNo, pageSize }] = context.queryKey;
-    
-    // eslint-disable-next-line no-console
-    console.debug('Fetching invoice items with params:', { pageNo, pageSize });
-    
     const response = await graphqlClient.query<{ InvoiceItems: InvoiceItemsData }>({
       query: GET_INVOICE_ITEMS_QUERY,
       variables: {
@@ -67,13 +63,12 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
 
     if (!response || typeof response !== 'object' || !response.InvoiceItems) {
       const errorMessage = 'Invalid response structure: Missing InvoiceItems';
-      // eslint-disable-next-line no-console
       console.error('Invalid response structure:', { response });
       throw new Error(`Failed to fetch invoice items: ${errorMessage}`);
     }
 
     const invoiceItems = response.InvoiceItems;
-    
+
     if (!invoiceItems || typeof invoiceItems !== 'object') {
       console.error('Invalid invoice items data:', { invoiceItems });
       throw new Error('Invalid invoice items data received from server');
@@ -86,20 +81,20 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
       totalPages: Number(invoiceItems?.totalPages) ?? 0,
       pageSize: Number(invoiceItems?.pageSize) ?? pageSize,
       pageNo: Number(invoiceItems?.pageNo) ?? pageNo,
-      items: Array.isArray(invoiceItems?.items) ? invoiceItems.items : []
+      items: Array.isArray(invoiceItems?.items) ? invoiceItems.items : [],
     };
-    
+
     return result;
   } catch (error) {
-    const errorDetails = error instanceof Error 
-      ? { message: error.message, stack: error.stack }
-      : { message: 'Unknown error' };
-    
-    // eslint-disable-next-line no-console
+    const errorDetails =
+      error instanceof Error
+        ? { message: error.message, stack: error.stack }
+        : { message: 'Unknown error' };
+
     console.error('Error in getInvoiceItems:', errorDetails);
-    
+
     throw new Error(
-      error instanceof Error 
+      error instanceof Error
         ? `Failed to fetch invoice items: ${error.message}`
         : 'An unknown error occurred while fetching invoice items'
     );
@@ -116,7 +111,9 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
  *   input: { itemName: 'New Invoice', category: 'Electronics', ... }
  * });
  */
-export const addInvoiceItem = async (params: AddInvoiceItemParams): Promise<AddInvoiceItemResponse> => {
+export const addInvoiceItem = async (
+  params: AddInvoiceItemParams
+): Promise<AddInvoiceItemResponse> => {
   const response = await graphqlClient.mutate<AddInvoiceItemResponse>({
     query: INSERT_INVOICE_ITEM_MUTATION,
     variables: params,

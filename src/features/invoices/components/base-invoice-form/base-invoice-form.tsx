@@ -101,16 +101,12 @@ export function BaseInvoiceForm({
     setItems(
       items.map((item) => {
         if (item.ItemId === id) {
-          // Get the current values with defaults
-          const currentPrice = item.UnitPrice || 0;
-          const currentQuantity = item.Quantity || 0;
+          const currentPrice = item.UnitPrice ?? 0;
+          const currentQuantity = item.Quantity ?? 0;
 
-          // Create a new item with the updates
           const updatedItem = { ...item, ...updates };
 
-          // If quantity or price is being updated, recalculate totals
           if ('Quantity' in updates || 'UnitPrice' in updates || 'Amount' in updates) {
-            // Use price if available, otherwise use unitPrice, otherwise fallback to current price
             const price =
               'UnitPrice' in updates && updates.UnitPrice !== undefined
                 ? updates.UnitPrice
@@ -118,16 +114,13 @@ export function BaseInvoiceForm({
                   ? updates.Amount
                   : currentPrice;
 
-            // Use the updated quantity if available, otherwise use the existing one
             const quantity =
               'Quantity' in updates && updates.Quantity !== undefined
                 ? updates.Quantity
                 : currentQuantity;
 
-            // Calculate the total
             const total = price * quantity;
 
-            // Update all related fields with type-safe values
             updatedItem.UnitPrice = price;
             updatedItem.Amount = total;
             updatedItem.Quantity = quantity;

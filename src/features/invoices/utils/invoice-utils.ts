@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { InvoiceItem, InvoiceItemDetails, InvoiceStatus } from '../types/invoices.types';
 
 export const generateInvoiceId = (): string => {
-  return `INV-${uuidv4().substring(0, 9).replace(/-/g, '')}`;
+  return `inv-${uuidv4().substring(0, 9).replace(/-/g, '')}`;
 };
 
 interface InvoiceTotals {

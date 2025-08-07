@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Loader2 } from 'lucide-react';
 import { InvoicesDetail } from 'features/invoices';
 import { useGetInvoiceItems } from 'features/invoices/hooks/use-invoices';
 import { useToast } from 'hooks/use-toast';
@@ -35,11 +36,19 @@ export function InvoiceDetailsPage() {
   }, [error, t, toast]);
 
   if (isLoading) {
-    return <div className="p-8">{t('LOADING')}...</div>;
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   if (!invoice) {
-    return <div className="p-8">{t('INVOICE_DETAIL_NOT_FOUND')}</div>;
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-medium-emphasis">{t('INVOICE_DETAIL_NOT_FOUND')}</p>
+      </div>
+    );
   }
 
   return <InvoicesDetail invoice={invoice} />;
