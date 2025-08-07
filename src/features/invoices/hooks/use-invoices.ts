@@ -9,7 +9,23 @@ import {
   updateInvoiceItem,
   deleteInvoiceItem,
 } from '../services/invoices.service';
-import { AddInvoiceItemParams, UpdateInvoiceItemParams } from '../types/invoices.types';
+import {
+  AddInvoiceItemParams,
+  InvoiceItem,
+  UpdateInvoiceItemParams,
+} from '../types/invoices.types';
+
+export interface InvoiceItemsResponse {
+  InvoiceItems: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    totalCount: number;
+    totalPages: number;
+    pageSize: number;
+    pageNo: number;
+    items: InvoiceItem[];
+  };
+}
 
 /**
  * GraphQL Inventory Hooks
@@ -36,15 +52,66 @@ interface InvoiceItemQueryParams {
  *   filter: { }
  * });
  */
+// Define the type for the invoice items response
+type InvoiceItemsData = {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  totalCount: number;
+  totalPages: number;
+  pageSize: number;
+  pageNo: number;
+  items: InvoiceItem[];
+};
+
+// Helper function to fetch invoice items
+const fetchInvoiceItems = async ({
+  queryKey,
+}: {
+  queryKey: readonly [string, InvoiceItemQueryParams];
+}): Promise<InvoiceItemsData> => {
+  const [, params] = queryKey;
+  return getInvoiceItems({
+    queryKey: ['invoice-items', { pageNo: params.pageNo, pageSize: params.pageSize }],
+  });
+};
+
 export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
-  return useGlobalQuery({
+  const { toast } = useToast();
+
+  return useGlobalQuery<
+    InvoiceItemsData,
+    Error,
+    InvoiceItemsData,
+    ['invoice-items', InvoiceItemQueryParams]
+  >({
     queryKey: ['invoice-items', params],
-    queryFn: getInvoiceItems,
+    queryFn: async ({ queryKey }) => {
+      try {
+        return await fetchInvoiceItems({ queryKey });
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to fetch invoice items';
+        console.error('Error in useGetInvoiceItems queryFn:', error);
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        throw error;
+      }
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
-    onError: (error) => {
-      throw error;
+    retry: 2,
+    retryDelay: (attempt) => Math.min(attempt * 1000, 3000),
+    onError: (error: Error) => {
+      console.error('Error in useGetInvoiceItems:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load invoice items. Please try again later.',
+        variant: 'destructive',
+      });
     },
   });
 };

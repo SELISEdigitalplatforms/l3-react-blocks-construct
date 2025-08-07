@@ -5,6 +5,13 @@
  * related to invoices, following the same patterns as REST API types.
  */
 
+// Type for status colors
+type StatusColors = {
+  text: string;
+  border: string;
+  bg: string;
+};
+
 export enum InvoiceStatus {
   DRAFT = 'Draft',
   PAID = 'Paid',
@@ -12,41 +19,44 @@ export enum InvoiceStatus {
   OVERDUE = 'Overdue',
 }
 
-export const statusColors: Record<InvoiceStatus, { text: string; border: string; bg: string }> = {
-  [InvoiceStatus.PAID]: {
-    text: 'text-success',
-    border: 'border-success',
-    bg: 'bg-success-background',
-  },
-  [InvoiceStatus.PENDING]: {
-    text: 'text-warning',
-    border: 'border-warning',
-    bg: 'bg-warning-background',
-  },
-  [InvoiceStatus.OVERDUE]: {
-    text: 'text-error',
-    border: 'border-error',
-    bg: 'bg-error-background',
-  },
-  [InvoiceStatus.DRAFT]: {
-    text: 'text-neutral',
-    border: 'border-neutral',
-    bg: 'bg-surface',
-  },
-};
+// Helper function to get status colors that works with both enum and string values
+export function getStatusColors(status: string): StatusColors {
+  // Define the status to variant mapping
+  const statusMap = new Map<string, 'success' | 'warning' | 'error' | 'neutral'>([
+    [InvoiceStatus.PAID, 'success'],
+    [InvoiceStatus.PENDING, 'warning'],
+    [InvoiceStatus.OVERDUE, 'error'],
+    [InvoiceStatus.DRAFT, 'neutral'],
+  ]);
+
+  // Helper function to normalize status string
+  const normalizeStatus = (s: string) => s.toLowerCase();
+
+  // Find the variant (case-insensitive)
+  const normalizedStatus = normalizeStatus(status);
+  const variant = Array.from(statusMap.entries())
+    .find(([key]) => normalizeStatus(key) === normalizedStatus)?.[1] || 'muted';
+
+  // Return the complete status styles
+  return {
+    text: `text-${variant}`,
+    border: `border-${variant}`,
+    bg: variant === 'muted' ? 'bg-muted/50' : `bg-${variant}-background`,
+  };
+}
 
 export interface CustomerDetails {
   CustomerName: string;
   CustomerImgUrl: string;
   BillingAddress: string;
   Email: string;
-  Phone: string;
+  PhoneNo: string;
 }
 
-export interface InvoiceItemDetail {
+export interface InvoiceItemDetails {
   ItemId: string;
   ItemName: string;
-  Category: number;
+  Category: string; // Changed from number to string
   Quantity: number;
   UnitPrice: number;
   Amount: number;
@@ -72,7 +82,7 @@ export interface InvoiceItem {
   Customer: CustomerDetails[];
   Status: InvoiceStatus[];
   GeneralNote?: string;
-  ItemDetail?: InvoiceItemDetail[];
+  ItemDetails?: InvoiceItemDetails[];
 }
 
 export interface GetInvoiceItemsResponse {
@@ -98,9 +108,9 @@ export interface AddInvoiceItemInput {
   DueDate: string;
   Amount: number;
   Customer: CustomerDetails[];
-  Status: InvoiceStatus[];
+  Status: string; // Changed from InvoiceStatus[] to string
   GeneralNote?: string;
-  ItemDetail?: InvoiceItemDetail[];
+  ItemDetails?: InvoiceItemDetails[];
 }
 
 export interface AddInvoiceItemParams {
@@ -132,7 +142,7 @@ export interface UpdateInvoiceItemInput {
   Customer: CustomerDetails[];
   Status: InvoiceStatus[];
   GeneralNote?: string;
-  ItemDetail?: InvoiceItemDetail[];
+  ItemDetails?: InvoiceItemDetails[];
 }
 
 export interface UpdateInvoiceItemParams {
@@ -153,5 +163,17 @@ export interface DeleteInvoiceItemResponse {
     itemId: string;
     totalImpactedData: number;
     acknowledged: boolean;
+  };
+}
+
+export interface InvoiceItemsResponse {
+  invoiceItems: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    totalCount: number;
+    totalPages: number;
+    pageSize: number;
+    pageNo: number;
+    items: InvoiceItem[];
   };
 }

@@ -8,45 +8,102 @@ import {
 import {
   AddInvoiceItemParams,
   AddInvoiceItemResponse,
-  DeleteInvoiceItemResponse,
   UpdateInvoiceItemParams,
   UpdateInvoiceItemResponse,
+  DeleteInvoiceItemResponse,
 } from '../types/invoices.types';
 
+interface InvoiceItemsData {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  totalCount: number;
+  totalPages: number;
+  pageSize: number;
+  pageNo: number;
+  items: any[];
+}
+
 /**
- * GraphQL Inventory Service
+ * GraphQL Invoice Service
  *
- * This service provides GraphQL-based operations for inventory management.
+ * This service provides GraphQL-based operations for invoice management.
  * It follows the same patterns as the existing REST services but uses GraphQL.
  */
 
 /**
- * Fetches paginated inventory items with filtering and sorting
+ * Fetches paginated invoice items with filtering and sorting
  * @param context - React Query context with queryKey array
  * @param context.queryKey.1 - Filtering and pagination params
- * @returns Promise with inventory data
+ * @returns Promise with invoice data
  * @example
  * // Basic usage
  * useQuery({
- *   queryKey: ['inventory', { pageNo: 1, pageSize: 100 }],
+ *   queryKey: ['invoice-items', { pageNo: 1, pageSize: 100 }],
  *   queryFn: getInvoiceItems
  * });
  */
-export const getInvoiceItems = async (context: {
-  queryKey: [string, { pageNo: number; pageSize: number }];
-}) => {
-  const [, { pageNo, pageSize }] = context.queryKey;
-  return graphqlClient.query({
-    query: GET_INVOICE_ITEMS_QUERY,
-    variables: {
-      input: {
-        filter: '{}',
-        sort: '{}',
-        pageNo,
-        pageSize,
+type GetInvoiceItemsContext = {
+  queryKey: readonly [string, { pageNo: number; pageSize: number }];
+};
+
+export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
+  try {
+    const [, { pageNo, pageSize }] = context.queryKey;
+    
+    // eslint-disable-next-line no-console
+    console.debug('Fetching invoice items with params:', { pageNo, pageSize });
+    
+    const response = await graphqlClient.query<{ InvoiceItems: InvoiceItemsData }>({
+      query: GET_INVOICE_ITEMS_QUERY,
+      variables: {
+        input: {
+          filter: '{}',
+          sort: '{}',
+          pageNo,
+          pageSize,
+        },
       },
-    },
-  });
+    });
+
+    if (!response || typeof response !== 'object' || !response.InvoiceItems) {
+      const errorMessage = 'Invalid response structure: Missing InvoiceItems';
+      // eslint-disable-next-line no-console
+      console.error('Invalid response structure:', { response });
+      throw new Error(`Failed to fetch invoice items: ${errorMessage}`);
+    }
+
+    const invoiceItems = response.InvoiceItems;
+    
+    if (!invoiceItems || typeof invoiceItems !== 'object') {
+      console.error('Invalid invoice items data:', { invoiceItems });
+      throw new Error('Invalid invoice items data received from server');
+    }
+
+    const result = {
+      hasNextPage: Boolean(invoiceItems?.hasNextPage) ?? false,
+      hasPreviousPage: Boolean(invoiceItems?.hasPreviousPage) ?? false,
+      totalCount: Number(invoiceItems?.totalCount) ?? 0,
+      totalPages: Number(invoiceItems?.totalPages) ?? 0,
+      pageSize: Number(invoiceItems?.pageSize) ?? pageSize,
+      pageNo: Number(invoiceItems?.pageNo) ?? pageNo,
+      items: Array.isArray(invoiceItems?.items) ? invoiceItems.items : []
+    };
+    
+    return result;
+  } catch (error) {
+    const errorDetails = error instanceof Error 
+      ? { message: error.message, stack: error.stack }
+      : { message: 'Unknown error' };
+    
+    // eslint-disable-next-line no-console
+    console.error('Error in getInvoiceItems:', errorDetails);
+    
+    throw new Error(
+      error instanceof Error 
+        ? `Failed to fetch invoice items: ${error.message}`
+        : 'An unknown error occurred while fetching invoice items'
+    );
+  }
 };
 
 /**

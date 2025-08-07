@@ -1,9 +1,18 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ColumnDef } from '@tanstack/react-table';
 import { createInvoiceTableColumns } from './invoices-table.column';
-import { Invoice, InvoiceStatus } from '../../data/invoice-data';
+import { InvoiceItem, InvoiceStatus } from '../../types/invoices.types';
+import { type ColumnDef } from '@tanstack/react-table';
+
+type RowData = {
+  original: InvoiceItem;
+};
+
+type ColumnDefWithFilter = ColumnDef<InvoiceItem> & {
+  filterFn?: (row: RowData, columnId: string, filterValue: any) => boolean;
+  sortingFn?: (rowA: RowData, rowB: RowData, columnId: string) => number;
+};
 
 // Mock the DataTableColumnHeader component
 jest.mock('components/blocks/data-table/data-table-column-header', () => ({
@@ -18,250 +27,244 @@ describe('Invoice Table Columns', () => {
   const mockT = (key: string) => key;
 
   // Sample invoice data for testing
-  const mockInvoice: Invoice = {
-    id: 'INV-001',
-    customerName: 'Test Customer',
-    customerImg: 'https://example.com/avatar.jpg',
-    dateIssued: '2025-06-01T00:00:00.000Z', // ISO format as per memory
-    dueDate: '2025-06-15T00:00:00.000Z',
-    amount: 1000,
-    status: InvoiceStatus.Paid,
-    currency: 'CHF',
-    billingInfo: { address: 'Test Address', email: 'test@example.com', phone: '+41123456789' },
-    orderDetails: { items: [], subtotal: 1000, taxes: 0, taxRate: 0, totalAmount: 1000 },
+  const mockInvoice: InvoiceItem = {
+    ItemId: 'INV-001',
+    DateIssued: '2025-06-01T00:00:00.000Z',
+    DueDate: '2025-06-15T00:00:00.000Z',
+    Amount: 1000,
+    Status: [InvoiceStatus.PAID],
+    Customer: [
+      {
+        CustomerName: 'Test Customer',
+        CustomerImgUrl: 'https://example.com/avatar.jpg',
+        BillingAddress: 'Test Address',
+        Email: 'test@example.com',
+        PhoneNo: '+41123456789',
+      },
+    ],
+    ItemDetails: [],
   };
 
-  // Get the column definitions
-  const columns: ColumnDef<Invoice, any>[] = createInvoiceTableColumns({ t: mockT });
+  // Get the column definitions with proper typing
+  const columns = createInvoiceTableColumns({ t: mockT }) as ColumnDefWithFilter[];
 
   test('creates the correct number of columns', () => {
     expect(columns).toHaveLength(6);
     expect(columns.map((col) => col.id)).toEqual([
-      'id',
-      'customerName',
-      'dateIssued',
-      'amount',
-      'dueDate',
-      'status',
+      'ItemId',
+      'Customer',
+      'DateIssued',
+      'Amount',
+      'DueDate',
+      'Status',
     ]);
   });
 
   test('should render ID cell correctly', () => {
-    const idColumn = columns.find((col) => col.id === 'id');
-    if (idColumn && idColumn.cell && typeof idColumn.cell === 'function') {
-      // Create a properly typed mock cell props object
-      const cellProps = {
-        row: {
-          original: mockInvoice,
-          id: 'row-1',
-          index: 0,
-          depth: 0,
-          getValue: () => mockInvoice.id,
-          renderValue: () => mockInvoice.id,
-          getVisibleCells: () => [],
-          getAllCells: () => [],
-          getIsSelected: () => false,
-          getIsSomeSelected: () => false,
-          getIsGrouped: () => false,
-          getIsExpanded: () => false,
-          getCanExpand: () => false,
-          getCanSelect: () => true,
-          getToggleSelectedHandler: () => jest.fn(),
-          getToggleExpandedHandler: () => jest.fn(),
-          subRows: [],
-          getParentRow: () => null,
-          getLeafRows: () => [],
-        } as any,
-        cell: {
-          id: 'id',
-          getValue: () => mockInvoice.id,
-          renderValue: () => mockInvoice.id,
-          column: idColumn,
-          getContext: () => ({}) as any,
-          row: {} as any,
-        } as any,
-        table: {} as any,
-        column: idColumn,
-        getValue: () => mockInvoice.id,
-        renderValue: () => mockInvoice.id,
-      };
-      render(idColumn.cell(cellProps as any));
-      expect(screen.getByText('INV-001')).toBeInTheDocument();
+    const idColumn = columns.find((col) => col.id === 'ItemId');
+    if (idColumn?.cell && typeof idColumn.cell === 'function') {
+      const { container } = render(<>{idColumn.cell({ row: { original: mockInvoice } } as any)}</>);
+      expect(container).toHaveTextContent('INV-001');
     }
   });
 
   test('should render customer cell with image correctly', () => {
-    const customerColumn = columns.find((col) => col.id === 'customerName');
-    if (customerColumn && customerColumn.cell && typeof customerColumn.cell === 'function') {
-      // Mock only the necessary properties and methods
-      const mockCellProps = {
-        row: {
-          original: mockInvoice,
-          getValue: jest.fn().mockReturnValue(mockInvoice.customerName),
-          // Add minimum required Row properties
-          id: 'test-row',
-          index: 0,
-          subRows: [],
-          depth: 0,
-          getVisibleCells: jest.fn().mockReturnValue([]),
-          getAllCells: jest.fn().mockReturnValue([]),
-        },
-      };
+    const customerColumn = columns.find((col) => col.id === 'Customer');
+    if (customerColumn?.cell && typeof customerColumn.cell === 'function') {
+      render(<>{customerColumn.cell({ row: { original: mockInvoice } } as any)}</>);
 
-      render(customerColumn.cell(mockCellProps as any));
-
-      const image = screen.getByRole('img');
-      expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', mockInvoice.customerImg);
-      expect(image).toHaveAttribute('alt', mockInvoice.customerName);
       expect(screen.getByText('Test Customer')).toBeInTheDocument();
+      const img = screen.getByRole('img');
+      expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
+      expect(img).toHaveAttribute('alt', 'Test Customer');
     }
   });
 
   test('should render date cells with correct formatting', () => {
-    const dateIssuedColumn = columns.find((col) => col.id === 'dateIssued');
-    const dueDateColumn = columns.find((col) => col.id === 'dueDate');
+    const dateIssuedColumn = columns.find((col) => col.id === 'DateIssued');
+    const dueDateColumn = columns.find((col) => col.id === 'DueDate');
 
     if (dateIssuedColumn && dateIssuedColumn.cell && typeof dateIssuedColumn.cell === 'function') {
-      const mockRowProps = {
-        original: mockInvoice,
-        getValue: jest.fn().mockReturnValue(mockInvoice.dateIssued),
-        // Add minimum required Row properties
-        id: 'test-row',
-        index: 0,
-        subRows: [],
-        depth: 0,
-        getVisibleCells: jest.fn().mockReturnValue([]),
-        getAllCells: jest.fn().mockReturnValue([]),
-      };
-
-      render(dateIssuedColumn.cell({ row: mockRowProps } as any));
-      // Date is formatted as dd/MM/yyyy
-      expect(screen.getByText('01/06/2025')).toBeInTheDocument();
+      const { container: issuedContainer } = render(
+        <>
+          {dateIssuedColumn.cell({
+            row: { original: mockInvoice },
+          } as any)}
+        </>
+      );
+      expect(issuedContainer).toHaveTextContent('01/06/2025');
     }
 
     if (dueDateColumn && dueDateColumn.cell && typeof dueDateColumn.cell === 'function') {
-      const mockRowProps = {
-        original: mockInvoice,
-        getValue: jest.fn().mockReturnValue(mockInvoice.dueDate),
-        // Add minimum required Row properties
-        id: 'test-row',
-        index: 0,
-        subRows: [],
-        depth: 0,
-        getVisibleCells: jest.fn().mockReturnValue([]),
-        getAllCells: jest.fn().mockReturnValue([]),
-      };
-
-      render(dueDateColumn.cell({ row: mockRowProps } as any));
-      expect(screen.getByText('15/06/2025')).toBeInTheDocument();
+      const { container: dueContainer } = render(
+        <>
+          {dueDateColumn.cell({
+            row: { original: mockInvoice },
+          } as any)}
+        </>
+      );
+      expect(dueContainer).toHaveTextContent('15/06/2025');
     }
   });
 
-  test('should render amount with currency correctly', () => {
-    const amountColumn = columns.find((col) => col.id === 'amount');
-    if (amountColumn && amountColumn.cell && typeof amountColumn.cell === 'function') {
-      const mockRowProps = {
-        original: mockInvoice,
-        getValue: jest.fn().mockReturnValue(mockInvoice.amount),
-        // Add minimum required Row properties
-        id: 'test-row',
-        index: 0,
-        subRows: [],
-        depth: 0,
-        getVisibleCells: jest.fn().mockReturnValue([]),
-        getAllCells: jest.fn().mockReturnValue([]),
-      };
-
-      render(amountColumn.cell({ row: mockRowProps } as any));
-      expect(screen.getByText('CHF 1000.00')).toBeInTheDocument();
+  test('should render amount with currency', () => {
+    const amountColumn = columns.find((col) => col.id === 'Amount');
+    if (amountColumn?.cell && typeof amountColumn.cell === 'function') {
+      const { container } = render(
+        <>{amountColumn.cell({ row: { original: mockInvoice } } as any)}</>
+      );
+      expect(container).toHaveTextContent('CHF 1000.00');
     }
   });
 
   test('should render status with correct styling', () => {
-    const statusColumn = columns.find((col) => col.id === 'status');
-    if (statusColumn && statusColumn.cell && typeof statusColumn.cell === 'function') {
-      const mockRowProps = {
-        original: mockInvoice,
-        getValue: jest.fn().mockReturnValue(mockInvoice.status),
-        // Add minimum required Row properties
-        id: 'test-row',
-        index: 0,
-        subRows: [],
-        depth: 0,
-        getVisibleCells: jest.fn().mockReturnValue([]),
-        getAllCells: jest.fn().mockReturnValue([]),
-      };
+    const statusColumn = columns.find((col) => col.id === 'Status');
+    if (statusColumn?.cell && typeof statusColumn.cell === 'function') {
+      render(
+        <div data-testid="status-container">
+          {statusColumn.cell({
+            row: {
+              original: {
+                ...mockInvoice,
+                Status: [InvoiceStatus.PAID],
+              },
+            },
+          } as any)}
+        </div>
+      );
 
-      render(statusColumn.cell({ row: mockRowProps } as any));
+      // Find the status text and check its styling
+      const statusText = screen.getByText('Paid');
 
-      const statusElement = screen.getByText('Paid');
-      expect(statusElement).toBeInTheDocument();
-      expect(statusElement.className).toContain('text-success');
+      // Check if the status text has the expected text color class
+      // The background color might be applied to a parent element
+      expect(statusText).toHaveClass('text-success');
+
+      // Check if the parent element has the expected background color
+      const statusBadge = statusText.closest('div');
+      expect(statusBadge).toHaveClass('bg-success/10');
     }
   });
 
   // Test filter functions by directly checking their implementation
   test('date filter function works correctly', () => {
-    const dateIssuedColumn = columns.find((col) => col.id === 'dateIssued');
+    const dateIssuedColumn = columns.find((col) => col.id === 'DateIssued');
+    if (!dateIssuedColumn?.filterFn || dateIssuedColumn.filterFn === 'auto') return;
 
-    // Skip test if column or filterFn doesn't exist
-    if (!dateIssuedColumn || typeof dateIssuedColumn.filterFn !== 'function') {
-      return;
-    }
+    const filterFn = dateIssuedColumn.filterFn;
 
-    // Instead of calling the filter function directly, test its behavior indirectly
-    // by checking if the date is within the range
-    const invoiceDate = new Date(mockInvoice.dateIssued);
+    // Test with date in range (inclusive of start date)
+    const inRangeResult1 = filterFn(
+      { original: { ...mockInvoice, DateIssued: '2025-06-01T00:00:00.000Z' } },
+      'DateIssued',
+      [new Date('2025-05-01T00:00:00.000Z'), new Date('2025-07-01T00:00:00.000Z')]
+    );
+    expect(inRangeResult1).toBe(true);
 
-    // Date in range
-    const inRangeFrom = new Date('2025-05-01');
-    const inRangeTo = new Date('2025-07-01');
-    expect(invoiceDate >= inRangeFrom && invoiceDate <= inRangeTo).toBe(true);
+    // Test with date in range (inclusive of end date)
+    const inRangeResult2 = filterFn(
+      { original: { ...mockInvoice, DateIssued: '2025-06-30T23:59:59.999Z' } },
+      'DateIssued',
+      [new Date('2025-05-01T00:00:00.000Z'), new Date('2025-07-01T00:00:00.000Z')]
+    );
+    expect(inRangeResult2).toBe(true);
 
-    // Date out of range
-    const outOfRangeFrom = new Date('2025-07-01');
-    const outOfRangeTo = new Date('2025-08-01');
-    expect(invoiceDate >= outOfRangeFrom && invoiceDate <= outOfRangeTo).toBe(false);
+    // Test with date out of range (before range)
+    const beforeRangeDate = '2025-04-30T00:00:00.000Z';
+    const startDate = '2025-05-01T00:00:00.000Z';
+    const endDate = '2025-07-01T00:00:00.000Z';
+
+    const outOfRangeBeforeResult = filterFn(
+      { original: { ...mockInvoice, DateIssued: beforeRangeDate } },
+      'DateIssued',
+      [new Date(startDate), new Date(endDate)]
+    );
+
+    expect(outOfRangeBeforeResult).toBe(false);
+
+    // Test with date out of range (after range)
+    const outOfRangeAfterResult = filterFn(
+      { original: { ...mockInvoice, DateIssued: '2025-07-02T00:00:00.000Z' } }, // One day after end
+      'DateIssued',
+      [new Date('2025-05-01T00:00:00.000Z'), new Date('2025-07-01T00:00:00.000Z')]
+    );
+    expect(outOfRangeAfterResult).toBe(false);
+
+    // Test with date exactly on start date (should be included)
+    const onStartDateResult = filterFn(
+      { original: { ...mockInvoice, DateIssued: '2025-05-01T00:00:00.000Z' } },
+      'DateIssued',
+      [new Date('2025-05-01T00:00:00.000Z'), new Date('2025-07-01T00:00:00.000Z')]
+    );
+    expect(onStartDateResult).toBe(true);
+
+    // Test with date exactly on end date (should be excluded)
+    const onEndDateResult = filterFn(
+      { original: { ...mockInvoice, DateIssued: '2025-07-01T00:00:00.000Z' } },
+      'DateIssued',
+      [new Date('2025-05-01T00:00:00.000Z'), new Date('2025-07-01T00:00:00.000Z')]
+    );
+    expect(onEndDateResult).toBe(false);
   });
 
   test('status filter function works correctly', () => {
-    const statusColumn = columns.find((col) => col.id === 'status');
+    const statusColumn = columns.find((col) => col.id === 'Status');
+    if (!statusColumn?.filterFn || statusColumn.filterFn === 'auto') return;
 
-    // Skip test if column or filterFn doesn't exist
-    if (!statusColumn || typeof statusColumn.filterFn !== 'function') {
-      return;
-    }
+    const filterFn = statusColumn.filterFn;
 
-    // Test status filtering logic directly
-    const status = mockInvoice.status;
+    // Test with status in filter
+    const matchingResult = filterFn({ original: mockInvoice }, 'Status', [
+      InvoiceStatus.PAID,
+      InvoiceStatus.PENDING,
+    ]);
+    expect(matchingResult).toBe(true);
 
-    // Status in filter
-    const matchingFilter = [InvoiceStatus.Paid, InvoiceStatus.Pending];
-    expect(matchingFilter.includes(status)).toBe(true);
-
-    // Status not in filter
-    const nonMatchingFilter = [InvoiceStatus.Pending, InvoiceStatus.Overdue];
-    expect(nonMatchingFilter.includes(status)).toBe(false);
-
-    // Empty filter should match everything
-    const emptyFilter: InvoiceStatus[] = [];
-    expect(emptyFilter.length === 0 || emptyFilter.includes(status)).toBe(true);
+    // Test with status not in filter
+    const nonMatchingResult = filterFn({ original: mockInvoice }, 'Status', [
+      InvoiceStatus.PENDING,
+      InvoiceStatus.OVERDUE,
+    ]);
+    expect(nonMatchingResult).toBe(false);
   });
 
   test('date sorting functions work correctly', () => {
-    // Test sorting logic directly instead of calling the sorting function
-    const earlierDate = new Date('2025-05-01T00:00:00.000Z');
-    const laterDate = new Date('2025-07-01T00:00:00.000Z');
+    const dateIssuedColumn = columns.find((col) => col.id === 'DateIssued');
+    if (!dateIssuedColumn?.sortingFn || dateIssuedColumn.sortingFn === 'auto') return;
+
+    const sortFn = dateIssuedColumn.sortingFn;
+
+    const earlierInvoice = {
+      ...mockInvoice,
+      DateIssued: '2025-05-01T00:00:00.000Z',
+    };
+    const laterInvoice = {
+      ...mockInvoice,
+      DateIssued: '2025-07-01T00:00:00.000Z',
+    };
 
     // Earlier date should come before later date
-    expect(earlierDate < laterDate).toBe(true);
+    const sortResult = sortFn(
+      { original: earlierInvoice },
+      { original: laterInvoice },
+      'DateIssued'
+    );
+    expect(sortResult).toBeLessThan(0);
 
     // Later date should come after earlier date
-    expect(laterDate > earlierDate).toBe(true);
+    const reverseSortResult = sortFn(
+      { original: laterInvoice },
+      { original: earlierInvoice },
+      'DateIssued'
+    );
+    expect(reverseSortResult).toBeGreaterThan(0);
 
-    // Different dates with same timestamp should be equal
-    const sameTimestampDate = new Date(earlierDate.getTime());
-    expect(earlierDate.getTime() === sameTimestampDate.getTime()).toBe(true);
+    // Equal dates should return 0
+    const sameDateResult = sortFn(
+      { original: mockInvoice },
+      { original: { ...mockInvoice } }, // New object to avoid reference equality
+      'DateIssued'
+    );
+    expect(sameDateResult).toBe(0);
   });
 });

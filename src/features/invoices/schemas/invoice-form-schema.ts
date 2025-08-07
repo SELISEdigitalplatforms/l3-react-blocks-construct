@@ -11,14 +11,3 @@ export const invoiceFormSchema = z.object({
 });
 
 export type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
-
-export interface InvoiceItem {
-  id: string;
-  name: string;
-  category: string;
-  quantity: number;
-  price: number;
-  total: number;
-  showNote: boolean;
-  note?: string;
-}

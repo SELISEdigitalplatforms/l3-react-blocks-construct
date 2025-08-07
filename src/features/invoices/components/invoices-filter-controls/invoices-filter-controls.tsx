@@ -56,7 +56,7 @@ export function InvoicesFilterControls<TData>({
 }: Readonly<InvoicesFilterControlsProps<TData>>) {
   const { t } = useTranslation();
 
-  const statusColumn = table.getColumn('status');
+  const statusColumn = table.getColumn('Status');
   const statusOptions = Object.values(InvoiceStatus).map((status) => ({
     label: t(status),
     value: status,
@@ -67,7 +67,7 @@ export function InvoicesFilterControls<TData>({
     <div className="flex items-center gap-2">
       {/* Date Issued Filter */}
       <DateRangeFilter
-        column={table.getColumn('dateIssued')}
+        column={table.getColumn('DateIssued')}
         title={t('DATE_ISSUED')}
         date={dateIssued}
         onDateChange={onDateIssuedChange}
@@ -75,7 +75,7 @@ export function InvoicesFilterControls<TData>({
 
       {/* Due Date Filter */}
       <DateRangeFilter
-        column={table.getColumn('dueDate')}
+        column={table.getColumn('DueDate')}
         title={t('DUE_DATE')}
         date={dueDate}
         onDateChange={onDueDateChange}

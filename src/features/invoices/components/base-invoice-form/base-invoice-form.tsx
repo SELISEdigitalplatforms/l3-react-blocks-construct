@@ -4,16 +4,20 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-
 import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
-import {
-  invoiceFormSchema,
-  type InvoiceFormValues,
-  type InvoiceItem,
-} from '../../schemas/invoice-form-schema';
+import { invoiceFormSchema, type InvoiceFormValues } from '../../schemas/invoice-form-schema';
+import { type OrderItem as BaseOrderItem } from '../../data/invoice-data';
+
+export type OrderItem = BaseOrderItem & {
+  id: string;
+  price: number;
+  total: number;
+  showNote: boolean;
+  note?: string;
+};
 import { Button } from 'components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import {
@@ -28,8 +32,8 @@ import {
 
 interface BaseInvoiceFormProps {
   defaultValues?: Partial<InvoiceFormValues>;
-  defaultItems?: InvoiceItem[];
-  onSubmit: (values: InvoiceFormValues, items: InvoiceItem[], action: 'draft' | 'send') => void;
+  defaultItems?: OrderItem[];
+  onSubmit: (values: InvoiceFormValues, items: OrderItem[], action: 'draft' | 'send') => void;
   title: string;
   showSuccessToast?: (action: 'draft' | 'send') => void;
 }
@@ -40,8 +44,11 @@ export function BaseInvoiceForm({
     {
       id: uuidv4(),
       name: '',
+      description: '',
       category: '',
       quantity: 0,
+      unitPrice: 0,
+      amount: 0,
       price: 0,
       total: 0,
       showNote: false,
@@ -56,7 +63,7 @@ export function BaseInvoiceForm({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [action, setAction] = useState<'draft' | 'send'>('send');
   const [showPreview, setShowPreview] = useState(false);
-  const [items, setItems] = useState<InvoiceItem[]>(defaultItems);
+  const [items, setItems] = useState<OrderItem[]>(defaultItems);
 
   const form = useForm<InvoiceFormValues>({
     resolver: async (data, context, options) => {
@@ -96,14 +103,42 @@ export function BaseInvoiceForm({
     showSuccessToast?.(action);
   };
 
-  const handleUpdateItem = (id: string, updates: Partial<InvoiceItem>) => {
+  const handleUpdateItem = (id: string, updates: Partial<OrderItem>) => {
     setItems(
       items.map((item) => {
         if (item.id === id) {
+          // Get the current values with defaults
+          const currentPrice = item.price || 0;
+          const currentQuantity = item.quantity || 0;
+          
+          // Create a new item with the updates
           const updatedItem = { ...item, ...updates };
-          if ('quantity' in updates || 'price' in updates) {
-            updatedItem.total = updatedItem.quantity * updatedItem.price;
+          
+          // If quantity or price is being updated, recalculate totals
+          if ('quantity' in updates || 'price' in updates || 'unitPrice' in updates) {
+            // Use price if available, otherwise use unitPrice, otherwise fallback to current price
+            const price = 'price' in updates && updates.price !== undefined 
+              ? updates.price 
+              : 'unitPrice' in updates && updates.unitPrice !== undefined 
+                ? updates.unitPrice 
+                : currentPrice;
+            
+            // Use the updated quantity if available, otherwise use the existing one
+            const quantity = 'quantity' in updates && updates.quantity !== undefined 
+              ? updates.quantity 
+              : currentQuantity;
+            
+            // Calculate the total
+            const total = price * quantity;
+            
+            // Update all related fields with type-safe values
+            updatedItem.price = price;
+            updatedItem.unitPrice = price;
+            updatedItem.amount = total;
+            updatedItem.total = total;
+            updatedItem.quantity = quantity;
           }
+          
           return updatedItem;
         }
         return item;
@@ -127,8 +162,11 @@ export function BaseInvoiceForm({
       {
         id: uuidv4(),
         name: '',
+        description: '',
         category: '',
         quantity: 0,
+        unitPrice: 0,
+        amount: 0,
         price: 0,
         total: 0,
         showNote: false,

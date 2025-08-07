@@ -21,12 +21,12 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 import { Textarea } from 'components/ui/textarea';
-import { InvoiceItem } from '../../schemas/invoice-form-schema';
+import { type OrderItem } from '../base-invoice-form/base-invoice-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
 
 interface InvoiceItemsTableProps {
-  items: InvoiceItem[];
-  onUpdateItem: (id: string, updates: Partial<InvoiceItem>) => void;
+  items: OrderItem[];
+  onUpdateItem: (id: string, updates: Partial<OrderItem>) => void;
   onRemoveItem: (id: string) => void;
   onToggleNote: (id: string) => void;
   onAddItem: () => void;

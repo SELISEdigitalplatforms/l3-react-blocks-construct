@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useInvoice } from '../../store/invoice-store';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
-import { type InvoiceFormValues, type InvoiceItem } from '../../schemas/invoice-form-schema';
+import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-helpers';
-import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
+import { BaseInvoiceForm, type OrderItem } from '../base-invoice-form/base-invoice-form';
 
 export function EditInvoice() {
   const { t } = useTranslation();
@@ -30,20 +30,26 @@ export function EditInvoice() {
   };
 
   const defaultItems =
-    invoice.orderDetails?.items?.map((item) => ({
-      id: crypto.randomUUID(),
-      name: item.name,
-      category: normalizeCategoryValue(item.category),
-      quantity: item.quantity,
-      price: item.unitPrice,
-      total: item.amount,
-      showNote: Boolean(item.description),
-      note: item.description,
-    })) || [];
+    invoice.orderDetails?.items?.map(
+      (item) =>
+        ({
+          id: crypto.randomUUID(),
+          name: item.name,
+          description: item.description,
+          category: normalizeCategoryValue(item.category) || 'General',
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          amount: item.amount,
+          price: item.unitPrice,
+          total: item.amount,
+          showNote: Boolean(item.description),
+          note: item.description,
+        }) as OrderItem
+    ) || [];
 
   const handleSubmit = (
     values: InvoiceFormValues,
-    items: InvoiceItem[],
+    items: OrderItem[],
     action: 'draft' | 'send'
   ) => {
     if (!invoiceId) return;

@@ -16,7 +16,6 @@ export const GET_INVOICE_ITEMS_QUERY = `
       pageNo
       items {
         ItemId
-        Category
         CreatedBy
         CreatedDate
         IsDeleted
@@ -26,13 +25,19 @@ export const GET_INVOICE_ITEMS_QUERY = `
         OrganizationIds
         Tags
         DeletedDate
-        Customer
         DateIssued
         Amount
         DueDate
         Status
         GeneralNote
-        ItemDetail {
+        Customer {
+          CustomerName
+          CustomerImgUrl
+          BillingAddress
+          Email
+          PhoneNo
+        }
+        ItemDetails {
           ItemId
           ItemName
           Category
