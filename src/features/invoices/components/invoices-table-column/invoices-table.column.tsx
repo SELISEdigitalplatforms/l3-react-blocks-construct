@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { DateRange } from 'react-day-picker';
 import { format, startOfDay, isAfter, isBefore, isSameDay, parseISO } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
+import { InvoiceItem, getStatusColors } from '../../types/invoices.types';
 
 interface ColumnFactoryProps {
   t: (key: string) => string;
@@ -115,25 +115,37 @@ export const createInvoiceTableColumns = ({
   },
   {
     id: 'Status',
-    accessorFn: (row) => row.Status?.[0] || '',
+    accessorKey: 'Status',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
-    filterFn: (row, id, value: InvoiceStatus[] | undefined) => {
-      if (!value?.length) return true;
-      const status = row.original.Status?.[0];
-      return status ? value.includes(status) : false;
+    filterFn: (row, columnId, value: string | string[]) => {
+      if (!value || (Array.isArray(value) && value.length === 0)) return true;
+      const rowValue = row.getValue(columnId) as string;
+      return Array.isArray(value)
+        ? value.some((v) => v.toLowerCase() === rowValue?.toLowerCase())
+        : value.toLowerCase() === rowValue?.toLowerCase();
+    },
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = (rowA.getValue(columnId) as string)?.toLowerCase() || '';
+      const b = (rowB.getValue(columnId) as string)?.toLowerCase() || '';
+      return a.localeCompare(b);
+    },
+    meta: {
+      filterVariant: 'select',
+      filterSelectOptions: [
+        { label: t('PAID'), value: 'Paid' },
+        { label: t('PENDING'), value: 'Pending' },
+        { label: t('OVERDUE'), value: 'Overdue' },
+        { label: t('DRAFT'), value: 'Draft' },
+      ],
     },
     cell: ({ row }) => {
-      const status = row.original.Status?.[0];
+      const status = row.original.Status;
       if (!status) return null;
-
-      // Get the status text from the enum if possible, otherwise use as is
-      const statusText =
-        Object.entries(InvoiceStatus).find(([, value]) => value === status)?.[1] || status;
 
       const { text } = getStatusColors(status);
       return (
         <div className="flex items-center">
-          <span className={`font-semibold ${text}`}>{statusText}</span>
+          <span className={`font-semibold ${text}`}>{status}</span>
         </div>
       );
     },

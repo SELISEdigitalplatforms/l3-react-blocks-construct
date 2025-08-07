@@ -19,6 +19,13 @@ export enum InvoiceStatus {
   OVERDUE = 'Overdue',
 }
 
+export const Categories = [
+  { value: 'electronics', label: 'Electronics' },
+  { value: 'furniture', label: 'Furniture' },
+  { value: 'accessories', label: 'Accessories' },
+  { value: 'apparel', label: 'Apparel' },
+];
+
 // Helper function to get status colors that works with both enum and string values
 export function getStatusColors(status: string): StatusColors {
   // Define the status to variant mapping
@@ -34,8 +41,10 @@ export function getStatusColors(status: string): StatusColors {
 
   // Find the variant (case-insensitive)
   const normalizedStatus = normalizeStatus(status);
-  const variant = Array.from(statusMap.entries())
-    .find(([key]) => normalizeStatus(key) === normalizedStatus)?.[1] || 'muted';
+  const variant =
+    Array.from(statusMap.entries()).find(
+      ([key]) => normalizeStatus(key) === normalizedStatus
+    )?.[1] || 'muted';
 
   // Return the complete status styles
   return {
@@ -81,7 +90,7 @@ export interface InvoiceItem {
   DueDate: string;
   Amount: number;
   Customer: CustomerDetails[];
-  Status: InvoiceStatus[];
+  Status: string;
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
   Subtotal?: number;

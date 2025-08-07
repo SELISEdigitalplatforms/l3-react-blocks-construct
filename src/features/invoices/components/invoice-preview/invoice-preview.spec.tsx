@@ -15,7 +15,7 @@ describe('InvoicePreview', () => {
     DateIssued: '2025-06-01T00:00:00.000Z',
     DueDate: '2025-06-15T00:00:00.000Z',
     Amount: 1000,
-    Status: [InvoiceStatus.PAID],
+    Status: InvoiceStatus.PAID,
     currency: 'CHF',
     Customer: [
       {

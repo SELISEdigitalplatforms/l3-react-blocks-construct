@@ -43,7 +43,7 @@ export function createInvoiceFromForm(
     DateIssued: new Date().toISOString(),
     Amount: TotalAmount,
     DueDate: formValues.dueDate?.toISOString() ?? new Date().toISOString(),
-    Status: [status],
+    Status: status,
     GeneralNote: formValues.generalNote,
     Customer: [
       {

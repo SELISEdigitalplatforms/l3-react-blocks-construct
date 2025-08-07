@@ -32,7 +32,7 @@ describe('Invoice Table Columns', () => {
     DateIssued: '2025-06-01T00:00:00.000Z',
     DueDate: '2025-06-15T00:00:00.000Z',
     Amount: 1000,
-    Status: [InvoiceStatus.PAID],
+    Status: InvoiceStatus.PAID,
     Customer: [
       {
         CustomerName: 'Test Customer',
@@ -126,7 +126,7 @@ describe('Invoice Table Columns', () => {
             row: {
               original: {
                 ...mockInvoice,
-                Status: [InvoiceStatus.PAID],
+                Status: InvoiceStatus.PAID,
               },
             },
           } as any)}

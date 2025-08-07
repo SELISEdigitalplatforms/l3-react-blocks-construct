@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InvoicesFilterControls } from './invoices-filter-controls';
-import { InvoiceStatus } from '../../data/invoice-data';
+import { InvoiceStatus } from '../../types/invoices.types';
 
 // Mock the DateRangeFilter component
 jest.mock('components/blocks/data-table/data-table-date-filter', () => ({
@@ -36,7 +36,7 @@ describe('InvoicesFilterControls', () => {
   const mockDueDate = { from: new Date('2025-02-01'), to: new Date('2025-02-28') };
   const mockOnDateIssuedChange = jest.fn();
   const mockOnDueDateChange = jest.fn();
-  
+
   // Create a mock table for testing
   const mockTable = {
     getColumn: jest.fn().mockImplementation((columnId) => {
@@ -67,14 +67,14 @@ describe('InvoicesFilterControls', () => {
         onDueDateChange={mockOnDueDateChange}
       />
     );
-    
+
     // Check if date filters are rendered
     expect(screen.getByTestId('date-filter-DATE_ISSUED')).toBeInTheDocument();
     expect(screen.getByTestId('date-filter-DUE_DATE')).toBeInTheDocument();
-    
+
     // Check if status filter is rendered
     expect(screen.getByTestId('faceted-filter-STATUS')).toBeInTheDocument();
-    
+
     // Check if status filter has the correct number of options (all enum values)
     const statusFilterText = screen.getByTestId('faceted-filter-STATUS').textContent;
     expect(statusFilterText).toContain(`${Object.values(InvoiceStatus).length} options`);
@@ -88,7 +88,7 @@ describe('InvoicesFilterControls', () => {
         onDueDateChange={mockOnDueDateChange}
       />
     );
-    
+
     // Check if filters are still rendered even without date ranges
     expect(screen.getByTestId('date-filter-DATE_ISSUED')).toBeInTheDocument();
     expect(screen.getByTestId('date-filter-DUE_DATE')).toBeInTheDocument();
@@ -108,7 +108,7 @@ describe('InvoicesFilterControls', () => {
         };
       }),
     };
-    
+
     render(
       <InvoicesFilterControls
         table={tableWithoutStatus as any}
@@ -118,11 +118,11 @@ describe('InvoicesFilterControls', () => {
         onDueDateChange={mockOnDueDateChange}
       />
     );
-    
+
     // Date filters should still be rendered
     expect(screen.getByTestId('date-filter-DATE_ISSUED')).toBeInTheDocument();
     expect(screen.getByTestId('date-filter-DUE_DATE')).toBeInTheDocument();
-    
+
     // Status filter should not be rendered
     expect(screen.queryByTestId('faceted-filter-STATUS')).not.toBeInTheDocument();
   });

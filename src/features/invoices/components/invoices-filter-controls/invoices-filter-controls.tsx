@@ -1,9 +1,9 @@
 import { Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DateRange } from 'react-day-picker';
-import { InvoiceStatus } from '../../data/invoice-data';
 import { DateRangeFilter } from 'components/blocks/data-table/data-table-date-filter';
 import { DataTableFacetedFilter } from 'components/blocks/data-table/data-table-faceted-filter';
+import { InvoiceStatus } from '../../types/invoices.types';
 
 /**
  * InvoicesFilterControls Component
@@ -60,7 +60,7 @@ export function InvoicesFilterControls<TData>({
   const statusOptions = Object.values(InvoiceStatus).map((status) => ({
     label: t(status),
     value: status,
-    icon: undefined
+    icon: undefined,
   }));
 
   return (

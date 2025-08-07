@@ -1,5 +1,4 @@
 import { Fragment } from 'react';
-import { Categories } from '../../data/invoice-data';
 import { useTranslation } from 'react-i18next';
 import { Control } from 'react-hook-form';
 import { MoreVertical, NotebookPen, Plus, Trash } from 'lucide-react';
@@ -22,7 +21,7 @@ import {
 } from 'components/ui/dropdown-menu';
 import { Textarea } from 'components/ui/textarea';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
-import { InvoiceItemDetails } from '../../types/invoices.types';
+import { Categories, InvoiceItemDetails } from '../../types/invoices.types';
 
 interface InvoiceItemsTableProps {
   items: InvoiceItemDetails[];

@@ -3,7 +3,25 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
-import { invoiceData } from 'features/invoices/data/invoice-data';
+// Mock invoice data
+const mockInvoiceData = [
+  {
+    id: 'test-invoice-id',
+    customerName: 'Test Customer',
+    status: 'draft',
+    currency: 'CHF',
+    dueDate: '2025-06-15',
+    billingInfo: {
+      email: 'test@example.com',
+      phone: '+41123456789',
+      address: 'Test Address',
+    },
+    orderDetails: {
+      items: [],
+      note: '',
+    },
+  },
+];
 
 // Mock the invoice store
 jest.mock('features/invoices/store/invoice-store', () => ({
@@ -34,7 +52,7 @@ jest.mock('features/invoices/store/invoice-store', () => ({
 
 // Mock the InvoicesDetail component
 jest.mock('features/invoices', () => ({
-  InvoicesDetail: ({ invoice }: { invoice: (typeof invoiceData)[0] }) => (
+  InvoicesDetail: ({ invoice }: { invoice: (typeof mockInvoiceData)[0] }) => (
     <div data-testid="invoice-detail">
       <div data-testid="customer-name">{invoice.customerName}</div>
       <div data-testid="invoice-id">{invoice.id}</div>

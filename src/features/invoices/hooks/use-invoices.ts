@@ -165,34 +165,15 @@ export const useAddInvoiceItem = () => {
  */
 export const useUpdateInvoiceItem = () => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
     mutationFn: (params: UpdateInvoiceItemParams) => updateInvoiceItem(params),
-    onSuccess: (data: any) => {
+    onSuccess: () => {
+      // Invalidate and refetch invoice items
       queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] === 'invoice-items',
       });
-
-      queryClient.refetchQueries({
-        predicate: (query) => query.queryKey[0] === 'invoice-items',
-        type: 'active',
-      });
-
-      if (data.updateInvoice.acknowledged) {
-        toast({
-          variant: 'success',
-          title: t('INVOICE_UPDATED'),
-          description: t('INVOICE_SUCCESSFULLY_UPDATED'),
-        });
-      } else {
-        handleError(
-          { error: { title: 'UNABLE_UPDATE_ITEM', message: t('UNABLE_UPDATE_INVOICE') } },
-          { variant: 'destructive' }
-        );
-      }
     },
     onError: (error) => {
       handleError(error, { variant: 'destructive' });

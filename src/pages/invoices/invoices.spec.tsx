@@ -3,7 +3,43 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { InvoicesPage } from './invoices';
-import { invoiceData } from 'features/invoices/data/invoice-data';
+// Mock invoice data
+const mockInvoiceData = [
+  {
+    id: '1',
+    customerName: 'Test Customer 1',
+    status: 'draft',
+    currency: 'CHF',
+    dueDate: '2025-06-15',
+    amount: 1000,
+    billingInfo: {
+      email: 'test1@example.com',
+      phone: '+41123456789',
+      address: 'Test Address 1',
+    },
+    orderDetails: {
+      items: [],
+      note: '',
+    },
+  },
+  {
+    id: '2',
+    customerName: 'Test Customer 2',
+    status: 'paid',
+    currency: 'CHF',
+    dueDate: '2025-07-15',
+    amount: 2000,
+    billingInfo: {
+      email: 'test2@example.com',
+      phone: '+41987654321',
+      address: 'Test Address 2',
+    },
+    orderDetails: {
+      items: [],
+      note: 'Test note',
+    },
+  },
+];
 
 // Mock the react-router-dom's useNavigate
 const mockNavigate = jest.fn();
@@ -14,10 +50,16 @@ jest.mock('react-router-dom', () => ({
 
 // Mock the invoice components
 jest.mock('features/invoices', () => ({
-  InvoicesOverviewTable: ({ data, onRowClick, toolbar }: { 
-    data: Array<typeof invoiceData[0]>; 
-    onRowClick: (invoice: typeof invoiceData[0]) => void; 
-    toolbar: (table: { getState: () => { pagination: { pageIndex: number; pageSize: number } } }) => React.ReactNode;
+  InvoicesOverviewTable: ({
+    data,
+    onRowClick,
+    toolbar,
+  }: {
+    data: Array<(typeof mockInvoiceData)[0]>;
+    onRowClick: (invoice: (typeof mockInvoiceData)[0]) => void;
+    toolbar: (table: {
+      getState: () => { pagination: { pageIndex: number; pageSize: number } };
+    }) => React.ReactNode;
   }) => (
     <div data-testid="invoices-table">
       <div data-testid="table-toolbar">
@@ -25,10 +67,10 @@ jest.mock('features/invoices', () => ({
       </div>
       <table>
         <tbody>
-          {data.map((invoice: typeof invoiceData[0]) => (
-            <tr 
-              key={invoice.id} 
-              data-testid={`invoice-row-${invoice.id}`} 
+          {data.map((invoice: (typeof mockInvoiceData)[0]) => (
+            <tr
+              key={invoice.id}
+              data-testid={`invoice-row-${invoice.id}`}
               onClick={() => onRowClick(invoice)}
             >
               <td>{invoice.id}</td>
@@ -114,7 +156,7 @@ describe('InvoicesPage', () => {
     // Get all invoice rows and click on the first one
     const invoiceRows = screen.getAllByTestId(/invoice-row-/);
     const firstInvoiceId = invoiceRows[0].getAttribute('data-testid')?.replace('invoice-row-', '');
-    
+
     // Click on the first invoice row
     fireEvent.click(invoiceRows[0]);
 

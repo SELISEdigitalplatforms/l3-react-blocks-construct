@@ -9,15 +9,6 @@ import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
 import { invoiceFormSchema, type InvoiceFormValues } from '../../schemas/invoice-form-schema';
-import { type OrderItem as BaseOrderItem } from '../../data/invoice-data';
-
-export type OrderItem = BaseOrderItem & {
-  id: string;
-  price: number;
-  total: number;
-  showNote: boolean;
-  note?: string;
-};
 import { Button } from 'components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import {
@@ -30,11 +21,14 @@ import {
   FormCurrencySelect,
 } from '../invoice-form/invoice-form';
 import { InvoiceItemDetails } from '../../types/invoices.types';
-
 interface BaseInvoiceFormProps {
   defaultValues?: Partial<InvoiceFormValues>;
   defaultItems?: InvoiceItemDetails[];
-  onSubmit: (values: InvoiceFormValues, items: InvoiceItemDetails[], action: 'draft' | 'send') => void;
+  onSubmit: (
+    values: InvoiceFormValues,
+    items: InvoiceItemDetails[],
+    action: 'draft' | 'send'
+  ) => void;
   title: string;
   showSuccessToast?: (action: 'draft' | 'send') => void;
 }
@@ -110,33 +104,35 @@ export function BaseInvoiceForm({
           // Get the current values with defaults
           const currentPrice = item.UnitPrice || 0;
           const currentQuantity = item.Quantity || 0;
-          
+
           // Create a new item with the updates
           const updatedItem = { ...item, ...updates };
-          
+
           // If quantity or price is being updated, recalculate totals
           if ('Quantity' in updates || 'UnitPrice' in updates || 'Amount' in updates) {
             // Use price if available, otherwise use unitPrice, otherwise fallback to current price
-            const price = 'UnitPrice' in updates && updates.UnitPrice !== undefined 
-              ? updates.UnitPrice 
-              : 'Amount' in updates && updates.Amount !== undefined 
-                ? updates.Amount 
-                : currentPrice;
-            
+            const price =
+              'UnitPrice' in updates && updates.UnitPrice !== undefined
+                ? updates.UnitPrice
+                : 'Amount' in updates && updates.Amount !== undefined
+                  ? updates.Amount
+                  : currentPrice;
+
             // Use the updated quantity if available, otherwise use the existing one
-            const quantity = 'Quantity' in updates && updates.Quantity !== undefined 
-              ? updates.Quantity 
-              : currentQuantity;
-            
+            const quantity =
+              'Quantity' in updates && updates.Quantity !== undefined
+                ? updates.Quantity
+                : currentQuantity;
+
             // Calculate the total
             const total = price * quantity;
-            
+
             // Update all related fields with type-safe values
             updatedItem.UnitPrice = price;
             updatedItem.Amount = total;
             updatedItem.Quantity = quantity;
           }
-          
+
           return updatedItem;
         }
         return item;

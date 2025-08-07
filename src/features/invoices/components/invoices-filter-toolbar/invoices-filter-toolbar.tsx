@@ -61,7 +61,7 @@ export function InvoicesFilterToolbar<TData>({
     table.resetColumnFilters();
   };
 
-  const isFiltered = search ?? table.getState().columnFilters.length > 0;
+  const isFiltered = search || table.getState().columnFilters.length > 0;
 
   return (
     <div className="flex flex-col w-full gap-4 sm:flex-row sm:items-center">

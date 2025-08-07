@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useInvoice } from '../../store/invoice-store';
 import { generateInvoiceId } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { useTranslation } from 'react-i18next';
@@ -11,15 +10,12 @@ import {
   CustomerDetails,
   InvoiceItemDetails,
   AddInvoiceItemParams,
-  InvoiceStatus as APIInvoiceStatus,
-  InvoiceItem,
   InvoiceStatus,
 } from '../../types/invoices.types';
 
 export function CreateInvoice() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { addInvoice } = useInvoice();
   const { toast } = useToast();
   const { mutate: addInvoiceItem } = useAddInvoiceItem();
   const invoiceId = generateInvoiceId();
@@ -30,7 +26,6 @@ export function CreateInvoice() {
     action: 'draft' | 'send'
   ) => {
     try {
-      // Create customer details for the API
       const customer: CustomerDetails = {
         CustomerName: values.customerName,
         CustomerImgUrl: '',
@@ -39,9 +34,7 @@ export function CreateInvoice() {
         PhoneNo: values.phoneNumber || '',
       };
 
-      // Create item details for the API with proper numeric types
       const itemDetails: InvoiceItemDetails[] = items.map((item) => {
-        // Ensure all numeric values are numbers
         const quantity = Number(item.Quantity) || 0;
         const unitPrice = Number(item.UnitPrice) || 0;
         const amount = Number(item.Amount) || 0;
@@ -59,57 +52,25 @@ export function CreateInvoice() {
         };
       });
 
-      // Calculate the total amount as a number
       const totalAmount = Number(
         items.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0).toFixed(2)
       );
 
-      // Create the API payload with proper typing
       const apiPayload: AddInvoiceItemParams = {
         input: {
           ItemId: invoiceId,
           DateIssued: new Date().toISOString(),
           DueDate: values.dueDate?.toISOString() || new Date().toISOString(),
-          Amount: totalAmount, // Keep as number
+          Amount: totalAmount,
           Customer: [customer],
-          Status: action === 'send' ? APIInvoiceStatus.PENDING : APIInvoiceStatus.DRAFT, // Now a single string value
+          Status: action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT,
           ItemDetails: itemDetails,
           GeneralNote: values.generalNote || '',
         },
       };
 
-      // The local invoice object will be created by the store based on the API response
       addInvoiceItem(apiPayload, {
         onSuccess: () => {
-          // Create a local invoice object for the UI
-          const localInvoice: InvoiceItem = {
-            ItemId: invoiceId,
-            Customer: [
-              {
-                CustomerName: values.customerName,
-                CustomerImgUrl: '',
-                BillingAddress: values.billingAddress || '',
-                Email: values.email || '',
-                PhoneNo: values.phoneNumber || '',
-              },
-            ],
-            DateIssued: new Date().toISOString(),
-            Amount: totalAmount,
-            DueDate: values.dueDate?.toISOString() || new Date().toISOString(),
-            Status: [action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT],
-            currency: values.currency || 'CHF',
-            GeneralNote: values.generalNote || '',
-            ItemDetails: itemDetails,
-            Subtotal: totalAmount,
-            Taxes: 0,
-            TaxRate: 0,
-            TotalAmount: totalAmount,
-          };
-
-          // Add to local state for immediate UI update
-          addInvoice(localInvoice);
-
-          // Show success message
           toast({
             title: t('SUCCESS'),
             description:
@@ -117,7 +78,6 @@ export function CreateInvoice() {
             variant: 'default',
           });
 
-          // Navigate to the invoice detail page
           navigate(`/invoices/${invoiceId}`);
         },
         onError: (error) => {

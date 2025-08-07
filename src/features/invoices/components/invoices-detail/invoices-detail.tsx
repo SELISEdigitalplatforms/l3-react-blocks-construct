@@ -27,7 +27,6 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
 
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  // Calculate totals from ItemDetails array
   const { subtotal, taxes, totalAmount } = invoice.ItemDetails?.reduce(
     (acc, item) => ({
       subtotal: acc.subtotal + (item.Amount || 0),
@@ -98,9 +97,9 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <div className="flex items-center gap-2">
                 <p className="text-high-emphasis">{t('STATUS')}:</p>
                 <Badge
-                  className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status[0] || 'Draft').text} ${getStatusColors(invoice.Status[0] || 'Draft').border} ${getStatusColors(invoice.Status[0] || 'Draft').bg} hover:${getStatusColors(invoice.Status[0] || 'Draft').bg}`}
+                  className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status || 'Draft').text} ${getStatusColors(invoice.Status || 'Draft').border} ${getStatusColors(invoice.Status || 'Draft').bg} hover:${getStatusColors(invoice.Status || 'Draft').bg}`}
                 >
-                  {invoice.Status[0] || 'Draft'}
+                  {invoice.Status || 'Draft'}
                 </Badge>
               </div>
               <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />
@@ -150,9 +149,9 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <div className="flex items-center gap-2">
                 <p className="font-bold text-high-emphasis">{invoice.ItemId}</p>
                 <Badge
-                  className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status[0] || 'Draft').text} ${getStatusColors(invoice.Status[0] || 'Draft').border} ${getStatusColors(invoice.Status[0] || 'Draft').bg} hover:${getStatusColors(invoice.Status[0] || 'Draft').bg}`}
+                  className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status).text} ${getStatusColors(invoice.Status).border} ${getStatusColors(invoice.Status).bg} hover:${getStatusColors(invoice.Status).bg}`}
                 >
-                  {invoice.Status[0] || 'Draft'}
+                  {invoice.Status}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
