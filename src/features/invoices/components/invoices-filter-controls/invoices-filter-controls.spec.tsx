@@ -99,7 +99,8 @@ describe('InvoicesFilterControls', () => {
     // Mock table without status column
     const tableWithoutStatus = {
       getColumn: jest.fn().mockImplementation((columnId) => {
-        if (columnId === 'status') {
+        if (columnId === 'Status') {
+          // Changed from 'status' to 'Status' to match component
           return null;
         }
         return {

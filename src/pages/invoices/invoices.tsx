@@ -62,7 +62,6 @@ export function InvoicesPage() {
     navigate(`/invoices/${data.ItemId}`);
   };
 
-  // Handle error state if needed
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">

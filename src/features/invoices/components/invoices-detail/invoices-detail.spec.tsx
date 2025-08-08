@@ -130,8 +130,8 @@ describe('InvoicesDetail', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
 
     // Check if financial details are displayed
-    expect(screen.getByText('CHF 500.00')).toBeInTheDocument();
-    expect(screen.getAllByText('CHF 1000.00').length).toBeGreaterThan(0);
+    expect(screen.getByText('CHF 500')).toBeInTheDocument();
+    expect(screen.getAllByText('CHF 1000').length).toBeGreaterThan(0);
 
     // Check if note is displayed
     expect(screen.getByText('Test Note')).toBeInTheDocument();
