@@ -109,10 +109,20 @@ export function InvoiceItemsTable({
                     <span className="absolute left-3 top-[12px]">{currency}</span>
                     <Input
                       className="pl-12"
-                      value={item.UnitPrice.toFixed(2)}
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={item.UnitPrice === 0 ? '' : item.UnitPrice}
                       onChange={(e) => {
-                        const price = parseFloat(e.target.value) || 0;
-                        onUpdateItem(item.ItemId, { UnitPrice: price });
+                        const value = e.target.value;
+                        if (value === '') {
+                          onUpdateItem(item.ItemId, { UnitPrice: 0 });
+                          return;
+                        }
+                        const price = parseFloat(value);
+                        if (!isNaN(price)) {
+                          onUpdateItem(item.ItemId, { UnitPrice: price });
+                        }
                       }}
                     />
                   </div>

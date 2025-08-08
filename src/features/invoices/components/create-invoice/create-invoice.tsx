@@ -91,7 +91,7 @@ export function CreateInvoice() {
           toast({
             title: 'Success',
             description: action === 'send' ? 'Invoice successfully sent' : 'Invoice saved as draft',
-            variant: 'default',
+            variant: 'success',
           });
 
           navigate(`/invoices/${invoiceId}`);
