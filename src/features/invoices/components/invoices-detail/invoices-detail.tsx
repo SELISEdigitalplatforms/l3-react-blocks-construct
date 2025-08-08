@@ -12,7 +12,7 @@ import darklogo from 'assets/images/construct_logo_dark.svg';
 import { Badge } from 'components/ui/badge';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { InvoiceItem, getStatusColors } from '../../types/invoices.types';
+import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
 
 interface InvoicesDetailProps {
   invoice: InvoiceItem;
@@ -99,7 +99,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 <Badge
                   className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status || 'Draft').text} ${getStatusColors(invoice.Status || 'Draft').border} ${getStatusColors(invoice.Status || 'Draft').bg} hover:${getStatusColors(invoice.Status || 'Draft').bg}`}
                 >
-                  {invoice.Status || 'Draft'}
+                  {invoice.Status ?? InvoiceStatus.DRAFT}
                 </Badge>
               </div>
               <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />

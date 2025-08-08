@@ -1,8 +1,13 @@
-import { ColumnDef } from '@tanstack/react-table';
+import { Trash } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { ColumnDef } from '@tanstack/react-table';
 import { format, startOfDay, isAfter, isBefore, isSameDay, parseISO } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import { InvoiceItem, getStatusColors } from '../../types/invoices.types';
+import { Button } from 'components/ui/button';
+import { useState } from 'react';
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { useDeleteInvoiceItem } from '../../hooks/use-invoices';
 
 interface ColumnFactoryProps {
   t: (key: string) => string;
@@ -29,7 +34,7 @@ export const createInvoiceTableColumns = ({
     enableSorting: false,
     cell: ({ row }) => (
       <div className="flex items-center">
-        <span className="min-w-[100px] truncate font-medium">{row.original.ItemId}</span>
+        <span className="min-w-[100px] truncate font-medium uppercase">{row.original.ItemId}</span>
       </div>
     ),
   },
@@ -146,6 +151,62 @@ export const createInvoiceTableColumns = ({
       return (
         <div className="flex items-center">
           <span className={`font-semibold ${text}`}>{status}</span>
+        </div>
+      );
+    },
+  },
+  {
+    id: 'actions',
+    cell: function ActionsCell({ row }) {
+      const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+      const { mutate: deleteInvoice, isPending: isDeleting } = useDeleteInvoiceItem();
+      const invoice = row.original;
+
+      const handleDelete = () => {
+        deleteInvoice(
+          {
+            filter: JSON.stringify({ _id: invoice.ItemId }),
+            input: { isHardDelete: true },
+          },
+          {
+            onSuccess: () => {
+              setShowDeleteDialog(false);
+            },
+            onError: (error) => {
+              console.error('Delete error:', error);
+            },
+          }
+        );
+      };
+
+      return (
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDeleteDialog(true);
+            }}
+            disabled={isDeleting}
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+
+          <div onClick={(e) => e.stopPropagation()}>
+            <ConfirmationModal
+              open={showDeleteDialog}
+              onOpenChange={(open: boolean) => {
+                setShowDeleteDialog(open);
+              }}
+              title="Delete Invoice"
+              description="Are you sure you want to delete this invoice?"
+              onConfirm={() => {
+                handleDelete();
+              }}
+              confirmText="DELETE"
+            />
+          </div>
         </div>
       );
     },

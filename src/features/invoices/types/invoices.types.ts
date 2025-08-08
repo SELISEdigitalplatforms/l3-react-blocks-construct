@@ -28,7 +28,6 @@ export const Categories = [
 
 // Helper function to get status colors that works with both enum and string values
 export function getStatusColors(status: string): StatusColors {
-  // Define the status to variant mapping
   const statusMap = new Map<string, 'success' | 'warning' | 'error' | 'neutral'>([
     [InvoiceStatus.PAID, 'success'],
     [InvoiceStatus.PENDING, 'warning'],
@@ -36,17 +35,14 @@ export function getStatusColors(status: string): StatusColors {
     [InvoiceStatus.DRAFT, 'neutral'],
   ]);
 
-  // Helper function to normalize status string
   const normalizeStatus = (s: string) => s.toLowerCase();
 
-  // Find the variant (case-insensitive)
   const normalizedStatus = normalizeStatus(status);
   const variant =
     Array.from(statusMap.entries()).find(
       ([key]) => normalizeStatus(key) === normalizedStatus
     )?.[1] || 'muted';
 
-  // Return the complete status styles
   return {
     text: `text-${variant}`,
     border: `border-${variant}`,
@@ -119,9 +115,13 @@ export interface GetInvoiceItemResponse {
 
 export interface AddInvoiceItemInput {
   ItemId: string;
+  CreatedBy?: string;
+  CreatedDate?: string;
   DateIssued: string;
   DueDate: string;
   Amount: number;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
   Customer: CustomerDetails[];
   Status: string;
   GeneralNote?: string;

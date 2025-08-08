@@ -1,5 +1,4 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
 import { useErrorHandler } from 'hooks/use-error-handler';
@@ -127,7 +126,6 @@ export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
 export const useAddInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { t } = useTranslation();
 
   return useGlobalMutation({
     mutationFn: (params: AddInvoiceItemParams) => addInvoiceItem(params),
@@ -144,8 +142,8 @@ export const useAddInvoiceItem = () => {
       if (data.insertInvoice?.acknowledged) {
         toast({
           variant: 'success',
-          title: t('INVOICE_ADDED'),
-          description: t('INVOICE_SUCCESSFULLY_CREATED'),
+          title: 'Invoice Added',
+          description: 'The invoice has been successfully added.',
         });
       }
     },
@@ -170,7 +168,6 @@ export const useUpdateInvoiceItem = () => {
   return useGlobalMutation({
     mutationFn: (params: UpdateInvoiceItemParams) => updateInvoiceItem(params),
     onSuccess: () => {
-      // Invalidate and refetch invoice items
       queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] === 'invoice-items',
       });
@@ -192,7 +189,6 @@ export const useUpdateInvoiceItem = () => {
 export const useDeleteInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { t } = useTranslation();
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation({
@@ -208,21 +204,21 @@ export const useDeleteInvoiceItem = () => {
         type: 'active',
       });
 
-      if (data.deleteInvoice?.acknowledged) {
+      if (data.deleteInvoiceItem?.acknowledged) {
         toast({
           variant: 'success',
-          title: t('INVOICE_DELETED'),
-          description: t('INVOICE_SUCCESSFULLY_DELETED'),
+          title: 'Invoice Deleted',
+          description: 'The invoice has been successfully deleted.',
         });
       } else {
         handleError(
-          { error: { title: 'UNABLE_DELETE_ITEM', message: t('UNABLE_DELETE_INVOICE') } },
+          { error: { title: 'Unable to delete invoice', message: 'Unable to delete invoice' } },
           { variant: 'destructive' }
         );
       }
     },
     onError: (error) => {
-      handleError(error, { variant: 'destructive' });
+      handleError(error);
     },
   });
 };

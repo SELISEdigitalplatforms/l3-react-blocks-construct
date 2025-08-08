@@ -12,13 +12,26 @@ import {
   AddInvoiceItemParams,
   InvoiceStatus,
 } from '../../types/invoices.types';
+import { useEffect, useState } from 'react';
+
+// Get current user profile from localStorage
+const getCurrentUser = () => {
+  if (typeof window === 'undefined') return null;
+  const profile = localStorage.getItem('userProfile');
+  return profile ? JSON.parse(profile) : null;
+};
 
 export function CreateInvoice() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [userProfile, setUserProfile] = useState(getCurrentUser());
   const { mutate: addInvoiceItem } = useAddInvoiceItem();
   const invoiceId = generateInvoiceId();
+
+  useEffect(() => {
+    setUserProfile(getCurrentUser());
+  }, []);
 
   const handleSubmit = async (
     values: InvoiceFormValues,
@@ -29,9 +42,9 @@ export function CreateInvoice() {
       const customer: CustomerDetails = {
         CustomerName: values.customerName,
         CustomerImgUrl: '',
-        BillingAddress: values.billingAddress || '',
-        Email: values.email || '',
-        PhoneNo: values.phoneNumber || '',
+        BillingAddress: values.billingAddress ?? '',
+        Email: values.email ?? '',
+        PhoneNo: values.phoneNumber ?? '',
       };
 
       const itemDetails: InvoiceItemDetails[] = items.map((item) => {
@@ -40,15 +53,15 @@ export function CreateInvoice() {
         const amount = Number(item.Amount) || 0;
 
         return {
-          ItemId: item.ItemId || uuidv4(),
-          ItemName: item.ItemName || '',
-          Note: item.Note || '',
-          Category: item.Category || '0',
-          Quantity: item.Quantity || quantity,
-          UnitPrice: item.UnitPrice || unitPrice,
-          Amount: item.Amount || amount,
-          Taxes: item.Taxes || 0,
-          Discount: item.Discount || 0,
+          ItemId: item.ItemId ?? uuidv4(),
+          ItemName: item.ItemName ?? '',
+          Note: item.Note ?? '',
+          Category: item.Category ?? '0',
+          Quantity: item.Quantity ?? quantity,
+          UnitPrice: item.UnitPrice ?? unitPrice,
+          Amount: item.Amount ?? amount,
+          Taxes: item.Taxes ?? 0,
+          Discount: item.Discount ?? 0,
         };
       });
 
@@ -59,22 +72,25 @@ export function CreateInvoice() {
       const apiPayload: AddInvoiceItemParams = {
         input: {
           ItemId: invoiceId,
+          CreatedBy: userProfile?.fullName ?? '',
+          CreatedDate: new Date().toISOString(),
           DateIssued: new Date().toISOString(),
-          DueDate: values.dueDate?.toISOString() || new Date().toISOString(),
+          DueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
           Amount: totalAmount,
           Customer: [customer],
           Status: action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT,
           ItemDetails: itemDetails,
-          GeneralNote: values.generalNote || '',
+          GeneralNote: values.generalNote ?? '',
+          LastUpdatedBy: userProfile?.fullName ?? '',
+          LastUpdatedDate: new Date().toISOString(),
         },
       };
 
       addInvoiceItem(apiPayload, {
         onSuccess: () => {
           toast({
-            title: t('SUCCESS'),
-            description:
-              action === 'send' ? t('INVOICE_SUCCESSFULLY_SENT') : t('INVOICE_SAVED_AS_DRAFT'),
+            title: 'Success',
+            description: action === 'send' ? 'Invoice successfully sent' : 'Invoice saved as draft',
             variant: 'default',
           });
 
@@ -83,8 +99,8 @@ export function CreateInvoice() {
         onError: (error) => {
           console.error('Error creating invoice:', error);
           toast({
-            title: t('ERROR'),
-            description: t('FAILED_TO_CREATE_INVOICE'),
+            title: 'Error',
+            description: 'Failed to create invoice',
             variant: 'destructive',
           });
         },
@@ -92,8 +108,8 @@ export function CreateInvoice() {
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       toast({
-        title: t('ERROR'),
-        description: t('AN_UNEXPECTED_ERROR_OCCURRED'),
+        title: 'Error',
+        description: 'An unexpected error occurred',
         variant: 'destructive',
       });
     }
