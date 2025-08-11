@@ -33,7 +33,7 @@ export function InvoicesPage() {
   });
 
   const {
-    data: invoiceItemsResponse,
+    data: invoiceDataItems,
     isLoading,
     error,
   } = useGetInvoiceItems({
@@ -41,8 +41,8 @@ export function InvoicesPage() {
     pageSize: paginationState.pageSize,
   });
 
-  const invoiceItems = invoiceItemsResponse?.items ?? [];
-  const totalCount = invoiceItemsResponse?.totalCount ?? 0;
+  const invoiceItems = invoiceDataItems?.items ?? [];
+  const totalCount = invoiceDataItems?.totalCount ?? 0;
 
   /**
    * Handles pagination changes.

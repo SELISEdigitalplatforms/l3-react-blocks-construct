@@ -27,6 +27,7 @@ export const GET_INVOICE_ITEMS_QUERY = `
         DeletedDate
         DateIssued
         Amount
+        Currency
         DueDate
         Status
         GeneralNote

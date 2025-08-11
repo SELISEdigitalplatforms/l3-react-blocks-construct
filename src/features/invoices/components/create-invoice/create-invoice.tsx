@@ -1,18 +1,18 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { v4 as uuidv4 } from 'uuid';
 import { generateInvoiceId } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
-import { useTranslation } from 'react-i18next';
 import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
 import { useAddInvoiceItem } from '../../hooks/use-invoices';
 import { useToast } from 'hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
 import {
   CustomerDetails,
   InvoiceItemDetails,
   AddInvoiceItemParams,
   InvoiceStatus,
 } from '../../types/invoices.types';
-import { useEffect, useState } from 'react';
 
 // Get current user profile from localStorage
 const getCurrentUser = () => {
@@ -78,6 +78,7 @@ export function CreateInvoice() {
           DueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
           Amount: totalAmount,
           Customer: [customer],
+          Currency: values.currency ?? '',
           Status: action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT,
           ItemDetails: itemDetails,
           GeneralNote: values.generalNote ?? '',

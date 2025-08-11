@@ -126,6 +126,7 @@ export interface AddInvoiceItemInput {
   Status: string;
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
+  Currency?: string;
 }
 
 export interface AddInvoiceItemParams {
@@ -158,6 +159,7 @@ export interface UpdateInvoiceItemInput {
   Status: InvoiceStatus[];
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
+  Currency?: string;
 }
 
 export interface UpdateInvoiceItemParams {

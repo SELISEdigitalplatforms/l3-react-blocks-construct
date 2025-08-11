@@ -62,7 +62,7 @@ export function EditInvoice() {
     email: invoice.Customer[0].Email ?? '',
     phoneNumber: formatPhoneToE164(invoice.Customer[0].PhoneNo ?? ''),
     billingAddress: invoice.Customer[0].BillingAddress ?? '',
-    currency: invoice.Currency?.toLowerCase() ?? '',
+    currency: invoice.Currency ?? '',
     dueDate: invoice.DueDate ? new Date(invoice.DueDate) : undefined,
     generalNote: invoice.GeneralNote ?? '',
   };
@@ -110,6 +110,7 @@ export function EditInvoice() {
         DueDate: values.dueDate?.toISOString() || new Date().toISOString(),
         Amount: updatedInvoice.Amount,
         Customer: [customer],
+        Currency: values.currency,
         Status: (action === 'send'
           ? InvoiceStatus.PENDING
           : InvoiceStatus.DRAFT) as unknown as InvoiceStatus[],

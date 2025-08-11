@@ -27,9 +27,9 @@ export interface InvoiceItemsResponse {
 }
 
 /**
- * GraphQL Inventory Hooks
+ * GraphQL Invoice Hooks
  *
- * This file contains React Query hooks for GraphQL inventory operations.
+ * This file contains React Query hooks for GraphQL invoice operations.
  * These hooks follow the same patterns as the existing REST API hooks.
  */
 
