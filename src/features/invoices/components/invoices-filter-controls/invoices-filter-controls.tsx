@@ -1,9 +1,9 @@
 import { Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { DateRange } from 'react-day-picker';
-import { InvoiceStatus } from '../../data/invoice-data';
 import { DateRangeFilter } from 'components/blocks/data-table/data-table-date-filter';
 import { DataTableFacetedFilter } from 'components/blocks/data-table/data-table-faceted-filter';
+import { InvoiceStatus } from '../../types/invoices.types';
 
 /**
  * InvoicesFilterControls Component
@@ -56,18 +56,18 @@ export function InvoicesFilterControls<TData>({
 }: Readonly<InvoicesFilterControlsProps<TData>>) {
   const { t } = useTranslation();
 
-  const statusColumn = table.getColumn('status');
+  const statusColumn = table.getColumn('Status');
   const statusOptions = Object.values(InvoiceStatus).map((status) => ({
     label: t(status),
     value: status,
-    icon: undefined
+    icon: undefined,
   }));
 
   return (
     <div className="flex items-center gap-2">
       {/* Date Issued Filter */}
       <DateRangeFilter
-        column={table.getColumn('dateIssued')}
+        column={table.getColumn('DateIssued')}
         title={t('DATE_ISSUED')}
         date={dateIssued}
         onDateChange={onDateIssuedChange}
@@ -75,7 +75,7 @@ export function InvoicesFilterControls<TData>({
 
       {/* Due Date Filter */}
       <DateRangeFilter
-        column={table.getColumn('dueDate')}
+        column={table.getColumn('DueDate')}
         title={t('DUE_DATE')}
         date={dueDate}
         onDateChange={onDueDateChange}

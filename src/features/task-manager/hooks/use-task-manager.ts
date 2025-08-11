@@ -9,18 +9,16 @@ import type {
   TaskCommentUpdateInput,
   TaskTagInsertInput,
   TaskTagUpdateInput,
-} from '../types/task-manager.types';
-import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from 'hooks/use-toast';
-import { useTranslation } from 'react-i18next';
-import { useErrorHandler } from 'hooks/use-error-handler';
-import type {
   TaskItemInsertInput,
   TaskItemUpdateInput,
   TaskSectionInsertInput,
   TaskSectionUpdateInput,
   UpdateTaskManagerSectionResponse,
 } from '../types/task-manager.types';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from 'hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { useErrorHandler } from 'hooks/use-error-handler';
 import type {
   InsertTaskItemResponse,
   UpdateTaskItemResponse,
@@ -464,7 +462,7 @@ export const useCreateTaskComment = () => {
     TaskCommentInsertInput & { taskId?: string }
   >({
     mutationFn: async (input) => {
-      const taskId = input.taskId || input.TaskId;
+      const taskId = input.taskId ?? input.TaskId;
       if (!taskId) {
         throw new Error('Task ID is required to create a comment');
       }

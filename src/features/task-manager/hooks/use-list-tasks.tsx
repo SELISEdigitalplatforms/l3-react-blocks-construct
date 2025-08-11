@@ -70,7 +70,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
     const newTask: TaskItem = {
       ItemId: tempId,
       Title: title,
-      Section: status || 'todo',
+      Section: status ?? '',
       IsCompleted: false,
       IsDeleted: false,
       CreatedDate: new Date().toISOString(),
@@ -81,23 +81,29 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
 
     setTasks((prev) => [newTask, ...prev]);
 
+    const handleTaskCreationResponse = (response: any) => {
+      const realId = response?.insertTaskManagerItem?.itemId;
+      if (!realId) return;
+
+      const updateTaskId = (task: TaskItem) =>
+        task.ItemId === tempId ? { ...task, ItemId: realId } : task;
+
+      setTasks((prev) => prev.map(updateTaskId));
+    };
+
+    const handleTaskCreationError = () => {
+      const filterOutTempTask = (task: TaskItem) => task.ItemId !== tempId;
+      setTasks((prev) => prev.filter(filterOutTempTask));
+    };
+
     createTaskItem({
       Title: title,
-      Section: status || '',
+      Section: status ?? '',
       IsCompleted: false,
       DueDate: new Date().toISOString(),
     })
-      .then((response: any) => {
-        const realId = response?.insertTaskManagerItem?.itemId;
-        if (realId) {
-          setTasks((prev) =>
-            prev.map((task) => (task.ItemId === tempId ? { ...task, ItemId: realId } : task))
-          );
-        }
-      })
-      .catch(() => {
-        setTasks((prev) => prev.filter((task) => task.ItemId !== tempId));
-      });
+      .then(handleTaskCreationResponse)
+      .catch(handleTaskCreationError);
 
     return tempId;
   };
@@ -122,58 +128,59 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
   };
 
   const getFilteredTasks = useCallback(() => {
-    return tasks.filter((task) => {
-      // Filter by search query
-      if (searchQuery) {
-        const searchLower = searchQuery.toLowerCase();
-        const matchesSearch =
-          task.Title?.toLowerCase().includes(searchLower) ||
-          task.Description?.toLowerCase().includes(searchLower) ||
-          task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(searchLower));
+    const matchesSearchQuery = (task: TaskItem): boolean => {
+      if (!searchQuery) return true;
 
-        if (!matchesSearch) return false;
-      }
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        task.Title?.toLowerCase().includes(searchLower) ||
+        task.Description?.toLowerCase().includes(searchLower) ||
+        Boolean(task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(searchLower)))
+      );
+    };
 
-      // Filter by priorities
-      if (filters.priorities?.length && !filters.priorities.some((p) => p === task.Priority)) {
-        return false;
-      }
+    const matchesPriority = (task: TaskItem): boolean => {
+      return !filters.priorities?.length || filters.priorities.some((p) => p === task.Priority);
+    };
 
-      // Filter by statuses (sections)
-      if (filters.statuses?.length && task.Section && !filters.statuses.includes(task.Section)) {
-        return false;
-      }
+    const matchesStatus = (task: TaskItem): boolean => {
+      return !filters.statuses?.length || !task.Section || filters.statuses.includes(task.Section);
+    };
 
-      // Filter by assignees
-      if (filters.assignees?.length && task.Assignee?.length) {
-        const hasMatchingAssignee = task.Assignee.some((assignee) =>
-          filters.assignees?.includes(assignee.ItemId)
-        );
-        if (!hasMatchingAssignee) return false;
-      }
+    const matchesAssignees = (task: TaskItem): boolean => {
+      if (!filters.assignees?.length || !task.Assignee?.length) return true;
+      return task.Assignee.some((assignee) => filters.assignees?.includes(assignee.ItemId));
+    };
 
-      // Filter by tags
-      if (filters.tags?.length && task.ItemTag?.length) {
-        const hasMatchingTag = task.ItemTag.some((tag) =>
-          filters.tags?.some((t) => t.ItemId === tag.ItemId)
-        );
-        if (!hasMatchingTag) return false;
-      }
+    const matchesTags = (task: TaskItem): boolean => {
+      if (!filters.tags?.length || !task.ItemTag?.length) return true;
+      
+      const tagIds = new Set(filters.tags.map(({ ItemId }) => ItemId));
+      return task.ItemTag.some(({ ItemId }) => tagIds.has(ItemId));
+    };
 
-      // Filter by due date
-      if (filters.dueDate?.from || filters.dueDate?.to) {
-        const taskDueDate = task.DueDate ? new Date(task.DueDate) : null;
+    const matchesDueDate = (task: TaskItem): boolean => {
+      if (!filters.dueDate?.from && !filters.dueDate?.to) return true;
 
-        if (filters.dueDate.from && taskDueDate && taskDueDate < filters.dueDate.from) {
-          return false;
-        }
-        if (filters.dueDate.to && taskDueDate && taskDueDate > filters.dueDate.to) {
-          return false;
-        }
-      }
+      const taskDueDate = task.DueDate ? new Date(task.DueDate) : null;
+      if (!taskDueDate) return true;
 
-      return true;
-    });
+      const { from, to } = filters.dueDate;
+      const isAfterFrom = !from || taskDueDate >= from;
+      const isBeforeTo = !to || taskDueDate <= to;
+
+      return isAfterFrom && isBeforeTo;
+    };
+
+    return tasks.filter(
+      (task) =>
+        matchesSearchQuery(task) &&
+        matchesPriority(task) &&
+        matchesStatus(task) &&
+        matchesAssignees(task) &&
+        matchesTags(task) &&
+        matchesDueDate(task)
+    );
   }, [tasks, searchQuery, filters]);
 
   const changeTaskStatus = (taskId: string, newStatus: 'todo' | 'inprogress' | 'done') => {

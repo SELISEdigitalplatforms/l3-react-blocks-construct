@@ -42,11 +42,11 @@ import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
  */
 
 interface EditableCommentProps {
-  readonly author: string;
-  readonly timestamp: string;
-  readonly initialComment: string;
-  readonly onEdit?: (newComment: string) => void;
-  readonly onDelete?: () => void;
+  author: string;
+  timestamp: string;
+  initialComment: string;
+  onEdit?: (newComment: string) => void;
+  onDelete?: () => void;
 }
 
 // Get current user profile from localStorage
@@ -62,7 +62,7 @@ export function EditableComment({
   initialComment,
   onEdit,
   onDelete,
-}: EditableCommentProps) {
+}: Readonly<EditableCommentProps>) {
   const [userProfile, setUserProfile] = useState(getCurrentUser());
   const [comment, setComment] = useState(initialComment);
   const [isEditing, setIsEditing] = useState(false);
@@ -80,11 +80,14 @@ export function EditableComment({
     }
   }, [isEditing]);
 
-  const parsedTime = timestamp
-    ? timestamp.includes('T')
-      ? new Date(timestamp)
-      : parse(timestamp, 'dd.MM.yyyy, HH:mm', new Date())
-    : new Date();
+  const parseTimestamp = (timeStr: string | undefined): Date => {
+    if (!timeStr) return new Date();
+    return timeStr.includes('T')
+      ? new Date(timeStr)
+      : parse(timeStr, 'dd.MM.yyyy, HH:mm', new Date());
+  };
+
+  const parsedTime = parseTimestamp(timestamp);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);

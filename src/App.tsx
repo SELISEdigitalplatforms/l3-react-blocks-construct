@@ -38,7 +38,6 @@ import NotFound from './pages/error/not-found/not-found';
 import Finance from './pages/finance/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
-import { InvoiceLayout } from './pages/invoices/invoice-layout';
 import { CreateInvoice, EditInvoice } from './features/invoices';
 import SharedWithMe from 'pages/file-manager/shared-files';
 import Trash from 'pages/file-manager/trash';
@@ -108,12 +107,10 @@ function AppContent() {
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
-                <Route element={<InvoiceLayout />}>
-                  <Route path="/invoices" element={<InvoicesPage />} />
-                  <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                  <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
-                  <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
-                </Route>
+                <Route path="/invoices" element={<InvoicesPage />} />
+                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
+                <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
                 <Route path="/file-manager/trash" element={<Trash />} />

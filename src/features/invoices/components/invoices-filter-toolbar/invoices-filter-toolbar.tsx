@@ -20,14 +20,14 @@ export function InvoicesFilterToolbar<TData>({
   const [dueDate, setDueDate] = useState<DateRange | undefined>();
 
   useEffect(() => {
-    const column = table.getColumn('customerName');
+    const column = table.getColumn('Customer');
     if (column) {
       column.setFilterValue(search);
     }
   }, [search, table]);
 
   useEffect(() => {
-    const column = table.getColumn('dateIssued');
+    const column = table.getColumn('DateIssued');
     if (column) {
       column.setFilterValue(
         dateIssued
@@ -41,7 +41,7 @@ export function InvoicesFilterToolbar<TData>({
   }, [dateIssued, table]);
 
   useEffect(() => {
-    const column = table.getColumn('dueDate');
+    const column = table.getColumn('DueDate');
     if (column) {
       column.setFilterValue(
         dueDate
@@ -61,7 +61,7 @@ export function InvoicesFilterToolbar<TData>({
     table.resetColumnFilters();
   };
 
-  const isFiltered = search ?? table.getState().columnFilters.length > 0;
+  const isFiltered = search || table.getState().columnFilters.length > 0;
 
   return (
     <div className="flex flex-col w-full gap-4 sm:flex-row sm:items-center">

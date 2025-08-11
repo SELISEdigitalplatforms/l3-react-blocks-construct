@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { SetStateAction, useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
@@ -19,9 +19,10 @@ import {
   TaskItem,
   TaskTagInsertInput,
   TaskCommentInsertInput,
+  TaskPriority,
+  TaskAttachments,
+  priorityStyle,
 } from '../../types/task-manager.types';
-import { TaskPriority, TaskAttachments, priorityStyle } from '../../types/task-manager.types';
-
 import { Calendar } from 'components/ui/calendar';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
@@ -36,7 +37,7 @@ import { Label } from 'components/ui/label';
 import { EditableHeading } from './editable-heading';
 import { EditableComment } from './editable-comment';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from 'components/ui/dialog';
-import { EditableDescription } from './editable-description';
+import { EditableDescription, EditableDescriptionRef } from './editable-description';
 import { AttachmentsSection } from './attachment-section';
 import { Separator } from 'components/ui/separator';
 import { Tags } from './tag-selector';
@@ -123,8 +124,8 @@ export default function TaskDetailsView({
     if (!usersResponse?.data) return [];
     return usersResponse.data.map((user) => ({
       ItemId: user.itemId,
-      Name: `${user.firstName} ${user.lastName || ''}`.trim(),
-      ImageUrl: user.profileImageUrl || '',
+      Name: `${user.firstName} ${user.lastName ?? ''}`.trim(),
+      ImageUrl: user.profileImageUrl ?? '',
     }));
   }, [usersResponse]);
   const { columns } = useCardTasks();
@@ -136,8 +137,6 @@ export default function TaskDetailsView({
     updateTaskDetails,
     addNewAttachment: addAttachment,
     deleteAttachment: removeAttachment,
-    addNewTag: addTagToTask,
-    deleteTag: removeTag,
   } = useTaskDetails(currentTaskId);
 
   const { mutate: createTag, isPending: isCreatingTag } = useCreateTags();
@@ -145,9 +144,9 @@ export default function TaskDetailsView({
   const [date, setDate] = useState<Date | undefined>(
     task?.DueDate ? new Date(task.DueDate) : undefined
   );
-  const [title, setTitle] = useState<string>(task?.Title || '');
-  const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted || false);
-  const [section, setSection] = useState<string>(task?.Section || '');
+  const [title, setTitle] = useState<string>(task?.Title ?? '');
+  const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted ?? false);
+  const [section, setSection] = useState<string>(task?.Section ?? '');
   const [attachments, setAttachments] = useState<TaskAttachments[]>(
     task?.Attachments?.map((attachment) => ({
       ItemId: attachment.ItemId,
@@ -157,18 +156,19 @@ export default function TaskDetailsView({
     })) || []
   );
   const [priority, setPriority] = useState<TaskPriority>(
-    task?.Priority && Object.values(TaskPriority).includes(task.Priority as TaskPriority)
-      ? (task.Priority as TaskPriority)
+    task?.Priority && Object.values(TaskPriority).includes(task.Priority)
+      ? task.Priority
       : TaskPriority.MEDIUM
   );
-  const [description, setDescription] = useState<string>(task?.Description || '');
+  const [description, setDescription] = useState<string>(task?.Description ?? '');
   const [newCommentContent, setNewCommentContent] = useState('');
   const [isWritingComment, setIsWritingComment] = useState(false);
   const [userProfile, setUserProfile] = useState<{ fullName?: string; profileImageUrl?: string }>(
     {}
   );
-  const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag || []);
+  const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag ?? []);
   const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
+  const descriptionRef = useRef<EditableDescriptionRef>(null);
 
   useEffect(() => {
     const profile = localStorage.getItem('userProfile');
@@ -202,13 +202,13 @@ export default function TaskDetailsView({
   useEffect(() => {
     if (!task) return;
 
-    const currentAssigneeIds = selectedAssignees
+    const currentAssigneeIds = [...selectedAssignees]
       .map((a) => a.ItemId)
-      .sort()
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
       .join(',');
     const newAssigneeIds = (task.Assignee || [])
       .map((a) => a.ItemId)
-      .sort()
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
       .join(',');
 
     if (currentAssigneeIds !== newAssigneeIds) {
@@ -239,13 +239,15 @@ export default function TaskDetailsView({
     }
   }, [calendarOpen, date]);
 
-  // Fetch all comments and filter by current task ID on the frontend
-  const { data: commentsData, isLoading: isLoadingComments } = useGetTaskComments({
+  const {
+    data: commentsData,
+    isLoading: isLoadingComments,
+    refetch: refetchComments,
+  } = useGetTaskComments({
     pageNo: 1,
     pageSize: 100,
   });
 
-  // Filter comments to only show those for the current task
   const comments = useMemo(() => {
     if (!commentsData?.TaskManagerComments?.items) return [];
     return commentsData.TaskManagerComments.items.filter(
@@ -277,68 +279,17 @@ export default function TaskDetailsView({
     }
   };
 
-  useEffect(() => {
-    if (task) {
-      setTitle(task.Title || '');
-      setIsMarkComplete(!!task.IsCompleted);
-      setSection(task.Section || 'To Do');
-      setAttachments(
-        (task.Attachments || []).map((attachment) => ({
-          ItemId: attachment.ItemId,
-          FileName: attachment.FileName,
-          FileSize: attachment.FileSize,
-          FileType: attachment.FileType,
-        }))
-      );
-      setDate(task.DueDate ? new Date(task.DueDate) : undefined);
-      setDescription(task.Description || '');
-      setSelectedTags(task.ItemTag || []);
-
-      if (task.Assignee) {
-        if (Array.isArray(task.Assignee)) {
-          setSelectedAssignees(
-            task.Assignee.length > 0
-              ? task.Assignee.map((assignee) => ({
-                  ItemId: assignee.ItemId || '',
-                  Name: assignee.Name || '',
-                  ImageUrl: assignee.ImageUrl || '',
-                }))
-              : []
-          );
-        } else if (typeof task.Assignee === 'object' && task.Assignee !== null) {
-          const assignee = task.Assignee as Assignee;
-          setSelectedAssignees([
-            {
-              ItemId: assignee.ItemId || '',
-              Name: assignee.Name || '',
-              ImageUrl: assignee.ImageUrl || '',
-            },
-          ]);
-        } else {
-          setSelectedAssignees([]);
-        }
-      } else {
-        setSelectedAssignees([]);
-      }
-
-      if (task.Priority && Object.values(TaskPriority).includes(task.Priority as TaskPriority)) {
-        setPriority(task.Priority as TaskPriority);
-      } else {
-        setPriority(TaskPriority.MEDIUM);
-      }
-    } else {
-      setTitle('');
-      setIsMarkComplete(false);
-      setSection('To Do');
-      setAttachments([]);
-      setDate(undefined);
-      setDescription('');
-      setSelectedTags([]);
-      setSelectedAssignees([]);
-      setPriority(TaskPriority.MEDIUM);
-    }
+  const resetForm = useCallback(() => {
+    setTitle('');
+    setIsMarkComplete(false);
+    setSection('To Do');
+    setAttachments([]);
+    setDate(undefined);
+    setDescription('');
+    setSelectedTags([]);
+    setSelectedAssignees([]);
+    setPriority(TaskPriority.MEDIUM);
   }, [
-    task,
     setTitle,
     setIsMarkComplete,
     setSection,
@@ -348,6 +299,94 @@ export default function TaskDetailsView({
     setSelectedTags,
     setSelectedAssignees,
     setPriority,
+  ]);
+
+  const setTaskAttachments = useCallback(
+    (attachments: any[]) => {
+      setAttachments(
+        (attachments || []).map((attachment) => ({
+          ItemId: attachment.ItemId,
+          FileName: attachment.FileName,
+          FileSize: attachment.FileSize,
+          FileType: attachment.FileType,
+        }))
+      );
+    },
+    [setAttachments]
+  );
+
+  const setTaskAssignees = useCallback(
+    (assignee: any) => {
+      if (!assignee) {
+        setSelectedAssignees([]);
+        return;
+      }
+
+      if (Array.isArray(assignee)) {
+        setSelectedAssignees(
+          assignee.length > 0
+            ? assignee.map((a) => ({
+                ItemId: a.ItemId || '',
+                Name: a.Name || '',
+                ImageUrl: a.ImageUrl || '',
+              }))
+            : []
+        );
+      } else if (typeof assignee === 'object' && assignee !== null) {
+        const a = assignee as Assignee;
+        setSelectedAssignees([
+          {
+            ItemId: a.ItemId || '',
+            Name: a.Name || '',
+            ImageUrl: a.ImageUrl || '',
+          },
+        ]);
+      } else {
+        setSelectedAssignees([]);
+      }
+    },
+    [setSelectedAssignees]
+  );
+
+  const setTaskPriority = useCallback(
+    (priority: any) => {
+      setPriority(
+        priority && Object.values(TaskPriority).includes(priority) ? priority : TaskPriority.MEDIUM
+      );
+    },
+    [setPriority]
+  );
+
+  useEffect(() => {
+    if (!task) {
+      resetForm();
+      return;
+    }
+
+    // Set basic task fields
+    setTitle(task.Title ?? '');
+    setIsMarkComplete(!!task.IsCompleted);
+    setSection(task.Section ?? '');
+    setDate(task.DueDate ? new Date(task.DueDate) : undefined);
+    setDescription(task.Description ?? '');
+    setSelectedTags(task.ItemTag ?? []);
+
+    // Set complex fields using extracted functions
+    setTaskAttachments(task.Attachments ?? []);
+    setTaskAssignees(task.Assignee);
+    setTaskPriority(task.Priority);
+  }, [
+    task,
+    resetForm,
+    setTitle,
+    setIsMarkComplete,
+    setSection,
+    setDate,
+    setDescription,
+    setSelectedTags,
+    setTaskAttachments,
+    setTaskAssignees,
+    setTaskPriority,
   ]);
 
   const handleTitleChange = async (newTitle: string) => {
@@ -375,30 +414,55 @@ export default function TaskDetailsView({
 
   const { mutate: createComment, isPending: isCreatingComment } = useCreateTaskComment();
 
+  const renderComments = () => {
+    if (isLoadingComments) {
+      return (
+        <div className="flex items-center justify-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      );
+    }
+
+    if (comments.length === 0) {
+      return null;
+    }
+
+    return comments.map((comment) => (
+      <EditableComment
+        key={comment.ItemId}
+        author={comment.Author}
+        timestamp={comment.CreatedDate ?? comment.Timestamp}
+        initialComment={comment.Content}
+        onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
+        onDelete={() => handleDeleteComment(comment.ItemId)}
+      />
+    ));
+  };
+
   const handleSubmitComment = async (content: string) => {
-    if (content.trim() && currentTaskId) {
-      try {
-        const commentInput: TaskCommentInsertInput = {
-          ItemId: uuidv4(),
-          TaskId: currentTaskId,
-          Content: content,
-          Author: userProfile.fullName || 'Anonymous',
-          IsDeleted: false,
-          Language: 'en',
-        };
+    if (!content.trim() || !currentTaskId) return;
 
-        setNewCommentContent('');
-        setIsWritingComment(false);
+    try {
+      const commentInput: TaskCommentInsertInput = {
+        ItemId: uuidv4(),
+        TaskId: currentTaskId,
+        Content: content,
+        Author: userProfile.fullName ?? '',
+        IsDeleted: false,
+        Language: '',
+      };
 
-        await createComment(commentInput);
-      } catch (error) {
-        console.error('Error adding comment:', error);
-        toast({
-          title: t('ERROR'),
-          description: t('FAILED_TO_ADD_COMMENT'),
-          variant: 'destructive',
-        });
-      }
+      setNewCommentContent('');
+      setIsWritingComment(false);
+      createComment(commentInput);
+      await refetchComments();
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: t('ERROR'),
+        description: t('FAILED_TO_ADD_COMMENT'),
+        variant: 'destructive',
+      });
     }
   };
 
@@ -434,8 +498,8 @@ export default function TaskDetailsView({
         Assignee: Array.isArray(task.Assignee)
           ? task.Assignee.map((id) => ({
               ItemId: id,
-              Name: selectedAssignees.find((a) => a.ItemId === id)?.Name || '',
-              ImageUrl: selectedAssignees.find((a) => a.ItemId === id)?.ImageUrl || '',
+              Name: selectedAssignees.find((a) => a.ItemId === id)?.Name ?? '',
+              ImageUrl: selectedAssignees.find((a) => a.ItemId === id)?.ImageUrl ?? '',
             }))
           : undefined,
       };
@@ -460,76 +524,97 @@ export default function TaskDetailsView({
     }
   };
 
+  const createNewTask = useCallback(
+    (): NewTaskInput => ({
+      Section: section,
+      IsCompleted: isMarkComplete,
+      Title: title,
+      Priority: priority,
+      DueDate: date ? new Date(date).toISOString() : undefined,
+      Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
+      Description: description ?? '',
+      ItemTag: selectedTags,
+      Attachments: attachments,
+      Comments: [],
+    }),
+    [
+      section,
+      isMarkComplete,
+      title,
+      priority,
+      date,
+      selectedAssignees,
+      description,
+      selectedTags,
+      attachments,
+    ]
+  );
+
+  const createNewTags = useCallback(
+    async (tagsToCreate: Array<string | ItemTag>) => {
+      if (tagsToCreate.length === 0) return;
+
+      const now = new Date().toISOString();
+      const existingTagLabels = tags.map((tag) => tag.TagLabel.toLowerCase());
+
+      const tagPromises = tagsToCreate
+        .filter((tag) => {
+          const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
+          return !existingTagLabels.includes(tagLabel.toLowerCase());
+        })
+        .map((tag) => {
+          const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
+          return createTag({
+            ItemId: uuidv4(),
+            Label: tagLabel,
+            CreatedDate: now,
+            IsDeleted: false,
+            LastUpdatedDate: now,
+          } as TaskTagInsertInput);
+        });
+
+      await Promise.all(tagPromises);
+    },
+    [tags, createTag]
+  );
+
   const handleAddItem = async () => {
-    if (isNewTaskModalOpen === true && !newTaskAdded) {
-      const tagsToCreate = [...selectedTags];
-      setSelectedTags([]);
+    if (isNewTaskModalOpen !== true || newTaskAdded) return;
 
-      const newTask: NewTaskInput = {
-        Section: section,
-        IsCompleted: isMarkComplete,
-        Title: title,
-        Priority: priority,
-        DueDate: date ? new Date(date).toISOString() : undefined,
-        Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
-        Description: description ?? '',
-        ItemTag: selectedTags,
-        Attachments: attachments,
-        Comments: [],
-      };
+    const tagsToCreate = [...selectedTags];
+    setSelectedTags([]);
 
-      try {
-        if (!title) {
-          throw new Error('Task title is required');
-        }
-
-        const newTaskId = await safeAddTask(newTask);
-
-        if (!newTaskId) {
-          throw new Error('Failed to create task: No task ID returned');
-        }
-
-        setCurrentTaskId(newTaskId);
-        setNewTaskAdded(true);
-
-        if (tagsToCreate.length > 0) {
-          const now = new Date().toISOString();
-          const existingTagLabels = tags.map((tag) => tag.TagLabel.toLowerCase());
-          const tagPromises = tagsToCreate
-            .filter((tag) => {
-              const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
-              return !existingTagLabels.includes(tagLabel.toLowerCase());
-            })
-            .map((tag) => {
-              const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
-              return createTag({
-                ItemId: uuidv4(),
-                Label: tagLabel,
-                CreatedDate: now,
-                IsDeleted: false,
-                LastUpdatedDate: now,
-              } as TaskTagInsertInput);
-            });
-
-          await Promise.all(tagPromises);
-        }
-
-        toast({
-          title: t('SUCCESS'),
-          description: t('TASK_CREATED_SUCCESSFULLY'),
-        });
-        onTaskAddedList?.();
-        onClose();
-      } catch (error) {
-        console.error('Error in handleAddItem:', error);
-        toast({
-          title: t('ERROR'),
-          description: error instanceof Error ? error.message : t('Failed to create task or tags'),
-          variant: 'destructive',
-        });
-
-        setSelectedTags(tagsToCreate);
+    try {
+      if (!title) {
+        throw new Error('Task title is required');
       }
+
+      const newTask = createNewTask();
+      const newTaskId = await safeAddTask(newTask);
+
+      if (!newTaskId) {
+        throw new Error('Failed to create task: No task ID returned');
+      }
+
+      setCurrentTaskId(newTaskId);
+      setNewTaskAdded(true);
+
+      await createNewTags(tagsToCreate);
+
+      toast({
+        title: t('SUCCESS'),
+        description: t('TASK_CREATED_SUCCESSFULLY'),
+      });
+      onTaskAddedList?.();
+      onClose();
+    } catch (error) {
+      console.error('Error in handleAddItem:', error);
+      toast({
+        title: t('ERROR'),
+        description: error instanceof Error ? error.message : t('Failed to create task or tags'),
+        variant: 'destructive',
+      });
+      setSelectedTags(tagsToCreate);
     }
   };
 
@@ -555,82 +640,92 @@ export default function TaskDetailsView({
     }
   };
 
-  const handleAssigneeChange = async (newAssignees: Assignee[]) => {
-    const previousAssignees = [...selectedAssignees];
+  const handleAssigneeChange = useCallback(
+    async (newAssignees: Assignee[]) => {
+      if (!currentTaskId) return;
 
-    try {
-      setSelectedAssignees(newAssignees);
-
-      if (currentTaskId) {
+      try {
         await updateTaskDetails({
           Assignee: newAssignees,
         });
-      }
-    } catch (error) {
-      console.error('Failed to update assignees:', error);
-      setSelectedAssignees(previousAssignees);
 
-      toast({
-        variant: 'destructive',
-        title: t('ERROR'),
-        description: t('Failed to update assignees. Please try again.'),
-      });
-    }
+        // Only update local state after successful API call
+        setSelectedAssignees(newAssignees);
+      } catch (error) {
+        console.error('Failed to update assignees:', error);
+        toast({
+          variant: 'destructive',
+          title: t('ERROR'),
+          description: t('Failed to update assignees. Please try again.'),
+        });
+        throw error;
+      }
+    },
+    [currentTaskId, updateTaskDetails, t, toast]
+  );
+
+  const handleTagChange = useCallback(
+    async (newTags: ItemTag[]) => {
+      if (!currentTaskId) return;
+
+      const previousTags = [...selectedTags];
+
+      try {
+        // Optimistically update the UI
+        setSelectedTags(newTags);
+
+        // Only make one API call to update the tags
+        await updateTaskDetails({
+          ItemTag: newTags,
+        });
+      } catch (error) {
+        console.error('Failed to update tags:', error);
+        // Revert to previous state on error
+        setSelectedTags(previousTags);
+        toast({
+          variant: 'destructive',
+          title: t('ERROR'),
+          description: t('Failed to update tags. Please try again.'),
+        });
+      }
+    },
+    [currentTaskId, selectedTags, updateTaskDetails, t, toast]
+  );
+
+  const mapAttachmentsForUpdate = (attachments: TaskAttachments[]) => {
+    return attachments.map(({ ItemId, FileName, FileSize, FileType }) => ({
+      ItemId,
+      FileName,
+      FileSize,
+      FileType,
+    }));
   };
 
-  const handleTagChange = async (newTags: Array<string | ItemTag>) => {
-    const normalizedNewTags = newTags.map((tag) =>
-      typeof tag === 'string' ? { ItemId: uuidv4(), TagLabel: tag } : tag
-    ) as ItemTag[];
+  const processAttachmentChanges = (
+    prevAttachments: TaskAttachments[],
+    updatedAttachments: TaskAttachments[]
+  ) => {
+    if (!currentTaskId) return;
 
-    const existingTagsMap = new Map(tags.map((tag) => [tag.TagLabel.toLowerCase(), tag]));
-
-    const processedTags = normalizedNewTags.map((tag) => {
-      const existingTag = existingTagsMap.get(tag.TagLabel.toLowerCase());
-      return existingTag || tag;
+    updateTaskDetails({
+      Attachments: mapAttachmentsForUpdate(updatedAttachments),
     });
 
-    const uniqueTags = Array.from(
-      new Map(processedTags.map((tag) => [tag.TagLabel.toLowerCase(), tag])).values()
+    const removedAttachments = prevAttachments.filter(
+      (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
     );
 
-    const previousTags = [...selectedTags];
+    const addedAttachments = updatedAttachments.filter(
+      (newAtt) => !prevAttachments.some((prevAtt) => prevAtt.ItemId === newAtt.ItemId)
+    );
 
-    setSelectedTags(uniqueTags);
+    addedAttachments.forEach((attachment) => {
+      addAttachment(attachment);
+    });
 
-    if (!currentTaskId) {
-      return;
-    }
-
-    try {
-      await updateTaskDetails({
-        ItemTag: uniqueTags,
-      });
-
-      const currentTagLabels = new Set(previousTags.map((tag) => tag.TagLabel.toLowerCase()));
-      const newTagLabels = new Set(uniqueTags.map((tag) => tag.TagLabel.toLowerCase()));
-
-      const tagsToAdd = uniqueTags.filter(
-        (tag) => !currentTagLabels.has(tag.TagLabel.toLowerCase())
-      );
-      const tagsToRemove = previousTags.filter(
-        (tag) => !newTagLabels.has(tag.TagLabel.toLowerCase())
-      );
-
-      await Promise.all([
-        ...tagsToAdd.map((tag) => addTagToTask(tag.TagLabel).catch(console.error)),
-        ...tagsToRemove.map((tag) => removeTag(tag.ItemId).catch(console.error)),
-      ]);
-    } catch (error) {
-      console.error('Failed to update tags:', error);
-      setSelectedTags(previousTags);
-
-      toast({
-        variant: 'destructive',
-        title: t('ERROR'),
-        description: t('Failed to update tags. Please try again.'),
-      });
-    }
+    removedAttachments.forEach(({ ItemId }) => {
+      removeAttachment(ItemId);
+    });
   };
 
   const handleAttachmentChange = async (newAttachments: SetStateAction<TaskAttachments[]>) => {
@@ -638,33 +733,7 @@ export default function TaskDetailsView({
       const updatedAttachments =
         typeof newAttachments === 'function' ? newAttachments(prev) : newAttachments;
 
-      if (currentTaskId) {
-        updateTaskDetails({
-          Attachments: updatedAttachments.map((attachment) => ({
-            ItemId: attachment.ItemId,
-            FileName: attachment.FileName,
-            FileSize: attachment.FileSize,
-            FileType: attachment.FileType,
-          })),
-        });
-
-        const removedAttachments = prev.filter(
-          (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
-        );
-
-        const addedAttachments = updatedAttachments.filter(
-          (newAtt) => !prev.some((prevAtt) => prevAtt.ItemId === newAtt.ItemId)
-        );
-
-        addedAttachments.forEach((attachment) => {
-          addAttachment(attachment);
-        });
-
-        removedAttachments.forEach((attachment) => {
-          removeAttachment(attachment.ItemId);
-        });
-      }
-
+      processAttachmentChanges(prev, updatedAttachments);
       return updatedAttachments;
     });
   };
@@ -760,7 +829,12 @@ export default function TaskDetailsView({
     <DialogContent
       className="rounded-md sm:max-w-[720px] xl:max-h-[750px] max-h-screen flex flex-col p-0"
       onInteractOutside={() => handleAddItem()}
-      onOpenAutoFocus={(e) => e.preventDefault()}
+      onOpenAutoFocus={(e) => {
+        e.preventDefault();
+        setTimeout(() => {
+          descriptionRef.current?.focus();
+        }, 0);
+      }}
     >
       <DialogHeader className="hidden">
         <DialogTitle />
@@ -889,9 +963,15 @@ export default function TaskDetailsView({
         </div>
         <div className="mt-6">
           <EditableDescription
+            ref={descriptionRef}
             taskId={taskId}
             initialContent={description}
-            onContentChange={(newContent) => {
+            isNewTask={isNewTaskModalOpen}
+            onContentChange={setDescription}
+            onSave={async (newContent) => {
+              if (taskId) {
+                await updateTaskDetails({ Description: newContent });
+              }
               setDescription(newContent);
             }}
           />
@@ -950,22 +1030,7 @@ export default function TaskDetailsView({
                 )}
               </div>
 
-              {isLoadingComments ? (
-                <div className="flex items-center justify-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : comments.length > 0 ? (
-                comments.map((comment) => (
-                  <EditableComment
-                    key={comment.ItemId}
-                    author={comment.Author}
-                    timestamp={comment.CreatedDate || comment.Timestamp}
-                    initialComment={comment.Content}
-                    onEdit={(newText) => handleEditComment(comment.ItemId, newText)}
-                    onDelete={() => handleDeleteComment(comment.ItemId)}
-                  />
-                ))
-              ) : null}
+              {renderComments()}
             </div>
           </div>
         )}

@@ -10,7 +10,13 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
-import { TaskItem, TaskSection, TaskPriority } from '../types/task-manager.types';
+import {
+  ItemTag,
+  TaskItem,
+  TaskPriority,
+  TaskSection,
+  TaskSectionWithTasks,
+} from '../types/task-manager.types';
 import {
   useGetTasks,
   useGetTaskSections,
@@ -21,10 +27,6 @@ import {
   useDeleteTaskSection,
 } from './use-task-manager';
 import { useToast } from 'hooks/use-toast';
-
-interface TaskSectionWithTasks extends TaskSection {
-  tasks: TaskItem[];
-}
 
 /**
  * useCardTasks Hook
@@ -89,24 +91,24 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
   const ensureTaskItem = useCallback((task: TaskItem): TaskItem => {
     return {
-      ItemId: task.ItemId || '',
-      Title: task.Title || '',
-      Description: task.Description || '',
-      IsCompleted: task.IsCompleted || false,
-      Priority: task.Priority || TaskPriority.MEDIUM,
-      Section: task.Section || '',
-      ItemTag: task.ItemTag || [],
-      Assignee: task.Assignee || [],
-      Comments: task.Comments || [],
-      Attachments: task.Attachments || [],
-      CreatedBy: task.CreatedBy || '',
-      CreatedDate: task.CreatedDate || new Date().toISOString(),
-      LastUpdatedBy: task.LastUpdatedBy || '',
-      LastUpdatedDate: task.LastUpdatedDate || new Date().toISOString(),
-      DueDate: task.DueDate || '',
-      IsDeleted: task.IsDeleted || false,
-      Language: task.Language || 'en',
-      OrganizationIds: task.OrganizationIds || [],
+      ItemId: task.ItemId ?? '',
+      Title: task.Title ?? '',
+      Description: task.Description ?? '',
+      IsCompleted: task.IsCompleted ?? false,
+      Priority: task.Priority ?? TaskPriority.MEDIUM,
+      Section: task.Section ?? '',
+      ItemTag: task.ItemTag ?? [],
+      Assignee: task.Assignee ?? [],
+      Comments: task.Comments ?? [],
+      Attachments: task.Attachments ?? [],
+      CreatedBy: task.CreatedBy ?? '',
+      CreatedDate: task.CreatedDate ?? new Date().toISOString(),
+      LastUpdatedBy: task.LastUpdatedBy ?? '',
+      LastUpdatedDate: task.LastUpdatedDate ?? new Date().toISOString(),
+      DueDate: task.DueDate ?? '',
+      IsDeleted: task.IsDeleted ?? false,
+      Language: task.Language ?? '',
+      OrganizationIds: task.OrganizationIds ?? [],
     };
   }, []);
 
@@ -127,11 +129,11 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
     // Create a stable reference to the filters object
     const currentFilters = {
-      priorities: filters.priorities || [],
-      statuses: filters.statuses || [],
-      assignees: filters.assignees || [],
-      tags: filters.tags || [],
-      dueDate: filters.dueDate || {},
+      priorities: filters.priorities ?? [],
+      statuses: filters.statuses ?? [],
+      assignees: filters.assignees ?? [],
+      tags: filters.tags ?? [],
+      dueDate: filters.dueDate ?? {},
     };
 
     setColumnTasks(() => {
@@ -156,62 +158,99 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         tasksBySectionId[section.ItemId] = [];
       });
 
+      const hasMatchingLabel = (label: string | undefined, query: string): boolean => {
+        if (!label) return false;
+        return label.toLowerCase().includes(query.toLowerCase());
+      };
+
+      const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean => {
+        if (!tags?.length || !query) return false;
+        return tags.some((tag) => hasMatchingLabel(tag.TagLabel, query));
+      };
+
+      const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
+        if (!query) return true;
+
+        const queryLower = query.toLowerCase();
+        const titleMatch = task.Title?.toLowerCase().includes(queryLower) || false;
+        const descriptionMatch = task.Description?.toLowerCase().includes(queryLower) || false;
+        const tagMatch = hasMatchingTag(task.ItemTag, queryLower);
+
+        return titleMatch || descriptionMatch || tagMatch;
+      };
+
+      const matchesPriorityFilter = (task: TaskItem): boolean => {
+        return !(
+          currentFilters.priorities.length &&
+          task.Priority &&
+          !currentFilters.priorities.includes(task.Priority)
+        );
+      };
+
+      const isAssigneeInFilter = (assignee: { ItemId?: string | null }): boolean => {
+        return Boolean(assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId));
+      };
+
+      const matchesAssigneeFilter = (task: TaskItem): boolean => {
+        if (!currentFilters.assignees.length || !task.Assignee?.length) return true;
+        return task.Assignee.some(isAssigneeInFilter);
+      };
+
+      const hasMatchingTagInFilter = (tag: ItemTag): boolean => {
+        const { ItemId } = tag;
+        if (!ItemId) return false;
+
+        return currentFilters.tags.some((filterTag) => filterTag.ItemId === ItemId);
+      };
+
+      const matchesTagsFilter = (task: TaskItem): boolean => {
+        if (!currentFilters.tags.length || !task.ItemTag?.length) return true;
+        return task.ItemTag.some(hasMatchingTagInFilter);
+      };
+
+      const matchesDueDateFilter = (task: TaskItem): boolean => {
+        if ((!currentFilters.dueDate?.from && !currentFilters.dueDate?.to) || !task.DueDate) {
+          return true;
+        }
+        const dueDate = new Date(task.DueDate);
+        if (currentFilters.dueDate?.from && dueDate < currentFilters.dueDate.from) return false;
+        if (currentFilters.dueDate?.to && dueDate > currentFilters.dueDate.to) return false;
+        return true;
+      };
+
+      const findSectionByTitle = (title: string): TaskSection | undefined => {
+        if (!title) return undefined;
+
+        const sections = Array.from(sectionsByTitle.values());
+        return sections.find((section) => section.Title === title);
+      };
+
+      const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
+        if (!tasksBySectionId[sectionId]) {
+          tasksBySectionId[sectionId] = [];
+        }
+        return tasksBySectionId[sectionId];
+      };
+
+      const addTaskToSection = (task: TaskItem): void => {
+        if (!task.Section) return;
+
+        const section = findSectionByTitle(task.Section);
+        if (!section) return;
+
+        const sectionTasks = ensureSectionTasksArray(section.ItemId);
+        sectionTasks.push(ensureTaskItem(task));
+      };
+
       if (tasksData?.TaskManagerItems?.items) {
         tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
-          // Skip if task doesn't match search query
-          if (searchQuery) {
-            const query = searchQuery.toLowerCase();
-            const matchesSearch =
-              task.Title?.toLowerCase().includes(query) ||
-              task.Description?.toLowerCase().includes(query) ||
-              task.ItemTag?.some((tag) => tag.TagLabel.toLowerCase().includes(query));
+          if (!matchesSearchQuery(task, searchQuery)) return;
+          if (!matchesPriorityFilter(task)) return;
+          if (!matchesAssigneeFilter(task)) return;
+          if (!matchesTagsFilter(task)) return;
+          if (!matchesDueDateFilter(task)) return;
 
-            if (!matchesSearch) return;
-          }
-
-          // Skip if task doesn't match priority filter
-          if (
-            currentFilters.priorities.length &&
-            task.Priority &&
-            !currentFilters.priorities.includes(task.Priority)
-          ) {
-            return;
-          }
-
-          // Skip if task doesn't match assignee filter
-          if (currentFilters.assignees.length && task.Assignee?.length) {
-            const hasMatchingAssignee = task.Assignee.some(
-              (assignee) => assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId)
-            );
-            if (!hasMatchingAssignee) return;
-          }
-
-          // Skip if task doesn't match tags filter
-          if (currentFilters.tags.length && task.ItemTag?.length) {
-            const hasMatchingTag = task.ItemTag.some((tag) =>
-              currentFilters.tags.some((t) => t.ItemId === tag.ItemId)
-            );
-            if (!hasMatchingTag) return;
-          }
-
-          // Skip if task doesn't match due date filter
-          if ((currentFilters.dueDate?.from || currentFilters.dueDate?.to) && task.DueDate) {
-            const dueDate = new Date(task.DueDate);
-            if (currentFilters.dueDate?.from && dueDate < currentFilters.dueDate.from) return;
-            if (currentFilters.dueDate?.to && dueDate > currentFilters.dueDate.to) return;
-          }
-
-          if (task.Section) {
-            const section = Array.from(sectionsByTitle.values()).find(
-              (s) => s.Title === task.Section
-            );
-            if (section) {
-              if (!tasksBySectionId[section.ItemId]) {
-                tasksBySectionId[section.ItemId] = [];
-              }
-              tasksBySectionId[section.ItemId].push(ensureTaskItem(task));
-            }
-          }
+          addTaskToSection(task);
         });
       }
 
@@ -403,51 +442,48 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           const taskId = response?.insertTaskManagerItem?.itemId;
 
           if (!taskId) {
-            // Remove the temporary task if no task ID was returned
-            setColumnTasks((prev) =>
-              prev.map((column) =>
-                column.ItemId === columnId
-                  ? {
-                      ...column,
-                      tasks: column.tasks.filter((t) => t.ItemId !== tempTask.ItemId),
-                    }
-                  : column
-              )
-            );
+            const removeTaskIfMatches = (tasks: TaskItem[]): TaskItem[] =>
+              tasks.filter((task) => task.ItemId !== tempTask.ItemId);
+
+            const removeTempTask = (prevColumns: TaskSectionWithTasks[]): TaskSectionWithTasks[] =>
+              prevColumns.map((column) => {
+                if (column.ItemId !== columnId) {
+                  return column;
+                }
+                return {
+                  ...column,
+                  tasks: removeTaskIfMatches(column.tasks),
+                };
+              });
+
+            setColumnTasks(removeTempTask);
             throw new Error('Failed to create task: No task ID returned from server');
           }
 
-          // Update the task with the real ID from the server
-          setColumnTasks((prev) =>
-            prev.map((column) =>
-              column.ItemId === columnId
-                ? {
-                    ...column,
-                    tasks: column.tasks.map((t) =>
-                      t.ItemId === tempTask.ItemId ? { ...t, ItemId: taskId } : t
-                    ),
-                  }
-                : column
-            )
-          );
+          const updateTaskId = (task: TaskItem): TaskItem =>
+            task.ItemId === tempTask.ItemId ? { ...task, ItemId: taskId } : task;
 
-          // Still refetch to ensure everything is in sync
+          const updateColumnTasks = (column: TaskSectionWithTasks): TaskSectionWithTasks =>
+            column.ItemId === columnId
+              ? { ...column, tasks: column.tasks.map(updateTaskId) }
+              : column;
+
+          setColumnTasks((prev) => prev.map(updateColumnTasks));
+
           await refetchTasks();
 
           return taskId;
         } catch (error) {
           console.error('Error in createTask mutation:', error);
-          // Remove the temporary task if creation failed
-          setColumnTasks((prev) =>
-            prev.map((column) =>
-              column.ItemId === columnId
-                ? {
-                    ...column,
-                    tasks: column.tasks.filter((t) => t.ItemId !== tempTask.ItemId),
-                  }
-                : column
-            )
-          );
+          const filterOutTempTask = (tasks: TaskItem[]): TaskItem[] =>
+            tasks.filter((task) => task.ItemId !== tempTask.ItemId);
+
+          const updateColumnOnError = (column: TaskSectionWithTasks): TaskSectionWithTasks =>
+            column.ItemId === columnId
+              ? { ...column, tasks: filterOutTempTask(column.tasks) }
+              : column;
+
+          setColumnTasks((prev) => prev.map(updateColumnOnError));
           throw new Error(
             error instanceof Error ? error.message : 'Failed to create task on the server'
           );

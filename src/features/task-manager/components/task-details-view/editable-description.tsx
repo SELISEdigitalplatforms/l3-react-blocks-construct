@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { ChevronDown, PenLine } from 'lucide-react';
@@ -38,205 +45,256 @@ import { useTaskDetails } from '../../hooks/use-task-details';
  * />
  */
 
+export interface EditableDescriptionRef {
+  focus: () => void;
+}
+
 interface EditableDescriptionProps {
-  readonly taskId?: string;
-  readonly initialContent?: string;
-  readonly onContentChange?: (content: string) => void;
+  taskId?: string;
+  initialContent: string;
+  onContentChange?: (content: string) => void;
+  onSave?: (content: string) => Promise<void>;
+  isNewTask?: boolean;
 }
 
 type EditorComponentType = React.ComponentType<any> | null;
 
-export function EditableDescription({
-  initialContent,
-  onContentChange,
-  taskId,
-}: EditableDescriptionProps) {
-  const { task, updateTaskDetails } = useTaskDetails(taskId);
-  const [content, setContent] = useState(initialContent);
-  const [isEditing, setIsEditing] = useState<boolean>(!initialContent);
-  const [isHovering, setIsHovering] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
-  const { t } = useTranslation();
-  const [forceRender, setForceRender] = useState(0);
+const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescriptionProps>(
+  ({ taskId, initialContent, onContentChange, onSave, isNewTask = false }, ref) => {
+    const { task, updateTaskDetails } = useTaskDetails(taskId);
+    const [content, setContent] = useState(initialContent);
+    const [isEditing, setIsEditing] = useState(isNewTask);
+    const editorContainerRef = useRef<HTMLDivElement>(null);
+    const [isHovering, setIsHovering] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+    const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
+    const { t } = useTranslation();
+    const [forceRender, setForceRender] = useState(0);
 
-  useEffect(() => {
-    if (initialContent && !content) {
-      setContent(initialContent);
-      setIsEditing(false);
-    } else if (!isEditing) {
-      setContent(initialContent);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialContent]);
+    useEffect(() => {
+      if (initialContent && !content) {
+        setContent(initialContent);
+        if (!isNewTask) {
+          setIsEditing(false);
+        }
+      } else if (!isEditing) {
+        setContent(initialContent);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialContent, isNewTask]);
 
-  useEffect(() => {
-    setIsMounted(true);
+    useEffect(() => {
+      setIsMounted(true);
 
-    if (isEditing) {
-      import('../../../../components/blocks/custom-text-editor/custom-text-editor')
-        .then((module) => {
-          setEditorComponent(() => module.default);
-        })
-        .catch((error) => {
-          console.error('Error loading editor:', error);
-        });
-    }
-  }, [isEditing]);
+      if (isEditing) {
+        import('../../../../components/blocks/custom-text-editor/custom-text-editor')
+          .then((module) => {
+            setEditorComponent(() => module.default);
+          })
+          .catch((error) => {
+            console.error('Error loading editor:', error);
+          });
+      }
+    }, [isEditing]);
 
-  const handleContentChange = (newContent: string) => {
-    setContent(newContent);
-  };
+    const handleContentChange = useCallback(
+      (newContent: string) => {
+        setContent(newContent);
+        if (onContentChange) {
+          onContentChange(newContent);
+        }
+      },
+      [onContentChange]
+    );
 
-  const handleSave = () => {
-    if (onContentChange) {
-      content && onContentChange(content);
-    }
+    useImperativeHandle(ref, () => ({
+      focus: () => {
+        if (editorContainerRef.current) {
+          const editor = editorContainerRef.current.querySelector(
+            '[contenteditable="true"]'
+          ) as HTMLElement;
+          if (editor) {
+            editor.focus();
+          }
+        }
+      },
+    }));
 
-    if (content && task) {
-      updateTaskDetails({ Description: content });
-    }
+    const cleanupEditorInstances = () => {
+      const editorContainers = document.querySelectorAll('.ql-container');
+      editorContainers.forEach((container) => {
+        const editorRoot = container.closest('.editor-root');
+        if (editorRoot?.parentNode) {
+          const contentContainer = document.createElement('div');
+          contentContainer.innerHTML = container.innerHTML;
+          const parentNode = editorRoot.parentNode as Node;
+          parentNode.replaceChild(contentContainer, editorRoot);
+        }
+      });
+    };
 
-    setEditorComponent(null);
-
-    setIsEditing(false);
-
-    setForceRender((prev) => prev + 1);
-  };
-
-  const handleCancel = () => {
-    setContent(initialContent);
-
-    setEditorComponent(null);
-
-    setIsEditing(false);
-
-    setForceRender((prev) => prev + 1);
-  };
-
-  const [showMore, setShowMore] = useState(false);
-  const [hasMoreLines, setHasMoreLines] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const checkLines = () => {
-      if (contentRef.current) {
-        const lineHeight = parseInt(window.getComputedStyle(contentRef.current).lineHeight) || 20;
-        const height = contentRef.current.scrollHeight;
-        const lineCount = Math.ceil(height / lineHeight);
-
-        setHasMoreLines(lineCount > 5);
+    const handleSave = async () => {
+      try {
+        if (onSave) {
+          await onSave(content);
+        } else if (onContentChange) {
+          onContentChange(content);
+        } else if (task) {
+          await updateTaskDetails({ Description: content });
+        }
+        setIsEditing(false);
+        setForceRender((prev) => prev + 1);
+      } catch (error) {
+        console.error('Error saving description:', error);
       }
     };
 
-    checkLines();
-
-    window.addEventListener('resize', checkLines);
-    window.addEventListener('load', checkLines);
-
-    return () => {
-      window.removeEventListener('resize', checkLines);
-      window.removeEventListener('load', checkLines);
+    const handleCancel = () => {
+      setContent(initialContent);
+      setIsEditing(false);
+      setForceRender((prev) => prev + 1);
     };
-  }, [content]);
 
-  const renderContent = () => {
-    if (!content) return null;
+    const [showMore, setShowMore] = useState(false);
+    const [hasMoreLines, setHasMoreLines] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
-    return (
-      <div className="relative">
-        <div
-          ref={contentRef}
-          className="ql-editor text-sm formatted-content"
-          style={{
-            maxHeight: !showMore && hasMoreLines ? '7.5em' : 'none',
-            overflow: !showMore && hasMoreLines ? 'hidden' : 'visible',
-            padding: '0',
-          }}
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+    useEffect(() => {
+      const checkLines = () => {
+        if (contentRef.current) {
+          const lineHeight = parseInt(window.getComputedStyle(contentRef.current).lineHeight) || 20;
+          const height = contentRef.current.scrollHeight;
+          const lineCount = Math.ceil(height / lineHeight);
 
-        {hasMoreLines && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mt-2 text-sm font-semibold border"
-            onClick={() => setShowMore(!showMore)}
-          >
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`}
-            />
-            {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
-          </Button>
-        )}
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    if (!isEditing) {
-      const styleTag = document.createElement('style');
-      styleTag.id = 'hide-quill-toolbar';
-      styleTag.innerHTML = '.ql-toolbar { display: none !important; }';
-      document.head.appendChild(styleTag);
-
-      return () => {
-        const existingStyle = document.getElementById('hide-quill-toolbar');
-        if (existingStyle) {
-          document.head.removeChild(existingStyle);
+          setHasMoreLines(lineCount > 5);
         }
       };
-    }
-  }, [isEditing, forceRender]);
 
-  const renderEditorContent = () => {
-    if (!isMounted || !editorComponent) {
-      return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;
-    }
+      checkLines();
 
-    const EditorComponent = editorComponent;
-    return (
-      <div>
-        <EditorComponent
-          key={`editor-instance-${forceRender}`}
-          value={content}
-          onChange={handleContentChange}
-          showIcons={false}
-        />
-        <div className="flex justify-end mt-4">
-          <div className="flex gap-2">
+      window.addEventListener('resize', checkLines);
+      window.addEventListener('load', checkLines);
+
+      return () => {
+        window.removeEventListener('resize', checkLines);
+        window.removeEventListener('load', checkLines);
+      };
+    }, [content]);
+
+    const renderContent = () => {
+      if (!content) return null;
+
+      return (
+        <div className="relative">
+          <div
+            ref={contentRef}
+            className="ql-editor text-sm formatted-content"
+            style={{
+              maxHeight: !showMore && hasMoreLines ? '7.5em' : 'none',
+              overflow: !showMore && hasMoreLines ? 'hidden' : 'visible',
+              padding: '0',
+            }}
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
+
+          {hasMoreLines && (
             <Button
               variant="ghost"
               size="sm"
-              className="text-sm font-semibold border"
-              onClick={handleCancel}
+              className="mt-2 text-sm font-semibold border"
+              onClick={() => setShowMore(!showMore)}
             >
-              {t('CANCEL')}
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`}
+              />
+              {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
             </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="text-sm font-semibold ml-2"
-              onClick={handleSave}
-            >
-              {t('SAVE')}
-            </Button>
+          )}
+        </div>
+      );
+    };
+
+    useEffect(() => {
+      const cleanup = () => {
+        const existingStyle = document.getElementById('hide-quill-toolbar');
+        if (existingStyle?.parentNode) {
+          existingStyle.parentNode.removeChild(existingStyle);
+        }
+
+        if (!isEditing) {
+          cleanupEditorInstances();
+        }
+      };
+
+      return cleanup;
+    }, [isEditing]);
+
+    const renderEditorContent = () => {
+      if (!isMounted) {
+        return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;
+      }
+
+      if (!editorComponent) {
+        import('../../../../components/blocks/custom-text-editor/custom-text-editor')
+          .then((module) => {
+            setEditorComponent(() => module.default);
+          })
+          .catch(console.error);
+        return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;
+      }
+
+      const EditorComponent = editorComponent;
+      return (
+        <div className="relative">
+          <div className="editor-root" key={`editor-container-${forceRender}`}>
+            <EditorComponent
+              key={`editor-instance-${forceRender}`}
+              value={content}
+              onChange={(newContent: string) => {
+                setContent(newContent);
+                handleContentChange(newContent);
+              }}
+              showIcons={false}
+              autoFocus
+            />
+          </div>
+          <div className="flex justify-end mt-4">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-sm font-semibold border"
+                onClick={handleCancel}
+              >
+                {t('CANCEL')}
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                className="text-sm font-semibold ml-2"
+                onClick={handleSave}
+              >
+                {t('SAVE')}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    );
-  };
+      );
+    };
 
-  return (
-    <section 
-      className="relative" 
-      key={`editor-container-${forceRender}`}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
-      <div className="flex items-center gap-1 h-9">
-        <Label className="text-high-emphasis text-base font-semibold">{t('DESCRIPTION')}</Label>
-        {isHovering && !isEditing && (
+    return (
+      <div
+        ref={editorContainerRef}
+        className={`relative rounded-md ${isHovering && 'bg-white'} ${isEditing && 'border-none'}`}
+        onMouseEnter={() => !isEditing && setIsHovering(true)}
+        onMouseLeave={() => !isEditing && setIsHovering(false)}
+        aria-label={t('TASK_DESCRIPTION')}
+        tabIndex={0}
+      >
+        <div className="flex items-center gap-1 h-9">
+          <Label className="text-high-emphasis text-base font-semibold">{t('DESCRIPTION')}</Label>
           <button
             type="button"
             onClick={(e) => {
@@ -245,14 +303,20 @@ export function EditableDescription({
               setIsEditing(true);
             }}
             aria-label={t('EDIT_DESCRIPTION')}
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
+            className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+              isEditing ? 'invisible' : 'hover:bg-accent hover:text-accent-foreground'
+            } h-9 w-9`}
           >
             <PenLine className="h-4 w-4 text-primary" />
           </button>
-        )}
-      </div>
+        </div>
 
-      {isEditing ? renderEditorContent() : <div className="text-sm">{renderContent()}</div>}
-    </section>
-  );
-}
+        {isEditing ? renderEditorContent() : <div className="text-sm">{renderContent()}</div>}
+      </div>
+    );
+  }
+);
+
+EditableDescription.displayName = 'EditableDescription';
+
+export { EditableDescription };
