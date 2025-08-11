@@ -33,7 +33,7 @@ interface InvoiceItemsTableProps {
   onDiscountChange: (value: number) => void;
   control: Control<any>;
   subtotal: number;
-  taxRate: number;
+  taxes: number;
   discount: number;
   totalAmount: number;
   currency: string;
@@ -49,7 +49,7 @@ export function InvoiceItemsTable({
   onDiscountChange,
   control,
   subtotal,
-  taxRate,
+  taxes,
   discount,
   totalAmount,
   currency,
@@ -223,7 +223,7 @@ export function InvoiceItemsTable({
                   <Input
                     type="number"
                     className="text-right pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    value={taxRate}
+                    value={taxes}
                     onChange={(e) => onTaxRateChange(Number(e.target.value))}
                     onBlur={(e) => onTaxRateChange(Number(e.target.value))}
                   />

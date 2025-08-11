@@ -104,7 +104,6 @@ describe('InvoicesDetail', () => {
     ],
     Subtotal: 1000,
     Taxes: 0,
-    TaxRate: 0,
     TotalAmount: 1000,
   };
 

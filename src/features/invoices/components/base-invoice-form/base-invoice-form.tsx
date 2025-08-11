@@ -239,7 +239,7 @@ export function BaseInvoiceForm({
                 onDiscountChange={handleDiscountChange}
                 control={form.control}
                 subtotal={items.reduce((acc, item) => acc + item.Amount, 0)}
-                taxRate={form.watch('taxes') || 0}
+                taxes={form.watch('taxes') || 0}
                 discount={form.watch('discount') || 0}
                 totalAmount={(function () {
                   const subtotal = items.reduce((acc, item) => acc + item.Amount, 0);
@@ -292,7 +292,6 @@ export function BaseInvoiceForm({
             })),
             Currency: form.watch('currency') ?? 'CHF',
             Subtotal: items.reduce((sum, item) => sum + (item.Amount || 0), 0),
-            TaxRate: Number(form.watch('taxes')) || 0,
             Taxes:
               (items.reduce((sum, item) => sum + (item.Amount || 0), 0) *
                 (Number(form.watch('taxes')) || 0)) /

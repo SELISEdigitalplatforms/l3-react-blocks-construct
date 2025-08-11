@@ -8,23 +8,21 @@ export const generateInvoiceId = (): string => {
 interface InvoiceTotals {
   Subtotal: number;
   Taxes: number;
-  TaxRate: number;
   TotalAmount: number;
 }
 
 export function calculateInvoiceTotals(
   items: InvoiceItemDetails[],
-  taxRate: number,
+  taxes: number,
   discount: number
 ): InvoiceTotals {
   const Subtotal = items.reduce((acc, item) => acc + (item.Amount || 0), 0);
-  const Taxes = (Subtotal * taxRate) / 100;
+  const Taxes = (Subtotal * taxes) / 100;
   const TotalAmount = Subtotal + Taxes - discount;
 
   return {
     Subtotal,
     Taxes,
-    TaxRate: taxRate,
     TotalAmount,
   };
 }
@@ -35,11 +33,11 @@ export function createInvoiceFromForm(
   items: InvoiceItemDetails[],
   action: 'draft' | 'send'
 ): InvoiceItem {
-  const taxRate = Number(formValues.taxes) || 0;
+  const taxes = Number(formValues.taxes) || 0;
   const discount = Number(formValues.discount) || 0;
-  const { TotalAmount, Subtotal, Taxes, TaxRate } = calculateInvoiceTotals(
+  const { TotalAmount, Subtotal, Taxes } = calculateInvoiceTotals(
     items,
-    taxRate,
+    taxes,
     discount
   );
   const status = action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT;
@@ -71,7 +69,6 @@ export function createInvoiceFromForm(
     })),
     Subtotal,
     Taxes,
-    TaxRate,
     TotalAmount,
   };
 }

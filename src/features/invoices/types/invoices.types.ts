@@ -88,7 +88,6 @@ export interface InvoiceItem {
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
   Subtotal?: number;
-  TaxRate?: number;
   TotalAmount?: number;
   Currency?: string;
   Taxes?: number;

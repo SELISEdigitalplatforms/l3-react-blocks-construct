@@ -27,14 +27,23 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const subtotal = Number(
-    invoice.ItemDetails?.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0).toFixed(2) || 0
+    invoice.ItemDetails?.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0).toFixed(2) ?? 0
   );
-  const taxPercentage = Number(invoice.Taxes) || 0;
+
   const discount = Number(invoice.Discount) || 0;
 
-  const actualTaxAmount = Number((subtotal * (taxPercentage / 100)).toFixed(2));
+  const isTaxPercentage = invoice.Taxes && invoice.Taxes <= 100;
+  const taxAmount = isTaxPercentage
+    ? Number((subtotal * (Number(invoice.Taxes) / 100)).toFixed(2))
+    : Number(invoice.Taxes) || 0;
+  const taxRate =
+    subtotal > 0
+      ? isTaxPercentage
+        ? Number(invoice.Taxes).toFixed(2)
+        : ((taxAmount / subtotal) * 100).toFixed(2)
+      : '0.00';
 
-  const totalAmount = Math.max(0, Number((subtotal + actualTaxAmount - discount).toFixed(2)));
+  const totalAmount = Math.max(0, Number((subtotal + taxAmount - discount).toFixed(2)));
 
   const handleSendInvoice = () => {
     setShowSendDialog(false);
@@ -256,11 +265,11 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">
-                  {t('TAXES')} ({invoice.Taxes}%)
+                  {t('TAXES')} ({taxRate}%)
                 </span>
                 <span className="text-sm font-semibold text-high-emphasis">
                   <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
-                  {actualTaxAmount.toFixed(2)} {/* Display the calculated actual tax amount */}
+                  {taxAmount.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
