@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
-// Removed unused import
 import { invoiceFormSchema, type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { Button } from 'components/ui/button';
 import { ChevronLeft } from 'lucide-react';
