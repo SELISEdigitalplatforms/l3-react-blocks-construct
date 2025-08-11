@@ -126,14 +126,14 @@ export const createInvoiceTableColumns = ({
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
     filterFn: (row, columnId, value: string | string[]) => {
       if (!value || (Array.isArray(value) && value.length === 0)) return true;
-      const rowValue = row.getValue(columnId) as string;
+      const rowValue = row.getValue(columnId);
       return Array.isArray(value)
-        ? value.some((v) => v.toLowerCase() === rowValue?.toLowerCase())
-        : value.toLowerCase() === rowValue?.toLowerCase();
+        ? value.some((v) => v.toLowerCase() === String(rowValue).toLowerCase())
+        : String(value).toLowerCase() === String(rowValue).toLowerCase();
     },
     sortingFn: (rowA, rowB, columnId) => {
-      const a = (rowA.getValue(columnId) as string)?.toLowerCase() || '';
-      const b = (rowB.getValue(columnId) as string)?.toLowerCase() || '';
+      const a = String(rowA.getValue(columnId) || '').toLowerCase();
+      const b = String(rowB.getValue(columnId) || '').toLowerCase();
       return a.localeCompare(b);
     },
     meta: {
@@ -195,7 +195,7 @@ export const createInvoiceTableColumns = ({
             <Trash className="h-4 w-4" />
           </Button>
 
-          <div onClick={(e) => e.stopPropagation()}>
+          <button onClick={(e) => e.stopPropagation()}>
             <ConfirmationModal
               open={showDeleteDialog}
               onOpenChange={(open: boolean) => {
@@ -208,7 +208,7 @@ export const createInvoiceTableColumns = ({
               }}
               confirmText="DELETE"
             />
-          </div>
+          </button>
         </div>
       );
     },

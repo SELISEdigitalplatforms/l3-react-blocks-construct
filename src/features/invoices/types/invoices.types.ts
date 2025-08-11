@@ -41,7 +41,7 @@ export function getStatusColors(status: string): StatusColors {
   const variant =
     Array.from(statusMap.entries()).find(
       ([key]) => normalizeStatus(key) === normalizedStatus
-    )?.[1] || 'muted';
+    )?.[1] ?? 'muted';
 
   return {
     text: `text-${variant}`,

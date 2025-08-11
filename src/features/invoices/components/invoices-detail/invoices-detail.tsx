@@ -27,7 +27,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const subtotal = Number(
-    (invoice.ItemDetails?.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0) || 0).toFixed(
+    (invoice.ItemDetails?.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0) ?? 0).toFixed(
       2
     )
   );

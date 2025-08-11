@@ -75,12 +75,12 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
     }
 
     const result = {
-      hasNextPage: Boolean(invoiceItems?.hasNextPage) ?? false,
-      hasPreviousPage: Boolean(invoiceItems?.hasPreviousPage) ?? false,
-      totalCount: Number(invoiceItems?.totalCount) ?? 0,
-      totalPages: Number(invoiceItems?.totalPages) ?? 0,
-      pageSize: Number(invoiceItems?.pageSize) ?? pageSize,
-      pageNo: Number(invoiceItems?.pageNo) ?? pageNo,
+      hasNextPage: Boolean(invoiceItems?.hasNextPage ?? false),
+      hasPreviousPage: Boolean(invoiceItems?.hasPreviousPage ?? false),
+      totalCount: Number(invoiceItems?.totalCount ?? 0),
+      totalPages: Number(invoiceItems?.totalPages ?? 0),
+      pageSize: Number(invoiceItems?.pageSize ?? pageSize),
+      pageNo: Number(invoiceItems?.pageNo ?? pageNo),
       items: Array.isArray(invoiceItems?.items) ? invoiceItems.items : [],
     };
 
@@ -123,12 +123,12 @@ export const addInvoiceItem = async (
       Discount: params.input.Discount ?? 0,
     },
   };
-  
+
   const response = await graphqlClient.mutate<AddInvoiceItemResponse>({
     query: INSERT_INVOICE_ITEM_MUTATION,
     variables: payload,
   });
-  
+
   return response;
 };
 

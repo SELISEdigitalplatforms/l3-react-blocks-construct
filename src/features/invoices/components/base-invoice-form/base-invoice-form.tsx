@@ -104,39 +104,49 @@ export function BaseInvoiceForm({
     showSuccessToast?.(action);
   };
 
+  const calculatePrice = (updates: Partial<InvoiceItemDetails>, currentPrice: number) => {
+    if ('UnitPrice' in updates && updates.UnitPrice !== undefined) {
+      return updates.UnitPrice;
+    }
+    if ('Amount' in updates && updates.Amount !== undefined) {
+      return updates.Amount;
+    }
+    return currentPrice;
+  };
+
+  const calculateQuantity = (updates: Partial<InvoiceItemDetails>, currentQuantity: number) => {
+    return 'Quantity' in updates && updates.Quantity !== undefined
+      ? updates.Quantity
+      : currentQuantity;
+  };
+
+  const updateItemWithCalculations = (
+    item: InvoiceItemDetails,
+    updates: Partial<InvoiceItemDetails>
+  ): InvoiceItemDetails => {
+    const currentPrice = item.UnitPrice ?? 0;
+    const currentQuantity = item.Quantity ?? 0;
+    const updatedItem = { ...item, ...updates };
+
+    if (!('Quantity' in updates) && !('UnitPrice' in updates) && !('Amount' in updates)) {
+      return updatedItem;
+    }
+
+    const price = calculatePrice(updates, currentPrice);
+    const quantity = calculateQuantity(updates, currentQuantity);
+    const total = price * quantity;
+
+    return {
+      ...updatedItem,
+      UnitPrice: price,
+      Amount: total,
+      Quantity: quantity,
+    };
+  };
+
   const handleUpdateItem = (id: string, updates: Partial<InvoiceItemDetails>) => {
     setItems(
-      items.map((item) => {
-        if (item.ItemId === id) {
-          const currentPrice = item.UnitPrice ?? 0;
-          const currentQuantity = item.Quantity ?? 0;
-
-          const updatedItem = { ...item, ...updates };
-
-          if ('Quantity' in updates || 'UnitPrice' in updates || 'Amount' in updates) {
-            const price =
-              'UnitPrice' in updates && updates.UnitPrice !== undefined
-                ? updates.UnitPrice
-                : 'Amount' in updates && updates.Amount !== undefined
-                  ? updates.Amount
-                  : currentPrice;
-
-            const quantity =
-              'Quantity' in updates && updates.Quantity !== undefined
-                ? updates.Quantity
-                : currentQuantity;
-
-            const total = price * quantity;
-
-            updatedItem.UnitPrice = price;
-            updatedItem.Amount = total;
-            updatedItem.Quantity = quantity;
-          }
-
-          return updatedItem;
-        }
-        return item;
-      })
+      items.map((item) => (item.ItemId === id ? updateItemWithCalculations(item, updates) : item))
     );
   };
 
@@ -258,7 +268,7 @@ export function BaseInvoiceForm({
             OrganizationIds: [],
             Tags: [],
             DateIssued: new Date().toISOString(),
-            DueDate: form.watch('dueDate')?.toISOString() || new Date().toISOString(),
+            DueDate: form.watch('dueDate')?.toISOString() ?? new Date().toISOString(),
             Status: 'Draft',
             Amount: (() => {
               const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
@@ -267,27 +277,27 @@ export function BaseInvoiceForm({
             })(),
             Customer: [
               {
-                CustomerName: form.watch('customerName') || '',
+                CustomerName: form.watch('customerName') ?? '',
                 CustomerImgUrl: '',
-                BillingAddress: form.watch('billingAddress') || '',
-                Email: form.watch('email') || '',
-                PhoneNo: form.watch('phoneNumber') || '',
+                BillingAddress: form.watch('billingAddress') ?? '',
+                Email: form.watch('email') ?? '',
+                PhoneNo: form.watch('phoneNumber') ?? '',
               },
             ],
-            GeneralNote: form.watch('generalNote') || '',
+            GeneralNote: form.watch('generalNote') ?? '',
             ItemDetails: items.map((item) => ({
               ...item,
-              Category: item.Category || '',
-              Note: item.Note || '',
+              Category: item.Category ?? '',
+              Note: item.Note ?? '',
             })),
-            Currency: form.watch('currency') || 'CHF',
+            Currency: form.watch('currency') ?? 'CHF',
             Subtotal: items.reduce((sum, item) => sum + (item.Amount || 0), 0),
             TaxRate: Number(form.watch('taxes')) || 0,
             Taxes:
               (items.reduce((sum, item) => sum + (item.Amount || 0), 0) *
                 (Number(form.watch('taxes')) || 0)) /
               100,
-            Discount: Number(form.watch('discount')) || 0,
+            Discount: Number(form.watch('discount')) ?? 0,
             TotalAmount: (() => {
               const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
               const taxAmount = (subtotal * (Number(form.watch('taxes')) || 0)) / 100;

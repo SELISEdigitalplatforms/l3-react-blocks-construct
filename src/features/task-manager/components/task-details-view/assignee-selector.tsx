@@ -69,41 +69,42 @@ const AssigneeSelectorComponent = ({
 
   // Update local selected when selectedAssignees changes
   useEffect(() => {
-    setLocalSelected(new Set(selectedAssignees.map(a => a.ItemId)));
+    setLocalSelected(new Set(selectedAssignees.map((a) => a.ItemId)));
   }, [selectedAssignees]);
 
-  const handleSelect = useCallback(async (assignee: Assignee) => {
-    const assigneeId = assignee.ItemId;
-    const isSelected = localSelected.has(assigneeId);
-    
-    // Update local state immediately for better UX
-    setLocalSelected(prev => {
-      const newSet = new Set(prev);
-      if (isSelected) {
-        newSet.delete(assigneeId);
-      } else {
-        newSet.add(assigneeId);
+  const handleSelect = useCallback(
+    async (assignee: Assignee) => {
+      const assigneeId = assignee.ItemId;
+      const isSelected = localSelected.has(assigneeId);
+
+      // Update local state immediately for better UX
+      setLocalSelected((prev) => {
+        const newSet = new Set(prev);
+        if (isSelected) {
+          newSet.delete(assigneeId);
+        } else {
+          newSet.add(assigneeId);
+        }
+        return newSet;
+      });
+
+      try {
+        setIsProcessing((prev) => ({ ...prev, [assigneeId]: true }));
+
+        const newAssignees = isSelected
+          ? selectedAssignees.filter((a) => a.ItemId !== assigneeId)
+          : [...selectedAssignees, assignee];
+
+        onChange(newAssignees);
+      } catch (error) {
+        console.error('Failed to update assignee:', error);
+        setLocalSelected(new Set(selectedAssignees.map((a) => a.ItemId)));
+      } finally {
+        setIsProcessing((prev) => ({ ...prev, [assigneeId]: false }));
       }
-      return newSet;
-    });
-    
-    try {
-      setIsProcessing(prev => ({ ...prev, [assigneeId]: true }));
-      
-      // Create new array based on updated local state
-      const newAssignees = isSelected
-        ? selectedAssignees.filter(a => a.ItemId !== assigneeId)
-        : [...selectedAssignees, assignee];
-      
-      await onChange(newAssignees);
-    } catch (error) {
-      console.error('Failed to update assignee:', error);
-      // Revert local state on error
-      setLocalSelected(new Set(selectedAssignees.map(a => a.ItemId)));
-    } finally {
-      setIsProcessing(prev => ({ ...prev, [assigneeId]: false }));
-    }
-  }, [selectedAssignees, localSelected, onChange]);
+    },
+    [selectedAssignees, localSelected, onChange]
+  );
 
   return (
     <div>
@@ -152,7 +153,7 @@ const AssigneeSelectorComponent = ({
                           className={cn(
                             'mr-2 flex h-4 w-4 items-center justify-center rounded border transition-colors',
                             localSelected.has(assignee.ItemId) && !isProcessing[assignee.ItemId]
-                              ? 'bg-primary border-primary' 
+                              ? 'bg-primary border-primary'
                               : 'border-border',
                             isProcessing[assignee.ItemId] ? 'opacity-50' : ''
                           )}

@@ -97,10 +97,10 @@ export function EditInvoice() {
 
     const customer: CustomerDetails = {
       CustomerName: values.customerName,
-      CustomerImgUrl: invoice.Customer[0]?.CustomerImgUrl || '',
-      BillingAddress: values.billingAddress || '',
-      Email: values.email || '',
-      PhoneNo: values.phoneNumber || '',
+      CustomerImgUrl: invoice.Customer[0]?.CustomerImgUrl ?? '',
+      BillingAddress: values.billingAddress ?? '',
+      Email: values.email ?? '',
+      PhoneNo: values.phoneNumber ?? '',
     };
 
     updateInvoiceItem({
@@ -108,24 +108,24 @@ export function EditInvoice() {
       input: {
         ItemId: invoiceId,
         DateIssued: new Date().toISOString(),
-        DueDate: values.dueDate?.toISOString() || new Date().toISOString(),
+        DueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
         Amount: updatedInvoice.Amount,
         Customer: [customer],
         Currency: values.currency,
         Status: (action === 'send'
           ? InvoiceStatus.PENDING
           : InvoiceStatus.DRAFT) as unknown as InvoiceStatus[],
-        GeneralNote: values.generalNote || '',
+        GeneralNote: values.generalNote ?? '',
         Taxes: values.taxes,
         Discount: values.discount,
         ItemDetails: items.map((item) => ({
-          ItemId: item.ItemId || uuidv4(),
+          ItemId: item.ItemId ?? uuidv4(),
           ItemName: item.ItemName,
-          Note: item.Note || '',
-          Category: item.Category || '0',
-          Quantity: Number(item.Quantity) || 0,
-          UnitPrice: Number(item.UnitPrice) || 0,
-          Amount: Number(item.Amount) || 0,
+          Note: item.Note ?? '',
+          Category: item.Category ?? '0',
+          Quantity: Number(item.Quantity) ?? 0,
+          UnitPrice: Number(item.UnitPrice) ?? 0,
+          Amount: Number(item.Amount) ?? 0,
         })),
       },
     });
