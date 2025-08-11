@@ -4,16 +4,11 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-
 import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
-import { createInvoiceFromForm } from '../../utils/invoice-utils';
-import {
-  invoiceFormSchema,
-  type InvoiceFormValues,
-  type InvoiceItem,
-} from '../../schemas/invoice-form-schema';
+// Removed unused import
+import { invoiceFormSchema, type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { Button } from 'components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import {
@@ -25,11 +20,15 @@ import {
   FormDateInput,
   FormCurrencySelect,
 } from '../invoice-form/invoice-form';
-
+import { InvoiceItemDetails } from '../../types/invoices.types';
 interface BaseInvoiceFormProps {
   defaultValues?: Partial<InvoiceFormValues>;
-  defaultItems?: InvoiceItem[];
-  onSubmit: (values: InvoiceFormValues, items: InvoiceItem[], action: 'draft' | 'send') => void;
+  defaultItems?: InvoiceItemDetails[];
+  onSubmit: (
+    values: InvoiceFormValues,
+    items: InvoiceItemDetails[],
+    action: 'draft' | 'send'
+  ) => void;
   title: string;
   showSuccessToast?: (action: 'draft' | 'send') => void;
 }
@@ -38,13 +37,13 @@ export function BaseInvoiceForm({
   defaultValues = {},
   defaultItems = [
     {
-      id: uuidv4(),
-      name: '',
-      category: '',
-      quantity: 0,
-      price: 0,
-      total: 0,
-      showNote: false,
+      ItemId: uuidv4(),
+      ItemName: '',
+      Category: '',
+      Quantity: 0,
+      UnitPrice: 0,
+      Amount: 0,
+      Note: '',
     },
   ],
   onSubmit,
@@ -56,7 +55,7 @@ export function BaseInvoiceForm({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [action, setAction] = useState<'draft' | 'send'>('send');
   const [showPreview, setShowPreview] = useState(false);
-  const [items, setItems] = useState<InvoiceItem[]>(defaultItems);
+  const [items, setItems] = useState<InvoiceItemDetails[]>(defaultItems);
 
   const form = useForm<InvoiceFormValues>({
     resolver: async (data, context, options) => {
@@ -80,9 +79,19 @@ export function BaseInvoiceForm({
       billingAddress: '',
       currency: '',
       generalNote: '',
+      taxes: 0,
+      discount: 0,
       ...defaultValues,
     },
   });
+
+  const handleTaxRateChange = (value: number) => {
+    form.setValue('taxes', value, { shouldValidate: true });
+  };
+
+  const handleDiscountChange = (value: number) => {
+    form.setValue('discount', value, { shouldValidate: true });
+  };
 
   const handleFormSubmit = () => {
     setShowConfirmModal(true);
@@ -96,14 +105,35 @@ export function BaseInvoiceForm({
     showSuccessToast?.(action);
   };
 
-  const handleUpdateItem = (id: string, updates: Partial<InvoiceItem>) => {
+  const handleUpdateItem = (id: string, updates: Partial<InvoiceItemDetails>) => {
     setItems(
       items.map((item) => {
-        if (item.id === id) {
+        if (item.ItemId === id) {
+          const currentPrice = item.UnitPrice ?? 0;
+          const currentQuantity = item.Quantity ?? 0;
+
           const updatedItem = { ...item, ...updates };
-          if ('quantity' in updates || 'price' in updates) {
-            updatedItem.total = updatedItem.quantity * updatedItem.price;
+
+          if ('Quantity' in updates || 'UnitPrice' in updates || 'Amount' in updates) {
+            const price =
+              'UnitPrice' in updates && updates.UnitPrice !== undefined
+                ? updates.UnitPrice
+                : 'Amount' in updates && updates.Amount !== undefined
+                  ? updates.Amount
+                  : currentPrice;
+
+            const quantity =
+              'Quantity' in updates && updates.Quantity !== undefined
+                ? updates.Quantity
+                : currentQuantity;
+
+            const total = price * quantity;
+
+            updatedItem.UnitPrice = price;
+            updatedItem.Amount = total;
+            updatedItem.Quantity = quantity;
           }
+
           return updatedItem;
         }
         return item;
@@ -112,12 +142,12 @@ export function BaseInvoiceForm({
   };
 
   const handleRemoveItem = (itemId: string) => {
-    setItems(items.filter((item) => item.id !== itemId));
+    setItems(items.filter((item) => item.ItemId !== itemId));
   };
 
   const handleToggleNote = (itemId: string) => {
     setItems(
-      items.map((item) => (item.id === itemId ? { ...item, showNote: !item.showNote } : item))
+      items.map((item) => (item.ItemId === itemId ? { ...item, showNote: !item.showNote } : item))
     );
   };
 
@@ -125,13 +155,13 @@ export function BaseInvoiceForm({
     setItems([
       ...items,
       {
-        id: uuidv4(),
-        name: '',
-        category: '',
-        quantity: 0,
-        price: 0,
-        total: 0,
-        showNote: false,
+        ItemId: uuidv4(),
+        ItemName: '',
+        Category: '',
+        Quantity: 0,
+        UnitPrice: 0,
+        Amount: 0,
+        Note: '',
       },
     ]);
   };
@@ -196,15 +226,17 @@ export function BaseInvoiceForm({
                 onRemoveItem={handleRemoveItem}
                 onToggleNote={handleToggleNote}
                 onAddItem={handleAddItem}
+                onTaxRateChange={handleTaxRateChange}
+                onDiscountChange={handleDiscountChange}
                 control={form.control}
-                subtotal={items.reduce((acc, item) => acc + item.total, 0)}
-                taxRate={7.5}
-                discount={50}
-                totalAmount={
-                  items.reduce((acc, item) => acc + item.total, 0) +
-                  items.reduce((acc, item) => acc + item.total, 0) * (7.5 / 100) -
-                  50
-                }
+                subtotal={items.reduce((acc, item) => acc + item.Amount, 0)}
+                taxRate={form.watch('taxes') || 0}
+                discount={form.watch('discount') || 0}
+                totalAmount={(function () {
+                  const subtotal = items.reduce((acc, item) => acc + item.Amount, 0);
+                  const taxAmount = subtotal * ((form.watch('taxes') || 0) / 100);
+                  return subtotal + taxAmount - (form.watch('discount') || 0);
+                })()}
                 currency={form.watch('currency')?.toUpperCase() || 'CHF'}
               />
             </div>
@@ -212,13 +244,59 @@ export function BaseInvoiceForm({
         </form>
       </FormProvider>
 
-      <InvoicePreview
-        open={showPreview}
-        onOpenChange={setShowPreview}
-        invoice={
-          showPreview ? createInvoiceFromForm('preview', form.getValues(), items, 'draft') : null
-        }
-      />
+      {showPreview && (
+        <InvoicePreview
+          open={showPreview}
+          onOpenChange={setShowPreview}
+          invoice={{
+            ItemId: 'preview',
+            CreatedBy: 'system',
+            CreatedDate: new Date().toISOString(),
+            IsDeleted: false,
+            Language: 'en',
+            LastUpdatedBy: 'system',
+            LastUpdatedDate: new Date().toISOString(),
+            OrganizationIds: [],
+            Tags: [],
+            DateIssued: new Date().toISOString(),
+            DueDate: form.watch('dueDate')?.toISOString() || new Date().toISOString(),
+            Status: 'Draft',
+            Amount: (() => {
+              const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
+              const taxAmount = (subtotal * (Number(form.watch('taxes')) || 0)) / 100;
+              return subtotal + taxAmount - (Number(form.watch('discount')) || 0);
+            })(),
+            Customer: [
+              {
+                CustomerName: form.watch('customerName') || '',
+                CustomerImgUrl: '',
+                BillingAddress: form.watch('billingAddress') || '',
+                Email: form.watch('email') || '',
+                PhoneNo: form.watch('phoneNumber') || '',
+              },
+            ],
+            GeneralNote: form.watch('generalNote') || '',
+            ItemDetails: items.map((item) => ({
+              ...item,
+              Category: item.Category || '',
+              Note: item.Note || '',
+            })),
+            Currency: form.watch('currency') || 'CHF',
+            Subtotal: items.reduce((sum, item) => sum + (item.Amount || 0), 0),
+            TaxRate: Number(form.watch('taxes')) || 0,
+            Taxes:
+              (items.reduce((sum, item) => sum + (item.Amount || 0), 0) *
+                (Number(form.watch('taxes')) || 0)) /
+              100,
+            Discount: Number(form.watch('discount')) || 0,
+            TotalAmount: (() => {
+              const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
+              const taxAmount = (subtotal * (Number(form.watch('taxes')) || 0)) / 100;
+              return subtotal + taxAmount - (Number(form.watch('discount')) || 0);
+            })(),
+          }}
+        />
+      )}
 
       <ConfirmationDialog
         open={showConfirmModal}
