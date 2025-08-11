@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InvoicesDetail } from './invoices-detail';
@@ -88,7 +87,7 @@ describe('InvoicesDetail', () => {
     DueDate: '2025-06-15T00:00:00.000Z',
     Amount: 1000,
     Status: InvoiceStatus.PAID,
-    currency: 'CHF',
+    Currency: 'CHF',
     GeneralNote: 'Test Note',
     ItemDetails: [
       {

@@ -62,7 +62,7 @@ export function EditInvoice() {
     email: invoice.Customer[0].Email ?? '',
     phoneNumber: formatPhoneToE164(invoice.Customer[0].PhoneNo ?? ''),
     billingAddress: invoice.Customer[0].BillingAddress ?? '',
-    currency: invoice.currency?.toLowerCase() ?? '',
+    currency: invoice.Currency?.toLowerCase() ?? '',
     dueDate: invoice.DueDate ? new Date(invoice.DueDate) : undefined,
     generalNote: invoice.GeneralNote ?? '',
   };

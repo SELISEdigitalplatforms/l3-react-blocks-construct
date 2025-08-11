@@ -222,10 +222,10 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                     </TableCell>
                     <TableCell className="text-high-emphasis">{item.Quantity}</TableCell>
                     <TableCell className="text-high-emphasis">
-                      {invoice.currency} {item.UnitPrice}
+                      {invoice.Currency} {item.UnitPrice}
                     </TableCell>
                     <TableCell className="text-high-emphasis">
-                      {invoice.currency} {item.Amount}
+                      {invoice.Currency} {item.Amount}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -249,7 +249,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('SUBTOTAL')}</span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  {invoice.currency} {subtotal.toFixed(2)}
+                  {invoice.Currency} {subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -257,19 +257,19 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                   {t('TAXES')} ({invoice.TaxRate}%)
                 </span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  {invoice.currency} {taxes.toFixed(2)}
+                  {invoice.Currency} {taxes.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  -{invoice.currency} {totalDiscount.toFixed(2)}
+                  -{invoice.Currency} {totalDiscount.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between border-t border-border pt-4">
                 <span className="font-semibold text-high-emphasis">{t('TOTAL_AMOUNT')}</span>
                 <span className="text-xl font-bold text-high-emphasis">
-                  {invoice.currency} {totalAmount.toFixed(2)}
+                  {invoice.Currency} {totalAmount.toFixed(2)}
                 </span>
               </div>
             </div>

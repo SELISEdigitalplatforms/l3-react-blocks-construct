@@ -57,7 +57,7 @@ const mockInvoice: InvoiceItem = {
     },
   ],
   Status: 'DRAFT',
-  currency: 'CHF',
+  Currency: 'CHF',
   GeneralNote: '',
   ItemDetails: [],
   Subtotal: 1000,

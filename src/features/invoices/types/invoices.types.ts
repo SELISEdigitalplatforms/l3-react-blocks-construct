@@ -93,7 +93,7 @@ export interface InvoiceItem {
   Taxes?: number;
   TaxRate?: number;
   TotalAmount?: number;
-  currency?: string;
+  Currency?: string;
 }
 
 export interface GetInvoiceItemsResponse {
