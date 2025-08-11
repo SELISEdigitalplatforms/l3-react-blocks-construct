@@ -32,9 +32,13 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
     )
   );
 
-  const taxRate = invoice.Taxes ?? 0;
-  const discount = invoice.Discount ?? 0;
-  const taxAmount = Number(((subtotal * taxRate) / 100).toFixed(2));
+  const taxRate = isPreview ? Number(invoice.TaxRate) || 0 : Number(invoice.Taxes) || 0;
+  const discount = Number(invoice.Discount) || 0;
+
+  const taxAmount = isPreview
+    ? Number((subtotal * (taxRate / 100)).toFixed(2))
+    : Number(taxRate.toFixed(2));
+
   const totalAmount = Math.max(0, Number((subtotal + taxAmount - discount).toFixed(2)));
 
   const handleSendInvoice = () => {

@@ -129,10 +129,17 @@ describe('InvoicesDetail', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
 
     // Check if financial details are displayed
-    expect(screen.getByText('CHF 500')).toBeInTheDocument();
-    expect(screen.getAllByText('CHF 1000').length).toBeGreaterThan(0);
+    // The currency and amount are in separate spans, so we need to check for both
+    const currencySpans = screen.getAllByText('CHF');
 
-    // Check if note is displayed
+    // Check for amounts without decimal places as they're rendered in the component
+    const amount500 = screen.getByText('500');
+    const amount1000 = screen.getByText('1000');
+
+    expect(currencySpans.length).toBeGreaterThan(0);
+    expect(amount500).toBeInTheDocument();
+    expect(amount1000).toBeInTheDocument();
+
     expect(screen.getByText('Test Note')).toBeInTheDocument();
   });
 
