@@ -29,6 +29,8 @@ interface InvoiceItemsTableProps {
   onRemoveItem: (id: string) => void;
   onToggleNote: (id: string) => void;
   onAddItem: () => void;
+  onTaxRateChange: (value: number) => void;
+  onDiscountChange: (value: number) => void;
   control: Control<any>;
   subtotal: number;
   taxRate: number;
@@ -43,6 +45,8 @@ export function InvoiceItemsTable({
   onRemoveItem,
   onToggleNote,
   onAddItem,
+  onTaxRateChange,
+  onDiscountChange,
   control,
   subtotal,
   taxRate,
@@ -215,13 +219,37 @@ export function InvoiceItemsTable({
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('TAXES')}</span>
               <div className="w-40">
-                <Input className="text-right" value={`${taxRate.toFixed(2)}%`} />
+                <div className="relative">
+                  <Input
+                    type="number"
+                    className="text-right pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={taxRate}
+                    onChange={(e) => onTaxRateChange(Number(e.target.value))}
+                    onBlur={(e) => onTaxRateChange(Number(e.target.value))}
+                  />
+                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                    %
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('DISCOUNT')}</span>
               <div className="w-40">
-                <Input className="text-right" value={`- ${currency} ${discount.toFixed(2)}`} />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                    - {currency}
+                  </span>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      className="text-right pl-6 pr-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      value={discount}
+                      onChange={(e) => onDiscountChange(Number(e.target.value))}
+                      onBlur={(e) => onDiscountChange(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex justify-between font-semibold pt-2 border-t">

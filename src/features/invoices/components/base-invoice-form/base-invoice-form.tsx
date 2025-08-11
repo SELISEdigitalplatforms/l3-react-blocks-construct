@@ -85,6 +85,14 @@ export function BaseInvoiceForm({
     },
   });
 
+  const handleTaxRateChange = (value: number) => {
+    form.setValue('taxes', value, { shouldValidate: true });
+  };
+
+  const handleDiscountChange = (value: number) => {
+    form.setValue('discount', value, { shouldValidate: true });
+  };
+
   const handleFormSubmit = () => {
     setShowConfirmModal(true);
   };
@@ -207,24 +215,7 @@ export function BaseInvoiceForm({
               />
               <FormDateInput control={form.control} name="dueDate" labelKey="DUE_DATE" />
               <FormCurrencySelect control={form.control} name="currency" labelKey="CURRENCY" />
-              <FormTextInput
-                control={form.control}
-                name="taxes"
-                labelKey="TAXES %"
-                placeholderKey="0"
-                type="number"
-                min={0}
-                step="0.01"
-              />
-              <FormTextInput
-                control={form.control}
-                name="discount"
-                labelKey="DISCOUNT"
-                placeholderKey="0"
-                type="number"
-                min={0}
-                step="0.01"
-              />
+
             </div>
           </FormSectionCard>
 
@@ -236,6 +227,8 @@ export function BaseInvoiceForm({
                 onRemoveItem={handleRemoveItem}
                 onToggleNote={handleToggleNote}
                 onAddItem={handleAddItem}
+                onTaxRateChange={handleTaxRateChange}
+                onDiscountChange={handleDiscountChange}
                 control={form.control}
                 subtotal={items.reduce((acc, item) => acc + item.Amount, 0)}
                 taxRate={form.watch('taxes') || 0}
