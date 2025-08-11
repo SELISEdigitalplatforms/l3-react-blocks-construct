@@ -33,15 +33,22 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const discount = Number(invoice.Discount) || 0;
 
   const isTaxPercentage = invoice.Taxes && invoice.Taxes <= 100;
+
+  const calculateTaxRate = () => {
+    if (subtotal <= 0) return '0.00';
+
+    if (isTaxPercentage) {
+      return Number(invoice.Taxes).toFixed(2);
+    }
+
+    return ((taxAmount / subtotal) * 100).toFixed(2);
+  };
+
   const taxAmount = isTaxPercentage
     ? Number((subtotal * (Number(invoice.Taxes) / 100)).toFixed(2))
     : Number(invoice.Taxes) || 0;
-  const taxRate =
-    subtotal > 0
-      ? isTaxPercentage
-        ? Number(invoice.Taxes).toFixed(2)
-        : ((taxAmount / subtotal) * 100).toFixed(2)
-      : '0.00';
+
+  const taxRate = calculateTaxRate();
 
   const totalAmount = Math.max(0, Number((subtotal + taxAmount - discount).toFixed(2)));
 
