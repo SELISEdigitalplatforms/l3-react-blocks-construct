@@ -137,8 +137,6 @@ export default function TaskDetailsView({
     updateTaskDetails,
     addNewAttachment: addAttachment,
     deleteAttachment: removeAttachment,
-    addNewTag: addTagToTask,
-    deleteTag: removeTag,
   } = useTaskDetails(currentTaskId);
 
   const { mutate: createTag, isPending: isCreatingTag } = useCreateTags();
@@ -642,83 +640,57 @@ export default function TaskDetailsView({
     }
   };
 
-  const handleAssigneeChange = async (newAssignees: Assignee[]) => {
-    const previousAssignees = [...selectedAssignees];
+  const handleAssigneeChange = useCallback(
+    async (newAssignees: Assignee[]) => {
+      if (!currentTaskId) return;
 
-    try {
-      setSelectedAssignees(newAssignees);
-
-      if (currentTaskId) {
+      try {
         await updateTaskDetails({
           Assignee: newAssignees,
         });
+
+        // Only update local state after successful API call
+        setSelectedAssignees(newAssignees);
+      } catch (error) {
+        console.error('Failed to update assignees:', error);
+        toast({
+          variant: 'destructive',
+          title: t('ERROR'),
+          description: t('Failed to update assignees. Please try again.'),
+        });
+        throw error;
       }
-    } catch (error) {
-      console.error('Failed to update assignees:', error);
-      setSelectedAssignees(previousAssignees);
+    },
+    [currentTaskId, updateTaskDetails, t, toast]
+  );
 
-      toast({
-        variant: 'destructive',
-        title: t('ERROR'),
-        description: t('Failed to update assignees. Please try again.'),
-      });
-    }
-  };
+  const handleTagChange = useCallback(
+    async (newTags: ItemTag[]) => {
+      if (!currentTaskId) return;
 
-  const handleTagChange = async (newTags: Array<string | ItemTag>) => {
-    const normalizedNewTags = newTags.map((tag) =>
-      typeof tag === 'string' ? { ItemId: uuidv4(), TagLabel: tag } : tag
-    );
+      const previousTags = [...selectedTags];
 
-    const existingTagsMap = new Map(tags.map((tag) => [tag.TagLabel.toLowerCase(), tag]));
+      try {
+        // Optimistically update the UI
+        setSelectedTags(newTags);
 
-    const processedTags = normalizedNewTags.map((tag) => {
-      const existingTag = existingTagsMap.get(tag.TagLabel.toLowerCase());
-      return existingTag || tag;
-    });
-
-    const uniqueTags = Array.from(
-      new Map(processedTags.map((tag) => [tag.TagLabel.toLowerCase(), tag])).values()
-    );
-
-    const previousTags = [...selectedTags];
-
-    setSelectedTags(uniqueTags);
-
-    if (!currentTaskId) {
-      return;
-    }
-
-    try {
-      await updateTaskDetails({
-        ItemTag: uniqueTags,
-      });
-
-      const currentTagLabels = new Set(previousTags.map((tag) => tag.TagLabel.toLowerCase()));
-      const newTagLabels = new Set(uniqueTags.map((tag) => tag.TagLabel.toLowerCase()));
-
-      const tagsToAdd = uniqueTags.filter(
-        (tag) => !currentTagLabels.has(tag.TagLabel.toLowerCase())
-      );
-      const tagsToRemove = previousTags.filter(
-        (tag) => !newTagLabels.has(tag.TagLabel.toLowerCase())
-      );
-
-      await Promise.all([
-        ...tagsToAdd.map((tag) => addTagToTask(tag.TagLabel).catch(console.error)),
-        ...tagsToRemove.map((tag) => removeTag(tag.ItemId).catch(console.error)),
-      ]);
-    } catch (error) {
-      console.error('Failed to update tags:', error);
-      setSelectedTags(previousTags);
-
-      toast({
-        variant: 'destructive',
-        title: t('ERROR'),
-        description: t('Failed to update tags. Please try again.'),
-      });
-    }
-  };
+        // Only make one API call to update the tags
+        await updateTaskDetails({
+          ItemTag: newTags,
+        });
+      } catch (error) {
+        console.error('Failed to update tags:', error);
+        // Revert to previous state on error
+        setSelectedTags(previousTags);
+        toast({
+          variant: 'destructive',
+          title: t('ERROR'),
+          description: t('Failed to update tags. Please try again.'),
+        });
+      }
+    },
+    [currentTaskId, selectedTags, updateTaskDetails, t, toast]
+  );
 
   const mapAttachmentsForUpdate = (attachments: TaskAttachments[]) => {
     return attachments.map(({ ItemId, FileName, FileSize, FileType }) => ({

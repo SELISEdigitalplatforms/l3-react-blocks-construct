@@ -1,6 +1,8 @@
-import { Plus } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { memo, useCallback, useState, useEffect } from 'react';
 import { Button } from 'components/ui/button';
+import { Label } from 'components/ui/label';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +16,7 @@ import {
   CommandItem,
   CommandList,
 } from 'components/ui/command';
-import { Checkbox } from 'components/ui/checkbox';
+
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Assignee } from '../../types/task-manager.types';
 import { cn } from 'lib/utils';
@@ -56,27 +58,57 @@ interface AssigneeSelectorProps {
   onChange: (selected: Assignee[]) => void;
 }
 
-export function AssigneeSelector({
+const AssigneeSelectorComponent = ({
   availableAssignees,
   selectedAssignees,
   onChange,
-}: Readonly<AssigneeSelectorProps>) {
+}: Readonly<AssigneeSelectorProps>) => {
   const { t } = useTranslation();
-  const handleAssigneeToggle = (assignee: Assignee) => {
-    const isSelected = selectedAssignees.some((a) => a.ItemId === assignee.ItemId);
+  const [isProcessing, setIsProcessing] = useState<Record<string, boolean>>({});
+  const [localSelected, setLocalSelected] = useState<Set<string>>(new Set());
 
-    if (isSelected) {
-      const newAssignees = selectedAssignees.filter((a) => a.ItemId !== assignee.ItemId);
-      onChange(newAssignees);
-    } else {
-      const newAssignees = [...selectedAssignees, assignee];
-      onChange(newAssignees);
+  // Update local selected when selectedAssignees changes
+  useEffect(() => {
+    setLocalSelected(new Set(selectedAssignees.map(a => a.ItemId)));
+  }, [selectedAssignees]);
+
+  const handleSelect = useCallback(async (assignee: Assignee) => {
+    const assigneeId = assignee.ItemId;
+    const isSelected = localSelected.has(assigneeId);
+    
+    // Update local state immediately for better UX
+    setLocalSelected(prev => {
+      const newSet = new Set(prev);
+      if (isSelected) {
+        newSet.delete(assigneeId);
+      } else {
+        newSet.add(assigneeId);
+      }
+      return newSet;
+    });
+    
+    try {
+      setIsProcessing(prev => ({ ...prev, [assigneeId]: true }));
+      
+      // Create new array based on updated local state
+      const newAssignees = isSelected
+        ? selectedAssignees.filter(a => a.ItemId !== assigneeId)
+        : [...selectedAssignees, assignee];
+      
+      await onChange(newAssignees);
+    } catch (error) {
+      console.error('Failed to update assignee:', error);
+      // Revert local state on error
+      setLocalSelected(new Set(selectedAssignees.map(a => a.ItemId)));
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [assigneeId]: false }));
     }
-  };
+  }, [selectedAssignees, localSelected, onChange]);
 
   return (
     <div>
-      <div className="flex items-center gap-2">
+      <Label className="text-high-emphasis text-base font-semibold">{t('ASSIGNEE')}</Label>
+      <div className="flex items-center gap-2 mt-2">
         <div className="flex -space-x-2">
           {selectedAssignees.slice(0, 3).map((assignee) => (
             <Avatar key={assignee.ItemId} className="h-8 w-8 border-2 border-background">
@@ -109,26 +141,33 @@ export function AssigneeSelector({
                 <CommandEmpty className="py-2 px-3 text-sm">{t('NO_MEMBERS_FOUND')}</CommandEmpty>
                 <CommandGroup>
                   {availableAssignees.map((assignee) => {
-                    const isSelected = selectedAssignees.some((a) => a.ItemId === assignee.ItemId);
                     return (
                       <CommandItem
                         key={assignee.ItemId}
-                        onSelect={() => handleAssigneeToggle(assignee)}
-                        className="flex items-center gap-2 px-2 py-1.5"
+                        value={assignee.ItemId}
+                        onSelect={() => handleSelect(assignee)}
+                        className="flex items-center px-2 py-1.5 cursor-pointer"
                       >
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handleAssigneeToggle(assignee)}
-                          className="h-4 w-4 rounded"
-                        />
+                        <div
+                          className={cn(
+                            'mr-2 flex h-4 w-4 items-center justify-center rounded border transition-colors',
+                            localSelected.has(assignee.ItemId) && !isProcessing[assignee.ItemId]
+                              ? 'bg-primary border-primary' 
+                              : 'border-border',
+                            isProcessing[assignee.ItemId] ? 'opacity-50' : ''
+                          )}
+                          aria-hidden="true"
+                        >
+                          {localSelected.has(assignee.ItemId) && !isProcessing[assignee.ItemId] && (
+                            <Check className="h-3 w-3 text-white" />
+                          )}
+                          {isProcessing[assignee.ItemId] && (
+                            <div className="h-3 w-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          )}
+                        </div>
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
-                          <AvatarFallback
-                            className={cn(
-                              'bg-gray-200 text-foreground text-xs',
-                              isSelected && 'bg-primary text-primary-foreground'
-                            )}
-                          >
+                          <AvatarFallback className="bg-gray-200 text-foreground text-xs">
                             {assignee.Name.split(' ')
                               .map((n: string) => n[0])
                               .join('')
@@ -148,4 +187,6 @@ export function AssigneeSelector({
       </div>
     </div>
   );
-}
+};
+
+export const AssigneeSelector = memo(AssigneeSelectorComponent);

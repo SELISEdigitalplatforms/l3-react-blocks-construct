@@ -65,7 +65,7 @@ interface UseTaskDetailsReturn {
   task: TaskItem | null;
   toggleTaskCompletion: (isCompleted: boolean) => Promise<void>;
   removeTask: () => Promise<boolean>;
-  updateTaskDetails: (updates: Partial<TaskItem>) => Promise<void>;
+  updateTaskDetails: (updates: Partial<TaskItem> | TaskItemUpdateInput) => Promise<TaskItem | undefined>;
   addNewAttachment: (attachment: TaskAttachments) => Promise<void>;
   deleteAttachment: (attachmentId: string) => Promise<void>;
   addNewTag: (tag: string) => Promise<void>;
@@ -203,26 +203,37 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         handleTagUpdates(updates, sanitizedUpdates);
         handleAssigneeUpdates(updates, sanitizedUpdates);
 
+        // Optimistically update the local state
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
 
-        updateTask({
+        // Make the API call without waiting for the tasks list to refetch
+        await updateTask({
           itemId: taskId,
           input: sanitizedUpdates,
         });
 
-        await refetchTasks();
+        // Show success toast
+        toast({
+          variant: 'default',
+          title: t('SUCCESS'),
+          description: t('Task updated successfully'),
+        });
 
+        // Dispatch an event to notify other components of the update
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('task-updated', { detail: updatedTask }));
         }
+
+        return updatedTask;
       } catch (error) {
         console.error('Failed to update task:', error);
+        // Revert to previous state on error
         setCurrentTask(previousTask);
         throw error;
       }
     },
-    [taskId, currentTask, updateTask, refetchTasks]
+    [taskId, currentTask, updateTask, t, toast]
   );
 
   const toggleTaskCompletion = useCallback(
