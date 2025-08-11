@@ -24,17 +24,18 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showSendDialog, setShowSendDialog] = useState(false);
-
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  const subtotal = invoice.ItemDetails?.reduce(
-    (sum, item) => sum + (item.Amount || 0),
-    0
-  ) || 0;
-  
-  const taxes = invoice.Taxes || 0;
-  const totalDiscount = invoice.Discount || 0;
-  const totalAmount = subtotal + taxes - totalDiscount;
+  const subtotal = Number(
+    (invoice.ItemDetails?.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0) || 0).toFixed(
+      2
+    )
+  );
+
+  const taxRate = invoice.Taxes ?? 0;
+  const discount = invoice.Discount ?? 0;
+  const taxAmount = Number(((subtotal * taxRate) / 100).toFixed(2));
+  const totalAmount = Math.max(0, Number((subtotal + taxAmount - discount).toFixed(2)));
 
   const handleSendInvoice = () => {
     setShowSendDialog(false);
@@ -256,18 +257,18 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">
-                  {t('TAXES')} ({invoice.TaxRate}%)
+                  {t('TAXES')} ({taxRate}%)
                 </span>
                 <span className="text-sm font-semibold text-high-emphasis">
                   <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
-                  {taxes.toFixed(2)}
+                  {taxAmount.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
                 <span className="text-sm font-semibold text-high-emphasis">
                   <span className="text-medium-emphasis uppercase">-{invoice.Currency} </span>
-                  {totalDiscount.toFixed(2)}
+                  {discount.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between border-t border-border pt-4">

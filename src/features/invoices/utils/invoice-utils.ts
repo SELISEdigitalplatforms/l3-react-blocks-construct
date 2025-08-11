@@ -35,7 +35,13 @@ export function createInvoiceFromForm(
   items: InvoiceItemDetails[],
   action: 'draft' | 'send'
 ): InvoiceItem {
-  const { TotalAmount, Subtotal, Taxes, TaxRate } = calculateInvoiceTotals(items, 7.5, 50);
+  const taxRate = Number(formValues.taxes) || 0;
+  const discount = Number(formValues.discount) || 0;
+  const { TotalAmount, Subtotal, Taxes, TaxRate } = calculateInvoiceTotals(
+    items,
+    taxRate,
+    discount
+  );
   const status = action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT;
 
   return {

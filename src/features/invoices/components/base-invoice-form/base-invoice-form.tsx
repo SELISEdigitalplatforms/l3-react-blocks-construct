@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
-import { createInvoiceFromForm } from '../../utils/invoice-utils';
+// Removed unused import
 import { invoiceFormSchema, type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { Button } from 'components/ui/button';
 import { ChevronLeft } from 'lucide-react';
@@ -215,7 +215,6 @@ export function BaseInvoiceForm({
               />
               <FormDateInput control={form.control} name="dueDate" labelKey="DUE_DATE" />
               <FormCurrencySelect control={form.control} name="currency" labelKey="CURRENCY" />
-
             </div>
           </FormSectionCard>
 
@@ -245,13 +244,59 @@ export function BaseInvoiceForm({
         </form>
       </FormProvider>
 
-      <InvoicePreview
-        open={showPreview}
-        onOpenChange={setShowPreview}
-        invoice={
-          showPreview ? createInvoiceFromForm('preview', form.getValues(), items, 'draft') : null
-        }
-      />
+      {showPreview && (
+        <InvoicePreview
+          open={showPreview}
+          onOpenChange={setShowPreview}
+          invoice={{
+            ItemId: 'preview',
+            CreatedBy: 'system',
+            CreatedDate: new Date().toISOString(),
+            IsDeleted: false,
+            Language: 'en',
+            LastUpdatedBy: 'system',
+            LastUpdatedDate: new Date().toISOString(),
+            OrganizationIds: [],
+            Tags: [],
+            DateIssued: new Date().toISOString(),
+            DueDate: form.watch('dueDate')?.toISOString() || new Date().toISOString(),
+            Status: 'Draft',
+            Amount: (() => {
+              const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
+              const taxAmount = (subtotal * (Number(form.watch('taxes')) || 0)) / 100;
+              return subtotal + taxAmount - (Number(form.watch('discount')) || 0);
+            })(),
+            Customer: [
+              {
+                CustomerName: form.watch('customerName') || '',
+                CustomerImgUrl: '',
+                BillingAddress: form.watch('billingAddress') || '',
+                Email: form.watch('email') || '',
+                PhoneNo: form.watch('phoneNumber') || '',
+              },
+            ],
+            GeneralNote: form.watch('generalNote') || '',
+            ItemDetails: items.map((item) => ({
+              ...item,
+              Category: item.Category || '',
+              Note: item.Note || '',
+            })),
+            Currency: form.watch('currency') || 'CHF',
+            Subtotal: items.reduce((sum, item) => sum + (item.Amount || 0), 0),
+            TaxRate: Number(form.watch('taxes')) || 0,
+            Taxes:
+              (items.reduce((sum, item) => sum + (item.Amount || 0), 0) *
+                (Number(form.watch('taxes')) || 0)) /
+              100,
+            Discount: Number(form.watch('discount')) || 0,
+            TotalAmount: (() => {
+              const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
+              const taxAmount = (subtotal * (Number(form.watch('taxes')) || 0)) / 100;
+              return subtotal + taxAmount - (Number(form.watch('discount')) || 0);
+            })(),
+          }}
+        />
+      )}
 
       <ConfirmationDialog
         open={showConfirmModal}
