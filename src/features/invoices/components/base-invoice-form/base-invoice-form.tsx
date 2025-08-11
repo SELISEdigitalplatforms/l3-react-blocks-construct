@@ -297,7 +297,7 @@ export function BaseInvoiceForm({
               (items.reduce((sum, item) => sum + (item.Amount || 0), 0) *
                 (Number(form.watch('taxes')) || 0)) /
               100,
-            Discount: Number(form.watch('discount')) ?? 0,
+            Discount: Number(form.watch('discount')) || 0,
             TotalAmount: (() => {
               const subtotal = items.reduce((sum, item) => sum + (item.Amount || 0), 0);
               const taxAmount = (subtotal * (Number(form.watch('taxes')) || 0)) / 100;

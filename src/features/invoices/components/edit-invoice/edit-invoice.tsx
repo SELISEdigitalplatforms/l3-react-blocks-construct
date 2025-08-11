@@ -123,9 +123,9 @@ export function EditInvoice() {
           ItemName: item.ItemName,
           Note: item.Note ?? '',
           Category: item.Category ?? '0',
-          Quantity: Number(item.Quantity) ?? 0,
-          UnitPrice: Number(item.UnitPrice) ?? 0,
-          Amount: Number(item.Amount) ?? 0,
+          Quantity: Number(item.Quantity) || 0,
+          UnitPrice: Number(item.UnitPrice) || 0,
+          Amount: Number(item.Amount) || 0,
         })),
       },
     });
