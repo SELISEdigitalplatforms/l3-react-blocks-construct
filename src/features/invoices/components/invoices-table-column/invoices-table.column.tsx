@@ -89,7 +89,9 @@ export const createInvoiceTableColumns = ({
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('AMOUNT')} />,
     cell: ({ row }) => (
       <div className="flex items-center">
-        <span>CHF {row.original.Amount.toFixed(2)}</span>
+        <span className="text-medium-emphasis uppercase">
+          {row.original.Currency} {row.original.Amount.toFixed(2)}
+        </span>
       </div>
     ),
   },

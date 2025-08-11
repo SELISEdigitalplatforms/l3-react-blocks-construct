@@ -114,10 +114,21 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
 export const addInvoiceItem = async (
   params: AddInvoiceItemParams
 ): Promise<AddInvoiceItemResponse> => {
+  // Ensure Taxes and Discount are always included, defaulting to 0 if undefined
+  const payload = {
+    ...params,
+    input: {
+      ...params.input,
+      Taxes: params.input.Taxes ?? 0,
+      Discount: params.input.Discount ?? 0,
+    },
+  };
+  
   const response = await graphqlClient.mutate<AddInvoiceItemResponse>({
     query: INSERT_INVOICE_ITEM_MUTATION,
-    variables: params,
+    variables: payload,
   });
+  
   return response;
 };
 

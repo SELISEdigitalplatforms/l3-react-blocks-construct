@@ -1,4 +1,6 @@
 import { useEffect, useMemo } from 'react';
+import { Loader2 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import { useToast } from 'hooks/use-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,7 +10,6 @@ import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-h
 import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
 import { CustomerDetails, InvoiceItemDetails, InvoiceStatus } from '../../types/invoices.types';
 import { useGetInvoiceItems, useUpdateInvoiceItem } from '../../hooks/use-invoices';
-import { Loader2 } from 'lucide-react';
 
 export function EditInvoice() {
   const { t } = useTranslation();
@@ -65,6 +66,8 @@ export function EditInvoice() {
     currency: invoice.Currency ?? '',
     dueDate: invoice.DueDate ? new Date(invoice.DueDate) : undefined,
     generalNote: invoice.GeneralNote ?? '',
+    taxes: invoice.Taxes ?? 0,
+    discount: invoice.Discount ?? 0,
   };
 
   const defaultItems =
@@ -78,8 +81,6 @@ export function EditInvoice() {
           UnitPrice: item.UnitPrice,
           Amount: item.Amount,
           Note: item.Note,
-          Taxes: item.Taxes,
-          Discount: item.Discount,
           showNote: Boolean(item.Note),
           note: item.Note,
         }) as InvoiceItemDetails
@@ -115,16 +116,16 @@ export function EditInvoice() {
           ? InvoiceStatus.PENDING
           : InvoiceStatus.DRAFT) as unknown as InvoiceStatus[],
         GeneralNote: values.generalNote || '',
+        Taxes: values.taxes,
+        Discount: values.discount,
         ItemDetails: items.map((item) => ({
-          ItemId: item.ItemId || crypto.randomUUID(),
+          ItemId: item.ItemId || uuidv4(),
           ItemName: item.ItemName,
           Note: item.Note || '',
           Category: item.Category || '0',
           Quantity: Number(item.Quantity) || 0,
           UnitPrice: Number(item.UnitPrice) || 0,
           Amount: Number(item.Amount) || 0,
-          Taxes: Number(item.Taxes) || 0,
-          Discount: Number(item.Discount) || 0,
         })),
       },
     });

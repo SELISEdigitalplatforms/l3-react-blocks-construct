@@ -215,17 +215,13 @@ export function InvoiceItemsTable({
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('TAXES')}</span>
               <div className="w-40">
-                <Input className="text-right" value={`${taxRate.toFixed(2)}%`} readOnly />
+                <Input className="text-right" value={`${taxRate.toFixed(2)}%`} />
               </div>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('DISCOUNT')}</span>
               <div className="w-40">
-                <Input
-                  className="text-right"
-                  value={`- ${currency} ${discount.toFixed(2)}`}
-                  readOnly
-                />
+                <Input className="text-right" value={`- ${currency} ${discount.toFixed(2)}`} />
               </div>
             </div>
             <div className="flex justify-between font-semibold pt-2 border-t">

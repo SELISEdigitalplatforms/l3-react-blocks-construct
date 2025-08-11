@@ -67,8 +67,6 @@ export interface InvoiceItemDetails {
   Amount: number;
   Note?: string;
   showNote?: boolean;
-  Taxes?: number;
-  Discount?: number;
 }
 
 export interface InvoiceItem {
@@ -90,10 +88,11 @@ export interface InvoiceItem {
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
   Subtotal?: number;
-  Taxes?: number;
   TaxRate?: number;
   TotalAmount?: number;
   Currency?: string;
+  Taxes?: number;
+  Discount?: number;
 }
 
 export interface GetInvoiceItemsResponse {
@@ -127,6 +126,8 @@ export interface AddInvoiceItemInput {
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
   Currency?: string;
+  Taxes?: number;
+  Discount?: number;
 }
 
 export interface AddInvoiceItemParams {
@@ -160,6 +161,8 @@ export interface UpdateInvoiceItemInput {
   GeneralNote?: string;
   ItemDetails?: InvoiceItemDetails[];
   Currency?: string;
+  Taxes?: number;
+  Discount?: number;
 }
 
 export interface UpdateInvoiceItemParams {

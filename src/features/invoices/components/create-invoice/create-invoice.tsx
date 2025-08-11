@@ -60,8 +60,6 @@ export function CreateInvoice() {
           Quantity: item.Quantity ?? quantity,
           UnitPrice: item.UnitPrice ?? unitPrice,
           Amount: item.Amount ?? amount,
-          Taxes: item.Taxes ?? 0,
-          Discount: item.Discount ?? 0,
         };
       });
 
@@ -84,6 +82,8 @@ export function CreateInvoice() {
           GeneralNote: values.generalNote ?? '',
           LastUpdatedBy: userProfile?.fullName ?? '',
           LastUpdatedDate: new Date().toISOString(),
+          Taxes: values.taxes,
+          Discount: values.discount,
         },
       };
 

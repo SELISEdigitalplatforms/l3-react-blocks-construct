@@ -27,15 +27,14 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
 
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  const { subtotal, taxes, totalAmount, totalDiscount } = invoice.ItemDetails?.reduce(
-    (acc, item) => ({
-      subtotal: acc.subtotal + (item.Amount || 0),
-      taxes: acc.taxes + (item.Taxes || 0),
-      totalDiscount: acc.totalDiscount + (item.Discount || 0),
-      totalAmount: acc.totalAmount + (item.Amount || 0) + (item.Taxes || 0) - (item.Discount || 0),
-    }),
-    { subtotal: 0, taxes: 0, totalDiscount: 0, totalAmount: 0 }
-  ) || { subtotal: 0, taxes: 0, totalDiscount: 0, totalAmount: 0 };
+  const subtotal = invoice.ItemDetails?.reduce(
+    (sum, item) => sum + (item.Amount || 0),
+    0
+  ) || 0;
+  
+  const taxes = invoice.Taxes || 0;
+  const totalDiscount = invoice.Discount || 0;
+  const totalAmount = subtotal + taxes - totalDiscount;
 
   const handleSendInvoice = () => {
     setShowSendDialog(false);

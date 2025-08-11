@@ -44,8 +44,6 @@ export function BaseInvoiceForm({
       UnitPrice: 0,
       Amount: 0,
       Note: '',
-      Taxes: 0,
-      Discount: 0,
     },
   ],
   onSubmit,
@@ -81,6 +79,8 @@ export function BaseInvoiceForm({
       billingAddress: '',
       currency: '',
       generalNote: '',
+      taxes: 0,
+      discount: 0,
       ...defaultValues,
     },
   });
@@ -154,8 +154,6 @@ export function BaseInvoiceForm({
         UnitPrice: 0,
         Amount: 0,
         Note: '',
-        Taxes: 0,
-        Discount: 0,
       },
     ]);
   };
@@ -209,6 +207,24 @@ export function BaseInvoiceForm({
               />
               <FormDateInput control={form.control} name="dueDate" labelKey="DUE_DATE" />
               <FormCurrencySelect control={form.control} name="currency" labelKey="CURRENCY" />
+              <FormTextInput
+                control={form.control}
+                name="taxes"
+                labelKey="TAXES %"
+                placeholderKey="0"
+                type="number"
+                min={0}
+                step="0.01"
+              />
+              <FormTextInput
+                control={form.control}
+                name="discount"
+                labelKey="DISCOUNT"
+                placeholderKey="0"
+                type="number"
+                min={0}
+                step="0.01"
+              />
             </div>
           </FormSectionCard>
 
@@ -222,13 +238,13 @@ export function BaseInvoiceForm({
                 onAddItem={handleAddItem}
                 control={form.control}
                 subtotal={items.reduce((acc, item) => acc + item.Amount, 0)}
-                taxRate={7.5}
-                discount={50}
-                totalAmount={
-                  items.reduce((acc, item) => acc + item.Amount, 0) +
-                  items.reduce((acc, item) => acc + item.Amount, 0) * (7.5 / 100) -
-                  50
-                }
+                taxRate={form.watch('taxes') || 0}
+                discount={form.watch('discount') || 0}
+                totalAmount={(function () {
+                  const subtotal = items.reduce((acc, item) => acc + item.Amount, 0);
+                  const taxAmount = subtotal * ((form.watch('taxes') || 0) / 100);
+                  return subtotal + taxAmount - (form.watch('discount') || 0);
+                })()}
                 currency={form.watch('currency')?.toUpperCase() || 'CHF'}
               />
             </div>

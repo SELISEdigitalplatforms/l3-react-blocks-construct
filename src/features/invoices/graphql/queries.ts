@@ -31,6 +31,8 @@ export const GET_INVOICE_ITEMS_QUERY = `
         DueDate
         Status
         GeneralNote
+        Taxes
+        Discount
         Customer {
           CustomerName
           CustomerImgUrl
@@ -46,8 +48,6 @@ export const GET_INVOICE_ITEMS_QUERY = `
           UnitPrice
           Amount
           Note
-          Taxes
-          Discount
         }
       }
     }
