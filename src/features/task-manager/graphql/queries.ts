@@ -47,12 +47,6 @@ export const GET_TASK_MANAGER_QUERY = `
           FileSize
           FileType
         }
-        Comments {
-          ItemId
-          Content
-          Timestamp
-          Author
-        }
       }
     }
   }

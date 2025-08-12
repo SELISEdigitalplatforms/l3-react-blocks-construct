@@ -535,7 +535,6 @@ export default function TaskDetailsView({
       Description: description ?? '',
       ItemTag: selectedTags,
       Attachments: attachments,
-      Comments: [],
     }),
     [
       section,
@@ -649,7 +648,6 @@ export default function TaskDetailsView({
           Assignee: newAssignees,
         });
 
-        // Only update local state after successful API call
         setSelectedAssignees(newAssignees);
       } catch (error) {
         console.error('Failed to update assignees:', error);
@@ -671,16 +669,13 @@ export default function TaskDetailsView({
       const previousTags = [...selectedTags];
 
       try {
-        // Optimistically update the UI
         setSelectedTags(newTags);
 
-        // Only make one API call to update the tags
         await updateTaskDetails({
           ItemTag: newTags,
         });
       } catch (error) {
         console.error('Failed to update tags:', error);
-        // Revert to previous state on error
         setSelectedTags(previousTags);
         toast({
           variant: 'destructive',

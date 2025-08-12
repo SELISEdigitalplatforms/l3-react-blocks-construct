@@ -83,7 +83,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
   const { mutateAsync: updateSection } = useUpdateTaskSection();
   const { mutateAsync: deleteSection } = useDeleteTaskSection();
 
-  // Fetch task sections
   const { data: sectionsData } = useGetTaskSections({
     pageNo: 1,
     pageSize: 100,
@@ -99,7 +98,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       Section: task.Section ?? '',
       ItemTag: task.ItemTag ?? [],
       Assignee: task.Assignee ?? [],
-      Comments: task.Comments ?? [],
       Attachments: task.Attachments ?? [],
       CreatedBy: task.CreatedBy ?? '',
       CreatedDate: task.CreatedDate ?? new Date().toISOString(),
@@ -123,11 +121,9 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
-  // Initialize columns with sections data and tasks
   useEffect(() => {
     if (!sectionsData?.TaskManagerSections?.items) return;
 
-    // Create a stable reference to the filters object
     const currentFilters = {
       priorities: filters.priorities ?? [],
       statuses: filters.statuses ?? [],
@@ -137,14 +133,12 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
     };
 
     setColumnTasks(() => {
-      // Filter sections if status filter is applied
       const filteredSections = sectionsData.TaskManagerSections.items.filter(
         (section: TaskSection) =>
           !currentFilters.statuses.length ||
           (section.Title && currentFilters.statuses.includes(section.Title))
       );
 
-      // Create a map of section titles to their corresponding section
       const sectionsByTitle = new Map<string, TaskSection>();
       filteredSections.forEach((section: TaskSection) => {
         if (section.Title) {
@@ -152,7 +146,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         }
       });
 
-      // Create a map of section IDs to their tasks
       const tasksBySectionId: Record<string, TaskItem[]> = {};
       filteredSections.forEach((section: TaskSection) => {
         tasksBySectionId[section.ItemId] = [];

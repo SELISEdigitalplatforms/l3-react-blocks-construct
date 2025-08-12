@@ -122,7 +122,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Attachments
               : currentTask?.Attachments
           ),
-          Comments: foundTask.Comments ?? [],
           CreatedBy: foundTask.CreatedBy ?? '',
           CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
           IsDeleted: foundTask.IsDeleted ?? false,

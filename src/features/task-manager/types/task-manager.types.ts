@@ -72,7 +72,6 @@ export interface TaskItem {
   Description?: string;
   Assignee?: Assignee[];
   Attachments?: TaskAttachments[];
-  Comments?: TaskComments[];
   DueDate?: string;
   LastUpdatedBy?: string;
   LastUpdatedDate?: string;
@@ -194,7 +193,6 @@ export interface TaskItemUpdateInput {
   Description?: string;
   Assignee?: Assignee[];
   ItemTag?: ItemTag[];
-  Comments?: TaskComments[];
   DueDate?: string;
   Priority?: TaskPriority;
   Section?: string;
