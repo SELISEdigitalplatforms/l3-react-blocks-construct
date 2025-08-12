@@ -52,7 +52,6 @@ export function createInvoiceFromForm(
     Customer: [
       {
         CustomerName: formValues.customerName ?? '',
-        CustomerImgUrl: '',
         BillingAddress: formValues.billingAddress ?? '',
         Email: formValues.email ?? '',
         PhoneNo: formValues.phoneNumber ?? '',

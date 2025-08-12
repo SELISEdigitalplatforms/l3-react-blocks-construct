@@ -278,7 +278,6 @@ export function BaseInvoiceForm({
             Customer: [
               {
                 CustomerName: form.watch('customerName') ?? '',
-                CustomerImgUrl: '',
                 BillingAddress: form.watch('billingAddress') ?? '',
                 Email: form.watch('email') ?? '',
                 PhoneNo: form.watch('phoneNumber') ?? '',

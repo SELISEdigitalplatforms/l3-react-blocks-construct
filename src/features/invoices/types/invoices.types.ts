@@ -52,7 +52,6 @@ export function getStatusColors(status: string): StatusColors {
 
 export interface CustomerDetails {
   CustomerName: string;
-  CustomerImgUrl: string;
   BillingAddress: string;
   Email: string;
   PhoneNo: string;

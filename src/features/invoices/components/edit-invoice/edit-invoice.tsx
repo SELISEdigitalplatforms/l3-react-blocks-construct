@@ -97,7 +97,6 @@ export function EditInvoice() {
 
     const customer: CustomerDetails = {
       CustomerName: values.customerName,
-      CustomerImgUrl: invoice.Customer[0]?.CustomerImgUrl ?? '',
       BillingAddress: values.billingAddress ?? '',
       Email: values.email ?? '',
       PhoneNo: values.phoneNumber ?? '',

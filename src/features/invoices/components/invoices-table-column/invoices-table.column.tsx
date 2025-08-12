@@ -46,13 +46,6 @@ export const createInvoiceTableColumns = ({
       const customer = row.original.Customer?.[0];
       return (
         <div className="flex items-center gap-2">
-          {customer?.CustomerImgUrl && (
-            <img
-              src={customer.CustomerImgUrl}
-              alt={customer.CustomerName}
-              className="h-8 w-8 rounded-full object-cover"
-            />
-          )}
           <span className="min-w-[150px] truncate">{customer?.CustomerName || 'N/A'}</span>
         </div>
       );

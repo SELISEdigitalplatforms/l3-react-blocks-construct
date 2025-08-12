@@ -77,7 +77,6 @@ describe('InvoicesDetail', () => {
     Customer: [
       {
         CustomerName: 'Test Customer',
-        CustomerImgUrl: 'https://example.com/avatar.jpg',
         BillingAddress: 'Test Address',
         Email: 'test@example.com',
         PhoneNo: '+41123456789',

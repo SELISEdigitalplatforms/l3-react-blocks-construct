@@ -48,7 +48,6 @@ describe('Invoice Table Columns', () => {
     Customer: [
       {
         CustomerName: 'Test Customer',
-        CustomerImgUrl: 'https://example.com/avatar.jpg',
         BillingAddress: 'Test Address',
         Email: 'test@example.com',
         PhoneNo: '+41123456789',
@@ -88,9 +87,6 @@ describe('Invoice Table Columns', () => {
       render(<>{customerColumn.cell({ row: { original: mockInvoice } } as any)}</>);
 
       expect(screen.getByText('Test Customer')).toBeInTheDocument();
-      const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
-      expect(img).toHaveAttribute('alt', 'Test Customer');
     }
   });
 

@@ -50,7 +50,6 @@ const mockInvoice: InvoiceItem = {
   Customer: [
     {
       CustomerName: 'Test Customer',
-      CustomerImgUrl: '',
       BillingAddress: 'Test Address',
       Email: 'test@example.com',
       PhoneNo: '+41123456789',

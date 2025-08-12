@@ -41,7 +41,6 @@ export function CreateInvoice() {
     try {
       const customer: CustomerDetails = {
         CustomerName: values.customerName,
-        CustomerImgUrl: '',
         BillingAddress: values.billingAddress ?? '',
         Email: values.email ?? '',
         PhoneNo: values.phoneNumber ?? '',

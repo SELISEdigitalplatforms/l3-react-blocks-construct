@@ -35,7 +35,6 @@ export const GET_INVOICE_ITEMS_QUERY = `
         Discount
         Customer {
           CustomerName
-          CustomerImgUrl
           BillingAddress
           Email
           PhoneNo

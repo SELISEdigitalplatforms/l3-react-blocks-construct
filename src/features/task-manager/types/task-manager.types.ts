@@ -46,6 +46,14 @@ export interface TaskComments {
 
 export interface TaskAttachments {
   ItemId: string;
+  IsDeleted?: boolean;
+  Tags?: string[];
+  Language?: string;
+  OrganizationIds?: string[];
+  CreatedBy?: string;
+  CreatedDate?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
   FileName: string;
   FileSize: string;
   FileType: 'pdf' | 'image' | 'other';
@@ -132,6 +140,18 @@ export interface GetSectionsResponse {
 export interface GetTagsResponse {
   TaskManagerTags: {
     items: TaskTag[];
+    totalCount: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    pageSize: number;
+    pageNo: number;
+    totalPages: number;
+  };
+}
+
+export interface GetAttachmentsResponse {
+  TaskAttachments: {
+    items: TaskAttachments[];
     totalCount: number;
     hasNextPage: boolean;
     hasPreviousPage: boolean;
@@ -282,4 +302,34 @@ export interface TaskCommentUpdateInput {
   Timestamp?: string;
   Author?: string;
   IsDeleted?: boolean;
+}
+
+export interface TaskAttachmentInsertInput {
+  ItemId: string;
+  IsDeleted?: boolean;
+  Tags?: string[];
+  Language?: string;
+  OrganizationIds?: string[];
+  CreatedBy?: string;
+  CreatedDate?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
+  FileName: string;
+  FileSize: string;
+  FileType: 'pdf' | 'image' | 'other';
+}
+
+export interface TaskAttachmentUpdateInput {
+  ItemId: string;
+  IsDeleted?: boolean;
+  Tags?: string[];
+  Language?: string;
+  OrganizationIds?: string[];
+  CreatedBy?: string;
+  CreatedDate?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
+  FileName: string;
+  FileSize: string;
+  FileType: 'pdf' | 'image' | 'other';
 }
