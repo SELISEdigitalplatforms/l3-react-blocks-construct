@@ -45,23 +45,6 @@ import { FileManagerMyFiles } from './pages/file-manager/my-files';
 
 const queryClient = new QueryClient();
 
-// function RedirectHandler() {
-//   const location = useLocation();
-
-//   useEffect(() => {
-//     if (location.pathname === '/success') {
-//       const headers = new Headers();
-//       headers.set('x-current-path', location.pathname);
-
-//       // setTimeout(() => {
-//       //   window.location.href = '/';
-//       // }, 10000);
-//     }
-//   }, [location]);
-
-//   return null;
-// }
-
 function AppContent() {
   const { isLoading } = useLanguageContext();
 
@@ -71,7 +54,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased relative">
-      {/* <RedirectHandler /> */}
       <ClientMiddleware>
         <ThemeProvider>
           <SidebarProvider>
