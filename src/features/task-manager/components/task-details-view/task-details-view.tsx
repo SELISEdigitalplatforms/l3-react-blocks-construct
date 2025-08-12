@@ -474,12 +474,6 @@ export default function TaskDetailsView({
     try {
       const taskForApi: Partial<TaskItem> = {
         ...task,
-        Attachments: task.Attachments?.map(({ ItemId, FileName, FileSize, FileType }) => ({
-          ItemId,
-          FileName,
-          FileType,
-          FileSize: typeof FileSize === 'string' ? parseInt(FileSize, 10) : FileSize,
-        })) as any,
         Assignee: Array.isArray(task.Assignee)
           ? task.Assignee.map((id) => ({
               ItemId: id,
@@ -519,19 +513,8 @@ export default function TaskDetailsView({
       Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
       Description: description ?? '',
       ItemTag: selectedTags,
-      Attachments: attachments,
     }),
-    [
-      section,
-      isMarkComplete,
-      title,
-      priority,
-      date,
-      selectedAssignees,
-      description,
-      selectedTags,
-      attachments,
-    ]
+    [section, isMarkComplete, title, priority, date, selectedAssignees, description, selectedTags]
   );
 
   const createNewTags = useCallback(

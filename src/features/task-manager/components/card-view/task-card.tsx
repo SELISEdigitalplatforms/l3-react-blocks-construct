@@ -224,7 +224,7 @@ export function TaskCard({
             ))}
         </div>
 
-        {(task.DueDate || task.Assignee || (task.Attachments?.length ?? 0) > 0) && (
+        {(task.DueDate || task.Assignee) && (
           <div className="mt-4 flex justify-between items-center text-xs text-gray-500">
             {task.DueDate && (
               <button

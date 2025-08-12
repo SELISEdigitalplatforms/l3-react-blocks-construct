@@ -72,7 +72,6 @@ export interface TaskItem {
   Language?: string;
   Description?: string;
   Assignee?: Assignee[];
-  Attachments?: TaskAttachments[];
   DueDate?: string;
   LastUpdatedBy?: string;
   LastUpdatedDate?: string;

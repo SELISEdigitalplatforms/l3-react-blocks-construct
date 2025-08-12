@@ -4,7 +4,6 @@ import { useGetTasks, useUpdateTaskItem, useDeleteTaskItem } from './use-task-ma
 import {
   TaskItem,
   TaskItemUpdateInput,
-  TaskAttachments,
   Assignee,
   TaskPriority,
   ItemTag,
@@ -51,8 +50,6 @@ const useToast = () => ({
  *   toggleTaskCompletion,
  *   addNewComment,
  *   deleteComment,
- *   addNewAttachment,
- *   deleteAttachment,
  *   addNewAssignee,
  *   deleteAssignee,
  *   addNewTag,
@@ -68,8 +65,6 @@ interface UseTaskDetailsReturn {
   updateTaskDetails: (
     updates: Partial<TaskItem> | TaskItemUpdateInput
   ) => Promise<TaskItem | undefined>;
-  addNewAttachment: (attachment: TaskAttachments) => Promise<void>;
-  deleteAttachment: (attachmentId: string) => Promise<void>;
   addNewTag: (tag: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;
   addNewAssignee: (assignee: Assignee) => Promise<void>;
@@ -94,16 +89,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           return tags || [];
         };
 
-        const mapToAttachments = (attachments?: TaskAttachments[]): TaskAttachments[] => {
-          if (!attachments) return [];
-          return attachments.map((att) => ({
-            ItemId: att.ItemId || '',
-            FileName: att.FileName || 'Unknown',
-            FileSize: att.FileSize || '0',
-            FileType: att.FileType || 'other',
-          }));
-        };
-
         const mappedTask: TaskItem = {
           ItemId: foundTask.ItemId,
           Title: foundTask.Title,
@@ -117,11 +102,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Assignee
               : currentTask?.Assignee || [],
           ItemTag: mapToItemTags(foundTask.ItemTag),
-          Attachments: mapToAttachments(
-            foundTask.Attachments && foundTask.Attachments.length > 0
-              ? foundTask.Attachments
-              : currentTask?.Attachments
-          ),
           CreatedBy: foundTask.CreatedBy ?? '',
           CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
           IsDeleted: foundTask.IsDeleted ?? false,
@@ -268,52 +248,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     }
   }, [taskId, refetchTasks, deleteTask, t, toast]);
 
-  const addNewAttachment = useCallback(
-    async (attachment: any) => {
-      if (!taskId || !currentTask) return;
-
-      try {
-        setCurrentTask((prev) =>
-          prev
-            ? {
-                ...prev,
-                attachments: [...(prev.Attachments || []), attachment],
-              }
-            : null
-        );
-
-        await refetchTasks();
-      } catch (error) {
-        console.error('Failed to add attachment:', error);
-        await refetchTasks();
-      }
-    },
-    [taskId, currentTask, refetchTasks]
-  );
-
-  const deleteAttachment = useCallback(
-    async (attachmentId: string) => {
-      if (!taskId || !currentTask) return;
-
-      try {
-        setCurrentTask((prev) =>
-          prev
-            ? {
-                ...prev,
-                attachments: (prev.Attachments || []).filter((a) => a.ItemId !== attachmentId),
-              }
-            : null
-        );
-
-        await refetchTasks();
-      } catch (error) {
-        console.error('Failed to delete attachment:', error);
-        await refetchTasks();
-      }
-    },
-    [taskId, currentTask, refetchTasks]
-  );
-
   const addNewAssignee = useCallback(
     async (assignee: Assignee) => {
       if (!taskId || !currentTask) return;
@@ -440,8 +374,6 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     updateTaskDetails,
     toggleTaskCompletion,
     removeTask,
-    addNewAttachment,
-    deleteAttachment,
     addNewAssignee,
     deleteAssignee,
     addNewTag: addNewTag,

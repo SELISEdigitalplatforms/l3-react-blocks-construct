@@ -3,10 +3,15 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
+import type { TaskAttachments } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
+import {
+  useDeleteTaskItem,
+  useGetTaskComments,
+  useGetTaskAttachments,
+} from '../../hooks/use-task-manager';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 
@@ -48,12 +53,10 @@ export function SortableTaskItem({
 }: Readonly<SortableTaskItemProps>) {
   const [task, setTask] = useState(initialTask);
 
-  // Update the task when it changes in the parent
   useEffect(() => {
     setTask(initialTask);
   }, [initialTask]);
 
-  // Listen for task updates from other components
   useEffect(() => {
     const handleTaskUpdated = (event: Event) => {
       const customEvent = event as CustomEvent<TaskItem>;
@@ -67,13 +70,11 @@ export function SortableTaskItem({
       window.removeEventListener('task-updated', handleTaskUpdated as EventListener);
     };
   }, [task.ItemId]);
-  // Fetch comments for this task
   const { data: commentsData } = useGetTaskComments({
     pageNo: 1,
     pageSize: 100,
   });
 
-  // Filter comments to only show those for the current task
   const taskComments = useMemo(() => {
     if (!commentsData?.TaskManagerComments?.items) return [];
     return commentsData.TaskManagerComments.items.filter(
@@ -82,7 +83,20 @@ export function SortableTaskItem({
   }, [commentsData, task.ItemId]);
 
   const commentsCount = taskComments.length;
-  const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
+
+  const { data: attachmentsData } = useGetTaskAttachments({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const taskAttachments = useMemo(() => {
+    if (!attachmentsData?.TaskAttachments?.items) return [];
+    return attachmentsData.TaskAttachments.items.filter(
+      (attachment: TaskAttachments) => attachment.TaskId === task.ItemId
+    );
+  }, [attachmentsData, task.ItemId]);
+
+  const attachmentsCount = taskAttachments.length;
   const assignees = (() => {
     if (!task?.Assignee) return [];
     const assigneeList = Array.isArray(task.Assignee) ? task.Assignee : [task.Assignee];

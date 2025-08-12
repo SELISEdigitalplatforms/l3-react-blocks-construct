@@ -41,12 +41,6 @@ export const GET_TASK_MANAGER_QUERY = `
           Name
           ImageUrl
         }
-        Attachments {
-          ItemId
-          FileName
-          FileSize
-          FileType
-        }
       }
     }
   }
