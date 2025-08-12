@@ -44,6 +44,8 @@ export interface TaskComments {
   LastUpdatedDate?: string;
 }
 
+export type FileType = 'pdf' | 'image' | 'other';
+
 export interface TaskAttachments {
   ItemId: string;
   IsDeleted?: boolean;
@@ -56,7 +58,7 @@ export interface TaskAttachments {
   LastUpdatedDate?: string;
   FileName: string;
   FileSize: string;
-  FileType: 'pdf' | 'image' | 'other';
+  FileType: FileType;
 }
 
 export interface TaskItem {
@@ -316,7 +318,7 @@ export interface TaskAttachmentInsertInput {
   LastUpdatedDate?: string;
   FileName: string;
   FileSize: string;
-  FileType: 'pdf' | 'image' | 'other';
+  FileType: FileType;
 }
 
 export interface TaskAttachmentUpdateInput {
@@ -331,5 +333,5 @@ export interface TaskAttachmentUpdateInput {
   LastUpdatedDate?: string;
   FileName: string;
   FileSize: string;
-  FileType: 'pdf' | 'image' | 'other';
+  FileType: FileType;
 }
