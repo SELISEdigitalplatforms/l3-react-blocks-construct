@@ -7,7 +7,11 @@ import { Card } from 'components/ui/card';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
+import {
+  useDeleteTaskItem,
+  useGetTaskComments,
+  useGetTaskAttachments,
+} from '../../hooks/use-task-manager';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
@@ -66,12 +70,25 @@ export function TaskCard({
     pageSize: 100,
   });
 
+  const { data: attachmentsData } = useGetTaskAttachments({
+    pageNo: 1,
+    pageSize: 100,
+    // The API will handle filtering by TaskId on the server side
+  });
+
   const taskComments = useMemo(() => {
     if (!commentsData?.TaskManagerComments?.items) return [];
     return commentsData.TaskManagerComments.items.filter(
       (comment) => comment.TaskId === task.ItemId
     );
   }, [commentsData, task.ItemId]);
+
+  const taskAttachments = useMemo(() => {
+    if (!attachmentsData?.TaskAttachments?.items) return [];
+    return attachmentsData.TaskAttachments.items.filter(
+      (attachment) => attachment.TaskId === task.ItemId
+    );
+  }, [attachmentsData, task.ItemId]);
 
   useEffect(() => {
     setTask(initialTask);
@@ -248,7 +265,7 @@ export function TaskCard({
                 </button>
               )}
 
-              {task.Attachments !== undefined && task.Attachments.length > 0 && (
+              {taskAttachments.length > 0 && (
                 <button className="flex items-center gap-1" onClick={handleInteractiveElementClick}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -263,14 +280,14 @@ export function TaskCard({
                   >
                     <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
                   </svg>
-                  <span>{task.Attachments.length}</span>
+                  <span>{taskAttachments.length}</span>
                 </button>
               )}
             </div>
 
             {task.Assignee && task.Assignee.length > 0 && (
               <div className="flex -space-x-2">
-                {task.Assignee.map((assignee, idx) => {
+                {task.Assignee.slice(0, 3).map((assignee, idx) => {
                   const displayName = assignee?.Name ?? '';
                   const imageUrl = assignee?.ImageUrl;
                   const initial = displayName ? displayName.charAt(0).toUpperCase() : '';
@@ -299,6 +316,16 @@ export function TaskCard({
                     </button>
                   );
                 })}
+                {task.Assignee.length > 3 && (
+                  <div
+                    className="h-6 w-6 rounded-full bg-gray-300 border-2 border-background flex items-center justify-center z-10 relative"
+                    style={{ zIndex: 10 }}
+                  >
+                    <span className="text-[10px] text-medium-emphasis font-medium">
+                      +{task.Assignee.length - 3}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>

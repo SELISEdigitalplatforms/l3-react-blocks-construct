@@ -2,7 +2,17 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { Button } from 'components/ui/button';
-import { Plus, Upload, Download, Trash2, File, ImageIcon, ChevronDown } from 'lucide-react';
+import {
+  Plus,
+  Upload,
+  Download,
+  Trash2,
+  File,
+  ImageIcon,
+  ChevronDown,
+  Loader2,
+  FileText,
+} from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Dialog,
@@ -13,7 +23,13 @@ import {
 } from 'components/ui/dialog';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
-import { TaskAttachments } from '../../types/task-manager.types';
+import {
+  TaskAttachments,
+  FileType,
+  TaskAttachmentInsertInput,
+} from '../../types/task-manager.types';
+import { useCreateTaskAttachment, useDeleteTaskAttachment } from '../../hooks/use-task-manager';
+import { useToast } from 'hooks/use-toast';
 
 /**
  * AttachmentsSection Component
@@ -46,17 +62,24 @@ import { TaskAttachments } from '../../types/task-manager.types';
  */
 
 interface AttachmentsSectionProps {
+  taskId?: string;
   attachments: TaskAttachments[];
-  setAttachments: React.Dispatch<React.SetStateAction<TaskAttachments[]>>;
+  onAttachmentsChange: () => void;
+  isLoading?: boolean;
 }
 
 export function AttachmentsSection({
-  attachments,
-  setAttachments,
+  taskId,
+  attachments = [],
+  onAttachmentsChange,
+  isLoading = false,
 }: Readonly<AttachmentsSectionProps>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const { mutate: createAttachment } = useCreateTaskAttachment();
+  const { mutate: deleteAttachment } = useDeleteTaskAttachment();
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -66,7 +89,7 @@ export function AttachmentsSection({
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const getFileType = (file: File): 'pdf' | 'image' | 'other' => {
+  const getFileType = (file: File): FileType => {
     if (file.type.includes('pdf')) return 'pdf';
     if (file.type.includes('image')) return 'image';
     return 'other';
@@ -74,33 +97,77 @@ export function AttachmentsSection({
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      const newAttachments = acceptedFiles.map((file) => ({
-        ItemId: uuidv4(),
-        FileName: file.name,
-        FileSize: formatFileSize(file.size),
-        FileType: getFileType(file),
-        file: file,
-      }));
+      if (!taskId) return;
 
-      setAttachments((prev) => [...prev, ...newAttachments]);
-      setIsDialogOpen(false);
+      const uploadPromises = acceptedFiles.map((file) => {
+        const fileId = uuidv4();
+        const fileSize = formatFileSize(file.size);
+        const fileType = getFileType(file);
+
+        const attachmentInput: TaskAttachmentInsertInput = {
+          ItemId: fileId,
+          TaskId: taskId,
+          FileName: file.name,
+          FileSize: fileSize,
+          FileType: fileType,
+          CreatedDate: new Date().toISOString(),
+        };
+
+        return new Promise<void>((resolve, reject) => {
+          createAttachment(attachmentInput, {
+            onError: (error) => {
+              console.error('Error uploading attachment:', error);
+              reject(error);
+            },
+            onSettled: () => {
+              resolve();
+            },
+          });
+        });
+      });
+
+      Promise.all(uploadPromises)
+        .then(() => {
+          onAttachmentsChange();
+        })
+        .catch((error) => {
+          console.error('Error uploading files:', error);
+          toast({
+            variant: 'destructive',
+            title: t('Error'),
+            description: t('Failed to upload files'),
+          });
+        });
     },
-    [setAttachments]
+    [taskId, t, toast, createAttachment, onAttachmentsChange]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'application/pdf': [],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [],
-      'image/jpeg': [],
-      'image/png': [],
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif'],
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
-    maxSize: 25 * 1024 * 1024,
+    maxSize: 25 * 1024 * 1024, // 25MB
+    multiple: true,
+    disabled: !taskId || isLoading,
   });
 
   const handleDeleteAttachment = (id: string) => {
-    setAttachments(attachments.filter((attachment) => attachment.ItemId !== id));
+    deleteAttachment(id, {
+      onError: (error) => {
+        console.error('Error deleting attachment:', error);
+        toast({
+          title: t('Error'),
+          description: t('Failed to delete attachment. Please try again.'),
+        });
+      },
+      onSuccess: () => {
+        onAttachmentsChange();
+      },
+    });
   };
 
   const handleDownload = async (attachment: TaskAttachments) => {
@@ -121,13 +188,28 @@ export function AttachmentsSection({
   };
 
   const getFileIcon = (type: string) => {
+    const iconContainerClass =
+      'flex-shrink-0 flex items-center justify-center w-12 h-10 rounded-[7px]';
+
     switch (type) {
       case 'pdf':
-        return <File className="h-5 w-5 text-blue-500" />;
+        return (
+          <div className={`${iconContainerClass} bg-primary-50`}>
+            <FileText className="h-5 w-5 text-primary" />
+          </div>
+        );
       case 'image':
-        return <ImageIcon className="h-5 w-5 text-blue-500" />;
+        return (
+          <div className={`${iconContainerClass} bg-error-background`}>
+            <ImageIcon className="h-5 w-5 text-error" />
+          </div>
+        );
       default:
-        return <File className="h-5 w-5 text-blue-500" />;
+        return (
+          <div className={`${iconContainerClass} bg-primary-50`}>
+            <File className="h-5 w-5 text-primary" />
+          </div>
+        );
     }
   };
 
@@ -171,15 +253,24 @@ export function AttachmentsSection({
               >
                 <Input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
-                  <Upload className="h-10 w-10 text-gray-400" />
-                  {isDragActive ? (
-                    <p>{t('DROP_FILES_HERE')}</p>
+                  {isLoading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <p className="text-sm">{t('UPLOADING')}...</p>
+                    </div>
                   ) : (
                     <>
-                      <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
-                      <p className="text-xs text-gray-500">
-                        {t('UPLOAD_ANY_FILE_TYPE_MAX_SIZE')}: 10MB
-                      </p>
+                      <Upload className="h-10 w-10 text-gray-400" />
+                      {isDragActive ? (
+                        <p>{t('DROP_FILES_HERE')}</p>
+                      ) : (
+                        <>
+                          <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
+                          <p className="text-xs text-gray-500">
+                            {t('UPLOAD_ANY_FILE_TYPE_MAX_SIZE')}: 25MB
+                          </p>
+                        </>
+                      )}
                     </>
                   )}
                 </div>
@@ -189,18 +280,31 @@ export function AttachmentsSection({
         )}
       </div>
 
-      {attachments.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
+      ) : attachments.length === 0 ? (
         <div
           {...getRootProps()}
           className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors border-gray-300 hover:border-primary/50"
         >
           <Input {...getInputProps()} />
           <div className="flex flex-col items-center gap-2">
-            <Upload className="h-10 w-10 text-gray-400" />
-            <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
-            <p className="text-xs text-gray-500">
-              PDF, DOCX, JPG, PNG | {t('MAX_SIZE')}: 25MB {t('PER_FILE')}
-            </p>
+            {isLoading ? (
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm">{t('UPLOADING')}...</p>
+              </div>
+            ) : (
+              <>
+                <Upload className="h-10 w-10 text-gray-400" />
+                <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
+                <p className="text-xs text-gray-500">
+                  PDF, DOCX, JPG, PNG | {t('MAX_SIZE')}: 25MB {t('PER_FILE')}
+                </p>
+              </>
+            )}
           </div>
         </div>
       ) : (
@@ -223,7 +327,7 @@ export function AttachmentsSection({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-gray-500 hover:text-primary"
+                      className="h-8 w-8 text-medium-emphasis hover:text-primary"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDownload(attachment);
@@ -234,7 +338,7 @@ export function AttachmentsSection({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-gray-500"
+                      className="h-8 w-8 text-error hover:text-error"
                       onClick={() => handleDeleteAttachment(attachment.ItemId)}
                     >
                       <Trash2 className="h-4 w-4" />

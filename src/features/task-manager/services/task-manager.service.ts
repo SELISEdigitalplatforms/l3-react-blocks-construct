@@ -965,17 +965,11 @@ export const createTaskAttachment = async (
   input: TaskAttachmentInsertInput
 ): Promise<InsertTaskAttachmentResponse> => {
   try {
-    const formattedInput = {
-      ...input,
-      ItemTag: getNormalizedTags(input),
-      Tags: undefined,
-    };
-
     const response = await graphqlClient.mutate<{
       insertTaskAttachment: { itemId: string };
     }>({
       query: INSERT_TASK_ATTACHMENT_MUTATION,
-      variables: { input: formattedInput },
+      variables: { input },
     });
 
     const responseData = (response as any).data || response;

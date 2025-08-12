@@ -615,12 +615,12 @@ export const useDeleteTaskComment = () => {
  * @returns Mutation function to create task attachment with loading and error states
  *
  * @example
- * const { mutate: createTask, isPending } = useCreateTaskAttachment();
- * createTask({
- *   Title: 'New Task',
- *   Description: 'Task description',
- *   Assignee: 'user-123',
- *   Priority: TaskPriority.MEDIUM
+ * const { mutate: createTaskAttachment, isPending } = useCreateTaskAttachment();
+ * createTaskAttachment({
+ *   TaskId: 'task-123',
+ *   File: 'file.pdf',
+ *  FileName: 'file.pdf',
+ *  FileSize: "53.4 Kb",
  * });
  */
 export const useCreateTaskAttachment = () => {
@@ -687,8 +687,8 @@ export const useDeleteTaskAttachment = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks-attachment'] });
       toast({
         variant: 'success',
-        title: t('TASK_REMOVED'),
-        description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
+        title: t('Attachment Removed'),
+        description: t('Attachment has been deleted successfully'),
       });
     },
     onError: (error: Error) => {

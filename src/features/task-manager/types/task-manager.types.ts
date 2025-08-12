@@ -48,6 +48,7 @@ export type FileType = 'pdf' | 'image' | 'other';
 
 export interface TaskAttachments {
   ItemId: string;
+  TaskId?: string;
   IsDeleted?: boolean;
   Tags?: string[];
   Language?: string;
@@ -306,6 +307,7 @@ export interface TaskCommentUpdateInput {
 
 export interface TaskAttachmentInsertInput {
   ItemId: string;
+  TaskId?: string;
   IsDeleted?: boolean;
   Tags?: string[];
   Language?: string;
@@ -321,6 +323,7 @@ export interface TaskAttachmentInsertInput {
 
 export interface TaskAttachmentUpdateInput {
   ItemId: string;
+  TaskId?: string;
   IsDeleted?: boolean;
   Tags?: string[];
   Language?: string;

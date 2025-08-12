@@ -165,10 +165,10 @@ export const GET_TASK_ATTACHMENTS_QUERY = `
       pageNo
       items {
         ItemId
+        TaskId
         FileName
         FileSize
         FileType
-        Timestamp
         CreatedBy
         CreatedDate
         LastUpdatedBy

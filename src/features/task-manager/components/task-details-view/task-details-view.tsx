@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
@@ -12,6 +12,7 @@ import {
   useGetTaskComments,
   useUpdateTaskComment,
   useDeleteTaskComment,
+  useGetTaskAttachments,
 } from '../../hooks/use-task-manager';
 import {
   Assignee,
@@ -20,7 +21,6 @@ import {
   TaskTagInsertInput,
   TaskCommentInsertInput,
   TaskPriority,
-  TaskAttachments,
   priorityStyle,
 } from '../../types/task-manager.types';
 import { Calendar } from 'components/ui/calendar';
@@ -131,13 +131,7 @@ export default function TaskDetailsView({
   const { columns } = useCardTasks();
   const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
   const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
-  const {
-    task,
-    removeTask,
-    updateTaskDetails,
-    addNewAttachment: addAttachment,
-    deleteAttachment: removeAttachment,
-  } = useTaskDetails(currentTaskId);
+  const { task, removeTask, updateTaskDetails } = useTaskDetails(currentTaskId);
 
   const { mutate: createTag, isPending: isCreatingTag } = useCreateTags();
 
@@ -147,14 +141,23 @@ export default function TaskDetailsView({
   const [title, setTitle] = useState<string>(task?.Title ?? '');
   const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted ?? false);
   const [section, setSection] = useState<string>(task?.Section ?? '');
-  const [attachments, setAttachments] = useState<TaskAttachments[]>(
-    task?.Attachments?.map((attachment) => ({
-      ItemId: attachment.ItemId,
-      FileName: attachment.FileName,
-      FileSize: attachment.FileSize,
-      FileType: attachment.FileType,
-    })) || []
-  );
+  // Fetch attachments
+  const {
+    data: attachmentsData,
+    isLoading: isLoadingAttachments,
+    refetch: refetchAttachments,
+  } = useGetTaskAttachments({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  // Filter attachments for the current task
+  const attachments = useMemo(() => {
+    if (!attachmentsData?.TaskAttachments?.items) return [];
+    return attachmentsData.TaskAttachments.items.filter(
+      (attachment) => attachment.TaskId === currentTaskId
+    );
+  }, [attachmentsData, currentTaskId]);
   const [priority, setPriority] = useState<TaskPriority>(
     task?.Priority && Object.values(TaskPriority).includes(task.Priority)
       ? task.Priority
@@ -283,7 +286,6 @@ export default function TaskDetailsView({
     setTitle('');
     setIsMarkComplete(false);
     setSection('To Do');
-    setAttachments([]);
     setDate(undefined);
     setDescription('');
     setSelectedTags([]);
@@ -293,27 +295,12 @@ export default function TaskDetailsView({
     setTitle,
     setIsMarkComplete,
     setSection,
-    setAttachments,
     setDate,
     setDescription,
     setSelectedTags,
     setSelectedAssignees,
     setPriority,
   ]);
-
-  const setTaskAttachments = useCallback(
-    (attachments: any[]) => {
-      setAttachments(
-        (attachments || []).map((attachment) => ({
-          ItemId: attachment.ItemId,
-          FileName: attachment.FileName,
-          FileSize: attachment.FileSize,
-          FileType: attachment.FileType,
-        }))
-      );
-    },
-    [setAttachments]
-  );
 
   const setTaskAssignees = useCallback(
     (assignee: any) => {
@@ -372,7 +359,6 @@ export default function TaskDetailsView({
     setSelectedTags(task.ItemTag ?? []);
 
     // Set complex fields using extracted functions
-    setTaskAttachments(task.Attachments ?? []);
     setTaskAssignees(task.Assignee);
     setTaskPriority(task.Priority);
   }, [
@@ -384,7 +370,6 @@ export default function TaskDetailsView({
     setDate,
     setDescription,
     setSelectedTags,
-    setTaskAttachments,
     setTaskAssignees,
     setTaskPriority,
   ]);
@@ -687,52 +672,6 @@ export default function TaskDetailsView({
     [currentTaskId, selectedTags, updateTaskDetails, t, toast]
   );
 
-  const mapAttachmentsForUpdate = (attachments: TaskAttachments[]) => {
-    return attachments.map(({ ItemId, FileName, FileSize, FileType }) => ({
-      ItemId,
-      FileName,
-      FileSize,
-      FileType,
-    }));
-  };
-
-  const processAttachmentChanges = (
-    prevAttachments: TaskAttachments[],
-    updatedAttachments: TaskAttachments[]
-  ) => {
-    if (!currentTaskId) return;
-
-    updateTaskDetails({
-      Attachments: mapAttachmentsForUpdate(updatedAttachments),
-    });
-
-    const removedAttachments = prevAttachments.filter(
-      (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
-    );
-
-    const addedAttachments = updatedAttachments.filter(
-      (newAtt) => !prevAttachments.some((prevAtt) => prevAtt.ItemId === newAtt.ItemId)
-    );
-
-    addedAttachments.forEach((attachment) => {
-      addAttachment(attachment);
-    });
-
-    removedAttachments.forEach(({ ItemId }) => {
-      removeAttachment(ItemId);
-    });
-  };
-
-  const handleAttachmentChange = async (newAttachments: SetStateAction<TaskAttachments[]>) => {
-    setAttachments((prev) => {
-      const updatedAttachments =
-        typeof newAttachments === 'function' ? newAttachments(prev) : newAttachments;
-
-      processAttachmentChanges(prev, updatedAttachments);
-      return updatedAttachments;
-    });
-  };
-
   const handleDeleteTask = async (): Promise<boolean> => {
     if (!currentTaskId) return false;
 
@@ -976,7 +915,12 @@ export default function TaskDetailsView({
           <AddTag onAddTag={handleTagAdd} isLoading={isCreatingTag} />
         </div>
         <div className="mt-6">
-          <AttachmentsSection attachments={attachments} setAttachments={handleAttachmentChange} />
+          <AttachmentsSection
+            taskId={taskId || task?.ItemId}
+            attachments={attachments}
+            onAttachmentsChange={refetchAttachments}
+            isLoading={isLoadingAttachments}
+          />
         </div>
         <Separator className="my-6" />
         {!isNewTaskModalOpen && (
