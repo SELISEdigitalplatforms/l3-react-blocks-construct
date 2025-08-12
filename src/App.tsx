@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 import { LoadingOverlay } from './components/core/loading-overlay';
 import './i18n/i18n';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'components/ui/toaster';
 import { ClientMiddleware } from 'state/client-middleware';
@@ -46,22 +45,22 @@ import { FileManagerMyFiles } from './pages/file-manager/my-files';
 
 const queryClient = new QueryClient();
 
-function RedirectHandler() {
-  const location = useLocation();
+// function RedirectHandler() {
+//   const location = useLocation();
 
-  useEffect(() => {
-    if (location.pathname === '/success') {
-      const headers = new Headers();
-      headers.set('x-current-path', location.pathname);
+//   useEffect(() => {
+//     if (location.pathname === '/success') {
+//       const headers = new Headers();
+//       headers.set('x-current-path', location.pathname);
 
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 10000);
-    }
-  }, [location]);
+//       // setTimeout(() => {
+//       //   window.location.href = '/';
+//       // }, 10000);
+//     }
+//   }, [location]);
 
-  return null;
-}
+//   return null;
+// }
 
 function AppContent() {
   const { isLoading } = useLanguageContext();
@@ -72,7 +71,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased relative">
-      <RedirectHandler />
+      {/* <RedirectHandler /> */}
       <ClientMiddleware>
         <ThemeProvider>
           <SidebarProvider>
