@@ -238,8 +238,6 @@ export const useCreateTaskItem = () => {
 
 export const useUpdateTaskItem = () => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<
@@ -250,11 +248,6 @@ export const useUpdateTaskItem = () => {
     mutationFn: (variables) => updateTaskItem(variables.itemId, variables.input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({
-        variant: 'success',
-        title: t('Updated task'),
-        description: t('You have updated the task successfully'),
-      });
     },
     onError: (error: Error) => {
       handleError(error);
@@ -651,8 +644,6 @@ export const useCreateTaskAttachment = () => {
 
 export const useUpdateTaskAttachment = () => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<
@@ -663,11 +654,6 @@ export const useUpdateTaskAttachment = () => {
     mutationFn: (variables) => updateTaskAttachment(variables.itemId, variables.input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({
-        variant: 'success',
-        title: t('Updated task'),
-        description: t('You have updated the task successfully'),
-      });
     },
     onError: (error: Error) => {
       handleError(error);

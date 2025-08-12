@@ -23,13 +23,13 @@ import {
 } from 'components/ui/dialog';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
+import { useToast } from 'hooks/use-toast';
 import {
   TaskAttachments,
   FileType,
   TaskAttachmentInsertInput,
 } from '../../types/task-manager.types';
 import { useCreateTaskAttachment, useDeleteTaskAttachment } from '../../hooks/use-task-manager';
-import { useToast } from 'hooks/use-toast';
 
 /**
  * AttachmentsSection Component
@@ -129,6 +129,7 @@ export function AttachmentsSection({
       Promise.all(uploadPromises)
         .then(() => {
           onAttachmentsChange();
+          setIsDialogOpen(false);
         })
         .catch((error) => {
           console.error('Error uploading files:', error);

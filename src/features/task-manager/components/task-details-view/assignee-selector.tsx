@@ -1,6 +1,7 @@
+import { memo, useCallback, useState, useEffect } from 'react';
 import { Plus, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { memo, useCallback, useState, useEffect } from 'react';
+import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
 import { Label } from 'components/ui/label';
 import {
@@ -16,10 +17,8 @@ import {
   CommandItem,
   CommandList,
 } from 'components/ui/command';
-
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Assignee } from '../../types/task-manager.types';
-import { cn } from 'lib/utils';
 
 /**
  * AssigneeSelector Component
@@ -67,7 +66,6 @@ const AssigneeSelectorComponent = ({
   const [isProcessing, setIsProcessing] = useState<Record<string, boolean>>({});
   const [localSelected, setLocalSelected] = useState<Set<string>>(new Set());
 
-  // Update local selected when selectedAssignees changes
   useEffect(() => {
     setLocalSelected(new Set(selectedAssignees.map((a) => a.ItemId)));
   }, [selectedAssignees]);
@@ -77,7 +75,6 @@ const AssigneeSelectorComponent = ({
       const assigneeId = assignee.ItemId;
       const isSelected = localSelected.has(assigneeId);
 
-      // Update local state immediately for better UX
       setLocalSelected((prev) => {
         const newSet = new Set(prev);
         if (isSelected) {

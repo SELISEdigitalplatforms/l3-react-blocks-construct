@@ -595,6 +595,11 @@ export default function TaskDetailsView({
 
   const handleClose = () => {
     onClose();
+    toast({
+      variant: 'success',
+      title: t('Updated task'),
+      description: t('You have updated the task successfully'),
+    });
     if (isNewTaskModalOpen && !newTaskAdded) {
       handleAddItem();
     }
@@ -870,7 +875,6 @@ export default function TaskDetailsView({
             </Popover>
           </div>
           <div>
-            <Label className="text-high-emphasis text-base font-semibold">{t('ASSIGNEE')}</Label>
             <AssigneeSelector
               availableAssignees={availableAssignees}
               selectedAssignees={selectedAssignees}
