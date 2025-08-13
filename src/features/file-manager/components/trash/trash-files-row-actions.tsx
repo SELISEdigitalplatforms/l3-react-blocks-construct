@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from 'components/ui/alert-dialog';
 import { Button } from 'components/ui/button';
-import { MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
+import { Eye, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { IFileTrashData } from '../../utils/file-manager';
 
@@ -26,6 +26,7 @@ interface TrashTableRowActionsProps {
   onRestore: (file: IFileTrashData) => void;
   onDelete: (file: IFileTrashData) => void;
   onPermanentDelete?: (file: IFileTrashData) => void;
+  onViewDetails?: (file: IFileTrashData) => void;
 }
 
 export function TrashTableRowActions({
@@ -33,6 +34,7 @@ export function TrashTableRowActions({
   onRestore,
   onDelete,
   onPermanentDelete,
+  onViewDetails,
 }: Readonly<TrashTableRowActionsProps>) {
   const { t } = useTranslation();
   const file = row.original;
@@ -43,7 +45,13 @@ export function TrashTableRowActions({
     setIsDropdownOpen(false);
     setTimeout(() => {
       action(file);
-    }, 100); // Small delay to ensure dropdown closes smoothly
+    }, 100);
+  };
+
+  const handleViewDetailsClick = () => {
+    if (onViewDetails) {
+      handleItemClick(onViewDetails);
+    }
   };
 
   const handleDropdownTriggerClick = (e: React.MouseEvent) => {
@@ -94,6 +102,11 @@ export function TrashTableRowActions({
           onClick={handleDropdownContentClick}
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
+          <DropdownMenuItem onClick={() => handleItemClick(handleViewDetailsClick)}>
+            <Eye className="mr-2 h-4 w-4" />
+            {t('VIEW_DETAILS')}
+          </DropdownMenuItem>
+
           <DropdownMenuItem onClick={() => handleItemClick(onRestore)}>
             <RotateCcw className="mr-2 h-4 w-4" />
             {t('RESTORE')}

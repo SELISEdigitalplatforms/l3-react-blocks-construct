@@ -13,12 +13,6 @@ interface TrashProps {
   onClearTrash?: () => void;
 }
 
-interface TrashProps {
-  onRestoreFile?: (file: IFileTrashData) => void;
-  readonly onPermanentDelete?: (file: IFileTrashData) => void;
-  onClearTrash?: () => void;
-}
-
 const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();

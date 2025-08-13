@@ -259,6 +259,12 @@ export const trashMockData: IFileTrashData[] = [
   },
 ];
 
+export interface PreviewProps {
+  file: IFileTrashData;
+  onClose: () => void;
+  t: (key: string) => string;
+}
+
 export const getFileTypeDisplayName = (fileType: string): string => {
   switch (fileType) {
     case 'Folder':
