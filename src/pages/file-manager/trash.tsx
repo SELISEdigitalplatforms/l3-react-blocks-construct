@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { IFileTrashData } from 'features/file-manager/utils/file-manager';
 import { TrashFilesListView } from 'features/file-manager/components/trash/trash-files-list-view';
 import { TrashGridView } from 'features/file-manager/components/trash/trash-files-grid-view';
 import { TrashFilters } from 'features/file-manager/types/header-toolbar.type';
 import { TrashHeaderToolbar } from 'features/file-manager/components/trash/trash-files-header-toolbar';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface TrashProps {
   onRestoreFile?: (file: IFileTrashData) => void;
@@ -12,6 +13,9 @@ interface TrashProps {
 }
 
 const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
+  const navigate = useNavigate();
+  const { folderId } = useParams<{ folderId?: string }>();
+
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -28,9 +32,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const handleRestoreFile = useCallback(
     (file: IFileTrashData) => {
       setRestoredItemIds((prev) => new Set([...Array.from(prev), file.id]));
-
       setSelectedItems((prev) => prev.filter((id) => id !== file.id));
-
       onRestoreFile?.(file);
     },
     [onRestoreFile]
@@ -39,9 +41,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const handlePermanentDelete = useCallback(
     (file: IFileTrashData) => {
       setDeletedItemIds((prev) => new Set([...Array.from(prev), file.id]));
-
       setSelectedItems((prev) => prev.filter((id) => id !== file.id));
-
       onPermanentDelete?.(file);
     },
     [onPermanentDelete]
@@ -54,7 +54,6 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
 
   const handleClearTrash = useCallback(() => {
     onClearTrash?.();
-
     setSelectedItems([]);
   }, [onClearTrash]);
 
@@ -71,6 +70,23 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     setSearchQuery(newFilters.name ?? '');
   }, []);
 
+  const handleNavigateToFolder = useCallback(
+    (folderId: string) => {
+      navigate(`/trash/${folderId}`);
+      setSelectedItems([]);
+    },
+    [navigate]
+  );
+
+  const handleNavigateBack = useCallback(() => {
+    navigate('/trash');
+    setSelectedItems([]);
+  }, [navigate]);
+
+  useEffect(() => {
+    setSelectedItems([]);
+  }, [folderId]);
+
   const commonViewProps = {
     onRestore: handleRestoreFile,
     onDelete: handlePermanentDelete,
@@ -80,6 +96,9 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     onSelectionChange: setSelectedItems,
     deletedItemIds,
     restoredItemIds,
+    currentFolderId: folderId,
+    onNavigateToFolder: handleNavigateToFolder,
+    onNavigateBack: handleNavigateBack,
   };
 
   return (

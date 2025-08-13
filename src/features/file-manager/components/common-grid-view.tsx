@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from 'components/ui/button';
 
 interface BaseFile {
-  id: string | number;
+  id: string;
   name: string;
   fileType: string;
 }
@@ -46,6 +46,11 @@ interface BaseGridViewProps<T extends BaseFile> {
   additionalFiles?: T[];
   filterFiles?: (files: T[], filters: Record<string, any>) => T[];
   processFiles?: (files: T[]) => T[];
+
+  // Add navigation props
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
+  onNavigateBack?: () => void;
 }
 
 // Common Card Component
@@ -76,7 +81,7 @@ const CommonCard = <T extends BaseFile>({
     : 'p-6 flex flex-col items-center text-center space-y-4';
 
   const iconContainerClasses = `${isFolder ? 'w-8 h-8' : 'w-20 h-20'} flex items-center justify-center rounded-lg ${isFolder ? backgroundColor : ''}`;
-  const iconClasses = `${isFolder ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor} `;
+  const iconClasses = `${isFolder ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor} rounded-lg`;
 
   const renderFolderLayout = () => (
     <div className="flex items-center justify-between">
@@ -147,17 +152,28 @@ export const CommonGridView = <T extends BaseFile>({
   additionalFiles = [],
   filterFiles,
   processFiles,
+  // Add navigation props
+  currentFolderId,
+  onNavigateToFolder,
 }: BaseGridViewProps<T>) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<T | null>(null);
 
+  // Updated handleViewDetails to support folder navigation
   const handleViewDetails = useCallback(
     (file: T) => {
-      setSelectedFile(file);
-      setIsDetailsOpen(true);
-      onViewDetails?.(file);
+      // Check if it's a folder and navigation is available
+      if (file.fileType === 'Folder' && onNavigateToFolder) {
+        // Navigate into folder instead of opening details
+        onNavigateToFolder(file.id);
+      } else {
+        // Open details for non-folder items
+        setSelectedFile(file);
+        setIsDetailsOpen(true);
+        onViewDetails?.(file);
+      }
     },
-    [onViewDetails]
+    [onViewDetails, onNavigateToFolder]
   );
 
   const handleCloseDetails = useCallback(() => {
@@ -277,7 +293,9 @@ export const CommonGridView = <T extends BaseFile>({
                 <p className="text-medium-emphasis max-w-sm">
                   {hasActiveFilters
                     ? 'No files match the current criteria'
-                    : emptyStateConfig.description}
+                    : currentFolderId
+                      ? 'This folder is empty'
+                      : emptyStateConfig.description}
                 </p>
               </div>
             )}
