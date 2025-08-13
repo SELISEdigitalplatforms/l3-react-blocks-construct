@@ -37,7 +37,7 @@ export function AssigneeAvatars({ assignees }: Readonly<AssigneeAvatarsProps>) {
       {assignees.slice(0, 3).map((user, index) => (
         <div
           key={getAvatarKey(user, index)}
-          className="h-8 w-8 rounded-full bg-gray-300 text-xs flex items-center justify-center border-2 border-white"
+          className="h-8 w-8 rounded-full bg-neutral-200 text-xs flex items-center justify-center border-2 border-white"
           title={user}
         >
           {user[0]}
@@ -46,7 +46,7 @@ export function AssigneeAvatars({ assignees }: Readonly<AssigneeAvatarsProps>) {
       {assignees.length > 3 && (
         <div
           key="more-indicator"
-          className="h-8 w-8 rounded-full bg-gray-200 text-xs flex items-center justify-center border-2 border-white"
+          className="h-8 w-8 rounded-full bg-neutral-200 text-xs flex items-center justify-center border-2 border-white"
           title={`+${assignees.length - 3} more`}
         >
           +{assignees.length - 3}

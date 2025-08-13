@@ -98,6 +98,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
 
     createTaskItem({
       Title: title,
+      Priority: TaskPriority.MEDIUM,
       Section: status ?? '',
       IsCompleted: false,
       DueDate: new Date().toISOString(),
@@ -154,7 +155,7 @@ export function useListTasks({ searchQuery = '', filters = {} }: UseListTasksPro
 
     const matchesTags = (task: TaskItem): boolean => {
       if (!filters.tags?.length || !task.ItemTag?.length) return true;
-      
+
       const tagIds = new Set(filters.tags.map(({ ItemId }) => ItemId));
       return task.ItemTag.some(({ ItemId }) => tagIds.has(ItemId));
     };

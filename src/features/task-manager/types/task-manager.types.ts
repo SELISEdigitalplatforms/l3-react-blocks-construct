@@ -48,17 +48,10 @@ export type FileType = 'pdf' | 'image' | 'other';
 
 export interface TaskAttachments {
   ItemId: string;
-  IsDeleted?: boolean;
-  Tags?: string[];
-  Language?: string;
-  OrganizationIds?: string[];
-  CreatedBy?: string;
-  CreatedDate?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
   FileName: string;
   FileSize: string;
   FileType: FileType;
+  FileUrl: string;
 }
 
 export interface TaskItem {
@@ -71,8 +64,6 @@ export interface TaskItem {
   Language?: string;
   Description?: string;
   Assignee?: Assignee[];
-  Attachments?: TaskAttachments[];
-  Comments?: TaskComments[];
   DueDate?: string;
   LastUpdatedBy?: string;
   LastUpdatedDate?: string;
@@ -81,6 +72,7 @@ export interface TaskItem {
   Section?: string;
   Tags?: string[];
   ItemTag?: ItemTag[];
+  AttachmentField?: TaskAttachments[];
 }
 
 export interface TaskSection {
@@ -151,18 +143,6 @@ export interface GetTagsResponse {
   };
 }
 
-export interface GetAttachmentsResponse {
-  TaskAttachments: {
-    items: TaskAttachments[];
-    totalCount: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    pageSize: number;
-    pageNo: number;
-    totalPages: number;
-  };
-}
-
 export interface GetCommentsResponse {
   TaskManagerComments: {
     items: TaskComments[];
@@ -194,7 +174,7 @@ export interface TaskItemUpdateInput {
   Description?: string;
   Assignee?: Assignee[];
   ItemTag?: ItemTag[];
-  Comments?: TaskComments[];
+  AttachmentField?: TaskAttachments[];
   DueDate?: string;
   Priority?: TaskPriority;
   Section?: string;
@@ -304,34 +284,4 @@ export interface TaskCommentUpdateInput {
   Timestamp?: string;
   Author?: string;
   IsDeleted?: boolean;
-}
-
-export interface TaskAttachmentInsertInput {
-  ItemId: string;
-  IsDeleted?: boolean;
-  Tags?: string[];
-  Language?: string;
-  OrganizationIds?: string[];
-  CreatedBy?: string;
-  CreatedDate?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
-  FileName: string;
-  FileSize: string;
-  FileType: FileType;
-}
-
-export interface TaskAttachmentUpdateInput {
-  ItemId: string;
-  IsDeleted?: boolean;
-  Tags?: string[];
-  Language?: string;
-  OrganizationIds?: string[];
-  CreatedBy?: string;
-  CreatedDate?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
-  FileName: string;
-  FileSize: string;
-  FileType: FileType;
 }

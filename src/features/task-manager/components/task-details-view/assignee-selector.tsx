@@ -1,6 +1,7 @@
+import { memo, useCallback, useState, useEffect } from 'react';
 import { Plus, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { memo, useCallback, useState, useEffect } from 'react';
+import { cn } from 'lib/utils';
 import { Button } from 'components/ui/button';
 import { Label } from 'components/ui/label';
 import {
@@ -16,10 +17,8 @@ import {
   CommandItem,
   CommandList,
 } from 'components/ui/command';
-
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { Assignee } from '../../types/task-manager.types';
-import { cn } from 'lib/utils';
 
 /**
  * AssigneeSelector Component
@@ -67,7 +66,6 @@ const AssigneeSelectorComponent = ({
   const [isProcessing, setIsProcessing] = useState<Record<string, boolean>>({});
   const [localSelected, setLocalSelected] = useState<Set<string>>(new Set());
 
-  // Update local selected when selectedAssignees changes
   useEffect(() => {
     setLocalSelected(new Set(selectedAssignees.map((a) => a.ItemId)));
   }, [selectedAssignees]);
@@ -77,7 +75,6 @@ const AssigneeSelectorComponent = ({
       const assigneeId = assignee.ItemId;
       const isSelected = localSelected.has(assigneeId);
 
-      // Update local state immediately for better UX
       setLocalSelected((prev) => {
         const newSet = new Set(prev);
         if (isSelected) {
@@ -114,7 +111,7 @@ const AssigneeSelectorComponent = ({
           {selectedAssignees.slice(0, 3).map((assignee) => (
             <Avatar key={assignee.ItemId} className="h-8 w-8 border-2 border-background">
               <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
-              <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+              <AvatarFallback className="bg-neutral-200 text-foreground text-xs">
                 {assignee.Name.split(' ')
                   .map((n: string) => n[0])
                   .join('')
@@ -124,7 +121,7 @@ const AssigneeSelectorComponent = ({
             </Avatar>
           ))}
           {selectedAssignees.length > 3 && (
-            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs text-gray-600 border-2 border-background">
+            <div className="h-8 w-8 rounded-full bg-neutral-200 flex items-center justify-center text-xs text-gray-600 border-2 border-background">
               +{selectedAssignees.length - 3}
             </div>
           )}
@@ -168,7 +165,7 @@ const AssigneeSelectorComponent = ({
                         </div>
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
-                          <AvatarFallback className="bg-gray-200 text-foreground text-xs">
+                          <AvatarFallback className="bg-neutral-200 text-foreground text-xs">
                             {assignee.Name.split(' ')
                               .map((n: string) => n[0])
                               .join('')

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronLeft } from 'lucide-react';
-import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
+import { useGetPreSignedUrlForUpload } from 'lib/api/hooks/use-storage';
 import API_CONFIG from 'config/api';
 import { Button } from 'components/ui/button';
 import { Card, CardContent } from 'components/ui/card';
@@ -25,7 +25,7 @@ import {
  * @example
  * const steps = ['General info', 'Additional info'];
  * const [currentStep, setCurrentStep] = useState(0);
- *
+ *c
  * return (
  *   <Stepper
  *     steps={steps}

@@ -1,5 +1,3 @@
-import { clients } from 'lib/https';
-
 export type GetPreSignedUrlForUploadPayload = {
   itemId?: string;
   metaData?: string;
@@ -17,14 +15,4 @@ export type GetPreSignedUrlForUploadResponse = {
   isSuccess: boolean;
   uploadUrl?: string;
   fileId?: string;
-};
-
-export const getPreSignedUrlForUpload = async (
-  payload: GetPreSignedUrlForUploadPayload
-): Promise<GetPreSignedUrlForUploadResponse> => {
-  const response = await clients.post<GetPreSignedUrlForUploadResponse>(
-    '/storage/v1/Files/GetPreSignedUrlForUpload',
-    JSON.stringify(payload)
-  );
-  return response;
 };
