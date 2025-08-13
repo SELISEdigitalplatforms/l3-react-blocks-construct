@@ -25,6 +25,8 @@ interface PreviewProps {
 const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
+  const [imageError, setImageError] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 0.25, 3));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 0.25, 0.25));
@@ -34,11 +36,37 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
     setRotation(0);
   };
 
-  // Generate a placeholder image URL based on file name
-  const getPlaceholderImage = (fileName: string) => {
-    const colors = ['ff6b6b', '4ecdc4', '45b7d1', '96ceb4', 'feca57', 'ff9ff3'];
-    const colorIndex = fileName.length % colors.length;
-    return `https://via.placeholder.com/800x600/${colors[colorIndex]}/ffffff?text=${encodeURIComponent(fileName.split('.')[0])}`;
+  const getPlaceholderImages = (fileName: string) => {
+    const cleanName = fileName.split('.')[0];
+    return [
+      `https://source.unsplash.com/800x600/?nature,abstract&sig=${cleanName}`,
+      `https://dummyimage.com/800x600/4a90e2/ffffff&text=${encodeURIComponent(cleanName)}`,
+      `data:image/svg+xml;base64,${btoa(`
+        <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100%" height="100%" fill="#e3f2fd"/>
+          <circle cx="400" cy="200" r="80" fill="#1976d2" opacity="0.3"/>
+          <circle cx="300" cy="350" r="60" fill="#42a5f5" opacity="0.4"/>
+          <circle cx="500" cy="380" r="70" fill="#90caf9" opacity="0.3"/>
+          <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="24" fill="#1976d2" text-anchor="middle" dy=".3em">
+            IMAGE PREVIEW
+          </text>
+          <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="20" fill="#1976d2" text-anchor="middle" dy=".3em">
+            ${cleanName}
+          </text>
+        </svg>
+      `)}`,
+    ];
+  };
+
+  const imageUrls = getPlaceholderImages(file.name);
+
+  const handleImageError = () => {
+    if (currentImageIndex < imageUrls.length - 1) {
+      setCurrentImageIndex((prev) => prev + 1);
+      setImageError(false);
+    } else {
+      setImageError(true);
+    }
   };
 
   return (
@@ -88,16 +116,27 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           </div>
         </div>
 
-        {/* Image Container */}
         <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
-          <img
-            src={getPlaceholderImage(file.name)}
-            alt={file.name}
-            className="max-w-full max-h-full object-contain transition-transform duration-200"
-            style={{
-              transform: `scale(${zoom}) rotate(${rotation}deg)`,
-            }}
-          />
+          {!imageError ? (
+            <img
+              src={imageUrls[currentImageIndex]}
+              alt={file.name}
+              className="max-w-full max-h-full object-contain transition-transform duration-200"
+              style={{
+                transform: `scale(${zoom}) rotate(${rotation}deg)`,
+              }}
+              onError={handleImageError}
+              onLoad={() => setImageError(false)}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center text-white">
+              <div className="w-32 h-32 bg-gray-700 rounded-lg flex items-center justify-center mb-4">
+                <ImageIcon className="w-16 h-16 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">{file.name}</h3>
+              <p className="text-gray-400">Image preview not available</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -106,17 +145,15 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 
 // Video Preview Component
 const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
-  // Generate placeholder video URL
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const getPlaceholderVideo = (fileName: string) => {
+  const getPlaceholderVideo = () => {
     return `https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`;
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-      <div className="relative w-full h-full max-w-6xl max-h-[90vh] flex flex-col">
+      <div className="relative w-full h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-black bg-opacity-50 text-white max-w-4xl">
+        <div className="flex items-center justify-between p-4 bg-black bg-opacity-50 text-white">
           <div className="flex items-center space-x-3 ">
             <VideoIcon className="w-5 h-5" />
             <div>
@@ -140,7 +177,7 @@ const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
               poster={`https://via.placeholder.com/800x450/2c3e50/ffffff?text=${encodeURIComponent(file.name.split('.')[0])}`}
               controls
             >
-              <source src={getPlaceholderVideo(file.name)} type="video/mp4" />
+              <source src={getPlaceholderVideo()} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -155,7 +192,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime] = useState(0);
-  const [duration] = useState(180); // Mock duration
+  const [duration] = useState(180);
 
   const handlePlayPause = () => setIsPlaying(!isPlaying);
   const handleMute = () => setIsMuted(!isMuted);
@@ -202,9 +239,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           </div>
         </div>
 
-        {/* Controls */}
         <div className="space-y-4">
-          {/* Progress Bar */}
           <div className="flex items-center space-x-3 text-sm text-gray-600">
             <span>{formatTime(currentTime)}</span>
             <div className="flex-1 bg-gray-200 rounded-full h-2">
@@ -216,7 +251,6 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
             <span>{formatTime(duration)}</span>
           </div>
 
-          {/* Play Controls */}
           <div className="flex items-center justify-center space-x-4">
             <button
               onClick={handleMute}
@@ -243,7 +277,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 // Document Preview Component
 const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 5; // Mock total pages
+  const totalPages = 5;
 
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
@@ -313,7 +347,6 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           </div>
         </div>
 
-        {/* Document Content */}
         <div className="flex-1 overflow-auto p-6">
           <div className="bg-white shadow-lg rounded-lg p-8 max-w-3xl mx-auto">
             <div className="prose prose-sm max-w-none">
@@ -337,7 +370,6 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   );
 };
 
-// Main File Preview Component
 interface FilePreviewProps {
   file: IFileTrashData | null;
   isOpen: boolean;
