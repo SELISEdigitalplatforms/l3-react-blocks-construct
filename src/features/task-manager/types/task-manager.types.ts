@@ -80,6 +80,7 @@ export interface TaskItem {
   Section?: string;
   Tags?: string[];
   ItemTag?: ItemTag[];
+  AttachmentField?: string[];
 }
 
 export interface TaskSection {

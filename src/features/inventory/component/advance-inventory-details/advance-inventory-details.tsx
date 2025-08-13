@@ -32,7 +32,7 @@ import {
 import { Skeleton } from 'components/ui/skeleton';
 import { useGetPreSignedUrlForUpload } from 'lib/api/hooks/use-storage';
 import API_CONFIG from 'config/api';
-import type { GetPreSignedUrlForUploadResponse } from 'lib/api/services/storage.service';
+import { GetPreSignedUrlForUploadResponse } from 'lib/api/types/storage.types';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**

@@ -272,7 +272,6 @@ export function TaskColumn({
           )}
         </div>
       </div>
-      here i
       <Dialog open={isTaskDetailsModalOpen} onOpenChange={setIsTaskDetailsModalOpen}>
         {isTaskDetailsModalOpen && (
           <TaskDetailsView
