@@ -149,8 +149,8 @@ export default function TaskDetailsView({
     if (task) {
       setTitle(task.Title ?? '');
       setDescription(task.Description ?? '');
-      setPriority(task.Priority || TaskPriority.MEDIUM);
-      setSection(task.Section || '');
+      setPriority(task.Priority ?? TaskPriority.MEDIUM);
+      setSection(task.Section ?? '');
       setIsMarkComplete(task.IsCompleted ?? false);
 
       if (task.AttachmentField) {
@@ -542,8 +542,8 @@ export default function TaskDetailsView({
       AttachmentField: attachments.length > 0 ? attachments : undefined,
       CreatedDate: now,
       LastUpdatedDate: now,
-      CreatedBy: userProfile?.fullName || '',
-      LastUpdatedBy: userProfile?.fullName || '',
+      CreatedBy: userProfile?.fullName ?? '',
+      LastUpdatedBy: userProfile?.fullName ?? '',
       Language: '',
       OrganizationIds: [],
     };

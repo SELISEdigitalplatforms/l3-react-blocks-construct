@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { TaskAttachments, FileType } from '../../types/task-manager.types';
@@ -6,13 +6,13 @@ import { Button } from 'components/ui/button';
 import {
   Plus,
   Upload,
-  Download,
-  Trash2,
   File,
   ImageIcon,
-  ChevronDown,
   Loader2,
   FileText,
+  Download,
+  Trash2,
+  ChevronDown,
 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -99,7 +99,7 @@ export function AttachmentsSection({
   const { mutate: getPreSignedUrl } = useGetPreSignedUrlForUpload();
   const [isUploading, setIsUploading] = useState(false);
 
-  const effectiveTaskId = taskItemId || taskId || pendingTaskId;
+  const effectiveTaskId = taskItemId ?? taskId ?? pendingTaskId;
 
   useEffect(() => {
     setUserProfile(getCurrentUser());
@@ -113,117 +113,129 @@ export function AttachmentsSection({
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const processFileUpload = async (file: File) => {
+    const uploadFile = async (url: string, fileToUpload: File) => {
+      const response = await fetch(url, {
+        method: 'PUT',
+        body: fileToUpload,
+        headers: {
+          'Content-Type': fileToUpload.type,
+          'x-ms-blob-type': 'BlockBlob',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to upload file: ${response.statusText}`);
+      }
+
+      return {
+        uploadUrl: url.split('?')[0],
+        fileSize: fileToUpload.size,
+        fileName: fileToUpload.name,
+        fileType: fileToUpload.type,
+      };
+    };
+
+    return new Promise<{
+      fileId: string;
+      uploadUrl: string;
+      fileName: string;
+      fileSize: number;
+      fileType: string;
+    } | null>((resolve) => {
+      getPreSignedUrl(
+        {
+          name: file.name,
+          projectKey: API_CONFIG.blocksKey,
+          itemId: '',
+          metaData: '',
+          accessModifier: 'Public',
+          configurationName: 'Default',
+          parentDirectoryId: '',
+          tags: '',
+        },
+        {
+          onSuccess: (data) => {
+            if (!data.isSuccess || !data.uploadUrl || !data.fileId) {
+              console.error('Failed to get presigned URL:', data);
+              resolve(null);
+              return;
+            }
+
+            uploadFile(data.uploadUrl, file)
+              .then((uploadResult) => {
+                resolve({
+                  fileId: data.fileId ?? '',
+                  uploadUrl: uploadResult.uploadUrl,
+                  fileName: uploadResult.fileName,
+                  fileSize: uploadResult.fileSize,
+                  fileType: uploadResult.fileType,
+                });
+              })
+              .catch((error) => {
+                console.error('Error uploading file:', error);
+                resolve(null);
+              });
+          },
+          onError: (error) => {
+            console.error('Error getting presigned URL:', error);
+            resolve(null);
+          },
+        }
+      );
+    });
+  };
+
   const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
+    (acceptedFiles: File[]) => {
       if (!effectiveTaskId) return;
 
-      const uploadFile = async (url: string, file: File) => {
-        const response = await fetch(url, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type,
-            'x-ms-blob-type': 'BlockBlob',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to upload file: ${response.statusText}`);
-        }
-
-        return {
-          uploadUrl: url.split('?')[0],
-          fileSize: file.size,
-          fileName: file.name,
-          fileType: file.type,
-        };
-      };
-
-      const getPresignedUrlAndUpload = (
-        file: File
-      ): Promise<{
-        fileId: string;
-        uploadUrl: string;
-        fileName: string;
-        fileSize: number;
-        fileType: string;
-      } | null> =>
-        new Promise((resolve) => {
-          getPreSignedUrl(
-            {
-              name: file.name,
-              projectKey: API_CONFIG.blocksKey,
-              itemId: '',
-              metaData: '',
-              accessModifier: 'Public',
-              configurationName: 'Default',
-              parentDirectoryId: '',
-              tags: '',
-            },
-            {
-              onSuccess: async (data) => {
-                if (!data.isSuccess || !data.uploadUrl || !data.fileId) {
-                  console.error('Failed to get presigned URL:', data);
-                  return resolve(null);
-                }
-                try {
-                  const uploadResult = await uploadFile(data.uploadUrl, file);
-                  resolve({
-                    fileId: data.fileId,
-                    uploadUrl: uploadResult.uploadUrl,
-                    fileName: uploadResult.fileName,
-                    fileSize: uploadResult.fileSize,
-                    fileType: uploadResult.fileType,
-                  });
-                } catch (error) {
-                  console.error('Error uploading file:', error);
-                  resolve(null);
-                }
-              },
-              onError: (error) => {
-                console.error('Error getting presigned URL:', error);
-                resolve(null);
-              },
+      const handleFileUpload = async () => {
+        setIsUploading(true);
+        try {
+          const uploadPromises = acceptedFiles.map(async (file) => {
+            const result = await processFileUpload(file);
+            if (!result) {
+              throw new Error(`Failed to upload file: ${file.name}`);
             }
-          );
-        });
 
-      setIsUploading(true);
-      try {
-        const uploadPromises = acceptedFiles.map(async (file) => {
-          const result = await getPresignedUrlAndUpload(file);
-          if (!result) {
-            throw new Error(`Failed to upload file: ${file.name}`);
+            return {
+              ItemId: result.fileId,
+              FileName: result.fileName,
+              FileSize: formatFileSize(result.fileSize),
+              FileType: getFileType(file),
+              FileUrl: result.uploadUrl,
+            } as TaskAttachments;
+          });
+
+          const newAttachments = await Promise.all(uploadPromises);
+          const validNewAttachments = newAttachments.filter(Boolean);
+
+          if (validNewAttachments.length > 0) {
+            onAttachmentsChange([...attachments, ...validNewAttachments]);
           }
 
-          const newAttachment: TaskAttachments = {
-            ItemId: result.fileId,
-            FileName: result.fileName,
-            FileSize: formatFileSize(result.fileSize),
-            FileType: getFileType(file),
-            FileUrl: result.uploadUrl,
-          };
-
-          return newAttachment;
-        });
-
-        const newAttachments = await Promise.all(uploadPromises);
-        const validNewAttachments = newAttachments.filter(Boolean) as TaskAttachments[];
-
-        if (validNewAttachments.length > 0) {
-          onAttachmentsChange([...attachments, ...validNewAttachments]);
+          setIsDialogOpen(false);
+        } catch (error) {
+          console.error('Error uploading files:', error);
+          handleError(error);
+        } finally {
+          setIsUploading(false);
         }
+      };
 
-        setIsDialogOpen(false);
-      } catch (error) {
-        console.error('Error uploading files:', error);
-        handleError(error);
-      } finally {
-        setIsUploading(false);
-      }
+      handleFileUpload();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [effectiveTaskId, onAttachmentsChange, t, userProfile?.fullName, handleError, getPreSignedUrl]
+    [
+      effectiveTaskId,
+      onAttachmentsChange,
+      t,
+      userProfile?.fullName,
+      handleError,
+      getPreSignedUrl,
+      attachments,
+    ]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -248,31 +260,38 @@ export function AttachmentsSection({
     onAttachmentsChange(updatedAttachments);
   };
 
+  const createDownloadLink = (blobUrl: string, fileName: string, fileExtension: string) => {
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = fileName.endsWith(`.${fileExtension}`)
+      ? fileName
+      : `${fileName}.${fileExtension}`;
+    return link;
+  };
+
+  const cleanupDownloadLink = (link: HTMLAnchorElement, blobUrl: string) => {
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    }, 100);
+  };
+
   const handleDownload = async (attachment: TaskAttachments) => {
+    if (!attachment.FileUrl) {
+      handleError(new Error('No file URL available for download'));
+      return;
+    }
+
     try {
-      if (!attachment.FileUrl) {
-        throw new Error('No file URL available for download');
-      }
-
       const fileExtension = attachment.FileName.split('.').pop()?.toLowerCase() || '';
-
       const response = await fetch(attachment.FileUrl);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = attachment.FileName.endsWith(`.${fileExtension}`)
-        ? attachment.FileName
-        : `${attachment.FileName}.${fileExtension}`;
-
+      const link = createDownloadLink(blobUrl, attachment.FileName, fileExtension);
       document.body.appendChild(link);
       link.click();
-
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-      }, 100);
+      cleanupDownloadLink(link, blobUrl);
     } catch (error) {
       console.error('Error downloading file:', error);
       handleError(error);
@@ -305,15 +324,99 @@ export function AttachmentsSection({
     }
   };
 
-  const createAttachmentRows = () => {
+  const attachmentRows = useMemo(() => {
     const rows = [];
     for (let i = 0; i < attachments.length; i += 2) {
       rows.push(attachments.slice(i, i + 2));
     }
     return rows;
-  };
+  }, [attachments]);
 
-  const attachmentRows = createAttachmentRows();
+  const visibleRows = useMemo(
+    () => (showMore ? attachmentRows : attachmentRows.slice(0, 2)),
+    [showMore, attachmentRows]
+  );
+
+  const renderEmptyState = () => (
+    <div
+      {...getRootProps()}
+      className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors border-gray-300 hover:border-primary/50"
+    >
+      <Input {...getInputProps()} />
+      <div className="flex flex-col items-center gap-2">
+        <Upload className="h-10 w-10 text-gray-400" />
+        <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
+        <p className="text-xs text-gray-500">
+          PDF, DOCX, JPG, PNG | {t('MAX_SIZE')}: 25MB {t('PER_FILE')}
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderAttachmentList = () => (
+    <div>
+      {visibleRows.map((row, rowIndex) => (
+        <div
+          key={`${row.length}-${rowIndex}`}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2"
+        >
+          {row.map((attachment) => (
+            <div key={attachment.ItemId} className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-3">
+                {getFileIcon(attachment.FileType)}
+                <div>
+                  <p className="text-sm font-medium">{attachment.FileName}</p>
+                  <p className="text-xs text-gray-500">{attachment.FileSize}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-medium-emphasis hover:text-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownload(attachment);
+                  }}
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-error hover:text-error"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteAttachment(attachment.ItemId);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+      {attachments.length > 4 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-2 text-sm font-semibold border"
+          onClick={() => setShowMore(!showMore)}
+        >
+          <ChevronDown className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`} />
+          {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
+        </Button>
+      )}
+    </div>
+  );
+
+  const renderAttachmentContent = () => {
+    if (attachments.length === 0) {
+      return renderEmptyState();
+    }
+    return renderAttachmentList();
+  };
 
   return (
     <div>
@@ -348,7 +451,7 @@ export function AttachmentsSection({
                   {isLoading || isUploading ? (
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      <p className="text-sm">{t('UPLOADING')}...</p>
+                      <p className="text-sm">Uploading...</p>
                     </div>
                   ) : (
                     <>
@@ -372,90 +475,12 @@ export function AttachmentsSection({
         )}
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
-      ) : attachments.length === 0 ? (
-        <div
-          {...getRootProps()}
-          className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors border-gray-300 hover:border-primary/50"
-        >
-          <Input {...getInputProps()} />
-          <div className="flex flex-col items-center gap-2">
-            {isLoading ? (
-              <div className="flex flex-col items-center gap-2">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm">{t('UPLOADING')}...</p>
-              </div>
-            ) : (
-              <>
-                <Upload className="h-10 w-10 text-gray-400" />
-                <p className="text-sm font-medium">{t('DRAG_AND_DROP_FILES_HERE')}</p>
-                <p className="text-xs text-gray-500">
-                  PDF, DOCX, JPG, PNG | {t('MAX_SIZE')}: 25MB {t('PER_FILE')}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div>
-          {(showMore ? attachmentRows : attachmentRows.slice(0, 2)).map((row, rowIndex) => (
-            <div
-              key={`${row.length}-${rowIndex}`}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2"
-            >
-              {row.map((attachment) => (
-                <div key={attachment.ItemId} className="flex items-center justify-between pt-2">
-                  <div className="flex items-center gap-3">
-                    {getFileIcon(attachment.FileType)}
-                    <div>
-                      <p className="text-sm font-medium">{attachment.FileName}</p>
-                      <p className="text-xs text-gray-500">{attachment.FileSize}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-medium-emphasis hover:text-primary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(attachment);
-                      }}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-error hover:text-error"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteAttachment(attachment.ItemId);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-          {attachments.length > 4 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-2 text-sm font-semibold border"
-              onClick={() => setShowMore(!showMore)}
-            >
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${showMore ? 'rotate-180' : ''}`}
-              />
-              {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
-            </Button>
-          )}
+      {renderAttachmentContent()}
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       )}
     </div>
