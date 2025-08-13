@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from 'components/ui/alert-dialog';
 import { Button } from 'components/ui/button';
-import { Eye, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
+import { Info, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { IFileTrashData } from '../../utils/file-manager';
 
@@ -103,7 +103,7 @@ export function TrashTableRowActions({
           onCloseAutoFocus={(e) => e.preventDefault()}
         >
           <DropdownMenuItem onClick={() => handleItemClick(handleViewDetailsClick)}>
-            <Eye className="mr-2 h-4 w-4" />
+            <Info className="mr-2 h-4 w-4" />
             {t('VIEW_DETAILS')}
           </DropdownMenuItem>
 

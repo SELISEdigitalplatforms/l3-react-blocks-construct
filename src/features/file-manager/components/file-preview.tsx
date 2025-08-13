@@ -15,9 +15,10 @@ import {
 } from 'lucide-react';
 import { IFileTrashData } from '../utils/file-manager';
 import { v4 as uuidv4 } from 'uuid';
+import { IFileData } from '../hooks/use-mock-files-query';
 
 interface PreviewProps {
-  file: IFileTrashData;
+  file: IFileTrashData | IFileData;
   onClose: () => void;
 }
 
@@ -383,7 +384,7 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 };
 
 interface FilePreviewProps {
-  file: IFileTrashData | null;
+  file: IFileTrashData | IFileData | null;
   isOpen: boolean;
   onClose: () => void;
 }

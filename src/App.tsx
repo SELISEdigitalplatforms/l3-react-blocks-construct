@@ -95,6 +95,7 @@ function AppContent() {
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
                 <Route path="/file-manager/trash" element={<Trash />} />
+                <Route path="/my-files/:folderId" element={<FileManagerMyFiles />} />
                 <Route path="/trash/:folderId" element={<Trash />} />
 
                 <Route path="/calendar" element={<CalendarPage />} />
@@ -105,6 +106,7 @@ function AppContent() {
               {/* redirecting */}
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/file-manager" element={<Navigate to="/file-manager/my-files" />} />
+              <Route path="/my-files" element={<Navigate to="/file-manager/my-files" />} />
               <Route path="/trash" element={<Navigate to="/file-manager/trash" />} />
 
               <Route path="*" element={<Navigate to="/404" />} />
