@@ -1,10 +1,10 @@
 import { useGlobalMutation } from 'state/query-client/hooks';
+import { useErrorHandler } from 'hooks/use-error-handler';
+import { getPreSignedUrlForUpload } from '../services/storage.service';
 import {
-  getPreSignedUrlForUpload,
   GetPreSignedUrlForUploadPayload,
   GetPreSignedUrlForUploadResponse,
-} from '../services/storage.service';
-import { useErrorHandler } from 'hooks/use-error-handler';
+} from '../types/storage.types';
 
 export const useGetPreSignedUrlForUpload = () => {
   const { handleError } = useErrorHandler();

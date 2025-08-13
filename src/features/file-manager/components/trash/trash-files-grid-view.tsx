@@ -29,6 +29,9 @@ interface TrashGridViewProps {
   restoredItemIds?: Set<string>;
   readonly selectedItems?: string[];
   readonly onSelectionChange?: (items: string[]) => void;
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
+  onNavigateBack?: () => void;
 }
 
 export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
@@ -56,6 +59,7 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       trashedDateFrom: props.filters.trashedDate?.from?.toISOString(),
       trashedDateTo: props.filters.trashedDate?.to?.toISOString(),
     },
+    folderId: props.currentFolderId,
   };
 
   const { data, isLoading, error } = useMockTrashFilesQuery(queryParams);
@@ -76,7 +80,7 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       ...prev,
       pageIndex: 0,
     }));
-  }, [props.filters]);
+  }, [props.filters, props.currentFolderId]);
 
   const handleLoadMore = useCallback(() => {
     if (data && data.data.length < data.totalCount) {
@@ -146,6 +150,17 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
     return filtered;
   }, []);
 
+  const handleViewDetails = useCallback(
+    (file: IFileTrashData) => {
+      if (file.fileType === 'Folder' && props.onNavigateToFolder) {
+        props.onNavigateToFolder(file.id);
+      } else {
+        props.onViewDetails?.(file);
+      }
+    },
+    [props]
+  );
+
   const renderActions = useCallback(
     (file: IFileTrashData) => {
       const mockRow = {
@@ -211,7 +226,7 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
 
   return (
     <CommonGridView
-      onViewDetails={props.onViewDetails}
+      onViewDetails={handleViewDetails}
       filters={props.filters}
       data={data ?? undefined}
       isLoading={isLoading}
@@ -230,7 +245,9 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
           props.filters.deletedBy ||
           props.filters.trashedDate
             ? t('NO_FILES_MATCH_CRITERIA')
-            : t('NO_DELETED_FILES'),
+            : props.currentFolderId
+              ? t('FOLDER_IS_EMPTY')
+              : t('NO_DELETED_FILES'),
       }}
       sectionLabels={{
         folder: t('FOLDER'),
@@ -240,7 +257,10 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       loadingMessage={t('LOADING')}
       loadMoreLabel={t('LOAD_MORE')}
       processFiles={processFiles}
-      filterFiles={filterFiles} // CRITICAL: Make sure this is included
+      filterFiles={filterFiles}
+      currentFolderId={props.currentFolderId}
+      onNavigateToFolder={props.onNavigateToFolder}
+      onNavigateBack={props.onNavigateBack}
     />
   );
 };

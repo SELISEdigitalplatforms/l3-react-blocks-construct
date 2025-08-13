@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from 'components/ui/button';
 
 interface BaseFile {
-  id: string | number;
+  id: string;
   name: string;
   fileType: string;
 }
@@ -46,6 +46,11 @@ interface BaseGridViewProps<T extends BaseFile> {
   additionalFiles?: T[];
   filterFiles?: (files: T[], filters: Record<string, any>) => T[];
   processFiles?: (files: T[]) => T[];
+
+  // Add navigation props
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
+  onNavigateBack?: () => void;
 }
 
 // Common Card Component
@@ -70,18 +75,18 @@ const CommonCard = <T extends BaseFile>({
   };
 
   const containerClasses =
-    'group relative bg-white rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer';
+    'group relative bg-background rounded-lg border border-border hover:border-gray-500 hover:bg-muted/50 hover:shadow-md transition-all duration-200 cursor-pointer';
   const contentClasses = isFolder
     ? 'p-3 flex items-center space-x-3'
     : 'p-6 flex flex-col items-center text-center space-y-4';
 
-  const iconContainerClasses = `${isFolder ? 'w-8 h-8' : 'w-20 h-20'} flex items-center justify-center ${isFolder ? backgroundColor : ''}`;
-  const iconClasses = `${isFolder ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor}`;
+  const iconContainerClasses = `${isFolder ? 'w-8 h-8' : 'w-20 h-20'} flex items-center justify-center rounded-lg ${isFolder ? backgroundColor : ''}`;
+  const iconClasses = `${isFolder ? 'w-5 h-5' : 'w-10 h-10'} ${iconColor} rounded-lg`;
 
   const renderFolderLayout = () => (
     <div className="flex items-center justify-between">
       <div className="flex-1 min-w-0">
-        <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+        <h3 className="text-sm font-medium text-high-emphasis truncate" title={file.name}>
           {file.name}
         </h3>
       </div>
@@ -98,7 +103,7 @@ const CommonCard = <T extends BaseFile>({
           <IconComponent className={`w-4 h-4 ${iconColor}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+          <h3 className="text-sm font-medium text-high-emphasis truncate" title={file.name}>
             {file.name}
           </h3>
         </div>
@@ -147,17 +152,28 @@ export const CommonGridView = <T extends BaseFile>({
   additionalFiles = [],
   filterFiles,
   processFiles,
+  // Add navigation props
+  currentFolderId,
+  onNavigateToFolder,
 }: BaseGridViewProps<T>) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<T | null>(null);
 
+  // Updated handleViewDetails to support folder navigation
   const handleViewDetails = useCallback(
     (file: T) => {
-      setSelectedFile(file);
-      setIsDetailsOpen(true);
-      onViewDetails?.(file);
+      // Check if it's a folder and navigation is available
+      if (file.fileType === 'Folder' && onNavigateToFolder) {
+        // Navigate into folder instead of opening details
+        onNavigateToFolder(file.id);
+      } else {
+        // Open details for non-folder items
+        setSelectedFile(file);
+        setIsDetailsOpen(true);
+        onViewDetails?.(file);
+      }
     },
-    [onViewDetails]
+    [onViewDetails, onNavigateToFolder]
   );
 
   const handleCloseDetails = useCallback(() => {
@@ -165,7 +181,6 @@ export const CommonGridView = <T extends BaseFile>({
     setSelectedFile(null);
   }, []);
 
-  // Process files
   const processedFiles = useMemo(() => {
     let files = [...additionalFiles, ...(data?.data || [])];
 
@@ -219,7 +234,7 @@ export const CommonGridView = <T extends BaseFile>({
           <div className="space-y-8">
             {folders.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                <h2 className="text-sm font-medium text-high-emphasis mb-4 py-2 rounded">
                   {sectionLabels.folder} ({folders.length})
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
@@ -245,7 +260,7 @@ export const CommonGridView = <T extends BaseFile>({
 
             {regularFiles.length > 0 && (
               <div>
-                <h2 className="text-sm font-medium text-gray-600 mb-4 py-2 rounded">
+                <h2 className="text-sm font-medium text-high-emphasis mb-4 py-2 rounded">
                   {sectionLabels.file} ({regularFiles.length})
                 </h2>
                 <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
@@ -272,11 +287,15 @@ export const CommonGridView = <T extends BaseFile>({
             {processedFiles.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <emptyStateConfig.icon className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{emptyStateConfig.title}</h3>
-                <p className="text-gray-500 max-w-sm">
+                <h3 className="text-lg font-medium text-high-emphasis mb-2">
+                  {emptyStateConfig.title}
+                </h3>
+                <p className="text-medium-emphasis max-w-sm">
                   {hasActiveFilters
                     ? 'No files match the current criteria'
-                    : emptyStateConfig.description}
+                    : currentFolderId
+                      ? 'This folder is empty'
+                      : emptyStateConfig.description}
                 </p>
               </div>
             )}

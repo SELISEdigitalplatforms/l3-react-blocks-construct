@@ -22,7 +22,7 @@ export function TableHeader() {
   const { t } = useTranslation();
 
   return (
-    <div className="border-b border-gray-200 sticky top-0 bg-white z-10">
+    <div className="border-b border-border sticky top-0 bg-white z-10">
       <div className="flex items-center h-14 font-medium text-sm text-gray-500">
         <div className="w-12" />
         <div className="w-6" />

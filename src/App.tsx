@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 import { LoadingOverlay } from './components/core/loading-overlay';
 import './i18n/i18n';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'components/ui/toaster';
 import { ClientMiddleware } from 'state/client-middleware';
@@ -46,23 +45,6 @@ import { FileManagerMyFiles } from './pages/file-manager/my-files';
 
 const queryClient = new QueryClient();
 
-function RedirectHandler() {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname === '/success') {
-      const headers = new Headers();
-      headers.set('x-current-path', location.pathname);
-
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 10000);
-    }
-  }, [location]);
-
-  return null;
-}
-
 function AppContent() {
   const { isLoading } = useLanguageContext();
 
@@ -72,7 +54,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased relative">
-      <RedirectHandler />
       <ClientMiddleware>
         <ThemeProvider>
           <SidebarProvider>
@@ -114,6 +95,7 @@ function AppContent() {
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
                 <Route path="/file-manager/trash" element={<Trash />} />
+                <Route path="/trash/:folderId" element={<Trash />} />
 
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/503" element={<ServiceUnavailable />} />
@@ -122,6 +104,9 @@ function AppContent() {
 
               {/* redirecting */}
               <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route path="/file-manager" element={<Navigate to="/file-manager/my-files" />} />
+              <Route path="/trash" element={<Navigate to="/file-manager/trash" />} />
+
               <Route path="*" element={<Navigate to="/404" />} />
             </Routes>
           </SidebarProvider>

@@ -73,6 +73,8 @@ export function TaskCard({
     );
   }, [commentsData, task.ItemId]);
 
+  const taskAttachments = task.AttachmentField ?? [];
+
   useEffect(() => {
     setTask(initialTask);
   }, [initialTask]);
@@ -207,10 +209,7 @@ export function TaskCard({
             ))}
         </div>
 
-        {(task.DueDate ||
-          task.Assignee ||
-          (task.Comments?.length ?? 0) > 0 ||
-          (task.Attachments?.length ?? 0) > 0) && (
+        {(task.DueDate || task.Assignee) && (
           <div className="mt-4 flex justify-between items-center text-xs text-gray-500">
             {task.DueDate && (
               <button
@@ -251,7 +250,7 @@ export function TaskCard({
                 </button>
               )}
 
-              {task.Attachments !== undefined && task.Attachments.length > 0 && (
+              {taskAttachments.length > 0 && (
                 <button className="flex items-center gap-1" onClick={handleInteractiveElementClick}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -266,14 +265,14 @@ export function TaskCard({
                   >
                     <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
                   </svg>
-                  <span>{task.Attachments.length}</span>
+                  <span>{taskAttachments.length}</span>
                 </button>
               )}
             </div>
 
             {task.Assignee && task.Assignee.length > 0 && (
               <div className="flex -space-x-2">
-                {task.Assignee.map((assignee, idx) => {
+                {task.Assignee.slice(0, 3).map((assignee, idx) => {
                   const displayName = assignee?.Name ?? '';
                   const imageUrl = assignee?.ImageUrl;
                   const initial = displayName ? displayName.charAt(0).toUpperCase() : '';
@@ -295,13 +294,23 @@ export function TaskCard({
                     >
                       <Avatar className="h-6 w-6 border-2 border-background">
                         <AvatarImage src={imageUrl} alt={displayName} />
-                        <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+                        <AvatarFallback className="bg-neutral-200 text-foreground text-xs">
                           {initial}
                         </AvatarFallback>
                       </Avatar>
                     </button>
                   );
                 })}
+                {task.Assignee.length > 3 && (
+                  <div
+                    className="h-6 w-6 rounded-full bg-neutral-200 border-2 border-background flex items-center justify-center z-10 relative"
+                    style={{ zIndex: 10 }}
+                  >
+                    <span className="text-[10px] text-medium-emphasis font-medium">
+                      +{task.Assignee.length - 3}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>

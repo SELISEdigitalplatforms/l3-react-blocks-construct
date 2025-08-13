@@ -14,9 +14,6 @@ import type {
   TaskSectionInsertInput,
   TaskSectionUpdateInput,
   UpdateTaskManagerSectionResponse,
-  GetAttachmentsResponse,
-  TaskAttachmentInsertInput,
-  TaskAttachmentUpdateInput,
 } from '../types/task-manager.types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from 'hooks/use-toast';
@@ -34,9 +31,6 @@ import type {
   DeleteTaskCommentResponse,
   UpdateTaskCommentResponse,
   InsertTaskCommentResponse,
-  InsertTaskAttachmentResponse,
-  UpdateTaskAttachmentResponse,
-  DeleteTaskAttachmentResponse,
 } from '../services/task-manager.service';
 import {
   getTasks,
@@ -56,10 +50,6 @@ import {
   deleteTaskComment,
   updateTaskComment,
   createTaskComment,
-  getTaskAttachments,
-  createTaskAttachment,
-  updateTaskAttachment,
-  deleteTaskAttachment,
 } from '../services/task-manager.service';
 
 interface TaskQueryParams {
@@ -174,30 +164,6 @@ export const useGetTaskComments = (params: TaskQueryParams) => {
 };
 
 /**
- * Hook to fetch task attachments with pagination
- * @param params - Pagination parameters
- * @returns Query result with attachments data
- *
- * @example
- * const { data, isLoading, error } = useGetTaskAttachments({
- *   pageNo: 1,
- *   pageSize: 20
- * });
- */
-export const useGetTaskAttachments = (params: TaskQueryParams) => {
-  return useGlobalQuery<GetAttachmentsResponse>({
-    queryKey: ['task-attachments', params],
-    queryFn: () => getTaskAttachments(params),
-    staleTime: 10 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    onError: (error) => {
-      throw error;
-    },
-  });
-};
-
-/**
  * Hook to create a new task item
  * @returns Mutation function to create task item with loading and error states
  *
@@ -238,8 +204,6 @@ export const useCreateTaskItem = () => {
 
 export const useUpdateTaskItem = () => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
   const { handleError } = useErrorHandler();
 
   return useGlobalMutation<
@@ -250,11 +214,6 @@ export const useUpdateTaskItem = () => {
     mutationFn: (variables) => updateTaskItem(variables.itemId, variables.input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({
-        variant: 'success',
-        title: t('Updated task'),
-        description: t('You have updated the task successfully'),
-      });
     },
     onError: (error: Error) => {
       handleError(error);
@@ -606,93 +565,6 @@ export const useDeleteTaskComment = () => {
         title: t('ERROR'),
         defaultMessage: t('FAILED_TO_DELETE_COMMENT'),
       });
-    },
-  });
-};
-
-/**
- * Hook to create a new task attachment
- * @returns Mutation function to create task attachment with loading and error states
- *
- * @example
- * const { mutate: createTask, isPending } = useCreateTaskAttachment();
- * createTask({
- *   Title: 'New Task',
- *   Description: 'Task description',
- *   Assignee: 'user-123',
- *   Priority: TaskPriority.MEDIUM
- * });
- */
-export const useCreateTaskAttachment = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const { handleError } = useErrorHandler();
-
-  return useGlobalMutation<InsertTaskAttachmentResponse, Error, TaskAttachmentInsertInput>({
-    mutationFn: createTaskAttachment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({
-        variant: 'success',
-        title: t('Attachment Uploaded'),
-        description: t('You have successfully uploaded the attachment!'),
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Error in useCreateTaskAttachment:', error);
-      handleError(error, {
-        title: t('ERROR'),
-        defaultMessage: t('Failed to upload attachment. Please try again.'),
-      });
-    },
-  });
-};
-
-export const useUpdateTaskAttachment = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const { handleError } = useErrorHandler();
-
-  return useGlobalMutation<
-    UpdateTaskAttachmentResponse,
-    Error,
-    { itemId: string; input: TaskAttachmentUpdateInput }
-  >({
-    mutationFn: (variables) => updateTaskAttachment(variables.itemId, variables.input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({
-        variant: 'success',
-        title: t('Updated task'),
-        description: t('You have updated the task successfully'),
-      });
-    },
-    onError: (error: Error) => {
-      handleError(error);
-    },
-  });
-};
-
-export const useDeleteTaskAttachment = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const { handleError } = useErrorHandler();
-
-  return useGlobalMutation<DeleteTaskAttachmentResponse, Error, string>({
-    mutationFn: (itemId) => deleteTaskAttachment(itemId, true),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks-attachment'] });
-      toast({
-        variant: 'success',
-        title: t('TASK_REMOVED'),
-        description: t('TASK_HAS_DELETED_SUCCESSFULLY'),
-      });
-    },
-    onError: (error: Error) => {
-      handleError(error);
     },
   });
 };

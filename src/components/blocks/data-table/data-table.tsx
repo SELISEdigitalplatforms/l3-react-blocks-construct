@@ -132,10 +132,10 @@ function DataTable<TData>({
       }
     };
 
-    if (isMobile) {
-      handleRowExpand();
-    } else {
+    if (onRowClick) {
       handleRowSelect();
+    } else if (isMobile && expandable) {
+      handleRowExpand();
     }
   };
 
@@ -181,7 +181,7 @@ function DataTable<TData>({
     getFacetedUniqueValues: getFacetedUniqueValues(), // Gets unique values for filtering UI (e.g., dropdown filters)
   });
 
-  // Function to toggle row expansion
+  // Function to toggle row expansion in mobile view if applicable
   const toggleRow = (rowId: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
@@ -394,7 +394,7 @@ function DataTable<TData>({
     <div className="flex flex-col gap-5">
       {toolbar ? toolbar(table) : null}
       <div className="flex">
-        <Card className="w-full border-none rounded-lg shadow-sm">
+        <Card className="w-full border-none rounded-lg shadow-sm bg-background">
           <ScrollArea className="w-full">
             <Table>
               {renderTableHeader()}

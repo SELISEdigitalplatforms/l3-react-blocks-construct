@@ -48,12 +48,10 @@ export function SortableTaskItem({
 }: Readonly<SortableTaskItemProps>) {
   const [task, setTask] = useState(initialTask);
 
-  // Update the task when it changes in the parent
   useEffect(() => {
     setTask(initialTask);
   }, [initialTask]);
 
-  // Listen for task updates from other components
   useEffect(() => {
     const handleTaskUpdated = (event: Event) => {
       const customEvent = event as CustomEvent<TaskItem>;
@@ -67,13 +65,11 @@ export function SortableTaskItem({
       window.removeEventListener('task-updated', handleTaskUpdated as EventListener);
     };
   }, [task.ItemId]);
-  // Fetch comments for this task
   const { data: commentsData } = useGetTaskComments({
     pageNo: 1,
     pageSize: 100,
   });
 
-  // Filter comments to only show those for the current task
   const taskComments = useMemo(() => {
     if (!commentsData?.TaskManagerComments?.items) return [];
     return commentsData.TaskManagerComments.items.filter(
@@ -82,7 +78,9 @@ export function SortableTaskItem({
   }, [commentsData, task.ItemId]);
 
   const commentsCount = taskComments.length;
-  const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
+
+  const taskAttachments = task.AttachmentField ?? [];
+  const attachmentsCount = taskAttachments.length;
   const assignees = (() => {
     if (!task?.Assignee) return [];
     const assigneeList = Array.isArray(task.Assignee) ? task.Assignee : [task.Assignee];
@@ -126,7 +124,7 @@ export function SortableTaskItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center min-w-max border-b border-gray-200 hover:bg-surface h-14 ${
+      className={`flex items-center min-w-max border-b border-border hover:bg-surface h-14 ${
         isDragging ? 'bg-blue-50' : ''
       }`}
     >

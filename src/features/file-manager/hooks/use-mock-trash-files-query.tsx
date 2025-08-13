@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { IFileTrashData, trashMockData } from '../utils/file-manager';
+import { folderContents, IFileTrashData, trashMockData } from '../utils/file-manager';
 
 interface TrashQueryParams {
   filter: {
@@ -12,6 +12,7 @@ interface TrashQueryParams {
   };
   page: number;
   pageSize: number;
+  folderId?: string;
 }
 
 export const useMockTrashFilesQuery = (queryParams: TrashQueryParams) => {
@@ -22,7 +23,15 @@ export const useMockTrashFilesQuery = (queryParams: TrashQueryParams) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
-        let filteredData = [...trashMockData];
+        let sourceData: IFileTrashData[];
+
+        if (queryParams.folderId && folderContents[queryParams.folderId]) {
+          sourceData = [...folderContents[queryParams.folderId]];
+        } else {
+          sourceData = [...trashMockData];
+        }
+
+        let filteredData = sourceData;
 
         if (queryParams.filter.name) {
           filteredData = filteredData.filter((file) =>

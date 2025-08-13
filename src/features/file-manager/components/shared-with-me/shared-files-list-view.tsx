@@ -338,7 +338,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
               onPaginationChange={handlePaginationChange}
               manualPagination={paginationProps.manualPagination}
               mobileColumns={['name']}
-              expandable={true}
+              expandable={false}
             />
           </div>
         </div>
