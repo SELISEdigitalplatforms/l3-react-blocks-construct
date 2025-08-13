@@ -5,6 +5,13 @@ import { TrashGridView } from 'features/file-manager/components/trash/trash-file
 import { TrashFilters } from 'features/file-manager/types/header-toolbar.type';
 import { TrashHeaderToolbar } from 'features/file-manager/components/trash/trash-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useMockTrashFilesQuery } from 'features/file-manager/hooks/use-mock-trash-files-query';
+
+interface TrashProps {
+  onRestoreFile?: (file: IFileTrashData) => void;
+  readonly onPermanentDelete?: (file: IFileTrashData) => void;
+  onClearTrash?: () => void;
+}
 
 interface TrashProps {
   onRestoreFile?: (file: IFileTrashData) => void;
@@ -37,11 +44,32 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const [deletedItemIds, setDeletedItemIds] = useState<Set<string>>(new Set());
   const [restoredItemIds, setRestoredItemIds] = useState<Set<string>>(new Set());
 
+  const [showEmptyView, setShowEmptyView] = useState(false);
+
+  const queryParams = {
+    filter: {
+      name: filters.name || searchQuery,
+      fileType: filters.fileType,
+      deletedDate: filters.trashedDate
+        ? {
+            from: filters.trashedDate.from,
+            to: filters.trashedDate.to,
+          }
+        : undefined,
+    },
+    page: 0,
+    pageSize: 50,
+    folderId,
+  };
+
+  const { data, isLoading, error } = useMockTrashFilesQuery(queryParams);
+
   const handleRestoreFile = useCallback(
     (file: IFileTrashData) => {
       setRestoredItemIds((prev) => new Set([...Array.from(prev), file.id]));
       setSelectedItems((prev) => prev.filter((id) => id !== file.id));
       onRestoreFile?.(file);
+      setShowEmptyView(false);
     },
     [onRestoreFile]
   );
@@ -58,11 +86,21 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const handleRestoreSelected = useCallback(() => {
     setRestoredItemIds((prev) => new Set([...Array.from(prev), ...selectedItems]));
     setSelectedItems([]);
+    if (selectedItems.length > 0) {
+      setShowEmptyView(false);
+    }
   }, [selectedItems]);
 
-  const handleClearTrash = useCallback(() => {
-    onClearTrash?.();
-    setSelectedItems([]);
+  const handleClearTrash = useCallback(async () => {
+    try {
+      await onClearTrash?.();
+      setShowEmptyView(true);
+      setSelectedItems([]);
+      setDeletedItemIds(new Set());
+      setRestoredItemIds(new Set());
+    } catch (error) {
+      console.error('Failed to clear trash:', error);
+    }
   }, [onClearTrash]);
 
   const handleViewModeChange = useCallback((mode: string) => {
@@ -78,17 +116,26 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
+    if (query.trim()) {
+      setShowEmptyView(false);
+    }
   }, []);
 
   const handleFiltersChange = useCallback((newFilters: TrashFilters) => {
     setFilters(newFilters);
     setSearchQuery(newFilters.name ?? '');
+
+    const hasActiveFilters = newFilters.fileType || newFilters.deletedBy || newFilters.trashedDate;
+    if (hasActiveFilters) {
+      setShowEmptyView(false);
+    }
   }, []);
 
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
       navigate(`/trash/${folderId}`);
       setSelectedItems([]);
+      setShowEmptyView(false);
     },
     [navigate]
   );
@@ -96,10 +143,12 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const handleNavigateBack = useCallback(() => {
     navigate('/trash');
     setSelectedItems([]);
+    setShowEmptyView(false);
   }, [navigate]);
 
   useEffect(() => {
     setSelectedItems([]);
+    setShowEmptyView(false);
   }, [folderId]);
 
   const commonViewProps = {
@@ -114,7 +163,19 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     currentFolderId: folderId,
     onNavigateToFolder: handleNavigateToFolder,
     onNavigateBack: handleNavigateBack,
+    data: data?.data || [],
+    totalCount: data?.totalCount || 0,
+    isLoading,
+    error,
   };
+
+  const EmptyTrashView = () => (
+    <div className="flex flex-col items-center justify-center h-full p-12 text-center">
+      <div className="text-6xl mb-6">🗑️</div>
+      <h3 className="text-xl font-medium text-high-emphasis mb-2">Trash is empty</h3>
+      <p className="text-medium-emphasis max-w-sm">All items have been permanently deleted</p>
+    </div>
+  );
 
   return (
     <div className="flex flex-col h-full w-full space-y-4">
@@ -131,14 +192,20 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
       />
 
       <div className="flex-1 overflow-hidden">
-        {viewMode === 'grid' ? (
-          <div className="h-full overflow-y-auto">
-            <TrashGridView {...commonViewProps} />
-          </div>
+        {showEmptyView ? (
+          <EmptyTrashView />
         ) : (
-          <div className="h-full">
-            <TrashFilesListView {...commonViewProps} />
-          </div>
+          <>
+            {viewMode === 'grid' ? (
+              <div className="h-full overflow-y-auto">
+                <TrashGridView {...commonViewProps} />
+              </div>
+            ) : (
+              <div className="h-full">
+                <TrashFilesListView {...commonViewProps} />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

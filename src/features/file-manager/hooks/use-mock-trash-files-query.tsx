@@ -13,6 +13,7 @@ interface TrashQueryParams {
   page: number;
   pageSize: number;
   folderId?: string;
+  isCleared?: boolean;
 }
 
 export const useMockTrashFilesQuery = (queryParams: TrashQueryParams) => {
@@ -23,6 +24,15 @@ export const useMockTrashFilesQuery = (queryParams: TrashQueryParams) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
+        if (queryParams.isCleared) {
+          setData({
+            data: [],
+            totalCount: 0,
+          });
+          setIsLoading(false);
+          return;
+        }
+
         let sourceData: IFileTrashData[];
 
         if (queryParams.folderId && folderContents[queryParams.folderId]) {
