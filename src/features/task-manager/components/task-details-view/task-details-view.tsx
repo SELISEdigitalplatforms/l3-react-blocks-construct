@@ -163,12 +163,10 @@ export default function TaskDetailsView({
         setSelectedTags(task.ItemTag);
       }
 
-      // Update selected assignees if they exist
       if (task.Assignee) {
         setSelectedAssignees(task.Assignee);
       }
 
-      // Update due date if it exists
       if (task.DueDate) {
         setDate(new Date(task.DueDate));
       }
@@ -379,7 +377,6 @@ export default function TaskDetailsView({
       return;
     }
 
-    // Set basic task fields
     setTitle(task.Title ?? '');
     setIsMarkComplete(!!task.IsCompleted);
     setSection(task.Section ?? '');
@@ -387,7 +384,6 @@ export default function TaskDetailsView({
     setDescription(task.Description ?? '');
     setSelectedTags(task.ItemTag ?? []);
 
-    // Set complex fields using extracted functions
     setTaskAssignees(task.Assignee);
     setTaskPriority(task.Priority);
   }, [
@@ -661,7 +657,6 @@ export default function TaskDetailsView({
 
   const handleAssigneeChange = useCallback(
     async (newAssignees: Assignee[]) => {
-      // If we're in new task mode, just update the local state
       if (isNewTaskModalOpen && !currentTaskId) {
         setSelectedAssignees(newAssignees);
         return;
