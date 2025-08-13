@@ -203,8 +203,8 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
               }}
               onPaginationChange={handlePaginationChange}
               manualPagination={true}
+              expandable={false}
               mobileColumns={['name']}
-              expandable={true}
             />
           </div>
         </div>
