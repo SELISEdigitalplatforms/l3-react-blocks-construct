@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InvoicesDetail } from './invoices-detail';
-import { Invoice, InvoiceStatus } from '../../data/invoice-data';
+import { InvoiceStatus } from '../../types/invoices.types';
 
 // Mock the dependencies
 jest.mock('react-router-dom', () => ({
@@ -73,37 +72,38 @@ jest.mock('assets/images/construct_logo_dark.svg', () => 'mock-logo-path');
 
 describe('InvoicesDetail', () => {
   // Sample invoice data for testing
-  const mockInvoice: Invoice = {
-    id: 'INV-001',
-    customerName: 'Test Customer',
-    customerImg: 'https://example.com/avatar.jpg',
-    dateIssued: '2025-06-01T00:00:00.000Z',
-    dueDate: '2025-06-15T00:00:00.000Z',
-    amount: 1000,
-    status: InvoiceStatus.Paid,
-    currency: 'CHF',
-    billingInfo: {
-      address: 'Test Address',
-      email: 'test@example.com',
-      phone: '+41123456789',
-    },
-    orderDetails: {
-      items: [
-        {
-          name: 'Test Item',
-          description: 'Test Description',
-          category: 'Test Category',
-          quantity: 2,
-          unitPrice: 500,
-          amount: 1000,
-        },
-      ],
-      subtotal: 1000,
-      taxes: 0,
-      taxRate: 0,
-      totalAmount: 1000,
-      note: 'Test Note',
-    },
+  const mockInvoice = {
+    ItemId: 'INV-001',
+    Customer: [
+      {
+        CustomerName: 'Test Customer',
+        BillingAddress: 'Test Address',
+        Email: 'test@example.com',
+        PhoneNo: '+41123456789',
+      },
+    ],
+    DateIssued: '2025-06-01T00:00:00.000Z',
+    DueDate: '2025-06-15T00:00:00.000Z',
+    Amount: 1000,
+    Status: InvoiceStatus.PAID,
+    Currency: 'CHF',
+    GeneralNote: 'Test Note',
+    ItemDetails: [
+      {
+        ItemId: 'ITEM-001',
+        ItemName: 'Test Item',
+        Note: 'Test Description',
+        Category: 'Test Category',
+        Quantity: 2,
+        UnitPrice: 500,
+        Amount: 1000,
+        Taxes: 0,
+        Discount: 0,
+      },
+    ],
+    Subtotal: 1000,
+    Taxes: 0,
+    TotalAmount: 1000,
   };
 
   test('renders invoice details correctly', () => {
@@ -127,10 +127,17 @@ describe('InvoicesDetail', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
 
     // Check if financial details are displayed
-    expect(screen.getByText('CHF 500.00')).toBeInTheDocument();
-    expect(screen.getAllByText('CHF 1000.00').length).toBeGreaterThan(0);
+    // The currency and amount are in separate spans, so we need to check for both
+    const currencySpans = screen.getAllByText('CHF');
 
-    // Check if note is displayed
+    // Check for amounts without decimal places as they're rendered in the component
+    const amount500 = screen.getByText('500');
+    const amount1000 = screen.getByText('1000');
+
+    expect(currencySpans.length).toBeGreaterThan(0);
+    expect(amount500).toBeInTheDocument();
+    expect(amount1000).toBeInTheDocument();
+
     expect(screen.getByText('Test Note')).toBeInTheDocument();
   });
 

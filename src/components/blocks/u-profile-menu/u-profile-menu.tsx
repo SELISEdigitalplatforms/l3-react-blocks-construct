@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronUp, Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -68,6 +68,19 @@ export const UProfileMenu = () => {
   };
 
   const fullName = `${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim() ?? ' ';
+
+  // Store user profile data in localStorage when it's available
+  useEffect(() => {
+    if (data) {
+      localStorage.setItem(
+        'userProfile',
+        JSON.stringify({
+          fullName,
+          profileImageUrl: data.profileImageUrl || DummyProfile,
+        })
+      );
+    }
+  }, [data, fullName]);
 
   return (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>

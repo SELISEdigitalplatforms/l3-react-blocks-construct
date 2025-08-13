@@ -43,19 +43,15 @@ interface NewTaskRowProps {
   onCancel: () => void;
 }
 
-const toTranslationKey = (title: string): string => {
-  return title.replace(/\s+/g, '_').toUpperCase();
-};
-
 export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
+  const { t } = useTranslation();
   const { columns } = useCardTasks();
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
-  const [newTaskStatus, setNewTaskStatus] = useState<string>('To Do');
-  const { t } = useTranslation();
+  const [newTaskStatus, setNewTaskStatus] = useState<string | undefined>(undefined);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      onAdd(newTaskTitle, newTaskStatus);
+      onAdd(newTaskTitle, newTaskStatus ?? '');
     } else if (e.key === 'Escape') {
       onCancel();
     }
@@ -71,7 +67,7 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
         <CircleIcon className="h-5 w-5 text-gray-300" />
       </div>
 
-      <div className="w-96 pl-2 mr-4">
+      <div className="w-72 pl-2 mr-4">
         <Input
           placeholder={t('ENTER_A_TITLE')}
           value={newTaskTitle}
@@ -82,16 +78,16 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
         />
       </div>
 
-      <div className="w-24 flex-shrink-0">
+      <div className="w-36 flex-shrink-0">
         <Select value={newTaskStatus} onValueChange={setNewTaskStatus}>
-          <SelectTrigger className="h-8 text-sm">
-            <SelectValue placeholder={t('TO_DO')} />
+          <SelectTrigger className="h-8 text-sm w-full">
+            <SelectValue placeholder="Select a list" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="min-w-[130px]">
             <SelectGroup>
               {columns.map((column) => (
-                <SelectItem key={column.id} value={column.title}>
-                  {t(toTranslationKey(column.title))}
+                <SelectItem key={column.ItemId} value={column.Title} className="truncate">
+                  {column.Title}
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -106,7 +102,7 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
 
       <div className="flex items-center gap-2 ml-auto pr-4">
         <Button
-          onClick={() => onAdd(newTaskTitle, newTaskStatus)}
+          onClick={() => onAdd(newTaskTitle, newTaskStatus ?? '')}
           className="h-8 bg-primary hover:bg-primary-700 text-white px-4"
         >
           <Plus className="h-4 w-4 mr-1" /> {t('ADD')}

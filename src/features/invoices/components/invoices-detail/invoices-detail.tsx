@@ -10,12 +10,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'c
 import { Separator } from 'components/ui/separator';
 import darklogo from 'assets/images/construct_logo_dark.svg';
 import { Badge } from 'components/ui/badge';
-import { Invoice, statusColors } from '../../data/invoice-data';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
 
 interface InvoicesDetailProps {
-  invoice: Invoice;
+  invoice: InvoiceItem;
   isPreview?: boolean;
 }
 
@@ -24,11 +24,33 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showSendDialog, setShowSendDialog] = useState(false);
-
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  const { subtotal, taxes, discount } = invoice.orderDetails;
-  const totalAmount = subtotal + taxes - (discount ?? 0);
+  const subtotal = Number(
+    invoice.ItemDetails?.reduce((sum, item) => sum + (Number(item.Amount) || 0), 0).toFixed(2) ?? 0
+  );
+
+  const discount = Number(invoice.Discount) || 0;
+
+  const isTaxPercentage = invoice.Taxes && invoice.Taxes <= 100;
+
+  const calculateTaxRate = () => {
+    if (subtotal <= 0) return '0.00';
+
+    if (isTaxPercentage) {
+      return Number(invoice.Taxes).toFixed(2);
+    }
+
+    return ((taxAmount / subtotal) * 100).toFixed(2);
+  };
+
+  const taxAmount = isTaxPercentage
+    ? Number((subtotal * (Number(invoice.Taxes) / 100)).toFixed(2))
+    : Number(invoice.Taxes) || 0;
+
+  const taxRate = calculateTaxRate();
+
+  const totalAmount = Math.max(0, Number((subtotal + taxAmount - discount).toFixed(2)));
 
   const handleSendInvoice = () => {
     setShowSendDialog(false);
@@ -55,7 +77,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`invoice-${invoice.id}.pdf`);
+      pdf.save(`invoice-${invoice.ItemId}.pdf`);
 
       toast({
         variant: 'success',
@@ -85,15 +107,15 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               >
                 <ChevronLeft className="h-5 w-5" />
               </Button>
-              <h1 className="text-2xl font-semibold">{invoice.id}</h1>
+              <h1 className="text-2xl font-semibold uppercase">{invoice.ItemId}</h1>
             </div>
             <div className="flex flex-col md:flex-row md:items-center gap-2">
               <div className="flex items-center gap-2">
                 <p className="text-high-emphasis">{t('STATUS')}:</p>
                 <Badge
-                  className={`text-xs rounded-[4px] py-[2px] px-2 ${statusColors[invoice.status].text} ${statusColors[invoice.status].border} ${statusColors[invoice.status].bg} hover:${statusColors[invoice.status].bg}`}
+                  className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status || 'Draft').text} ${getStatusColors(invoice.Status || 'Draft').border} ${getStatusColors(invoice.Status || 'Draft').bg} hover:${getStatusColors(invoice.Status || 'Draft').bg}`}
                 >
-                  {invoice.status}
+                  {invoice.Status ?? InvoiceStatus.DRAFT}
                 </Badge>
               </div>
               <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />
@@ -102,7 +124,10 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                   <Download className="h-4 w-4 mr-1" />
                   {t('DOWNLOAD')}
                 </Button>
-                <Button variant="outline" onClick={() => navigate(`/invoices/edit/${invoice.id}`)}>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(`/invoices/edit/${invoice.ItemId}`)}
+                >
                   <Pencil className="h-4 w-4 mr-1" />
                   {t('EDIT')}
                 </Button>
@@ -118,7 +143,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
             </div>
           </>
         ) : (
-          <h1 className="text-2xl font-semibold">{invoice.id}</h1>
+          <h1 className="text-2xl font-semibold">{invoice.ItemId}</h1>
         )}
       </div>
       <Card className="w-full border-none rounded-lg shadow-sm" ref={invoiceRef}>
@@ -138,40 +163,40 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
             <div className="flex flex-col gap-2 w-[50%]">
               <h1 className="text-medium-emphasis">{t('INVOICE_DETAILS')}</h1>
               <div className="flex items-center gap-2">
-                <p className="font-bold text-high-emphasis">{invoice.id}</p>
+                <p className="font-bold text-high-emphasis uppercase">{invoice.ItemId}</p>
                 <Badge
-                  className={`text-xs rounded-[4px] py-[2px] px-2 ${statusColors[invoice.status].text} ${statusColors[invoice.status].border} ${statusColors[invoice.status].bg} hover:${statusColors[invoice.status].bg}`}
+                  className={`text-xs rounded-[4px] py-[2px] px-2 ${getStatusColors(invoice.Status).text} ${getStatusColors(invoice.Status).border} ${getStatusColors(invoice.Status).bg} hover:${getStatusColors(invoice.Status).bg}`}
                 >
-                  {invoice.status}
+                  {invoice.Status}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('DATE_ISSUED')}:</p>
                 <p className="text-sm text-high-emphasis">
-                  {new Date(invoice.dateIssued).toLocaleDateString()}
+                  {new Date(invoice.DateIssued).toLocaleDateString()}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('DUE_DATE')}:</p>
                 <p className="text-sm text-high-emphasis">
-                  {new Date(invoice.dueDate).toLocaleDateString()}
+                  {new Date(invoice.DueDate).toLocaleDateString()}
                 </p>
               </div>
             </div>
             <div className="flex flex-col gap-2 w-[50%]">
               <h3 className="text-base font-medium text-medium-emphasis mb-2">{t('BILLED_TO')}</h3>
-              <p className="text-base font-bold">{invoice.customerName}</p>
+              <p className="text-base font-bold">{invoice.Customer[0].CustomerName}</p>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('BILLING_ADDRESS')}:</p>
-                <p className="text-sm text-high-emphasis">{invoice.billingInfo.address}</p>
+                <p className="text-sm text-high-emphasis">{invoice.Customer[0].BillingAddress}</p>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('EMAIL')}:</p>
-                <p className="text-sm text-high-emphasis">{invoice.billingInfo.email}</p>
+                <p className="text-sm text-high-emphasis">{invoice.Customer[0].Email}</p>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-medium-emphasis">{t('PHONE_NO')}:</p>
-                <p className="text-sm text-high-emphasis">{invoice.billingInfo.phone}</p>
+                <p className="text-sm text-high-emphasis">{invoice.Customer[0].PhoneNo}</p>
               </div>
             </div>
           </div>
@@ -197,25 +222,27 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoice.orderDetails.items.map((item) => (
-                  <TableRow key={item.name} className="hover:bg-transparent">
+                {(invoice.ItemDetails || []).map((item) => (
+                  <TableRow key={item.ItemId} className="hover:bg-transparent">
                     <TableCell>
                       <div>
-                        <p className="font-semibold text-high-emphasis">{item.name}</p>
-                        {item.description && (
-                          <p className="text-sm text-medium-emphasis w-[80%]">{item.description}</p>
+                        <p className="font-semibold text-high-emphasis">{item.ItemName}</p>
+                        {item.Note && (
+                          <p className="text-sm text-medium-emphasis w-[80%]">{item.Note}</p>
                         )}
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold text-high-emphasis">
-                      {item.category}
+                      {item.Category}
                     </TableCell>
-                    <TableCell className="text-high-emphasis">{item.quantity}</TableCell>
+                    <TableCell className="text-high-emphasis">{item.Quantity}</TableCell>
                     <TableCell className="text-high-emphasis">
-                      {invoice.currency} {item.unitPrice.toFixed(2)}
+                      <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
+                      {item.UnitPrice}
                     </TableCell>
                     <TableCell className="text-high-emphasis">
-                      {invoice.currency} {item.amount.toFixed(2)}
+                      <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
+                      {item.Amount}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -223,17 +250,15 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
             </Table>
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row w-full items-end sm:justify-between">
-            <div className="flex flex-col gap-2">
-              {invoice.orderDetails.note && (
+          <div className="flex flex-col-reverse sm:flex-row w-full items-start sm:justify-between">
+            <div className="flex flex-col gap-2 w-[50%]">
+              {invoice.GeneralNote && (
                 <>
                   <div className="flex items-cnter gap-1">
                     <h3 className="font-medium text-medium-emphasis">{t('GENERAL_NOTE')}</h3>
                     <h3 className="text-low-emphasis">({t('OPTIONAL')})</h3>
                   </div>
-                  <p className="text-sm text-medium-emphasis w-[64%]">
-                    {invoice.orderDetails.note}
-                  </p>
+                  <p className="text-sm text-medium-emphasis w-[64%]">{invoice.GeneralNote}</p>
                 </>
               )}
             </div>
@@ -241,29 +266,31 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">{t('SUBTOTAL')}</span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  {invoice.currency} {invoice.orderDetails.subtotal.toFixed(2)}
+                  <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
+                  {subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-medium-emphasis">
-                  {t('TAXES')} ({invoice.orderDetails.taxRate}%)
+                  {t('TAXES')} ({taxRate}%)
                 </span>
                 <span className="text-sm font-semibold text-high-emphasis">
-                  {invoice.currency} {invoice.orderDetails.taxes.toFixed(2)}
+                  <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
+                  {taxAmount.toFixed(2)}
                 </span>
               </div>
-              {invoice.orderDetails.discount && (
-                <div className="flex justify-between">
-                  <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
-                  <span className="text-sm font-semibold text-secondary">
-                    - {invoice.currency} {invoice.orderDetails.discount.toFixed(2)}
-                  </span>
-                </div>
-              )}
+              <div className="flex justify-between">
+                <span className="text-sm text-medium-emphasis">{t('DISCOUNT')}</span>
+                <span className="text-sm font-semibold text-high-emphasis">
+                  <span className="text-medium-emphasis uppercase">-{invoice.Currency} </span>
+                  {discount.toFixed(2)}
+                </span>
+              </div>
               <div className="flex justify-between border-t border-border pt-4">
                 <span className="font-semibold text-high-emphasis">{t('TOTAL_AMOUNT')}</span>
                 <span className="text-xl font-bold text-high-emphasis">
-                  {invoice.currency} {totalAmount.toFixed(2)}
+                  <span className="text-medium-emphasis uppercase">{invoice.Currency} </span>
+                  {totalAmount.toFixed(2)}
                 </span>
               </div>
             </div>

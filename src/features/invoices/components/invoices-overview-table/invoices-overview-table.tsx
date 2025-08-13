@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Invoice } from '../../data/invoice-data';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import {
   ColumnDef,
@@ -23,6 +22,7 @@ import { TableRow, TableCell, TableHeader, TableHead, Table, TableBody } from 'c
 import { Skeleton } from 'components/ui/skeleton';
 import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
 import { DataTablePagination } from 'components/blocks/data-table/data-table-pagination';
+import { InvoiceItem, InvoiceStatus } from '../../types/invoices.types';
 
 interface RowType {
   id: string | number;
@@ -73,7 +73,6 @@ function InvoicesOverviewTable<TData>({
     data: error ? [] : data,
     columns: columns,
     pageCount: Math.ceil((error ? 0 : data.length) / pagination.pageSize),
-
     state: {
       sorting,
       columnVisibility,
@@ -83,11 +82,9 @@ function InvoicesOverviewTable<TData>({
         pageSize: pagination.pageSize,
       },
     },
-
     manualPagination,
     enableSorting: !isLoading,
-    enableColumnFilters: !isLoading,
-
+    enableColumnFilters: true,
     onPaginationChange: (updater) => {
       if (typeof updater === 'function') {
         const newPagination = updater({
@@ -99,17 +96,15 @@ function InvoicesOverviewTable<TData>({
         onPaginationChange?.(updater);
       }
     },
-
-    onSortingChange: setSorting, // Updates sorting state when sorting changes
-    onColumnFiltersChange: setColumnFilters, // Updates filters when they change
-    onColumnVisibilityChange: setColumnVisibility, // Updates column visibility state
-
-    getCoreRowModel: getCoreRowModel(), // Retrieves the core row model (basic data handling)
-    getFilteredRowModel: getFilteredRowModel(), // Applies filtering logic to the data
-    getPaginationRowModel: getPaginationRowModel(), // Handles pagination logic
-    getSortedRowModel: getSortedRowModel(), // Handles sorting logic
-    getFacetedRowModel: getFacetedRowModel(), // Enables faceted filtering (for multi-filtering)
-    getFacetedUniqueValues: getFacetedUniqueValues(), // Gets unique values for filtering UI (e.g., dropdown filters)
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
   const renderLoadingState = () => {
@@ -169,35 +164,35 @@ function InvoicesOverviewTable<TData>({
   };
 
   const calculateStats = (data: TData[]) => {
-    const invoices = data as Invoice[];
+    const invoices = data as InvoiceItem[];
     return {
       total: {
         count: invoices.length,
-        amount: invoices.reduce((sum, invoice) => sum + invoice.amount, 0),
+        amount: invoices.reduce((sum, invoice) => sum + invoice.Amount, 0),
       },
       paid: {
-        count: invoices.filter((invoice) => invoice.status === 'Paid').length,
+        count: invoices.filter((invoice) => invoice.Status === InvoiceStatus.PAID).length,
         amount: invoices
-          .filter((invoice) => invoice.status === 'Paid')
-          .reduce((sum, invoice) => sum + invoice.amount, 0),
+          .filter((invoice) => invoice.Status === InvoiceStatus.PAID)
+          .reduce((sum, invoice) => sum + invoice.Amount, 0),
       },
       pending: {
-        count: invoices.filter((invoice) => invoice.status === 'Pending').length,
+        count: invoices.filter((invoice) => invoice.Status === InvoiceStatus.PENDING).length,
         amount: invoices
-          .filter((invoice) => invoice.status === 'Pending')
-          .reduce((sum, invoice) => sum + invoice.amount, 0),
+          .filter((invoice) => invoice.Status === InvoiceStatus.PENDING)
+          .reduce((sum, invoice) => sum + invoice.Amount, 0),
       },
       overdue: {
-        count: invoices.filter((invoice) => invoice.status === 'Overdue').length,
+        count: invoices.filter((invoice) => invoice.Status === InvoiceStatus.OVERDUE).length,
         amount: invoices
-          .filter((invoice) => invoice.status === 'Overdue')
-          .reduce((sum, invoice) => sum + invoice.amount, 0),
+          .filter((invoice) => invoice.Status === InvoiceStatus.OVERDUE)
+          .reduce((sum, invoice) => sum + invoice.Amount, 0),
       },
       draft: {
-        count: invoices.filter((invoice) => invoice.status === 'Draft').length,
+        count: invoices.filter((invoice) => invoice.Status === InvoiceStatus.DRAFT).length,
         amount: invoices
-          .filter((invoice) => invoice.status === 'Draft')
-          .reduce((sum, invoice) => sum + invoice.amount, 0),
+          .filter((invoice) => invoice.Status === InvoiceStatus.DRAFT)
+          .reduce((sum, invoice) => sum + invoice.Amount, 0),
       },
     };
   };
@@ -246,7 +241,7 @@ function InvoicesOverviewTable<TData>({
               type="button"
               onClick={() => {
                 setActiveStatus(null);
-                setColumnFilters(columnFilters.filter((filter) => filter.id !== 'status'));
+                setColumnFilters(columnFilters.filter((filter) => filter.id !== 'Status'));
               }}
               className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${!activeStatus ? 'bg-primary-50' : ''}`}
             >
@@ -271,9 +266,9 @@ function InvoicesOverviewTable<TData>({
               type="button"
               onClick={() => {
                 setActiveStatus('Paid');
-                setColumnFilters([
-                  ...columnFilters.filter((filter) => filter.id !== 'status'),
-                  { id: 'status', value: 'Paid' },
+                setColumnFilters((prev) => [
+                  ...prev.filter((filter) => filter.id !== 'Status'),
+                  { id: 'Status', value: 'Paid' },
                 ]);
               }}
               className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Paid' ? 'bg-primary-50' : ''}`}
@@ -299,9 +294,9 @@ function InvoicesOverviewTable<TData>({
               type="button"
               onClick={() => {
                 setActiveStatus('Pending');
-                setColumnFilters([
-                  ...columnFilters.filter((filter) => filter.id !== 'status'),
-                  { id: 'status', value: 'Pending' },
+                setColumnFilters((prev) => [
+                  ...prev.filter((filter) => filter.id !== 'Status'),
+                  { id: 'Status', value: 'Pending' },
                 ]);
               }}
               className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Pending' ? 'bg-primary-50' : ''}`}
@@ -327,9 +322,9 @@ function InvoicesOverviewTable<TData>({
               type="button"
               onClick={() => {
                 setActiveStatus('Overdue');
-                setColumnFilters([
-                  ...columnFilters.filter((filter) => filter.id !== 'status'),
-                  { id: 'status', value: 'Overdue' },
+                setColumnFilters((prev) => [
+                  ...prev.filter((filter) => filter.id !== 'Status'),
+                  { id: 'Status', value: 'Overdue' },
                 ]);
               }}
               className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Overdue' ? 'bg-primary-50' : ''}`}
@@ -355,9 +350,9 @@ function InvoicesOverviewTable<TData>({
               type="button"
               onClick={() => {
                 setActiveStatus('Draft');
-                setColumnFilters([
-                  ...columnFilters.filter((filter) => filter.id !== 'status'),
-                  { id: 'status', value: 'Draft' },
+                setColumnFilters((prev) => [
+                  ...prev.filter((filter) => filter.id !== 'Status'),
+                  { id: 'Status', value: 'Draft' },
                 ]);
               }}
               className={`flex flex-col hover:bg-primary-50 hover:rounded-[4px] w-full text-left gap-2 px-4 py-3 ${activeStatus === 'Draft' ? 'bg-primary-50' : ''}`}

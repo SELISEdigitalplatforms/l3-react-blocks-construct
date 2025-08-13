@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 import { LoadingOverlay } from './components/core/loading-overlay';
 import './i18n/i18n';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'components/ui/toaster';
 import { ClientMiddleware } from 'state/client-middleware';
@@ -38,7 +37,6 @@ import NotFound from './pages/error/not-found/not-found';
 import Finance from './pages/finance/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
-import { InvoiceLayout } from './pages/invoices/invoice-layout';
 import { CreateInvoice, EditInvoice } from './features/invoices';
 import SharedWithMe from 'pages/file-manager/shared-files';
 import Trash from 'pages/file-manager/trash';
@@ -46,23 +44,6 @@ import { ChatPage } from './pages/chat/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
 
 const queryClient = new QueryClient();
-
-function RedirectHandler() {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname === '/success') {
-      const headers = new Headers();
-      headers.set('x-current-path', location.pathname);
-
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 10000);
-    }
-  }, [location]);
-
-  return null;
-}
 
 function AppContent() {
   const { isLoading } = useLanguageContext();
@@ -73,7 +54,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background font-sans antialiased relative">
-      <RedirectHandler />
       <ClientMiddleware>
         <ThemeProvider>
           <SidebarProvider>
@@ -108,12 +88,10 @@ function AppContent() {
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
-                <Route element={<InvoiceLayout />}>
-                  <Route path="/invoices" element={<InvoicesPage />} />
-                  <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                  <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
-                  <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
-                </Route>
+                <Route path="/invoices" element={<InvoicesPage />} />
+                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
+                <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
                 <Route path="/file-manager/trash" element={<Trash />} />

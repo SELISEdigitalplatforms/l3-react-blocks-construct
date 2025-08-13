@@ -135,7 +135,7 @@ export function FormWrapperField({
   );
 }
 
-interface FormTextInputProps {
+interface FormTextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   control: Control<InvoiceFormValues>;
   name: keyof InvoiceFormValues;
   labelKey: string;
@@ -149,12 +149,20 @@ export function FormTextInput({
   labelKey,
   placeholderKey,
   type = 'text',
+  ...rest
 }: Readonly<FormTextInputProps>) {
   const { t } = useTranslation();
 
   return (
     <FormWrapperField control={control} name={name} labelKey={labelKey}>
-      {(field) => <Input placeholder={`${t(placeholderKey)}...`} type={type} {...field} />}
+      {(field) => (
+        <Input 
+          placeholder={`${t(placeholderKey)}...`} 
+          type={type} 
+          {...field} 
+          {...rest}
+        />
+      )}
     </FormWrapperField>
   );
 }

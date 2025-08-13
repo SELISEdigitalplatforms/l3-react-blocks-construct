@@ -13,7 +13,7 @@ import {
 } from 'components/ui/dialog';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
-import { Attachment } from '../../services/task-service';
+import { TaskAttachments } from '../../types/task-manager.types';
 
 /**
  * AttachmentsSection Component
@@ -46,11 +46,14 @@ import { Attachment } from '../../services/task-service';
  */
 
 interface AttachmentsSectionProps {
-  readonly attachments: Attachment[];
-  readonly setAttachments: React.Dispatch<React.SetStateAction<Attachment[]>>;
+  attachments: TaskAttachments[];
+  setAttachments: React.Dispatch<React.SetStateAction<TaskAttachments[]>>;
 }
 
-export function AttachmentsSection({ attachments, setAttachments }: AttachmentsSectionProps) {
+export function AttachmentsSection({
+  attachments,
+  setAttachments,
+}: Readonly<AttachmentsSectionProps>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { t } = useTranslation();
@@ -72,10 +75,10 @@ export function AttachmentsSection({ attachments, setAttachments }: AttachmentsS
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const newAttachments = acceptedFiles.map((file) => ({
-        id: uuidv4(),
-        name: file.name,
-        size: formatFileSize(file.size),
-        type: getFileType(file),
+        ItemId: uuidv4(),
+        FileName: file.name,
+        FileSize: formatFileSize(file.size),
+        FileType: getFileType(file),
         file: file,
       }));
 
@@ -97,7 +100,24 @@ export function AttachmentsSection({ attachments, setAttachments }: AttachmentsS
   });
 
   const handleDeleteAttachment = (id: string) => {
-    setAttachments(attachments.filter((attachment) => attachment.id !== id));
+    setAttachments(attachments.filter((attachment) => attachment.ItemId !== id));
+  };
+
+  const handleDownload = async (attachment: TaskAttachments) => {
+    try {
+      const content = `File: ${attachment.FileName}\nSize: ${attachment.FileSize}`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.FileName || 'attachment.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error creating download:', error);
+    }
   };
 
   const getFileIcon = (type: string) => {
@@ -191,23 +211,31 @@ export function AttachmentsSection({ attachments, setAttachments }: AttachmentsS
               className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2"
             >
               {row.map((attachment) => (
-                <div key={attachment.id} className="flex items-center justify-between pt-2">
+                <div key={attachment.ItemId} className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-3">
-                    {getFileIcon(attachment.type)}
+                    {getFileIcon(attachment.FileType)}
                     <div>
-                      <p className="text-sm font-medium">{attachment.name}</p>
-                      <p className="text-xs text-gray-500">{attachment.size}</p>
+                      <p className="text-sm font-medium">{attachment.FileName}</p>
+                      <p className="text-xs text-gray-500">{attachment.FileSize}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-500 hover:text-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(attachment);
+                      }}
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-gray-500"
-                      onClick={() => handleDeleteAttachment(attachment.id)}
+                      onClick={() => handleDeleteAttachment(attachment.ItemId)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

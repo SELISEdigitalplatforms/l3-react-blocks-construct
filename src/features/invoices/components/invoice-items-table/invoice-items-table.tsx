@@ -1,5 +1,4 @@
 import { Fragment } from 'react';
-import { Categories } from '../../data/invoice-data';
 import { useTranslation } from 'react-i18next';
 import { Control } from 'react-hook-form';
 import { MoreVertical, NotebookPen, Plus, Trash } from 'lucide-react';
@@ -21,18 +20,20 @@ import {
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
 import { Textarea } from 'components/ui/textarea';
-import { InvoiceItem } from '../../schemas/invoice-form-schema';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
+import { Categories, InvoiceItemDetails } from '../../types/invoices.types';
 
 interface InvoiceItemsTableProps {
-  items: InvoiceItem[];
-  onUpdateItem: (id: string, updates: Partial<InvoiceItem>) => void;
+  items: InvoiceItemDetails[];
+  onUpdateItem: (id: string, updates: Partial<InvoiceItemDetails>) => void;
   onRemoveItem: (id: string) => void;
   onToggleNote: (id: string) => void;
   onAddItem: () => void;
+  onTaxRateChange: (value: number) => void;
+  onDiscountChange: (value: number) => void;
   control: Control<any>;
   subtotal: number;
-  taxRate: number;
+  taxes: number;
   discount: number;
   totalAmount: number;
   currency: string;
@@ -44,9 +45,11 @@ export function InvoiceItemsTable({
   onRemoveItem,
   onToggleNote,
   onAddItem,
+  onTaxRateChange,
+  onDiscountChange,
   control,
   subtotal,
-  taxRate,
+  taxes,
   discount,
   totalAmount,
   currency,
@@ -68,19 +71,19 @@ export function InvoiceItemsTable({
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <Fragment key={item.id}>
+            <Fragment key={item.ItemId}>
               <TableRow className="hover:bg-transparent">
                 <TableCell>
                   <Input
                     placeholder={`${t('ENTER_ITEM_NAME')}...`}
-                    value={item.name}
-                    onChange={(e) => onUpdateItem(item.id, { name: e.target.value })}
+                    value={item.ItemName}
+                    onChange={(e) => onUpdateItem(item.ItemId, { ItemName: e.target.value })}
                   />
                 </TableCell>
                 <TableCell>
                   <Select
-                    value={item.category}
-                    onValueChange={(value) => onUpdateItem(item.id, { category: value })}
+                    value={item.Category}
+                    onValueChange={(value) => onUpdateItem(item.ItemId, { Category: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={t('SELECT_CATEGORY')} />
@@ -98,10 +101,10 @@ export function InvoiceItemsTable({
                   <Input
                     type="number"
                     className="w-20"
-                    value={item.quantity}
+                    value={item.Quantity}
                     onChange={(e) => {
                       const quantity = parseInt(e.target.value) || 0;
-                      onUpdateItem(item.id, { quantity });
+                      onUpdateItem(item.ItemId, { Quantity: quantity });
                     }}
                   />
                 </TableCell>
@@ -110,10 +113,20 @@ export function InvoiceItemsTable({
                     <span className="absolute left-3 top-[12px]">{currency}</span>
                     <Input
                       className="pl-12"
-                      value={item.price.toFixed(2)}
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={item.UnitPrice === 0 ? '' : item.UnitPrice}
                       onChange={(e) => {
-                        const price = parseFloat(e.target.value) || 0;
-                        onUpdateItem(item.id, { price });
+                        const value = e.target.value;
+                        if (value === '') {
+                          onUpdateItem(item.ItemId, { UnitPrice: 0 });
+                          return;
+                        }
+                        const price = parseFloat(value);
+                        if (!isNaN(price)) {
+                          onUpdateItem(item.ItemId, { UnitPrice: price });
+                        }
                       }}
                     />
                   </div>
@@ -121,7 +134,7 @@ export function InvoiceItemsTable({
                 <TableCell>
                   <div className="relative w-32">
                     <span className="absolute left-3 top-[12px]">{currency}</span>
-                    <Input className="pl-12" value={item.total.toFixed(2)} readOnly />
+                    <Input className="pl-12" value={item.Amount.toFixed(2)} readOnly />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -133,17 +146,17 @@ export function InvoiceItemsTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {item.showNote ? (
-                        <DropdownMenuItem onClick={() => onToggleNote(item.id)}>
+                        <DropdownMenuItem onClick={() => onToggleNote(item.ItemId)}>
                           <Trash className="h-4 w-4 mr-2" />
                           <span>{t('REMOVE_NOTE')}</span>
                         </DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem onClick={() => onToggleNote(item.id)}>
+                        <DropdownMenuItem onClick={() => onToggleNote(item.ItemId)}>
                           <NotebookPen className="h-4 w-4 mr-2" />
                           <span>{t('ADD_NOTE')}</span>
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onClick={() => onRemoveItem(item.id)}>
+                      <DropdownMenuItem onClick={() => onRemoveItem(item.ItemId)}>
                         <Trash className="h-4 w-4 mr-2" />
                         <span>{t('REMOVE_ITEM')}</span>
                       </DropdownMenuItem>
@@ -161,8 +174,8 @@ export function InvoiceItemsTable({
                       <Textarea
                         placeholder={`${t('WRITE_HERE')}...`}
                         className="min-h-[100px]"
-                        value={item.note}
-                        onChange={(e) => onUpdateItem(item.id, { note: e.target.value })}
+                        value={item.Note}
+                        onChange={(e) => onUpdateItem(item.ItemId, { Note: e.target.value })}
                       />
                     </div>
                   </TableCell>
@@ -206,17 +219,37 @@ export function InvoiceItemsTable({
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('TAXES')}</span>
               <div className="w-40">
-                <Input className="text-right" value={`${taxRate.toFixed(2)}%`} readOnly />
+                <div className="relative">
+                  <Input
+                    type="number"
+                    className="text-right pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={taxes}
+                    onChange={(e) => onTaxRateChange(Number(e.target.value))}
+                    onBlur={(e) => onTaxRateChange(Number(e.target.value))}
+                  />
+                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                    %
+                  </span>
+                </div>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm">{t('DISCOUNT')}</span>
               <div className="w-40">
-                <Input
-                  className="text-right"
-                  value={`- ${currency} ${discount.toFixed(2)}`}
-                  readOnly
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                    - {currency}
+                  </span>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      className="text-right pl-6 pr-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      value={discount}
+                      onChange={(e) => onDiscountChange(Number(e.target.value))}
+                      onBlur={(e) => onDiscountChange(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex justify-between font-semibold pt-2 border-t">

@@ -6,12 +6,12 @@ import {
   DialogTitle,
 } from 'components/ui/dialog';
 import { InvoicesDetail } from '../invoices-detail/invoices-detail';
-import { Invoice } from '../../data/invoice-data';
+import { InvoiceItem } from '../../types/invoices.types';
 
 interface InvoicePreviewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  invoice: Invoice | null;
+  invoice: InvoiceItem | null;
   [key: string]: any;
 }
 

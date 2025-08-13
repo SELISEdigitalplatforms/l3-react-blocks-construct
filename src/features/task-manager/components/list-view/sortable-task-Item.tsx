@@ -1,13 +1,14 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
-import { ITask, TPriority } from '../../types/task';
+import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
-import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
+import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
+import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 
 /**
  * SortableTaskItem Component
@@ -24,7 +25,7 @@ import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
  * - Provides a dropdown menu for task actions
  *
  * Props:
- * @param {ITask} task - The task object to display
+ * @param {TaskItem} task - The task object to display
  * @param {(id: string) => void} handleTaskClick - Callback triggered when the task title is clicked
  *
  * @returns {JSX.Element} The sortable task item component
@@ -35,19 +36,85 @@ import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
  */
 
 interface SortableTaskItemProps {
-  readonly task: ITask;
-  readonly handleTaskClick: (id: string) => void;
+  task: TaskItem;
+  columns: TaskSection[];
+  handleTaskClick: (id: string) => void;
 }
 
-export function SortableTaskItem({ task, handleTaskClick }: SortableTaskItemProps) {
+export function SortableTaskItem({
+  task: initialTask,
+  columns,
+  handleTaskClick,
+}: Readonly<SortableTaskItemProps>) {
+  const [task, setTask] = useState(initialTask);
+
+  // Update the task when it changes in the parent
+  useEffect(() => {
+    setTask(initialTask);
+  }, [initialTask]);
+
+  // Listen for task updates from other components
+  useEffect(() => {
+    const handleTaskUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<TaskItem>;
+      if (customEvent.detail?.ItemId === task.ItemId) {
+        setTask(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('task-updated', handleTaskUpdated as EventListener);
+    return () => {
+      window.removeEventListener('task-updated', handleTaskUpdated as EventListener);
+    };
+  }, [task.ItemId]);
+  // Fetch comments for this task
+  const { data: commentsData } = useGetTaskComments({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  // Filter comments to only show those for the current task
+  const taskComments = useMemo(() => {
+    if (!commentsData?.TaskManagerComments?.items) return [];
+    return commentsData.TaskManagerComments.items.filter(
+      (comment) => comment.TaskId === task.ItemId
+    );
+  }, [commentsData, task.ItemId]);
+
+  const commentsCount = taskComments.length;
+  const attachmentsCount = Array.isArray(task?.Attachments) ? task.Attachments.length : 0;
+  const assignees = (() => {
+    if (!task?.Assignee) return [];
+    const assigneeList = Array.isArray(task.Assignee) ? task.Assignee : [task.Assignee];
+    return assigneeList
+      .map((assignee) => (typeof assignee === 'string' ? assignee : assignee.Name || ''))
+      .filter(Boolean);
+  })();
+  const { updateTaskDetails } = useTaskDetails(task.ItemId);
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskItem();
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: `task-${task.id}`,
+    id: `task-${task.ItemId}`,
     data: {
-      task,
+      task: {
+        id: task.ItemId,
+        content: task.Title,
+        isCompleted: task.IsCompleted,
+        priority: task.Priority,
+        dueDate: task.DueDate,
+        itemTag: task.ItemTag,
+        comments: commentsCount,
+        attachments: attachmentsCount,
+        assignees: assignees,
+        status: task.Section,
+        tags: task.Tags,
+      },
     },
   });
-  const { columns } = useCardTasks();
-  const { removeTask, toggleTaskCompletion, updateTaskDetails } = useTaskDetails(task.id);
+
+  const handleDelete = useCallback(() => {
+    deleteTask(task.ItemId);
+  }, [deleteTask, task.ItemId]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -72,34 +139,35 @@ export function SortableTaskItem({ task, handleTaskClick }: SortableTaskItemProp
       </div>
 
       <div className="w-6 flex-shrink-0 flex items-center justify-center">
-        <StatusCircle isCompleted={task.isCompleted} />
+        <StatusCircle isCompleted={task.IsCompleted} />
       </div>
 
-      <div className="w-64 pl-2 mr-4">
+      <div className="w-72 pl-2 mr-4">
         <button
-          onClick={() => handleTaskClick(task.id)}
-          className="text-sm text-high-emphasis cursor-pointer hover:underline truncate"
+          onClick={() => handleTaskClick(task.ItemId)}
+          className="w-full text-left text-sm text-high-emphasis cursor-pointer hover:underline truncate"
+          title={task.Title}
         >
-          {task.content}
+          {task.Title}
         </button>
       </div>
 
-      <div className="w-24 flex-shrink-0">
-        <span className="text-sm text-high-emphasis">{task.status}</span>
+      <div className="w-32 flex-shrink-0">
+        <span className="text-sm text-high-emphasis">{task.Section}</span>
       </div>
 
-      {task.priority && (
-        <div className="w-24 flex-shrink-0 flex items-center">
-          <TaskManagerBadge className="px-2 py-0.5" priority={task.priority as TPriority}>
-            {task.priority}
+      {task.Priority && (
+        <div className="w-32 flex-shrink-0 flex items-center">
+          <TaskManagerBadge className={`px-2 py-0.5 ${priorityStyle[task.Priority]}`}>
+            {task.Priority}
           </TaskManagerBadge>
         </div>
       )}
 
-      <div className="w-28 flex-shrink-0">
-        {task.dueDate && (
+      <div className="w-32 flex-shrink-0">
+        {task.DueDate && (
           <span className="text-sm text-high-emphasis">
-            {new Date(task.dueDate).toLocaleDateString('en-GB', {
+            {new Date(task.DueDate).toLocaleDateString('en-GB', {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',
@@ -109,37 +177,38 @@ export function SortableTaskItem({ task, handleTaskClick }: SortableTaskItemProp
       </div>
 
       <div className="w-32 flex-shrink-0">
-        <AssigneeAvatars assignees={task.assignees} />
+        <AssigneeAvatars assignees={assignees || []} />
       </div>
 
-      <div className="w-32 flex-shrink-0">
-        {task.tags && task.tags.length > 0 && (
-          <TaskManagerBadge className="px-2 py-0.5">{[task.tags[0]]}</TaskManagerBadge>
+      <div className="w-28 flex-shrink-0">
+        {task.ItemTag && task.ItemTag.length > 0 && (
+          <TaskManagerBadge className="px-2 py-0.5">{task.ItemTag[0].TagLabel}</TaskManagerBadge>
         )}
       </div>
 
       <div className="flex items-center gap-3 ml-auto pr-4 text-high-emphasis text-xs">
-        {task.comments !== undefined && task.comments > 0 && (
+        {commentsCount > 0 && (
           <div className="flex items-center">
             <MessageSquare className="h-4 w-4 mr-1" />
-            <span className="text-xs">{task.comments}</span>
+            <span className="text-xs">{commentsCount}</span>
           </div>
         )}
 
-        {task.attachments !== undefined && task.attachments > 0 && (
+        {attachmentsCount > 0 && (
           <div className="flex items-center">
             <Paperclip className="h-4 w-4 mr-1" />
-            <span className="text-xs">{task.attachments}</span>
+            <span className="text-xs">{attachmentsCount}</span>
           </div>
         )}
 
         <button className="p-4 text-medium-emphasis hover:text-high-emphasis">
           <TaskManagerDropdownMenu
             task={task}
-            columns={columns}
-            onToggleComplete={() => toggleTaskCompletion(!task.isCompleted)}
-            onDelete={removeTask}
-            onMoveToColumn={(title) => updateTaskDetails({ section: title })}
+            columns={columns.map((column) => ({ id: column.ItemId, title: column.Title }))}
+            onToggleComplete={() => updateTaskDetails({ IsCompleted: !task.IsCompleted })}
+            onDelete={handleDelete}
+            isDeleting={isDeleting}
+            onMoveToColumn={(title: string) => updateTaskDetails({ Section: title })}
           />
         </button>
       </div>
