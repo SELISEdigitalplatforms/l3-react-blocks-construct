@@ -83,7 +83,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   };
 
   return (
-    <div className="flex flex-col h-full w-full space-y-4 p-4 md:p-6">
+    <div className="flex flex-col h-full w-full space-y-4">
       <TrashHeaderToolbar
         viewMode={viewMode}
         handleViewMode={handleViewModeChange}
