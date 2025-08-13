@@ -73,7 +73,7 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
       <div className="relative w-full h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-black bg-opacity-50 text-white">
+        <div className="flex items-center justify-between p-4 bg-transparent bg-opacity-50 text-gray-50">
           <div className="flex items-center space-x-3">
             <ImageIcon className="w-5 h-5" />
             <div>
@@ -84,32 +84,32 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           <div className="flex items-center space-x-2">
             <button
               onClick={handleZoomOut}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              className="p-2  hover:bg-opacity-20 rounded-lg transition-colors"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
             <span className="text-sm px-2">{Math.round(zoom * 100)}%</span>
             <button
               onClick={handleZoomIn}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              className="p-2  hover:bg-opacity-20 rounded-lg transition-colors"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
               onClick={handleRotate}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              className="p-2  hover:bg-opacity-20 rounded-lg transition-colors"
             >
               <RotateCw className="w-4 h-4" />
             </button>
             <button
               onClick={handleReset}
-              className="px-3 py-1 text-sm hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              className="px-3 py-1 text-sm  hover:bg-opacity-20 rounded-lg transition-colors"
             >
               Reset
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              className="p-2  hover:bg-opacity-50 rounded-lg transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -153,7 +153,7 @@ const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
       <div className="relative w-full h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-black bg-opacity-50 text-white">
+        <div className="flex items-center justify-between p-4 bg-transparent bg-opacity-50 text-gray-50">
           <div className="flex items-center space-x-3 ">
             <VideoIcon className="w-5 h-5" />
             <div>
@@ -163,7 +163,7 @@ const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors bg-background text-high-emphasis"
+            className="p-2  hover:bg-opacity-20 rounded-lg transition-colors text-gray-50"
           >
             <X className="w-4 h-4" />
           </button>
@@ -260,7 +260,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
             </button>
             <button
               onClick={handlePlayPause}
-              className="p-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors"
+              className="p-4 bg-blue-500 hover:bg-blue-600 text-high-emphasis rounded-full transition-colors"
             >
               {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
             </button>
@@ -316,12 +316,12 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           <div className="flex items-center space-x-3">
             <span className="text-2xl">{getFileIcon(file.name)}</span>
             <div>
-              <h3 className="font-medium text-gray-900">{file.name}</h3>
-              <p className="text-sm text-gray-500">{file.size}</p>
+              <h3 className="font-medium text-high-emphasis">{file.name}</h3>
+              <p className="text-sm text-medium-emphasis">{file.size}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-medium-emphasis">
               Page {currentPage} of {totalPages}
             </span>
             <button
@@ -338,10 +338,7 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
             >
               Next
             </button>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
+            <button onClick={onClose} className="p-2 rounded-lg transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -351,7 +348,7 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           <div className="bg-white shadow-lg rounded-lg p-8 max-w-3xl mx-auto">
             <div className="prose prose-sm max-w-none">
               <h2 className="text-xl font-bold mb-4">Document Preview - Page {currentPage}</h2>
-              <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+              <div className="whitespace-pre-line text-high-emphasis leading-relaxed">
                 {generateMockContent()}
               </div>
               {currentPage > 1 && (
