@@ -260,7 +260,6 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       filterFiles={filterFiles}
       currentFolderId={props.currentFolderId}
       onNavigateToFolder={props.onNavigateToFolder}
-      onNavigateBack={props.onNavigateBack}
     />
   );
 };

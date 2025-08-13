@@ -39,7 +39,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
-  // Keep both preview and details states
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
@@ -108,13 +107,11 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     }));
   }, [filters, currentFolderId]);
 
-  // Handle row click to show preview for files
   const handleRowClick = useCallback(
     (file: IFileTrashData) => {
       if (file.fileType === 'Folder' && onNavigateToFolder) {
         onNavigateToFolder(file.id);
       } else {
-        // Show preview for all non-folder file types
         setSelectedFile(file);
         setIsPreviewOpen(true);
       }
@@ -122,7 +119,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     [onNavigateToFolder]
   );
 
-  // Handle view details action from dropdown
   const handleViewDetails = useCallback((file: IFileTrashData) => {
     setSelectedFile(file);
     setIsDetailsOpen(true);
@@ -158,7 +154,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return TrashTableColumns({
       onRestore: handleRestoreWrapper,
       onDelete: handleDeleteWrapper,
-      onViewDetails: handleViewDetails, // Add this for dropdown view details action
+      onViewDetails: handleViewDetails,
       t,
     });
   }, [handleRestoreWrapper, handleDeleteWrapper, handleViewDetails, t]);
@@ -222,10 +218,8 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         </div>
       )}
 
-      {/* File Preview for direct row clicks */}
-      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} t={t} />
+      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
-      {/* Details Sheet for dropdown view details action */}
       <TrashDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
