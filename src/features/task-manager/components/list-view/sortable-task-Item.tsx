@@ -79,7 +79,6 @@ export function SortableTaskItem({
 
   const commentsCount = taskComments.length;
 
-  // Use attachments directly from the task item
   const taskAttachments = task.AttachmentField ?? [];
   const attachmentsCount = taskAttachments.length;
   const assignees = (() => {
@@ -125,7 +124,7 @@ export function SortableTaskItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center min-w-max border-b border-gray-200 hover:bg-surface h-14 ${
+      className={`flex items-center min-w-max border-b border-border hover:bg-surface h-14 ${
         isDragging ? 'bg-blue-50' : ''
       }`}
     >

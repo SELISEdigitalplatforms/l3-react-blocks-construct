@@ -196,23 +196,21 @@ export function AttachmentsSection({
             throw new Error(`Failed to upload file: ${file.name}`);
           }
 
-          // Create a new attachment object matching the TaskAttachments interface
           const newAttachment: TaskAttachments = {
-            ItemId: result.fileId, // Use the fileId from the upload response
+            ItemId: result.fileId,
             FileName: result.fileName,
             FileSize: formatFileSize(result.fileSize),
             FileType: getFileType(file),
+            FileUrl: result.uploadUrl,
           };
 
           return newAttachment;
         });
 
         const newAttachments = await Promise.all(uploadPromises);
-        // Filter out any null values from failed uploads
         const validNewAttachments = newAttachments.filter(Boolean) as TaskAttachments[];
 
         if (validNewAttachments.length > 0) {
-          // Update the attachments list with the new attachments
           onAttachmentsChange([...attachments, ...validNewAttachments]);
         }
 
@@ -252,18 +250,29 @@ export function AttachmentsSection({
 
   const handleDownload = async (attachment: TaskAttachments) => {
     try {
-      const content = `File: ${attachment.FileName}\nSize: ${attachment.FileSize}\nType: ${attachment.FileType}`;
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
+      if (!attachment.FileUrl) {
+        throw new Error('No file URL available for download');
+      }
+
+      const fileExtension = attachment.FileName.split('.').pop()?.toLowerCase() || '';
+
+      const response = await fetch(attachment.FileUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
       const link = document.createElement('a');
-      link.href = url;
-      const extension =
-        attachment.FileType === 'pdf' ? '.pdf' : attachment.FileType === 'image' ? '.jpg' : '.txt';
-      link.download = `${attachment.FileName}${extension}`;
+      link.href = blobUrl;
+      link.download = attachment.FileName.endsWith(`.${fileExtension}`)
+        ? attachment.FileName
+        : `${attachment.FileName}.${fileExtension}`;
+
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
     } catch (error) {
       console.error('Error downloading file:', error);
       handleError(error);
@@ -331,7 +340,7 @@ export function AttachmentsSection({
                 className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                   isDragActive
                     ? 'border-primary bg-primary/5'
-                    : 'border-gray-300 hover:border-primary/50'
+                    : 'border-border hover:border-primary/50'
                 }`}
               >
                 <Input {...getInputProps()} />

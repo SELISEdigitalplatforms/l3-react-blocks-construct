@@ -274,7 +274,7 @@ export const TaskManagerFilterSheet = ({
                           className="flex items-center gap-2"
                         >
                           <Checkbox checked={selectedAssignees.includes(assignee.id)} />
-                          <div className="w-7 h-7 rounded-full bg-gray-300 flex items-center justify-center text-sm border-2 border-white">
+                          <div className="w-7 h-7 rounded-full bg-neutral-200 flex items-center justify-center text-sm border-2 border-white">
                             {assignee.name[0]}
                           </div>
                           <span>{assignee.name}</span>

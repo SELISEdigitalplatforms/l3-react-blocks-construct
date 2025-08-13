@@ -142,37 +142,32 @@ export default function TaskDetailsView({
   const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted ?? false);
   const [section, setSection] = useState<string>(task?.Section ?? '');
 
-  // Use attachments directly from the task item
   const [attachments, setAttachments] = useState<TaskAttachments[]>(task?.AttachmentField ?? []);
-  const isLoadingAttachments = false; // No loading state needed since we're using local data
+  const isLoadingAttachments = false;
 
-  // Update local state when task changes
   useEffect(() => {
     if (task) {
-      // Update title, description, etc. from task
       setTitle(task.Title ?? '');
       setDescription(task.Description ?? '');
       setPriority(task.Priority || TaskPriority.MEDIUM);
       setSection(task.Section || '');
       setIsMarkComplete(task.IsCompleted ?? false);
-      
-      // Update attachments if they exist
+
       if (task.AttachmentField) {
         setAttachments(task.AttachmentField);
       } else {
         setAttachments([]);
       }
-      
-      // Update selected tags if they exist
+
       if (task.ItemTag) {
         setSelectedTags(task.ItemTag);
       }
-      
+
       // Update selected assignees if they exist
       if (task.Assignee) {
         setSelectedAssignees(task.Assignee);
       }
-      
+
       // Update due date if it exists
       if (task.DueDate) {
         setDate(new Date(task.DueDate));
@@ -981,7 +976,7 @@ export default function TaskDetailsView({
                 <div className="flex gap-2">
                   <Avatar className="h-10 w-10 border-2 border-white">
                     <AvatarImage src={userProfile.profileImageUrl} alt={userProfile.fullName} />
-                    <AvatarFallback className="bg-gray-300 text-xs">
+                    <AvatarFallback className="bg-neutral-200 text-xs">
                       {userProfile.fullName?.charAt(0) ?? ''}
                     </AvatarFallback>
                   </Avatar>

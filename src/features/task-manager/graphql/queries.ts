@@ -46,6 +46,7 @@ export const GET_TASK_MANAGER_QUERY = `
           FileName
           FileSize
           FileType
+          FileUrl
         }
       }
     }

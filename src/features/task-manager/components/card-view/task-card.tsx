@@ -294,7 +294,7 @@ export function TaskCard({
                     >
                       <Avatar className="h-6 w-6 border-2 border-background">
                         <AvatarImage src={imageUrl} alt={displayName} />
-                        <AvatarFallback className="bg-gray-300 text-foreground text-xs">
+                        <AvatarFallback className="bg-neutral-200 text-foreground text-xs">
                           {initial}
                         </AvatarFallback>
                       </Avatar>
@@ -303,7 +303,7 @@ export function TaskCard({
                 })}
                 {task.Assignee.length > 3 && (
                   <div
-                    className="h-6 w-6 rounded-full bg-gray-300 border-2 border-background flex items-center justify-center z-10 relative"
+                    className="h-6 w-6 rounded-full bg-neutral-200 border-2 border-background flex items-center justify-center z-10 relative"
                     style={{ zIndex: 10 }}
                   >
                     <span className="text-[10px] text-medium-emphasis font-medium">

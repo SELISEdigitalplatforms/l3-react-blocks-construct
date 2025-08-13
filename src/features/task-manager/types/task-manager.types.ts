@@ -51,6 +51,7 @@ export interface TaskAttachments {
   FileName: string;
   FileSize: string;
   FileType: FileType;
+  FileUrl: string;
 }
 
 export interface TaskItem {
