@@ -207,6 +207,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime] = useState(0);
   const [duration] = useState(180);
+  const [randomHeight] = useState(Math.random() * 40 + 10);
 
   const handlePlayPause = () => setIsPlaying(!isPlaying);
   const handleMute = () => setIsMuted(!isMuted);
@@ -245,7 +246,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
                 }`}
                 style={{
                   width: '3px',
-                  height: `${Math.random() * 40 + 10}px`,
+                  height: `${randomHeight}px`,
                   animationDelay: `${i * 0.1}s`,
                 }}
               />
