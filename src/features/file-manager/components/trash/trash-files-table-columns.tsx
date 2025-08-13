@@ -7,12 +7,14 @@ import { CustomtDateFormat } from 'lib/custom-date-formatter';
 import { TrashTableRowActions } from './trash-files-row-actions';
 
 interface ColumnFactoryProps {
+  onViewDetails?: (file: IFileTrashData) => void;
   onRestore: (file: IFileTrashData) => void;
   onDelete: (file: IFileTrashData) => void;
   t: (key: string) => string;
 }
 
 export const TrashTableColumns = ({
+  onViewDetails,
   onRestore,
   onDelete,
   t,
@@ -87,7 +89,12 @@ export const TrashTableColumns = ({
         }}
         type="button"
       >
-        <TrashTableRowActions row={row} onRestore={onRestore} onDelete={onDelete} />
+        <TrashTableRowActions
+          row={row}
+          onRestore={onRestore}
+          onDelete={onDelete}
+          onViewDetails={onViewDetails}
+        />
       </button>
     ),
   },
