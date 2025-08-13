@@ -117,7 +117,7 @@ export const ChatSidebar = ({
                 </div>
                 <Input
                   type="text"
-                  className="w-full py-2 pl-10 pr-3 text-sm bg-gray-100 border-0 rounded-md focus:ring-2 focus:ring-primary focus:bg-white"
+                  className="w-full py-2 pl-10 pr-3 text-sm bg-surface border-0 rounded-md focus:ring-2 focus:ring-primary focus:bg-white"
                   placeholder={t('SEARCH')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}

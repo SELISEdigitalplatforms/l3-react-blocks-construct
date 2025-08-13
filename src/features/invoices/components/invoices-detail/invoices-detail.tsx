@@ -8,11 +8,13 @@ import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
 import { Separator } from 'components/ui/separator';
-import darklogo from 'assets/images/construct_logo_dark.svg';
+import darkLogo from 'assets/images/construct_logo_dark.svg';
+import lightLogo from 'assets/images/construct_logo_light.svg';
 import { Badge } from 'components/ui/badge';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
+import { useTheme } from 'styles/theme/theme-provider';
 
 interface InvoicesDetailProps {
   invoice: InvoiceItem;
@@ -23,6 +25,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [showSendDialog, setShowSendDialog] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -150,7 +153,11 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
         <CardContent className="flex flex-col !p-[24px] sm:!py-[56px] sm:!px-[70px] gap-6">
           <div className="flex flex-col sm:flex-row sm:justify-between">
             <div className="w-[220px] h-[80px]">
-              <img src={darklogo} alt="logo" className="w-full h-full object-cover" />
+              <img
+                src={theme === 'dark' ? lightLogo : darkLogo}
+                alt="logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col border-l-none sm:border-l sm:border-medium-emphasis pl-4">
               <h2 className="font-semibold text-high-emphasis">Blocks Construct</h2>
