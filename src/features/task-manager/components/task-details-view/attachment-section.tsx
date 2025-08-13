@@ -113,29 +113,57 @@ export function AttachmentsSection({
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const processFileUpload = async (file: File) => {
-    const uploadFile = async (url: string, fileToUpload: File) => {
-      const response = await fetch(url, {
-        method: 'PUT',
-        body: fileToUpload,
-        headers: {
-          'Content-Type': fileToUpload.type,
-          'x-ms-blob-type': 'BlockBlob',
-        },
-      });
+  const uploadFileToStorage = async (url: string, fileToUpload: File) => {
+    const response = await fetch(url, {
+      method: 'PUT',
+      body: fileToUpload,
+      headers: {
+        'Content-Type': fileToUpload.type,
+        'x-ms-blob-type': 'BlockBlob',
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(`Failed to upload file: ${response.statusText}`);
-      }
+    if (!response.ok) {
+      throw new Error(`Failed to upload file: ${response.statusText}`);
+    }
 
-      return {
-        uploadUrl: url.split('?')[0],
-        fileSize: fileToUpload.size,
-        fileName: fileToUpload.name,
-        fileType: fileToUpload.type,
-      };
+    return {
+      uploadUrl: url.split('?')[0],
+      fileSize: fileToUpload.size,
+      fileName: fileToUpload.name,
+      fileType: fileToUpload.type,
     };
+  };
 
+  const handleUploadSuccess = (data: any, file: File, resolve: any) => {
+    if (!data.isSuccess || !data.uploadUrl || !data.fileId) {
+      console.error('Failed to get presigned URL:', data);
+      resolve(null);
+      return;
+    }
+
+    uploadFileToStorage(data.uploadUrl, file)
+      .then((uploadResult) => {
+        resolve({
+          fileId: data.fileId ?? '',
+          uploadUrl: uploadResult.uploadUrl,
+          fileName: uploadResult.fileName,
+          fileSize: uploadResult.fileSize,
+          fileType: uploadResult.fileType,
+        });
+      })
+      .catch((error) => {
+        console.error('Error uploading file:', error);
+        resolve(null);
+      });
+  };
+
+  const handleUploadError = (error: any, resolve: any) => {
+    console.error('Error getting presigned URL:', error);
+    resolve(null);
+  };
+
+  const processFileUpload = (file: File) => {
     return new Promise<{
       fileId: string;
       uploadUrl: string;
@@ -155,32 +183,8 @@ export function AttachmentsSection({
           tags: '',
         },
         {
-          onSuccess: (data) => {
-            if (!data.isSuccess || !data.uploadUrl || !data.fileId) {
-              console.error('Failed to get presigned URL:', data);
-              resolve(null);
-              return;
-            }
-
-            uploadFile(data.uploadUrl, file)
-              .then((uploadResult) => {
-                resolve({
-                  fileId: data.fileId ?? '',
-                  uploadUrl: uploadResult.uploadUrl,
-                  fileName: uploadResult.fileName,
-                  fileSize: uploadResult.fileSize,
-                  fileType: uploadResult.fileType,
-                });
-              })
-              .catch((error) => {
-                console.error('Error uploading file:', error);
-                resolve(null);
-              });
-          },
-          onError: (error) => {
-            console.error('Error getting presigned URL:', error);
-            resolve(null);
-          },
+          onSuccess: (data) => handleUploadSuccess(data, file, resolve),
+          onError: (error) => handleUploadError(error, resolve),
         }
       );
     });
@@ -260,38 +264,31 @@ export function AttachmentsSection({
     onAttachmentsChange(updatedAttachments);
   };
 
-  const createDownloadLink = (blobUrl: string, fileName: string, fileExtension: string) => {
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = fileName.endsWith(`.${fileExtension}`)
-      ? fileName
-      : `${fileName}.${fileExtension}`;
-    return link;
-  };
-
-  const cleanupDownloadLink = (link: HTMLAnchorElement, blobUrl: string) => {
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    }, 100);
-  };
-
   const handleDownload = async (attachment: TaskAttachments) => {
-    if (!attachment.FileUrl) {
-      handleError(new Error('No file URL available for download'));
-      return;
-    }
-
     try {
-      const fileExtension = attachment.FileName.split('.').pop()?.toLowerCase() || '';
+      if (!attachment.FileUrl) {
+        throw new Error('No file URL available for download');
+      }
+
+      const fileExtension = attachment.FileName.split('.').pop()?.toLowerCase() ?? '';
+
       const response = await fetch(attachment.FileUrl);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
 
-      const link = createDownloadLink(blobUrl, attachment.FileName, fileExtension);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = attachment.FileName.endsWith(`.${fileExtension}`)
+        ? attachment.FileName
+        : `${attachment.FileName}.${fileExtension}`;
+
       document.body.appendChild(link);
       link.click();
-      cleanupDownloadLink(link, blobUrl);
+
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
     } catch (error) {
       console.error('Error downloading file:', error);
       handleError(error);
