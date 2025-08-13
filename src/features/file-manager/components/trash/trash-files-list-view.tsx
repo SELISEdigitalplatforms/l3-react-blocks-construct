@@ -132,14 +132,12 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     });
   }, [handleRestoreWrapper, handleDeleteWrapper, t]);
 
-  // Enhanced display data with client-side date filtering
   const displayData = useMemo(() => {
     if (!data?.data) {
       return [];
     }
 
     return data.data.filter((file: IFileTrashData) => {
-      // Filter out deleted and restored items
       if (deletedItemIds.has(file.id)) {
         return false;
       }
@@ -147,7 +145,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         return false;
       }
 
-      // Apply date range filtering
       if (filters.trashedDate) {
         const fileDate = new Date(file.trashedDate);
         const { from, to } = filters.trashedDate;
@@ -168,12 +165,11 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return {
       pageIndex: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
-      totalCount: displayData.length, // Use filtered data count for accurate pagination
-      manualPagination: false, // Changed to false since we're doing client-side filtering
+      totalCount: displayData.length,
+      manualPagination: false,
     };
   }, [displayData.length, paginationState]);
 
-  // Paginate the filtered data client-side
   const paginatedData = useMemo(() => {
     const startIndex = paginationState.pageIndex * paginationState.pageSize;
     const endIndex = startIndex + paginationState.pageSize;
@@ -208,7 +204,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
               onPaginationChange={handlePaginationChange}
               manualPagination={paginationProps.manualPagination}
               mobileColumns={['name']}
-              expandable={true}
+              expandable={false}
             />
           </div>
         </div>
