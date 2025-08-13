@@ -24,7 +24,6 @@ interface TrashFilesListViewProps {
   restoredItemIds?: Set<string>;
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
-  onNavigateBack?: () => void;
 }
 
 export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({

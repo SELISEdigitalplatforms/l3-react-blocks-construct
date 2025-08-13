@@ -13,6 +13,14 @@ interface TrashProps {
   onClearTrash?: () => void;
 }
 
+const EmptyTrashView = () => (
+  <div className="flex flex-col items-center justify-center h-full p-12 text-center">
+    <div className="text-6xl mb-6">🗑️</div>
+    <h3 className="text-xl font-medium text-high-emphasis mb-2">Trash is empty</h3>
+    <p className="text-medium-emphasis max-w-sm">All items have been permanently deleted</p>
+  </div>
+);
+
 const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
@@ -162,14 +170,6 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     isLoading,
     error,
   };
-
-  const EmptyTrashView = () => (
-    <div className="flex flex-col items-center justify-center h-full p-12 text-center">
-      <div className="text-6xl mb-6">🗑️</div>
-      <h3 className="text-xl font-medium text-high-emphasis mb-2">Trash is empty</h3>
-      <p className="text-medium-emphasis max-w-sm">All items have been permanently deleted</p>
-    </div>
-  );
 
   return (
     <div className="flex flex-col h-full w-full space-y-4">

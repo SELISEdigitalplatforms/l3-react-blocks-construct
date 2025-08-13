@@ -31,7 +31,6 @@ interface TrashGridViewProps {
   readonly onSelectionChange?: (items: string[]) => void;
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
-  onNavigateBack?: () => void;
 }
 
 export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
@@ -224,6 +223,18 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
     [t]
   );
 
+  const getEmptyStateMessage = () => {
+    if (props.filters.trashedDate) {
+      return t('NO_FILES_MATCH_CRITERIA');
+    }
+
+    if (props.currentFolderId) {
+      return t('FOLDER_IS_EMPTY');
+    }
+
+    return t('NO_DELETED_FILES');
+  };
+
   return (
     <CommonGridView
       onViewDetails={handleViewDetails}
@@ -240,14 +251,10 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
         icon: Trash2,
         title: t('TRASH_EMPTY'),
         description:
-          props.filters.name ||
-          props.filters.fileType ||
-          props.filters.deletedBy ||
-          props.filters.trashedDate
-            ? t('NO_FILES_MATCH_CRITERIA')
-            : props.currentFolderId
-              ? t('FOLDER_IS_EMPTY')
-              : t('NO_DELETED_FILES'),
+          props.filters.name ??
+          props.filters.fileType ??
+          props.filters.deletedBy ??
+          getEmptyStateMessage(),
       }}
       sectionLabels={{
         folder: t('FOLDER'),

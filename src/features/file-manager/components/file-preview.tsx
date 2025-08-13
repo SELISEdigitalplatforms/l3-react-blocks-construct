@@ -178,6 +178,19 @@ const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
               poster={`https://via.placeholder.com/800x450/2c3e50/ffffff?text=${encodeURIComponent(file.name.split('.')[0])}`}
               controls
             >
+              <track
+                kind="captions"
+                src="/path/to/captions.vtt"
+                srcLang="en"
+                label="English Captions"
+                default
+              />
+              <track
+                kind="subtitles"
+                src="/path/to/subtitles-es.vtt"
+                srcLang="es"
+                label="Spanish Subtitles"
+              />
               <source src={getPlaceholderVideo()} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
