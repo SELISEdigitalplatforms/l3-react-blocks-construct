@@ -1,19 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from 'components/ui/button';
+import { Skeleton } from 'components/ui/skeleton';
 
 interface BaseFile {
   id: string;
   name: string;
   fileType: string;
-}
-
-interface BaseCardProps<T extends BaseFile> {
-  file: T;
-  onViewDetails?: (file: T) => void;
-  renderActions: (file: T) => React.ReactNode;
-  IconComponent: React.ComponentType<{ className?: string }>;
-  iconColor: string;
-  backgroundColor: string;
 }
 
 interface BaseGridViewProps<T extends BaseFile> {
@@ -42,18 +34,23 @@ interface BaseGridViewProps<T extends BaseFile> {
   errorMessage: string;
   loadingMessage: string;
   loadMoreLabel: string;
-  // Additional props for customization
   additionalFiles?: T[];
   filterFiles?: (files: T[], filters: Record<string, any>) => T[];
   processFiles?: (files: T[]) => T[];
-
-  // Add navigation props
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
   onNavigateBack?: () => void;
 }
 
-// Common Card Component
+interface BaseCardProps<T extends BaseFile> {
+  file: T;
+  onViewDetails?: (file: T) => void;
+  renderActions: (file: T) => React.ReactNode;
+  IconComponent: React.ComponentType<{ className?: string }>;
+  iconColor: string;
+  backgroundColor: string;
+}
+
 const CommonCard = <T extends BaseFile>({
   file,
   onViewDetails,
@@ -152,22 +149,17 @@ export const CommonGridView = <T extends BaseFile>({
   additionalFiles = [],
   filterFiles,
   processFiles,
-  // Add navigation props
   currentFolderId,
   onNavigateToFolder,
 }: BaseGridViewProps<T>) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<T | null>(null);
 
-  // Updated handleViewDetails to support folder navigation
   const handleViewDetails = useCallback(
     (file: T) => {
-      // Check if it's a folder and navigation is available
       if (file.fileType === 'Folder' && onNavigateToFolder) {
-        // Navigate into folder instead of opening details
         onNavigateToFolder(file.id);
       } else {
-        // Open details for non-folder items
         setSelectedFile(file);
         setIsDetailsOpen(true);
         onViewDetails?.(file);
@@ -206,6 +198,63 @@ export const CommonGridView = <T extends BaseFile>({
       (Array.isArray(value) ? value.length > 0 : true)
   );
 
+  const FolderSkeletonCard = () => (
+    <div className="group relative bg-background rounded-lg border border-border p-3">
+      <div className="flex items-center space-x-3">
+        <Skeleton className="w-8 h-8 rounded-lg" />
+        <div className="flex items-center justify-between flex-1">
+          <div className="flex-1 min-w-0">
+            <Skeleton className="h-4 w-24" />
+          </div>
+          <Skeleton className="h-6 w-6 rounded" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const FileSkeletonCard = () => (
+    <div className="group relative bg-background rounded-lg border border-border p-6">
+      <div className="flex flex-col items-center text-center space-y-4">
+        <Skeleton className="w-20 h-20 rounded-lg" />
+        <div className="flex items-center justify-between space-x-2 mt-2 w-full">
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
+            <Skeleton className="w-8 h-8 rounded-lg" />
+            <div className="flex-1 min-w-0">
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
+          <Skeleton className="h-6 w-6 rounded" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const SkeletonGrid = ({
+    count = 6,
+    title,
+    type = 'file',
+  }: {
+    count?: number;
+    title: string;
+    type?: 'file' | 'folder';
+  }) => (
+    <div>
+      <div className="flex items-center space-x-2 mb-4 py-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-4 w-8" />
+      </div>
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+        {Array.from({ length: count }).map((_, index) =>
+          type === 'folder' ? (
+            <FolderSkeletonCard key={`${title}-folder-skeleton-${index}`} />
+          ) : (
+            <FileSkeletonCard key={`${title}-file-skeleton-${index}`} />
+          )
+        )}
+      </div>
+    </div>
+  );
+
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -218,10 +267,13 @@ export const CommonGridView = <T extends BaseFile>({
 
   if (isLoading && !processedFiles.length) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">{loadingMessage}</p>
+      <div className={`flex flex-col h-full ${isDetailsOpen ? 'flex-1' : 'w-full'}`}>
+        <div className="flex-1">
+          <div className="space-y-8">
+            <SkeletonGrid count={3} title="folders" type="folder" />
+
+            <SkeletonGrid count={6} title="files" type="file" />
+          </div>
         </div>
       </div>
     );
