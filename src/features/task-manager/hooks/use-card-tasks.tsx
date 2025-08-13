@@ -98,6 +98,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       Section: task.Section ?? '',
       ItemTag: task.ItemTag ?? [],
       Assignee: task.Assignee ?? [],
+      AttachmentField: task.AttachmentField ?? [],
       CreatedBy: task.CreatedBy ?? '',
       CreatedDate: task.CreatedDate ?? new Date().toISOString(),
       LastUpdatedBy: task.LastUpdatedBy ?? '',

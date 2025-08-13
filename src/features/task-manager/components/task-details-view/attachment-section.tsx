@@ -1,11 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
-import {
-  TaskAttachments,
-  FileType,
-  TaskAttachmentInsertInput,
-} from '../../types/task-manager.types';
+import { TaskAttachments, FileType } from '../../types/task-manager.types';
 import { Button } from 'components/ui/button';
 import {
   Plus,
@@ -28,8 +24,9 @@ import {
 } from 'components/ui/dialog';
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
-import { useToast } from 'hooks/use-toast';
-import { useCreateTaskAttachment, useDeleteTaskAttachment } from '../../hooks/use-task-manager';
+import { useGetPreSignedUrlForUpload } from 'lib/api/hooks/use-storage';
+import API_CONFIG from 'config/api';
+import { useErrorHandler } from 'hooks/use-error-handler';
 
 const getFileType = (file: File): FileType => {
   if (file.type.includes('pdf')) return 'pdf';
@@ -74,9 +71,9 @@ const getFileType = (file: File): FileType => {
 
 interface AttachmentsSectionProps {
   taskId?: string;
-  taskItemId?: string; // Add taskItemId prop to ensure we have the correct ID
+  taskItemId?: string;
   attachments: TaskAttachments[];
-  onAttachmentsChange: () => void;
+  onAttachmentsChange: (attachments: TaskAttachments[]) => void;
   isLoading?: boolean;
 }
 
@@ -95,14 +92,13 @@ export function AttachmentsSection({
 }: Readonly<AttachmentsSectionProps>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const [pendingTaskId] = useState(() => uuidv4()); // Generate a unique ID for the pending task
+  const [pendingTaskId] = useState(() => uuidv4());
   const { t } = useTranslation();
-  const { toast } = useToast();
+  const { handleError } = useErrorHandler();
   const [userProfile, setUserProfile] = useState(getCurrentUser());
-  const { mutate: createAttachment } = useCreateTaskAttachment();
-  const { mutate: deleteAttachment } = useDeleteTaskAttachment();
+  const { mutate: getPreSignedUrl } = useGetPreSignedUrlForUpload();
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Use the provided taskItemId if available, otherwise fall back to taskId or pendingTaskId
   const effectiveTaskId = taskItemId || taskId || pendingTaskId;
 
   useEffect(() => {
@@ -118,57 +114,118 @@ export function AttachmentsSection({
   };
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      const uploadPromises = acceptedFiles.map((file) => {
-        const fileSize = formatFileSize(file.size);
-        const fileType = getFileType(file);
+    async (acceptedFiles: File[]) => {
+      if (!effectiveTaskId) return;
 
-        const attachmentInput: TaskAttachmentInsertInput = {
-          ItemId: effectiveTaskId, // Use the same ID as TaskId
-          TaskId: effectiveTaskId,
-          FileName: file.name,
-          FileSize: fileSize,
-          FileType: fileType,
-          CreatedBy: userProfile?.fullName || 'System',
-          CreatedDate: new Date().toISOString(),
-          LastUpdatedBy: userProfile?.fullName || 'System',
-          LastUpdatedDate: new Date().toISOString(),
-          // For pending tasks, we'll mark them as not deleted
-          IsDeleted: false,
-          // Add any other required fields
-          Language: 'en',
-          OrganizationIds: [],
+      const uploadFile = async (url: string, file: File) => {
+        const response = await fetch(url, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+            'x-ms-blob-type': 'BlockBlob',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to upload file: ${response.statusText}`);
+        }
+
+        return {
+          uploadUrl: url.split('?')[0],
+          fileSize: file.size,
+          fileName: file.name,
+          fileType: file.type,
         };
+      };
 
-        return new Promise<void>((resolve, reject) => {
-          createAttachment(attachmentInput, {
-            onError: (error) => {
-              console.error('Error uploading attachment:', error);
-              reject(error);
+      const getPresignedUrlAndUpload = (
+        file: File
+      ): Promise<{
+        fileId: string;
+        uploadUrl: string;
+        fileName: string;
+        fileSize: number;
+        fileType: string;
+      } | null> =>
+        new Promise((resolve) => {
+          getPreSignedUrl(
+            {
+              name: file.name,
+              projectKey: API_CONFIG.blocksKey,
+              itemId: '',
+              metaData: '',
+              accessModifier: 'Public',
+              configurationName: 'Default',
+              parentDirectoryId: '',
+              tags: '',
             },
-            onSettled: () => {
-              resolve();
-            },
-          });
+            {
+              onSuccess: async (data) => {
+                if (!data.isSuccess || !data.uploadUrl || !data.fileId) {
+                  console.error('Failed to get presigned URL:', data);
+                  return resolve(null);
+                }
+                try {
+                  const uploadResult = await uploadFile(data.uploadUrl, file);
+                  resolve({
+                    fileId: data.fileId,
+                    uploadUrl: uploadResult.uploadUrl,
+                    fileName: uploadResult.fileName,
+                    fileSize: uploadResult.fileSize,
+                    fileType: uploadResult.fileType,
+                  });
+                } catch (error) {
+                  console.error('Error uploading file:', error);
+                  resolve(null);
+                }
+              },
+              onError: (error) => {
+                console.error('Error getting presigned URL:', error);
+                resolve(null);
+              },
+            }
+          );
         });
-      });
 
-      Promise.all(uploadPromises)
-        .then(() => {
-          onAttachmentsChange();
-          setIsDialogOpen(false);
-        })
-        .catch((error) => {
-          console.error('Error uploading files:', error);
-          toast({
-            variant: 'destructive',
-            title: t('Error'),
-            description: t('Failed to upload files'),
-          });
+      setIsUploading(true);
+      try {
+        const uploadPromises = acceptedFiles.map(async (file) => {
+          const result = await getPresignedUrlAndUpload(file);
+          if (!result) {
+            throw new Error(`Failed to upload file: ${file.name}`);
+          }
+
+          // Create a new attachment object matching the TaskAttachments interface
+          const newAttachment: TaskAttachments = {
+            ItemId: result.fileId, // Use the fileId from the upload response
+            FileName: result.fileName,
+            FileSize: formatFileSize(result.fileSize),
+            FileType: getFileType(file),
+          };
+
+          return newAttachment;
         });
+
+        const newAttachments = await Promise.all(uploadPromises);
+        // Filter out any null values from failed uploads
+        const validNewAttachments = newAttachments.filter(Boolean) as TaskAttachments[];
+
+        if (validNewAttachments.length > 0) {
+          // Update the attachments list with the new attachments
+          onAttachmentsChange([...attachments, ...validNewAttachments]);
+        }
+
+        setIsDialogOpen(false);
+      } catch (error) {
+        console.error('Error uploading files:', error);
+        handleError(error);
+      } finally {
+        setIsUploading(false);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [taskId, t, toast, createAttachment, onAttachmentsChange]
+    [effectiveTaskId, onAttachmentsChange, t, userProfile?.fullName, handleError, getPreSignedUrl]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -179,42 +236,37 @@ export function AttachmentsSection({
       'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
-    maxSize: 25 * 1024 * 1024, // 25MB
+    maxSize: 25 * 1024 * 1024,
     multiple: true,
-    disabled: isLoading,
-    noClick: !effectiveTaskId, // Prevent clicking if we don't have a task ID
-    noKeyboard: !effectiveTaskId, // Prevent keyboard interaction if we don't have a task ID
+    disabled: isLoading || isUploading,
+    noClick: !effectiveTaskId || isUploading,
+    noKeyboard: !effectiveTaskId || isUploading,
   });
 
-  const handleDeleteAttachment = (id: string) => {
-    deleteAttachment(id, {
-      onError: (error) => {
-        console.error('Error deleting attachment:', error);
-        toast({
-          title: t('Error'),
-          description: t('Failed to delete attachment. Please try again.'),
-        });
-      },
-      onSuccess: () => {
-        onAttachmentsChange();
-      },
-    });
+  const handleDeleteAttachment = (attachmentId: string) => {
+    const updatedAttachments = attachments.filter(
+      (attachment) => attachment.ItemId !== attachmentId
+    );
+    onAttachmentsChange(updatedAttachments);
   };
 
   const handleDownload = async (attachment: TaskAttachments) => {
     try {
-      const content = `File: ${attachment.FileName}\nSize: ${attachment.FileSize}`;
+      const content = `File: ${attachment.FileName}\nSize: ${attachment.FileSize}\nType: ${attachment.FileType}`;
       const blob = new Blob([content], { type: 'text/plain' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = attachment.FileName || 'attachment.txt';
+      const extension =
+        attachment.FileType === 'pdf' ? '.pdf' : attachment.FileType === 'image' ? '.jpg' : '.txt';
+      link.download = `${attachment.FileName}${extension}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error creating download:', error);
+      console.error('Error downloading file:', error);
+      handleError(error);
     }
   };
 
@@ -284,7 +336,7 @@ export function AttachmentsSection({
               >
                 <Input {...getInputProps()} />
                 <div className="flex flex-col items-center gap-2">
-                  {isLoading ? (
+                  {isLoading || isUploading ? (
                     <div className="flex flex-col items-center gap-2">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                       <p className="text-sm">{t('UPLOADING')}...</p>
@@ -370,7 +422,10 @@ export function AttachmentsSection({
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-error hover:text-error"
-                      onClick={() => handleDeleteAttachment(attachment.ItemId)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteAttachment(attachment.ItemId);
+                      }}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

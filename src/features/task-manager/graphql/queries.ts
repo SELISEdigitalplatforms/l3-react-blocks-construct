@@ -32,7 +32,6 @@ export const GET_TASK_MANAGER_QUERY = `
         Priority
         Section
         Tags
-        AttachmentField
         ItemTag {
           ItemId
           TagLabel
@@ -41,6 +40,12 @@ export const GET_TASK_MANAGER_QUERY = `
           ItemId
           Name
           ImageUrl
+        }
+        AttachmentField {
+          ItemId
+          FileName
+          FileSize
+          FileType
         }
       }
     }

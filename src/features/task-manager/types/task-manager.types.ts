@@ -48,15 +48,6 @@ export type FileType = 'pdf' | 'image' | 'other';
 
 export interface TaskAttachments {
   ItemId: string;
-  TaskId?: string;
-  IsDeleted?: boolean;
-  Tags?: string[];
-  Language?: string;
-  OrganizationIds?: string[];
-  CreatedBy?: string;
-  CreatedDate?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
   FileName: string;
   FileSize: string;
   FileType: FileType;
@@ -80,7 +71,7 @@ export interface TaskItem {
   Section?: string;
   Tags?: string[];
   ItemTag?: ItemTag[];
-  AttachmentField?: string[];
+  AttachmentField?: TaskAttachments[];
 }
 
 export interface TaskSection {
@@ -151,18 +142,6 @@ export interface GetTagsResponse {
   };
 }
 
-export interface GetAttachmentsResponse {
-  TaskAttachments: {
-    items: TaskAttachments[];
-    totalCount: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    pageSize: number;
-    pageNo: number;
-    totalPages: number;
-  };
-}
-
 export interface GetCommentsResponse {
   TaskManagerComments: {
     items: TaskComments[];
@@ -194,6 +173,7 @@ export interface TaskItemUpdateInput {
   Description?: string;
   Assignee?: Assignee[];
   ItemTag?: ItemTag[];
+  AttachmentField?: TaskAttachments[];
   DueDate?: string;
   Priority?: TaskPriority;
   Section?: string;
@@ -303,36 +283,4 @@ export interface TaskCommentUpdateInput {
   Timestamp?: string;
   Author?: string;
   IsDeleted?: boolean;
-}
-
-export interface TaskAttachmentInsertInput {
-  ItemId: string;
-  TaskId?: string;
-  IsDeleted?: boolean;
-  Tags?: string[];
-  Language?: string;
-  OrganizationIds?: string[];
-  CreatedBy?: string;
-  CreatedDate?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
-  FileName: string;
-  FileSize: string;
-  FileType: FileType;
-}
-
-export interface TaskAttachmentUpdateInput {
-  ItemId: string;
-  TaskId?: string;
-  IsDeleted?: boolean;
-  Tags?: string[];
-  Language?: string;
-  OrganizationIds?: string[];
-  CreatedBy?: string;
-  CreatedDate?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
-  FileName: string;
-  FileSize: string;
-  FileType: FileType;
 }

@@ -3,15 +3,10 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MessageSquare, Paperclip } from 'lucide-react';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
-import type { TaskAttachments } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { AssigneeAvatars } from './assignee-avatars';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import {
-  useDeleteTaskItem,
-  useGetTaskComments,
-  useGetTaskAttachments,
-} from '../../hooks/use-task-manager';
+import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 
@@ -84,18 +79,8 @@ export function SortableTaskItem({
 
   const commentsCount = taskComments.length;
 
-  const { data: attachmentsData } = useGetTaskAttachments({
-    pageNo: 1,
-    pageSize: 100,
-  });
-
-  const taskAttachments = useMemo(() => {
-    if (!attachmentsData?.TaskAttachments?.items) return [];
-    return attachmentsData.TaskAttachments.items.filter(
-      (attachment: TaskAttachments) => attachment.TaskId === task.ItemId
-    );
-  }, [attachmentsData, task.ItemId]);
-
+  // Use attachments directly from the task item
+  const taskAttachments = task.AttachmentField ?? [];
   const attachmentsCount = taskAttachments.length;
   const assignees = (() => {
     if (!task?.Assignee) return [];

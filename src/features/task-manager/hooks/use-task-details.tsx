@@ -102,6 +102,9 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
               ? foundTask.Assignee
               : currentTask?.Assignee || [],
           ItemTag: mapToItemTags(foundTask.ItemTag),
+          AttachmentField: Array.isArray(foundTask.AttachmentField)
+            ? foundTask.AttachmentField
+            : [],
           CreatedBy: foundTask.CreatedBy ?? '',
           CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
           IsDeleted: foundTask.IsDeleted ?? false,
@@ -171,6 +174,18 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
     }
   };
 
+  // Helper function to handle attachment updates
+  const handleAttachmentUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    if ('AttachmentField' in updates) {
+      sanitizedUpdates.AttachmentField = Array.isArray(updates.AttachmentField)
+        ? updates.AttachmentField
+        : [];
+    }
+  };
+
   const updateTaskDetails = useCallback(
     async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
       if (!taskId || !currentTask) return;
@@ -183,6 +198,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         handleBasicFieldUpdates(updates, sanitizedUpdates);
         handleTagUpdates(updates, sanitizedUpdates);
         handleAssigneeUpdates(updates, sanitizedUpdates);
+        handleAttachmentUpdates(updates, sanitizedUpdates);
 
         const updatedTask = { ...currentTask, ...updates };
         setCurrentTask(updatedTask as TaskItem);
@@ -192,7 +208,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
           input: sanitizedUpdates,
         });
         toast({
-          variant: 'default',
+          variant: 'success',
           title: t('SUCCESS'),
           description: t('Task updated successfully'),
         });

@@ -12,7 +12,6 @@ import {
   useGetTaskComments,
   useUpdateTaskComment,
   useDeleteTaskComment,
-  useGetTaskAttachments,
 } from '../../hooks/use-task-manager';
 import {
   Assignee,
@@ -21,6 +20,7 @@ import {
   TaskTagInsertInput,
   TaskCommentInsertInput,
   TaskPriority,
+  TaskAttachments,
   priorityStyle,
 } from '../../types/task-manager.types';
 import { Calendar } from 'components/ui/calendar';
@@ -141,23 +141,57 @@ export default function TaskDetailsView({
   const [title, setTitle] = useState<string>(task?.Title ?? '');
   const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted ?? false);
   const [section, setSection] = useState<string>(task?.Section ?? '');
-  // Fetch attachments
-  const {
-    data: attachmentsData,
-    isLoading: isLoadingAttachments,
-    refetch: refetchAttachments,
-  } = useGetTaskAttachments({
-    pageNo: 1,
-    pageSize: 100,
-  });
 
-  // Filter attachments for the current task
-  const attachments = useMemo(() => {
-    if (!attachmentsData?.TaskAttachments?.items) return [];
-    return attachmentsData.TaskAttachments.items.filter(
-      (attachment) => attachment.TaskId === currentTaskId
-    );
-  }, [attachmentsData, currentTaskId]);
+  // Use attachments directly from the task item
+  const [attachments, setAttachments] = useState<TaskAttachments[]>(task?.AttachmentField ?? []);
+  const isLoadingAttachments = false; // No loading state needed since we're using local data
+
+  // Update local state when task changes
+  useEffect(() => {
+    if (task) {
+      // Update title, description, etc. from task
+      setTitle(task.Title ?? '');
+      setDescription(task.Description ?? '');
+      setPriority(task.Priority || TaskPriority.MEDIUM);
+      setSection(task.Section || '');
+      setIsMarkComplete(task.IsCompleted ?? false);
+      
+      // Update attachments if they exist
+      if (task.AttachmentField) {
+        setAttachments(task.AttachmentField);
+      } else {
+        setAttachments([]);
+      }
+      
+      // Update selected tags if they exist
+      if (task.ItemTag) {
+        setSelectedTags(task.ItemTag);
+      }
+      
+      // Update selected assignees if they exist
+      if (task.Assignee) {
+        setSelectedAssignees(task.Assignee);
+      }
+      
+      // Update due date if it exists
+      if (task.DueDate) {
+        setDate(new Date(task.DueDate));
+      }
+    }
+  }, [task]);
+
+  // Handle attachment changes and update both local state and backend
+  const handleAttachmentsChange = useCallback(
+    async (newAttachments: TaskAttachments[]) => {
+      setAttachments(newAttachments);
+      if (currentTaskId) {
+        await updateTaskDetails({
+          AttachmentField: newAttachments,
+        });
+      }
+    },
+    [currentTaskId, updateTaskDetails]
+  );
   const [priority, setPriority] = useState<TaskPriority>(
     task?.Priority && Object.values(TaskPriority).includes(task.Priority)
       ? task.Priority
@@ -514,11 +548,12 @@ export default function TaskDetailsView({
       Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
       Description: description ?? '',
       ItemTag: selectedTags,
+      AttachmentField: attachments.length > 0 ? attachments : undefined,
       CreatedDate: now,
       LastUpdatedDate: now,
-      CreatedBy: userProfile?.fullName || 'System',
-      LastUpdatedBy: userProfile?.fullName || 'System',
-      Language: 'en',
+      CreatedBy: userProfile?.fullName || '',
+      LastUpdatedBy: userProfile?.fullName || '',
+      Language: '',
       OrganizationIds: [],
     };
   }, [
@@ -530,6 +565,7 @@ export default function TaskDetailsView({
     selectedAssignees,
     description,
     selectedTags,
+    attachments,
     userProfile,
   ]);
 
@@ -932,7 +968,7 @@ export default function TaskDetailsView({
             taskId={taskId}
             taskItemId={task?.ItemId}
             attachments={attachments}
-            onAttachmentsChange={refetchAttachments}
+            onAttachmentsChange={handleAttachmentsChange}
             isLoading={isLoadingAttachments}
           />
         </div>

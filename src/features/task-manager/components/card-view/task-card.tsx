@@ -7,11 +7,7 @@ import { Card } from 'components/ui/card';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
-import {
-  useDeleteTaskItem,
-  useGetTaskComments,
-  useGetTaskAttachments,
-} from '../../hooks/use-task-manager';
+import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
@@ -70,12 +66,6 @@ export function TaskCard({
     pageSize: 100,
   });
 
-  const { data: attachmentsData } = useGetTaskAttachments({
-    pageNo: 1,
-    pageSize: 100,
-    // The API will handle filtering by TaskId on the server side
-  });
-
   const taskComments = useMemo(() => {
     if (!commentsData?.TaskManagerComments?.items) return [];
     return commentsData.TaskManagerComments.items.filter(
@@ -83,12 +73,7 @@ export function TaskCard({
     );
   }, [commentsData, task.ItemId]);
 
-  const taskAttachments = useMemo(() => {
-    if (!attachmentsData?.TaskAttachments?.items) return [];
-    return attachmentsData.TaskAttachments.items.filter(
-      (attachment) => attachment.TaskId === task.ItemId
-    );
-  }, [attachmentsData, task.ItemId]);
+  const taskAttachments = task.AttachmentField ?? [];
 
   useEffect(() => {
     setTask(initialTask);
