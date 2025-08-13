@@ -503,8 +503,9 @@ export default function TaskDetailsView({
     }
   };
 
-  const createNewTask = useCallback(
-    (): NewTaskInput => ({
+  const createNewTask = useCallback((): NewTaskInput => {
+    const now = new Date().toISOString();
+    return {
       Section: section,
       IsCompleted: isMarkComplete,
       Title: title,
@@ -513,9 +514,24 @@ export default function TaskDetailsView({
       Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
       Description: description ?? '',
       ItemTag: selectedTags,
-    }),
-    [section, isMarkComplete, title, priority, date, selectedAssignees, description, selectedTags]
-  );
+      CreatedDate: now,
+      LastUpdatedDate: now,
+      CreatedBy: userProfile?.fullName || 'System',
+      LastUpdatedBy: userProfile?.fullName || 'System',
+      Language: 'en',
+      OrganizationIds: [],
+    };
+  }, [
+    section,
+    isMarkComplete,
+    title,
+    priority,
+    date,
+    selectedAssignees,
+    description,
+    selectedTags,
+    userProfile,
+  ]);
 
   const createNewTags = useCallback(
     async (tagsToCreate: Array<string | ItemTag>) => {
@@ -614,13 +630,18 @@ export default function TaskDetailsView({
 
   const handleAssigneeChange = useCallback(
     async (newAssignees: Assignee[]) => {
+      // If we're in new task mode, just update the local state
+      if (isNewTaskModalOpen && !currentTaskId) {
+        setSelectedAssignees(newAssignees);
+        return;
+      }
+
       if (!currentTaskId) return;
 
       try {
         await updateTaskDetails({
           Assignee: newAssignees,
         });
-
         setSelectedAssignees(newAssignees);
       } catch (error) {
         console.error('Failed to update assignees:', error);
@@ -632,18 +653,23 @@ export default function TaskDetailsView({
         throw error;
       }
     },
-    [currentTaskId, updateTaskDetails, t, toast]
+    [currentTaskId, updateTaskDetails, t, toast, isNewTaskModalOpen]
   );
 
   const handleTagChange = useCallback(
     async (newTags: ItemTag[]) => {
+      // If we're in new task mode, just update the local state
+      if (isNewTaskModalOpen && !currentTaskId) {
+        setSelectedTags(newTags);
+        return;
+      }
+
       if (!currentTaskId) return;
 
       const previousTags = [...selectedTags];
 
       try {
         setSelectedTags(newTags);
-
         await updateTaskDetails({
           ItemTag: newTags,
         });
@@ -657,7 +683,7 @@ export default function TaskDetailsView({
         });
       }
     },
-    [currentTaskId, selectedTags, updateTaskDetails, t, toast]
+    [currentTaskId, selectedTags, updateTaskDetails, t, toast, isNewTaskModalOpen]
   );
 
   const handleDeleteTask = async (): Promise<boolean> => {
@@ -903,7 +929,8 @@ export default function TaskDetailsView({
         </div>
         <div className="mt-6">
           <AttachmentsSection
-            taskId={taskId || task?.ItemId}
+            taskId={taskId}
+            taskItemId={task?.ItemId}
             attachments={attachments}
             onAttachmentsChange={refetchAttachments}
             isLoading={isLoadingAttachments}

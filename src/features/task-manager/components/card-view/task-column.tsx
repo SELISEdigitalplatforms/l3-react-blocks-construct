@@ -178,7 +178,6 @@ export function TaskColumn({
           onDelete={onDeleteColumn}
         />
       </div>
-
       <div
         ref={setNodeRef}
         className={`bg-neutral-25 p-3 border shadow-sm rounded-lg flex flex-col ${
@@ -273,7 +272,7 @@ export function TaskColumn({
           )}
         </div>
       </div>
-
+      here i
       <Dialog open={isTaskDetailsModalOpen} onOpenChange={setIsTaskDetailsModalOpen}>
         {isTaskDetailsModalOpen && (
           <TaskDetailsView

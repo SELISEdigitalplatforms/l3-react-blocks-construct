@@ -1,6 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
+import {
+  TaskAttachments,
+  FileType,
+  TaskAttachmentInsertInput,
+} from '../../types/task-manager.types';
 import { Button } from 'components/ui/button';
 import {
   Plus,
@@ -24,12 +29,13 @@ import {
 import { Label } from 'components/ui/label';
 import { Input } from 'components/ui/input';
 import { useToast } from 'hooks/use-toast';
-import {
-  TaskAttachments,
-  FileType,
-  TaskAttachmentInsertInput,
-} from '../../types/task-manager.types';
 import { useCreateTaskAttachment, useDeleteTaskAttachment } from '../../hooks/use-task-manager';
+
+const getFileType = (file: File): FileType => {
+  if (file.type.includes('pdf')) return 'pdf';
+  if (file.type.includes('image')) return 'image';
+  return 'other';
+};
 
 /**
  * AttachmentsSection Component
@@ -48,6 +54,8 @@ import { useCreateTaskAttachment, useDeleteTaskAttachment } from '../../hooks/us
  * - Supports showing more or fewer attachments with a toggle button
  *
  * Props:
+ * @param {string} taskId - The ID of the task
+ * @param {string} taskItemId - The ID of the task item
  * @param {Attachment[]} attachments - The list of current attachments
  * @param {React.Dispatch<React.SetStateAction<Attachment[]>>} setAttachments - Callback to update the attachments list
  *
@@ -56,30 +64,50 @@ import { useCreateTaskAttachment, useDeleteTaskAttachment } from '../../hooks/us
  * @example
  * // Basic usage
  * <AttachmentsSection
- *   attachments={taskAttachments}
- *   setAttachments={setTaskAttachments}
+ *   taskId={taskId}
+ *   taskItemId={task?.ItemId} // Pass the task's ItemId explicitly
+ *   attachments={attachments}
+ *   onAttachmentsChange={refetchAttachments}
+ *   isLoading={isLoadingAttachments}
  * />
  */
 
 interface AttachmentsSectionProps {
   taskId?: string;
+  taskItemId?: string; // Add taskItemId prop to ensure we have the correct ID
   attachments: TaskAttachments[];
   onAttachmentsChange: () => void;
   isLoading?: boolean;
 }
 
+const getCurrentUser = () => {
+  if (typeof window === 'undefined') return null;
+  const profile = localStorage.getItem('userProfile');
+  return profile ? JSON.parse(profile) : null;
+};
+
 export function AttachmentsSection({
   taskId,
+  taskItemId,
   attachments = [],
   onAttachmentsChange,
   isLoading = false,
 }: Readonly<AttachmentsSectionProps>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [pendingTaskId] = useState(() => uuidv4()); // Generate a unique ID for the pending task
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [userProfile, setUserProfile] = useState(getCurrentUser());
   const { mutate: createAttachment } = useCreateTaskAttachment();
   const { mutate: deleteAttachment } = useDeleteTaskAttachment();
+
+  // Use the provided taskItemId if available, otherwise fall back to taskId or pendingTaskId
+  const effectiveTaskId = taskItemId || taskId || pendingTaskId;
+
+  useEffect(() => {
+    setUserProfile(getCurrentUser());
+  }, []);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -89,28 +117,27 @@ export function AttachmentsSection({
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const getFileType = (file: File): FileType => {
-    if (file.type.includes('pdf')) return 'pdf';
-    if (file.type.includes('image')) return 'image';
-    return 'other';
-  };
-
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      if (!taskId) return;
-
       const uploadPromises = acceptedFiles.map((file) => {
-        const fileId = uuidv4();
         const fileSize = formatFileSize(file.size);
         const fileType = getFileType(file);
 
         const attachmentInput: TaskAttachmentInsertInput = {
-          ItemId: fileId,
-          TaskId: taskId,
+          ItemId: effectiveTaskId, // Use the same ID as TaskId
+          TaskId: effectiveTaskId,
           FileName: file.name,
           FileSize: fileSize,
           FileType: fileType,
+          CreatedBy: userProfile?.fullName || 'System',
           CreatedDate: new Date().toISOString(),
+          LastUpdatedBy: userProfile?.fullName || 'System',
+          LastUpdatedDate: new Date().toISOString(),
+          // For pending tasks, we'll mark them as not deleted
+          IsDeleted: false,
+          // Add any other required fields
+          Language: 'en',
+          OrganizationIds: [],
         };
 
         return new Promise<void>((resolve, reject) => {
@@ -140,6 +167,7 @@ export function AttachmentsSection({
           });
         });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [taskId, t, toast, createAttachment, onAttachmentsChange]
   );
 
@@ -153,7 +181,9 @@ export function AttachmentsSection({
     },
     maxSize: 25 * 1024 * 1024, // 25MB
     multiple: true,
-    disabled: !taskId || isLoading,
+    disabled: isLoading,
+    noClick: !effectiveTaskId, // Prevent clicking if we don't have a task ID
+    noKeyboard: !effectiveTaskId, // Prevent keyboard interaction if we don't have a task ID
   });
 
   const handleDeleteAttachment = (id: string) => {

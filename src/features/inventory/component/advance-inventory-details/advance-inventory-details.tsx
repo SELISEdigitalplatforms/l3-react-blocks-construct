@@ -30,9 +30,9 @@ import {
   useDeleteInventoryItem,
 } from 'features/inventory/hooks/use-inventory';
 import { Skeleton } from 'components/ui/skeleton';
-import { useGetPreSignedUrlForUpload } from 'features/inventory/hooks/use-storage';
+import { useGetPreSignedUrlForUpload } from 'lib/api/hooks/use-storage';
 import API_CONFIG from 'config/api';
-import type { GetPreSignedUrlForUploadResponse } from '../../services/storage.service';
+import type { GetPreSignedUrlForUploadResponse } from 'lib/api/services/storage.service';
 import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
 
 /**
