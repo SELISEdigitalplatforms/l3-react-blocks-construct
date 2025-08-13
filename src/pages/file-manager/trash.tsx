@@ -42,7 +42,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
 
   const queryParams = {
     filter: {
-      name: filters.name || searchQuery,
+      name: filters.name ?? searchQuery,
       fileType: filters.fileType,
       deletedDate: filters.trashedDate
         ? {
@@ -119,7 +119,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     setFilters(newFilters);
     setSearchQuery(newFilters.name ?? '');
 
-    const hasActiveFilters = newFilters.fileType || newFilters.deletedBy || newFilters.trashedDate;
+    const hasActiveFilters = newFilters.fileType ?? newFilters.deletedBy ?? newFilters.trashedDate;
     if (hasActiveFilters) {
       setShowEmptyView(false);
     }
@@ -157,8 +157,8 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     currentFolderId: folderId,
     onNavigateToFolder: handleNavigateToFolder,
     onNavigateBack: handleNavigateBack,
-    data: data?.data || [],
-    totalCount: data?.totalCount || 0,
+    data: data?.data ?? [],
+    totalCount: data?.totalCount ?? 0,
     isLoading,
     error,
   };

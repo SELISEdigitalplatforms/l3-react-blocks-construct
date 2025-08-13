@@ -183,7 +183,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return {
       pageIndex: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
-      totalCount: data?.totalCount || 0,
+      totalCount: data?.totalCount ?? 0,
       manualPagination: true,
     };
   }, [data?.totalCount, paginationState]);

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from 'components/ui/button';
-import { Skeleton } from 'components/ui/skeleton';
+import { SkeletonGrid } from './file-manager-grid-view-skeleton';
 
 interface BaseFile {
   id: string;
@@ -39,7 +39,6 @@ interface BaseGridViewProps<T extends BaseFile> {
   processFiles?: (files: T[]) => T[];
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
-  onNavigateBack?: () => void;
 }
 
 interface BaseCardProps<T extends BaseFile> {
@@ -155,6 +154,18 @@ export const CommonGridView = <T extends BaseFile>({
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<T | null>(null);
 
+  const getEmptyStateMessage = () => {
+    if (hasActiveFilters) {
+      return 'No files match the current criteria';
+    }
+
+    if (currentFolderId) {
+      return 'This folder is empty';
+    }
+
+    return emptyStateConfig.description;
+  };
+
   const handleViewDetails = useCallback(
     (file: T) => {
       if (file.fileType === 'Folder' && onNavigateToFolder) {
@@ -196,63 +207,6 @@ export const CommonGridView = <T extends BaseFile>({
       value !== null &&
       value !== '' &&
       (Array.isArray(value) ? value.length > 0 : true)
-  );
-
-  const FolderSkeletonCard = () => (
-    <div className="group relative bg-background rounded-lg border border-border p-3">
-      <div className="flex items-center space-x-3">
-        <Skeleton className="w-8 h-8 rounded-lg" />
-        <div className="flex items-center justify-between flex-1">
-          <div className="flex-1 min-w-0">
-            <Skeleton className="h-4 w-24" />
-          </div>
-          <Skeleton className="h-6 w-6 rounded" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const FileSkeletonCard = () => (
-    <div className="group relative bg-background rounded-lg border border-border p-6">
-      <div className="flex flex-col items-center text-center space-y-4">
-        <Skeleton className="w-20 h-20 rounded-lg" />
-        <div className="flex items-center justify-between space-x-2 mt-2 w-full">
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            <Skeleton className="w-8 h-8 rounded-lg" />
-            <div className="flex-1 min-w-0">
-              <Skeleton className="h-4 w-20" />
-            </div>
-          </div>
-          <Skeleton className="h-6 w-6 rounded" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const SkeletonGrid = ({
-    count = 6,
-    title,
-    type = 'file',
-  }: {
-    count?: number;
-    title: string;
-    type?: 'file' | 'folder';
-  }) => (
-    <div>
-      <div className="flex items-center space-x-2 mb-4 py-2">
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-8" />
-      </div>
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-        {Array.from({ length: count }).map((_, index) =>
-          type === 'folder' ? (
-            <FolderSkeletonCard key={`${title}-folder-skeleton-${index}`} />
-          ) : (
-            <FileSkeletonCard key={`${title}-file-skeleton-${index}`} />
-          )
-        )}
-      </div>
-    </div>
   );
 
   if (error) {
@@ -342,13 +296,7 @@ export const CommonGridView = <T extends BaseFile>({
                 <h3 className="text-lg font-medium text-high-emphasis mb-2">
                   {emptyStateConfig.title}
                 </h3>
-                <p className="text-medium-emphasis max-w-sm">
-                  {hasActiveFilters
-                    ? 'No files match the current criteria'
-                    : currentFolderId
-                      ? 'This folder is empty'
-                      : emptyStateConfig.description}
-                </p>
+                <p className="text-medium-emphasis max-w-sm">{getEmptyStateMessage()}</p>
               </div>
             )}
 

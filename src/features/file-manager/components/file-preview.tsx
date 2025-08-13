@@ -14,11 +14,11 @@ import {
   Music,
 } from 'lucide-react';
 import { IFileTrashData } from '../utils/file-manager';
+import { v4 as uuidv4 } from 'uuid';
 
 interface PreviewProps {
   file: IFileTrashData;
   onClose: () => void;
-  t: (key: string) => string;
 }
 
 // Image Preview Component
@@ -38,23 +38,24 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 
   const getPlaceholderImages = (fileName: string) => {
     const cleanName = fileName.split('.')[0];
+    const svgString = [
+      '<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">',
+      '  <rect width="100%" height="100%" fill="#e3f2fd"/>',
+      '  <circle cx="400" cy="200" r="80" fill="#1976d2" opacity="0.3"/>',
+      '  <circle cx="300" cy="350" r="60" fill="#42a5f5" opacity="0.4"/>',
+      '  <circle cx="500" cy="380" r="70" fill="#90caf9" opacity="0.3"/>',
+      '  <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="24" fill="#1976d2" text-anchor="middle" dy=".3em">',
+      '    IMAGE PREVIEW',
+      '  </text>',
+      '  <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="20" fill="#1976d2" text-anchor="middle" dy=".3em">',
+      `    ${cleanName}`,
+      '  </text>',
+      '</svg>',
+    ].join('\n');
     return [
       `https://source.unsplash.com/800x600/?nature,abstract&sig=${cleanName}`,
       `https://dummyimage.com/800x600/4a90e2/ffffff&text=${encodeURIComponent(cleanName)}`,
-      `data:image/svg+xml;base64,${btoa(`
-        <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-          <rect width="100%" height="100%" fill="#e3f2fd"/>
-          <circle cx="400" cy="200" r="80" fill="#1976d2" opacity="0.3"/>
-          <circle cx="300" cy="350" r="60" fill="#42a5f5" opacity="0.4"/>
-          <circle cx="500" cy="380" r="70" fill="#90caf9" opacity="0.3"/>
-          <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="24" fill="#1976d2" text-anchor="middle" dy=".3em">
-            IMAGE PREVIEW
-          </text>
-          <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="20" fill="#1976d2" text-anchor="middle" dy=".3em">
-            ${cleanName}
-          </text>
-        </svg>
-      `)}`,
+      `data:image/svg+xml;base64,${btoa(svgString)}`,
     ];
   };
 
@@ -225,7 +226,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           <div className="flex items-end space-x-1">
             {Array.from({ length: 20 }).map((_, i) => (
               <div
-                key={i}
+                key={uuidv4()}
                 className={`bg-white rounded-full transition-all duration-300 ${
                   isPlaying ? 'animate-pulse' : ''
                 }`}
@@ -371,15 +372,14 @@ interface FilePreviewProps {
   file: IFileTrashData | null;
   isOpen: boolean;
   onClose: () => void;
-  t: (key: string) => string;
 }
 
-export const FilePreview: React.FC<FilePreviewProps> = ({ file, isOpen, onClose, t }) => {
+export const FilePreview: React.FC<FilePreviewProps> = ({ file, isOpen, onClose }) => {
   if (!isOpen || !file || file.fileType === 'Folder') {
     return null;
   }
 
-  const commonProps = { file, onClose, t };
+  const commonProps = { file, onClose };
 
   switch (file.fileType) {
     case 'Image':
