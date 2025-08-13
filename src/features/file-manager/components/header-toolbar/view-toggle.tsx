@@ -14,7 +14,7 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
   className = '',
 }) => (
   <Tabs value={viewMode} onValueChange={onViewModeChange}>
-    <TabsList className={`border rounded-lg flex ${className}`}>
+    <TabsList className={`border rounded-lg flex bg-background ${className}`}>
       <TabsTrigger value="list" className="px-2">
         <AlignJustify className="h-3 w-3" />
       </TabsTrigger>

@@ -16,7 +16,15 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
 
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    try {
+      const saved = sessionStorage.getItem('trash-view-mode');
+      return (saved as 'grid' | 'list') || 'list';
+    } catch {
+      return 'list';
+    }
+  });
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [filters, setFilters] = useState<TrashFilters>({
@@ -58,7 +66,14 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   }, [onClearTrash]);
 
   const handleViewModeChange = useCallback((mode: string) => {
-    setViewMode(mode as 'grid' | 'list');
+    const newViewMode = mode as 'grid' | 'list';
+    setViewMode(newViewMode);
+
+    try {
+      sessionStorage.setItem('trash-view-mode', newViewMode);
+    } catch (error) {
+      console.warn('Failed to save view mode to sessionStorage:', error);
+    }
   }, []);
 
   const handleSearchChange = useCallback((query: string) => {
