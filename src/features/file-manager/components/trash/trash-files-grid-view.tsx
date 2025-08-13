@@ -14,6 +14,7 @@ import { TrashDetailsSheet } from './trash-files-details';
 import { CommonGridView } from '../common-grid-view';
 import { Trash2 } from 'lucide-react';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-trash-files-query';
+import { FilePreview } from '../file-preview';
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;
@@ -36,6 +37,10 @@ interface TrashGridViewProps {
 export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -154,11 +159,27 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
       if (file.fileType === 'Folder' && props.onNavigateToFolder) {
         props.onNavigateToFolder(file.id);
       } else {
-        props.onViewDetails?.(file);
+        setSelectedFile(file);
+        setIsPreviewOpen(true);
       }
     },
     [props]
   );
+
+  const handleOpenDetails = useCallback((file: IFileTrashData) => {
+    setSelectedFile(file);
+    setIsDetailsOpen(true);
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFile(null);
+  }, []);
+
+  const handleCloseDetails = useCallback(() => {
+    setIsDetailsOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   const renderActions = useCallback(
     (file: IFileTrashData) => {
@@ -197,30 +218,11 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
           row={mockRow}
           onRestore={handleRestore}
           onDelete={handlePermanentDelete}
+          onViewDetails={handleOpenDetails}
         />
       );
     },
-    [props]
-  );
-
-  const renderDetailsSheet = useCallback(
-    (file: IFileTrashData | null, isOpen: boolean, onClose: () => void) => (
-      <TrashDetailsSheet
-        isOpen={isOpen}
-        onClose={onClose}
-        file={
-          file
-            ? {
-                ...file,
-                lastModified: file.trashedDate ?? new Date(file.trashedDate ?? Date.now()),
-                isShared: file.isShared ?? false,
-              }
-            : null
-        }
-        t={t}
-      />
-    ),
-    [t]
+    [props, handleOpenDetails]
   );
 
   const getEmptyStateMessage = () => {
@@ -235,38 +237,68 @@ export const TrashGridView: React.FC<TrashGridViewProps> = (props) => {
     return t('NO_DELETED_FILES');
   };
 
+  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
+
   return (
-    <CommonGridView
-      onViewDetails={handleViewDetails}
-      filters={props.filters}
-      data={data ?? undefined}
-      isLoading={isLoading}
-      error={error}
-      onLoadMore={handleLoadMore}
-      renderDetailsSheet={renderDetailsSheet}
-      getFileTypeIcon={getFileTypeIcon}
-      getFileTypeInfo={getFileTypeInfo}
-      renderActions={renderActions}
-      emptyStateConfig={{
-        icon: Trash2,
-        title: t('TRASH_EMPTY'),
-        description:
-          props.filters.name ??
-          props.filters.fileType ??
-          props.filters.deletedBy ??
-          getEmptyStateMessage(),
-      }}
-      sectionLabels={{
-        folder: t('FOLDER'),
-        file: t('FILE'),
-      }}
-      errorMessage={t('ERROR_LOADING_FILES')}
-      loadingMessage={t('LOADING')}
-      loadMoreLabel={t('LOAD_MORE')}
-      processFiles={processFiles}
-      filterFiles={filterFiles}
-      currentFolderId={props.currentFolderId}
-      onNavigateToFolder={props.onNavigateToFolder}
-    />
+    <div className="flex h-full w-full rounded-xl relative">
+      {!shouldHideMainContent && (
+        <div
+          className={`flex flex-col h-full transition-all duration-300 ${
+            isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
+          }`}
+        >
+          <CommonGridView
+            onViewDetails={handleViewDetails}
+            filters={props.filters}
+            data={data ?? undefined}
+            isLoading={isLoading}
+            error={error}
+            onLoadMore={handleLoadMore}
+            renderDetailsSheet={() => null}
+            getFileTypeIcon={getFileTypeIcon}
+            getFileTypeInfo={getFileTypeInfo}
+            renderActions={renderActions}
+            emptyStateConfig={{
+              icon: Trash2,
+              title: t('TRASH_EMPTY'),
+              description:
+                props.filters.name ??
+                props.filters.fileType ??
+                props.filters.deletedBy ??
+                getEmptyStateMessage(),
+            }}
+            sectionLabels={{
+              folder: t('FOLDER'),
+              file: t('FILE'),
+            }}
+            errorMessage={t('ERROR_LOADING_FILES')}
+            loadingMessage={t('LOADING')}
+            loadMoreLabel={t('LOAD_MORE')}
+            processFiles={processFiles}
+            filterFiles={filterFiles}
+            currentFolderId={props.currentFolderId}
+            onNavigateToFolder={props.onNavigateToFolder}
+          />
+        </div>
+      )}
+
+      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
+
+      <TrashDetailsSheet
+        isOpen={isDetailsOpen}
+        onClose={handleCloseDetails}
+        file={
+          selectedFile
+            ? {
+                ...selectedFile,
+                lastModified:
+                  selectedFile.trashedDate ?? new Date(selectedFile.trashedDate ?? Date.now()),
+                isShared: selectedFile.isShared ?? false,
+              }
+            : null
+        }
+        t={t}
+      />
+    </div>
   );
 };
