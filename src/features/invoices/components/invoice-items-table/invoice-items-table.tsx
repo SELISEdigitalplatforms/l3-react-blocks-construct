@@ -186,13 +186,12 @@ export function InvoiceItemsTable({
         </TableBody>
       </Table>
       <div className="flex flex-col gap-6 border-t border-border border-dashed py-4">
-        <div className="flex w-full justify-between">
-          <div className="flex flex-col gap-6 w-[40%]">
+        <div className="flex w-full justify-between flex-col md:flex-row gap-4 md:gap-0">
+          <div className="flex flex-col gap-6 w-full md:w-[40%]">
             <Button type="button" variant="outline" className="w-[120px]" onClick={onAddItem}>
               <Plus className="h-4 w-4 mr-2 text-primary" />
               <span className="text-primary hover:text-primary">{t('ADD_ITEM')}</span>
             </Button>
-
             <FormField
               control={control}
               name="generalNote"
@@ -209,7 +208,7 @@ export function InvoiceItemsTable({
               )}
             />
           </div>
-          <div className="flex flex-col gap-4 w-[40%]">
+          <div className="flex flex-col gap-4 w-full md:w-[40%]">
             <div className="flex justify-between">
               <span className="text-sm">{t('SUBTOTAL')}</span>
               <span className="text-sm font-medium">

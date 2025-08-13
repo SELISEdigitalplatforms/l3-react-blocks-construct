@@ -37,13 +37,23 @@ export function FormActionButtons({ setShowPreview, setAction }: Readonly<FormAc
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-4">
-      <Button type="button" variant="outline" onClick={() => setShowPreview(true)}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => setShowPreview(true)}
+        className="text-xs md:text-sm"
+      >
         {t('PREVIEW')}
       </Button>
-      <Button type="submit" variant="outline" onClick={() => setAction('draft')}>
+      <Button
+        type="submit"
+        variant="outline"
+        onClick={() => setAction('draft')}
+        className="text-xs md:text-sm"
+      >
         {t('SAVE_AS_DRAFT')}
       </Button>
-      <Button type="submit" onClick={() => setAction('send')}>
+      <Button type="submit" onClick={() => setAction('send')} className="text-xs md:text-sm">
         {t('SAVE_AND_SEND')}
       </Button>
     </div>
@@ -156,12 +166,7 @@ export function FormTextInput({
   return (
     <FormWrapperField control={control} name={name} labelKey={labelKey}>
       {(field) => (
-        <Input 
-          placeholder={`${t(placeholderKey)}...`} 
-          type={type} 
-          {...field} 
-          {...rest}
-        />
+        <Input placeholder={`${t(placeholderKey)}...`} type={type} {...field} {...rest} />
       )}
     </FormWrapperField>
   );

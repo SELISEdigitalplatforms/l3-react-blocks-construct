@@ -124,23 +124,23 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />
               <div className="flex items-center gap-2">
                 <Button variant="outline" onClick={handleDownloadPDF}>
-                  <Download className="h-4 w-4 mr-1" />
-                  {t('DOWNLOAD')}
+                  <Download className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('DOWNLOAD')}</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate(`/invoices/edit/${invoice.ItemId}`)}
                 >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  {t('EDIT')}
+                  <Pencil className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('EDIT')}</span>
                 </Button>
                 <Button
                   variant="default"
                   className="bg-primary"
                   onClick={() => setShowSendDialog(true)}
                 >
-                  <Send className="h-4 w-4 mr-1" />
-                  {t('SEND')}
+                  <Send className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('SEND')}</span>
                 </Button>
               </div>
             </div>
