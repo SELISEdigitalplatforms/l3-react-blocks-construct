@@ -47,6 +47,8 @@ import { Info, Users } from 'lucide-react';
 interface ColumnFactoryProps {
   onViewDetails: (file: IFileData) => void;
   onDownload: (file: IFileData) => void;
+  onMove: (file: IFileData) => void;
+  onCopy: (file: IFileData) => void;
 
   onRename: (file: IFileData) => void;
   onShare: (file: IFileData) => void;
@@ -60,6 +62,8 @@ export const createFileTableColumns = ({
   onShare,
   onDelete,
   onRename,
+  onCopy,
+  onMove,
   t,
 }: ColumnFactoryProps): ColumnDef<IFileDataWithSharing, any>[] => [
   {
@@ -203,6 +207,8 @@ export const createFileTableColumns = ({
           onShare={onShare}
           onDelete={onDelete}
           onRename={onRename}
+          onCopy={onCopy}
+          onMove={onMove}
         />
       </button>
     ),

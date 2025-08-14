@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleIcon, GripVertical, Plus, X } from 'lucide-react';
 import { Button } from 'components/ui/button';
@@ -47,7 +47,13 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
   const { t } = useTranslation();
   const { columns } = useCardTasks();
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
-  const [newTaskStatus, setNewTaskStatus] = useState<string | undefined>(undefined);
+  const [newTaskStatus, setNewTaskStatus] = useState<string>('');
+
+  useEffect(() => {
+    if (columns?.length > 0 && !newTaskStatus) {
+      setNewTaskStatus(columns[0].Title);
+    }
+  }, [columns, newTaskStatus]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -81,7 +87,7 @@ export function NewTaskRow({ onAdd, onCancel }: Readonly<NewTaskRowProps>) {
       <div className="w-36 flex-shrink-0">
         <Select value={newTaskStatus} onValueChange={setNewTaskStatus}>
           <SelectTrigger className="h-8 text-sm w-full">
-            <SelectValue placeholder="Select a list" />
+            <SelectValue placeholder={t('SELECT_A_LIST')} />
           </SelectTrigger>
           <SelectContent className="min-w-[130px]">
             <SelectGroup>

@@ -1,12 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useCallback, useState } from 'react';
-// import { MyFileGridViewProps } from '../../types/file-manager.type';
 import { BaseGridView } from '../basic-grid-view';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 import { IFileData } from '../../hooks/use-mock-files-query';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
+import {
+  matchesFileType,
+  matchesModifiedDate,
+  matchesName,
+} from '../../utils/grid-view-filter-files';
 
 interface MyFileGridViewProps {
   onViewDetails?: (file: IFileData) => void;
@@ -60,27 +64,11 @@ const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
 
   const filterFiles = useCallback((files: IFileData[], filters: any): IFileData[] => {
     return files.filter((file) => {
-      if (filters.fileType && filters.fileType.length > 0) {
-        if (!filters.fileType.includes(file.fileType)) return false;
-      }
-
-      if (filters.name && filters.name.trim()) {
-        const searchTerm = filters.name.toLowerCase();
-        if (!file.name.toLowerCase().includes(searchTerm)) return false;
-      }
-
-      if (filters.lastModified?.from || filters.lastModified?.to) {
-        const modifiedDate = new Date(file.lastModified);
-
-        if (filters.lastModified.from && modifiedDate < new Date(filters.lastModified.from)) {
-          return false;
-        }
-        if (filters.lastModified.to && modifiedDate > new Date(filters.lastModified.to)) {
-          return false;
-        }
-      }
-
-      return true;
+      return (
+        matchesFileType(file, filters.fileType) &&
+        matchesName(file, filters.name) &&
+        matchesModifiedDate(file, filters.modifiedDate)
+      );
     });
   }, []);
 

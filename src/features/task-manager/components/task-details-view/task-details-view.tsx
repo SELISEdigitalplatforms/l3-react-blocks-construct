@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   useCreateTags,
   useGetTaskTags,
+  useGetTaskSections,
   useGetUsers,
   useCreateTaskItem,
   useCreateTaskComment,
@@ -309,10 +310,19 @@ export default function TaskDetailsView({
     }
   };
 
+  const { data: sectionsData } = useGetTaskSections({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const defaultSection = useMemo(() => {
+    return sectionsData?.TaskManagerSections?.items?.[0]?.Title ?? '';
+  }, [sectionsData]);
+
   const resetForm = useCallback(() => {
     setTitle('');
     setIsMarkComplete(false);
-    setSection('To Do');
+    setSection(defaultSection);
     setDate(undefined);
     setDescription('');
     setSelectedTags([]);
@@ -327,6 +337,7 @@ export default function TaskDetailsView({
     setSelectedTags,
     setSelectedAssignees,
     setPriority,
+    defaultSection,
   ]);
 
   const setTaskAssignees = useCallback(

@@ -48,7 +48,7 @@ interface TaskSectionWithTasks extends TaskSection {
  * // Basic usage
  * <AddTaskDialog
  *   activeColumn="1"
- *   columns={[{ id: '1', title: 'To Do' }]}
+ *   columns={[{ id: '1', title: 'To do' }]}
  *   onAddTask={(columnId, content) => console.log('Task added:', columnId, content)}
  * />
  */

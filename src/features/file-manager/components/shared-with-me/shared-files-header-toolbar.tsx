@@ -5,23 +5,13 @@ import { BaseHeaderToolbar } from '../header-toolbar/base-header-toolbar';
 
 export const SharedWithMeHeaderToolbar: React.FC<SharedWithMeHeaderToolbarProps> = (props) => {
   const filterConfigs: FilterConfig[] = [
+    fileTypeFilterConfig,
     {
-      key: 'sharedBy',
-      type: 'user',
-      label: 'SHARED_BY',
-      users: props.sharedUsers,
-    },
-    {
-      key: 'sharedDate',
-      type: 'dateRange',
-      label: 'SHARED_DATE',
-    },
-    {
-      key: 'modifiedDate',
+      key: 'lastModified',
       type: 'dateRange',
       label: 'MODIFIED_DATE',
+      showInMobile: true,
     },
-    fileTypeFilterConfig,
   ];
 
   return (
