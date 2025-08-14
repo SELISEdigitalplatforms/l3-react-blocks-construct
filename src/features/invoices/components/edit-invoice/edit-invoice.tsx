@@ -1,46 +1,20 @@
-import { useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
-import { useToast } from 'hooks/use-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-helpers';
 import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
 import { CustomerDetails, InvoiceItemDetails, InvoiceStatus } from '../../types/invoices.types';
-import { useGetInvoiceItems, useUpdateInvoiceItem } from '../../hooks/use-invoices';
+import { useUpdateInvoiceItem } from '../../hooks/use-invoices';
+import { useInvoiceDetails } from '../../hooks/use-invoice-details';
 
 export function EditInvoice() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { invoiceId } = useParams();
-  const { toast } = useToast();
   const { mutate: updateInvoiceItem } = useUpdateInvoiceItem();
-
-  const {
-    data: invoicesData,
-    isLoading,
-    error,
-  } = useGetInvoiceItems({
-    pageNo: 1,
-    pageSize: 100,
-  });
-
-  const invoice = useMemo(() => {
-    if (!invoicesData?.items || !invoiceId) return undefined;
-    return invoicesData.items.find((item) => item.ItemId === invoiceId);
-  }, [invoicesData, invoiceId]);
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: t('ERROR'),
-        description: t('FAILED_TO_LOAD_INVOICE'),
-        variant: 'destructive',
-      });
-    }
-  }, [error, t, toast]);
+  const { invoice, invoiceId, isLoading, toast } = useInvoiceDetails();
 
   if (isLoading) {
     return (
