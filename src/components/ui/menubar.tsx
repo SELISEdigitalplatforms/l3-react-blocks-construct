@@ -12,11 +12,15 @@ function MenubarGroup({ ...props }: Readonly<React.ComponentProps<typeof Menubar
   return <MenubarPrimitive.Group {...props} />;
 }
 
-function MenubarPortal({ ...props }: Readonly<React.ComponentProps<typeof MenubarPrimitive.Portal>>) {
+function MenubarPortal({
+  ...props
+}: Readonly<React.ComponentProps<typeof MenubarPrimitive.Portal>>) {
   return <MenubarPrimitive.Portal {...props} />;
 }
 
-function MenubarRadioGroup({ ...props }: Readonly<React.ComponentProps<typeof MenubarPrimitive.RadioGroup>>) {
+function MenubarRadioGroup({
+  ...props
+}: Readonly<React.ComponentProps<typeof MenubarPrimitive.RadioGroup>>) {
   return <MenubarPrimitive.RadioGroup {...props} />;
 }
 
@@ -30,10 +34,7 @@ const Menubar = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
-    className={cn(
-      'flex h-10 items-center space-x-1 rounded-[6px] border bg-background p-1',
-      className
-    )}
+    className={cn('flex h-10 items-center space-x-1 rounded-[6px] border p-1', className)}
     {...props}
   />
 ));
