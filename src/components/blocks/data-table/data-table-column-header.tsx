@@ -51,11 +51,11 @@ export function DataTableColumnHeader<TData, TValue>({
   const handleSort = () => {
     const currentSort = column.getIsSorted();
     if (currentSort === false) {
-      column.toggleSorting(false); // Set to ascending
+      column.toggleSorting(false);
     } else if (currentSort === 'asc') {
-      column.toggleSorting(true); // Set to descending
+      column.toggleSorting(true);
     } else {
-      column.clearSorting(); // Clear sorting
+      column.clearSorting();
     }
   };
 

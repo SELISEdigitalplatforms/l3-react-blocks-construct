@@ -1,6 +1,5 @@
 import { graphqlClient } from 'lib/graphql-client';
 import {
-  GET_TASK_ATTACHMENTS_QUERY,
   GET_TASK_COMMENTS_QUERY,
   GET_TASK_MANAGER_QUERY,
   GET_TASK_MANAGER_SECTIONS_QUERY,
@@ -25,9 +24,6 @@ import type {
   GetTagsResponse,
   TaskTagInsertInput,
   TaskTagUpdateInput,
-  GetAttachmentsResponse,
-  TaskAttachmentInsertInput,
-  TaskAttachmentUpdateInput,
 } from '../types/task-manager.types';
 import {
   INSERT_TASK_MANAGER_ITEM_MUTATION,
@@ -42,9 +38,6 @@ import {
   INSERT_TASK_COMMENTS_MUTATION,
   UPDATE_TASK_COMMENTS_MUTATION,
   DELETE_TASK_COMMENTS_MUTATION,
-  DELETE_TASK_ATTACHMENT_MUTATION,
-  INSERT_TASK_ATTACHMENT_MUTATION,
-  UPDATE_TASK_ATTACHMENT_MUTATION,
 } from '../graphql/mutations';
 import { clients } from 'lib/https';
 
@@ -435,81 +428,6 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
     console.error('Error fetching task sections:', error);
     return {
       TaskManagerComments: {
-        items: [],
-        totalCount: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-        pageSize,
-        pageNo,
-        totalPages: 0,
-      },
-    };
-  }
-};
-
-/**
- * Fetches task attachments with pagination
- * @param params - Pagination parameters
- * @returns Promise with task attachments data
- */
-export const getTaskAttachments = async (
-  params: PaginationParams
-): Promise<GetAttachmentsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
-
-  try {
-    const response = await graphqlClient.query({
-      query: GET_TASK_ATTACHMENTS_QUERY,
-      variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
-      },
-    });
-
-    const responseData = (response as any)?.data || response;
-    let taskAttachments: GetAttachmentsResponse['TaskAttachments'] | null = null;
-
-    if (responseData && typeof responseData === 'object') {
-      if ('TaskAttachments' in responseData) {
-        taskAttachments = responseData.TaskAttachments;
-      } else if ('items' in responseData || 'totalCount' in responseData) {
-        taskAttachments = responseData as GetAttachmentsResponse['TaskAttachments'];
-      }
-    }
-
-    if (taskAttachments) {
-      return {
-        TaskAttachments: {
-          items: taskAttachments.items || [],
-          totalCount: taskAttachments.totalCount || 0,
-          hasNextPage: taskAttachments.hasNextPage || false,
-          hasPreviousPage: taskAttachments.hasPreviousPage || false,
-          pageSize: taskAttachments.pageSize || pageSize,
-          pageNo: taskAttachments.pageNo || pageNo,
-          totalPages: taskAttachments.totalPages || 1,
-        },
-      };
-    }
-    console.warn('Unexpected response structure, returning default sections');
-    return {
-      TaskAttachments: {
-        items: [],
-        totalCount: 0,
-        hasNextPage: false,
-        hasPreviousPage: false,
-        pageSize,
-        pageNo,
-        totalPages: 0,
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching task sections:', error);
-    return {
-      TaskAttachments: {
         items: [],
         totalCount: 0,
         hasNextPage: false,
@@ -959,91 +877,6 @@ export const deleteTaskComment = async (
     console.error('Error in deleteTaskComment:', error);
     throw error;
   }
-};
-
-export const createTaskAttachment = async (
-  input: TaskAttachmentInsertInput
-): Promise<InsertTaskAttachmentResponse> => {
-  try {
-    const formattedInput = {
-      ...input,
-      ItemTag: getNormalizedTags(input),
-      Tags: undefined,
-    };
-
-    const response = await graphqlClient.mutate<{
-      insertTaskAttachment: { itemId: string };
-    }>({
-      query: INSERT_TASK_ATTACHMENT_MUTATION,
-      variables: { input: formattedInput },
-    });
-
-    const responseData = (response as any).data || response;
-
-    if (!responseData) {
-      throw new Error('No response data received from server');
-    }
-
-    if (!responseData.insertTaskAttachment?.itemId) {
-      throw new Error('No task ID in response');
-    }
-
-    return responseData;
-  } catch (error) {
-    console.error('Error in createTaskItem:', error);
-    throw error;
-  }
-};
-
-/**
- * Updates an existing task item
- * @param itemId - ID of the task to update
- * @param input - Updated task data
- * @returns Promise with update result
- */
-export const updateTaskAttachment = async (
-  itemId: string,
-  input: TaskAttachmentUpdateInput
-): Promise<UpdateTaskAttachmentResponse> => {
-  const cleanInput = Object.fromEntries(
-    Object.entries(input).filter(([, value]) => value !== undefined)
-  );
-
-  try {
-    const response = await graphqlClient.mutate({
-      query: UPDATE_TASK_ATTACHMENT_MUTATION,
-      variables: {
-        filter: JSON.stringify({ _id: itemId }),
-        input: cleanInput,
-      },
-    });
-
-    return (response as any).data as UpdateTaskAttachmentResponse;
-  } catch (error) {
-    console.error('Error updating task attachment:', error);
-    throw error;
-  }
-};
-
-/**
- * Deletes a task attachment
- * @param itemId - ID of the task attachment to delete
- * @param isHardDelete - Whether to perform a hard delete
- * @returns Promise with deletion result
- */
-export const deleteTaskAttachment = async (
-  itemId: string,
-  isHardDelete = false
-): Promise<DeleteTaskAttachmentResponse> => {
-  const response = await graphqlClient.mutate({
-    query: DELETE_TASK_ATTACHMENT_MUTATION,
-    variables: {
-      filter: JSON.stringify({ _id: itemId }),
-      input: { isHardDelete },
-    },
-  });
-
-  return (response as any).data as DeleteTaskAttachmentResponse;
 };
 
 export const getUsers = (payload: GetUsersPayload) => {

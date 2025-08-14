@@ -7,6 +7,7 @@ import { IFileTrashData, PaginationState } from '../../utils/file-manager';
 import { TrashTableColumns } from './trash-files-table-columns';
 import { TrashDetailsSheet } from './trash-files-details';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-trash-files-query';
+import { FilePreview } from '../file-preview';
 
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
@@ -21,6 +22,8 @@ interface TrashFilesListViewProps {
   };
   deletedItemIds?: Set<string>;
   restoredItemIds?: Set<string>;
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
 }
 
 export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
@@ -29,10 +32,13 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
   filters,
   deletedItemIds = new Set(),
   restoredItemIds = new Set(),
+  currentFolderId,
+  onNavigateToFolder,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
@@ -59,6 +65,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
           : undefined,
         deletedDate: filters.trashedDate ?? undefined,
       },
+      folderId: currentFolderId,
     };
   }, [
     paginationState.pageIndex,
@@ -67,6 +74,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     filters.fileType,
     filters.trashedDate,
     allowedFileTypes,
+    currentFolderId,
   ]);
 
   const { data, isLoading, error } = useMockTrashFilesQuery(queryParams);
@@ -96,9 +104,21 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
       ...prev,
       pageIndex: 0,
     }));
-  }, [filters]);
+  }, [filters, currentFolderId]);
 
-  const handleViewDetailsWrapper = useCallback((file: IFileTrashData) => {
+  const handleRowClick = useCallback(
+    (file: IFileTrashData) => {
+      if (file.fileType === 'Folder' && onNavigateToFolder) {
+        onNavigateToFolder(file.id);
+      } else {
+        setSelectedFile(file);
+        setIsPreviewOpen(true);
+      }
+    },
+    [onNavigateToFolder]
+  );
+
+  const handleViewDetails = useCallback((file: IFileTrashData) => {
     setSelectedFile(file);
     setIsDetailsOpen(true);
   }, []);
@@ -119,6 +139,11 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     [onDelete]
   );
 
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFile(null);
+  }, []);
+
   const handleCloseDetails = useCallback(() => {
     setIsDetailsOpen(false);
     setSelectedFile(null);
@@ -128,63 +153,41 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return TrashTableColumns({
       onRestore: handleRestoreWrapper,
       onDelete: handleDeleteWrapper,
+      onViewDetails: handleViewDetails,
       t,
     });
-  }, [handleRestoreWrapper, handleDeleteWrapper, t]);
+  }, [handleRestoreWrapper, handleDeleteWrapper, handleViewDetails, t]);
 
-  // Enhanced display data with client-side date filtering
   const displayData = useMemo(() => {
     if (!data?.data) {
       return [];
     }
 
     return data.data.filter((file: IFileTrashData) => {
-      // Filter out deleted and restored items
       if (deletedItemIds.has(file.id)) {
         return false;
       }
       if (restoredItemIds.has(file.id)) {
         return false;
       }
-
-      // Apply date range filtering
-      if (filters.trashedDate) {
-        const fileDate = new Date(file.trashedDate);
-        const { from, to } = filters.trashedDate;
-
-        if (from && fileDate < from) {
-          return false;
-        }
-        if (to && fileDate > to) {
-          return false;
-        }
-      }
-
       return true;
     });
-  }, [data?.data, deletedItemIds, restoredItemIds, filters.trashedDate]);
+  }, [data?.data, deletedItemIds, restoredItemIds]);
 
   const paginationProps = useMemo(() => {
     return {
       pageIndex: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
-      totalCount: displayData.length, // Use filtered data count for accurate pagination
-      manualPagination: false, // Changed to false since we're doing client-side filtering
+      totalCount: data?.totalCount ?? 0,
+      manualPagination: true,
     };
-  }, [displayData.length, paginationState]);
-
-  // Paginate the filtered data client-side
-  const paginatedData = useMemo(() => {
-    const startIndex = paginationState.pageIndex * paginationState.pageSize;
-    const endIndex = startIndex + paginationState.pageSize;
-    return displayData.slice(startIndex, endIndex);
-  }, [displayData, paginationState.pageIndex, paginationState.pageSize]);
+  }, [data?.totalCount, paginationState]);
 
   if (error) {
     return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && isDetailsOpen;
+  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
@@ -196,9 +199,9 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         >
           <div className="h-full flex-col flex w-full gap-6 md:gap-8">
             <DataTable
-              data={paginatedData}
+              data={displayData}
               columns={columns}
-              onRowClick={handleViewDetailsWrapper}
+              onRowClick={handleRowClick}
               isLoading={isLoading}
               pagination={{
                 pageIndex: paginationProps.pageIndex,
@@ -208,11 +211,13 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
               onPaginationChange={handlePaginationChange}
               manualPagination={paginationProps.manualPagination}
               mobileColumns={['name']}
-              expandable={true}
+              expandable={false}
             />
           </div>
         </div>
       )}
+
+      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
       <TrashDetailsSheet
         isOpen={isDetailsOpen}

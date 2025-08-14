@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileType } from '../utils/file-manager';
+import { FileType, IFileDataWithSharing } from '../utils/file-manager';
 
 export interface IFileData {
   id: string;
@@ -14,7 +14,304 @@ export interface IFileData {
     avatar?: string;
   };
   sharedDate?: Date;
+  parentFolderId?: string;
 }
+
+export const FILE_BREADCRUMB_TITLES = {
+  '/files': 'MY_FILES',
+  '/files/1': 'MEETING_NOTES',
+  '/files/2': 'RESEARCH_DATA',
+  '/files/3': 'CLIENT_DOCUMENTS',
+  '/files/4': 'PROJECT_FILES',
+  '/files/5': 'DESIGN_ASSETS',
+  '/files/11': 'MARKETING_ASSETS',
+};
+
+export const filesFolderContents: Record<string, IFileData[]> = {
+  '1': [
+    {
+      id: '1-1',
+      name: 'Weekly_Standup_Notes.doc',
+      lastModified: new Date('2025-02-01'),
+      fileType: 'File',
+      size: '2.3 MB',
+      isShared: true,
+      parentFolderId: '1',
+      sharedBy: {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      sharedDate: new Date('2025-02-01'),
+    },
+    {
+      id: '1-2',
+      name: 'Sprint_Planning.pdf',
+      lastModified: new Date('2025-01-28'),
+      fileType: 'File',
+      size: '1.8 MB',
+      isShared: true,
+      parentFolderId: '1',
+      sharedBy: {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      sharedDate: new Date('2025-01-28'),
+    },
+    {
+      id: '1-3',
+      name: 'Action_Items.xlsx',
+      lastModified: new Date('2025-01-25'),
+      fileType: 'File',
+      size: '0.9 MB',
+      isShared: false,
+      parentFolderId: '1',
+      sharedBy: {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      sharedDate: new Date('2025-01-25'),
+    },
+  ],
+  '2': [
+    // Research Data folder
+    {
+      id: '2-1',
+      name: 'Survey_Results.csv',
+      lastModified: new Date('2025-02-02'),
+      fileType: 'File',
+      size: '5.4 MB',
+      isShared: true,
+      parentFolderId: '2',
+      sharedBy: {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      sharedDate: new Date('2025-02-02'),
+    },
+    {
+      id: '2-2',
+      name: 'Analysis_Report.pdf',
+      lastModified: new Date('2025-01-30'),
+      fileType: 'File',
+      size: '3.2 MB',
+      isShared: true,
+      parentFolderId: '2',
+      sharedBy: {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      sharedDate: new Date('2025-01-30'),
+    },
+    {
+      id: '2-3',
+      name: 'Raw_Data.json',
+      lastModified: new Date('2025-01-27'),
+      fileType: 'File',
+      size: '12.1 MB',
+      isShared: false,
+      parentFolderId: '2',
+      sharedBy: {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+      sharedDate: new Date('2025-01-27'),
+    },
+  ],
+  '3': [
+    {
+      id: '3-1',
+      name: 'Contract_Agreement.pdf',
+      lastModified: new Date('2025-02-01'),
+      fileType: 'File',
+      size: '2.7 MB',
+      isShared: true,
+      parentFolderId: '3',
+      sharedBy: {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      sharedDate: new Date('2025-02-01'),
+    },
+    {
+      id: '3-2',
+      name: 'Client_Proposal.docx',
+      lastModified: new Date('2025-01-29'),
+      fileType: 'File',
+      size: '4.1 MB',
+      isShared: true,
+      parentFolderId: '3',
+      sharedBy: {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      sharedDate: new Date('2025-01-29'),
+    },
+    {
+      id: '3-3',
+      name: 'Requirements_Spec.pdf',
+      lastModified: new Date('2025-01-26'),
+      fileType: 'File',
+      size: '6.3 MB',
+      isShared: true,
+      parentFolderId: '3',
+      sharedBy: {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      sharedDate: new Date('2025-01-26'),
+    },
+  ],
+  '4': [
+    {
+      id: '4-1',
+      name: 'Architecture_Diagram.png',
+      lastModified: new Date('2025-02-01'),
+      fileType: 'Image',
+      size: '3.8 MB',
+      isShared: true,
+      parentFolderId: '4',
+      sharedBy: {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      sharedDate: new Date('2025-02-01'),
+    },
+    {
+      id: '4-2',
+      name: 'Technical_Specs.md',
+      lastModified: new Date('2025-01-31'),
+      fileType: 'File',
+      size: '1.2 MB',
+      isShared: true,
+      parentFolderId: '4',
+      sharedBy: {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+      sharedDate: new Date('2025-01-31'),
+    },
+    {
+      id: '4-3',
+      name: 'Code_Review.pdf',
+      lastModified: new Date('2025-01-28'),
+      fileType: 'File',
+      size: '2.9 MB',
+      isShared: false,
+      parentFolderId: '4',
+      sharedBy: {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      sharedDate: new Date('2025-01-28'),
+    },
+  ],
+  '5': [
+    {
+      id: '5-1',
+      name: 'Logo_Variations.ai',
+      lastModified: new Date('2025-02-02'),
+      fileType: 'File',
+      size: '8.4 MB',
+      isShared: true,
+      parentFolderId: '5',
+      sharedBy: {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+      sharedDate: new Date('2025-02-02'),
+    },
+    {
+      id: '5-2',
+      name: 'UI_Components.sketch',
+      lastModified: new Date('2025-01-30'),
+      fileType: 'File',
+      size: '15.7 MB',
+      isShared: true,
+      parentFolderId: '5',
+      sharedBy: {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      sharedDate: new Date('2025-01-30'),
+    },
+    {
+      id: '5-3',
+      name: 'Color_Palette.png',
+      lastModified: new Date('2025-01-27'),
+      fileType: 'Image',
+      size: '1.1 MB',
+      isShared: true,
+      parentFolderId: '5',
+      sharedBy: {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      sharedDate: new Date('2025-01-27'),
+    },
+  ],
+  '11': [
+    {
+      id: '11-1',
+      name: 'Campaign_Banner.jpg',
+      lastModified: new Date('2025-01-31'),
+      fileType: 'Image',
+      size: '7.2 MB',
+      isShared: true,
+      parentFolderId: '11',
+      sharedBy: {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+      sharedDate: new Date('2025-01-31'),
+    },
+    {
+      id: '11-2',
+      name: 'Social_Media_Kit.zip',
+      lastModified: new Date('2025-01-29'),
+      fileType: 'File',
+      size: '23.5 MB',
+      isShared: true,
+      parentFolderId: '11',
+      sharedBy: {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      sharedDate: new Date('2025-01-29'),
+    },
+    {
+      id: '11-3',
+      name: 'Brand_Guidelines.pdf',
+      lastModified: new Date('2025-01-26'),
+      fileType: 'File',
+      size: '9.8 MB',
+      isShared: true,
+      parentFolderId: '11',
+      sharedBy: {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      sharedDate: new Date('2025-01-26'),
+    },
+  ],
+};
 
 export const mockFileData: IFileData[] = [
   {
@@ -233,13 +530,20 @@ interface QueryParams {
   filter: {
     name?: string;
     fileType?: FileType;
+    lastModified?: {
+      from?: Date;
+      to?: Date;
+    };
   };
   page: number;
   pageSize: number;
+  folderId?: string;
 }
 
 export const useMockFilesQuery = (queryParams: QueryParams) => {
-  const [data, setData] = useState<null | { data: IFileData[]; totalCount: number }>(null);
+  const [data, setData] = useState<null | { data: IFileDataWithSharing[]; totalCount: number }>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -249,8 +553,17 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
       pageSize: queryParams.pageSize,
       filterName: queryParams.filter.name ?? '',
       filterFileType: queryParams.filter.fileType ?? '',
+      filterLastModified: queryParams.filter.lastModified,
+      folderId: queryParams.folderId,
     }),
-    [queryParams.page, queryParams.pageSize, queryParams.filter.name, queryParams.filter.fileType]
+    [
+      queryParams.page,
+      queryParams.pageSize,
+      queryParams.filter.name,
+      queryParams.filter.fileType,
+      queryParams.filter.lastModified,
+      queryParams.folderId,
+    ]
   );
 
   const refetch = useCallback(() => {
@@ -269,6 +582,27 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
 
     if (params.filterFileType) {
       filteredData = filteredData.filter((file) => file.fileType === params.filterFileType);
+    }
+
+    if (params.filterLastModified?.from || params.filterLastModified?.to) {
+      filteredData = filteredData.filter((file) => {
+        const lastModified = file.lastModified;
+        if (!lastModified) return false;
+
+        if (params.filterLastModified?.from && lastModified < params.filterLastModified.from) {
+          return false;
+        }
+
+        if (params.filterLastModified?.to) {
+          const endOfDay = new Date(params.filterLastModified.to);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (lastModified > endOfDay) {
+            return false;
+          }
+        }
+
+        return true;
+      });
     }
 
     return filteredData;
@@ -305,7 +639,15 @@ export const useMockFilesQuery = (queryParams: QueryParams) => {
   );
 
   const processData = useCallback(() => {
-    const filteredData = filterData(mockFileData, memoizedQueryParams);
+    let sourceData: IFileData[];
+
+    if (memoizedQueryParams.folderId && filesFolderContents[memoizedQueryParams.folderId]) {
+      sourceData = [...filesFolderContents[memoizedQueryParams.folderId]];
+    } else {
+      sourceData = [...mockFileData];
+    }
+
+    const filteredData = filterData(sourceData, memoizedQueryParams);
     const paginatedData = paginateData(filteredData, memoizedQueryParams);
 
     return {

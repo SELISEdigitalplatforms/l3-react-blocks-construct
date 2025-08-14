@@ -10,9 +10,9 @@ import {
   PaginationState,
 } from '../../utils/file-manager';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
+import { FilePreview } from '../file-preview';
 
 const MyFilesListView: React.FC<MyFilesListViewProps> = ({
-  onViewDetails,
   onShare,
   onDelete,
   onRename,
@@ -22,10 +22,13 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   renamedFiles,
   fileSharedUsers = {},
   filePermissions = {},
+  currentFolderId,
+  onNavigateToFolder,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
 
@@ -39,6 +42,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     page: paginationState.pageIndex,
     pageSize: paginationState.pageSize,
     filter: filters,
+    folderId: currentFolderId,
   };
 
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
@@ -126,16 +130,29 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
       ...prev,
       pageIndex: 0,
     }));
-  }, [filters]);
+  }, [filters, currentFolderId]);
 
-  const handleViewDetailsWrapper = useCallback(
+  const handleRowClick = useCallback(
     (file: IFileDataWithSharing) => {
-      setSelectedFile(file);
-      setIsDetailsOpen(true);
-      onViewDetails(file);
+      if (file.fileType === 'Folder' && onNavigateToFolder) {
+        onNavigateToFolder(file.id);
+      } else {
+        setSelectedFile(file);
+        setIsPreviewOpen(true);
+      }
     },
-    [onViewDetails]
+    [onNavigateToFolder]
   );
+
+  const handleViewDetails = useCallback((file: IFileDataWithSharing) => {
+    setSelectedFile(file);
+    setIsDetailsOpen(true);
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   const handleCloseDetails = useCallback(() => {
     setIsDetailsOpen(false);
@@ -168,7 +185,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   );
 
   const columns = createFileTableColumns({
-    onViewDetails: handleViewDetailsWrapper,
+    onViewDetails: handleViewDetails,
     onDownload: handleDownloadWrapper,
     onShare: handleShareWrapper,
     onDelete: handleDeleteWrapper,
@@ -180,7 +197,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     return <div className="p-4 text-error">{t('ERROR_LOADING_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && isDetailsOpen;
+  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
@@ -194,7 +211,7 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
             <DataTable
               data={combinedData}
               columns={columns}
-              onRowClick={handleViewDetailsWrapper}
+              onRowClick={handleRowClick}
               isLoading={isLoading}
               pagination={{
                 pageIndex: paginationState.pageIndex,
@@ -203,12 +220,14 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
               }}
               onPaginationChange={handlePaginationChange}
               manualPagination={true}
+              expandable={false}
               mobileColumns={['name']}
-              expandable={true}
             />
           </div>
         </div>
       )}
+
+      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
       <RegularFileDetailsSheet
         isOpen={isDetailsOpen}

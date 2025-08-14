@@ -41,17 +41,12 @@ export const GET_TASK_MANAGER_QUERY = `
           Name
           ImageUrl
         }
-        Attachments {
+        AttachmentField {
           ItemId
           FileName
           FileSize
           FileType
-        }
-        Comments {
-          ItemId
-          Content
-          Timestamp
-          Author
+          FileUrl
         }
       }
     }
@@ -171,10 +166,10 @@ export const GET_TASK_ATTACHMENTS_QUERY = `
       pageNo
       items {
         ItemId
+        TaskId
         FileName
         FileSize
         FileType
-        Timestamp
         CreatedBy
         CreatedDate
         LastUpdatedBy

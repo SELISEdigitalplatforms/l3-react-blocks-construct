@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
@@ -131,13 +131,7 @@ export default function TaskDetailsView({
   const { columns } = useCardTasks();
   const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
   const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
-  const {
-    task,
-    removeTask,
-    updateTaskDetails,
-    addNewAttachment: addAttachment,
-    deleteAttachment: removeAttachment,
-  } = useTaskDetails(currentTaskId);
+  const { task, removeTask, updateTaskDetails } = useTaskDetails(currentTaskId);
 
   const { mutate: createTag, isPending: isCreatingTag } = useCreateTags();
 
@@ -147,13 +141,49 @@ export default function TaskDetailsView({
   const [title, setTitle] = useState<string>(task?.Title ?? '');
   const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted ?? false);
   const [section, setSection] = useState<string>(task?.Section ?? '');
-  const [attachments, setAttachments] = useState<TaskAttachments[]>(
-    task?.Attachments?.map((attachment) => ({
-      ItemId: attachment.ItemId,
-      FileName: attachment.FileName,
-      FileSize: attachment.FileSize,
-      FileType: attachment.FileType,
-    })) || []
+
+  const [attachments, setAttachments] = useState<TaskAttachments[]>(task?.AttachmentField ?? []);
+  const isLoadingAttachments = false;
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.Title ?? '');
+      setDescription(task.Description ?? '');
+      setPriority(task.Priority ?? TaskPriority.MEDIUM);
+      setSection(task.Section ?? '');
+      setIsMarkComplete(task.IsCompleted ?? false);
+
+      if (task.AttachmentField) {
+        setAttachments(task.AttachmentField);
+      } else {
+        setAttachments([]);
+      }
+
+      if (task.ItemTag) {
+        setSelectedTags(task.ItemTag);
+      }
+
+      if (task.Assignee) {
+        setSelectedAssignees(task.Assignee);
+      }
+
+      if (task.DueDate) {
+        setDate(new Date(task.DueDate));
+      }
+    }
+  }, [task]);
+
+  // Handle attachment changes and update both local state and backend
+  const handleAttachmentsChange = useCallback(
+    async (newAttachments: TaskAttachments[]) => {
+      setAttachments(newAttachments);
+      if (currentTaskId) {
+        await updateTaskDetails({
+          AttachmentField: newAttachments,
+        });
+      }
+    },
+    [currentTaskId, updateTaskDetails]
   );
   const [priority, setPriority] = useState<TaskPriority>(
     task?.Priority && Object.values(TaskPriority).includes(task.Priority)
@@ -283,7 +313,6 @@ export default function TaskDetailsView({
     setTitle('');
     setIsMarkComplete(false);
     setSection('To Do');
-    setAttachments([]);
     setDate(undefined);
     setDescription('');
     setSelectedTags([]);
@@ -293,27 +322,12 @@ export default function TaskDetailsView({
     setTitle,
     setIsMarkComplete,
     setSection,
-    setAttachments,
     setDate,
     setDescription,
     setSelectedTags,
     setSelectedAssignees,
     setPriority,
   ]);
-
-  const setTaskAttachments = useCallback(
-    (attachments: any[]) => {
-      setAttachments(
-        (attachments || []).map((attachment) => ({
-          ItemId: attachment.ItemId,
-          FileName: attachment.FileName,
-          FileSize: attachment.FileSize,
-          FileType: attachment.FileType,
-        }))
-      );
-    },
-    [setAttachments]
-  );
 
   const setTaskAssignees = useCallback(
     (assignee: any) => {
@@ -363,7 +377,6 @@ export default function TaskDetailsView({
       return;
     }
 
-    // Set basic task fields
     setTitle(task.Title ?? '');
     setIsMarkComplete(!!task.IsCompleted);
     setSection(task.Section ?? '');
@@ -371,8 +384,6 @@ export default function TaskDetailsView({
     setDescription(task.Description ?? '');
     setSelectedTags(task.ItemTag ?? []);
 
-    // Set complex fields using extracted functions
-    setTaskAttachments(task.Attachments ?? []);
     setTaskAssignees(task.Assignee);
     setTaskPriority(task.Priority);
   }, [
@@ -384,7 +395,6 @@ export default function TaskDetailsView({
     setDate,
     setDescription,
     setSelectedTags,
-    setTaskAttachments,
     setTaskAssignees,
     setTaskPriority,
   ]);
@@ -489,12 +499,6 @@ export default function TaskDetailsView({
     try {
       const taskForApi: Partial<TaskItem> = {
         ...task,
-        Attachments: task.Attachments?.map(({ ItemId, FileName, FileSize, FileType }) => ({
-          ItemId,
-          FileName,
-          FileType,
-          FileSize: typeof FileSize === 'string' ? parseInt(FileSize, 10) : FileSize,
-        })) as any,
         Assignee: Array.isArray(task.Assignee)
           ? task.Assignee.map((id) => ({
               ItemId: id,
@@ -524,8 +528,9 @@ export default function TaskDetailsView({
     }
   };
 
-  const createNewTask = useCallback(
-    (): NewTaskInput => ({
+  const createNewTask = useCallback((): NewTaskInput => {
+    const now = new Date().toISOString();
+    return {
       Section: section,
       IsCompleted: isMarkComplete,
       Title: title,
@@ -534,21 +539,26 @@ export default function TaskDetailsView({
       Assignee: selectedAssignees.length > 0 ? selectedAssignees.map((a) => a.ItemId) : undefined,
       Description: description ?? '',
       ItemTag: selectedTags,
-      Attachments: attachments,
-      Comments: [],
-    }),
-    [
-      section,
-      isMarkComplete,
-      title,
-      priority,
-      date,
-      selectedAssignees,
-      description,
-      selectedTags,
-      attachments,
-    ]
-  );
+      AttachmentField: attachments.length > 0 ? attachments : undefined,
+      CreatedDate: now,
+      LastUpdatedDate: now,
+      CreatedBy: userProfile?.fullName ?? '',
+      LastUpdatedBy: userProfile?.fullName ?? '',
+      Language: '',
+      OrganizationIds: [],
+    };
+  }, [
+    section,
+    isMarkComplete,
+    title,
+    priority,
+    date,
+    selectedAssignees,
+    description,
+    selectedTags,
+    attachments,
+    userProfile,
+  ]);
 
   const createNewTags = useCallback(
     async (tagsToCreate: Array<string | ItemTag>) => {
@@ -628,6 +638,11 @@ export default function TaskDetailsView({
 
   const handleClose = () => {
     onClose();
+    toast({
+      variant: 'success',
+      title: t('Updated task'),
+      description: t('You have updated the task successfully'),
+    });
     if (isNewTaskModalOpen && !newTaskAdded) {
       handleAddItem();
     }
@@ -642,14 +657,17 @@ export default function TaskDetailsView({
 
   const handleAssigneeChange = useCallback(
     async (newAssignees: Assignee[]) => {
+      if (isNewTaskModalOpen && !currentTaskId) {
+        setSelectedAssignees(newAssignees);
+        return;
+      }
+
       if (!currentTaskId) return;
 
       try {
         await updateTaskDetails({
           Assignee: newAssignees,
         });
-
-        // Only update local state after successful API call
         setSelectedAssignees(newAssignees);
       } catch (error) {
         console.error('Failed to update assignees:', error);
@@ -661,26 +679,28 @@ export default function TaskDetailsView({
         throw error;
       }
     },
-    [currentTaskId, updateTaskDetails, t, toast]
+    [currentTaskId, updateTaskDetails, t, toast, isNewTaskModalOpen]
   );
 
   const handleTagChange = useCallback(
     async (newTags: ItemTag[]) => {
+      // If we're in new task mode, just update the local state
+      if (isNewTaskModalOpen && !currentTaskId) {
+        setSelectedTags(newTags);
+        return;
+      }
+
       if (!currentTaskId) return;
 
       const previousTags = [...selectedTags];
 
       try {
-        // Optimistically update the UI
         setSelectedTags(newTags);
-
-        // Only make one API call to update the tags
         await updateTaskDetails({
           ItemTag: newTags,
         });
       } catch (error) {
         console.error('Failed to update tags:', error);
-        // Revert to previous state on error
         setSelectedTags(previousTags);
         toast({
           variant: 'destructive',
@@ -689,54 +709,8 @@ export default function TaskDetailsView({
         });
       }
     },
-    [currentTaskId, selectedTags, updateTaskDetails, t, toast]
+    [currentTaskId, selectedTags, updateTaskDetails, t, toast, isNewTaskModalOpen]
   );
-
-  const mapAttachmentsForUpdate = (attachments: TaskAttachments[]) => {
-    return attachments.map(({ ItemId, FileName, FileSize, FileType }) => ({
-      ItemId,
-      FileName,
-      FileSize,
-      FileType,
-    }));
-  };
-
-  const processAttachmentChanges = (
-    prevAttachments: TaskAttachments[],
-    updatedAttachments: TaskAttachments[]
-  ) => {
-    if (!currentTaskId) return;
-
-    updateTaskDetails({
-      Attachments: mapAttachmentsForUpdate(updatedAttachments),
-    });
-
-    const removedAttachments = prevAttachments.filter(
-      (prevAtt) => !updatedAttachments.some((newAtt) => newAtt.ItemId === prevAtt.ItemId)
-    );
-
-    const addedAttachments = updatedAttachments.filter(
-      (newAtt) => !prevAttachments.some((prevAtt) => prevAtt.ItemId === newAtt.ItemId)
-    );
-
-    addedAttachments.forEach((attachment) => {
-      addAttachment(attachment);
-    });
-
-    removedAttachments.forEach(({ ItemId }) => {
-      removeAttachment(ItemId);
-    });
-  };
-
-  const handleAttachmentChange = async (newAttachments: SetStateAction<TaskAttachments[]>) => {
-    setAttachments((prev) => {
-      const updatedAttachments =
-        typeof newAttachments === 'function' ? newAttachments(prev) : newAttachments;
-
-      processAttachmentChanges(prev, updatedAttachments);
-      return updatedAttachments;
-    });
-  };
 
   const handleDeleteTask = async (): Promise<boolean> => {
     if (!currentTaskId) return false;
@@ -953,7 +927,6 @@ export default function TaskDetailsView({
             </Popover>
           </div>
           <div>
-            <Label className="text-high-emphasis text-base font-semibold">{t('ASSIGNEE')}</Label>
             <AssigneeSelector
               availableAssignees={availableAssignees}
               selectedAssignees={selectedAssignees}
@@ -981,7 +954,13 @@ export default function TaskDetailsView({
           <AddTag onAddTag={handleTagAdd} isLoading={isCreatingTag} />
         </div>
         <div className="mt-6">
-          <AttachmentsSection attachments={attachments} setAttachments={handleAttachmentChange} />
+          <AttachmentsSection
+            taskId={taskId}
+            taskItemId={task?.ItemId}
+            attachments={attachments}
+            onAttachmentsChange={handleAttachmentsChange}
+            isLoading={isLoadingAttachments}
+          />
         </div>
         <Separator className="my-6" />
         {!isNewTaskModalOpen && (
@@ -992,7 +971,7 @@ export default function TaskDetailsView({
                 <div className="flex gap-2">
                   <Avatar className="h-10 w-10 border-2 border-white">
                     <AvatarImage src={userProfile.profileImageUrl} alt={userProfile.fullName} />
-                    <AvatarFallback className="bg-gray-300 text-xs">
+                    <AvatarFallback className="bg-neutral-200 text-xs">
                       {userProfile.fullName?.charAt(0) ?? ''}
                     </AvatarFallback>
                   </Avatar>
