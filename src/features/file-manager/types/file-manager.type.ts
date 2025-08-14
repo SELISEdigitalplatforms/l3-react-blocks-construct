@@ -41,6 +41,4 @@ export interface MyFileGridViewProps {
   renamedFiles?: Map<string, IFileDataWithSharing>;
   fileSharedUsers?: { [key: string]: SharedUser[] };
   filePermissions?: { [key: string]: { [key: string]: string } };
-  currentFolderId?: string;
-  onNavigateToFolder?: (folderId: string) => void;
 }

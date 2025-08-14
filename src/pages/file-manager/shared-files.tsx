@@ -16,7 +16,6 @@ import { FilePreview } from 'features/file-manager/components/file-preview';
 interface SharedWithMeProps {
   onCreateFile?: () => void;
 }
-
 export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
@@ -32,7 +31,6 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     }
   });
 
-  // ✅ ADD file preview state management
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedFileForPreview, setSelectedFileForPreview] = useState<any>(null);
 
@@ -57,42 +55,33 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
 
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
-      navigate(`/shared-files/${folderId}`); // Keep your existing URL structure
+      navigate(`/shared-files/${folderId}`);
     },
     [navigate]
   );
 
   const handleNavigateBack = useCallback(() => {
-    navigate('/shared-files'); // Keep your existing URL structure
+    navigate('/shared-files');
   }, [navigate]);
 
-  // ✅ ADD file preview handler
   const handleFilePreview = useCallback((file: any) => {
-    console.log('Preview shared file:', file);
     setSelectedFileForPreview(file);
     setIsPreviewOpen(true);
 
-    // You can also implement specific preview logic here
     switch (file.fileType) {
       case 'PDF':
-        // Could open PDF viewer modal instead of generic preview
         break;
       case 'Image':
-        // Could open image lightbox
         break;
       case 'Video':
-        // Could open video player
         break;
       case 'Document':
-        // Could open document viewer
         break;
       default:
-        // Use generic preview component
         break;
     }
   }, []);
 
-  // ✅ ADD close preview handler
   const handleClosePreview = useCallback(() => {
     setIsPreviewOpen(false);
     setSelectedFileForPreview(null);
@@ -109,10 +98,8 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     [fileManager, handleFiltersChange, filters]
   );
 
-  // ✅ UPDATED commonViewProps with file preview
   const commonViewProps = {
-    onViewDetails: fileManager.handleViewDetails,
-    onFilePreview: handleFilePreview, // ✅ ADD this missing prop
+    onFilePreview: handleFilePreview,
     onDownload: fileManager.handleDownload,
     onShare: fileManager.handleShare,
     onDelete: fileManager.handleDelete,
@@ -184,7 +171,6 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
           commonViewProps={commonViewProps}
         />
 
-        {/* ✅ ADD File Preview Component */}
         <FilePreview
           file={selectedFileForPreview}
           isOpen={isPreviewOpen}
