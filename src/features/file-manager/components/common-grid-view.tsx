@@ -16,7 +16,7 @@ interface BaseFile {
 }
 
 interface BaseGridViewProps<T extends BaseFile> {
-  onViewDetails?: (file: T) => void; // Only for dropdown actions
+  onViewDetails?: (file: T) => void;
   onFilePreview?: (file: T) => void; // NEW: For file preview
   onNavigateToFolder?: (folderId: string) => void; // For folder navigation
   filters: Record<string, any>;
@@ -352,11 +352,10 @@ export const CommonGridView = <T extends BaseFile>({
         </div>
       </div>
 
-      {/* Details sheet - only opens from dropdown actions */}
       {renderDetailsSheet(selectedFile, isDetailsOpen, handleCloseDetails)}
 
       {/* ✅ NEW: Preview sheet - opens from card clicks */}
-      {renderPreviewSheet && renderPreviewSheet(selectedFile, isPreviewOpen, handleClosePreview)}
+      {renderPreviewSheet?.(selectedFile, isPreviewOpen, handleClosePreview)}
     </div>
   );
 };

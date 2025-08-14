@@ -50,13 +50,13 @@ const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
         }
 
         // Filter by search term (file name)
-        if (filters.name && filters.name.trim()) {
+        if (filters.name?.trim()) {
           const searchTerm = filters.name.toLowerCase();
           if (!file.name.toLowerCase().includes(searchTerm)) return false;
         }
 
         // Filter by shared by user
-        if (filters.sharedBy && filters.sharedBy.trim()) {
+        if (filters.sharedBy?.trim()) {
           const sharedBy = (file as any).sharedBy?.toLowerCase() || '';
           if (!sharedBy.includes(filters.sharedBy.toLowerCase())) return false;
         }
