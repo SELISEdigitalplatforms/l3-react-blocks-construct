@@ -11,11 +11,11 @@ import { FileViewRenderer } from 'features/file-manager/components/file-view-ren
 import { SharedFilters } from 'features/file-manager/types/header-toolbar.type';
 import { SharedWithMeHeaderToolbar } from 'features/file-manager/components/shared-with-me/shared-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
+import { FilePreview } from 'features/file-manager/components/file-preview';
 
 interface SharedWithMeProps {
   onCreateFile?: () => void;
 }
-
 export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
@@ -30,6 +30,9 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
       return 'list';
     }
   });
+
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectedFileForPreview, setSelectedFileForPreview] = useState<any>(null);
 
   const { filters, handleFiltersChange } = useFileFilters<SharedFilters>({
     name: '',
@@ -61,6 +64,29 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     navigate('/shared-files');
   }, [navigate]);
 
+  const handleFilePreview = useCallback((file: any) => {
+    setSelectedFileForPreview(file);
+    setIsPreviewOpen(true);
+
+    switch (file.fileType) {
+      case 'PDF':
+        break;
+      case 'Image':
+        break;
+      case 'Video':
+        break;
+      case 'Document':
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFileForPreview(null);
+  }, []);
+
   const handleSearchChange = useCallback(
     (query: string) => {
       fileManager.handleSearchChange(query);
@@ -73,7 +99,7 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   );
 
   const commonViewProps = {
-    onViewDetails: fileManager.handleViewDetails,
+    onFilePreview: handleFilePreview,
     onDownload: fileManager.handleDownload,
     onShare: fileManager.handleShare,
     onDelete: fileManager.handleDelete,
@@ -137,13 +163,22 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
 
   return (
     <FileManagerLayout headerToolbar={headerToolbar} modals={modals}>
-      <FileViewRenderer
-        viewMode={viewMode}
-        GridComponent={SharedFilesGridView}
-        ListComponent={SharedFilesListView}
-        commonViewProps={commonViewProps}
-      />
+      <div className="relative h-full">
+        <FileViewRenderer
+          viewMode={viewMode}
+          GridComponent={SharedFilesGridView}
+          ListComponent={SharedFilesListView}
+          commonViewProps={commonViewProps}
+        />
+
+        <FilePreview
+          file={selectedFileForPreview}
+          isOpen={isPreviewOpen}
+          onClose={handleClosePreview}
+        />
+      </div>
     </FileManagerLayout>
   );
 };
+
 export default SharedWithMe;

@@ -160,6 +160,8 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
   }, []);
 
   const handleDownloadWrapper = () => undefined;
+  const handleMoveWrapper = () => undefined;
+  const handleCopyWrapper = () => undefined;
 
   const handleShareWrapper = useCallback(
     (file: IFileDataWithSharing) => {
@@ -190,6 +192,8 @@ const MyFilesListView: React.FC<MyFilesListViewProps> = ({
     onShare: handleShareWrapper,
     onDelete: handleDeleteWrapper,
     onRename: handleRenameWrapper,
+    onMove: handleMoveWrapper,
+    onCopy: handleCopyWrapper,
     t,
   });
 

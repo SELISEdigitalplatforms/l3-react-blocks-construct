@@ -71,7 +71,6 @@ const FallbackAvatarFallback: React.FC<{ className?: string; children: React.Rea
   <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
 );
 
-// Main shared component
 const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
   isOpen,
   onClose,
@@ -94,6 +93,7 @@ const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
             file.lastModified instanceof Date ? file.lastModified : new Date(file.lastModified),
         })
       : file.sharedWith || [];
+
   const ownerName = getOwnerName(sharedUsers, variant);
   const creationDate = getDateCreated(file, variant);
   const fileTypeDisplayName = getFileTypeDisplayName(file.fileType);
@@ -205,6 +205,7 @@ const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
           </div>
         </div>
 
+        {/* ✅ SHARED USERS SECTION - Should now work with mock data */}
         {sharedUsers.length > 0 && (
           <div className="space-y-4 border-t border-gray-100 pt-6">
             <h3 className="text-base font-medium text-high-emphasis">
@@ -212,12 +213,12 @@ const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
             </h3>
 
             <div className="space-y-3">
-              {sharedUsers.map((user) => (
-                <div key={user.id} className="flex items-center gap-3">
+              {sharedUsers.map((user, index) => (
+                <div key={user.id || index} className="flex items-center gap-3">
                   <AvatarComponent className="h-9 w-9">
-                    <AvatarImageComponent src={user.avatar} alt={user.name} />
+                    <AvatarImageComponent src={user.avatar} alt={user.name || 'User'} />
                     <AvatarFallbackComponent className="text-xs bg-gray-100">
-                      {user.name
+                      {(user.name || 'U')
                         .split(' ')
                         .map((n) => n[0])
                         .join('')
@@ -226,13 +227,13 @@ const FileDetailsSheet: React.FC<BaseFileDetailsSheetProps> = ({
                   </AvatarComponent>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-high-emphasis truncate">
-                      {user.name}
+                      {user.name || 'Unknown User'}
                       {user.role === 'Owner' && (
-                        <span className="text-gray-500 font-normal"> (you)</span>
+                        <span className="text-gray-500 font-normal"> (owner)</span>
                       )}
                     </div>
                     <div className="text-xs text-gray-500 capitalize">
-                      {(user.role ?? '').toLowerCase()}
+                      {(user.role ?? 'member').toLowerCase()}
                     </div>
                   </div>
                   {user.role !== 'Owner' && <div className="text-xs text-gray-400"></div>}

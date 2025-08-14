@@ -11,6 +11,7 @@ import { FileModals } from 'features/file-manager/components/modals/file-modals'
 import { FileFilters } from 'features/file-manager/components/common-filters';
 import { FileManagerHeaderToolbar } from 'features/file-manager/components/my-files/my-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
+import { FilePreview } from 'features/file-manager/components/file-preview';
 
 interface FileManagerMyFilesProps {
   onCreateFile?: () => void;
@@ -19,6 +20,8 @@ interface FileManagerMyFilesProps {
 export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreateFile }) => {
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
+
+  const fileManager = useFileManager({ onCreateFile });
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
     try {
@@ -29,7 +32,9 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     }
   });
 
-  const fileManager = useFileManager({ onCreateFile });
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectedFileForPreview, setSelectedFileForPreview] = useState<any>(null);
+
   const { filters, handleFiltersChange } = useFileFilters<FileFilters>({
     name: '',
     fileType: undefined,
@@ -58,6 +63,29 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     navigate('/my-files');
   }, [navigate]);
 
+  const handleFilePreview = useCallback((file: any) => {
+    setSelectedFileForPreview(file);
+    setIsPreviewOpen(true);
+
+    switch (file.fileType) {
+      case 'PDF':
+        break;
+      case 'Image':
+        break;
+      case 'Video':
+        break;
+      case 'Document':
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFileForPreview(null);
+  }, []);
+
   const handleSearchChange = useCallback(
     (query: string) => {
       fileManager.handleSearchChange(query);
@@ -70,10 +98,13 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
   );
 
   const commonViewProps = {
-    onViewDetails: fileManager.handleViewDetails,
+    onFilePreview: handleFilePreview,
     onDownload: fileManager.handleDownload,
     onShare: fileManager.handleShare,
     onDelete: fileManager.handleDelete,
+    onMove: fileManager.handleMove,
+    onCopy: fileManager.handleCopy,
+    onOpen: fileManager.handleOpen,
     onRename: fileManager.handleRename,
     onRenameUpdate: fileManager.handleRenameUpdate,
     filters,
@@ -130,12 +161,21 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
 
   return (
     <FileManagerLayout headerToolbar={headerToolbar} modals={modals}>
-      <FileViewRenderer
-        viewMode={viewMode}
-        GridComponent={MyFileGridView}
-        ListComponent={MyFilesListView}
-        commonViewProps={commonViewProps}
-      />
+      <div className="relative h-full">
+        <FileViewRenderer
+          viewMode={viewMode}
+          GridComponent={MyFileGridView}
+          ListComponent={MyFilesListView}
+          commonViewProps={commonViewProps}
+        />
+        <FilePreview
+          file={selectedFileForPreview}
+          isOpen={isPreviewOpen}
+          onClose={handleClosePreview}
+        />
+      </div>
     </FileManagerLayout>
   );
 };
+
+export default FileManagerMyFiles;

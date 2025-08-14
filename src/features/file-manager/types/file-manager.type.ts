@@ -20,22 +20,21 @@ export interface SharedFilesListViewProps {
   newFiles?: IFileDataWithSharing[];
   newFolders?: IFileDataWithSharing[];
   renamedFiles?: Map<string, IFileDataWithSharing>;
-  fileSharedUsers?: Record<string, any[]>;
-  filePermissions?: Record<string, any>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
 }
 
-export interface MyFileGridViewProps {
-  onViewDetails: (file: IFileDataWithSharing) => void;
-  onDownload: (file: IFileDataWithSharing) => void;
+export interface SharedFilesGridViewProps {
+  onViewDetails?: (file: IFileDataWithSharing) => void;
+  onFilePreview?: (file: IFileDataWithSharing) => void;
   onShare: (file: IFileDataWithSharing) => void;
   onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
   onRename: (file: IFileDataWithSharing) => void;
-  filters: {
-    name: string;
-    fileType?: 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-  };
+  filters: any;
   newFiles?: IFileDataWithSharing[];
   newFolders?: IFileDataWithSharing[];
   renamedFiles?: Map<string, IFileDataWithSharing>;
@@ -43,4 +42,5 @@ export interface MyFileGridViewProps {
   filePermissions?: { [key: string]: { [key: string]: string } };
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
+  onNavigateBack?: () => void;
 }

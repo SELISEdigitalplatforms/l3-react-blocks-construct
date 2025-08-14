@@ -3,20 +3,32 @@ import { Folder } from 'lucide-react';
 import { getFileTypeIcon, getFileTypeInfo, IFileDataWithSharing } from '../utils/file-manager';
 
 import { CommonGridView } from './common-grid-view';
-import { FileProcessingProps, useFileProcessing } from '../hooks/use-file-processing';
+import { useFileProcessing } from '../hooks/use-file-processing';
 import { useGridViewData } from '../hooks/use-grid-view-data';
-import { FileActionProps, useFileActions } from './common-grid-view-helpers';
+import { useFileActions } from './common-grid-view-helpers';
 
-export interface BaseGridViewProps extends FileActionProps, FileProcessingProps {
+export interface BaseGridViewProps {
+  onViewDetails?: (file: IFileDataWithSharing) => void;
+  onFilePreview?: (file: IFileDataWithSharing) => void;
+  onNavigateToFolder?: (folderId: string) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
+
   filters: any;
-  onFilePreview?: (file: IFileDataWithSharing) => void; // NEW: For file preview
   queryBuilder: (params: any) => any;
   filterFiles: (files: IFileDataWithSharing[], filters: any) => IFileDataWithSharing[];
   currentFolderId?: string;
-  onNavigateToFolder?: (folderId: string) => void;
+
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: Record<string, any[]>;
+  filePermissions?: Record<string, any>;
 }
 
-// Updated BaseGridView component
 export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
   const { t } = useTranslation();
 
@@ -30,15 +42,16 @@ export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
 
   return (
     <CommonGridView<IFileDataWithSharing>
-      onFilePreview={props.onFilePreview} // NEW: For file preview
-      onNavigateToFolder={props.onNavigateToFolder} // For folder navigation
+      onViewDetails={props.onViewDetails}
+      onFilePreview={props.onFilePreview}
+      onNavigateToFolder={props.onNavigateToFolder}
       filters={props.filters}
       data={data ?? undefined}
       isLoading={isLoading}
       error={error}
       onLoadMore={handleLoadMore}
-      renderDetailsSheet={() => null} // Remove details sheet from CommonGridView
-      renderPreviewSheet={() => null} // Remove preview sheet from CommonGridView (handled in parent)
+      renderDetailsSheet={() => null}
+      renderPreviewSheet={() => null}
       getFileTypeIcon={getFileTypeIcon}
       getFileTypeInfo={getFileTypeInfo}
       renderActions={renderActions}

@@ -126,7 +126,7 @@ const AddDropdownMenu = ({
     <div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="sm" className="h-10 text-sm font-bold">
+          <Button className="text-sm font-bold rounded">
             <Plus className="h-4 w-4 mr-1" />
             {t('ADD_NEW')}
           </Button>
@@ -164,10 +164,10 @@ const AddDropdownMenu = ({
               <div className="flex flex-col items-center gap-4">
                 <Upload className="h-12 w-12 text-gray-400" />
                 <div className="space-y-2">
-                  <p className="text-lg text-gray-900">
+                  <p className="text-lg text-high-emphasis">
                     Drag & drop files here, or click to select files
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-medium-emphasis">
                     PDF, DOCX, JPG, PNG | Max size: 25MB per file
                   </p>
                 </div>
@@ -230,7 +230,6 @@ const AddDropdownMenu = ({
         </DialogContent>
       </Dialog>
 
-      {/* Create Folder Modal */}
       <Dialog open={isCreateFolderModalOpen} onOpenChange={setIsCreateFolderModalOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
