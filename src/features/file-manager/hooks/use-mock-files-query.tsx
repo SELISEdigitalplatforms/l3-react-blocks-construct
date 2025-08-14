@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileType } from '../utils/file-manager';
+import { FileType, IFileDataWithSharing } from '../utils/file-manager';
 
 export interface IFileData {
   id: string;
@@ -541,7 +541,9 @@ interface QueryParams {
 }
 
 export const useMockFilesQuery = (queryParams: QueryParams) => {
-  const [data, setData] = useState<null | { data: IFileData[]; totalCount: number }>(null);
+  const [data, setData] = useState<null | { data: IFileDataWithSharing[]; totalCount: number }>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
