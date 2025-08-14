@@ -12,6 +12,7 @@ import { FileFilters } from 'features/file-manager/components/common-filters';
 import { FileManagerHeaderToolbar } from 'features/file-manager/components/my-files/my-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FilePreview } from 'features/file-manager/components/file-preview';
+import { useViewMode } from 'hooks/use-view-mode';
 
 interface FileManagerMyFilesProps {
   onCreateFile?: () => void;
@@ -23,13 +24,9 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
 
   const fileManager = useFileManager({ onCreateFile });
 
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    try {
-      const saved = sessionStorage.getItem('file-manager-view-mode');
-      return (saved as 'grid' | 'list') || 'list';
-    } catch {
-      return 'list';
-    }
+  const { viewMode, handleViewModeChange } = useViewMode({
+    storageKey: 'file-manager-view-mode',
+    defaultMode: 'list',
   });
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -40,17 +37,6 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     fileType: undefined,
     lastModified: undefined,
   });
-
-  const handleViewModeChange = useCallback((mode: string) => {
-    const newViewMode = mode as 'grid' | 'list';
-    setViewMode(newViewMode);
-
-    try {
-      sessionStorage.setItem('file-manager-view-mode', newViewMode);
-    } catch (error) {
-      console.warn('Failed to save view mode to sessionStorage:', error);
-    }
-  }, []);
 
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
