@@ -9,7 +9,6 @@ import { FileActionProps, useFileActions } from './common-grid-view-helpers';
 
 export interface BaseGridViewProps extends FileActionProps, FileProcessingProps {
   filters: any;
-  onViewDetails?: (file: IFileDataWithSharing) => void; // Only for dropdown
   onFilePreview?: (file: IFileDataWithSharing) => void; // NEW: For file preview
   queryBuilder: (params: any) => any;
   filterFiles: (files: IFileDataWithSharing[], filters: any) => IFileDataWithSharing[];
@@ -31,7 +30,6 @@ export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
 
   return (
     <CommonGridView<IFileDataWithSharing>
-      onViewDetails={props.onViewDetails} // Only for dropdown actions
       onFilePreview={props.onFilePreview} // NEW: For file preview
       onNavigateToFolder={props.onNavigateToFolder} // For folder navigation
       filters={props.filters}
