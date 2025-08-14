@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
 import { MenubarContent } from 'components/ui/menubar';
@@ -29,6 +29,7 @@ export function Notification() {
     all: NotificationType[];
     unread: NotificationType[];
   }>({ all: [], unread: [] });
+  const [isMarkingAllAsRead, setIsMarkingAllAsRead] = useState(false);
 
   const currentTabNotifications = React.useMemo(() => {
     return tabData[tabId as keyof typeof tabData] || [];
@@ -46,6 +47,10 @@ export function Notification() {
     SortProperty: 'createdTime',
     SortIsDescending: true,
   });
+
+  const isAllNotificationsRead = useMemo(() => {
+    return tabData.all.every((notification) => notification.isRead);
+  }, [tabData.all]);
 
   const updateTabData = useCallback(
     (prev: { all: NotificationType[]; unread: NotificationType[] }) => {
@@ -129,8 +134,8 @@ export function Notification() {
   }, [currentTabNotifications, tabId]);
 
   const renderNotificationContent = () => {
-    if (isLoading && page === 0) {
-      return <NotificationSkeletonList count={5} />;
+    if ((isLoading && page === 0) || isMarkingAllAsRead) {
+      return <NotificationSkeletonList count={Math.min(5, currentTabNotifications.length || 5)} />;
     }
 
     if (filteredNotifications.length > 0) {
@@ -189,9 +194,21 @@ export function Notification() {
     };
   }, [accessToken]);
 
-  const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead();
+  const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead({
+    onSuccess: () => {
+      setTabData((prev) => ({
+        all: prev.all.map((n) => ({ ...n, isRead: true })),
+        unread: [],
+      }));
+      setPage(0);
+      setHasMore(true);
+      setIsMarkingAllAsRead(false);
+      void refetch();
+    },
+  });
 
   const handleMarkAllAsRead = () => {
+    setIsMarkingAllAsRead(true);
     markAllAsRead();
   };
 
@@ -205,7 +222,12 @@ export function Notification() {
         <div className="flex w-full flex-col gap-4">
           <div className="flex items-center justify-between px-4 pt-4 bg-background z-10">
             <h3 className="text-xl font-bold text-high-emphasis">{t('NOTIFICATIONS')}</h3>
-            <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead} disabled={isPending}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleMarkAllAsRead}
+              disabled={isPending || isAllNotificationsRead}
+            >
               {isPending ? (
                 <Loader2 className="w-4 h-4 text-primary animate-spin" />
               ) : (
