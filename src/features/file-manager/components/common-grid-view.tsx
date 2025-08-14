@@ -342,7 +342,7 @@ export const CommonGridView = <T extends BaseFile>({
 
       {renderDetailsSheet(selectedFile, isDetailsOpen, handleCloseDetails)}
 
-      {renderPreviewSheet && renderPreviewSheet(selectedFile, isPreviewOpen, handleClosePreview)}
+      {renderPreviewSheet?.(selectedFile, isPreviewOpen, handleClosePreview)}
     </div>
   );
 };

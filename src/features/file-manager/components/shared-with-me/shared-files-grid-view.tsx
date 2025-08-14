@@ -7,6 +7,12 @@ import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
 import { SharedFilesGridViewProps } from '../../types/file-manager.type';
+import {
+  matchesFileType,
+  matchesModifiedDate,
+  matchesName,
+  matchesSharedDate,
+} from '../../utils/grid-view-filter-files';
 
 const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
   const { t } = useTranslation();
@@ -52,45 +58,12 @@ const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
   const filterFiles = useCallback(
     (files: IFileDataWithSharing[], filters: any): IFileDataWithSharing[] => {
       return files.filter((file) => {
-        if (filters.fileType && filters.fileType.length > 0) {
-          if (!filters.fileType.includes(file.fileType)) return false;
-        }
-
-        if (filters.name && filters.name.trim()) {
-          const searchTerm = filters.name.toLowerCase();
-          if (!file.name.toLowerCase().includes(searchTerm)) return false;
-        }
-
-        if (filters.sharedBy && filters.sharedBy.trim()) {
-          const sharedBy =
-            file.sharedBy?.name?.toLowerCase() || file.sharedBy?.id?.toLowerCase() || '';
-          if (!sharedBy.includes(filters.sharedBy.toLowerCase())) return false;
-        }
-
-        if (filters.sharedDate?.from || filters.sharedDate?.to) {
-          const sharedDate = file.sharedDate ? new Date(file.sharedDate) : null;
-          if (!sharedDate) return false;
-
-          if (filters.sharedDate.from && sharedDate < new Date(filters.sharedDate.from)) {
-            return false;
-          }
-          if (filters.sharedDate.to && sharedDate > new Date(filters.sharedDate.to)) {
-            return false;
-          }
-        }
-
-        if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
-          const modifiedDate = new Date(file.lastModified);
-
-          if (filters.modifiedDate.from && modifiedDate < new Date(filters.modifiedDate.from)) {
-            return false;
-          }
-          if (filters.modifiedDate.to && modifiedDate > new Date(filters.modifiedDate.to)) {
-            return false;
-          }
-        }
-
-        return true;
+        return (
+          matchesFileType(file, filters.fileType) &&
+          matchesName(file, filters.name) &&
+          matchesSharedDate(file, filters.sharedDate) &&
+          matchesModifiedDate(file, filters.modifiedDate)
+        );
       });
     },
     []

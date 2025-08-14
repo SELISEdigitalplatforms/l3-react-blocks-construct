@@ -12,6 +12,7 @@ import { SharedFilters } from 'features/file-manager/types/header-toolbar.type';
 import { SharedWithMeHeaderToolbar } from 'features/file-manager/components/shared-with-me/shared-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FilePreview } from 'features/file-manager/components/file-preview';
+import { useViewMode } from 'hooks/use-view-mode';
 
 interface SharedWithMeProps {
   onCreateFile?: () => void;
@@ -22,13 +23,9 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
 
   const fileManager = useFileManager({ onCreateFile });
 
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    try {
-      const saved = sessionStorage.getItem('shared-with-me-view-mode');
-      return (saved as 'grid' | 'list') || 'list';
-    } catch {
-      return 'list';
-    }
+  const { viewMode, handleViewModeChange } = useViewMode({
+    storageKey: 'shared-with-me-view-mode',
+    defaultMode: 'list',
   });
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -37,21 +34,9 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const { filters, handleFiltersChange } = useFileFilters<SharedFilters>({
     name: '',
     fileType: undefined,
-    sharedBy: undefined,
     sharedDate: undefined,
     modifiedDate: undefined,
   });
-
-  const handleViewModeChange = useCallback((mode: string) => {
-    const newViewMode = mode as 'grid' | 'list';
-    setViewMode(newViewMode);
-
-    try {
-      sessionStorage.setItem('shared-with-me-view-mode', newViewMode);
-    } catch (error) {
-      console.warn('Failed to save view mode to sessionStorage:', error);
-    }
-  }, []);
 
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
@@ -67,19 +52,6 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const handleFilePreview = useCallback((file: any) => {
     setSelectedFileForPreview(file);
     setIsPreviewOpen(true);
-
-    switch (file.fileType) {
-      case 'PDF':
-        break;
-      case 'Image':
-        break;
-      case 'Video':
-        break;
-      case 'Document':
-        break;
-      default:
-        break;
-    }
   }, []);
 
   const handleClosePreview = useCallback(() => {

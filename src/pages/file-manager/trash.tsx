@@ -6,6 +6,7 @@ import { TrashFilters } from 'features/file-manager/types/header-toolbar.type';
 import { TrashHeaderToolbar } from 'features/file-manager/components/trash/trash-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMockTrashFilesQuery } from 'features/file-manager/hooks/use-mock-trash-files-query';
+import { useViewMode } from 'hooks/use-view-mode';
 
 interface TrashProps {
   onRestoreFile?: (file: IFileTrashData) => void;
@@ -25,13 +26,9 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
 
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    try {
-      const saved = sessionStorage.getItem('trash-view-mode');
-      return (saved as 'grid' | 'list') || 'list';
-    } catch {
-      return 'list';
-    }
+  const { viewMode, handleViewModeChange } = useViewMode({
+    storageKey: 'trash-view-mode',
+    defaultMode: 'list',
   });
 
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -104,17 +101,6 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
       console.error('Failed to clear trash:', error);
     }
   }, [onClearTrash]);
-
-  const handleViewModeChange = useCallback((mode: string) => {
-    const newViewMode = mode as 'grid' | 'list';
-    setViewMode(newViewMode);
-
-    try {
-      sessionStorage.setItem('trash-view-mode', newViewMode);
-    } catch (error) {
-      console.warn('Failed to save view mode to sessionStorage:', error);
-    }
-  }, []);
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
