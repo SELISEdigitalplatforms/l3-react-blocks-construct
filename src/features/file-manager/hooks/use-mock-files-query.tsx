@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  filesFolderContents,
-  FileType,
-  IFileDataWithSharing,
-  mockFileData,
-} from '../utils/file-manager';
+import { FileType, IFileDataWithSharing } from '../utils/file-manager';
+import { filesFolderContents, mockFileData } from '../utils/mock-data';
 
 export interface IFileData {
   id: string;
