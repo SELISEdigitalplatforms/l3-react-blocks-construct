@@ -52,19 +52,6 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
   const handleFilePreview = useCallback((file: any) => {
     setSelectedFileForPreview(file);
     setIsPreviewOpen(true);
-
-    switch (file.fileType) {
-      case 'PDF':
-        break;
-      case 'Image':
-        break;
-      case 'Video':
-        break;
-      case 'Document':
-        break;
-      default:
-        break;
-    }
   }, []);
 
   const handleClosePreview = useCallback(() => {

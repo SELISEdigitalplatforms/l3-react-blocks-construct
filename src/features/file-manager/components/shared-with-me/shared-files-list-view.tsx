@@ -108,22 +108,70 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     });
 
     const filteredLocalFiles = localFiles.filter((file) => {
-      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      if (filters.name?.trim() && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
         return false;
       }
+
       if (filters.fileType && file.fileType !== filters.fileType) {
         return false;
       }
+
+      if (filters.sharedDate?.from || filters.sharedDate?.to) {
+        const sharedDate = file.sharedDate ? new Date(file.sharedDate) : null;
+        if (!sharedDate) return false;
+
+        if (filters.sharedDate.from && sharedDate < new Date(filters.sharedDate.from)) {
+          return false;
+        }
+        if (filters.sharedDate.to) {
+          const endOfDay = new Date(filters.sharedDate.to);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (sharedDate > endOfDay) {
+            return false;
+          }
+        }
+      }
+
+      if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
+        const modifiedDate = file.lastModified ? new Date(file.lastModified) : null;
+        if (!modifiedDate) return false;
+
+        if (filters.modifiedDate.from && modifiedDate < new Date(filters.modifiedDate.from)) {
+          return false;
+        }
+        if (filters.modifiedDate.to) {
+          const endOfDay = new Date(filters.modifiedDate.to);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (modifiedDate > endOfDay) {
+            return false;
+          }
+        }
+      }
+
       return true;
     });
 
     const filteredServerFiles = processedServerFiles.filter((file: IFileDataWithSharing) => {
-      if (filters.name && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
-        return false;
-      }
       if (filters.fileType && file.fileType !== filters.fileType) {
         return false;
       }
+
+      if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
+        const modifiedDate = file.lastModified ? new Date(file.lastModified) : null;
+        if (!modifiedDate) return false;
+
+        if (filters.modifiedDate.from && modifiedDate < new Date(filters.modifiedDate.from)) {
+          return false;
+        }
+        if (filters.modifiedDate.to) {
+          const endOfDay = new Date(filters.modifiedDate.to);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (modifiedDate > endOfDay) {
+            return false;
+          }
+        }
+      }
+
       return true;
     });
 
@@ -133,99 +181,15 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     return [...filteredLocalFiles, ...uniqueServerFiles];
   }, [localFiles, data?.data, filters, renamedFiles, fileSharedUsers, filePermissions]);
 
-  const isNameMatch = (file: IFileDataWithSharing, nameFilter: string): boolean => {
-    if (!nameFilter) return true;
-    return file.name.toLowerCase().includes(nameFilter.toLowerCase());
-  };
-
-  const isFileTypeMatch = (file: IFileDataWithSharing, fileTypeFilter: string): boolean => {
-    if (!fileTypeFilter) return true;
-    return file.fileType === fileTypeFilter;
-  };
-
-  const isSharedByMatch = (file: IFileDataWithSharing, sharedByFilter: any): boolean => {
-    if (!sharedByFilter) return true;
-
-    const sharedById = file.sharedBy?.id;
-    if (!sharedById) return false;
-
-    if (Array.isArray(sharedByFilter)) {
-      return sharedByFilter.length === 0 || sharedByFilter.includes(sharedById);
-    }
-
-    return sharedByFilter === sharedById;
-  };
-
-  const createEndOfDay = (date: Date): Date => {
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-    return endOfDay;
-  };
-
-  const isDateInRange = (fileDate: Date | null, dateRange: { from?: Date; to?: Date }): boolean => {
-    if (!dateRange?.from && !dateRange?.to) return true;
-    if (!fileDate) return false;
-
-    if (dateRange.from && fileDate < dateRange.from) return false;
-    if (dateRange.to && fileDate > createEndOfDay(dateRange.to)) return false;
-
-    return true;
-  };
-
-  const isSharedDateMatch = (
-    file: IFileDataWithSharing,
-    sharedDateFilter: { from?: Date; to?: Date }
-  ): boolean => {
-    return isDateInRange(file.sharedDate ?? null, sharedDateFilter);
-  };
-
-  const isModifiedDateMatch = (
-    file: IFileDataWithSharing,
-    modifiedDateFilter: { from?: Date; to?: Date }
-  ): boolean => {
-    return isDateInRange(file.lastModified ?? null, modifiedDateFilter);
-  };
-
-  const displayData = useMemo(() => {
-    return combinedData.filter((file: IFileDataWithSharing) => {
-      return (
-        isNameMatch(file, filters.name ?? '') &&
-        isFileTypeMatch(file, filters.fileType ?? '') &&
-        isSharedByMatch(file, filters.sharedBy) &&
-        isSharedDateMatch(file, filters.sharedDate ?? {}) &&
-        isModifiedDateMatch(file, filters.modifiedDate ?? {})
-      );
-    });
-  }, [
-    combinedData,
-    filters.fileType,
-    filters.modifiedDate,
-    filters.name,
-    filters.sharedBy,
-    filters.sharedDate,
-    isModifiedDateMatch,
-    isSharedDateMatch,
-  ]);
-
-  const paginationProps = useMemo(() => {
-    const hasClientFiltering = displayData.length !== combinedData.length;
-
-    if (hasClientFiltering) {
-      return {
-        pageIndex: paginationState.pageIndex,
-        pageSize: paginationState.pageSize,
-        totalCount: displayData.length,
-        manualPagination: false,
-      };
-    } else {
-      return {
-        pageIndex: paginationState.pageIndex,
-        pageSize: paginationState.pageSize,
-        totalCount: paginationState.totalCount,
-        manualPagination: true,
-      };
-    }
-  }, [displayData.length, combinedData.length, paginationState]);
+  const paginationProps = useMemo(
+    () => ({
+      pageIndex: paginationState.pageIndex,
+      pageSize: paginationState.pageSize,
+      totalCount: paginationState.totalCount,
+      manualPagination: true,
+    }),
+    [paginationState]
+  );
 
   const handlePaginationChange = useCallback(
     (newPagination: { pageIndex: number; pageSize: number }) => {
@@ -345,7 +309,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
         >
           <div className="h-full flex-col flex w-full gap-6 md:gap-8">
             <DataTable
-              data={displayData}
+              data={combinedData}
               columns={columns}
               onRowClick={handleRowClick}
               isLoading={isLoading}

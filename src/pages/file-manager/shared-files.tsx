@@ -34,7 +34,6 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const { filters, handleFiltersChange } = useFileFilters<SharedFilters>({
     name: '',
     fileType: undefined,
-    sharedBy: undefined,
     sharedDate: undefined,
     modifiedDate: undefined,
   });
@@ -53,19 +52,6 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   const handleFilePreview = useCallback((file: any) => {
     setSelectedFileForPreview(file);
     setIsPreviewOpen(true);
-
-    switch (file.fileType) {
-      case 'PDF':
-        break;
-      case 'Image':
-        break;
-      case 'Video':
-        break;
-      case 'Document':
-        break;
-      default:
-        break;
-    }
   }, []);
 
   const handleClosePreview = useCallback(() => {
