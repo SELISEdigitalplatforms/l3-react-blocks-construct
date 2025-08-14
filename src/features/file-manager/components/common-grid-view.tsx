@@ -1,7 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from 'components/ui/button';
-import { Skeleton } from 'components/ui/skeleton';
+import { SkeletonGrid } from './file-manager-grid-view-skeleton';
 
+interface BaseFile {
+  id: string;
+  name: string;
+  fileType: string;
+}
+
+// Updated interfaces to support file preview and navigation
 interface BaseFile {
   id: string;
   name: string;
@@ -10,6 +17,8 @@ interface BaseFile {
 
 interface BaseGridViewProps<T extends BaseFile> {
   onViewDetails?: (file: T) => void;
+  onFilePreview?: (file: T) => void; // NEW: For file preview
+  onNavigateToFolder?: (folderId: string) => void; // For folder navigation
   filters: Record<string, any>;
   data?: {
     data: T[];
@@ -19,6 +28,7 @@ interface BaseGridViewProps<T extends BaseFile> {
   error?: any;
   onLoadMore: () => void;
   renderDetailsSheet: (file: T | null, isOpen: boolean, onClose: () => void) => React.ReactNode;
+  renderPreviewSheet?: (file: T | null, isOpen: boolean, onClose: () => void) => React.ReactNode; // NEW: Preview sheet
   getFileTypeIcon: (fileType: string) => React.ComponentType<{ className?: string }>;
   getFileTypeInfo: (fileType: string) => { iconColor: string; backgroundColor: string };
   renderActions: (file: T) => React.ReactNode;
@@ -38,13 +48,12 @@ interface BaseGridViewProps<T extends BaseFile> {
   filterFiles?: (files: T[], filters: Record<string, any>) => T[];
   processFiles?: (files: T[]) => T[];
   currentFolderId?: string;
-  onNavigateToFolder?: (folderId: string) => void;
-  onNavigateBack?: () => void;
 }
 
 interface BaseCardProps<T extends BaseFile> {
   file: T;
-  onViewDetails?: (file: T) => void;
+  onFilePreview?: (file: T) => void; // NEW: For file preview
+  onNavigateToFolder?: (folderId: string) => void; // For folder navigation
   renderActions: (file: T) => React.ReactNode;
   IconComponent: React.ComponentType<{ className?: string }>;
   iconColor: string;
@@ -53,7 +62,8 @@ interface BaseCardProps<T extends BaseFile> {
 
 const CommonCard = <T extends BaseFile>({
   file,
-  onViewDetails,
+  onFilePreview,
+  onNavigateToFolder,
   renderActions,
   IconComponent,
   iconColor,
@@ -61,18 +71,26 @@ const CommonCard = <T extends BaseFile>({
 }: BaseCardProps<T>) => {
   const isFolder = file.fileType === 'Folder';
 
+  // ✅ UPDATED: Separate click behaviors like MyFilesListView
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     const isActionButton = target.closest('[data-action-button="true"]');
 
     if (!isActionButton) {
       e.preventDefault();
-      onViewDetails?.(file);
+
+      if (isFolder && onNavigateToFolder) {
+        // Navigate to folder
+        onNavigateToFolder(file.id);
+      } else if (!isFolder && onFilePreview) {
+        // Preview file
+        onFilePreview(file);
+      }
     }
   };
 
   const containerClasses =
-    'group relative bg-background rounded-lg border border-border hover:border-gray-500 hover:bg-muted/50 hover:shadow-md transition-all duration-200 cursor-pointer';
+    'group relative bg-background rounded-lg border border-border hover:bg-muted/50 hover:shadow-md transition-all duration-200 cursor-pointer';
   const contentClasses = isFolder
     ? 'p-3 flex items-center space-x-3'
     : 'p-6 flex flex-col items-center text-center space-y-4';
@@ -115,7 +133,7 @@ const CommonCard = <T extends BaseFile>({
     <button
       className={containerClasses}
       onClick={handleCardClick}
-      aria-label={`View details for ${file.name}`}
+      aria-label={isFolder ? `Open folder ${file.name}` : `Preview ${file.name}`}
       type="button"
     >
       <div className={contentClasses}>
@@ -131,13 +149,15 @@ const CommonCard = <T extends BaseFile>({
 };
 
 export const CommonGridView = <T extends BaseFile>({
-  onViewDetails,
+  onFilePreview, // NEW: For file preview
+  onNavigateToFolder, // For folder navigation
   filters,
   data,
   isLoading,
   error,
   onLoadMore,
   renderDetailsSheet,
+  renderPreviewSheet, // NEW: Preview sheet
   getFileTypeIcon,
   getFileTypeInfo,
   renderActions,
@@ -150,26 +170,43 @@ export const CommonGridView = <T extends BaseFile>({
   filterFiles,
   processFiles,
   currentFolderId,
-  onNavigateToFolder,
 }: BaseGridViewProps<T>) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false); // NEW: Preview state
   const [selectedFile, setSelectedFile] = useState<T | null>(null);
 
-  const handleViewDetails = useCallback(
+  const getEmptyStateMessage = () => {
+    if (hasActiveFilters) {
+      return 'No files match the current criteria';
+    }
+
+    if (currentFolderId) {
+      return 'This folder is empty';
+    }
+
+    return emptyStateConfig.description;
+  };
+
+  // ✅ SEPARATE view details handler (only for dropdown actions)
+
+  // ✅ NEW: File preview handler
+  const handleFilePreview = useCallback(
     (file: T) => {
-      if (file.fileType === 'Folder' && onNavigateToFolder) {
-        onNavigateToFolder(file.id);
-      } else {
-        setSelectedFile(file);
-        setIsDetailsOpen(true);
-        onViewDetails?.(file);
-      }
+      setSelectedFile(file);
+      setIsPreviewOpen(true);
+      onFilePreview?.(file);
     },
-    [onViewDetails, onNavigateToFolder]
+    [onFilePreview]
   );
 
   const handleCloseDetails = useCallback(() => {
     setIsDetailsOpen(false);
+    setSelectedFile(null);
+  }, []);
+
+  // ✅ NEW: Close preview handler
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
     setSelectedFile(null);
   }, []);
 
@@ -198,63 +235,6 @@ export const CommonGridView = <T extends BaseFile>({
       (Array.isArray(value) ? value.length > 0 : true)
   );
 
-  const FolderSkeletonCard = () => (
-    <div className="group relative bg-background rounded-lg border border-border p-3">
-      <div className="flex items-center space-x-3">
-        <Skeleton className="w-8 h-8 rounded-lg" />
-        <div className="flex items-center justify-between flex-1">
-          <div className="flex-1 min-w-0">
-            <Skeleton className="h-4 w-24" />
-          </div>
-          <Skeleton className="h-6 w-6 rounded" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const FileSkeletonCard = () => (
-    <div className="group relative bg-background rounded-lg border border-border p-6">
-      <div className="flex flex-col items-center text-center space-y-4">
-        <Skeleton className="w-20 h-20 rounded-lg" />
-        <div className="flex items-center justify-between space-x-2 mt-2 w-full">
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            <Skeleton className="w-8 h-8 rounded-lg" />
-            <div className="flex-1 min-w-0">
-              <Skeleton className="h-4 w-20" />
-            </div>
-          </div>
-          <Skeleton className="h-6 w-6 rounded" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const SkeletonGrid = ({
-    count = 6,
-    title,
-    type = 'file',
-  }: {
-    count?: number;
-    title: string;
-    type?: 'file' | 'folder';
-  }) => (
-    <div>
-      <div className="flex items-center space-x-2 mb-4 py-2">
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-4 w-8" />
-      </div>
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
-        {Array.from({ length: count }).map((_, index) =>
-          type === 'folder' ? (
-            <FolderSkeletonCard key={`${title}-folder-skeleton-${index}`} />
-          ) : (
-            <FileSkeletonCard key={`${title}-file-skeleton-${index}`} />
-          )
-        )}
-      </div>
-    </div>
-  );
-
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -267,11 +247,12 @@ export const CommonGridView = <T extends BaseFile>({
 
   if (isLoading && !processedFiles.length) {
     return (
-      <div className={`flex flex-col h-full ${isDetailsOpen ? 'flex-1' : 'w-full'}`}>
+      <div
+        className={`flex flex-col h-full ${isDetailsOpen || isPreviewOpen ? 'flex-1' : 'w-full'}`}
+      >
         <div className="flex-1">
           <div className="space-y-8">
             <SkeletonGrid count={3} title="folders" type="folder" />
-
             <SkeletonGrid count={6} title="files" type="file" />
           </div>
         </div>
@@ -281,7 +262,9 @@ export const CommonGridView = <T extends BaseFile>({
 
   return (
     <div className="flex h-full w-full">
-      <div className={`flex flex-col h-full ${isDetailsOpen ? 'flex-1' : 'w-full'}`}>
+      <div
+        className={`flex flex-col h-full ${isDetailsOpen || isPreviewOpen ? 'flex-1' : 'w-full'}`}
+      >
         <div className="flex-1">
           <div className="space-y-8">
             {folders.length > 0 && (
@@ -298,7 +281,7 @@ export const CommonGridView = <T extends BaseFile>({
                       <CommonCard
                         key={`folder-${file.id}-${file.name}`}
                         file={file}
-                        onViewDetails={handleViewDetails}
+                        onNavigateToFolder={onNavigateToFolder} // For folder navigation
                         renderActions={renderActions}
                         IconComponent={IconComponent}
                         iconColor={iconColor}
@@ -324,7 +307,7 @@ export const CommonGridView = <T extends BaseFile>({
                       <CommonCard
                         key={`file-${file.id}-${file.name}`}
                         file={file}
-                        onViewDetails={handleViewDetails}
+                        onFilePreview={handleFilePreview} // For file preview
                         renderActions={renderActions}
                         IconComponent={IconComponent}
                         iconColor={iconColor}
@@ -342,13 +325,7 @@ export const CommonGridView = <T extends BaseFile>({
                 <h3 className="text-lg font-medium text-high-emphasis mb-2">
                   {emptyStateConfig.title}
                 </h3>
-                <p className="text-medium-emphasis max-w-sm">
-                  {hasActiveFilters
-                    ? 'No files match the current criteria'
-                    : currentFolderId
-                      ? 'This folder is empty'
-                      : emptyStateConfig.description}
-                </p>
+                <p className="text-medium-emphasis max-w-sm">{getEmptyStateMessage()}</p>
               </div>
             )}
 
@@ -376,6 +353,9 @@ export const CommonGridView = <T extends BaseFile>({
       </div>
 
       {renderDetailsSheet(selectedFile, isDetailsOpen, handleCloseDetails)}
+
+      {/* ✅ NEW: Preview sheet - opens from card clicks */}
+      {renderPreviewSheet?.(selectedFile, isPreviewOpen, handleClosePreview)}
     </div>
   );
 };

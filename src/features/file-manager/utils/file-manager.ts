@@ -259,6 +259,12 @@ export const trashMockData: IFileTrashData[] = [
   },
 ];
 
+export interface PreviewProps {
+  file: IFileTrashData;
+  onClose: () => void;
+  t: (key: string) => string;
+}
+
 export const getFileTypeDisplayName = (fileType: string): string => {
   switch (fileType) {
     case 'Folder':
@@ -368,6 +374,8 @@ export interface MyFilesListViewProps {
   renamedFiles: Map<string, IFileDataWithSharing>;
   fileSharedUsers?: { [key: string]: SharedUser[] };
   filePermissions?: { [key: string]: { [key: string]: string } };
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
 }
 
 export interface FileManagerHeaderToolbarProps {

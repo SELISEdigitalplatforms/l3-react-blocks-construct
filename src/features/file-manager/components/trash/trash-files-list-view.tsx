@@ -7,6 +7,7 @@ import { IFileTrashData, PaginationState } from '../../utils/file-manager';
 import { TrashTableColumns } from './trash-files-table-columns';
 import { TrashDetailsSheet } from './trash-files-details';
 import { useMockTrashFilesQuery } from '../../hooks/use-mock-trash-files-query';
+import { FilePreview } from '../file-preview';
 
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;
@@ -23,7 +24,6 @@ interface TrashFilesListViewProps {
   restoredItemIds?: Set<string>;
   currentFolderId?: string;
   onNavigateToFolder?: (folderId: string) => void;
-  onNavigateBack?: () => void;
 }
 
 export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
@@ -38,6 +38,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
@@ -111,11 +112,16 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
         onNavigateToFolder(file.id);
       } else {
         setSelectedFile(file);
-        setIsDetailsOpen(true);
+        setIsPreviewOpen(true);
       }
     },
     [onNavigateToFolder]
   );
+
+  const handleViewDetails = useCallback((file: IFileTrashData) => {
+    setSelectedFile(file);
+    setIsDetailsOpen(true);
+  }, []);
 
   const handleRestoreWrapper = useCallback(
     (file: IFileTrashData) => {
@@ -133,6 +139,11 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     [onDelete]
   );
 
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFile(null);
+  }, []);
+
   const handleCloseDetails = useCallback(() => {
     setIsDetailsOpen(false);
     setSelectedFile(null);
@@ -142,9 +153,10 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return TrashTableColumns({
       onRestore: handleRestoreWrapper,
       onDelete: handleDeleteWrapper,
+      onViewDetails: handleViewDetails,
       t,
     });
-  }, [handleRestoreWrapper, handleDeleteWrapper, t]);
+  }, [handleRestoreWrapper, handleDeleteWrapper, handleViewDetails, t]);
 
   const displayData = useMemo(() => {
     if (!data?.data) {
@@ -166,7 +178,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return {
       pageIndex: paginationState.pageIndex,
       pageSize: paginationState.pageSize,
-      totalCount: data?.totalCount || 0,
+      totalCount: data?.totalCount ?? 0,
       manualPagination: true,
     };
   }, [data?.totalCount, paginationState]);
@@ -175,7 +187,7 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
     return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && isDetailsOpen;
+  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
@@ -186,8 +198,6 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
           }`}
         >
           <div className="h-full flex-col flex w-full gap-6 md:gap-8">
-            {/* Remove the internal breadcrumb since DynamicBreadcrumb handles it */}
-
             <DataTable
               data={displayData}
               columns={columns}
@@ -206,6 +216,8 @@ export const TrashFilesListView: React.FC<TrashFilesListViewProps> = ({
           </div>
         </div>
       )}
+
+      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
       <TrashDetailsSheet
         isOpen={isDetailsOpen}

@@ -13,11 +13,13 @@ interface TrashProps {
   onClearTrash?: () => void;
 }
 
-interface TrashProps {
-  onRestoreFile?: (file: IFileTrashData) => void;
-  readonly onPermanentDelete?: (file: IFileTrashData) => void;
-  onClearTrash?: () => void;
-}
+const EmptyTrashView = () => (
+  <div className="flex flex-col items-center justify-center h-full p-12 text-center">
+    <div className="text-6xl mb-6">🗑️</div>
+    <h3 className="text-xl font-medium text-high-emphasis mb-2">Trash is empty</h3>
+    <p className="text-medium-emphasis max-w-sm">All items have been permanently deleted</p>
+  </div>
+);
 
 const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClearTrash }) => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
 
   const queryParams = {
     filter: {
-      name: filters.name || searchQuery,
+      name: filters.name ?? searchQuery,
       fileType: filters.fileType,
       deletedDate: filters.trashedDate
         ? {
@@ -125,7 +127,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     setFilters(newFilters);
     setSearchQuery(newFilters.name ?? '');
 
-    const hasActiveFilters = newFilters.fileType || newFilters.deletedBy || newFilters.trashedDate;
+    const hasActiveFilters = newFilters.fileType ?? newFilters.deletedBy ?? newFilters.trashedDate;
     if (hasActiveFilters) {
       setShowEmptyView(false);
     }
@@ -163,19 +165,11 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
     currentFolderId: folderId,
     onNavigateToFolder: handleNavigateToFolder,
     onNavigateBack: handleNavigateBack,
-    data: data?.data || [],
-    totalCount: data?.totalCount || 0,
+    data: data?.data ?? [],
+    totalCount: data?.totalCount ?? 0,
     isLoading,
     error,
   };
-
-  const EmptyTrashView = () => (
-    <div className="flex flex-col items-center justify-center h-full p-12 text-center">
-      <div className="text-6xl mb-6">🗑️</div>
-      <h3 className="text-xl font-medium text-high-emphasis mb-2">Trash is empty</h3>
-      <p className="text-medium-emphasis max-w-sm">All items have been permanently deleted</p>
-    </div>
-  );
 
   return (
     <div className="flex flex-col h-full w-full space-y-4">

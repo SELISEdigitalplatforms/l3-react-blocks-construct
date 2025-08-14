@@ -9,9 +9,9 @@ import { SharedFilesListViewProps } from '../../types/file-manager.type';
 import { SharedFileTableColumns } from './shared-files-table-columns';
 import { IFileDataWithSharing, PaginationState } from '../../utils/file-manager';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
+import { FilePreview } from '../file-preview';
 
 const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
-  onViewDetails,
   onShare,
   onDelete,
   onMove,
@@ -23,12 +23,16 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
   renamedFiles = new Map(),
   fileSharedUsers = {},
   filePermissions = {},
+  currentFolderId,
+  onNavigateToFolder,
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
+
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -56,6 +60,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
         sharedDate: filters.sharedDate ?? undefined,
         modifiedDate: filters.modifiedDate ?? undefined,
       },
+      folderId: currentFolderId,
     };
   }, [
     paginationState.pageIndex,
@@ -65,6 +70,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     filters.sharedBy,
     filters.sharedDate,
     filters.modifiedDate,
+    currentFolderId,
   ]);
 
   const localFiles = useMemo(() => {
@@ -232,14 +238,27 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     []
   );
 
-  const handleViewDetailsWrapper = useCallback(
+  const handleRowClick = useCallback(
     (file: IFileDataWithSharing) => {
-      setSelectedFile(file);
-      setIsDetailsOpen(true);
-      onViewDetails(file);
+      if (file.fileType === 'Folder' && onNavigateToFolder) {
+        onNavigateToFolder(file.id);
+      } else {
+        setSelectedFile(file);
+        setIsPreviewOpen(true);
+      }
     },
-    [onViewDetails]
+    [onNavigateToFolder]
   );
+
+  const handleViewDetails = useCallback((file: IFileDataWithSharing) => {
+    setSelectedFile(file);
+    setIsDetailsOpen(true);
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    setSelectedFile(null);
+  }, []);
 
   const handleCloseDetails = useCallback(() => {
     setIsDetailsOpen(false);
@@ -273,18 +292,18 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
 
   const columns = useMemo(() => {
     return SharedFileTableColumns({
-      onViewDetails: handleViewDetailsWrapper,
+      onViewDetails: handleViewDetails,
       onDownload: handleDownloadWrapper,
       onShare: handleShareWrapper,
       onDelete: handleDeleteWrapper,
       onMove: onMove,
       onRename: handleRenameWrapper,
       onCopy: onCopy,
-      onOpen: handleViewDetailsWrapper,
+      onOpen: handleViewDetails,
       t,
     });
   }, [
-    handleViewDetailsWrapper,
+    handleViewDetails,
     handleDownloadWrapper,
     handleShareWrapper,
     handleDeleteWrapper,
@@ -308,13 +327,13 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
       ...prev,
       pageIndex: 0,
     }));
-  }, [filters]);
+  }, [filters, currentFolderId]);
 
   if (error) {
     return <div className="p-4 text-error">{t('ERROR_LOADING_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && isDetailsOpen;
+  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
 
   return (
     <div className="flex h-full w-full rounded-xl relative">
@@ -328,7 +347,7 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
             <DataTable
               data={displayData}
               columns={columns}
-              onRowClick={handleViewDetailsWrapper}
+              onRowClick={handleRowClick}
               isLoading={isLoading}
               pagination={{
                 pageIndex: paginationProps.pageIndex,
@@ -343,6 +362,8 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
           </div>
         </div>
       )}
+
+      <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
       <RegularFileDetailsSheet
         isOpen={isDetailsOpen}

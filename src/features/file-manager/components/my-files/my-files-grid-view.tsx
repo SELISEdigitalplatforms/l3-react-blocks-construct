@@ -11,12 +11,22 @@ const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
       page: params.page,
       pageSize: params.pageSize,
       filter: params.filters,
+      folderId: props.currentFolderId,
     }),
-    []
+    [props.currentFolderId]
   );
 
   const filterFiles = useCallback(createBasicFileFilter(), []);
-  return <BaseGridView {...props} queryBuilder={queryBuilder} filterFiles={filterFiles} />;
+
+  return (
+    <BaseGridView
+      {...props}
+      queryBuilder={queryBuilder}
+      filterFiles={filterFiles}
+      currentFolderId={props.currentFolderId}
+      onNavigateToFolder={props.onNavigateToFolder}
+    />
+  );
 };
 
 export default MyFileGridView;
