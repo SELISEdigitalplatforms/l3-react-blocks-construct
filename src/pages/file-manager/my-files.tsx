@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
@@ -38,26 +38,27 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     lastModified: undefined,
   });
 
-  const handleNavigateToFolder = useCallback(
-    (folderId: string) => {
-      navigate(`/my-files/${folderId}`);
-    },
+  const navigationHandlers = useMemo(
+    () => ({
+      toFolder: (folderId: string) => navigate(`/my-files/${folderId}`),
+      back: () => navigate('/my-files'),
+    }),
     [navigate]
   );
 
-  const handleNavigateBack = useCallback(() => {
-    navigate('/my-files');
-  }, [navigate]);
-
-  const handleFilePreview = useCallback((file: any) => {
-    setSelectedFileForPreview(file);
-    setIsPreviewOpen(true);
-  }, []);
-
-  const handleClosePreview = useCallback(() => {
-    setIsPreviewOpen(false);
-    setSelectedFileForPreview(null);
-  }, []);
+  const previewHandlers = useMemo(
+    () => ({
+      open: (file: any) => {
+        setSelectedFileForPreview(file);
+        setIsPreviewOpen(true);
+      },
+      close: () => {
+        setIsPreviewOpen(false);
+        setSelectedFileForPreview(null);
+      },
+    }),
+    []
+  );
 
   const handleSearchChange = useCallback(
     (query: string) => {
@@ -70,66 +71,119 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     [fileManager, handleFiltersChange, filters]
   );
 
-  const commonViewProps = {
-    onFilePreview: handleFilePreview,
-    onDownload: fileManager.handleDownload,
-    onShare: fileManager.handleShare,
-    onDelete: fileManager.handleDelete,
-    onMove: fileManager.handleMove,
-    onCopy: fileManager.handleCopy,
-    onOpen: fileManager.handleOpen,
-    onRename: fileManager.handleRename,
-    onRenameUpdate: fileManager.handleRenameUpdate,
-    filters,
-    newFiles: fileManager.newFiles,
-    newFolders: fileManager.newFolders,
-    renamedFiles: fileManager.renamedFiles,
-    fileSharedUsers: fileManager.fileSharedUsers,
-    filePermissions: fileManager.filePermissions,
-    currentFolderId: folderId,
-    onNavigateToFolder: handleNavigateToFolder,
-    onNavigateBack: handleNavigateBack,
-  };
-
-  const headerToolbar = (
-    <FileManagerHeaderToolbar
-      viewMode={viewMode}
-      handleViewMode={handleViewModeChange}
-      searchQuery={fileManager.searchQuery}
-      onSearchChange={handleSearchChange}
-      filters={filters}
-      onFiltersChange={(filters) =>
-        handleFiltersChange({
-          ...filters,
-          name: filters.name ?? '',
-        })
-      }
-      onFileUpload={(files) => fileManager.handleFileUpload(files, false)}
-      onFolderCreate={(name) => fileManager.handleFolderCreate(name, false)}
-    />
+  // Extracted filter change handler for toolbar
+  const handleToolbarFiltersChange = useCallback(
+    (newFilters: any) =>
+      handleFiltersChange({
+        ...newFilters,
+        name: newFilters.name ?? '',
+      }),
+    [handleFiltersChange]
   );
 
-  const modals = (
-    <FileModals
-      isRenameModalOpen={fileManager.isRenameModalOpen}
-      onRenameModalClose={fileManager.handleRenameModalClose}
-      onRenameConfirm={fileManager.handleRenameConfirm}
-      fileToRename={
-        fileManager.fileToRename
-          ? { ...fileManager.fileToRename, isShared: !!fileManager.fileToRename.isShared }
-          : null
-      }
-      isShareModalOpen={fileManager.isShareModalOpen}
-      onShareModalClose={fileManager.handleShareModalClose}
-      onShareConfirm={fileManager.handleShareConfirm}
-      fileToShare={
-        fileManager.fileToShare
-          ? { ...fileManager.fileToShare, isShared: !!fileManager.fileToShare.isShared }
-          : null
-      }
-      RenameModalComponent={RenameModal}
-      ShareModalComponent={ShareWithMeModal}
-    />
+  const ensureFileHasSharedProperty = (file: any) =>
+    file ? { ...file, isShared: !!file.isShared } : null;
+
+  const fileHandlers = useMemo(
+    () => ({
+      onFilePreview: previewHandlers.open,
+      onDownload: fileManager.handleDownload,
+      onShare: fileManager.handleShare,
+      onDelete: fileManager.handleDelete,
+      onMove: fileManager.handleMove,
+      onCopy: fileManager.handleCopy,
+      onOpen: fileManager.handleOpen,
+      onRename: fileManager.handleRename,
+      onRenameUpdate: fileManager.handleRenameUpdate,
+    }),
+    [
+      previewHandlers.open,
+      fileManager.handleDownload,
+      fileManager.handleShare,
+      fileManager.handleDelete,
+      fileManager.handleMove,
+      fileManager.handleCopy,
+      fileManager.handleOpen,
+      fileManager.handleRename,
+      fileManager.handleRenameUpdate,
+    ]
+  );
+
+  const commonViewProps = useMemo(
+    () => ({
+      ...fileHandlers,
+      filters,
+      newFiles: fileManager.newFiles,
+      newFolders: fileManager.newFolders,
+      renamedFiles: fileManager.renamedFiles,
+      fileSharedUsers: fileManager.fileSharedUsers,
+      filePermissions: fileManager.filePermissions,
+      currentFolderId: folderId,
+      onNavigateToFolder: navigationHandlers.toFolder,
+      onNavigateBack: navigationHandlers.back,
+    }),
+    [
+      fileHandlers,
+      filters,
+      fileManager.newFiles,
+      fileManager.newFolders,
+      fileManager.renamedFiles,
+      fileManager.fileSharedUsers,
+      fileManager.filePermissions,
+      folderId,
+      navigationHandlers.toFolder,
+      navigationHandlers.back,
+    ]
+  );
+
+  const headerToolbar = useMemo(
+    () => (
+      <FileManagerHeaderToolbar
+        viewMode={viewMode}
+        handleViewMode={handleViewModeChange}
+        searchQuery={fileManager.searchQuery}
+        onSearchChange={handleSearchChange}
+        filters={filters}
+        onFiltersChange={handleToolbarFiltersChange}
+        onFileUpload={(files) => fileManager.handleFileUpload(files, false)}
+        onFolderCreate={(name) => fileManager.handleFolderCreate(name, false)}
+      />
+    ),
+    [
+      viewMode,
+      handleViewModeChange,
+      fileManager,
+      handleSearchChange,
+      filters,
+      handleToolbarFiltersChange,
+    ]
+  );
+
+  const modals = useMemo(
+    () => (
+      <FileModals
+        isRenameModalOpen={fileManager.isRenameModalOpen}
+        onRenameModalClose={fileManager.handleRenameModalClose}
+        onRenameConfirm={fileManager.handleRenameConfirm}
+        fileToRename={ensureFileHasSharedProperty(fileManager.fileToRename)}
+        isShareModalOpen={fileManager.isShareModalOpen}
+        onShareModalClose={fileManager.handleShareModalClose}
+        onShareConfirm={fileManager.handleShareConfirm}
+        fileToShare={ensureFileHasSharedProperty(fileManager.fileToShare)}
+        RenameModalComponent={RenameModal}
+        ShareModalComponent={ShareWithMeModal}
+      />
+    ),
+    [
+      fileManager.isRenameModalOpen,
+      fileManager.handleRenameModalClose,
+      fileManager.handleRenameConfirm,
+      fileManager.fileToRename,
+      fileManager.isShareModalOpen,
+      fileManager.handleShareModalClose,
+      fileManager.handleShareConfirm,
+      fileManager.fileToShare,
+    ]
   );
 
   return (
@@ -144,7 +198,7 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
         <FilePreview
           file={selectedFileForPreview}
           isOpen={isPreviewOpen}
-          onClose={handleClosePreview}
+          onClose={previewHandlers.close}
         />
       </div>
     </FileManagerLayout>
