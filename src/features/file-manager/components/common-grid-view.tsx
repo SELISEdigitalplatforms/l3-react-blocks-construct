@@ -71,7 +71,7 @@ const CommonCard = <T extends BaseFile>({
   };
 
   const containerClasses =
-    'group relative bg-background rounded-lg border border-border hover:border-gray-500 hover:bg-muted/50 hover:shadow-md transition-all duration-200 cursor-pointer';
+    'group relative bg-background rounded-lg border border-border hover:bg-muted/50 hover:shadow-md transition-all duration-200 cursor-pointer';
   const contentClasses = isFolder
     ? 'p-3 flex items-center space-x-3'
     : 'p-6 flex flex-col items-center text-center space-y-4';
