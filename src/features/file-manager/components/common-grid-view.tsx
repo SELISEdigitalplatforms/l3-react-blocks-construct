@@ -8,15 +8,8 @@ interface BaseFile {
   fileType: string;
 }
 
-// Updated interfaces to support file preview and navigation
-interface BaseFile {
-  id: string;
-  name: string;
-  fileType: string;
-}
-
 interface BaseGridViewProps<T extends BaseFile> {
-  onViewDetails?: (file: T) => void;
+  onViewDetails?: (file: T) => void; // Only for dropdown actions
   onFilePreview?: (file: T) => void; // NEW: For file preview
   onNavigateToFolder?: (folderId: string) => void; // For folder navigation
   filters: Record<string, any>;
@@ -60,6 +53,7 @@ interface BaseCardProps<T extends BaseFile> {
   backgroundColor: string;
 }
 
+// Updated CommonCard with debugging
 const CommonCard = <T extends BaseFile>({
   file,
   onFilePreview,
@@ -71,7 +65,7 @@ const CommonCard = <T extends BaseFile>({
 }: BaseCardProps<T>) => {
   const isFolder = file.fileType === 'Folder';
 
-  // ✅ UPDATED: Separate click behaviors like MyFilesListView
+  // ✅ UPDATED: Separate click behaviors with debugging
   const handleCardClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     const isActionButton = target.closest('[data-action-button="true"]');
@@ -79,12 +73,23 @@ const CommonCard = <T extends BaseFile>({
     if (!isActionButton) {
       e.preventDefault();
 
+      // ✅ Add debugging logs
+      console.log('Card clicked:', {
+        fileName: file.name,
+        fileType: file.fileType,
+        isFolder,
+        hasNavigateHandler: !!onNavigateToFolder,
+        hasPreviewHandler: !!onFilePreview,
+      });
+
       if (isFolder && onNavigateToFolder) {
-        // Navigate to folder
+        console.log('Navigating to folder:', file.id);
         onNavigateToFolder(file.id);
       } else if (!isFolder && onFilePreview) {
-        // Preview file
+        console.log('Previewing file:', file.id);
         onFilePreview(file);
+      } else {
+        console.log('No action taken - missing handler');
       }
     }
   };
@@ -148,6 +153,7 @@ const CommonCard = <T extends BaseFile>({
   );
 };
 
+// Updated CommonGridView with preview support
 export const CommonGridView = <T extends BaseFile>({
   onFilePreview, // NEW: For file preview
   onNavigateToFolder, // For folder navigation
@@ -175,6 +181,13 @@ export const CommonGridView = <T extends BaseFile>({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false); // NEW: Preview state
   const [selectedFile, setSelectedFile] = useState<T | null>(null);
 
+  // ✅ Add debugging to check if navigation props are received
+  console.log('CommonGridView props:', {
+    hasNavigateToFolder: !!onNavigateToFolder,
+    hasFilePreview: !!onFilePreview,
+    currentFolderId,
+  });
+
   const getEmptyStateMessage = () => {
     if (hasActiveFilters) {
       return 'No files match the current criteria';
@@ -186,8 +199,6 @@ export const CommonGridView = <T extends BaseFile>({
 
     return emptyStateConfig.description;
   };
-
-  // ✅ SEPARATE view details handler (only for dropdown actions)
 
   // ✅ NEW: File preview handler
   const handleFilePreview = useCallback(
@@ -281,7 +292,8 @@ export const CommonGridView = <T extends BaseFile>({
                       <CommonCard
                         key={`folder-${file.id}-${file.name}`}
                         file={file}
-                        onNavigateToFolder={onNavigateToFolder} // For folder navigation
+                        onNavigateToFolder={onNavigateToFolder} // ✅ For folder navigation
+                        onFilePreview={onFilePreview} // ✅ Pass both props for consistency
                         renderActions={renderActions}
                         IconComponent={IconComponent}
                         iconColor={iconColor}
@@ -307,7 +319,8 @@ export const CommonGridView = <T extends BaseFile>({
                       <CommonCard
                         key={`file-${file.id}-${file.name}`}
                         file={file}
-                        onFilePreview={handleFilePreview} // For file preview
+                        onNavigateToFolder={onNavigateToFolder} // ✅ Pass both props for consistency
+                        onFilePreview={handleFilePreview} // ✅ For file preview
                         renderActions={renderActions}
                         IconComponent={IconComponent}
                         iconColor={iconColor}
@@ -352,10 +365,11 @@ export const CommonGridView = <T extends BaseFile>({
         </div>
       </div>
 
+      {/* Details sheet - only opens from dropdown actions */}
       {renderDetailsSheet(selectedFile, isDetailsOpen, handleCloseDetails)}
 
       {/* ✅ NEW: Preview sheet - opens from card clicks */}
-      {renderPreviewSheet?.(selectedFile, isPreviewOpen, handleClosePreview)}
+      {renderPreviewSheet && renderPreviewSheet(selectedFile, isPreviewOpen, handleClosePreview)}
     </div>
   );
 };

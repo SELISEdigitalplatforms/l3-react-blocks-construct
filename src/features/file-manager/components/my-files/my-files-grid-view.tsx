@@ -19,13 +19,14 @@ const MyFileGridView: React.FC<MyFileGridViewProps> = (props) => {
   const filterFiles = useCallback(createBasicFileFilter(), []);
 
   return (
-    <BaseGridView
-      {...props}
-      queryBuilder={queryBuilder}
-      filterFiles={filterFiles}
-      currentFolderId={props.currentFolderId}
-      onNavigateToFolder={props.onNavigateToFolder}
-    />
+    <></>
+    // <BaseGridView
+    //   {...props}
+    //   queryBuilder={queryBuilder}
+    //   filterFiles={filterFiles}
+    //   currentFolderId={props.currentFolderId}
+    //   onNavigateToFolder={props.onNavigateToFolder}
+    // />
   );
 };
 

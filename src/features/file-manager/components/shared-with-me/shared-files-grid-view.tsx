@@ -23,6 +23,15 @@ interface SharedFilesGridViewProps {
 }
 
 const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
+  // ✅ Enhanced debugging to check all received props
+  console.log('SharedFileGridView received props:', {
+    hasNavigateToFolder: !!props.onNavigateToFolder,
+    hasFilePreview: !!props.onFilePreview,
+    hasViewDetails: !!props.onViewDetails,
+    currentFolderId: props.currentFolderId,
+    propsKeys: Object.keys(props), // Show all prop names
+  });
+
   const queryBuilder = useCallback(
     (params: any) => ({
       page: params.page,
@@ -50,13 +59,13 @@ const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
         }
 
         // Filter by search term (file name)
-        if (filters.name?.trim()) {
+        if (filters.name && filters.name.trim()) {
           const searchTerm = filters.name.toLowerCase();
           if (!file.name.toLowerCase().includes(searchTerm)) return false;
         }
 
         // Filter by shared by user
-        if (filters.sharedBy?.trim()) {
+        if (filters.sharedBy && filters.sharedBy.trim()) {
           const sharedBy = (file as any).sharedBy?.toLowerCase() || '';
           if (!sharedBy.includes(filters.sharedBy.toLowerCase())) return false;
         }
@@ -69,7 +78,37 @@ const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
     []
   );
 
-  return <BaseGridView {...props} queryBuilder={queryBuilder} filterFiles={filterFiles} />;
+  // ✅ Enhanced debugging to ensure props are passed correctly to BaseGridView
+  console.log('SharedFileGridView passing to BaseGridView:', {
+    hasNavigateToFolder: !!props.onNavigateToFolder,
+    hasFilePreview: !!props.onFilePreview,
+    hasViewDetails: !!props.onViewDetails,
+    currentFolderId: props.currentFolderId,
+  });
+
+  return (
+    <BaseGridView
+      // ✅ Explicitly pass the navigation and preview props
+      onNavigateToFolder={props.onNavigateToFolder}
+      onFilePreview={props.onFilePreview}
+      onViewDetails={props.onViewDetails}
+      // ✅ Spread remaining props
+      filters={props.filters}
+      newFiles={props.newFiles}
+      newFolders={props.newFolders}
+      renamedFiles={props.renamedFiles}
+      fileSharedUsers={props.fileSharedUsers}
+      filePermissions={props.filePermissions}
+      currentFolderId={props.currentFolderId}
+      onShare={props.onShare}
+      onDelete={props.onDelete}
+      onMove={props.onMove}
+      onCopy={props.onCopy}
+      onRename={props.onRename}
+      queryBuilder={queryBuilder}
+      filterFiles={filterFiles}
+    />
+  );
 };
 
 export default SharedFileGridView;
