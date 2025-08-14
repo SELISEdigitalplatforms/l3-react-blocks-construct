@@ -42,7 +42,7 @@ import {
  * // Basic usage
  * <ColumnMenu
  *   columnId="1"
- *   columnTitle="To Do"
+ *   columnTitle="To do"
  *   onRename={(id, title) => console.log('Renamed:', id, title)}
  *   onDelete={(id) => console.log('Deleted:', id)}
  * />
