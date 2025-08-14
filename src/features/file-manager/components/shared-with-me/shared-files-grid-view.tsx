@@ -6,25 +6,7 @@ import { IFileDataWithSharing } from '../../utils/file-manager';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from 'hooks/use-mobile';
-
-interface SharedFilesGridViewProps {
-  onViewDetails?: (file: IFileDataWithSharing) => void;
-  onFilePreview?: (file: IFileDataWithSharing) => void;
-  onShare: (file: IFileDataWithSharing) => void;
-  onDelete: (file: IFileDataWithSharing) => void;
-  onMove: (file: IFileDataWithSharing) => void;
-  onCopy: (file: IFileDataWithSharing) => void;
-  onRename: (file: IFileDataWithSharing) => void;
-  filters: any;
-  newFiles?: IFileDataWithSharing[];
-  newFolders?: IFileDataWithSharing[];
-  renamedFiles?: Map<string, IFileDataWithSharing>;
-  fileSharedUsers?: Record<string, any[]>;
-  filePermissions?: Record<string, any>;
-  currentFolderId?: string;
-  onNavigateToFolder?: (folderId: string) => void;
-  onNavigateBack?: () => void;
-}
+import { SharedFilesGridViewProps } from '../../types/file-manager.type';
 
 const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
   const { t } = useTranslation();
@@ -41,7 +23,7 @@ const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
       setIsDetailsOpen(true);
       props.onViewDetails?.(file);
     },
-    [props.onViewDetails]
+    [props.onViewDetails, props.fileSharedUsers]
   );
 
   const handleCloseDetails = useCallback(() => {
@@ -151,14 +133,24 @@ const SharedFileGridView: React.FC<SharedFilesGridViewProps> = (props) => {
         onClose={handleCloseDetails}
         file={
           selectedFileForDetails
-            ? {
-                ...selectedFileForDetails,
-                lastModified:
-                  typeof selectedFileForDetails.lastModified === 'string'
-                    ? selectedFileForDetails.lastModified
-                    : (selectedFileForDetails.lastModified?.toISOString?.() ?? ''),
-                isShared: selectedFileForDetails.isShared ?? false,
-              }
+            ? (() => {
+                const sharedUsersFromProp =
+                  props.fileSharedUsers?.[selectedFileForDetails.id] || [];
+                const existingSharedWith = selectedFileForDetails.sharedWith || [];
+
+                const combinedSharedUsers =
+                  sharedUsersFromProp.length > 0 ? sharedUsersFromProp : existingSharedWith;
+
+                return {
+                  ...selectedFileForDetails,
+                  lastModified:
+                    typeof selectedFileForDetails.lastModified === 'string'
+                      ? selectedFileForDetails.lastModified
+                      : (selectedFileForDetails.lastModified?.toISOString?.() ?? ''),
+                  isShared: combinedSharedUsers.length > 0,
+                  sharedWith: combinedSharedUsers,
+                };
+              })()
             : null
         }
         t={t}

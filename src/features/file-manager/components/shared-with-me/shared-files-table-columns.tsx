@@ -32,6 +32,8 @@ export const SharedFileTableColumns = ({
   onShare,
   onDelete,
   onMove,
+  onCopy,
+
   onRename,
   t,
 }: ColumnFactoryProps): ColumnDef<IFileData, any>[] => [
@@ -280,6 +282,7 @@ export const SharedFileTableColumns = ({
           onShare={onShare}
           onDelete={onDelete}
           onMove={onMove}
+          onCopy={onCopy}
           onRename={onRename}
         />
       </button>

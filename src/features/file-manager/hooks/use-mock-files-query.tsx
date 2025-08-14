@@ -27,7 +27,7 @@ export const FILE_BREADCRUMB_TITLES = {
   '/files/11': 'MARKETING_ASSETS',
 };
 
-export const filesFolderContents: Record<string, IFileData[]> = {
+export const filesFolderContents: Record<string, IFileDataWithSharing[]> = {
   '1': [
     {
       id: '1-1',
@@ -43,6 +43,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/luca-meier.jpg',
       },
       sharedDate: new Date('2025-02-01'),
+      sharedWith: [
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+      ],
     },
     {
       id: '1-2',
@@ -58,6 +70,13 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/aaron-green.jpg',
       },
       sharedDate: new Date('2025-01-28'),
+      sharedWith: [
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+      ],
     },
     {
       id: '1-3',
@@ -91,6 +110,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/aaron-green.jpg',
       },
       sharedDate: new Date('2025-02-02'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
     {
       id: '2-2',
@@ -106,6 +137,23 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/luca-meier.jpg',
       },
       sharedDate: new Date('2025-01-30'),
+      sharedWith: [
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
     {
       id: '2-3',
@@ -138,6 +186,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/sarah-pavan.jpg',
       },
       sharedDate: new Date('2025-02-01'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+      ],
     },
     {
       id: '3-2',
@@ -153,6 +213,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/luca-meier.jpg',
       },
       sharedDate: new Date('2025-01-29'),
+      sharedWith: [
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
     {
       id: '3-3',
@@ -168,6 +240,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/aaron-green.jpg',
       },
       sharedDate: new Date('2025-01-26'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+      ],
     },
   ],
   '4': [
@@ -185,6 +269,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/luca-meier.jpg',
       },
       sharedDate: new Date('2025-02-01'),
+      sharedWith: [
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
     {
       id: '4-2',
@@ -200,6 +296,23 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/adrian-muller.jpg',
       },
       sharedDate: new Date('2025-01-31'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+      ],
     },
     {
       id: '4-3',
@@ -232,6 +345,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/adrian-muller.jpg',
       },
       sharedDate: new Date('2025-02-02'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+      ],
     },
     {
       id: '5-2',
@@ -247,6 +372,23 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/sarah-pavan.jpg',
       },
       sharedDate: new Date('2025-01-30'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
     {
       id: '5-3',
@@ -262,6 +404,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/luca-meier.jpg',
       },
       sharedDate: new Date('2025-01-27'),
+      sharedWith: [
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+      ],
     },
   ],
   '11': [
@@ -279,6 +433,18 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/adrian-muller.jpg',
       },
       sharedDate: new Date('2025-01-31'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+      ],
     },
     {
       id: '11-2',
@@ -294,6 +460,23 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/aaron-green.jpg',
       },
       sharedDate: new Date('2025-01-29'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '3',
+          name: 'Sarah Pavan',
+          avatar: '/avatars/sarah-pavan.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
     {
       id: '11-3',
@@ -309,11 +492,28 @@ export const filesFolderContents: Record<string, IFileData[]> = {
         avatar: '/avatars/sarah-pavan.jpg',
       },
       sharedDate: new Date('2025-01-26'),
+      sharedWith: [
+        {
+          id: '1',
+          name: 'Luca Meier',
+          avatar: '/avatars/luca-meier.jpg',
+        },
+        {
+          id: '2',
+          name: 'Aaron Green',
+          avatar: '/avatars/aaron-green.jpg',
+        },
+        {
+          id: '4',
+          name: 'Adrian Müller',
+          avatar: '/avatars/adrian-muller.jpg',
+        },
+      ],
     },
   ],
 };
 
-export const mockFileData: IFileData[] = [
+export const mockFileData: IFileDataWithSharing[] = [
   {
     id: '1',
     name: 'Meeting Notes',
@@ -355,6 +555,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/sarah-pavan.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+    ],
   },
   {
     id: '4',
@@ -369,6 +586,18 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/luca-meier.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+    ],
   },
   {
     id: '5',
@@ -383,6 +612,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/adrian-muller.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+    ],
   },
   {
     id: '6',
@@ -397,6 +643,18 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/sarah-pavan.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+    ],
   },
   {
     id: '7',
@@ -425,6 +683,18 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/aaron-green.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+    ],
   },
   {
     id: '9',
@@ -439,6 +709,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/luca-meier.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+    ],
   },
   {
     id: '10',
@@ -453,6 +740,18 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/sarah-pavan.jpg',
     },
     sharedDate: new Date('2025-02-03'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+    ],
   },
   {
     id: '11',
@@ -467,6 +766,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/adrian-muller.jpg',
     },
     sharedDate: new Date('2025-02-01'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+    ],
   },
   {
     id: '12',
@@ -481,6 +797,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/aaron-green.jpg',
     },
     sharedDate: new Date('2025-01-28'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+      {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+    ],
   },
   {
     id: '13',
@@ -495,6 +828,18 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/luca-meier.jpg',
     },
     sharedDate: new Date('2025-01-25'),
+    sharedWith: [
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+    ],
   },
   {
     id: '14',
@@ -509,6 +854,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/sarah-pavan.jpg',
     },
     sharedDate: new Date('2025-01-20'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '4',
+        name: 'Adrian Müller',
+        avatar: '/avatars/adrian-muller.jpg',
+      },
+    ],
   },
   {
     id: '15',
@@ -523,6 +885,23 @@ export const mockFileData: IFileData[] = [
       avatar: '/avatars/adrian-muller.jpg',
     },
     sharedDate: new Date('2025-01-15'),
+    sharedWith: [
+      {
+        id: '1',
+        name: 'Luca Meier',
+        avatar: '/avatars/luca-meier.jpg',
+      },
+      {
+        id: '2',
+        name: 'Aaron Green',
+        avatar: '/avatars/aaron-green.jpg',
+      },
+      {
+        id: '3',
+        name: 'Sarah Pavan',
+        avatar: '/avatars/sarah-pavan.jpg',
+      },
+    ],
   },
 ];
 

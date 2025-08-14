@@ -363,7 +363,6 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
         </div>
       )}
 
-      {/* ✅ ADD FilePreview component like MyFilesListView */}
       <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
       <RegularFileDetailsSheet
