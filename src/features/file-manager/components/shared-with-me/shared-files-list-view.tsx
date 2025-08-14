@@ -108,28 +108,8 @@ const SharedFilesListView: React.FC<SharedFilesListViewProps> = ({
     });
 
     const filteredLocalFiles = localFiles.filter((file) => {
-      if (filters.name?.trim() && !file.name.toLowerCase().includes(filters.name.toLowerCase())) {
-        return false;
-      }
-
       if (filters.fileType && file.fileType !== filters.fileType) {
         return false;
-      }
-
-      if (filters.sharedDate?.from || filters.sharedDate?.to) {
-        const sharedDate = file.sharedDate ? new Date(file.sharedDate) : null;
-        if (!sharedDate) return false;
-
-        if (filters.sharedDate.from && sharedDate < new Date(filters.sharedDate.from)) {
-          return false;
-        }
-        if (filters.sharedDate.to) {
-          const endOfDay = new Date(filters.sharedDate.to);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (sharedDate > endOfDay) {
-            return false;
-          }
-        }
       }
 
       if (filters.modifiedDate?.from || filters.modifiedDate?.to) {

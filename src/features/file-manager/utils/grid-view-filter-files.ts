@@ -25,7 +25,7 @@ export const matchesSharedBy = (file: IFileDataWithSharing, sharedByFilter?: str
   const trimmedFilter = sharedByFilter?.trim();
   if (!trimmedFilter) return true;
 
-  const sharedBy = file.sharedBy?.name?.toLowerCase() || file.sharedBy?.id?.toLowerCase() || '';
+  const sharedBy = file.sharedBy?.name?.toLowerCase() ?? file.sharedBy?.id?.toLowerCase() ?? '';
   return sharedBy.includes(trimmedFilter.toLowerCase());
 };
 
