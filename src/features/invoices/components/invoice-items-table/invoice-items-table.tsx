@@ -73,7 +73,7 @@ export function InvoiceItemsTable({
           {items.map((item) => (
             <Fragment key={item.ItemId}>
               <TableRow className="hover:bg-transparent">
-                <TableCell>
+                <TableCell className="min-w-[100px] md:min-w-[200px]">
                   <Input
                     placeholder={`${t('ENTER_ITEM_NAME')}...`}
                     value={item.ItemName}

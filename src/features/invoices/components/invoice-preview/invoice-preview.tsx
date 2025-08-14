@@ -1,10 +1,7 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from 'components/ui/dialog';
+import { X } from 'lucide-react';
+import { Dialog, DialogClose, DialogContent, DialogTitle } from 'components/ui/dialog';
+import { Button } from 'components/ui/button';
+import { useMediaQuery } from 'hooks/use-media-query';
 import { InvoicesDetail } from '../invoices-detail/invoices-detail';
 import { InvoiceItem } from '../../types/invoices.types';
 
@@ -21,16 +18,39 @@ export function InvoicePreview({
   invoice,
   ...props
 }: Readonly<InvoicePreviewProps>) {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   if (!invoice) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogHeader>
-        <DialogTitle />
-        <DialogDescription />
-      </DialogHeader>
-      <DialogContent className="max-w-[1000px] max-h-[90vh] overflow-y-auto p-8" {...props}>
-        <InvoicesDetail invoice={invoice} isPreview />
+      <DialogContent
+        className={`
+          ${isMobile ? 'w-full h-full max-w-none max-h-none rounded-none' : 'max-w-[1000px] h-[90vh] flex flex-col'}
+          p-0 overflow-hidden
+        `}
+        {...props}
+      >
+        <div
+          className={`sticky top-0 z-10 flex items-center justify-between bg-background border-b ${isMobile ? 'p-4' : 'p-6 pb-4'}`}
+        >
+          <DialogTitle className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>
+            Invoice Preview
+          </DialogTitle>
+          <DialogClose asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogClose>
+        </div>
+        <div
+          className={`
+            ${isMobile ? 'p-2' : 'p-6 pt-4'} 
+            flex-1 overflow-y-auto
+          `}
+        >
+          <InvoicesDetail invoice={invoice} isPreview />
+        </div>
       </DialogContent>
     </Dialog>
   );

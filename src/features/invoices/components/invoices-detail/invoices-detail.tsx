@@ -167,7 +167,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
           </div>
           <Separator />
           <div className="flex flex-col sm:flex-row w-full sm:justify-between">
-            <div className="flex flex-col gap-2 w-[50%]">
+            <div className="flex flex-col gap-2 w-full md:w-[50%]">
               <h1 className="text-medium-emphasis">{t('INVOICE_DETAILS')}</h1>
               <div className="flex items-center gap-2">
                 <p className="font-bold text-high-emphasis uppercase">{invoice.ItemId}</p>
@@ -190,7 +190,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2 w-[50%]">
+            <div className="flex flex-col gap-2 w-full md:w-[50%]">
               <h3 className="text-base font-medium text-medium-emphasis mb-2">{t('BILLED_TO')}</h3>
               <p className="text-base font-bold">{invoice.Customer[0].CustomerName}</p>
               <div className="flex items-center gap-2">
@@ -258,7 +258,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
           </div>
 
           <div className="flex flex-col-reverse sm:flex-row w-full items-start sm:justify-between">
-            <div className="flex flex-col gap-2 w-[50%]">
+            <div className="flex flex-col gap-2 w-full md:w-[50%]">
               {invoice.GeneralNote && (
                 <>
                   <div className="flex items-cnter gap-1">
