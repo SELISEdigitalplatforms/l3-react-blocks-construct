@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
@@ -17,11 +17,9 @@ interface FileManagerMyFilesProps {
 }
 
 export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreateFile }) => {
-  // Add navigation hooks (same as Trash)
   const navigate = useNavigate();
   const { folderId } = useParams<{ folderId?: string }>();
 
-  // Add view mode state with sessionStorage persistence (same as Trash)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
     try {
       const saved = sessionStorage.getItem('file-manager-view-mode');
@@ -38,7 +36,6 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     lastModified: undefined,
   });
 
-  // Add view mode change handler with sessionStorage persistence (same as Trash)
   const handleViewModeChange = useCallback((mode: string) => {
     const newViewMode = mode as 'grid' | 'list';
     setViewMode(newViewMode);
@@ -50,7 +47,6 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     }
   }, []);
 
-  // Add folder navigation handlers (same as Trash)
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
       navigate(`/my-files/${folderId}`);
@@ -73,12 +69,6 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     [fileManager, handleFiltersChange, filters]
   );
 
-  // Reset state when folder changes (same as Trash)
-  useEffect(() => {
-    // Reset any selection or other state when navigating folders
-    // You might want to add state resets here if needed
-  }, [folderId]);
-
   const commonViewProps = {
     onViewDetails: fileManager.handleViewDetails,
     onDownload: fileManager.handleDownload,
@@ -92,7 +82,6 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     renamedFiles: fileManager.renamedFiles,
     fileSharedUsers: fileManager.fileSharedUsers,
     filePermissions: fileManager.filePermissions,
-    // Add folder navigation props (same as Trash)
     currentFolderId: folderId,
     onNavigateToFolder: handleNavigateToFolder,
     onNavigateBack: handleNavigateBack,
@@ -100,8 +89,8 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
 
   const headerToolbar = (
     <FileManagerHeaderToolbar
-      viewMode={viewMode} // Use local viewMode state instead of fileManager.viewMode
-      handleViewMode={handleViewModeChange} // Use local handler instead of fileManager.handleViewModeChange
+      viewMode={viewMode}
+      handleViewMode={handleViewModeChange}
       searchQuery={fileManager.searchQuery}
       onSearchChange={handleSearchChange}
       filters={filters}
@@ -142,7 +131,7 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
   return (
     <FileManagerLayout headerToolbar={headerToolbar} modals={modals}>
       <FileViewRenderer
-        viewMode={viewMode} // Use local viewMode state
+        viewMode={viewMode}
         GridComponent={MyFileGridView}
         ListComponent={MyFilesListView}
         commonViewProps={commonViewProps}

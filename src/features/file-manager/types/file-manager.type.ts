@@ -22,6 +22,8 @@ export interface SharedFilesListViewProps {
   renamedFiles?: Map<string, IFileDataWithSharing>;
   fileSharedUsers?: Record<string, any[]>;
   filePermissions?: Record<string, any>;
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
 }
 
 export interface MyFileGridViewProps {
