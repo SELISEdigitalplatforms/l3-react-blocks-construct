@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
@@ -10,18 +10,53 @@ import { useFileFilters } from 'features/file-manager/hooks/use-file-filters';
 import { FileModals } from 'features/file-manager/components/modals/file-modals';
 import { FileFilters } from 'features/file-manager/components/common-filters';
 import { FileManagerHeaderToolbar } from 'features/file-manager/components/my-files/my-files-header-toolbar';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface FileManagerMyFilesProps {
   onCreateFile?: () => void;
 }
 
 export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreateFile }) => {
+  const navigate = useNavigate();
+  const { folderId } = useParams<{ folderId?: string }>();
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    try {
+      const saved = sessionStorage.getItem('file-manager-view-mode');
+      return (saved as 'grid' | 'list') || 'list';
+    } catch {
+      return 'list';
+    }
+  });
+
   const fileManager = useFileManager({ onCreateFile });
   const { filters, handleFiltersChange } = useFileFilters<FileFilters>({
     name: '',
     fileType: undefined,
     lastModified: undefined,
   });
+
+  const handleViewModeChange = useCallback((mode: string) => {
+    const newViewMode = mode as 'grid' | 'list';
+    setViewMode(newViewMode);
+
+    try {
+      sessionStorage.setItem('file-manager-view-mode', newViewMode);
+    } catch (error) {
+      console.warn('Failed to save view mode to sessionStorage:', error);
+    }
+  }, []);
+
+  const handleNavigateToFolder = useCallback(
+    (folderId: string) => {
+      navigate(`/my-files/${folderId}`);
+    },
+    [navigate]
+  );
+
+  const handleNavigateBack = useCallback(() => {
+    navigate('/my-files');
+  }, [navigate]);
 
   const handleSearchChange = useCallback(
     (query: string) => {
@@ -47,12 +82,15 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
     renamedFiles: fileManager.renamedFiles,
     fileSharedUsers: fileManager.fileSharedUsers,
     filePermissions: fileManager.filePermissions,
+    currentFolderId: folderId,
+    onNavigateToFolder: handleNavigateToFolder,
+    onNavigateBack: handleNavigateBack,
   };
 
   const headerToolbar = (
     <FileManagerHeaderToolbar
-      viewMode={fileManager.viewMode}
-      handleViewMode={fileManager.handleViewModeChange}
+      viewMode={viewMode}
+      handleViewMode={handleViewModeChange}
       searchQuery={fileManager.searchQuery}
       onSearchChange={handleSearchChange}
       filters={filters}
@@ -93,7 +131,7 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
   return (
     <FileManagerLayout headerToolbar={headerToolbar} modals={modals}>
       <FileViewRenderer
-        viewMode={fileManager.viewMode}
+        viewMode={viewMode}
         GridComponent={MyFileGridView}
         ListComponent={MyFilesListView}
         commonViewProps={commonViewProps}

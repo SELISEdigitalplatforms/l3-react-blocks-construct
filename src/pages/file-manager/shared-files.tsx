@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
 import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
 import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
@@ -10,13 +10,27 @@ import { FileManagerLayout } from 'features/file-manager/file-manager-layout';
 import { FileViewRenderer } from 'features/file-manager/components/file-view-renderer';
 import { SharedFilters } from 'features/file-manager/types/header-toolbar.type';
 import { SharedWithMeHeaderToolbar } from 'features/file-manager/components/shared-with-me/shared-files-header-toolbar';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface SharedWithMeProps {
   onCreateFile?: () => void;
 }
 
 export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
+  const navigate = useNavigate();
+  const { folderId } = useParams<{ folderId?: string }>();
+
   const fileManager = useFileManager({ onCreateFile });
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    try {
+      const saved = sessionStorage.getItem('shared-with-me-view-mode');
+      return (saved as 'grid' | 'list') || 'list';
+    } catch {
+      return 'list';
+    }
+  });
+
   const { filters, handleFiltersChange } = useFileFilters<SharedFilters>({
     name: '',
     fileType: undefined,
@@ -24,6 +38,28 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     sharedDate: undefined,
     modifiedDate: undefined,
   });
+
+  const handleViewModeChange = useCallback((mode: string) => {
+    const newViewMode = mode as 'grid' | 'list';
+    setViewMode(newViewMode);
+
+    try {
+      sessionStorage.setItem('shared-with-me-view-mode', newViewMode);
+    } catch (error) {
+      console.warn('Failed to save view mode to sessionStorage:', error);
+    }
+  }, []);
+
+  const handleNavigateToFolder = useCallback(
+    (folderId: string) => {
+      navigate(`/shared-files/${folderId}`);
+    },
+    [navigate]
+  );
+
+  const handleNavigateBack = useCallback(() => {
+    navigate('/shared-files');
+  }, [navigate]);
 
   const handleSearchChange = useCallback(
     (query: string) => {
@@ -52,20 +88,27 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     renamedFiles: fileManager.renamedFiles,
     fileSharedUsers: fileManager.fileSharedUsers,
     filePermissions: fileManager.filePermissions,
+    currentFolderId: folderId,
+    onNavigateToFolder: handleNavigateToFolder,
+    onNavigateBack: handleNavigateBack,
   };
 
   const headerToolbar = (
     <SharedWithMeHeaderToolbar
-      viewMode={fileManager.viewMode}
-      handleViewMode={fileManager.handleViewModeChange}
+      viewMode={viewMode}
+      handleViewMode={handleViewModeChange}
       searchQuery={fileManager.searchQuery}
       onSearchChange={handleSearchChange}
       filters={filters}
-      onFiltersChange={handleFiltersChange}
-      onFileUpload={(files: FileList | File[]) =>
-        fileManager.handleFileUpload(Array.isArray(files) ? files : Array.from(files), true)
+      onFiltersChange={(filters) =>
+        handleFiltersChange({
+          ...filters,
+          name: filters.name ?? '',
+        })
       }
-      onFolderCreate={(name: string) => fileManager.handleFolderCreate(name, true)}
+      onFileUpload={(files) => fileManager.handleFileUpload(files, false)}
+      onFolderCreate={(name) => fileManager.handleFolderCreate(name, false)}
+      sharedUsers={[]}
     />
   );
 
@@ -95,7 +138,7 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
   return (
     <FileManagerLayout headerToolbar={headerToolbar} modals={modals}>
       <FileViewRenderer
-        viewMode={fileManager.viewMode}
+        viewMode={viewMode}
         GridComponent={SharedFilesGridView}
         ListComponent={SharedFilesListView}
         commonViewProps={commonViewProps}
@@ -103,5 +146,4 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
     </FileManagerLayout>
   );
 };
-
 export default SharedWithMe;

@@ -5,15 +5,19 @@ import { getFileTypeIcon, getFileTypeInfo, IFileDataWithSharing } from '../utils
 import { CommonGridView } from './common-grid-view';
 import { FileProcessingProps, useFileProcessing } from '../hooks/use-file-processing';
 import { useGridViewData } from '../hooks/use-grid-view-data';
-import { FileActionProps, useFileActions, useFileDetailsSheet } from './common-grid-view-helpers';
+import { FileActionProps, useFileActions } from './common-grid-view-helpers';
 
 export interface BaseGridViewProps extends FileActionProps, FileProcessingProps {
   filters: any;
-  onViewDetails?: (file: IFileDataWithSharing) => void;
+  onViewDetails?: (file: IFileDataWithSharing) => void; // Only for dropdown
+  onFilePreview?: (file: IFileDataWithSharing) => void; // NEW: For file preview
   queryBuilder: (params: any) => any;
   filterFiles: (files: IFileDataWithSharing[], filters: any) => IFileDataWithSharing[];
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
 }
 
+// Updated BaseGridView component
 export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
   const { t } = useTranslation();
 
@@ -24,17 +28,19 @@ export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
 
   const { processFiles } = useFileProcessing(props);
   const { renderActions } = useFileActions(props);
-  const { renderDetailsSheet } = useFileDetailsSheet(t);
 
   return (
-    <CommonGridView
-      onViewDetails={props.onViewDetails}
+    <CommonGridView<IFileDataWithSharing>
+      onViewDetails={props.onViewDetails} // Only for dropdown actions
+      onFilePreview={props.onFilePreview} // NEW: For file preview
+      onNavigateToFolder={props.onNavigateToFolder} // For folder navigation
       filters={props.filters}
       data={data ?? undefined}
       isLoading={isLoading}
       error={error}
       onLoadMore={handleLoadMore}
-      renderDetailsSheet={renderDetailsSheet}
+      renderDetailsSheet={() => null} // Remove details sheet from CommonGridView
+      renderPreviewSheet={() => null} // Remove preview sheet from CommonGridView (handled in parent)
       getFileTypeIcon={getFileTypeIcon}
       getFileTypeInfo={getFileTypeInfo}
       renderActions={renderActions}
@@ -52,6 +58,7 @@ export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
       loadMoreLabel={t('LOAD_MORE')}
       processFiles={processFiles}
       filterFiles={props.filterFiles}
+      currentFolderId={props.currentFolderId}
     />
   );
 };
