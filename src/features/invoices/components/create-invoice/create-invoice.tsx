@@ -89,9 +89,11 @@ export function CreateInvoice() {
       addInvoiceItem(apiPayload, {
         onSuccess: () => {
           toast({
-            title: 'Success',
-            description: action === 'send' ? 'Invoice successfully sent' : 'Invoice saved as draft',
             variant: 'success',
+            title: t(action === 'send' ? 'INVOICE_SENT' : 'DRAFT_SAVED'),
+            description: t(
+              action === 'send' ? 'INVOICE_SENT_SUCCESSFULLY' : 'INVOICE_DRAFT_SAVED_SUCCESSFULLY'
+            ),
           });
 
           navigate(`/invoices/${invoiceId}`);
@@ -99,18 +101,18 @@ export function CreateInvoice() {
         onError: (error) => {
           console.error('Error creating invoice:', error);
           toast({
-            title: 'Error',
-            description: 'Failed to create invoice',
             variant: 'destructive',
+            title: t('FAILED_CREATE_INVOICE'),
+            description: t('UNABLE_CREATE_INVOICE'),
           });
         },
       });
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred',
         variant: 'destructive',
+        title: t('UNEXPECTED_ERROR'),
+        description: t('AN_UNEXPECTED_ERROR_OCCURRED'),
       });
     }
   };

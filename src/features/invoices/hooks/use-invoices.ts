@@ -1,5 +1,6 @@
 import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useToast } from 'hooks/use-toast';
 import { useErrorHandler } from 'hooks/use-error-handler';
 import {
@@ -76,6 +77,7 @@ const fetchInvoiceItems = async ({
 
 export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   return useGlobalQuery<
     InvoiceItemsData,
@@ -89,12 +91,12 @@ export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
         return await fetchInvoiceItems({ queryKey });
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Failed to fetch invoice items';
+          error instanceof Error ? error.message : 'COULD_NOT_RETRIEVE_INVOICE_ITEM';
         console.error('Error in useGetInvoiceItems queryFn:', error);
         toast({
-          title: 'Error',
-          description: errorMessage,
           variant: 'destructive',
+          title: t('UNABLE_LOAD_INVOICE_ITEMS'),
+          description: t(errorMessage),
         });
         throw error;
       }
@@ -107,9 +109,9 @@ export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
     onError: (error: Error) => {
       console.error('Error in useGetInvoiceItems:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to load invoice items. Please try again later.',
         variant: 'destructive',
+        title: t('UNABLE_LOAD_INVOICE_ITEMS'),
+        description: t('COULD_NOT_RETRIEVE_INVOICE_ITEM'),
       });
     },
   });
@@ -126,6 +128,7 @@ export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
 export const useAddInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   return useGlobalMutation({
     mutationFn: (params: AddInvoiceItemParams) => addInvoiceItem(params),
@@ -142,8 +145,8 @@ export const useAddInvoiceItem = () => {
       if (data.insertInvoice?.acknowledged) {
         toast({
           variant: 'success',
-          title: 'Invoice Added',
-          description: 'The invoice has been successfully added.',
+          title: t('INVOICE_ADDED'),
+          description: t('INVOICES_HAS_SUCCESSFULLY_ADDED'),
         });
       }
     },
@@ -190,6 +193,7 @@ export const useDeleteInvoiceItem = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { handleError } = useErrorHandler();
+  const { t } = useTranslation();
 
   return useGlobalMutation({
     mutationFn: ({ filter, input }: { filter: string; input: { isHardDelete: boolean } }) =>
@@ -207,12 +211,14 @@ export const useDeleteInvoiceItem = () => {
       if (data.deleteInvoiceItem?.acknowledged) {
         toast({
           variant: 'success',
-          title: 'Invoice Deleted',
-          description: 'The invoice has been successfully deleted.',
+          title: t('INVOICE_DELETED'),
+          description: t('INVOICE_DELETED_SUCCESSFULLY'),
         });
       } else {
         handleError(
-          { error: { title: 'Unable to delete invoice', message: 'Unable to delete invoice' } },
+          {
+            error: { title: t('UNABLE_DELETED_INVOICE'), message: t('INVOICE_COULD_NOT_DELETED') },
+          },
           { variant: 'destructive' }
         );
       }

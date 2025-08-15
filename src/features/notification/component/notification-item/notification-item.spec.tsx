@@ -66,7 +66,7 @@ describe('NotificationItem', () => {
     // Click the menu trigger to show menu
     fireEvent.click(screen.getByTestId('ellipsis-icon'));
     // Click the Mark as Read menu item
-    fireEvent.click(screen.getByText('MARK_AS_READ'));
+    fireEvent.click(screen.getByText('MARKED_AS_READ'));
     expect(mutateMock).toHaveBeenCalledWith(
       'notif-1',
       expect.objectContaining({
@@ -79,6 +79,6 @@ describe('NotificationItem', () => {
     render(<NotificationItem notification={{ ...mockNotification, isRead: true } as any} />);
     expect(screen.getByText('Test Type')).toBeInTheDocument();
     // The menu item should be disabled (role="menuitem" and disabled prop)
-    expect(screen.getByText('MARK_AS_READ').closest('div')).toHaveAttribute('disabled');
+    expect(screen.getByText('MARKED_AS_READ').closest('div')).toHaveAttribute('disabled');
   });
 });
