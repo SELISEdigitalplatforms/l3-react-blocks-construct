@@ -193,13 +193,7 @@ export const createFileTableColumns = ({
       </div>
     ),
     cell: ({ row }) => (
-      <button
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        type="button"
-      >
+      <div className="flex justify-end">
         <FileTableRowActions
           row={row}
           onViewDetails={onViewDetails}
@@ -210,7 +204,7 @@ export const createFileTableColumns = ({
           onCopy={onCopy}
           onMove={onMove}
         />
-      </button>
+      </div>
     ),
   },
 ];
