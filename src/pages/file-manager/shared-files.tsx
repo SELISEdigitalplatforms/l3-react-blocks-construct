@@ -40,13 +40,13 @@ export const SharedWithMe: React.FC<SharedWithMeProps> = ({ onCreateFile }) => {
 
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
-      navigate(`/shared-files/${folderId}`);
+      navigate(`/file-manager/shared-files/${folderId}`);
     },
     [navigate]
   );
 
   const handleNavigateBack = useCallback(() => {
-    navigate('/shared-files');
+    navigate('/file-manager/shared-files');
   }, [navigate]);
 
   const handleFilePreview = useCallback((file: any) => {

@@ -129,7 +129,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/invoices/edit/${invoice.ItemId}`)}
+                  onClick={() => navigate(`/invoices/${invoice.ItemId}/edit`)}
                 >
                   <Pencil className="h-4 w-4 sm:mr-1" />
                   <span className="hidden sm:inline">{t('EDIT')}</span>
