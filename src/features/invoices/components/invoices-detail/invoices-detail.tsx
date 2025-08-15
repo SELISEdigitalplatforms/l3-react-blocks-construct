@@ -85,13 +85,13 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
       toast({
         variant: 'success',
         title: t('INVOICE_DOWNLOADED'),
-        description: t('DOWNLOADED_INVOICE_SUCCESSFULLY'),
+        description: t('INVOICE_DOWNLOADED_SUCCESSFULLY'),
       });
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: t('SOMETHING_WENT_WRONG'),
-        description: t('SOMETHING_WENT_WRONG_DOWNLOADING_INVOICE'),
+        title: t('UNABLE_PROCESS_REQUEST'),
+        description: t('ISSUE_GENERATING_INVOICE'),
       });
     }
   };
@@ -304,8 +304,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
           </div>
           <Separator />
           <p className="text-sm text-medium-emphasis">
-            Please make sure that payments are within the stated due date. Thank you for your
-            business.
+            {t('PLEASE_MAKE_SURE_PAYMENT_WITHIN_DUEDATE')}
           </p>
         </CardContent>
       </Card>

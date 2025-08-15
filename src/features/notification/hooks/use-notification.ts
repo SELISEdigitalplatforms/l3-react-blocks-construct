@@ -58,8 +58,8 @@ export const useMarkNotificationAsRead = () => {
       if (data.isSuccess) {
         toast({
           variant: 'success',
-          title: t('MARK_AS_READ'),
-          description: t('MARKED_THIS_NOTIFICATION_AS_READ'),
+          title: t('MARKED_AS_READ'),
+          description: t('NOTIFICATION_HAS_MARKED_AS_READ'),
         });
       }
     },
@@ -113,9 +113,9 @@ export const useMarkAllNotificationAsRead = (options?: { onSuccess?: () => void 
         options?.onSuccess?.();
 
         toast({
-          title: t('MARKED_ALL_AS_READ'),
-          description: t('ALL_NOTIFICATIONS_MARKED_AS_READ'),
           variant: 'success',
+          title: t('MARKED_ALL_AS_READ'),
+          description: t('ALL_NOTIFICATION_UPDATED_SUCCESSFULLY'),
         });
       }
     },

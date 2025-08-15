@@ -303,9 +303,9 @@ export default function TaskDetailsView({
     } catch (error) {
       console.error('Error updating comment:', error);
       toast({
-        title: t('ERROR'),
-        description: t('FAILED_TO_UPDATE_COMMENT'),
         variant: 'destructive',
+        title: t('UNABLE_UPDATE_COMMENT'),
+        description: t('FAILED_TO_UPDATE_COMMENT'),
       });
     }
   };
@@ -480,9 +480,9 @@ export default function TaskDetailsView({
     } catch (error) {
       console.error('Error adding comment:', error);
       toast({
-        title: t('ERROR'),
-        description: t('FAILED_TO_ADD_COMMENT'),
         variant: 'destructive',
+        title: t('UNABLE_ADD_COMMENT'),
+        description: t('FAILED_ADD_COMMENT'),
       });
     }
   };
@@ -495,9 +495,9 @@ export default function TaskDetailsView({
     } catch (error) {
       console.error('Error deleting comment:', error);
       toast({
-        title: t('ERROR'),
-        description: t('FAILED_TO_DELETE_COMMENT'),
         variant: 'destructive',
+        title: t('UNABLE_DELETE_COMMENT'),
+        description: t('FAILED_TO_DELETE_COMMENT'),
       });
     }
   };
@@ -606,9 +606,7 @@ export default function TaskDetailsView({
     setSelectedTags([]);
 
     try {
-      if (!title) {
-        throw new Error('Task title is required');
-      }
+      if (!title) return;
 
       const newTask = createNewTask();
       const newTaskId = await safeAddTask(newTask);
@@ -623,7 +621,7 @@ export default function TaskDetailsView({
       await createNewTags(tagsToCreate);
 
       toast({
-        title: t('SUCCESS'),
+        title: t('TASK_CREATED'),
         description: t('TASK_CREATED_SUCCESSFULLY'),
       });
       onTaskAddedList?.();
@@ -631,8 +629,8 @@ export default function TaskDetailsView({
     } catch (error) {
       console.error('Error in handleAddItem:', error);
       toast({
-        title: t('ERROR'),
-        description: error instanceof Error ? error.message : t('Failed to create task or tags'),
+        title: t('UNABLE_CREATE_TASK'),
+        description: error instanceof Error ? error.message : t('FAILED_CREATE_TASK'),
         variant: 'destructive',
       });
       setSelectedTags(tagsToCreate);
@@ -651,8 +649,8 @@ export default function TaskDetailsView({
     onClose();
     toast({
       variant: 'success',
-      title: t('Updated task'),
-      description: t('You have updated the task successfully'),
+      title: t('TASK_UPDATED'),
+      description: t('TASK_UPDATED_SUCCESSFULLY'),
     });
     if (isNewTaskModalOpen && !newTaskAdded) {
       handleAddItem();
@@ -684,8 +682,8 @@ export default function TaskDetailsView({
         console.error('Failed to update assignees:', error);
         toast({
           variant: 'destructive',
-          title: t('ERROR'),
-          description: t('Failed to update assignees. Please try again.'),
+          title: t('UNABLE_UPDATE_ASSIGNEES'),
+          description: t('FAILED_UPDATE_ASSIGNEES'),
         });
         throw error;
       }
@@ -695,7 +693,6 @@ export default function TaskDetailsView({
 
   const handleTagChange = useCallback(
     async (newTags: ItemTag[]) => {
-      // If we're in new task mode, just update the local state
       if (isNewTaskModalOpen && !currentTaskId) {
         setSelectedTags(newTags);
         return;
@@ -715,8 +712,8 @@ export default function TaskDetailsView({
         setSelectedTags(previousTags);
         toast({
           variant: 'destructive',
-          title: t('ERROR'),
-          description: t('Failed to update tags. Please try again.'),
+          title: t('UNABLE_UPDATE_TAGS'),
+          description: t('FAILED_UPDATE_TAGS'),
         });
       }
     },
@@ -736,7 +733,7 @@ export default function TaskDetailsView({
       }
     } catch (error) {
       toast({
-        title: t('ERROR'),
+        title: t('UNABLE_DELETE_TASK'),
         description: t('FAILED_TO_DELETE_TASK'),
         variant: 'destructive',
       });
@@ -764,9 +761,9 @@ export default function TaskDetailsView({
 
     if (tagExists) {
       toast({
-        title: t('TAG_EXISTS'),
-        description: t('TAG_ALREADY_ADDED'),
-        variant: 'default',
+        variant: 'destructive',
+        title: t('TAG_ALREADY_EXISTS'),
+        description: t('THIS_TAG_ALREADY_ADDED'),
       });
       return;
     }
@@ -803,7 +800,7 @@ export default function TaskDetailsView({
     } catch (error) {
       console.error('Error adding tag:', error);
       toast({
-        title: t('ERROR'),
+        title: t('UNABLE_ADD_TAG'),
         description: t('FAILED_TO_ADD_TAG'),
         variant: 'destructive',
       });
@@ -912,9 +909,9 @@ export default function TaskDetailsView({
                         updateTaskDetails({ DueDate: undefined });
                       } else {
                         toast({
-                          title: t('ERROR'),
-                          description: t('INVALID_DATE_SELECTED'),
                           variant: 'destructive',
+                          title: t('INVALID_DATE_SELECTED'),
+                          description: t('PLEASE_SELECT_VALID_DATE'),
                         });
                       }
                     }}
