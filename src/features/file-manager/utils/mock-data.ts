@@ -60,10 +60,10 @@ const createFileDefinition = (
   id,
   name,
   fileType,
-  lastModified: options.lastModified || '2025-02-01',
-  size: options.size || '1.0 MB',
+  lastModified: options.lastModified ?? '2025-02-01',
+  size: options.size ?? '1.0 MB',
   isShared: options.isShared ?? false,
-  sharedById: options.sharedById || '1',
+  sharedById: options.sharedById ?? '1',
   sharedWithIds: options.sharedWithIds,
 });
 
@@ -85,7 +85,7 @@ const createFolderContents = (
       lastModified: file.lastModified,
       size: file.size,
       isShared: file.isShared,
-      sharedById: file.sharedById || '1',
+      sharedById: file.sharedById ?? '1',
       sharedWithIds: file.sharedWithIds,
     })
   );
@@ -292,7 +292,7 @@ const createRootFiles = (
       lastModified: file.lastModified,
       size: file.size,
       isShared: file.isShared,
-      sharedById: file.sharedById || '1',
+      sharedById: file.sharedById ?? '1',
       sharedWithIds: file.sharedWithIds,
     })
   );
