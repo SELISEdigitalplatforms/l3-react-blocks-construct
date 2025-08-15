@@ -603,7 +603,6 @@ export default function TaskDetailsView({
     if (isNewTaskModalOpen !== true || newTaskAdded) return;
 
     const tagsToCreate = [...selectedTags];
-    setSelectedTags([]);
 
     try {
       if (!title) return;
@@ -620,20 +619,30 @@ export default function TaskDetailsView({
 
       await createNewTags(tagsToCreate);
 
+      resetForm();
+      setNewTaskAdded(false);
+      setCurrentTaskId(undefined);
+      setSelectedTags([]);
+
       toast({
+        variant: 'success',
         title: t('TASK_CREATED'),
         description: t('TASK_CREATED_SUCCESSFULLY'),
       });
+
       onTaskAddedList?.();
       onClose();
+
+      return true;
     } catch (error) {
       console.error('Error in handleAddItem:', error);
       toast({
+        variant: 'destructive',
         title: t('UNABLE_CREATE_TASK'),
         description: error instanceof Error ? error.message : t('FAILED_CREATE_TASK'),
-        variant: 'destructive',
       });
       setSelectedTags(tagsToCreate);
+      return false;
     }
   };
 
@@ -646,15 +655,22 @@ export default function TaskDetailsView({
   };
 
   const handleClose = () => {
+    if (isNewTaskModalOpen) {
+      if (!newTaskAdded) {
+        handleAddItem().then(() => {
+          resetForm();
+          onClose();
+        });
+        return;
+      }
+      resetForm();
+    }
     onClose();
     toast({
       variant: 'success',
       title: t('TASK_UPDATED'),
       description: t('TASK_UPDATED_SUCCESSFULLY'),
     });
-    if (isNewTaskModalOpen && !newTaskAdded) {
-      handleAddItem();
-    }
   };
 
   const handleSectionChange = async (newSection: string) => {
@@ -810,7 +826,11 @@ export default function TaskDetailsView({
   return (
     <DialogContent
       className="rounded-md sm:max-w-[720px] xl:max-h-[750px] max-h-screen flex flex-col p-0"
-      onInteractOutside={() => handleAddItem()}
+      onInteractOutside={() => {
+        if (!isNewTaskModalOpen) {
+          onClose();
+        }
+      }}
       onOpenAutoFocus={(e) => {
         e.preventDefault();
         setTimeout(() => {
