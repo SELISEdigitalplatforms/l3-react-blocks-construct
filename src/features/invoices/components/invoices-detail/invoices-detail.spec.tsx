@@ -17,6 +17,14 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
+jest.mock('styles/theme/theme-provider', () => ({
+  __esModule: true,
+  useTheme: () => ({
+    theme: 'light',
+    setTheme: jest.fn(),
+  }),
+}));
+
 jest.mock('html2canvas', () =>
   jest.fn().mockResolvedValue({
     toDataURL: jest.fn().mockReturnValue('data:image/png;base64,mockImageData'),

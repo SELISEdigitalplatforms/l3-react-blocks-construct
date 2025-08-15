@@ -69,6 +69,7 @@ export const useMarkNotificationAsRead = () => {
 /**
  * Custom hook to mark all notifications as read
  *
+ * @param onSuccess - Optional callback function to be called after successful mutation
  * @returns {Object} The mutation object from react-query with the following properties:
  * @property {Function} mutate - Function to trigger the mark all as read action
  * @property {boolean} isPending - Indicates if the mutation is in progress
@@ -77,12 +78,16 @@ export const useMarkNotificationAsRead = () => {
  * @property {Function} reset - Function to reset the mutation state
  *
  * @example
- * const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead();
+ * const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead({
+ *   onSuccess: () => {
+ *     // Handle successful mark all as read
+ *   }
+ * });
  *
  * // To mark all notifications as read:
  * markAllAsRead();
  */
-export const useMarkAllNotificationAsRead = () => {
+export const useMarkAllNotificationAsRead = (options?: { onSuccess?: () => void }) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -90,9 +95,23 @@ export const useMarkAllNotificationAsRead = () => {
   return useMutation({
     mutationFn: markAllNotificationAsRead,
     onSuccess: (data) => {
+      queryClient.setQueryData<{ notifications: Notification[] }>(['notifications'], (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          notifications: old.notifications.map((notification) => ({
+            ...notification,
+            isRead: true,
+          })),
+        };
+      });
+
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
 
       if (data.isSuccess) {
+        options?.onSuccess?.();
+
         toast({
           title: t('MARKED_ALL_AS_READ'),
           description: t('ALL_NOTIFICATIONS_MARKED_AS_READ'),

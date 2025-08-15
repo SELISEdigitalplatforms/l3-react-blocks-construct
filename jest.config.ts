@@ -18,6 +18,7 @@ const config: Config = {
     '^constant/(.*)$': '<rootDir>/src/constant/$1',
     '^config/(.*)$': '<rootDir>/src/config/$1',
     '^state/(.*)$': '<rootDir>/src/state/$1',
+    '^styles/(.*)$': '<rootDir>/src/styles/$1',
   },
   testMatch: ['**/*.spec.{ts,tsx}'],
   collectCoverage: true,

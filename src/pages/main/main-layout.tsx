@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Bell, Library } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { AppSidebar } from '../../components/blocks/layout/app-sidebar';
 import { UProfileMenu } from '../../components/blocks/u-profile-menu';
 import { SidebarTrigger, useSidebar } from 'components/ui/sidebar';
@@ -50,9 +50,10 @@ export default function MainLayout() {
             <SidebarTrigger className="pl-0" />
           </div>
           <div className="flex justify-between items-center gap-1 sm:gap-3 md:gap-8">
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
+            {/* TODO: Need later when the docs are ready and do binding to redirect to docs page*/}
+            {/* <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
               <Library className="!w-5 !h-5 text-medium-emphasis" />
-            </Button>
+            </Button> */}
             <Menubar className="border-none">
               <MenubarMenu>
                 <MenubarTrigger
