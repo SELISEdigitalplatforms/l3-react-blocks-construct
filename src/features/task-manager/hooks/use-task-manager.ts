@@ -188,15 +188,15 @@ export const useCreateTaskItem = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         variant: 'success',
-        title: t('Created Task'),
-        description: t('You have successfully created the new task!'),
+        title: t('TASK_CREATED'),
+        description: t('TASK_CREATED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
       console.error('Error in useCreateTaskItem:', error);
       handleError(error, {
-        title: t('ERROR'),
-        defaultMessage: t('Failed to create task. Please try again.'),
+        title: t('UNABLE_CREATE_TASK'),
+        defaultMessage: t('FAILED_CREATE_TASK_TRY_AGAIN'),
       });
     },
   });
@@ -255,12 +255,15 @@ export const useCreateTaskSection = () => {
       queryClient.invalidateQueries({ queryKey: ['task-sections'] });
       toast({
         variant: 'success',
-        title: t('Create New Section'),
-        description: t('You have successfully created a new section'),
+        title: t('SECTION_CREATED'),
+        description: t('NEW_SECTION_CREATED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
-      handleError(error);
+      handleError(error, {
+        title: t('UNABLE_CREATE_SECTION'),
+        defaultMessage: t('FAILED_CREATE_SECTION_TRY_AGAIN'),
+      });
     },
   });
 };
@@ -285,36 +288,24 @@ export const useUpdateTaskSection = () => {
       if (acknowledged) {
         toast({
           variant: 'success',
-          title: t('Section Updated'),
-          description: t('The section has been updated successfully'),
+          title: t('SECTION_UPDATED'),
+          description: t('SECTION_UPDATED_SUCCESSFULLY'),
         });
       } else if (totalImpactedData === 0) {
         toast({
           variant: 'default',
-          title: t('No Changes'),
-          description: t('The section was not modified. The data may be the same.'),
+          title: t('NO_CHANGES'),
+          description: t('SECTION_NOT_MODIFIED'),
         });
       }
 
       return responseData;
     },
     onError: (error: Error) => {
-      let errorMessage = t('Failed to update section. Please try again.');
-
-      if (
-        error.message.includes('No records were updated') ||
-        error.message.includes('No response received') ||
-        error.message.includes('No data in response')
-      ) {
-        errorMessage = t(
-          'No changes were made. The section may not exist or the data is the same.'
-        );
-      }
-
       toast({
         variant: 'destructive',
-        title: t('Error'),
-        description: errorMessage,
+        title: t('UPDATE_FAILED'),
+        description: t('FAILED_UPDATE_SECTION_TRY_AGAIN'),
       });
 
       handleError(error);
@@ -334,11 +325,16 @@ export const useDeleteTaskSection = () => {
       queryClient.invalidateQueries({ queryKey: ['task-sections'] });
       toast({
         variant: 'success',
-        title: t('COLUMN_DELETED'),
-        description: t('COLUMN_HAS_DELETED_SUCCESSFULLY'),
+        title: t('SECTION_DELETED'),
+        description: t('SECTION_DELETED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
+      toast({
+        variant: 'destructive',
+        title: t('DELETE_FAILED'),
+        description: t('FAILED_DELETE_SECTION_TRY_AGAIN'),
+      });
       handleError(error);
     },
   });
@@ -369,15 +365,15 @@ export const useCreateTags = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         variant: 'success',
-        title: t('Created Tag'),
-        description: t('You have successfully created the new tag!'),
+        title: t('TAG_CREATED'),
+        description: t('NEW_TAG_CREATED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
       console.error('Error in useCreateTaskItem:', error);
       handleError(error, {
-        title: t('ERROR'),
-        defaultMessage: t('Failed to create tag. Please try again.'),
+        title: t('CREATION_FAILED'),
+        defaultMessage: t('FAILED_CREATE_TAG_TRY_AGAIN'),
       });
     },
   });
@@ -399,8 +395,8 @@ export const useUpdateTags = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         variant: 'success',
-        title: t('Updated Tag'),
-        description: t('You have updated the tag successfully'),
+        title: t('TAG_UPDATED'),
+        description: t('TAG_UPDATED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
@@ -421,8 +417,8 @@ export const useDeleteTags = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({
         variant: 'success',
-        title: t('Deleted Tag'),
-        description: t('You have successfully deleted a tag'),
+        title: t('TAG_DELETED'),
+        description: t('TAG_DELETED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
@@ -476,15 +472,15 @@ export const useCreateTaskComment = () => {
 
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('COMMENT_ADDED_SUCCESSFULLY'),
+        title: t('COMMENT_ADDED'),
+        description: t('COMMENT_HAS_ADDED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
       console.error('Error in useCreateTaskComment:', error);
       handleError(error, {
-        title: t('ERROR'),
-        defaultMessage: t('FAILED_TO_ADD_COMMENT'),
+        title: t('UNABLE_ADD_COMMENT'),
+        defaultMessage: t('FAILED_ADD_COMMENT'),
       });
     },
   });
@@ -519,16 +515,13 @@ export const useUpdateTaskComment = () => {
       queryClient.invalidateQueries({ queryKey: ['task-comments'] });
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('COMMENT_UPDATED_SUCCESSFULLY'),
+        title: t('COMMENT_UPDATED'),
+        description: t('COMMENT_HAS_UPDATED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
       console.error('Error in useUpdateTaskComment:', error);
-      handleError(error, {
-        title: t('ERROR'),
-        defaultMessage: t('FAILED_TO_UPDATE_COMMENT'),
-      });
+      handleError(error);
     },
   });
 };
@@ -555,16 +548,13 @@ export const useDeleteTaskComment = () => {
       queryClient.invalidateQueries({ queryKey: ['task-comments'] });
       toast({
         variant: 'success',
-        title: t('SUCCESS'),
-        description: t('COMMENT_DELETED_SUCCESSFULLY'),
+        title: t('COMMENT_DELETED'),
+        description: t('COMMENT_HAS_DELETED_SUCCESSFULLY'),
       });
     },
     onError: (error: Error) => {
       console.error('Error in useDeleteTaskComment:', error);
-      handleError(error, {
-        title: t('ERROR'),
-        defaultMessage: t('FAILED_TO_DELETE_COMMENT'),
-      });
+      handleError(error);
     },
   });
 };

@@ -209,8 +209,8 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
         });
         toast({
           variant: 'success',
-          title: t('SUCCESS'),
-          description: t('Task updated successfully'),
+          title: t('TASK_UPDATED'),
+          description: t('TASK_UPDATED_SUCCESSFULLY'),
         });
 
         if (typeof window !== 'undefined') {
@@ -257,7 +257,7 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
       console.error('Failed to delete task:', error);
       toast({
         variant: 'destructive',
-        title: t('ERROR'),
+        title: t('UNABLE_DELETE_TASK'),
         description: t('FAILED_TO_DELETE_TASK'),
       });
       return false;
@@ -345,10 +345,8 @@ export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
 
         toast({
           variant: 'destructive',
-          title: t ? t('Error adding tag') : 'Error adding tag',
-          description: t
-            ? t('There was an error adding the tag to the task')
-            : 'There was an error adding the tag to the task',
+          title: t('TASK_CREATION_FAILED'),
+          description: t('FAILED_CREATE_TASK'),
         });
       }
     },

@@ -114,9 +114,9 @@ export function EditInvoice() {
       onSubmit={handleSubmit}
       showSuccessToast={(action) => {
         toast({
-          title: t(action === 'send' ? 'INVOICE_UPDATED' : 'INVOICE_SAVE_DRAFT'),
+          title: t(action === 'send' ? 'INVOICE_UPDATED' : 'DRAFT_SAVED'),
           description: t(
-            action === 'send' ? 'INVOICE_UPDATED_SUCCESSFULLY' : 'INVOICE_SAVED_DRAFT_SUCCESSFULLY'
+            action === 'send' ? 'INVOICE_UPDATED_SUCCESSFULLY' : 'INVOICE_DRAFT_SAVED_SUCCESSFULLY'
           ),
           variant: 'success',
         });

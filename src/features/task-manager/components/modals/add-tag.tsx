@@ -58,9 +58,9 @@ export function AddTag({ onAddTag, isLoading: propIsLoading = false }: Readonly<
       setIsOpen(false);
     } catch (error) {
       toast({
-        title: t('ERROR'),
-        description: t('FAILED_TO_ADD_TAG'),
         variant: 'destructive',
+        title: t('UNABLE_ADD_TAG'),
+        description: t('FAILED_TO_ADD_TAG'),
       });
     } finally {
       setIsLoading(false);
@@ -97,7 +97,7 @@ export function AddTag({ onAddTag, isLoading: propIsLoading = false }: Readonly<
               onClick={handleAddTag}
               disabled={!newTagTitle.trim() || isLoading || propIsLoading}
             >
-              {isLoading || propIsLoading ? 'Adding...' : 'Add Tag'}
+              {t('ADD_TAG')}
             </Button>
           </DialogClose>
         </div>

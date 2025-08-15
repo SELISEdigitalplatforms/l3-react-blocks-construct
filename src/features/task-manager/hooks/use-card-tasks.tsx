@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DragEndEvent,
   DragOverEvent,
@@ -74,6 +75,7 @@ interface UseCardTasksProps {
 
 export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksProps = {}) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [columnTasks, setColumnTasks] = useState<TaskSectionWithTasks[]>([]);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
@@ -346,14 +348,14 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         );
       } catch (error) {
         toast({
-          title: 'Error updating section',
-          description: 'Failed to update the section. Please try again.',
           variant: 'destructive',
+          title: t('SECTION_UPDATE_FAILED'),
+          description: t('FAILED_UPDATE_SECTION'),
         });
         console.error('Error updating section:', error);
       }
     },
-    [updateSection, toast]
+    [updateSection, toast, t]
   );
 
   const removeColumn = useCallback(
@@ -363,14 +365,14 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         setColumnTasks((prev) => prev.filter((column) => column.ItemId !== columnId));
       } catch (error) {
         toast({
-          title: 'Error deleting section',
-          description: 'Failed to delete the section. Please try again.',
           variant: 'destructive',
+          title: t('SECTION_DELETION_FAILED'),
+          description: t('FAILED_DELETE_SECTION'),
         });
         console.error('Error deleting section:', error);
       }
     },
-    [deleteSection, toast]
+    [deleteSection, toast, t]
   );
 
   const addTaskToColumn = useCallback(
@@ -378,7 +380,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       if (!content.trim()) return null;
 
       try {
-        // Find the section and ensure it has a title
         const section = columnTasks.find((col: TaskSection) => col.ItemId === columnId);
         if (!section) {
           const errorMessage = `Section not found for column ${columnId}`;
@@ -391,7 +392,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           throw new Error(`Section title is empty for column ${columnId}`);
         }
 
-        // Create a temporary task with a temporary ID
         const tempTask: TaskItem = {
           ItemId: `temp-${Date.now()}`,
           Title: content,
@@ -404,18 +404,16 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           ItemTag: [],
           CreatedBy: '',
           CreatedDate: new Date().toISOString(),
-          DueDate: new Date().toISOString(), // Set default due date to today
+          DueDate: new Date().toISOString(),
           IsDeleted: false,
         };
 
-        // Add the temporary task to the local state immediately
         setColumnTasks((prev) =>
           prev.map((column) =>
             column.ItemId === columnId ? { ...column, tasks: [...column.tasks, tempTask] } : column
           )
         );
 
-        // Execute the create task mutation
         try {
           const taskData = {
             Title: content,
@@ -426,12 +424,11 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
             OrganizationIds: [],
             Priority: TaskPriority.MEDIUM,
             ItemTag: [],
-            DueDate: new Date().toISOString(), // Set default due date to today
+            DueDate: new Date().toISOString(),
           };
 
           const response = await createTask(taskData);
 
-          // The response structure is { insertTaskManagerItem: { itemId: string, ... } }
           const taskId = response?.insertTaskManagerItem?.itemId;
 
           if (!taskId) {
@@ -484,15 +481,14 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       } catch (error) {
         console.error('Error in addTaskToColumn:', error);
         toast({
-          title: 'Error creating task',
-          description:
-            error instanceof Error ? error.message : 'Failed to create the task. Please try again.',
           variant: 'destructive',
+          title: t('TASK_CREATION_FAILED'),
+          description: error instanceof Error ? error.message : t('FAILED_CREATE_TASK'),
         });
-        throw error; // Re-throw to be handled by the caller
+        throw error;
       }
     },
-    [createTask, toast, columnTasks, refetchTasks]
+    [createTask, toast, columnTasks, refetchTasks, t]
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -580,27 +576,24 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       } catch (error) {
         console.error('Error moving task to column:', error);
         toast({
-          title: 'Error moving task',
-          description: 'Failed to move the task. Please try again.',
           variant: 'destructive',
+          title: t('TASK_MOVE_FAILED'),
+          description: t('FAILED_MOVE_THE_TASK'),
         });
-        // Refetch to reset to server state
         refetchTasks();
       }
     },
-    [columnTasks, updateTask, toast, refetchTasks]
+    [columnTasks, updateTask, toast, refetchTasks, t]
   );
 
   const handleTaskDrag = useCallback(
     async (activeTaskId: string, overTaskId: string, sourceColumnIndex: number) => {
-      // Find the target column index by checking which column contains the task we're over
       const targetColumnIndex = columnTasks.findIndex((col) =>
         col.tasks.some((task) => task.ItemId === overTaskId)
       );
 
       if (targetColumnIndex === -1 || sourceColumnIndex === -1) return;
 
-      // Create a deep copy of the columns to avoid reference issues
       const newColumns = JSON.parse(JSON.stringify(columnTasks));
       const sourceTasks = [...newColumns[sourceColumnIndex].tasks];
       const sourceTaskIndex = sourceTasks.findIndex((task) => task.ItemId === activeTaskId);
@@ -657,20 +650,18 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
           return newState;
         });
 
-        // Refetch tasks to ensure everything is in sync
         await refetchTasks();
       } catch (error) {
         console.error('Error moving task:', error);
         toast({
-          title: 'Error moving task',
-          description: 'Failed to move the task. Please try again.',
           variant: 'destructive',
+          title: t('TASK_MOVE_FAILED'),
+          description: t('FAILED_MOVE_THE_TASK'),
         });
-        // Refetch to reset to server state
         refetchTasks();
       }
     },
-    [columnTasks, updateTask, toast, refetchTasks]
+    [columnTasks, updateTask, toast, refetchTasks, t]
   );
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -781,14 +772,14 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         await refetchTasks();
       } catch (error) {
         toast({
-          title: 'Error updating task',
-          description: 'Failed to update the task status. Please try again.',
           variant: 'destructive',
+          title: t('TASK_UPDATE_FAILED'),
+          description: t('FAILED_UPDATE_TASK_STATUS'),
         });
         console.error('Error updating task:', error);
       }
     },
-    [updateTask, refetchTasks, toast]
+    [updateTask, refetchTasks, toast, t]
   );
 
   const mappedColumns = columnTasks.map((column) => ({

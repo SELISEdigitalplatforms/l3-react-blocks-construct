@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useCallback } from 'react';
 import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
+import { useTranslation } from 'react-i18next';
 import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
 import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
 import { useToast } from 'hooks/use-toast';
@@ -73,6 +74,7 @@ export function TaskCardView({
   filters,
 }: Readonly<TaskCardViewProps>) {
   const { touchEnabled } = useDeviceCapabilities();
+  const { t } = useTranslation();
 
   const { data: sectionsData, isLoading } = useGetTaskSections({
     pageNo: 1,
@@ -113,14 +115,14 @@ export function TaskCardView({
       } catch (error) {
         toast({
           variant: 'destructive',
-          title: 'Error',
-          description: 'Failed to add task. Please try again.',
+          title: t('UNABLE_CREATE_TASK'),
+          description: t('FAILED_CREATE_TASK'),
         });
         console.error('Error adding task:', error);
         throw error;
       }
     },
-    [addTaskToColumn, toast]
+    [addTaskToColumn, toast, t]
   );
 
   const taskMatchesSearchQuery = (task: TaskItem, query: string): boolean => {
@@ -196,22 +198,19 @@ export function TaskCardView({
 
         toast({
           variant: 'success',
-          title: 'Column created',
-          description: 'The new column has been created successfully',
+          title: t('COLUMN_CREATED'),
+          description: t('NEW_COLUMN_CREATED_SUCCESSFULLY'),
         });
       } catch (error) {
         console.error('Error creating column:', error);
         toast({
           variant: 'destructive',
-          title: 'Error creating column',
-          description:
-            error instanceof Error
-              ? error.message
-              : 'Failed to create the column. Please try again.',
+          title: t('COLUMN_CREATION_FAILED'),
+          description: error instanceof Error ? error.message : t('FAILED_TO_CREATE_COLUMN'),
         });
       }
     },
-    [addColumn, toast]
+    [addColumn, toast, t]
   );
 
   useEffect(() => {
