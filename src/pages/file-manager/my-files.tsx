@@ -40,8 +40,8 @@ export const FileManagerMyFiles: React.FC<FileManagerMyFilesProps> = ({ onCreate
 
   const navigationHandlers = useMemo(
     () => ({
-      toFolder: (folderId: string) => navigate(`/my-files/${folderId}`),
-      back: () => navigate('/my-files'),
+      toFolder: (folderId: string) => navigate(`/file-manager/my-files/${folderId}`),
+      back: () => navigate('/file-manager/my-files'),
     }),
     [navigate]
   );

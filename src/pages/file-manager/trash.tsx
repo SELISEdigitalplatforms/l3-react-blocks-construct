@@ -121,7 +121,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
 
   const handleNavigateToFolder = useCallback(
     (folderId: string) => {
-      navigate(`/trash/${folderId}`);
+      navigate(`/file-manager/trash/${folderId}`);
       setSelectedItems([]);
       setShowEmptyView(false);
     },
@@ -129,7 +129,7 @@ const Trash: React.FC<TrashProps> = ({ onRestoreFile, onPermanentDelete, onClear
   );
 
   const handleNavigateBack = useCallback(() => {
-    navigate('/trash');
+    navigate('/file-manager/trash');
     setSelectedItems([]);
     setShowEmptyView(false);
   }, [navigate]);

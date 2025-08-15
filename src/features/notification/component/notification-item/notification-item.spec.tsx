@@ -41,10 +41,10 @@ const mockNotification = {
   id: 'notif-1',
   isRead: false,
   createdTime: new Date().toISOString(),
-  payload: {
-    notificationType: 'Test Type',
-    responseValue: 'Test message',
-  },
+  denormalizedPayload: JSON.stringify({
+    Title: 'Test Type',
+    Description: 'Test message',
+  }),
 };
 
 describe('NotificationItem', () => {
@@ -56,7 +56,7 @@ describe('NotificationItem', () => {
     render(<NotificationItem notification={mockNotification as any} />);
     expect(screen.getByText('Test Type')).toBeInTheDocument();
     expect(screen.getByText('Test message')).toBeInTheDocument();
-    expect(screen.getByText(/^TODAY, \d{2}:\d{2}$/)).toBeInTheDocument();
+    expect(screen.getByText(/^TODAY, \d{1,2}:\d{2} [AP]M$/)).toBeInTheDocument();
   });
 
   it('calls markAsRead with notification id and onError callback when menu item is clicked', () => {

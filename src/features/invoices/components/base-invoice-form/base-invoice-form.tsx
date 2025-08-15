@@ -179,7 +179,7 @@ export function BaseInvoiceForm({
     <div className="flex flex-col w-full gap-4">
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col w-full gap-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start gap-2 md:gap-0 md:items-center md:justify-between flex-col md:flex-row">
             <div className="flex items-center gap-2">
               <Button
                 size="icon"
@@ -196,7 +196,7 @@ export function BaseInvoiceForm({
           </div>
 
           <FormSectionCard titleKey="GENERAL_INFO">
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <FormTextInput
                 control={form.control}
                 name="customerName"

@@ -71,8 +71,13 @@ export const useDeviceTableColumns = () => {
       id: 'actions',
       enableHiding: false,
       cell: () => (
-        <Button size="icon" variant="ghost" className="rounded-full opacity-50 cursor-not-allowed">
-          <Trash className="h-4 w-4 text-destructive" />
+        <Button
+          size="icon"
+          disabled
+          variant="ghost"
+          className="group rounded-full disabled:text-gray-400"
+        >
+          <Trash className="h-4 w-4 text-destructive group-disabled:text-gray-400" />
         </Button>
       ),
     },

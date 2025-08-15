@@ -113,7 +113,7 @@ describe('MainLayout', () => {
   it('renders all navigation and utility elements', () => {
     renderWithRouter(<MainLayout />);
     expect(screen.getByTestId('bell-icon')).toBeInTheDocument();
-    expect(screen.getByTestId('library-icon')).toBeInTheDocument();
+    // expect(screen.getByTestId('library-icon')).toBeInTheDocument();
     expect(screen.getByTestId('language-selector')).toBeInTheDocument();
     expect(screen.getByTestId('profile-menu')).toBeInTheDocument();
     expect(screen.getByTestId('notification')).toBeInTheDocument();

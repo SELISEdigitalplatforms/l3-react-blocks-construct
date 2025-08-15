@@ -90,14 +90,14 @@ function AppContent() {
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/invoices" element={<InvoicesPage />} />
                 <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                <Route path="/invoices/edit/:invoiceId" element={<EditInvoice />} />
+                <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
                 <Route path="/file-manager/trash" element={<Trash />} />
-                <Route path="/my-files/:folderId" element={<FileManagerMyFiles />} />
-                <Route path="/shared-files/:folderId" element={<SharedWithMe />} />
-                <Route path="/trash/:folderId" element={<Trash />} />
+                <Route path="/file-manager/my-files/:folderId" element={<FileManagerMyFiles />} />
+                <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMe />} />
+                <Route path="/file-manager/trash/:folderId" element={<Trash />} />
 
                 <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/503" element={<ServiceUnavailable />} />

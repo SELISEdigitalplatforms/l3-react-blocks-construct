@@ -8,11 +8,13 @@ import { Card, CardContent } from 'components/ui/card';
 import { Button } from 'components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
 import { Separator } from 'components/ui/separator';
-import darklogo from 'assets/images/construct_logo_dark.svg';
+import darkLogo from 'assets/images/construct_logo_dark.svg';
+import lightLogo from 'assets/images/construct_logo_light.svg';
 import { Badge } from 'components/ui/badge';
 import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
+import { useTheme } from 'styles/theme/theme-provider';
 
 interface InvoicesDetailProps {
   invoice: InvoiceItem;
@@ -23,6 +25,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [showSendDialog, setShowSendDialog] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -121,23 +124,23 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
               <Separator orientation="vertical" className="hidden md:flex h-5 mx-1 sm:mx-3" />
               <div className="flex items-center gap-2">
                 <Button variant="outline" onClick={handleDownloadPDF}>
-                  <Download className="h-4 w-4 mr-1" />
-                  {t('DOWNLOAD')}
+                  <Download className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('DOWNLOAD')}</span>
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate(`/invoices/edit/${invoice.ItemId}`)}
+                  onClick={() => navigate(`/invoices/${invoice.ItemId}/edit`)}
                 >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  {t('EDIT')}
+                  <Pencil className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('EDIT')}</span>
                 </Button>
                 <Button
                   variant="default"
                   className="bg-primary"
                   onClick={() => setShowSendDialog(true)}
                 >
-                  <Send className="h-4 w-4 mr-1" />
-                  {t('SEND')}
+                  <Send className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('SEND')}</span>
                 </Button>
               </div>
             </div>
@@ -150,7 +153,11 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
         <CardContent className="flex flex-col !p-[24px] sm:!py-[56px] sm:!px-[70px] gap-6">
           <div className="flex flex-col sm:flex-row sm:justify-between">
             <div className="w-[220px] h-[80px]">
-              <img src={darklogo} alt="logo" className="w-full h-full object-cover" />
+              <img
+                src={theme === 'dark' ? lightLogo : darkLogo}
+                alt="logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col border-l-none sm:border-l sm:border-medium-emphasis pl-4">
               <h2 className="font-semibold text-high-emphasis">Blocks Construct</h2>
@@ -160,7 +167,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
           </div>
           <Separator />
           <div className="flex flex-col sm:flex-row w-full sm:justify-between">
-            <div className="flex flex-col gap-2 w-[50%]">
+            <div className="flex flex-col gap-2 w-full md:w-[50%]">
               <h1 className="text-medium-emphasis">{t('INVOICE_DETAILS')}</h1>
               <div className="flex items-center gap-2">
                 <p className="font-bold text-high-emphasis uppercase">{invoice.ItemId}</p>
@@ -183,7 +190,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                 </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2 w-[50%]">
+            <div className="flex flex-col gap-2 w-full md:w-[50%]">
               <h3 className="text-base font-medium text-medium-emphasis mb-2">{t('BILLED_TO')}</h3>
               <p className="text-base font-bold">{invoice.Customer[0].CustomerName}</p>
               <div className="flex items-center gap-2">
@@ -251,7 +258,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
           </div>
 
           <div className="flex flex-col-reverse sm:flex-row w-full items-start sm:justify-between">
-            <div className="flex flex-col gap-2 w-[50%]">
+            <div className="flex flex-col gap-2 w-full md:w-[50%]">
               {invoice.GeneralNote && (
                 <>
                   <div className="flex items-cnter gap-1">
