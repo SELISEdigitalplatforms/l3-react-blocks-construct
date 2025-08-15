@@ -87,7 +87,7 @@ export const NotificationItem = ({ notification }: Readonly<NotificationItemProp
                       <span>{t('MARKING_AS_READ')}</span>
                     </>
                   ) : (
-                    <span>{t('MARK_AS_READ')}</span>
+                    <span>{t('MARKED_AS_READ')}</span>
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled>{t('REMOVE_NOTIFICATION')}</DropdownMenuItem>
