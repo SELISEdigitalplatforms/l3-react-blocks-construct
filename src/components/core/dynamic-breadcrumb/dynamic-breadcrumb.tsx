@@ -79,11 +79,14 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
     };
   });
 
-  const displayedCrumbs = breadcrumbIndex
-    ? dynamicBreadcrumbs.slice(breadcrumbIndex - 1)
-    : shouldHideFirstBreadcrumb()
-      ? dynamicBreadcrumbs.slice(1)
-      : dynamicBreadcrumbs;
+  const getDisplayedCrumbs = () => {
+    if (breadcrumbIndex) {
+      return dynamicBreadcrumbs.slice(breadcrumbIndex - 1);
+    }
+    return shouldHideFirstBreadcrumb() ? dynamicBreadcrumbs.slice(1) : dynamicBreadcrumbs;
+  };
+
+  const displayedCrumbs = getDisplayedCrumbs();
 
   if (displayedCrumbs.length === 1 && DYNAMIC_BREADCRUMB_TITLES[displayedCrumbs[0].href]) {
     return null;
