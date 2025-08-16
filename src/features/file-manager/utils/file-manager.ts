@@ -138,7 +138,75 @@ export interface IFileTrashData {
   size: string;
   trashedDate: Date;
   isShared?: boolean;
+  parentFolderId?: string;
 }
+
+export const DYNAMIC_BREADCRUMB_TITLES = {
+  '/trash': 'TRASH',
+  '/trash/3': 'DESIGN_ASSETS',
+  '/trash/4': 'DESIGN_ASSETS_2',
+};
+
+export const folderContents: Record<string, IFileTrashData[]> = {
+  '3': [
+    {
+      id: '3-1',
+      name: 'Logo_Design.png',
+      fileType: 'Image',
+      size: '2.1 MB',
+      trashedDate: new Date('2025-01-03'),
+      isShared: true,
+      parentFolderId: '3',
+    },
+    {
+      id: '3-2',
+      name: 'Brand_Guidelines.pdf',
+      fileType: 'File',
+      size: '5.3 MB',
+      trashedDate: new Date('2025-06-03'),
+      isShared: true,
+      parentFolderId: '3',
+    },
+    {
+      id: '3-3',
+      name: 'Icon_Set.svg',
+      fileType: 'Image',
+      size: '1.8 MB',
+      trashedDate: new Date('2025-03-03'),
+      isShared: true,
+      parentFolderId: '3',
+    },
+  ],
+  '4': [
+    {
+      id: '4-1',
+      name: 'Mockup_Design.jpg',
+      fileType: 'Image',
+      size: '4.2 MB',
+      trashedDate: new Date('2025-01-10'),
+      isShared: true,
+      parentFolderId: '4',
+    },
+    {
+      id: '4-2',
+      name: 'Style_Guide.docx',
+      fileType: 'File',
+      size: '3.1 MB',
+      trashedDate: new Date('2025-04-03'),
+      isShared: true,
+      parentFolderId: '4',
+    },
+    {
+      id: '4-3',
+      name: 'Color_Palette.png',
+      fileType: 'Image',
+      size: '0.9 MB',
+      trashedDate: new Date('2025-04-03'),
+      isShared: true,
+      parentFolderId: '4',
+    },
+  ],
+};
 
 export const trashMockData: IFileTrashData[] = [
   {
@@ -190,6 +258,12 @@ export const trashMockData: IFileTrashData[] = [
     isShared: false,
   },
 ];
+
+export interface PreviewProps {
+  file: IFileTrashData;
+  onClose: () => void;
+  t: (key: string) => string;
+}
 
 export const getFileTypeDisplayName = (fileType: string): string => {
   switch (fileType) {
@@ -300,6 +374,8 @@ export interface MyFilesListViewProps {
   renamedFiles: Map<string, IFileDataWithSharing>;
   fileSharedUsers?: { [key: string]: SharedUser[] };
   filePermissions?: { [key: string]: { [key: string]: string } };
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
 }
 
 export interface FileManagerHeaderToolbarProps {

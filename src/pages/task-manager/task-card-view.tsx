@@ -1,28 +1,30 @@
-import { useEffect } from 'react';
-import {
-  DndContext,
-  DragOverlay,
-  closestCorners,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { AddColumnDialog } from 'features/task-manager/components/card-view/add-column-dialog';
-import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
-import { AddTaskDialog } from 'features/task-manager/components/card-view/add-task-dialog';
-import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
-import { Dialog } from 'components/ui/dialog';
-import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
+import { useEffect, useMemo, useCallback } from 'react';
+import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
+import { useTranslation } from 'react-i18next';
 import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
+import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
+import { useToast } from 'hooks/use-toast';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
+import { Skeleton } from 'components/ui/skeleton';
+import {
+  TaskSection,
+  TaskSectionWithTasks,
+  TaskItem,
+  ItemTag,
+} from 'features/task-manager/types/task-manager.types';
+import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
+import { AddColumn } from '../../features/task-manager/components/modals/add-column';
+import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
+import { AddTask } from '../../features/task-manager/components/modals/add-task';
+import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
+import { Dialog } from 'components/ui/dialog';
 
 /**
  * TaskCardView Component
  *
  * A card-based (Kanban-style) task board for managing tasks within draggable columns.
- * Built using `@dnd-kit/core` for drag-and-drop and internal task management
- * via the `useCardTasks` hook. Supports adaptive drag sensitivity based on device.
+ * Built using `@dnd-kit/core` for drag-and-drop and external task management
+ * via the `useGetTaskSections` hook. Supports adaptive drag sensitivity based on device.
  *
  * Features:
  * - Drag-and-drop columns and tasks
@@ -52,28 +54,34 @@ import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
 interface TaskCardViewProps {
   isNewTaskModalOpen?: boolean;
   setNewTaskModalOpen: (isOpen: boolean) => void;
+  searchQuery?: string;
+  filters: {
+    priorities: string[];
+    statuses: string[];
+    assignees: string[];
+    tags: ItemTag[];
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
 }
 
 export function TaskCardView({
   isNewTaskModalOpen,
   setNewTaskModalOpen,
+  searchQuery = '',
+  filters,
 }: Readonly<TaskCardViewProps>) {
-  const { touchEnabled, screenSize } = useDeviceCapabilities();
+  const { touchEnabled } = useDeviceCapabilities();
+  const { t } = useTranslation();
 
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: screenSize === 'tablet' ? 5 : 10,
-    },
+  const { data: sectionsData, isLoading } = useGetTaskSections({
+    pageNo: 1,
+    pageSize: 100,
   });
 
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: screenSize === 'mobile' ? 250 : 150,
-      tolerance: screenSize === 'mobile' ? 5 : 3,
-    },
-  });
-
-  const dndSensors = useSensors(touchSensor, mouseSensor);
+  const { toast } = useToast();
 
   const {
     columns,
@@ -83,11 +91,127 @@ export function TaskCardView({
     addColumn,
     renameColumn,
     deleteColumn,
-    addTask,
+    addTask: addTaskToColumn,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
-  } = useCardTasks();
+    sensors,
+  } = useCardTasks({
+    searchQuery,
+    filters: {
+      priorities: filters.priorities,
+      statuses: filters.statuses,
+      assignees: filters.assignees,
+      tags: filters.tags,
+      dueDate: filters.dueDate,
+    },
+  });
+
+  const handleAddTask = useCallback(
+    async (columnId: string, content: string) => {
+      try {
+        const taskId = await addTaskToColumn(columnId, content);
+        return taskId;
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: t('UNABLE_CREATE_TASK'),
+          description: t('FAILED_CREATE_TASK'),
+        });
+        console.error('Error adding task:', error);
+        throw error;
+      }
+    },
+    [addTaskToColumn, toast, t]
+  );
+
+  const taskMatchesSearchQuery = (task: TaskItem, query: string): boolean => {
+    const lowerQuery = query.toLowerCase();
+    const matchesBasicFields =
+      task.Title?.toLowerCase().includes(lowerQuery) ||
+      task.Description?.toLowerCase().includes(lowerQuery);
+
+    const matchesItemTag = task.ItemTag?.some(
+      (tag) =>
+        tag.TagLabel?.toLowerCase().includes(lowerQuery) ||
+        tag.ItemId?.toLowerCase().includes(lowerQuery)
+    );
+
+    const matchesTags = task.Tags?.some(
+      (tag) => typeof tag === 'string' && tag.toLowerCase().includes(lowerQuery)
+    );
+
+    return matchesBasicFields || matchesItemTag || matchesTags || false;
+  };
+
+  const taskMatchesTagFilter = (
+    task: TaskItem,
+    filterTags: Array<string | { ItemId: string }>
+  ): boolean => {
+    if (!task.ItemTag) return false;
+
+    return task.ItemTag.some((tag) =>
+      filterTags.some((filterTag) => {
+        if (typeof filterTag === 'string') {
+          return tag.ItemId === filterTag || tag.TagLabel === filterTag;
+        }
+        return tag.ItemId === filterTag.ItemId;
+      })
+    );
+  };
+
+  const apiColumns = useMemo<TaskSectionWithTasks[]>(() => {
+    if (!sectionsData?.TaskManagerSections?.items) return [];
+
+    return sectionsData.TaskManagerSections.items.map((section): TaskSectionWithTasks => {
+      const sectionTasks = section.tasks || [];
+      let tasks = searchQuery
+        ? sectionTasks.filter((task) => taskMatchesSearchQuery(task, searchQuery))
+        : [...sectionTasks];
+
+      // Apply tag filters if any
+      if (filters.tags.length > 0) {
+        tasks = tasks.filter((task) => taskMatchesTagFilter(task, filters.tags));
+      }
+
+      return {
+        ...section,
+        IsDeleted: section.IsDeleted || false,
+        Language: section.Language || 'en',
+        LastUpdatedBy: section.LastUpdatedBy,
+        LastUpdatedDate: section.LastUpdatedDate,
+        OrganizationIds: section.OrganizationIds || [],
+        Tags: section.Tags || [],
+        tasks: tasks,
+      };
+    });
+  }, [sectionsData, searchQuery, filters.tags]);
+
+  const handleAddColumn = useCallback(
+    async (title: string) => {
+      try {
+        const newSectionId = await addColumn(title);
+
+        if (!newSectionId) {
+          throw new Error('No section ID returned from server');
+        }
+
+        toast({
+          variant: 'success',
+          title: t('COLUMN_CREATED'),
+          description: t('NEW_COLUMN_CREATED_SUCCESSFULLY'),
+        });
+      } catch (error) {
+        console.error('Error creating column:', error);
+        toast({
+          variant: 'destructive',
+          title: t('COLUMN_CREATION_FAILED'),
+          description: error instanceof Error ? error.message : t('FAILED_TO_CREATE_COLUMN'),
+        });
+      }
+    },
+    [addColumn, toast, t]
+  );
 
   useEffect(() => {
     const handleSetActiveColumn = (event: Event) => {
@@ -102,20 +226,31 @@ export function TaskCardView({
     };
   }, [setActiveColumn]);
 
+  if (isLoading) {
+    return (
+      <div className="flex space-x-4 p-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="w-64 p-4 space-y-4">
+            <Skeleton className="h-8 w-3/4" />
+            <div className="space-y-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="h-full w-full">
       <DndContext
-        sensors={dndSensors}
+        sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
-        autoScroll={{
-          threshold: {
-            x: 0.2,
-            y: 0.2,
-          },
-        }}
+        autoScroll={true}
         measuring={{
           draggable: {
             measure: (element) => element.getBoundingClientRect(),
@@ -129,20 +264,29 @@ export function TaskCardView({
           }}
         >
           <div className="flex space-x-4 min-h-full">
-            {columns.map((column) => (
-              <TaskColumn
-                key={column.id}
-                column={column}
-                tasks={column.tasks || []}
-                setActiveColumn={setActiveColumn}
-                onAddTask={(columnId, content) => addTask(columnId, content)}
-                onRenameColumn={(columnId, newTitle) => renameColumn(columnId, newTitle)}
-                onDeleteColumn={(columnId) => deleteColumn(columnId)}
-              />
-            ))}
+            {apiColumns.map((column: TaskSection) => {
+              const columnTasks = columns.find((col) => col.ItemId === column.ItemId)?.tasks || [];
+
+              const filteredTasks = columnTasks.filter(
+                (task) => task.Title?.toLowerCase().includes(searchQuery.toLowerCase()) // Apply the filtering
+              );
+
+              return (
+                <TaskColumn
+                  key={column.ItemId}
+                  column={column}
+                  tasks={filteredTasks}
+                  sections={apiColumns}
+                  setActiveColumn={setActiveColumn}
+                  onAddTask={handleAddTask}
+                  onRenameColumn={(columnId, newTitle) => renameColumn(columnId, newTitle)}
+                  onDeleteColumn={(columnId) => deleteColumn(columnId)}
+                />
+              );
+            })}
 
             <div className="flex items-start pt-10 px-2">
-              <AddColumnDialog onAddColumn={(title) => addColumn(title)} />
+              <AddColumn onAddColumn={handleAddColumn} />
             </div>
           </div>
         </div>
@@ -150,19 +294,23 @@ export function TaskCardView({
         <DragOverlay>{activeTask && <TaskDragOverlay activeTask={activeTask} />}</DragOverlay>
       </DndContext>
 
-      <AddTaskDialog
+      <AddTask
         activeColumn={activeColumn}
         columns={columns}
-        onAddTask={(columnId, content) => addTask(columnId, content)}
+        onAddTask={async (columnId, content) => {
+          try {
+            await handleAddTask(columnId, content);
+          } catch (error) {
+            console.error('Error in AddTaskDialog:', error);
+          }
+        }}
       />
 
       <Dialog open={isNewTaskModalOpen} onOpenChange={setNewTaskModalOpen}>
-        {isNewTaskModalOpen && (
-          <TaskDetailsView
-            onClose={() => setNewTaskModalOpen(false)}
-            isNewTaskModalOpen={isNewTaskModalOpen}
-          />
-        )}
+        <TaskDetailsView
+          onClose={() => setNewTaskModalOpen(false)}
+          isNewTaskModalOpen={isNewTaskModalOpen}
+        />
       </Dialog>
     </div>
   );

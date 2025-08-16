@@ -35,25 +35,20 @@ export const menuItems: MenuItem[] = [
   createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined'),
   createMenuItem('iam', 'IAM', '/identity-management', 'Users', { isIntegrated: true }),
   createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store', { isIntegrated: true }),
+  createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', { isIntegrated: true }),
+  createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation', {
+    isIntegrated: true,
+  }),
   createMenuItem('mail', 'MAIL', '/mail/inbox', 'Inbox'),
   createMenuItem('calendar', 'CALENDAR', '/calendar', 'Calendar'),
   createMenuItem('activity-log', 'ACTIVITY_LOG', '/activity-log', 'FileClock'),
   createMenuItem('timeline', 'TIMELINE', '/timeline', 'History'),
-  createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation'),
   createMenuItem('chat', 'CHAT', '/chat', 'MessageSquareText'),
-  createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText'),
-  createMenuItemWithChildren(
-    'file-manager',
-    'FILE_MANAGER',
-    '/file-manager',
-    'Folder',
-
-    [
-      createMenuItem('my-files', 'MY_FILES', '/file-manager/my-files'),
-      createMenuItem('shared-files', 'SHARED_WITH_ME', '/file-manager/shared-files'),
-      createMenuItem('trash', 'TRASH', '/file-manager/trash'),
-    ]
-  ),
+  createMenuItemWithChildren('file-manager', 'FILE_MANAGER', '/file-manager', 'Folder', [
+    createMenuItem('my-files', 'MY_FILES', '/file-manager/my-files'),
+    createMenuItem('shared-files', 'SHARED_WITH_ME', '/file-manager/shared-files'),
+    createMenuItem('trash', 'TRASH', '/file-manager/trash'),
+  ]),
   createMenuItem('404', 'ERROR_404', '/404', 'SearchX'),
   createMenuItem('503', 'ERROR_503', '/503', 'TriangleAlert'),
 ];

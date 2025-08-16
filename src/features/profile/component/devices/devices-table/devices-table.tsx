@@ -130,9 +130,14 @@ export const DevicesTable = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl text-high-emphasis">{t('MY_DEVICES')}</CardTitle>
-            <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive">
-              <Trash className="w-3 h-3 opacity-50 cursor-not-allowed" />
-              <span className="text-sm font-bold sr-only sm:not-sr-only sm:whitespace-nowrap opacity-50 cursor-not-allowed">
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled
+              className="text-destructive hover:text-destructive disabled:text-gray-400"
+            >
+              <Trash className="w-3 h-3 disabled:text-gray-400" />
+              <span className="text-sm font-bold sr-only sm:not-sr-only sm:whitespace-nowrap disabled:text-gray-400">
                 {t('REMOVE_ALL_DEVICES')}
               </span>
             </Button>

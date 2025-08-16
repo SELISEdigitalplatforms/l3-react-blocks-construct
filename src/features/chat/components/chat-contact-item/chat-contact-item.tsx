@@ -178,7 +178,7 @@ export const ChatContactItem = ({
       <button
         type="button"
         className={cn(
-          'group relative flex flex-col items-center w-full p-3 text-center hover:bg-gray-50 transition-colors',
+          'group relative flex flex-col items-center w-full p-3 text-center hover:bg-surface transition-colors',
           isSelected && 'bg-primary-50',
           className
         )}
@@ -198,7 +198,7 @@ export const ChatContactItem = ({
     <button
       type="button"
       className={cn(
-        'group relative flex items-center w-full p-4 text-left hover:bg-gray-50 transition-colors',
+        'group relative flex items-center w-full p-4 text-left hover:bg-surface transition-colors',
         isSelected && 'bg-primary-50',
         className
       )}

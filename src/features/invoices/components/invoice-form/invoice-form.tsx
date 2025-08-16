@@ -37,13 +37,23 @@ export function FormActionButtons({ setShowPreview, setAction }: Readonly<FormAc
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-4">
-      <Button type="button" variant="outline" onClick={() => setShowPreview(true)}>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => setShowPreview(true)}
+        className="text-xs md:text-sm"
+      >
         {t('PREVIEW')}
       </Button>
-      <Button type="submit" variant="outline" onClick={() => setAction('draft')}>
+      <Button
+        type="submit"
+        variant="outline"
+        onClick={() => setAction('draft')}
+        className="text-xs md:text-sm"
+      >
         {t('SAVE_AS_DRAFT')}
       </Button>
-      <Button type="submit" onClick={() => setAction('send')}>
+      <Button type="submit" onClick={() => setAction('send')} className="text-xs md:text-sm">
         {t('SAVE_AND_SEND')}
       </Button>
     </div>
@@ -135,7 +145,7 @@ export function FormWrapperField({
   );
 }
 
-interface FormTextInputProps {
+interface FormTextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   control: Control<InvoiceFormValues>;
   name: keyof InvoiceFormValues;
   labelKey: string;
@@ -149,12 +159,15 @@ export function FormTextInput({
   labelKey,
   placeholderKey,
   type = 'text',
+  ...rest
 }: Readonly<FormTextInputProps>) {
   const { t } = useTranslation();
 
   return (
     <FormWrapperField control={control} name={name} labelKey={labelKey}>
-      {(field) => <Input placeholder={`${t(placeholderKey)}...`} type={type} {...field} />}
+      {(field) => (
+        <Input placeholder={`${t(placeholderKey)}...`} type={type} {...field} {...rest} />
+      )}
     </FormWrapperField>
   );
 }

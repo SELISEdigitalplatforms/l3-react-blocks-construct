@@ -78,7 +78,7 @@ export const useAddInventoryItem = () => {
         toast({
           variant: 'success',
           title: t('INVENTORY_ITEM_ADDED'),
-          description: t('INVENTORY_ITEM_SUCCESSFULLY_CREATED'),
+          description: t('INVENTORY_ITEM_CREATED_SUCCESSFULLY'),
         });
       }
     },
@@ -118,7 +118,7 @@ export const useUpdateInventoryItem = () => {
         toast({
           variant: 'success',
           title: t('INVENTORY_ITEM_UPDATED'),
-          description: t('INVENTORY_ITEM_SUCCESSFULLY_UPDATED'),
+          description: t('INVENTORY_ITEM_UPDATED_SUCCESSFULLY'),
         });
       } else {
         handleError(
@@ -164,7 +164,7 @@ export const useDeleteInventoryItem = () => {
         toast({
           variant: 'success',
           title: t('INVENTORY_ITEM_DELETED'),
-          description: t('INVENTORY_ITEM_SUCCESSFULLY_DELETED'),
+          description: t('INVENTORY_ITEM_DELETED_SUCCESSFULLY'),
         });
       } else {
         handleError(

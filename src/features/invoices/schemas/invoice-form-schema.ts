@@ -8,17 +8,8 @@ export const invoiceFormSchema = z.object({
   dueDate: z.date().optional(),
   currency: z.string().min(1, { message: 'CURRENCY_REQUIRED' }),
   generalNote: z.string().optional(),
+  taxes: z.number().min(0, { message: 'TAXES_MUST_BE_POSITIVE' }).default(0),
+  discount: z.number().min(0, { message: 'DISCOUNT_MUST_BE_POSITIVE' }).default(0),
 });
 
 export type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
-
-export interface InvoiceItem {
-  id: string;
-  name: string;
-  category: string;
-  quantity: number;
-  price: number;
-  total: number;
-  showNote: boolean;
-  note?: string;
-}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { parse } from 'date-fns';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
 
 /**
  * EditableComment Component
@@ -41,12 +42,19 @@ import { Input } from 'components/ui/input';
  */
 
 interface EditableCommentProps {
-  readonly author: string;
-  readonly timestamp: string;
-  readonly initialComment: string;
-  readonly onEdit?: (newComment: string) => void;
-  readonly onDelete?: () => void;
+  author: string;
+  timestamp: string;
+  initialComment: string;
+  onEdit?: (newComment: string) => void;
+  onDelete?: () => void;
 }
+
+// Get current user profile from localStorage
+const getCurrentUser = () => {
+  if (typeof window === 'undefined') return null;
+  const profile = localStorage.getItem('userProfile');
+  return profile ? JSON.parse(profile) : null;
+};
 
 export function EditableComment({
   author,
@@ -54,11 +62,16 @@ export function EditableComment({
   initialComment,
   onEdit,
   onDelete,
-}: EditableCommentProps) {
+}: Readonly<EditableCommentProps>) {
+  const [userProfile, setUserProfile] = useState(getCurrentUser());
   const [comment, setComment] = useState(initialComment);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    setUserProfile(getCurrentUser());
+  }, []);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -67,7 +80,14 @@ export function EditableComment({
     }
   }, [isEditing]);
 
-  const parsedTime = parse(timestamp, 'dd.MM.yyyy, HH:mm', new Date());
+  const parseTimestamp = (timeStr: string | undefined): Date => {
+    if (!timeStr) return new Date();
+    return timeStr.includes('T')
+      ? new Date(timeStr)
+      : parse(timeStr, 'dd.MM.yyyy, HH:mm', new Date());
+  };
+
+  const parsedTime = parseTimestamp(timestamp);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -100,15 +120,31 @@ export function EditableComment({
 
   return (
     <div className="flex gap-2">
-      <div className="h-10 w-10 rounded-full bg-gray-300 text-xs flex items-center justify-center border-2 border-white">
-        {author[0].toUpperCase()}
-      </div>
+      <Avatar className="h-10 w-10 border-2 border-white">
+        <AvatarImage
+          src={author === userProfile?.fullName ? userProfile?.profileImageUrl : ''}
+          alt={author}
+        />
+        <AvatarFallback className="bg-gray-300 text-xs">
+          {author
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
       <div className="flex-1">
         <div className="flex items-center">
           <p className="text-sm font-bold text-high-emphasis">{author}</p>
           <span className="mx-2 h-2 w-2 rounded-full bg-neutral-200" />
           <p className="text-xs text-low-emphasis font-normal">
-            {new Date(parsedTime).toLocaleString()}
+            {parsedTime.toLocaleString(undefined, {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </p>
         </div>
 
@@ -126,12 +162,12 @@ export function EditableComment({
           <p className="text-base text-high-emphasis font-normal">{comment}</p>
         )}
 
-        {author == 'Block Smith' && (
+        {author === userProfile?.fullName && (
           <div className="flex gap-2 mt-1">
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 p-0 text-xs font-semibold text-primary"
+              className="h-6 text-xs font-semibold text-primary"
               onClick={() => setIsEditing(true)}
             >
               {t('EDIT')}
@@ -139,7 +175,7 @@ export function EditableComment({
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 p-0 text-xs font-semibold text-primary"
+              className="h-6 text-xs font-semibold text-destructive hover:text-destructive"
               onClick={onDelete}
             >
               {t('DELETE')}

@@ -18,7 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'components/ui/select';
-import { ITaskManagerColumn } from '../../types/task';
+import { TaskItem, TaskSection } from '../../types/task-manager.types';
+
+interface TaskSectionWithTasks extends TaskSection {
+  tasks: TaskItem[];
+}
 
 /**
  * AddTaskDialog Component
@@ -44,18 +48,18 @@ import { ITaskManagerColumn } from '../../types/task';
  * // Basic usage
  * <AddTaskDialog
  *   activeColumn="1"
- *   columns={[{ id: '1', title: 'To Do' }]}
+ *   columns={[{ id: '1', title: 'To do' }]}
  *   onAddTask={(columnId, content) => console.log('Task added:', columnId, content)}
  * />
  */
 
-interface AddTaskDialogProps {
+interface AddTaskProps {
   activeColumn: string | null;
-  columns: ITaskManagerColumn[];
+  columns: TaskSectionWithTasks[];
   onAddTask: (columnId: string, content: string) => void;
 }
 
-export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<AddTaskDialogProps>) {
+export function AddTask({ activeColumn, columns, onAddTask }: Readonly<AddTaskProps>) {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [selectedColumnId, setSelectedColumnId] = useState(activeColumn ?? '1');
   const { t } = useTranslation();
@@ -102,8 +106,8 @@ export function AddTaskDialog({ activeColumn, columns, onAddTask }: Readonly<Add
               <SelectContent>
                 <SelectGroup>
                   {columns.map((column) => (
-                    <SelectItem key={column.id} value={column.id}>
-                      {column.title}
+                    <SelectItem key={column.ItemId} value={column.ItemId}>
+                      {column.Title}
                     </SelectItem>
                   ))}
                 </SelectGroup>

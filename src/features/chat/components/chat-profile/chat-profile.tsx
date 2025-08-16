@@ -126,7 +126,7 @@ export function ChatProfile({
       toast({
         variant: 'success',
         title: t('USER_REMOVED'),
-        description: t('REMOVED_USER_GROUP_SUCCESSFULLY'),
+        description: t('USER_SUCCESSFULLY_REMOVED_GROUP'),
       });
     }
   };
@@ -143,7 +143,7 @@ export function ChatProfile({
       toast({
         variant: 'success',
         title: t('YOU_LEFT_GROUP'),
-        description: t('GROUP_EXIT_SUCCESS_MESSAGE'),
+        description: t('YOU_SUCCESSFULLY_EXITED_GROUP'),
       });
       setShowLeaveModal(false);
     }

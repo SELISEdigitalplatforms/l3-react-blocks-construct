@@ -63,6 +63,83 @@ export function AuthLayout() {
     return false;
   };
 
+  const renderAuthContent = () => {
+    if (is404Error(loginOptionsError)) {
+      return (
+        <div className="w-full max-w-xl mx-auto">
+          <div className="relative overflow-hidden rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 p-8 shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-50/80 to-transparent"></div>
+            <div className="relative z-10">
+              <div className="mb-4 flex justify-center">
+                <div className="rounded-full bg-red-100 p-3">
+                  <AlertTriangle className="h-8 w-8 text-red-600" />
+                </div>
+              </div>
+              <div className="text-center space-y-4">
+                <h2 className="text-2xl font-bold text-red-900 tracking-tight">
+                  Incorrect Project Key
+                </h2>
+                <div className="space-y-3 text-red-700">
+                  <p className="text-base leading-relaxed">
+                    It seems your project is not set up in the Blocks Cloud.
+                  </p>
+                  <p className="text-sm leading-relaxed">
+                    Please create a project at{' '}
+                    <a
+                      href="https://cloud.seliseblocks.com"
+                      className="font-semibold underline decoration-red-400 underline-offset-2 hover:decoration-red-600 transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      cloud.seliseblocks.com
+                    </a>
+                    , then update your{' '}
+                    <code className="inline-flex items-center px-2 py-1 rounded-md bg-red-200/60 text-red-800 font-mono text-xs border border-red-300/50">
+                      .env
+                    </code>{' '}
+                    configuration in Construct accordingly.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (is500Error(loginOptionsError)) {
+      return (
+        <div className="w-full max-w-xl mx-auto">
+          <div className="relative overflow-hidden rounded-xl border border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/50 p-8 shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-transparent"></div>
+            <div className="relative z-10">
+              <div className="mb-4 flex justify-center">
+                <div className="rounded-full bg-orange-100 p-3">
+                  <AlertTriangle className="h-8 w-8 text-orange-600" />
+                </div>
+              </div>
+              <div className="text-center space-y-4">
+                <h2 className="text-2xl font-bold text-orange-900 tracking-tight">
+                  Services Temporarily Unavailable
+                </h2>
+                <div className="space-y-3 text-orange-700">
+                  <p className="text-base leading-relaxed">
+                    The services are temporarily unavailable.
+                  </p>
+                  <p className="text-base leading-relaxed font-semibold">
+                    Everything will be back to normal soon.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return <Outlet />;
+  };
+
   if (isLoading) return null;
 
   return (
@@ -79,74 +156,7 @@ export function AuthLayout() {
         <div className="absolute top-2 right-4">
           <LanguageSelector />
         </div>
-        {is404Error(loginOptionsError) ? (
-          <div className="w-full max-w-xl mx-auto">
-            <div className="relative overflow-hidden rounded-xl border border-red-200 bg-gradient-to-br from-red-50 to-red-100/50 p-8 shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-50/80 to-transparent"></div>
-              <div className="relative z-10">
-                <div className="mb-4 flex justify-center">
-                  <div className="rounded-full bg-red-100 p-3">
-                    <AlertTriangle className="h-8 w-8 text-red-600" />
-                  </div>
-                </div>
-                <div className="text-center space-y-4">
-                  <h2 className="text-2xl font-bold text-red-900 tracking-tight">
-                    Incorrect Project Key
-                  </h2>
-                  <div className="space-y-3 text-red-700">
-                    <p className="text-base leading-relaxed">
-                      It seems your project is not set up in the Blocks Cloud.
-                    </p>
-                    <p className="text-sm leading-relaxed">
-                      Please create a project at{' '}
-                      <a
-                        href="https://cloud.seliseblocks.com"
-                        className="font-semibold underline decoration-red-400 underline-offset-2 hover:decoration-red-600 transition-colors"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        cloud.seliseblocks.com
-                      </a>
-                      , then update your{' '}
-                      <code className="inline-flex items-center px-2 py-1 rounded-md bg-red-200/60 text-red-800 font-mono text-xs border border-red-300/50">
-                        .env
-                      </code>{' '}
-                      configuration in Construct accordingly.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : is500Error(loginOptionsError) ? (
-          <div className="w-full max-w-xl mx-auto">
-            <div className="relative overflow-hidden rounded-xl border border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/50 p-8 shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/80 to-transparent"></div>
-              <div className="relative z-10">
-                <div className="mb-4 flex justify-center">
-                  <div className="rounded-full bg-orange-100 p-3">
-                    <AlertTriangle className="h-8 w-8 text-orange-600" />
-                  </div>
-                </div>
-                <div className="text-center space-y-4">
-                  <h2 className="text-2xl font-bold text-orange-900 tracking-tight">
-                    Services Temporarily Unavailable
-                  </h2>
-                  <div className="space-y-3 text-orange-700">
-                    <p className="text-base leading-relaxed">
-                      The services are temporarily unavailable.
-                    </p>
-                    <p className="text-base leading-relaxed font-semibold">
-                      Everything will be back to normal soon.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <Outlet />
-        )}
+        {renderAuthContent()}
       </div>
     </div>
   );

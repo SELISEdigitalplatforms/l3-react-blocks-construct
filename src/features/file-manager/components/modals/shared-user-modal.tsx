@@ -247,19 +247,19 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-md mx-4 max-h-[80vh] flex flex-col shadow-xl">
-        <div className="p-4 border-b border-gray-200">
+        <div className="pt-4 px-4 bg-background">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-900">{getDialogTitle()}</h2>
+            <h2 className="text-lg font-medium text-high-emphasis">{getDialogTitle()}</h2>
             <button onClick={handleCancel} className="p-1 hover:bg-gray-100 rounded-full">
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-medium-emphasis" />
             </button>
           </div>
         </div>
 
         {currentView === 'share' && (
           <>
-            <div className="p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Share with people</h3>
+            <div className="p-4 bg-background">
+              <h3 className="text-sm font-medium text-high-emphasis mb-3">Share with people</h3>
 
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -268,7 +268,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
                   placeholder="Add people"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-24 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  className="w-full pl-10 pr-24 py-2.5 border border-gray-300 bg-background rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
                   <PermissionDropdown
@@ -280,7 +280,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 pb-4">
+            <div className="flex-1 overflow-y-auto px-4 pb-4 bg-background">
               {searchQuery ? (
                 <div className="space-y-2">
                   {filteredUsers.map((user) => {
@@ -289,7 +289,7 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
                       <button
                         key={user.id}
                         onClick={() => handleUserToggle(user)}
-                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 border-2 transition-all w-full text-left ${
+                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-muted/50 border-2 transition-all w-full text-left ${
                           isSelected ? 'bg-blue-50 border-blue-200' : 'border-transparent'
                         }`}
                         aria-pressed={isSelected}
@@ -297,21 +297,23 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
                       >
                         <Avatar name={user.name} />
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">
+                          <div className="text-sm font-medium text-high-emphasis truncate">
                             {user.name}
                           </div>
-                          <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                          <div className="text-xs text-medium-emphasis truncate">{user.email}</div>
                         </div>
                         {isSelected && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
                       </button>
                     );
                   })}
                   {filteredUsers.length === 0 && (
-                    <div className="text-center text-gray-500 text-sm py-8">No users found</div>
+                    <div className="text-center text-medium-emphasis text-sm py-8">
+                      No users found
+                    </div>
                   )}
                 </div>
               ) : (
-                <div className="text-center text-gray-500 text-sm py-12">
+                <div className="text-center text-medium-emphasis text-sm py-12">
                   The list is currently empty
                 </div>
               )}
@@ -322,18 +324,22 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
         {currentView === 'manage' && (
           <>
             <div className="p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-1">Share with people</h3>
-              <div className="text-xs text-gray-500">{selectedUsers.length} added to the list</div>
+              <h3 className="text-sm font-medium text-high-emphasis mb-1">Share with people</h3>
+              <div className="text-xs text-medium-emphasis">
+                {selectedUsers.length} added to the list
+              </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 pb-4">
+            <div className="flex-1 overflow-y-auto px-4 pb-4 bg-background">
               <div className="space-y-3">
                 {selectedUsers.map((user) => (
                   <div key={user.id} className="flex items-center gap-3 p-2">
                     <Avatar name={user.name} size="sm" />
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">{user.name}</div>
-                      <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                      <div className="text-sm font-medium text-high-emphasis truncate">
+                        {user.name}
+                      </div>
+                      <div className="text-xs text-medium-emphasis truncate">{user.email}</div>
                     </div>
                     <PermissionDropdown
                       value={permissions[user.id] || defaultRole}
@@ -354,10 +360,10 @@ export const ShareWithMeModal: React.FC<ShareWithMeModalProps> = ({
         )}
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+        <div className="py-3  px-4 flex items-center justify-between bg-background">
           <button
             onClick={handleCancel}
-            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+            className="px-4 py-2 text-sm text-high-emphasis hover:bg-gray-200 rounded-md transition-colors"
           >
             Cancel
           </button>

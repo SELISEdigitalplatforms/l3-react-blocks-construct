@@ -56,6 +56,18 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
   const location = useLocation();
   const { t } = useTranslation();
   const pathSegments = location.pathname.split('/').filter((segment) => segment);
+  const fileManagerRoutes = ['my-files', 'shared-files', 'trash'];
+
+  const shouldHideFirstBreadcrumb = () => {
+    let shouldHide = false;
+    fileManagerRoutes.forEach((route) => {
+      const segmentIndex = pathSegments.indexOf(route);
+      if (segmentIndex !== -1 && segmentIndex === pathSegments.length - 2) {
+        shouldHide = true;
+      }
+    });
+    return shouldHide;
+  };
 
   const dynamicBreadcrumbs: DynamicBreadcrumbSegment[] = pathSegments.map((segment, index) => {
     const href = `/${pathSegments.slice(0, index + 1).join('/')}`;
@@ -67,9 +79,14 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
     };
   });
 
-  const displayedCrumbs = breadcrumbIndex
-    ? dynamicBreadcrumbs.slice(breadcrumbIndex - 1)
-    : dynamicBreadcrumbs;
+  const getDisplayedCrumbs = () => {
+    if (breadcrumbIndex) {
+      return dynamicBreadcrumbs.slice(breadcrumbIndex - 1);
+    }
+    return shouldHideFirstBreadcrumb() ? dynamicBreadcrumbs.slice(1) : dynamicBreadcrumbs;
+  };
+
+  const displayedCrumbs = getDisplayedCrumbs();
 
   if (displayedCrumbs.length === 1 && DYNAMIC_BREADCRUMB_TITLES[displayedCrumbs[0].href]) {
     return null;

@@ -1,5 +1,26 @@
-import { useTaskContext } from '../contexts/task-context';
-import { TaskDetails } from '../services/task-service';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useGetTasks, useUpdateTaskItem, useDeleteTaskItem } from './use-task-manager';
+import {
+  TaskItem,
+  TaskItemUpdateInput,
+  Assignee,
+  TaskPriority,
+  ItemTag,
+} from '../types/task-manager.types';
+
+interface ToastOptions {
+  variant: 'default' | 'destructive' | 'success';
+  title: string;
+  description: string;
+}
+
+const useToast = () => ({
+  toast: (options: ToastOptions) => {
+    // eslint-disable-next-line no-console
+    console.info(`[${options.variant}] ${options.title}: ${options.description}`);
+  },
+});
 
 /**
  * useTaskDetails Hook
@@ -29,8 +50,6 @@ import { TaskDetails } from '../services/task-service';
  *   toggleTaskCompletion,
  *   addNewComment,
  *   deleteComment,
- *   addNewAttachment,
- *   deleteAttachment,
  *   addNewAssignee,
  *   deleteAssignee,
  *   addNewTag,
@@ -39,106 +58,339 @@ import { TaskDetails } from '../services/task-service';
  * } = useTaskDetails(taskId);
  */
 
-export function useTaskDetails(taskId?: string) {
-  const {
-    taskDetails,
-    updateTask,
-    deleteTask,
-    updateTaskStatus,
-    addComment,
-    addAttachment,
-    addAssignee,
-    addTag,
-    removeComment,
-    removeAttachment,
-    removeAssignee,
-    removeTag,
-  } = useTaskContext();
+interface UseTaskDetailsReturn {
+  task: TaskItem | null;
+  toggleTaskCompletion: (isCompleted: boolean) => Promise<void>;
+  removeTask: () => Promise<boolean>;
+  updateTaskDetails: (
+    updates: Partial<TaskItem> | TaskItemUpdateInput
+  ) => Promise<TaskItem | undefined>;
+  addNewTag: (tag: string) => Promise<void>;
+  deleteTag: (tagId: string) => Promise<void>;
+  addNewAssignee: (assignee: Assignee) => Promise<void>;
+  deleteAssignee: (assigneeId: string) => Promise<void>;
+}
 
-  const task = taskId ? taskDetails.find((task) => task.id === taskId) : null;
+export function useTaskDetails(taskId?: string): UseTaskDetailsReturn {
+  const [currentTask, setCurrentTask] = useState<TaskItem | null>(null);
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const { data: tasksData, refetch: refetchTasks } = useGetTasks({
+    pageNo: 1,
+    pageSize: 100,
+  });
 
-  const getAllTasks = () => taskDetails;
+  useEffect(() => {
+    if (taskId && tasksData?.TaskManagerItems?.items) {
+      const foundTask = tasksData.TaskManagerItems.items.find((task) => task.ItemId === taskId);
 
-  const updateTaskDetails = (updates: Partial<TaskDetails>) => {
-    if (taskId) {
-      updateTask(taskId, updates);
+      if (foundTask) {
+        const mapToItemTags = (tags?: ItemTag[]): ItemTag[] => {
+          return tags || [];
+        };
+
+        const mappedTask: TaskItem = {
+          ItemId: foundTask.ItemId,
+          Title: foundTask.Title,
+          Description: foundTask.Description ?? '',
+          IsCompleted: foundTask.IsCompleted ?? false,
+          Priority: foundTask.Priority ?? TaskPriority.MEDIUM,
+          Section: foundTask.Section ?? '',
+          DueDate: foundTask.DueDate ?? '',
+          Assignee:
+            Array.isArray(foundTask.Assignee) && foundTask.Assignee.length > 0
+              ? foundTask.Assignee
+              : currentTask?.Assignee || [],
+          ItemTag: mapToItemTags(foundTask.ItemTag),
+          AttachmentField: Array.isArray(foundTask.AttachmentField)
+            ? foundTask.AttachmentField
+            : [],
+          CreatedBy: foundTask.CreatedBy ?? '',
+          CreatedDate: foundTask.CreatedDate ?? new Date().toISOString(),
+          IsDeleted: foundTask.IsDeleted ?? false,
+          Language: foundTask.Language ?? 'en',
+          OrganizationIds: foundTask.OrganizationIds ?? [],
+        };
+
+        setCurrentTask(mappedTask);
+      }
+    } else {
+      setCurrentTask(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId, tasksData, currentTask?.Assignee]);
+
+  const { mutate: updateTask } = useUpdateTaskItem();
+
+  // Helper function to handle basic field updates
+  const handleBasicFieldUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    const fieldsToUpdate: Array<keyof TaskItemUpdateInput> = [
+      'Title',
+      'Description',
+      'DueDate',
+      'Priority',
+      'Section',
+      'IsCompleted',
+      'Language',
+      'OrganizationIds',
+      'IsDeleted',
+    ];
+
+    fieldsToUpdate.forEach((field) => {
+      if (field in updates) {
+        sanitizedUpdates[field] = updates[field] as any;
+      }
+    });
+  };
+
+  // Helper function to handle tag updates
+  const handleTagUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    if ('ItemTag' in updates) {
+      sanitizedUpdates.ItemTag = updates.ItemTag as ItemTag[];
+    } else if ('Tags' in updates) {
+      const tags = updates.Tags as (string | ItemTag)[] | undefined;
+      if (Array.isArray(tags)) {
+        sanitizedUpdates.ItemTag = tags.map((tag) => ({
+          ItemId: typeof tag === 'string' ? tag : tag.ItemId,
+          TagLabel: typeof tag === 'string' ? tag : tag.TagLabel,
+        }));
+      }
     }
   };
 
-  const removeTask = () => {
-    if (taskId) {
-      deleteTask(taskId);
+  // Helper function to handle assignee updates
+  const handleAssigneeUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    if ('Assignee' in updates) {
+      sanitizedUpdates.Assignee = Array.isArray(updates.Assignee) ? updates.Assignee : [];
     }
   };
 
-  const toggleTaskCompletion = (isCompleted: boolean) => {
-    if (taskId) {
-      updateTaskStatus(taskId, isCompleted);
+  // Helper function to handle attachment updates
+  const handleAttachmentUpdates = (
+    updates: Partial<TaskItem> | TaskItemUpdateInput,
+    sanitizedUpdates: TaskItemUpdateInput
+  ) => {
+    if ('AttachmentField' in updates) {
+      sanitizedUpdates.AttachmentField = Array.isArray(updates.AttachmentField)
+        ? updates.AttachmentField
+        : [];
     }
   };
 
-  const addNewComment = (author: string, text: string) => {
-    if (taskId) {
-      addComment(taskId, author, text);
-    }
-  };
+  const updateTaskDetails = useCallback(
+    async (updates: Partial<TaskItem> | TaskItemUpdateInput) => {
+      if (!taskId || !currentTask) return;
 
-  const deleteComment = (commentId: string) => {
-    if (taskId) {
-      removeComment(taskId, commentId);
-    }
-  };
+      const previousTask = { ...currentTask };
 
-  const addNewAttachment = (name: string, size: string, type: 'pdf' | 'image' | 'other') => {
-    if (taskId) {
-      addAttachment(taskId, name, size, type);
-    }
-  };
+      try {
+        const sanitizedUpdates: TaskItemUpdateInput = {};
 
-  const deleteAttachment = (attachmentId: string) => {
-    if (taskId) {
-      removeAttachment(taskId, attachmentId);
-    }
-  };
+        handleBasicFieldUpdates(updates, sanitizedUpdates);
+        handleTagUpdates(updates, sanitizedUpdates);
+        handleAssigneeUpdates(updates, sanitizedUpdates);
+        handleAttachmentUpdates(updates, sanitizedUpdates);
 
-  const addNewAssignee = (name: string, avatar: string) => {
-    if (taskId) {
-      addAssignee(taskId, name, avatar);
-    }
-  };
+        const updatedTask = { ...currentTask, ...updates };
+        setCurrentTask(updatedTask as TaskItem);
 
-  const deleteAssignee = (assigneeId: string) => {
-    if (taskId) {
-      removeAssignee(taskId, assigneeId);
-    }
-  };
+        updateTask({
+          itemId: taskId,
+          input: sanitizedUpdates,
+        });
+        toast({
+          variant: 'success',
+          title: t('TASK_UPDATED'),
+          description: t('TASK_UPDATED_SUCCESSFULLY'),
+        });
 
-  const addNewTag = (label: string) => {
-    if (taskId) {
-      addTag(taskId, label);
-    }
-  };
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('task-updated', { detail: updatedTask }));
+        }
 
-  const deleteTag = (tagId: string) => {
-    if (taskId) {
-      removeTag(taskId, tagId);
+        return updatedTask;
+      } catch (error) {
+        console.error('Failed to update task:', error);
+        setCurrentTask(previousTask);
+        throw error;
+      }
+    },
+    [taskId, currentTask, updateTask, t, toast]
+  );
+
+  const toggleTaskCompletion = useCallback(
+    async (isCompleted: boolean) => {
+      if (!taskId) return;
+
+      try {
+        setCurrentTask((prev) => (prev ? { ...prev, isCompleted } : null));
+
+        await refetchTasks();
+      } catch (error) {
+        console.error('Failed to toggle task status:', error);
+        await refetchTasks();
+      }
+    },
+    [taskId, refetchTasks]
+  );
+
+  const { mutateAsync: deleteTask } = useDeleteTaskItem();
+
+  const removeTask = useCallback(async () => {
+    if (!taskId) return false;
+
+    try {
+      await deleteTask(taskId);
+
+      await refetchTasks();
+      return true;
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      toast({
+        variant: 'destructive',
+        title: t('UNABLE_DELETE_TASK'),
+        description: t('FAILED_TO_DELETE_TASK'),
+      });
+      return false;
     }
-  };
+  }, [taskId, refetchTasks, deleteTask, t, toast]);
+
+  const addNewAssignee = useCallback(
+    async (assignee: Assignee) => {
+      if (!taskId || !currentTask) return;
+
+      try {
+        setCurrentTask((prev) =>
+          prev
+            ? {
+                ...prev,
+                Assignee: [assignee],
+              }
+            : null
+        );
+
+        await refetchTasks();
+      } catch (error) {
+        console.error('Failed to add assignee:', error);
+        await refetchTasks();
+      }
+    },
+    [taskId, currentTask, refetchTasks]
+  );
+
+  const deleteAssignee = useCallback(
+    async (assigneeId: string) => {
+      if (!taskId || !currentTask) return;
+
+      try {
+        const updatedAssignees = currentTask.Assignee?.filter(
+          (assignee) => assignee.ItemId !== assigneeId
+        );
+
+        updateTask({
+          itemId: taskId,
+          input: {
+            Assignee: updatedAssignees,
+          },
+        });
+
+        await refetchTasks();
+      } catch (error) {
+        console.error('Failed to delete assignee:', error);
+        await refetchTasks();
+      }
+    },
+    [taskId, currentTask, refetchTasks, updateTask]
+  );
+
+  const addNewTag = useCallback(
+    async (tag: string) => {
+      if (!taskId || !currentTask) return;
+
+      try {
+        const newTag: ItemTag = {
+          ItemId: Date.now().toString(),
+          TagLabel: tag,
+        };
+        const updatedTags = [...(currentTask.ItemTag || []), newTag];
+
+        setCurrentTask((prev: TaskItem | null) =>
+          prev
+            ? {
+                ...prev,
+                ItemTag: updatedTags,
+              }
+            : null
+        );
+
+        const update: Partial<TaskItem> = {
+          ItemTag: updatedTags,
+        };
+
+        await updateTaskDetails(update);
+
+        await refetchTasks();
+      } catch (error) {
+        console.error('Error adding tag:', error);
+        await refetchTasks();
+
+        toast({
+          variant: 'destructive',
+          title: t('TASK_CREATION_FAILED'),
+          description: t('FAILED_CREATE_TASK'),
+        });
+      }
+    },
+    [taskId, currentTask, refetchTasks, t, toast, updateTaskDetails]
+  );
+
+  const deleteTag = useCallback(
+    async (tagId: string) => {
+      if (!taskId || !currentTask) return;
+
+      try {
+        setCurrentTask((prev) =>
+          prev
+            ? {
+                ...prev,
+                ItemTag: (prev.ItemTag || []).filter((t) => t.ItemId !== tagId),
+              }
+            : null
+        );
+
+        const update: TaskItemUpdateInput = {
+          ItemTag: (currentTask.ItemTag || []).filter((t) => t.ItemId !== tagId),
+        };
+
+        await updateTaskDetails(update);
+
+        await refetchTasks();
+      } catch (error) {
+        console.error('Error removing tag:', error);
+        await refetchTasks();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [taskId, currentTask, refetchTasks]
+  );
 
   return {
-    task,
-    tasks: taskDetails,
-    getAllTasks,
+    task: currentTask,
     updateTaskDetails,
-    removeTask,
     toggleTaskCompletion,
-    addNewComment,
-    deleteComment,
-    addNewAttachment,
-    deleteAttachment,
+    removeTask,
     addNewAssignee,
     deleteAssignee,
-    addNewTag,
-    deleteTag,
+    addNewTag: addNewTag,
+    deleteTag: deleteTag,
   };
 }
