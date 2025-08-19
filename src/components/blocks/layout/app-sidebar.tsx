@@ -54,7 +54,6 @@ export function AppSidebar(): JSX.Element | null {
   const { setOpenMobile, open, isMobile, openMobile } = useSidebar();
 
   const filteredMenuItems = useFilteredMenu(menuItems);
-  console.log('filteredMenuItems', filteredMenuItems);
 
   const integratedMenuItems = filteredMenuItems.filter((item) => item.isIntegrated === true);
   const designOnlyMenuItems = filteredMenuItems.filter((item) => item.isIntegrated !== true);

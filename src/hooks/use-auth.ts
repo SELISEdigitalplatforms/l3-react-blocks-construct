@@ -15,7 +15,6 @@ export const useAuth = () => {
   };
 
   return {
-    // 🚀 RETURN SAFE FUNCTIONS instead of direct functions
     hasRole: safeHasRole,
     hasPermission: safeHasPermission,
 
