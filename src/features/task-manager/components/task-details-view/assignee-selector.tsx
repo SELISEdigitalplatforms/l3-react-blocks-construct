@@ -66,69 +66,68 @@ const AssigneeSelectorComponent = ({
 }: Readonly<AssigneeSelectorProps>) => {
   const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState<Record<string, boolean>>({});
-  
-  // Track selected IDs in state for instant feedback
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(selectedAssignees.map(a => a.ItemId)));
-  
-  // Keep the selectedIds in sync with selectedAssignees from props
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(
+    new Set(selectedAssignees.map((a) => a.ItemId))
+  );
+
   useEffect(() => {
-    const newIds = new Set(selectedAssignees.map(a => a.ItemId));
-    setSelectedIds(prev => {
-      // Only update if there's an actual change to prevent unnecessary re-renders
-      if (prev.size !== newIds.size || 
-          Array.from(prev).some(id => !newIds.has(id)) || 
-          Array.from(newIds).some(id => !prev.has(id))) {
+    const newIds = new Set(selectedAssignees.map((a) => a.ItemId));
+    setSelectedIds((prev) => {
+      if (
+        prev.size !== newIds.size ||
+        Array.from(prev).some((id) => !newIds.has(id)) ||
+        Array.from(newIds).some((id) => !prev.has(id))
+      ) {
         return newIds;
       }
       return prev;
     });
   }, [selectedAssignees]);
-  
-  // Memoize the available assignees to prevent unnecessary re-renders
-  const memoizedAvailableAssignees = useMemo(() => 
-    availableAssignees.map(assignee => ({
-      ...assignee,
-      isSelected: selectedIds.has(assignee.ItemId),
-      isProcessing: isProcessing[assignee.ItemId] || false
-    })), 
+
+  const memoizedAvailableAssignees = useMemo(
+    () =>
+      availableAssignees.map((assignee) => ({
+        ...assignee,
+        isSelected: selectedIds.has(assignee.ItemId),
+        isProcessing: isProcessing[assignee.ItemId] || false,
+      })),
     [availableAssignees, selectedIds, isProcessing]
   );
 
-  const handleSelect = useCallback((assignee: Assignee) => {
-    const assigneeId = assignee.ItemId;
-    
-    // Toggle the selection immediately
-    setSelectedIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(assigneeId)) {
-        newSet.delete(assigneeId);
-      } else {
-        newSet.add(assigneeId);
-      }
-      
-      // Update the parent with the new selection
-      const newAssignees = availableAssignees
-        .filter(a => a.ItemId === assigneeId ? newSet.has(assigneeId) : newSet.has(a.ItemId))
-        .map(({ ItemId, Name, ImageUrl }) => ({ ItemId, Name, ImageUrl: ImageUrl || '' }));
-      
-      // Call the parent's onChange with the new assignees
-      onChange(newAssignees);
-      
-      return newSet;
-    });
-    
-    // Only show loading in edit mode
-    if (isEditMode) {
-      setIsProcessing(prev => ({ ...prev, [assigneeId]: true }));
-      
-      // Clear processing state after a short delay
-      const timer = setTimeout(() => {
-        setIsProcessing(prev => ({ ...prev, [assigneeId]: false }));
-      }, 500);
+  const handleSelect = useCallback(
+    (assignee: Assignee) => {
+      const assigneeId = assignee.ItemId;
 
-      return () => clearTimeout(timer);
-    }
-  }, [availableAssignees, onChange, isEditMode]);
+      setSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(assigneeId)) {
+          newSet.delete(assigneeId);
+        } else {
+          newSet.add(assigneeId);
+        }
+
+        const newAssignees = availableAssignees
+          .filter((a) => (a.ItemId === assigneeId ? newSet.has(assigneeId) : newSet.has(a.ItemId)))
+          .map(({ ItemId, Name, ImageUrl }) => ({ ItemId, Name, ImageUrl: ImageUrl || '' }));
+
+        onChange(newAssignees);
+
+        return newSet;
+      });
+
+      if (isEditMode) {
+        setIsProcessing((prev) => ({ ...prev, [assigneeId]: true }));
+
+        const timer = setTimeout(() => {
+          setIsProcessing((prev) => ({ ...prev, [assigneeId]: false }));
+        }, 500);
+
+        return () => clearTimeout(timer);
+      }
+    },
+    [availableAssignees, onChange, isEditMode]
+  );
 
   return (
     <div>
