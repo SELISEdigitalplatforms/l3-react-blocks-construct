@@ -36,12 +36,12 @@ export const menuItems: MenuItem[] = [
   createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined'),
   createMenuItem('iam', 'IAM', '/identity-management', 'Users', {
     isIntegrated: true,
-    roles: 'admin',
+    roles: MENU_PERMISSIONS.ADMIN_ONLY,
   }),
   createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store', { isIntegrated: true }),
   createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', {
     isIntegrated: true,
-    permissions: MENU_PERMISSIONS.INVOICE_READ,
+    permissions: [MENU_PERMISSIONS.INVOICE_READ, MENU_PERMISSIONS.INVOICE_WRITE],
   }),
   createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation', {
     isIntegrated: true,

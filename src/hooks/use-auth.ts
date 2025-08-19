@@ -18,6 +18,7 @@ export const useAuth = () => {
     hasRole: safeHasRole,
     hasPermission: safeHasPermission,
 
+    //Defining the roles for Construct Demo
     isAdmin: !isLoading && user?.active && hasRole('admin'),
     isUser: !isLoading && user?.active && hasRole('user'),
     isGuest: !isLoading && user?.active && hasRole('guest'),

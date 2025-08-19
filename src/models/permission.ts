@@ -26,5 +26,5 @@ export interface CombinedGuardProps {
   showFallback?: boolean;
   requireAllRoles?: boolean;
   requireAllPermissions?: boolean;
-  requireBoth?: boolean; // true = user needs roles AND permissions, false = user needs roles OR permissions
+  requireBoth?: boolean;
 }

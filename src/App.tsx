@@ -98,7 +98,10 @@ function AppContent() {
                     path="/invoices"
                     element={
                       <PermissionGuard
-                        permissions={MENU_PERMISSIONS.INVOICE_READ}
+                        permissions={[
+                          MENU_PERMISSIONS.INVOICE_READ,
+                          MENU_PERMISSIONS.INVOICE_WRITE,
+                        ]}
                         fallbackType="dialog"
                       >
                         <InvoicesPage />
