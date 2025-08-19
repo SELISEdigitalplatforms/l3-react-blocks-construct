@@ -1,6 +1,6 @@
 export const MENU_PERMISSIONS = {
   // Feature-based permissions
-  INVOICE_ACCESS: 'invoice_read',
+  INVOICE_READ: 'invoice_read',
   MAIL_ACCESS: 'mail_access',
   FILES_READ: 'files_read',
   FILES_SHARED: 'files_shared',

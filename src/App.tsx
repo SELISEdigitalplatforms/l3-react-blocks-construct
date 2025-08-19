@@ -45,6 +45,7 @@ import { FileManagerMyFiles } from './pages/file-manager/my-files';
 import { PermissionGuard } from './components/blocks/gurads/permission-guard/permission-guard';
 import { useGetAccount } from './features/profile/hooks/use-account';
 import { PermissionsProvider } from './providers/permission-provider';
+import { MENU_PERMISSIONS } from './config/roles-permissions';
 
 const queryClient = new QueryClient();
 
@@ -96,7 +97,10 @@ function AppContent() {
                   <Route
                     path="/invoices"
                     element={
-                      <PermissionGuard permissions="invoice_read" fallbackType="dialog">
+                      <PermissionGuard
+                        permissions={MENU_PERMISSIONS.INVOICE_READ}
+                        fallbackType="dialog"
+                      >
                         <InvoicesPage />
                       </PermissionGuard>
                     }

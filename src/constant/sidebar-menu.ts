@@ -1,4 +1,5 @@
 import { MenuItem } from '../models/sidebar';
+import { MENU_PERMISSIONS } from 'config/roles-permissions';
 
 const createMenuItem = (
   id: string,
@@ -40,7 +41,7 @@ export const menuItems: MenuItem[] = [
   createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store', { isIntegrated: true }),
   createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', {
     isIntegrated: true,
-    permissions: 'invoice_read',
+    permissions: MENU_PERMISSIONS.INVOICE_READ,
   }),
   createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation', {
     isIntegrated: true,
