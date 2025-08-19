@@ -27,6 +27,86 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   const { hasPermission, isLoading, user } = usePermissions();
   const { toast } = useToast();
 
+  const checkPermissionAccess = () => {
+    return hasPermission(permissions, requireAll);
+  };
+
+  const getPermissionsArray = () => {
+    return Array.isArray(permissions) ? permissions : [permissions];
+  };
+
+  const getRequirementText = () => {
+    return requireAll ? 'all of' : 'one of';
+  };
+
+  const isUserInactive = user && !user.active;
+  const hasAccess = !isLoading && !isUserInactive && checkPermissionAccess();
+  const shouldShowInactiveToast = isUserInactive && showFallback && fallbackType === 'toast';
+  const shouldShowPermissionToast =
+    !isLoading &&
+    !isUserInactive &&
+    !hasAccess &&
+    !fallback &&
+    showFallback &&
+    fallbackType === 'toast';
+  const shouldRedirectTo404 =
+    !isLoading &&
+    !isUserInactive &&
+    !hasAccess &&
+    !fallback &&
+    showFallback &&
+    fallbackType === 'dialog';
+
+  useEffect(() => {
+    if (shouldShowInactiveToast) {
+      toast({
+        variant: 'destructive',
+        title: 'Account Inactive',
+        description: 'Your account is inactive. Please contact your administrator.',
+      });
+    }
+  }, [shouldShowInactiveToast, toast]);
+
+  useEffect(() => {
+    if (shouldShowPermissionToast) {
+      const requiredPermissions = getPermissionsArray();
+      const requirementText = getRequirementText();
+
+      toast({
+        variant: 'destructive',
+        title: 'Permission Required',
+        description: `You need ${requirementText} these permissions: ${requiredPermissions.join(', ')}`,
+      });
+    }
+  }, [shouldShowPermissionToast, toast, permissions, requireAll]);
+
+  useEffect(() => {
+    if (shouldRedirectTo404) {
+      window.location.href = '/404';
+    }
+  }, [shouldRedirectTo404]);
+
+  const renderInactiveUserDialog = () => (
+    <Dialog open={true} onOpenChange={() => {}}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserX className="h-5 w-5 text-red-500" />
+            Account Inactive
+          </DialogTitle>
+          <DialogDescription>
+            Your account is inactive. Please contact your administrator to reactivate your account.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-4">
@@ -35,60 +115,23 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     );
   }
 
-  if (user && !user.active) {
+  if (isUserInactive) {
     if (!showFallback) return null;
 
     if (fallbackType === 'toast') {
-      useEffect(() => {
-        toast({
-          variant: 'destructive',
-          title: 'Account Inactive',
-          description: 'Your account is inactive. Please contact your administrator.',
-        });
-      }, [toast]);
       return null;
     }
 
     if (fallbackType === 'dialog') {
-      return (
-        <Dialog open={true} onOpenChange={() => {}}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-red-500" />
-                Account Inactive
-              </DialogTitle>
-              <DialogDescription>
-                Your account is inactive. Please contact your administrator to reactivate your
-                account.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-end">
-              <Button variant="outline" onClick={() => window.history.back()}>
-                Go Back
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      );
+      return renderInactiveUserDialog();
     }
 
     return null;
   }
 
   if (checkOnClick) {
-    const hasAccess = hasPermission(permissions, requireAll);
-
-    // If no access, hide the component entirely
-    if (!hasAccess) {
-      return null;
-    }
-
-    // If has access, render the component normally
-    return <>{children}</>;
+    return hasAccess ? <>{children}</> : null;
   }
-
-  const hasAccess = hasPermission(permissions, requireAll);
 
   if (hasAccess) {
     return <>{children}</>;
@@ -102,17 +145,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     return null;
   }
 
-  const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
-  const requirementText = requireAll ? 'all of' : 'one of';
-
   if (fallbackType === 'toast') {
-    useEffect(() => {
-      toast({
-        variant: 'destructive',
-        title: 'Permission Required',
-        description: `You need ${requirementText} these permissions: ${requiredPermissions.join(', ')}`,
-      });
-    }, [toast, requirementText, requiredPermissions]);
     return null;
   }
 
@@ -120,7 +153,5 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     return null;
   }
 
-  // Direct redirect to 404 - this will execute immediately
-  window.location.href = '/404';
   return null;
 };

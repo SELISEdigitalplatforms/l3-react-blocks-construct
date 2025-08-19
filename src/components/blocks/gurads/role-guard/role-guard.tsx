@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect } from 'react';
 import { RoleGuardProps } from 'models/permission';
-import { usePermissions } from '/hooks/use-permissions';
+import { usePermissions } from 'hooks/use-permissions';
 import { useToast } from 'hooks/use-toast';
 import {
   Dialog,
@@ -29,6 +30,101 @@ export const RoleGuard: React.FC<
   const { hasRole, isLoading, user, userRoles } = usePermissions();
   const { toast } = useToast();
 
+  // Helper function to check role access
+  const checkRoleAccess = () => {
+    return hasRole(roles, requireAll);
+  };
+
+  // Helper function to convert roles to array
+  const getRolesArray = () => {
+    return Array.isArray(roles) ? roles : [roles];
+  };
+
+  // Helper function to get requirement text
+  const getRequirementText = () => {
+    return requireAll ? 'all of' : 'one of';
+  };
+
+  // Helper function to handle inactive user fallback
+  const handleInactiveUser = () => {
+    if (!showFallback) return null;
+    if (fallbackType === 'toast') return null;
+    if (fallbackType === 'dialog') return renderInactiveUserDialog();
+    return null;
+  };
+
+  // Calculate conditions for hooks at the top
+  const isUserInactive = user && !user.active;
+  const hasAccess = !isLoading && !isUserInactive && checkRoleAccess();
+  const shouldShowInactiveToast = isUserInactive && showFallback && fallbackType === 'toast';
+  const shouldShowRoleToast =
+    !isLoading &&
+    !isUserInactive &&
+    !hasAccess &&
+    !fallback &&
+    showFallback &&
+    fallbackType === 'toast';
+  const shouldRedirectTo404 =
+    !isLoading &&
+    !isUserInactive &&
+    !hasAccess &&
+    !fallback &&
+    showFallback &&
+    fallbackType === 'dialog';
+
+  // All hooks at the top - called unconditionally
+  useEffect(() => {
+    if (shouldShowInactiveToast) {
+      toast({
+        variant: 'destructive',
+        title: 'Account Inactive',
+        description: 'Your account is inactive. Please contact your administrator.',
+      });
+    }
+  }, [shouldShowInactiveToast, toast]);
+
+  useEffect(() => {
+    if (shouldShowRoleToast) {
+      const requiredRoles = getRolesArray();
+      const requirementText = getRequirementText();
+
+      toast({
+        variant: 'destructive',
+        title: 'Access Denied',
+        description: `You need ${requirementText} these roles: ${requiredRoles.join(', ')}. Your current roles: ${userRoles.join(', ') || 'None'}`,
+      });
+    }
+  }, [shouldShowRoleToast, toast, roles, requireAll, userRoles]);
+
+  useEffect(() => {
+    if (shouldRedirectTo404) {
+      window.location.href = '/404';
+    }
+  }, [shouldRedirectTo404]);
+
+  const renderInactiveUserDialog = () => (
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    <Dialog open={true} onOpenChange={() => {}}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserX className="h-5 w-5 text-red-500" />
+            Account Inactive
+          </DialogTitle>
+          <DialogDescription>
+            Your account is inactive. Please contact your administrator to reactivate your account.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // Early returns for simple cases
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-4">
@@ -37,49 +133,9 @@ export const RoleGuard: React.FC<
     );
   }
 
-  if (user && !user.active) {
-    if (!showFallback) return null;
-
-    if (fallbackType === 'toast') {
-      useEffect(() => {
-        toast({
-          variant: 'destructive',
-          title: 'Account Inactive',
-          description: 'Your account is inactive. Please contact your administrator.',
-        });
-      }, [toast]);
-      return null;
-    }
-
-    if (fallbackType === 'dialog') {
-      return (
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        <Dialog open={true} onOpenChange={() => {}}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <UserX className="h-5 w-5 text-red-500" />
-                Account Inactive
-              </DialogTitle>
-              <DialogDescription>
-                Your account is inactive. Please contact your administrator to reactivate your
-                account.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-end">
-              <Button variant="outline" onClick={() => window.history.back()}>
-                Go Back
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      );
-    }
-
-    return null;
+  if (isUserInactive) {
+    return handleInactiveUser();
   }
-
-  const hasAccess = hasRole(roles, requireAll);
 
   if (hasAccess) {
     return <>{children}</>;
@@ -89,29 +145,9 @@ export const RoleGuard: React.FC<
     return <>{fallback}</>;
   }
 
-  if (!showFallback) {
+  if (!showFallback || fallbackType === 'toast' || fallbackType === 'hidden') {
     return null;
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const requiredRoles = Array.isArray(roles) ? roles : [roles];
-  const requirementText = requireAll ? 'all of' : 'one of';
-
-  if (fallbackType === 'toast') {
-    useEffect(() => {
-      toast({
-        variant: 'destructive',
-        title: 'Access Denied',
-        description: `You need ${requirementText} these roles: ${requiredRoles.join(', ')}. Your current roles: ${userRoles.join(', ') || 'None'}`,
-      });
-    }, [toast, requirementText, requiredRoles, userRoles]);
-    return null;
-  }
-
-  if (fallbackType === 'hidden') {
-    return null;
-  }
-
-  window.location.href = '/404';
   return null;
 };
