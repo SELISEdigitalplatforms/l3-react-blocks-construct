@@ -4,9 +4,7 @@ import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { InvoicesHeaderToolbar } from './invoices-header-toolbar';
 
-// Mock the react-i18next hook
 jest.mock('react-i18next', () => ({
-  // this mock makes sure any components using the translate hook can use it without a warning being shown
   useTranslation: () => {
     return {
       t: (key: string) => key,
@@ -14,6 +12,29 @@ jest.mock('react-i18next', () => ({
         changeLanguage: jest.fn(),
       },
     };
+  },
+}));
+
+jest.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
+  PermissionGuard: ({
+    children,
+    showFallback,
+  }: {
+    children: React.ReactNode;
+    showFallback?: boolean;
+  }) => {
+    const hasPermission = (global as any).mockHasPermission ?? true;
+    return hasPermission ? (
+      <>{children}</>
+    ) : showFallback ? (
+      <div data-testid="permission-denied">No Permission</div>
+    ) : null;
+  },
+}));
+
+jest.mock('config/roles-permissions', () => ({
+  MENU_PERMISSIONS: {
+    INVOICE_WRITE: 'invoice:write',
   },
 }));
 
@@ -26,17 +47,18 @@ describe('InvoicesHeaderToolbar', () => {
     );
   };
 
+  beforeEach(() => {
+    (global as any).mockHasPermission = true;
+  });
+
   test('renders with default title', () => {
     renderComponent();
-    
-    // Check if the default title is rendered
+
     expect(screen.getByText('INVOICES')).toBeInTheDocument();
-    
-    // Check if the "New Invoice" button is rendered
+
     const newInvoiceButton = screen.getByText('NEW_INVOICE');
     expect(newInvoiceButton).toBeInTheDocument();
-    
-    // Check if the button has the correct link
+
     const linkElement = screen.getByRole('link');
     expect(linkElement).toHaveAttribute('href', '/invoices/create-invoice');
   });
@@ -44,15 +66,13 @@ describe('InvoicesHeaderToolbar', () => {
   test('renders with custom title', () => {
     const customTitle = 'CUSTOM_TITLE';
     renderComponent({ title: customTitle });
-    
-    // Check if the custom title is rendered
+
     expect(screen.getByText(customTitle)).toBeInTheDocument();
   });
 
   test('renders button with correct styling', () => {
     renderComponent();
-    
-    // Check if the button has the correct size and styling classes
+
     const button = screen.getByRole('button');
     expect(button).toHaveClass('text-sm');
     expect(button).toHaveClass('font-bold');
@@ -60,12 +80,53 @@ describe('InvoicesHeaderToolbar', () => {
 
   test('renders Plus icon in the button', () => {
     renderComponent();
-    
-    // Check if the button contains the Plus icon
-    // Note: Since Plus is from lucide-react, we can't directly test for the SVG,
-    // but we can check that the button contains both the icon and text
+
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
     expect(screen.getByText('NEW_INVOICE')).toBeInTheDocument();
+  });
+
+  test('shows new invoice button when user has invoice write permission', () => {
+    (global as any).mockHasPermission = true;
+    renderComponent();
+
+    expect(screen.getByText('NEW_INVOICE')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getByRole('link')).toBeInTheDocument();
+  });
+
+  test('hides new invoice button when user lacks invoice write permission', () => {
+    (global as any).mockHasPermission = false;
+    renderComponent();
+
+    expect(screen.queryByText('NEW_INVOICE')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+
+    expect(screen.getByText('INVOICES')).toBeInTheDocument();
+  });
+
+  test('title remains visible regardless of permissions', () => {
+    (global as any).mockHasPermission = true;
+    const { rerender } = renderComponent();
+    expect(screen.getByText('INVOICES')).toBeInTheDocument();
+
+    (global as any).mockHasPermission = false;
+    rerender(
+      <BrowserRouter>
+        <InvoicesHeaderToolbar />
+      </BrowserRouter>
+    );
+    expect(screen.getByText('INVOICES')).toBeInTheDocument();
+  });
+
+  test('renders with custom title and no permissions', () => {
+    (global as any).mockHasPermission = false;
+    const customTitle = 'CUSTOM_INVOICES';
+    renderComponent({ title: customTitle });
+
+    expect(screen.getByText(customTitle)).toBeInTheDocument();
+
+    expect(screen.queryByText('NEW_INVOICE')).not.toBeInTheDocument();
   });
 });
