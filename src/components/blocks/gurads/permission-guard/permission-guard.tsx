@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePermissions } from 'hooks/use-permissions';
 import { useToast } from 'hooks/use-toast';
 import {
@@ -22,9 +22,11 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   showFallback = true,
   requireAll = false,
   fallbackType = 'dialog',
+  checkOnClick = false,
 }) => {
   const { hasPermission, isLoading, user, userPermissions } = usePermissions();
   const { toast } = useToast();
+  const [showPermissionDialog, setShowPermissionDialog] = useState(false);
 
   if (isLoading) {
     return (
@@ -75,6 +77,66 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     return null;
   }
 
+  if (checkOnClick) {
+    const handleClick = (e: React.MouseEvent) => {
+      const hasAccess = hasPermission(permissions, requireAll);
+
+      if (!hasAccess) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (fallbackType === 'toast') {
+          const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
+          const requirementText = requireAll ? 'all of' : 'one of';
+          toast({
+            variant: 'destructive',
+            title: 'Permission Required',
+            description: `You need ${requirementText} these permissions: ${requiredPermissions.join(', ')}`,
+          });
+        } else if (fallbackType === 'dialog') {
+          setShowPermissionDialog(true);
+        }
+      }
+    };
+
+    return (
+      <>
+        {React.cloneElement(children as React.ReactElement, {
+          onClick: handleClick,
+        })}
+
+        {showPermissionDialog && fallbackType === 'dialog' && (
+          <Dialog open={true} onOpenChange={() => setShowPermissionDialog(false)}>
+            <DialogContent className="sm:max-w-md bg-background">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 mb-4 text-high-emphasis">
+                  <Shield className="h-5 w-5 text-amber-500" />
+                  Permission Required
+                </DialogTitle>
+                <DialogDescription className="space-y-2  text-high-emphasis">
+                  <p>
+                    You need {requireAll ? 'all of' : 'one of'} these permissions:{' '}
+                    <strong>
+                      {(Array.isArray(permissions) ? permissions : [permissions]).join(', ')}
+                    </strong>
+                  </p>
+                  <p className="text-sm">
+                    Your current permissions: {userPermissions.join(', ') || 'None'}
+                  </p>
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setShowPermissionDialog(false)}>
+                  Close
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </>
+    );
+  }
+
   const hasAccess = hasPermission(permissions, requireAll);
 
   if (hasAccess) {
@@ -109,18 +171,18 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
   return (
     <Dialog open={true} onOpenChange={() => (window.location.href = '/dashboard')}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-background">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 mb-4  text-high-emphasis">
             <Shield className="h-5 w-5 text-amber-500" />
             Permission Required
           </DialogTitle>
-          <DialogDescription className="space-y-2">
+          <DialogDescription className="space-y-2  text-high-emphasis">
             <p>
               You need {requirementText} these permissions:{' '}
               <strong>{requiredPermissions.join(', ')}</strong>
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm ">
               Your current permissions: {userPermissions.join(', ') || 'None'}
             </p>
           </DialogDescription>

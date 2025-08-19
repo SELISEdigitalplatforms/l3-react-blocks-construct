@@ -16,6 +16,7 @@ export interface PermissionGuardProps {
   requireAll?: boolean;
   fallbackType?: 'dialog' | 'toast' | 'hidden';
   autoShowDialog?: boolean;
+  checkOnClick?: boolean;
 }
 
 export interface CombinedGuardProps {

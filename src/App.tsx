@@ -79,7 +79,20 @@ function AppContent() {
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/inventory/add" element={<InventoryForm />} />
                 <Route path="/inventory/:itemId" element={<InventoryDetails />} />
-                <Route path="/activity-log" element={<ActivityLogPage1 />} />
+                <Route
+                  path="/activity-log"
+                  element={
+                    <PermissionGuard
+                      permissions={[
+                        MENU_PERMISSIONS.ACTIVITY_LOG_READ,
+                        MENU_PERMISSIONS.ACTIVITY_LOG_WRITE,
+                      ]}
+                      fallbackType="dialog"
+                    >
+                      <ActivityLogPage1 />
+                    </PermissionGuard>
+                  }
+                />
                 <Route path="/timeline" element={<ActivityLogPage2 />} />
                 <Route path="/mail" element={<Email />} />
                 <Route path="/mail/:category" element={<Email />} />
