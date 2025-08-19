@@ -24,6 +24,12 @@ export interface MenuItem {
     | 'ReceiptText'
     | 'MessageSquareText';
   children?: MenuItem[];
+
+  roles?: string | string[];
+  permissions?: string | string[];
+  requireAllRoles?: boolean;
+  requireAllPermissions?: boolean;
+  requireBoth?: boolean;
 }
 
 export interface SidebarMenuItemProps {

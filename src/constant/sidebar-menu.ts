@@ -33,9 +33,15 @@ const createMenuItemWithChildren = (
 export const menuItems: MenuItem[] = [
   createMenuItem('dashboard', 'DASHBOARD', '/dashboard', 'LayoutDashboard'),
   createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined'),
-  createMenuItem('iam', 'IAM', '/identity-management', 'Users', { isIntegrated: true }),
+  createMenuItem('iam', 'IAM', '/identity-management', 'Users', {
+    isIntegrated: true,
+    roles: 'admin',
+  }),
   createMenuItem('inventory', 'INVENTORY', '/inventory', 'Store', { isIntegrated: true }),
-  createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', { isIntegrated: true }),
+  createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', {
+    isIntegrated: true,
+    permissions: 'invoice_read',
+  }),
   createMenuItem('task-manager', 'TASK_MANAGER', '/task-manager', 'Presentation', {
     isIntegrated: true,
   }),

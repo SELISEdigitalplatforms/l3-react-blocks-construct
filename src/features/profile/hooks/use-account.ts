@@ -6,6 +6,7 @@ import {
   changePassword,
   createAccount,
   getAccount,
+  getPermissionGroups,
   updateAccount,
 } from '../services/accounts.service';
 import { useTranslation } from 'react-i18next';
@@ -23,10 +24,17 @@ export const useGetAccount = () => {
   return useGlobalQuery({
     queryKey: ['getAccount'],
     queryFn: getAccount,
-    staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep unused data in cache for 10 minutes
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnMount: false, // Don't refetch on component mount if data exists
+    // staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
+    // gcTime: 10 * 60 * 1000, // Keep unused data in cache for 10 minutes
+    // refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    // refetchOnMount: false, // Don't refetch on component mount if data exists
+  });
+};
+
+export const useGetPermissionGroups = () => {
+  return useGlobalQuery({
+    queryKey: ['getPermissionGroups'],
+    queryFn: getPermissionGroups,
   });
 };
 

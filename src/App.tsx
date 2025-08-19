@@ -42,82 +42,98 @@ import SharedWithMe from 'pages/file-manager/shared-files';
 import Trash from 'pages/file-manager/trash';
 import { ChatPage } from './pages/chat/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
+import { PermissionGuard } from './components/blocks/gurads/permission-guard/permission-guard';
+import { useGetAccount } from './features/profile/hooks/use-account';
+import { PermissionsProvider } from './providers/permission-provider';
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const { isLoading } = useLanguageContext();
+  const { data: user } = useGetAccount();
 
   if (isLoading) {
     return <LoadingOverlay />;
   }
 
   return (
-    <div className="min-h-screen bg-background font-sans antialiased relative">
-      <ClientMiddleware>
-        <ThemeProvider>
-          <SidebarProvider>
-            <Routes>
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<SigninPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/sent-email" element={<EmailVerification />} />
-                <Route path="/activate" element={<SetPasswordPage />} />
-                <Route path="/resetpassword" element={<ResetPasswordPage />} />
-                <Route path="/success" element={<ActivationSuccess />} />
-                <Route path="/activate-failed" element={<VerificationFailed />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/verify-key" element={<VerifyOtpKey />} />
-              </Route>
-              <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/finance" element={<Finance />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/inventory/add" element={<InventoryForm />} />
-                <Route path="/inventory/:itemId" element={<InventoryDetails />} />
-                <Route path="/activity-log" element={<ActivityLogPage1 />} />
-                <Route path="/timeline" element={<ActivityLogPage2 />} />
-                <Route path="/mail" element={<Email />} />
-                <Route path="/mail/:category" element={<Email />} />
-                <Route path="/mail/:category/:emailId" element={<Email />} />
-                <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/identity-management" element={<TaskPage />} />
-                <Route path="/services/storage" element={<Storage />} />
-                <Route path="/services/mail" element={<Mail />} />
-                <Route path="/task-manager" element={<TaskManager />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/invoices" element={<InvoicesPage />} />
-                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
-                <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
-                <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash" element={<Trash />} />
-                <Route path="/file-manager/my-files/:folderId" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash/:folderId" element={<Trash />} />
+    <PermissionsProvider user={user}>
+      <div className="min-h-screen bg-background font-sans antialiased relative">
+        <ClientMiddleware>
+          <ThemeProvider>
+            <SidebarProvider>
+              <Routes>
+                <Route element={<AuthLayout />}>
+                  <Route path="/login" element={<SigninPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/sent-email" element={<EmailVerification />} />
+                  <Route path="/activate" element={<SetPasswordPage />} />
+                  <Route path="/resetpassword" element={<ResetPasswordPage />} />
+                  <Route path="/success" element={<ActivationSuccess />} />
+                  <Route path="/activate-failed" element={<VerificationFailed />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/verify-key" element={<VerifyOtpKey />} />
+                </Route>
+                <Route element={<MainLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/finance" element={<Finance />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/inventory/add" element={<InventoryForm />} />
+                  <Route path="/inventory/:itemId" element={<InventoryDetails />} />
+                  <Route path="/activity-log" element={<ActivityLogPage1 />} />
+                  <Route path="/timeline" element={<ActivityLogPage2 />} />
+                  <Route path="/mail" element={<Email />} />
+                  <Route path="/mail/:category" element={<Email />} />
+                  <Route path="/mail/:category/:emailId" element={<Email />} />
+                  <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
+                  <Route path="/help" element={<Help />} />
+                  <Route path="/identity-management" element={<TaskPage />} />
+                  <Route path="/services/storage" element={<Storage />} />
+                  <Route path="/services/mail" element={<Mail />} />
+                  <Route path="/task-manager" element={<TaskManager />} />
+                  <Route path="/chat" element={<ChatPage />} />
+                  <Route
+                    path="/invoices"
+                    element={
+                      <PermissionGuard permissions="invoice_read" fallbackType="dialog">
+                        <InvoicesPage />
+                      </PermissionGuard>
+                    }
+                  />
+                  <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                  <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
+                  <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
+                  <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
+                  <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
+                  <Route path="/file-manager/trash" element={<Trash />} />
+                  <Route path="/file-manager/my-files/:folderId" element={<FileManagerMyFiles />} />
+                  <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMe />} />
+                  <Route path="/file-manager/trash/:folderId" element={<Trash />} />
 
-                <Route path="/calendar" element={<CalendarPage />} />
-                <Route path="/503" element={<ServiceUnavailable />} />
-                <Route path="/404" element={<NotFound />} />
-              </Route>
+                  <Route path="/calendar" element={<CalendarPage />} />
+                  <Route path="/503" element={<ServiceUnavailable />} />
+                  <Route path="/404" element={<NotFound />} />
+                </Route>
 
-              {/* redirecting */}
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-              <Route path="/file-manager" element={<Navigate to="/file-manager/my-files" />} />
-              <Route path="/my-files" element={<Navigate to="/file-manager/my-files" />} />
-              <Route path="/shared-files" element={<Navigate to="/file-manager/shared-files" />} />
-              <Route path="/trash" element={<Navigate to="/file-manager/trash" />} />
+                {/* redirecting */}
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+                <Route path="/file-manager" element={<Navigate to="/file-manager/my-files" />} />
+                <Route path="/my-files" element={<Navigate to="/file-manager/my-files" />} />
+                <Route
+                  path="/shared-files"
+                  element={<Navigate to="/file-manager/shared-files" />}
+                />
+                <Route path="/trash" element={<Navigate to="/file-manager/trash" />} />
 
-              <Route path="*" element={<Navigate to="/404" />} />
-            </Routes>
-          </SidebarProvider>
-        </ThemeProvider>
-      </ClientMiddleware>
-      <Toaster />
-    </div>
+                <Route path="*" element={<Navigate to="/404" />} />
+              </Routes>
+            </SidebarProvider>
+          </ThemeProvider>
+        </ClientMiddleware>
+        <Toaster />
+      </div>
+    </PermissionsProvider>
   );
 }
 
