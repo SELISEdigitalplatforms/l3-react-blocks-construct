@@ -1,5 +1,4 @@
 import { usePermissions } from './use-permissions';
-import { MENU_PERMISSIONS } from 'config/roles-permissions';
 
 export const useAuth = () => {
   const { hasRole, hasPermission, user, userRoles, userPermissions, isLoading } = usePermissions();
@@ -17,15 +16,6 @@ export const useAuth = () => {
   return {
     hasRole: safeHasRole,
     hasPermission: safeHasPermission,
-
-    //Defining the roles for Construct Demo
-    isAdmin: !isLoading && user?.active && hasRole('admin'),
-    isUser: !isLoading && user?.active && hasRole('user'),
-    isGuest: !isLoading && user?.active && hasRole('guest'),
-
-    canViewInvoices: !isLoading && user?.active && hasPermission(MENU_PERMISSIONS.INVOICE_READ),
-    canEditInvoices: !isLoading && user?.active && hasPermission('invoice_write'),
-    canDeleteInvoices: !isLoading && user?.active && hasPermission('invoice_delete'),
 
     user,
     isActive: user?.active || false,

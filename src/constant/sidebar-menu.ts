@@ -48,7 +48,9 @@ export const menuItems: MenuItem[] = [
   }),
   createMenuItem('mail', 'MAIL', '/mail/inbox', 'Inbox'),
   createMenuItem('calendar', 'CALENDAR', '/calendar', 'Calendar'),
-  createMenuItem('activity-log', 'ACTIVITY_LOG', '/activity-log', 'FileClock'),
+  createMenuItem('activity-log', 'ACTIVITY_LOG', '/activity-log', 'FileClock', {
+    permissions: [MENU_PERMISSIONS.ACTIVITY_LOG_READ, MENU_PERMISSIONS.ACTIVITY_LOG_WRITE],
+  }),
   createMenuItem('timeline', 'TIMELINE', '/timeline', 'History'),
   createMenuItem('chat', 'CHAT', '/chat', 'MessageSquareText'),
   createMenuItemWithChildren('file-manager', 'FILE_MANAGER', '/file-manager', 'Folder', [
