@@ -773,6 +773,7 @@ export function Email() {
                 setSelectedEmail={setSelectedEmail}
                 handleComposeEmail={handleComposeEmail}
                 handleCloseCompose={handleCloseCompose}
+                isCollapsedEmailSidebar={isCollapsedEmailSidebar}
               />
             </div>
           </>
@@ -982,16 +983,16 @@ export function Email() {
             )}
           </>
         )}
-
-        {(isComposing.isCompose || isComposing.isForward) && (
-          <EmailCompose
-            addOrUpdateEmailInSent={addOrUpdateEmailInSent}
-            onClose={handleCloseCompose}
-            selectedEmail={selectedEmail}
-            isComposing={isComposing}
-          />
-        )}
       </div>
+
+      {(isComposing.isCompose || isComposing.isForward) && (
+        <EmailCompose
+          addOrUpdateEmailInSent={addOrUpdateEmailInSent}
+          onClose={handleCloseCompose}
+          selectedEmail={selectedEmail}
+          isComposing={isComposing}
+        />
+      )}
     </>
   );
 }
