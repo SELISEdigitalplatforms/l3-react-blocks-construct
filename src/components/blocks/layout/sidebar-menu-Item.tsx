@@ -66,7 +66,7 @@ export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
               <div className="flex items-center justify-start w-full">
                 {renderIcon(item.icon as IconName)}
                 <span
-                  className={`ml-3 truncate ${!showText && 'hidden'} ${isActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
+                  className={`ml-5 truncate ${!showText && 'hidden'} ${isActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
                 >
                   {t(item.name)}
                 </span>
@@ -94,7 +94,7 @@ export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({
                       >
                         {renderIcon(child.icon as IconName)}
                         <span
-                          className={`ml-3 truncate ${!showText && 'hidden'} ${isChildActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
+                          className={`ml-5 truncate ${!showText && 'hidden'} ${isChildActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
                         >
                           {t(child.name)}
                         </span>

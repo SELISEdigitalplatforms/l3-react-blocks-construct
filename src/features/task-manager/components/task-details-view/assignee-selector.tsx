@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, useEffect } from 'react';
+import { memo, useCallback, useState, useMemo, useEffect } from 'react';
 import { Plus, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from 'lib/utils';
@@ -54,54 +54,81 @@ import { Assignee } from '../../types/task-manager.types';
 interface AssigneeSelectorProps {
   availableAssignees: Assignee[];
   selectedAssignees: Assignee[];
-  onChange: (selected: Assignee[]) => void;
+  onChange: (assignees: Assignee[]) => void;
+  isEditMode?: boolean;
 }
 
 const AssigneeSelectorComponent = ({
   availableAssignees,
   selectedAssignees,
   onChange,
+  isEditMode = false,
 }: Readonly<AssigneeSelectorProps>) => {
   const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState<Record<string, boolean>>({});
-  const [localSelected, setLocalSelected] = useState<Set<string>>(new Set());
-
+  
+  // Track selected IDs in state for instant feedback
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(selectedAssignees.map(a => a.ItemId)));
+  
+  // Keep the selectedIds in sync with selectedAssignees from props
   useEffect(() => {
-    setLocalSelected(new Set(selectedAssignees.map((a) => a.ItemId)));
-  }, [selectedAssignees]);
-
-  const handleSelect = useCallback(
-    async (assignee: Assignee) => {
-      const assigneeId = assignee.ItemId;
-      const isSelected = localSelected.has(assigneeId);
-
-      setLocalSelected((prev) => {
-        const newSet = new Set(prev);
-        if (isSelected) {
-          newSet.delete(assigneeId);
-        } else {
-          newSet.add(assigneeId);
-        }
-        return newSet;
-      });
-
-      try {
-        setIsProcessing((prev) => ({ ...prev, [assigneeId]: true }));
-
-        const newAssignees = isSelected
-          ? selectedAssignees.filter((a) => a.ItemId !== assigneeId)
-          : [...selectedAssignees, assignee];
-
-        onChange(newAssignees);
-      } catch (error) {
-        console.error('Failed to update assignee:', error);
-        setLocalSelected(new Set(selectedAssignees.map((a) => a.ItemId)));
-      } finally {
-        setIsProcessing((prev) => ({ ...prev, [assigneeId]: false }));
+    const newIds = new Set(selectedAssignees.map(a => a.ItemId));
+    setSelectedIds(prev => {
+      // Only update if there's an actual change to prevent unnecessary re-renders
+      if (prev.size !== newIds.size || 
+          Array.from(prev).some(id => !newIds.has(id)) || 
+          Array.from(newIds).some(id => !prev.has(id))) {
+        return newIds;
       }
-    },
-    [selectedAssignees, localSelected, onChange]
+      return prev;
+    });
+  }, [selectedAssignees]);
+  
+  // Memoize the available assignees to prevent unnecessary re-renders
+  const memoizedAvailableAssignees = useMemo(() => 
+    availableAssignees.map(assignee => ({
+      ...assignee,
+      isSelected: selectedIds.has(assignee.ItemId),
+      isProcessing: isProcessing[assignee.ItemId] || false
+    })), 
+    [availableAssignees, selectedIds, isProcessing]
   );
+
+  const handleSelect = useCallback((assignee: Assignee) => {
+    const assigneeId = assignee.ItemId;
+    
+    // Toggle the selection immediately
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(assigneeId)) {
+        newSet.delete(assigneeId);
+      } else {
+        newSet.add(assigneeId);
+      }
+      
+      // Update the parent with the new selection
+      const newAssignees = availableAssignees
+        .filter(a => a.ItemId === assigneeId ? newSet.has(assigneeId) : newSet.has(a.ItemId))
+        .map(({ ItemId, Name, ImageUrl }) => ({ ItemId, Name, ImageUrl: ImageUrl || '' }));
+      
+      // Call the parent's onChange with the new assignees
+      onChange(newAssignees);
+      
+      return newSet;
+    });
+    
+    // Only show loading in edit mode
+    if (isEditMode) {
+      setIsProcessing(prev => ({ ...prev, [assigneeId]: true }));
+      
+      // Clear processing state after a short delay
+      const timer = setTimeout(() => {
+        setIsProcessing(prev => ({ ...prev, [assigneeId]: false }));
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [availableAssignees, onChange, isEditMode]);
 
   return (
     <div>
@@ -138,45 +165,43 @@ const AssigneeSelectorComponent = ({
               <CommandList className="max-h-[300px] overflow-y-auto">
                 <CommandEmpty className="py-2 px-3 text-sm">{t('NO_MEMBERS_FOUND')}</CommandEmpty>
                 <CommandGroup>
-                  {availableAssignees.map((assignee) => {
-                    return (
-                      <CommandItem
-                        key={assignee.ItemId}
-                        value={assignee.ItemId}
-                        onSelect={() => handleSelect(assignee)}
-                        className="flex items-center px-2 py-1.5 cursor-pointer"
+                  {memoizedAvailableAssignees.map((assignee) => (
+                    <CommandItem
+                      key={assignee.ItemId}
+                      value={assignee.ItemId}
+                      onSelect={() => handleSelect(assignee)}
+                      className="flex items-center px-2 py-1.5 cursor-pointer"
+                    >
+                      <div
+                        className={cn(
+                          'mr-2 flex h-4 w-4 items-center justify-center rounded border transition-colors',
+                          assignee.isSelected && !assignee.isProcessing
+                            ? 'bg-primary border-primary'
+                            : 'border-border',
+                          assignee.isProcessing ? 'opacity-50' : ''
+                        )}
+                        aria-hidden="true"
                       >
-                        <div
-                          className={cn(
-                            'mr-2 flex h-4 w-4 items-center justify-center rounded border transition-colors',
-                            localSelected.has(assignee.ItemId) && !isProcessing[assignee.ItemId]
-                              ? 'bg-primary border-primary'
-                              : 'border-border',
-                            isProcessing[assignee.ItemId] ? 'opacity-50' : ''
-                          )}
-                          aria-hidden="true"
-                        >
-                          {localSelected.has(assignee.ItemId) && !isProcessing[assignee.ItemId] && (
-                            <Check className="h-3 w-3 text-white" />
-                          )}
-                          {isProcessing[assignee.ItemId] && (
-                            <div className="h-3 w-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                          )}
-                        </div>
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
-                          <AvatarFallback className="bg-neutral-200 text-foreground text-xs">
-                            {assignee.Name.split(' ')
-                              .map((n: string) => n[0])
-                              .join('')
-                              .toUpperCase()
-                              .substring(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm">{assignee.Name}</span>
-                      </CommandItem>
-                    );
-                  })}
+                        {assignee.isSelected && !assignee.isProcessing && (
+                          <Check className="h-3 w-3 text-white" />
+                        )}
+                        {assignee.isProcessing && (
+                          <div className="h-3 w-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        )}
+                      </div>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={assignee.ImageUrl} alt={assignee.Name} />
+                        <AvatarFallback className="bg-neutral-200 text-foreground text-xs">
+                          {assignee.Name.split(' ')
+                            .map((n: string) => n[0])
+                            .join('')
+                            .toUpperCase()
+                            .substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{assignee.Name}</span>
+                    </CommandItem>
+                  ))}
                 </CommandGroup>
               </CommandList>
             </Command>
