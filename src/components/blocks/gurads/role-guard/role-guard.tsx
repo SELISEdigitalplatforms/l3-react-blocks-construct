@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { RoleGuardProps } from 'models/permission';
 import { usePermissions } from '/hooks/use-permissions';
 import { useToast } from 'hooks/use-toast';
@@ -9,9 +9,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from 'components/ui/dialog';
-import { Lock, Shield, UserX } from 'lucide-react';
+import { UserX } from 'lucide-react';
 import { Button } from 'components/ui/button';
 
 export const RoleGuard: React.FC<
@@ -26,11 +25,9 @@ export const RoleGuard: React.FC<
   showFallback = true,
   requireAll = false,
   fallbackType = 'dialog',
-  autoShowDialog = false,
 }) => {
   const { hasRole, isLoading, user, userRoles } = usePermissions();
   const { toast } = useToast();
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -56,14 +53,9 @@ export const RoleGuard: React.FC<
 
     if (fallbackType === 'dialog') {
       return (
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="opacity-50 cursor-not-allowed">
-              <UserX className="h-4 w-4 mr-2" />
-              Restricted Access
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        <Dialog open={true} onOpenChange={() => {}}>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <UserX className="h-5 w-5 text-red-500" />
@@ -74,6 +66,11 @@ export const RoleGuard: React.FC<
                 account.
               </DialogDescription>
             </DialogHeader>
+            <div className="flex justify-end">
+              <Button variant="outline" onClick={() => window.history.back()}>
+                Go Back
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       );
@@ -115,30 +112,6 @@ export const RoleGuard: React.FC<
     return null;
   }
 
-  return (
-    <Dialog open={autoShowDialog || dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="opacity-50">
-          <Lock className="h-4 w-4 mr-2" />
-          Restricted Access
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-amber-500" />
-            Role Required
-          </DialogTitle>
-          <DialogDescription className="space-y-2">
-            <p>
-              You need {requirementText} these roles: <strong>{requiredRoles.join(', ')}</strong>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Your current roles: {userRoles.join(', ') || 'None'}
-            </p>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  );
+  window.location.href = '/404';
+  return null;
 };

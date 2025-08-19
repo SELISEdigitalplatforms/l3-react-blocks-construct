@@ -22,7 +22,7 @@ export function InvoicesHeaderToolbar({
       <PermissionGuard
         permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
         fallbackType="dialog"
-        checkOnClick={true}
+        showFallback={false}
       >
         <Link to="/invoices/create-invoice">
           <Button size="sm" className="text-sm font-bold">
