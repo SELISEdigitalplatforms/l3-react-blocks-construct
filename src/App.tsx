@@ -42,6 +42,8 @@ import SharedWithMe from 'pages/file-manager/shared-files';
 import Trash from 'pages/file-manager/trash';
 import { ChatPage } from './pages/chat/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
+import { PermissionGuard } from './components/blocks/gurads/permission-guard/permission-guard';
+import { MENU_PERMISSIONS } from './config/roles-permissions';
 
 const queryClient = new QueryClient();
 
@@ -69,6 +71,7 @@ function AppContent() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/verify-key" element={<VerifyOtpKey />} />
               </Route>
+
               <Route element={<MainLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/finance" element={<Finance />} />
@@ -88,7 +91,17 @@ function AppContent() {
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
-                <Route path="/invoices" element={<InvoicesPage />} />
+                <Route
+                  path="/invoices"
+                  element={
+                    <PermissionGuard
+                      permissions={[MENU_PERMISSIONS.INVOICE_READ, MENU_PERMISSIONS.INVOICE_WRITE]}
+                      fallbackType="dialog"
+                    >
+                      <InvoicesPage />
+                    </PermissionGuard>
+                  }
+                />
                 <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
                 <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />

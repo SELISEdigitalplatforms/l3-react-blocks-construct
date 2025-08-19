@@ -192,13 +192,15 @@ export function EmailCompose({
 
   return (
     <>
-      {/* Grid View */}
+      {/* Desktop View */}
       <div
-        className={`hidden md:flex fixed ${
-          isMaximized
-            ? 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh] overflow-y-auto'
-            : 'bottom-0 right-4 w-[560px] min-h-[480px] max-h-[90vh] scroll-auto'
-        } border shadow-md rounded-t overflow-hidden z-50 flex flex-col bg-white`}
+        className={`fixed ${
+          isMinimized
+            ? 'bottom-0 right-4 w-80 h-12 overflow-hidden rounded-t cursor-pointer'
+            : isMaximized
+              ? 'inset-0 w-full h-full max-h-screen min-h-screen rounded-none'
+              : 'bottom-0 right-4 w-[560px] min-h-[480px] max-h-[90vh] scroll-auto'
+        } border shadow-md rounded-t overflow-visible z-[9999] flex flex-col bg-white`}
       >
         <EmailComposeHeader
           onMinimize={handleMinimize}

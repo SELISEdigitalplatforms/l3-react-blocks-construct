@@ -11,6 +11,7 @@ import {
   TaskSectionWithTasks,
   TaskItem,
   ItemTag,
+  GetSectionsResponse,
 } from 'features/task-manager/types/task-manager.types';
 import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
 import { AddColumn } from '../../features/task-manager/components/modals/add-column';
@@ -79,7 +80,7 @@ export function TaskCardView({
   const { data: sectionsData, isLoading } = useGetTaskSections({
     pageNo: 1,
     pageSize: 100,
-  });
+  }) as { data?: GetSectionsResponse; isLoading: boolean };
 
   const { toast } = useToast();
 
@@ -169,7 +170,6 @@ export function TaskCardView({
         ? sectionTasks.filter((task) => taskMatchesSearchQuery(task, searchQuery))
         : [...sectionTasks];
 
-      // Apply tag filters if any
       if (filters.tags.length > 0) {
         tasks = tasks.filter((task) => taskMatchesTagFilter(task, filters.tags));
       }
@@ -227,17 +227,47 @@ export function TaskCardView({
   }, [setActiveColumn]);
 
   if (isLoading) {
+    const finalCount = 6;
+    const skeletonTasksCount = 3;
     return (
-      <div className="flex space-x-4 p-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="w-64 p-4 space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <div className="space-y-2">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
+      <div className="flex space-x-4 p-4 overflow-x-auto">
+        {Array.from({ length: finalCount }).map((_, columnIndex) => {
+          const columnId = `skeleton-col-${columnIndex}`;
+          return (
+            <div key={columnId} className="w-72 flex-shrink-0 bg-muted/20 rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-6 w-32 rounded-md" />
+                <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+
+              <div className="space-y-3 mt-3">
+                {Array.from({ length: skeletonTasksCount }).map((_, taskIndex) => {
+                  const taskId = `${columnId}-task-${taskIndex}`;
+                  return (
+                    <div key={taskId} className="bg-card rounded-lg border p-3 space-y-3">
+                      <Skeleton className="h-5 w-4/5 rounded" />
+                      <div className="flex flex-wrap gap-2">
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                        <Skeleton className="h-5 w-12 rounded-full" />
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        <div className="flex -space-x-2">
+                          <Skeleton className="h-6 w-6 rounded-full" />
+                          <Skeleton className="h-6 w-6 rounded-full" />
+                        </div>
+                        <Skeleton className="h-5 w-20 rounded" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-3">
+                <Skeleton className="h-9 w-full rounded-md" />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   }
