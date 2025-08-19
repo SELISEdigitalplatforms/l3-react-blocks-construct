@@ -971,7 +971,7 @@ export default function TaskDetailsView({
           <div>
             <div className="w-full">
               <AssigneeSelector
-                key={`assignee-selector-${task?.ItemId || 'new'}`}
+                key={`assignee-selector-${task?.ItemId ?? 'new'}`}
                 availableAssignees={availableAssignees}
                 selectedAssignees={selectedAssignees}
                 isEditMode={!isNewTaskModalOpen}

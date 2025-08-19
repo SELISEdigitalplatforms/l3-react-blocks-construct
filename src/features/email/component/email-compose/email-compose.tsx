@@ -177,9 +177,25 @@ export function EmailCompose({
     });
   };
 
+  const getContainerClasses = () => {
+    if (isMinimized) {
+      return 'fixed bottom-0 right-4 w-80 h-12 overflow-hidden rounded-t cursor-pointer';
+    }
+    if (isMaximized) {
+      return 'fixed inset-0 w-full h-full max-h-screen min-h-screen rounded-none';
+    }
+    return 'fixed bottom-0 right-4 w-[560px] min-h-[480px] max-h-[90vh] scroll-auto';
+  };
+
+  const getContainerClassNames = () => {
+    const baseClasses =
+      'border shadow-md rounded-t overflow-visible z-[9999] flex flex-col bg-white';
+    return `${getContainerClasses()} ${baseClasses}`;
+  };
+
   if (isMinimized) {
     return (
-      <div className="fixed bottom-0 right-4 w-80 shadow-lg border border-low-emphasis rounded-t overflow-hidden z-50">
+      <div className={getContainerClassNames()}>
         <EmailComposeHeader
           onMinimize={handleMinimize}
           onMaximize={handleMaximize}
@@ -193,15 +209,7 @@ export function EmailCompose({
   return (
     <>
       {/* Desktop View */}
-      <div
-        className={`fixed ${
-          isMinimized
-            ? 'bottom-0 right-4 w-80 h-12 overflow-hidden rounded-t cursor-pointer'
-            : isMaximized
-              ? 'inset-0 w-full h-full max-h-screen min-h-screen rounded-none'
-              : 'bottom-0 right-4 w-[560px] min-h-[480px] max-h-[90vh] scroll-auto'
-        } border shadow-md rounded-t overflow-visible z-[9999] flex flex-col bg-white`}
-      >
+      <div className={getContainerClassNames()}>
         <EmailComposeHeader
           onMinimize={handleMinimize}
           onMaximize={handleMaximize}
