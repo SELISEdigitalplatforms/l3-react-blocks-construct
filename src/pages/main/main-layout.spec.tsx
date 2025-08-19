@@ -1,5 +1,26 @@
+// Set environment variables
 process.env.REACT_APP_API_BASE_URL = 'https://test-api.com';
 process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY = 'test-key';
+process.env.REACT_APP_PUBLIC_BLOCKS_API_URL = 'https://test-api.com';
+process.env.REACT_APP_PUBLIC_API_URL = 'https://test-api.com';
+process.env.REACT_APP_AUTH0_DOMAIN = 'test-auth0-domain';
+process.env.REACT_APP_AUTH0_CLIENT_ID = 'test-auth0-client-id';
+process.env.REACT_APP_AUTH0_AUDIENCE = 'test-auth0-audience';
+
+// Mock window.location
+const originalWindow = window as any;
+Object.defineProperty(window, 'location', {
+  value: {
+    ...originalWindow.location,
+    hostname: 'localhost',
+    protocol: 'http:',
+    host: 'localhost:3000',
+    pathname: '/',
+    search: '',
+    hash: '',
+  },
+  writable: true,
+});
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -32,10 +53,17 @@ jest.mock('components/ui/sidebar', () => ({
   }),
 }));
 
+jest.mock('providers/permission-provider', () => ({
+  PermissionsProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="permissions-provider">{children}</div>
+  ),
+}));
+
+// Mock react-router-dom
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   Outlet: () => <div data-testid="outlet">Outlet Content</div>,
-  useLocation: () => ({
+  useLocation: jest.fn().mockReturnValue({
     pathname: '/',
     search: '',
     hash: '',
@@ -95,6 +123,17 @@ jest.mock('features/notification/hooks/use-notification', () => ({
       unReadNotificationsCount: 0,
       totalNotificationsCount: 0,
     },
+  }),
+}));
+
+jest.mock('features/profile/hooks/use-account', () => ({
+  useGetAccount: jest.fn().mockReturnValue({
+    data: {
+      id: 'test-user-id',
+      name: 'Test User',
+      email: 'test@example.com',
+    },
+    isLoading: false,
   }),
 }));
 
