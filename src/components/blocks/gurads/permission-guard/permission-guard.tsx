@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { usePermissions } from 'hooks/use-permissions';
 import { useToast } from 'hooks/use-toast';
 import {
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'components/ui/dialog';
-import { Shield, UserX } from 'lucide-react';
+import { UserX } from 'lucide-react';
 import { Button } from 'components/ui/button';
 import { PermissionGuardProps } from 'models/permission';
 
@@ -24,9 +24,8 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   fallbackType = 'dialog',
   checkOnClick = false,
 }) => {
-  const { hasPermission, isLoading, user, userPermissions } = usePermissions();
+  const { hasPermission, isLoading, user } = usePermissions();
   const { toast } = useToast();
-  const [showPermissionDialog, setShowPermissionDialog] = useState(false);
 
   if (isLoading) {
     return (
@@ -78,63 +77,15 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   }
 
   if (checkOnClick) {
-    const handleClick = (e: React.MouseEvent) => {
-      const hasAccess = hasPermission(permissions, requireAll);
+    const hasAccess = hasPermission(permissions, requireAll);
 
-      if (!hasAccess) {
-        e.preventDefault();
-        e.stopPropagation();
+    // If no access, hide the component entirely
+    if (!hasAccess) {
+      return null;
+    }
 
-        if (fallbackType === 'toast') {
-          const requiredPermissions = Array.isArray(permissions) ? permissions : [permissions];
-          const requirementText = requireAll ? 'all of' : 'one of';
-          toast({
-            variant: 'destructive',
-            title: 'Permission Required',
-            description: `You need ${requirementText} these permissions: ${requiredPermissions.join(', ')}`,
-          });
-        } else if (fallbackType === 'dialog') {
-          setShowPermissionDialog(true);
-        }
-      }
-    };
-
-    return (
-      <>
-        {React.cloneElement(children as React.ReactElement, {
-          onClick: handleClick,
-        })}
-
-        {showPermissionDialog && fallbackType === 'dialog' && (
-          <Dialog open={true} onOpenChange={() => setShowPermissionDialog(false)}>
-            <DialogContent className="sm:max-w-md bg-background">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 mb-4 text-high-emphasis">
-                  <Shield className="h-5 w-5 text-amber-500" />
-                  Permission Required
-                </DialogTitle>
-                <DialogDescription className="space-y-2  text-high-emphasis">
-                  <p>
-                    You need {requireAll ? 'all of' : 'one of'} these permissions:{' '}
-                    <strong>
-                      {(Array.isArray(permissions) ? permissions : [permissions]).join(', ')}
-                    </strong>
-                  </p>
-                  <p className="text-sm">
-                    Your current permissions: {userPermissions.join(', ') || 'None'}
-                  </p>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setShowPermissionDialog(false)}>
-                  Close
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </>
-    );
+    // If has access, render the component normally
+    return <>{children}</>;
   }
 
   const hasAccess = hasPermission(permissions, requireAll);
@@ -169,30 +120,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     return null;
   }
 
-  return (
-    <Dialog open={true} onOpenChange={() => (window.location.href = '/dashboard')}>
-      <DialogContent className="sm:max-w-md bg-background">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 mb-4  text-high-emphasis">
-            <Shield className="h-5 w-5 text-amber-500" />
-            Permission Required
-          </DialogTitle>
-          <DialogDescription className="space-y-2  text-high-emphasis">
-            <p>
-              You need {requirementText} these permissions:{' '}
-              <strong>{requiredPermissions.join(', ')}</strong>
-            </p>
-            <p className="text-sm ">
-              Your current permissions: {userPermissions.join(', ') || 'None'}
-            </p>
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => (window.location.href = '/dashboard')}>
-            Go to Dashboard
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+  // Direct redirect to 404 - this will execute immediately
+  window.location.href = '/404';
+  return null;
 };

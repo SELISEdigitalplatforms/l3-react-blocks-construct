@@ -115,8 +115,30 @@ function AppContent() {
                     </PermissionGuard>
                   }
                 />
-                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
+
+                <Route
+                  path="/invoices/create-invoice"
+                  element={
+                    <PermissionGuard
+                      permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
+                      fallbackType="dialog"
+                    >
+                      <CreateInvoice />
+                    </PermissionGuard>
+                  }
+                />
+
+                <Route
+                  path="/invoices/:invoiceId/edit"
+                  element={
+                    <PermissionGuard
+                      permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
+                      fallbackType="dialog"
+                    >
+                      <EditInvoice />
+                    </PermissionGuard>
+                  }
+                />
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
