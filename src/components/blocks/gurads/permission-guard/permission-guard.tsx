@@ -27,6 +27,17 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   const { hasPermission, isLoading, user } = usePermissions();
   const { toast } = useToast();
 
+  const getRequirementText = (): string => {
+    switch (requireAll) {
+      case true:
+        return 'all of';
+      case false:
+        return 'one of';
+      default:
+        return 'one of';
+    }
+  };
+
   const checkPermissionAccess = () => {
     return hasPermission(permissions, requireAll);
   };
@@ -35,56 +46,55 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     return Array.isArray(permissions) ? permissions : [permissions];
   };
 
-  const getRequirementText = () => {
-    return requireAll ? 'all of' : 'one of';
+  const showInactiveAccountToast = () => {
+    toast({
+      variant: 'destructive',
+      title: 'Account Inactive',
+      description: 'Your account is inactive. Please contact your administrator.',
+    });
+  };
+
+  const showPermissionDeniedToast = () => {
+    const requiredPermissions = getPermissionsArray();
+    const requirementText = getRequirementText(); // Using switch statement method
+
+    toast({
+      variant: 'destructive',
+      title: 'Permission Required',
+      description: `You need ${requirementText} these permissions: ${requiredPermissions.join(', ')}`,
+    });
   };
 
   const isUserInactive = user && !user.active;
   const hasAccess = !isLoading && !isUserInactive && checkPermissionAccess();
-  const shouldShowInactiveToast = isUserInactive && showFallback && fallbackType === 'toast';
-  const shouldShowPermissionToast =
-    !isLoading &&
-    !isUserInactive &&
-    !hasAccess &&
-    !fallback &&
-    showFallback &&
-    fallbackType === 'toast';
-  const shouldRedirectTo404 =
-    !isLoading &&
-    !isUserInactive &&
-    !hasAccess &&
-    !fallback &&
-    showFallback &&
-    fallbackType === 'dialog';
+  const isToastMode = fallbackType === 'toast';
+  const isDialogMode = fallbackType === 'dialog';
 
   useEffect(() => {
-    if (shouldShowInactiveToast) {
-      toast({
-        variant: 'destructive',
-        title: 'Account Inactive',
-        description: 'Your account is inactive. Please contact your administrator.',
-      });
-    }
-  }, [shouldShowInactiveToast, toast]);
+    if (!showFallback) return;
 
-  useEffect(() => {
-    if (shouldShowPermissionToast) {
-      const requiredPermissions = getPermissionsArray();
-      const requirementText = getRequirementText();
-
-      toast({
-        variant: 'destructive',
-        title: 'Permission Required',
-        description: `You need ${requirementText} these permissions: ${requiredPermissions.join(', ')}`,
-      });
+    if (isUserInactive && isToastMode) {
+      showInactiveAccountToast();
+      return;
     }
-  }, [shouldShowPermissionToast, toast, permissions, requireAll]);
 
-  useEffect(() => {
-    if (shouldRedirectTo404) {
-      window.location.href = '/404';
+    if (!isLoading && !isUserInactive && !hasAccess && !fallback) {
+      if (isToastMode) {
+        showPermissionDeniedToast();
+      } else if (isDialogMode) {
+        window.location.href = '/404';
+      }
     }
-  }, [shouldRedirectTo404]);
+  }, [
+    isUserInactive,
+    isLoading,
+    hasAccess,
+    showFallback,
+    isToastMode,
+    isDialogMode,
+    permissions,
+    requireAll,
+  ]);
 
   const renderInactiveUserDialog = () => (
     <Dialog open={true} onOpenChange={() => {}}>
@@ -107,26 +117,31 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     </Dialog>
   );
 
+  const renderLoadingSpinner = () => (
+    <div className="flex items-center justify-center p-4">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  );
+
+  const handleInactiveUser = () => {
+    if (!showFallback) return null;
+    if (isToastMode) return null;
+    if (isDialogMode) return renderInactiveUserDialog();
+    return null;
+  };
+
+  const handleAccessDenied = () => {
+    if (fallback) return <>{fallback}</>;
+    if (!showFallback || isToastMode || fallbackType === 'hidden') return null;
+    return null;
+  };
+
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return renderLoadingSpinner();
   }
 
   if (isUserInactive) {
-    if (!showFallback) return null;
-
-    if (fallbackType === 'toast') {
-      return null;
-    }
-
-    if (fallbackType === 'dialog') {
-      return renderInactiveUserDialog();
-    }
-
-    return null;
+    return handleInactiveUser();
   }
 
   if (checkOnClick) {
@@ -137,21 +152,5 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     return <>{children}</>;
   }
 
-  if (fallback) {
-    return <>{fallback}</>;
-  }
-
-  if (!showFallback) {
-    return null;
-  }
-
-  if (fallbackType === 'toast') {
-    return null;
-  }
-
-  if (fallbackType === 'hidden') {
-    return null;
-  }
-
-  return null;
+  return handleAccessDenied();
 };
