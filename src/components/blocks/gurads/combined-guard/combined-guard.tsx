@@ -44,23 +44,15 @@ export const CombinedGuard: React.FC<
       : hasRoleAccess || hasPermissionAccess;
   };
 
-  const convertRolesToArray = (roles: any) => {
-    if (!roles) return [];
-    return Array.isArray(roles) ? roles : [roles];
+  const convertToArray = (items: any) => {
+    if (!items) return [];
+    return Array.isArray(items) ? items : [items];
   };
 
-  const convertPermissionsToArray = (permissions: any) => {
-    if (!permissions) return [];
-    return Array.isArray(permissions) ? permissions : [permissions];
-  };
+  const buildAccessMessage = () => {
+    const requiredRoles = convertToArray(roles);
+    const requiredPermissions = convertToArray(permissions);
 
-  const getRequiredItems = () => {
-    const requiredRoles = convertRolesToArray(roles);
-    const requiredPermissions = convertPermissionsToArray(permissions);
-    return { requiredRoles, requiredPermissions };
-  };
-
-  const buildAccessMessage = (requiredRoles: string[], requiredPermissions: string[]) => {
     const parts = [
       requiredRoles.length > 0 ? `Roles: ${requiredRoles.join(', ')}` : '',
       requiredPermissions.length > 0 ? `Permissions: ${requiredPermissions.join(', ')}` : '',
@@ -69,53 +61,58 @@ export const CombinedGuard: React.FC<
     return parts.join(' and ');
   };
 
+  const showInactiveAccountToast = () => {
+    toast({
+      variant: 'destructive',
+      title: 'Account Inactive',
+      description: 'Your account is inactive. Please contact your administrator.',
+    });
+  };
+
+  const showAccessDeniedToast = () => {
+    const message = buildAccessMessage();
+    const currentAccess = `Current: Roles [${userRoles.join(', ') || 'None'}], Permissions [${userPermissions.join(', ') || 'None'}]`;
+
+    toast({
+      variant: 'destructive',
+      title: 'Access Denied',
+      description: `You need ${message}. ${currentAccess}`,
+    });
+  };
+
   const isUserInactive = user && !user.active;
   const hasAccess = !isLoading && !isUserInactive && checkAccess();
-  const shouldShowInactiveToast = isUserInactive && showFallback && fallbackType === 'toast';
-  const shouldShowAccessDeniedToast =
-    !isLoading &&
-    !isUserInactive &&
-    !hasAccess &&
-    !fallback &&
-    showFallback &&
-    fallbackType === 'toast';
-  const shouldRedirectTo404 =
-    !isLoading &&
-    !isUserInactive &&
-    !hasAccess &&
-    !fallback &&
-    showFallback &&
-    fallbackType === 'dialog';
+  const isToastMode = fallbackType === 'toast';
+  const isDialogMode = fallbackType === 'dialog';
 
   useEffect(() => {
-    if (shouldShowInactiveToast) {
-      toast({
-        variant: 'destructive',
-        title: 'Account Inactive',
-        description: 'Your account is inactive. Please contact your administrator.',
-      });
+    if (!showFallback || !isToastMode) return;
+
+    if (isUserInactive) {
+      showInactiveAccountToast();
+    } else if (!isLoading && !hasAccess && !fallback) {
+      showAccessDeniedToast();
     }
-  }, [shouldShowInactiveToast, toast]);
+  }, [
+    isUserInactive,
+    isLoading,
+    hasAccess,
+    fallback,
+    showFallback,
+    isToastMode,
+    userRoles,
+    userPermissions,
+    roles,
+    permissions,
+  ]);
 
   useEffect(() => {
-    if (shouldShowAccessDeniedToast) {
-      const { requiredRoles, requiredPermissions } = getRequiredItems();
-      const message = buildAccessMessage(requiredRoles, requiredPermissions);
-      const currentAccess = `Current: Roles [${userRoles.join(', ') || 'None'}], Permissions [${userPermissions.join(', ') || 'None'}]`;
-
-      toast({
-        variant: 'destructive',
-        title: 'Access Denied',
-        description: `You need ${message}. ${currentAccess}`,
-      });
-    }
-  }, [shouldShowAccessDeniedToast, toast, userRoles, userPermissions, roles, permissions]);
-
-  useEffect(() => {
-    if (shouldRedirectTo404) {
+    const shouldRedirect =
+      !isLoading && !isUserInactive && !hasAccess && !fallback && showFallback && isDialogMode;
+    if (shouldRedirect) {
       window.location.href = '/404';
     }
-  }, [shouldRedirectTo404]);
+  }, [isLoading, isUserInactive, hasAccess, fallback, showFallback, isDialogMode]);
 
   const renderInactiveUserDialog = () => (
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -139,26 +136,20 @@ export const CombinedGuard: React.FC<
     </Dialog>
   );
 
+  const renderLoadingSpinner = () => (
+    <div className="flex items-center justify-center p-4">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+  );
+
   // Early returns for simple cases
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return renderLoadingSpinner();
   }
 
   if (isUserInactive) {
-    if (!showFallback) return null;
-
-    if (fallbackType === 'toast') {
-      return null;
-    }
-
-    if (fallbackType === 'dialog') {
-      return renderInactiveUserDialog();
-    }
-
+    if (!showFallback || isToastMode) return null;
+    if (isDialogMode) return renderInactiveUserDialog();
     return null;
   }
 
@@ -170,17 +161,5 @@ export const CombinedGuard: React.FC<
     return <>{fallback}</>;
   }
 
-  if (!showFallback) {
-    return null;
-  }
-
-  if (fallbackType === 'toast') {
-    return null;
-  }
-
-  if (fallbackType === 'hidden') {
-    return null;
-  }
-
-  return null;
+  return showFallback && !isToastMode && fallbackType !== 'hidden' ? null : null;
 };

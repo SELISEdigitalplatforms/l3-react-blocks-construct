@@ -17,7 +17,6 @@ import { Button } from 'components/ui/button';
 export const RoleGuard: React.FC<
   RoleGuardProps & {
     fallbackType?: 'dialog' | 'toast' | 'hidden';
-    autoShowDialog?: boolean;
   }
 > = ({
   roles,
@@ -30,22 +29,25 @@ export const RoleGuard: React.FC<
   const { hasRole, isLoading, user, userRoles } = usePermissions();
   const { toast } = useToast();
 
-  // Helper function to check role access
   const checkRoleAccess = () => {
     return hasRole(roles, requireAll);
   };
 
-  // Helper function to convert roles to array
   const getRolesArray = () => {
     return Array.isArray(roles) ? roles : [roles];
   };
 
-  // Helper function to get requirement text
   const getRequirementText = () => {
-    return requireAll ? 'all of' : 'one of';
+    switch (requireAll) {
+      case true:
+        return 'all of';
+      case false:
+        return 'one of';
+      default:
+        return 'one of';
+    }
   };
 
-  // Helper function to handle inactive user fallback
   const handleInactiveUser = () => {
     if (!showFallback) return null;
     if (fallbackType === 'toast') return null;
@@ -53,7 +55,6 @@ export const RoleGuard: React.FC<
     return null;
   };
 
-  // Calculate conditions for hooks at the top
   const isUserInactive = user && !user.active;
   const hasAccess = !isLoading && !isUserInactive && checkRoleAccess();
   const shouldShowInactiveToast = isUserInactive && showFallback && fallbackType === 'toast';
@@ -72,7 +73,6 @@ export const RoleGuard: React.FC<
     showFallback &&
     fallbackType === 'dialog';
 
-  // All hooks at the top - called unconditionally
   useEffect(() => {
     if (shouldShowInactiveToast) {
       toast({
