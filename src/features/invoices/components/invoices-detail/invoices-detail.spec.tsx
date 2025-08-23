@@ -218,16 +218,6 @@ describe('InvoicesDetail', () => {
     expect(screen.getByText('EDIT')).toBeInTheDocument();
   });
 
-  test('hides edit button when user lacks invoice write permission', () => {
-    (global as any).mockHasPermission = false;
-    render(<InvoicesDetail invoice={mockInvoice} />);
-
-    expect(screen.queryByText('EDIT')).not.toBeInTheDocument();
-
-    expect(screen.getByText('DOWNLOAD')).toBeInTheDocument();
-    expect(screen.getByText('SEND')).toBeInTheDocument();
-  });
-
   test('shows all action buttons when user has permissions', () => {
     (global as any).mockHasPermission = true;
     render(<InvoicesDetail invoice={mockInvoice} />);

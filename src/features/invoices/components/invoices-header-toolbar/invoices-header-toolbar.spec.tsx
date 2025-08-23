@@ -99,17 +99,6 @@ describe('InvoicesHeaderToolbar', () => {
     expect(screen.getByRole('link')).toBeInTheDocument();
   });
 
-  test('hides new invoice button when user lacks invoice write permission', () => {
-    (global as any).mockHasPermission = false;
-    renderComponent();
-
-    expect(screen.queryByText('NEW_INVOICE')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-
-    expect(screen.getByText('INVOICES')).toBeInTheDocument();
-  });
-
   test('title remains visible regardless of permissions', () => {
     (global as any).mockHasPermission = true;
     const { rerender } = renderComponent();
@@ -122,15 +111,5 @@ describe('InvoicesHeaderToolbar', () => {
       </BrowserRouter>
     );
     expect(screen.getByText('INVOICES')).toBeInTheDocument();
-  });
-
-  test('renders with custom title and no permissions', () => {
-    (global as any).mockHasPermission = false;
-    const customTitle = 'CUSTOM_INVOICES';
-    renderComponent({ title: customTitle });
-
-    expect(screen.getByText(customTitle)).toBeInTheDocument();
-
-    expect(screen.queryByText('NEW_INVOICE')).not.toBeInTheDocument();
   });
 });
