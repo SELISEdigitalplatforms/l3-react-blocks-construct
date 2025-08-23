@@ -42,8 +42,6 @@ import SharedWithMe from 'pages/file-manager/shared-files';
 import Trash from 'pages/file-manager/trash';
 import { ChatPage } from './pages/chat/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
-import { PermissionGuard } from './components/blocks/gurads/permission-guard/permission-guard';
-import { MENU_PERMISSIONS } from './config/roles-permissions';
 
 const queryClient = new QueryClient();
 
@@ -79,20 +77,8 @@ function AppContent() {
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/inventory/add" element={<InventoryForm />} />
                 <Route path="/inventory/:itemId" element={<InventoryDetails />} />
-                <Route
-                  path="/activity-log"
-                  element={
-                    <PermissionGuard
-                      permissions={[
-                        MENU_PERMISSIONS.ACTIVITY_LOG_READ,
-                        MENU_PERMISSIONS.ACTIVITY_LOG_WRITE,
-                      ]}
-                      fallbackType="dialog"
-                    >
-                      <ActivityLogPage1 />
-                    </PermissionGuard>
-                  }
-                />
+
+                <Route path="/activity-log" element={<ActivityLogPage1 />} />
                 <Route path="/timeline" element={<ActivityLogPage2 />} />
                 <Route path="/mail" element={<Email />} />
                 <Route path="/mail/:category" element={<Email />} />
@@ -104,6 +90,9 @@ function AppContent() {
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
+                {/* 
+                To implement permissions for feature Invoices
+
                 <Route
                   path="/invoices"
                   element={
@@ -136,9 +125,15 @@ function AppContent() {
                       fallbackType="dialog"
                     >
                       <EditInvoice />
-                    </PermissionGuard>
+                    </PermissionGuard
                   }
                 />
+                */}
+
+                <Route path="/invoices" element={<InvoicesPage />} />
+                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
+                <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
+
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />

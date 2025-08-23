@@ -15,8 +15,6 @@ import { useToast } from 'hooks/use-toast';
 import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
 import { useTheme } from 'styles/theme/theme-provider';
-import { PermissionGuard } from 'components/blocks/gurads/permission-guard/permission-guard';
-import { MENU_PERMISSIONS } from 'config/roles-permissions';
 
 interface InvoicesDetailProps {
   invoice: InvoiceItem;
@@ -129,12 +127,15 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                   <Download className="h-4 w-4 sm:mr-1" />
                   <span className="hidden sm:inline">{t('DOWNLOAD')}</span>
                 </Button>
-
-                <PermissionGuard
-                  permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
-                  fallbackType="dialog"
-                  showFallback={false}
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(`/invoices/${invoice.ItemId}/edit`)}
                 >
+                  <Pencil className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('EDIT')}</span>
+                </Button>
+                {/* To hide edit button for users without write access use permissions={[MENU_PERMISSIONS.INVOICE_WRITE]} 
+                <PermissionGuard permissions={[MENU_PERMISSIONS.INVOICE_WRITE]} fallbackType="dialog" showFallback={false}>
                   <Button
                     variant="outline"
                     onClick={() => navigate(`/invoices/${invoice.ItemId}/edit`)}
@@ -143,7 +144,7 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                     <span className="hidden sm:inline">{t('EDIT')}</span>
                   </Button>
                 </PermissionGuard>
-
+                */}
                 <Button
                   variant="default"
                   className="bg-primary"
