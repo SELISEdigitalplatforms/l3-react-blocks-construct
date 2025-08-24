@@ -121,6 +121,15 @@ jobs:
           resource-group: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.CLUSTER_NAME }}
 
+
+      - name: Add kubelogin
+        uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: "v0.0.24"
+
+      - name: Convert kubeconfig to use AAD
+        run: |
+          kubelogin convert-kubeconfig -l azurecli
       - name: Setup Helm Installer
         uses: Azure/setup-helm@v3.5
         with:
