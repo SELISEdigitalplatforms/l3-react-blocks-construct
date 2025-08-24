@@ -119,11 +119,13 @@ jobs:
           cluster-name: ${{ secrets.CLUSTER_NAME }}
 
 
-      - uses: azure/use-kubelogin@v1
+
+      - name: Add kubelogin
+        uses: azure/use-kubelogin@v1
         with:
           kubelogin-version: "v0.0.24"
 
-      - name: convert kubeconfig
+      - name: Convert kubeconfig to use AAD
         run: |
           kubelogin convert-kubeconfig -l azurecli
       - name: Setup Helm Installer
