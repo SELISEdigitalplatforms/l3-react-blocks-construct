@@ -17,6 +17,7 @@ import { SignInResponse } from '../../services/auth.service';
 import { SsoSignin } from 'pages/auth/signin/signin-sso';
 import { GRANT_TYPES } from 'constant/auth';
 import { LoginOption } from 'constant/sso';
+import { Loader } from 'lucide-react';
 
 /**
  * SigninForm Component
@@ -56,6 +57,8 @@ type SigninProps = {
 
 export const SigninForm = ({ loginOption }: SigninProps) => {
   const [searchParams] = useSearchParams();
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
   const isFirstTimeCall = useRef<boolean>(true);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -135,11 +138,30 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   useEffect(() => {
     const state = searchParams.get('state');
     const code = searchParams.get('code');
+
     if (code && state && isFirstTimeCall.current) {
       isFirstTimeCall.current = false;
-      signin(code, state);
+      setIsSigningIn(true);
+
+      signin(code, state)
+        .then(() => {
+          setIsSigningIn(false);
+        })
+        .catch((error) => {
+          console.error('Signin failed:', error);
+          setIsSigningIn(false);
+        });
     }
   }, [searchParams, signin]);
+
+  if (isSigningIn) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Loader size={20} />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

@@ -6,7 +6,7 @@ import bgAuthDark from 'assets/images/bg_auth_dark.svg';
 import { useTheme } from 'styles/theme/theme-provider';
 import LanguageSelector from 'components/blocks/language-selector/language-selector';
 import { useGetLoginOptions } from 'features/auth/hooks/use-auth';
-import { AlertTriangle, Loader } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 export function AuthLayout() {
   const { isLoading, error: loginOptionsError } = useGetLoginOptions();
@@ -140,7 +140,7 @@ export function AuthLayout() {
     return <Outlet />;
   };
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return null;
 
   return (
     <div className="flex w-full h-screen">
