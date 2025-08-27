@@ -69,4 +69,4 @@ jobs:
       ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
       CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
-    # needs: [sonarqube-job]
+    needs: [sonarqube-job]
