@@ -54,3 +54,22 @@ jobs:
       CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_PROD_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_PROD_RESOURCE_GROUP }}
     # needs: [sonarqube-job] 
+  # storybook-job:
+  #   if: ${{ github.event_name == 'push' }}
+  #   permissions:
+  #       contents: read
+  #       id-token: write
+  #   uses: ./.github/workflows/4_storybook.yml
+  #   with:
+  #     CONTAINER_NAME: 'prod-$SERVICE_NAME-storybook'
+  #     NAMESPACE: 'prod-$REPO_NAME'
+  #     SERVICE_NAME: $SERVICE_NAME
+  #     CI_BUILD: 'storybook-prod'
+  #   secrets:
+  #     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+  #     AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_PROD_CREDENTIALS }}
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_PROD_CONTAINER_REGISTRY }}
+  #     ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_PROD_RESOURCE_GROUP }}
+  #     CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_PROD_CLUSTER }}
+  #     ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_PROD_RESOURCE_GROUP }}
+  #   # needs: [sonarqube-job]
