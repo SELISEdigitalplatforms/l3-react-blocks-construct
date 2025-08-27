@@ -75,7 +75,7 @@ jobs:
           az acr build \
           --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ inputs.CONTAINER_NAME }}:${{ github.sha }} \
           --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} -g ${{ secrets.ACR_RESOURCE_GROUP }} \
-          --file ${{ env.DOCKERFILE }} \
+          --file ${{ env.STORYBOOK_DOCKERFILE }} \
           --build-arg ci_build=${{ inputs.CI_BUILD }} .
 
   deployWebToK8s:
