@@ -17,7 +17,7 @@ import { SignInResponse } from '../../services/auth.service';
 import { SsoSignin } from 'pages/auth/signin/signin-sso';
 import { GRANT_TYPES } from 'constant/auth';
 import { LoginOption } from 'constant/sso';
-import { Loader } from 'lucide-react';
+import { LoadingOverlay } from 'components/core/loading-overlay';
 
 /**
  * SigninForm Component
@@ -155,12 +155,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   }, [searchParams, signin]);
 
   if (isSigningIn) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <Loader size={20} />
-      </div>
-    );
+    return <LoadingOverlay />;
   }
 
   return (
