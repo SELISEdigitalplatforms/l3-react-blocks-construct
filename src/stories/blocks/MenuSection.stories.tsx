@@ -63,10 +63,9 @@ const MockMenuSection = ({
       return (
         <Collapsible key={item.id} open={isMenuOpen} onOpenChange={() => toggleMenu(item.id)}>
           <CollapsibleTrigger asChild>
-            <div
-              role="button"
-              tabIndex={0}
-              className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors w-full ${
+            <button
+              type="button"
+              className={`w-full flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
                 isActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
               }`}
               onClick={() => handleItemClick(item)}
@@ -96,18 +95,17 @@ const MockMenuSection = ({
                   />
                 </>
               )}
-            </div>
+            </button>
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="ml-6 mt-1 space-y-1">
               {item.children?.map((child: any) => {
                 const isChildActive = pathname.includes(child.path);
                 return (
-                  <div
+                  <button
                     key={child.id}
-                    role="button"
-                    tabIndex={0}
-                    className={`flex items-center p-2 rounded-lg cursor-pointer transition-colors ${
+                    type="button"
+                    className={`w-full flex items-center p-2 rounded-lg cursor-pointer transition-colors ${
                       isChildActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => handleItemClick(child)}
@@ -132,7 +130,7 @@ const MockMenuSection = ({
                         {child.name}
                       </span>
                     )}
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -142,11 +140,10 @@ const MockMenuSection = ({
     }
 
     return (
-      <div
+      <button
         key={item.id}
-        role="button"
-        tabIndex={0}
-        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors w-full ${
+        type="button"
+        className={`w-full flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
           isActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
         }`}
         onClick={() => handleItemClick(item)}
@@ -169,7 +166,7 @@ const MockMenuSection = ({
             {item.name}
           </span>
         )}
-      </div>
+      </button>
     );
   };
 
