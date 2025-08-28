@@ -156,43 +156,48 @@ export const MobileDark: Story = {
   },
 };
 
-export const Interactive: Story = {
-  render: (args) => {
-    const [isOpen, setIsOpen] = React.useState(args.open);
-    const [currentTheme, setCurrentTheme] = React.useState(args.theme);
+const InteractiveComponent = (args: any) => {
+  const [isOpen, setIsOpen] = React.useState(args.open);
+  const [currentTheme, setCurrentTheme] = React.useState(args.theme);
 
-    return (
-      <div className="space-y-4">
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-          >
-            {isOpen ? 'Collapse' : 'Expand'}
-          </button>
-          <button
-            onClick={() => setCurrentTheme(currentTheme === 'light' ? 'dark' : 'light')}
-            className="px-3 py-1 bg-gray-600 text-white rounded text-sm"
-          >
-            Toggle Theme
-          </button>
-        </div>
-        <div 
-          className={`w-64 border rounded-lg p-2 transition-colors ${
-            currentTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-          }`}
-          style={{ minHeight: '60px' }}
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
         >
-          <MockLogoSection
-            {...args}
-            theme={currentTheme}
-            open={isOpen}
-            onClose={() => console.log('Close clicked')}
-          />
-        </div>
+          {isOpen ? 'Collapse' : 'Expand'}
+        </button>
+        <button
+          onClick={() => setCurrentTheme(currentTheme === 'light' ? 'dark' : 'light')}
+          className="px-3 py-1 bg-gray-600 text-white rounded text-sm"
+        >
+          Toggle Theme
+        </button>
       </div>
-    );
-  },
+      <div 
+        className={`w-64 border rounded-lg p-2 transition-colors ${
+          currentTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+        }`}
+        style={{ minHeight: '60px' }}
+      >
+        <MockLogoSection
+          {...args}
+          theme={currentTheme}
+          open={isOpen}
+          onClose={() => {
+            // eslint-disable-next-line no-console
+            console.log('Close clicked');
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const Interactive: Story = {
+  render: InteractiveComponent,
   args: {
     theme: 'light',
     open: true,

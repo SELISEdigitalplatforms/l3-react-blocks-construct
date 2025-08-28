@@ -82,7 +82,15 @@ const MockAppSidebar = ({
   };
 
   const showText = !isCollapsed || isMobile;
-  const sidebarWidth = isMobile ? 'w-64' : (isCollapsed ? 'w-16' : 'w-64');
+  
+  let sidebarWidth: string;
+  if (isMobile) {
+    sidebarWidth = 'w-64';
+  } else if (isCollapsed) {
+    sidebarWidth = 'w-16';
+  } else {
+    sidebarWidth = 'w-64';
+  }
 
   return (
     <Router>

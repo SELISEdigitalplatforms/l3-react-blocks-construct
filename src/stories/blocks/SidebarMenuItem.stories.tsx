@@ -29,6 +29,7 @@ const MockSidebarMenuItem = ({
   const hasChildren = item.children && item.children.length > 0;
 
   const handleClick = () => {
+    // eslint-disable-next-line no-console
     console.log('Navigating to:', item.path);
   };
 
@@ -45,8 +46,9 @@ const MockSidebarMenuItem = ({
       <Router>
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <CollapsibleTrigger asChild>
-            <div 
-              className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+            <button
+              type="button"
+              className={`w-full flex items-center p-3 rounded-lg cursor-pointer transition-colors border-0 bg-transparent text-left ${
                 isActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
               }`}
               onClick={handleClick}
@@ -64,16 +66,20 @@ const MockSidebarMenuItem = ({
                   />
                 </>
               )}
-            </div>
+            </button>
           </CollapsibleTrigger>
           
           <CollapsibleContent>
             <div className="ml-6 mt-1 space-y-1">
               {item.children?.map((child) => (
-                <div
+                <button
                   key={child.id}
-                  className="flex items-center p-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => console.log('Navigating to child:', child.path)}
+                  type="button"
+                  className="w-full flex items-center p-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors border-0 bg-transparent text-left"
+                  onClick={() => {
+                    // eslint-disable-next-line no-console
+                    console.log('Navigating to child:', child.path);
+                  }}
                 >
                   {renderIcon(child.icon)}
                   {showText && (
@@ -81,7 +87,7 @@ const MockSidebarMenuItem = ({
                       {child.name}
                     </span>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </CollapsibleContent>
@@ -92,8 +98,9 @@ const MockSidebarMenuItem = ({
 
   return (
     <Router>
-      <div
-        className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors ${
+      <button
+        type="button"
+        className={`w-full flex items-center p-3 rounded-lg cursor-pointer transition-colors border-0 bg-transparent text-left ${
           isActive ? 'bg-blue-50' : 'hover:bg-gray-50'
         }`}
         onClick={handleClick}
@@ -104,7 +111,7 @@ const MockSidebarMenuItem = ({
             {item.name}
           </span>
         )}
-      </div>
+      </button>
     </Router>
   );
 };

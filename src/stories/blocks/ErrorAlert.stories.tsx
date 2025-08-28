@@ -61,25 +61,27 @@ export const Hidden: Story = {
   },
 };
 
+const InteractiveComponent = (args: any) => {
+  const [showError, setShowError] = React.useState(false);
+  
+  return (
+    <div>
+      <button 
+        onClick={() => setShowError(true)}
+        className="mb-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+      >
+        Trigger Error
+      </button>
+      <ErrorAlert 
+        {...args} 
+        isError={showError}
+        title="Interactive Error"
+        message="This error was triggered by clicking the button above."
+      />
+    </div>
+  );
+};
+
 export const Interactive: Story = {
-  render: (args) => {
-    const [showError, setShowError] = React.useState(false);
-    
-    return (
-      <div>
-        <button 
-          onClick={() => setShowError(true)}
-          className="mb-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Trigger Error
-        </button>
-        <ErrorAlert 
-          {...args} 
-          isError={showError}
-          title="Interactive Error"
-          message="This error was triggered by clicking the button above."
-        />
-      </div>
-    );
-  },
+  render: InteractiveComponent,
 };

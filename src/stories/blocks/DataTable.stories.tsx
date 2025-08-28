@@ -1,17 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../components/ui/table';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
 
 // Mock simplified DataTable component to demonstrate functionality
-const MockDataTable = ({ 
+const MockDataTable = ({
   data = [] as any[],
   isLoading = false,
   columns = [] as any[],
   showPagination = true,
-  showActions = true 
+  showActions = true,
 }: {
   data?: any[];
   isLoading?: boolean;
@@ -36,11 +43,11 @@ const MockDataTable = ({
 
   const sortedData = React.useMemo(() => {
     if (!sortColumn) return data;
-    
+
     return [...data].sort((a, b) => {
       const aValue = a[sortColumn];
       const bValue = b[sortColumn];
-      
+
       if (sortDirection === 'asc') {
         return aValue > bValue ? 1 : -1;
       } else {
@@ -114,13 +121,16 @@ const MockDataTable = ({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (showActions ? 1 : 0)} className="text-center py-8">
+                <TableCell
+                  colSpan={columns.length + (showActions ? 1 : 0)}
+                  className="text-center py-8"
+                >
                   No data available
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((row, index) => (
-                <TableRow key={index} className="hover:bg-gray-50">
+              paginatedData.map((row) => (
+                <TableRow key={row.id ?? row.email ?? row.name} className="hover:bg-gray-50">
                   {columns.map((column) => (
                     <TableCell key={column.key}>
                       {column.render ? column.render(row[column.key], row) : row[column.key]}
@@ -139,17 +149,18 @@ const MockDataTable = ({
           </TableBody>
         </Table>
       </div>
-      
+
       {showPagination && totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-700">
-            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, data.length)} of {data.length} entries
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, data.length)} of {data.length} entries
           </p>
           <div className="flex space-x-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
             >
               Previous
@@ -157,7 +168,7 @@ const MockDataTable = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
             >
               Next
@@ -176,7 +187,8 @@ const meta: Meta<typeof MockDataTable> = {
   parameters: {
     docs: {
       description: {
-        component: 'A reusable and customizable table component that supports column-based filtering, sorting, visibility toggles, pagination, and expandable rows.',
+        component:
+          'A reusable and customizable table component that supports column-based filtering, sorting, visibility toggles, pagination, and expandable rows.',
       },
     },
   },
@@ -194,15 +206,13 @@ const sampleColumns = [
   { key: 'id', header: 'ID', sortable: true },
   { key: 'name', header: 'Name', sortable: true },
   { key: 'email', header: 'Email', sortable: true },
-  { 
-    key: 'status', 
+  {
+    key: 'status',
     header: 'Status',
     sortable: false,
     render: (value: string) => (
-      <Badge variant={value === 'Active' ? 'default' : 'secondary'}>
-        {value}
-      </Badge>
-    )
+      <Badge variant={value === 'Active' ? 'default' : 'secondary'}>{value}</Badge>
+    ),
   },
   { key: 'role', header: 'Role', sortable: true },
 ];
