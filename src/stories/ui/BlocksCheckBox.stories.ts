@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Checkbox } from 'components/ui/checkbox';
+import { Checkbox } from '../../components/ui/checkbox';
 const meta: Meta<typeof Checkbox> = {
-  title: 'UI/Forms/Checkbox',
+  title: 'UI Components/Forms/Checkbox',
   component: Checkbox,
   tags: ['autodocs'],
   parameters: {

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
-import { Input, InputProps } from 'components/ui/input';
+import { Input, InputProps } from '../../components/ui/input';
 
 const meta: Meta<InputProps> = {
-  title: 'UI/Input',
+  title: 'UI Components/Input',
 
   component: Input,
   tags: ['autodocs'],
