@@ -2,17 +2,21 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../components/ui/collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../../components/ui/collapsible';
 
 // Mock simplified MenuSection component to demonstrate functionality
-const MockMenuSection = ({ 
+const MockMenuSection = ({
   title = 'Menu Section',
   items = [],
   showText = true,
   pathname = '/dashboard',
   isMobile = false,
   open = true,
-  onItemClick
+  onItemClick,
 }: {
   title?: string;
   items?: Array<{
@@ -36,9 +40,9 @@ const MockMenuSection = ({
   const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({});
 
   const toggleMenu = (menuId: string) => {
-    setOpenMenus(prev => ({
+    setOpenMenus((prev) => ({
       ...prev,
-      [menuId]: !prev[menuId]
+      [menuId]: !prev[menuId],
     }));
   };
 
@@ -60,10 +64,18 @@ const MockMenuSection = ({
         <Collapsible key={item.id} open={isMenuOpen} onOpenChange={() => toggleMenu(item.id)}>
           <CollapsibleTrigger asChild>
             <div
+              role="button"
+              tabIndex={0}
               className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors w-full ${
                 isActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
               }`}
               onClick={() => handleItemClick(item)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleItemClick(item);
+                }
+              }}
             >
               <div className="flex items-center justify-center w-6 h-6">
                 <span className={`text-lg ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
@@ -72,19 +84,20 @@ const MockMenuSection = ({
               </div>
               {showText && (
                 <>
-                  <span className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}>
+                  <span
+                    className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
                     {item.name}
                   </span>
-                  <ChevronRight 
+                  <ChevronRight
                     className={`ml-auto h-4 w-4 transition-transform ${isMenuOpen ? 'rotate-90' : ''} ${
                       isActive ? 'text-blue-600' : 'text-gray-400'
-                    }`} 
+                    }`}
                   />
                 </>
               )}
             </div>
           </CollapsibleTrigger>
-          
           <CollapsibleContent>
             <div className="ml-6 mt-1 space-y-1">
               {item.children?.map((child: any) => {
@@ -92,18 +105,30 @@ const MockMenuSection = ({
                 return (
                   <div
                     key={child.id}
+                    role="button"
+                    tabIndex={0}
                     className={`flex items-center p-2 rounded-lg cursor-pointer transition-colors ${
                       isChildActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => handleItemClick(child)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleItemClick(child);
+                      }
+                    }}
                   >
                     <div className="flex items-center justify-center w-6 h-6">
-                      <span className={`text-sm ${isChildActive ? 'text-blue-600' : 'text-gray-600'}`}>
+                      <span
+                        className={`text-sm ${isChildActive ? 'text-blue-600' : 'text-gray-600'}`}
+                      >
                         {child.icon}
                       </span>
                     </div>
                     {showText && (
-                      <span className={`ml-3 text-sm ${isChildActive ? 'text-blue-600' : 'text-gray-600'}`}>
+                      <span
+                        className={`ml-3 text-sm ${isChildActive ? 'text-blue-600' : 'text-gray-600'}`}
+                      >
                         {child.name}
                       </span>
                     )}
@@ -119,10 +144,18 @@ const MockMenuSection = ({
     return (
       <div
         key={item.id}
+        role="button"
+        tabIndex={0}
         className={`flex items-center p-3 rounded-lg cursor-pointer transition-colors w-full ${
           isActive ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
         }`}
         onClick={() => handleItemClick(item)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleItemClick(item);
+          }
+        }}
       >
         <div className="flex items-center justify-center w-6 h-6">
           <span className={`text-lg ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
@@ -130,7 +163,9 @@ const MockMenuSection = ({
           </span>
         </div>
         {showText && (
-          <span className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}>
+          <span
+            className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}
+          >
             {item.name}
           </span>
         )}
@@ -144,9 +179,7 @@ const MockMenuSection = ({
         {/* Section Title */}
         {showText && (
           <div className="px-2">
-            <p className="text-xs font-medium uppercase text-gray-500 tracking-wide">
-              {title}
-            </p>
+            <p className="text-xs font-medium uppercase text-gray-500 tracking-wide">{title}</p>
           </div>
         )}
 
@@ -158,9 +191,7 @@ const MockMenuSection = ({
         )}
 
         {/* Menu Items */}
-        <div className="space-y-1">
-          {items.map(item => renderMenuItem(item))}
-        </div>
+        <div className="space-y-1">{items.map((item) => renderMenuItem(item))}</div>
       </div>
     </Router>
   );
@@ -173,7 +204,8 @@ const meta: Meta<typeof MockMenuSection> = {
   parameters: {
     docs: {
       description: {
-        component: 'A menu section component that groups related menu items under a common title. Supports both regular menu items and expandable items with children.',
+        component:
+          'A menu section component that groups related menu items under a common title. Supports both regular menu items and expandable items with children.',
       },
     },
   },
@@ -334,7 +366,7 @@ export const MultipleSections: Story = {
         open={args.open}
         onItemClick={args.onItemClick}
       />
-      
+
       <MockMenuSection
         title="Design Only"
         items={[
