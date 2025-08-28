@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'components/ui/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../components/ui/accordion';
 
 const meta: Meta<typeof Accordion> = {
-  title: 'UI/Accordion',
+  title: 'UI Components/Accordion',
   component: Accordion,
   tags: ['autodocs'],
   parameters: {

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Button, ButtonProps } from 'components/ui/button';
+import { Button, ButtonProps } from '../../components/ui/button';
 import { Mail, Plus } from 'lucide-react';
 
 const meta: Meta<ButtonProps> = {
-  title: 'UI/Button',
+  title: 'UI Components/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {

@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'components/ui/collapsible';
-import { Button } from 'components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../components/ui/collapsible';
+import { Button } from '../../components/ui/button';
 import { ChevronsUpDown } from 'lucide-react';
 
 const meta: Meta<typeof Collapsible> = {
-  title: 'UI/Collapsible',
+  title: 'UI Components/Collapsible',
   component: Collapsible,
   tags: ['autodocs'],
   parameters: {

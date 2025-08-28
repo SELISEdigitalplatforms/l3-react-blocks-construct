@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
-import { Checkbox } from 'components/ui/checkbox';
+import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input';
+import { Checkbox } from '../../components/ui/checkbox';
 
 const meta: Meta<typeof Label> = {
-  title: 'UI/Label',
+  title: 'UI Components/Label',
   component: Label,
   tags: ['autodocs'],
   parameters: {

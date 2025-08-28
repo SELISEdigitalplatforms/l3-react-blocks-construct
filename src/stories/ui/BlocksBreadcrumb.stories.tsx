@@ -7,11 +7,11 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from 'components/ui/breadcrumb';
+} from '../../components/ui/breadcrumb';
 import { Slash } from 'lucide-react';
 
 const meta: Meta<typeof Breadcrumb> = {
-  title: 'UI/Breadcrumb',
+  title: 'UI Components/Breadcrumb',
   component: Breadcrumb,
   tags: ['autodocs'],
   parameters: {

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'components/ui/tooltip';
-import { Button } from 'components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../components/ui/tooltip';
+import { Button } from '../../components/ui/button';
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'UI/Tooltip',
+  title: 'UI Components/Tooltip',
   component: Tooltip,
   tags: ['autodocs'],
   parameters: {

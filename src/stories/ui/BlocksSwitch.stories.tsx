@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Switch } from 'components/ui/switch';
-import { Label } from 'components/ui/label';
+import { Switch } from '../../components/ui/switch';
+import { Label } from '../../components/ui/label';
 
 const meta: Meta<typeof Switch> = {
-  title: 'UI/Switch',
+  title: 'UI Components/Switch',
   component: Switch,
   tags: ['autodocs'],
   parameters: {

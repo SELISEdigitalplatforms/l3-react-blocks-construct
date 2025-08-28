@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 
 const meta: Meta<typeof Avatar> = {
-  title: 'UI/Avatar',
+  title: 'UI Components/Avatar',
   component: Avatar,
   tags: ['autodocs'],
   parameters: {
