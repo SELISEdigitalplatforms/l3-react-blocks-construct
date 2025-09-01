@@ -122,6 +122,7 @@ jobs:
           cluster-name: ${{ secrets.CLUSTER_NAME }}
 
 
+
       - name: Add kubelogin
         uses: azure/use-kubelogin@v1
         with:

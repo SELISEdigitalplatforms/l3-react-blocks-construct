@@ -1,4 +1,3 @@
-import React from 'react';
 import { SidebarMenu } from 'components/ui/sidebar';
 import { SidebarMenuItemComponent } from '../layout/sidebar-menu-Item';
 import { MenuItem } from 'models/sidebar';

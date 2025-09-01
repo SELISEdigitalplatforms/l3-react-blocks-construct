@@ -134,6 +134,17 @@ export function InvoicesDetail({ invoice, isPreview = false }: Readonly<Invoices
                   <Pencil className="h-4 w-4 sm:mr-1" />
                   <span className="hidden sm:inline">{t('EDIT')}</span>
                 </Button>
+                {/* To hide edit button for users without write access use permissions={[MENU_PERMISSIONS.INVOICE_WRITE]} 
+                <PermissionGuard permissions={[MENU_PERMISSIONS.INVOICE_WRITE]} fallbackType="dialog" showFallback={false}>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(`/invoices/${invoice.ItemId}/edit`)}
+                  >
+                    <Pencil className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">{t('EDIT')}</span>
+                  </Button>
+                </PermissionGuard>
+                */}
                 <Button
                   variant="default"
                   className="bg-primary"

@@ -7,6 +7,7 @@ import { LogoSection } from '../sidebar/logo-section';
 import { MenuSection } from '../sidebar/menu-section';
 import { getSidebarStyle } from 'utils/sidebar-utils';
 import { useTranslation } from 'react-i18next';
+import { useFilteredMenu } from 'hooks/use-filtered-menu';
 
 /**
  * AppSidebar Component
@@ -52,8 +53,10 @@ export function AppSidebar(): JSX.Element | null {
   const { t } = useTranslation();
   const { setOpenMobile, open, isMobile, openMobile } = useSidebar();
 
-  const integratedMenuItems = menuItems.filter((item) => item.isIntegrated === true);
-  const designOnlyMenuItems = menuItems.filter((item) => item.isIntegrated !== true);
+  const filteredMenuItems = useFilteredMenu(menuItems);
+
+  const integratedMenuItems = filteredMenuItems.filter((item) => item.isIntegrated === true);
+  const designOnlyMenuItems = filteredMenuItems.filter((item) => item.isIntegrated !== true);
 
   useEffect(() => {
     if (!isMobile) {

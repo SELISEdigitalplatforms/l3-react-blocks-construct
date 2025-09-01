@@ -19,6 +19,14 @@ export const getAccount = async (): Promise<User> => {
   return res.data;
 };
 
+export const getPermissionGroups = async (): Promise<
+  { resourceGroup: string; count: number }[]
+> => {
+  const res = await clients.get<{ data: { resourceGroup: string; count: number }[] }>(
+    '/iam/v1/Resource/GetResourceGroups'
+  );
+  return res.data;
+};
 /**
  * Creates a new user account with the provided form data.
  *

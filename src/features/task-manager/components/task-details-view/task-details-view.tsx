@@ -133,16 +133,18 @@ export default function TaskDetailsView({
   const [currentTaskId, setCurrentTaskId] = useState<string | undefined>(taskId);
   const [newTaskAdded, setNewTaskAdded] = useState<boolean>(false);
   const { task, removeTask, updateTaskDetails } = useTaskDetails(currentTaskId);
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const { mutate: createTag, isPending: isCreatingTag } = useCreateTags();
-
   const [date, setDate] = useState<Date | undefined>(
     task?.DueDate ? new Date(task.DueDate) : undefined
   );
   const [title, setTitle] = useState<string>(task?.Title ?? '');
   const [isMarkComplete, setIsMarkComplete] = useState<boolean>(task?.IsCompleted ?? false);
   const [section, setSection] = useState<string>(task?.Section ?? '');
-
   const [attachments, setAttachments] = useState<TaskAttachments[]>(task?.AttachmentField ?? []);
   const isLoadingAttachments = false;
 
@@ -198,7 +200,7 @@ export default function TaskDetailsView({
     {}
   );
   const [selectedTags, setSelectedTags] = useState<ItemTag[]>(task?.ItemTag ?? []);
-  const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>([]);
+  const [selectedAssignees, setSelectedAssignees] = useState<Assignee[]>(task?.Assignee || []);
   const descriptionRef = useRef<EditableDescriptionRef>(null);
 
   useEffect(() => {
@@ -228,39 +230,30 @@ export default function TaskDetailsView({
     if (hasDifference) {
       setSelectedTags(task.ItemTag);
     }
-  }, [task?.ItemTag, selectedTags, isNewTaskModalOpen, setSelectedTags]);
+  }, [task?.ItemTag, selectedTags, isNewTaskModalOpen]);
 
   useEffect(() => {
-    if (!task) return;
-
-    const currentAssigneeIds = [...selectedAssignees]
-      .map((a) => a.ItemId)
-      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
-      .join(',');
-    const newAssigneeIds = (task.Assignee || [])
-      .map((a) => a.ItemId)
-      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
-      .join(',');
-
-    if (currentAssigneeIds !== newAssigneeIds) {
-      if (task.Assignee && Array.isArray(task.Assignee) && task.Assignee.length > 0) {
-        const newAssignees = task.Assignee.map((assignee) => ({
-          ItemId: assignee.ItemId || '',
-          Name: assignee.Name || '',
-          ImageUrl: assignee.ImageUrl || '',
-        }));
-        setSelectedAssignees(newAssignees);
-      } else if (selectedAssignees.length > 0) {
-        setSelectedAssignees([]);
-      }
+    if (!task) {
+      setSelectedAssignees([]);
+      return;
     }
-  }, [task, task?.Assignee, selectedAssignees]);
-  const [open, setOpen] = useState(false);
-  const { toast } = useToast();
-  const badgeArray = useMemo(() => [TaskPriority.HIGH, TaskPriority.MEDIUM, TaskPriority.LOW], []);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [calendarOpen, setCalendarOpen] = useState(false);
+    const taskAssignees = task.Assignee || [];
+    const newAssignees = taskAssignees.map((assignee) => ({
+      ItemId: assignee.ItemId || '',
+      Name: assignee.Name || '',
+      ImageUrl: assignee.ImageUrl || '',
+    }));
+
+    setSelectedAssignees((prevAssignees) => {
+      if (prevAssignees.length === 0 || prevAssignees[0]?.ItemId !== newAssignees[0]?.ItemId) {
+        return newAssignees;
+      }
+      return prevAssignees;
+    });
+  }, [task, task?.ItemId]);
+
+  const badgeArray = useMemo(() => [TaskPriority.HIGH, TaskPriority.MEDIUM, TaskPriority.LOW], []);
 
   useEffect(() => {
     if (calendarOpen && !date) {
@@ -657,21 +650,65 @@ export default function TaskDetailsView({
   const handleClose = () => {
     if (isNewTaskModalOpen) {
       if (!newTaskAdded) {
-        handleAddItem().then(() => {
-          resetForm();
-          onClose();
-        });
+        onClose();
         return;
       }
-      resetForm();
+    } else {
+      toast({
+        variant: 'success',
+        title: t('TASK_UPDATED'),
+        description: t('TASK_UPDATED_SUCCESSFULLY'),
+      });
     }
     onClose();
-    toast({
-      variant: 'success',
-      title: t('TASK_UPDATED'),
-      description: t('TASK_UPDATED_SUCCESSFULLY'),
-    });
   };
+
+  const handleAssigneeChange = useCallback(
+    async (newAssignees: Assignee[]) => {
+      const previousAssignees = [...selectedAssignees];
+      setSelectedAssignees(newAssignees);
+
+      if (!currentTaskId) {
+        return;
+      }
+
+      try {
+        const currentIds = new Set(previousAssignees.map((a) => a.ItemId));
+        const newIds = new Set(newAssignees.map((a) => a.ItemId));
+        const hasChanges =
+          previousAssignees.length !== newAssignees.length ||
+          Array.from(currentIds).some((id) => !newIds.has(id)) ||
+          Array.from(newIds).some((id) => !currentIds.has(id));
+
+        if (hasChanges) {
+          updateTaskDetails({
+            Assignee: newAssignees.map((a) => ({
+              ItemId: a.ItemId,
+              Name: a.Name,
+              ImageUrl: a.ImageUrl || '',
+            })),
+          }).catch((error) => {
+            console.error('Failed to update assignees:', error);
+            setSelectedAssignees(previousAssignees);
+            toast({
+              variant: 'destructive',
+              title: t('UNABLE_UPDATE_ASSIGNEES'),
+              description: t('FAILED_UPDATE_ASSIGNEES'),
+            });
+          });
+        }
+      } catch (error) {
+        console.error('Error in handleAssigneeChange:', error);
+        setSelectedAssignees(previousAssignees);
+        toast({
+          variant: 'destructive',
+          title: t('UNABLE_UPDATE_ASSIGNEES'),
+          description: t('FAILED_UPDATE_ASSIGNEES'),
+        });
+      }
+    },
+    [currentTaskId, updateTaskDetails, t, selectedAssignees, toast]
+  );
 
   const handleSectionChange = async (newSection: string) => {
     setSection(newSection);
@@ -679,33 +716,6 @@ export default function TaskDetailsView({
       await updateTaskDetails({ Section: newSection });
     }
   };
-
-  const handleAssigneeChange = useCallback(
-    async (newAssignees: Assignee[]) => {
-      if (isNewTaskModalOpen && !currentTaskId) {
-        setSelectedAssignees(newAssignees);
-        return;
-      }
-
-      if (!currentTaskId) return;
-
-      try {
-        await updateTaskDetails({
-          Assignee: newAssignees,
-        });
-        setSelectedAssignees(newAssignees);
-      } catch (error) {
-        console.error('Failed to update assignees:', error);
-        toast({
-          variant: 'destructive',
-          title: t('UNABLE_UPDATE_ASSIGNEES'),
-          description: t('FAILED_UPDATE_ASSIGNEES'),
-        });
-        throw error;
-      }
-    },
-    [currentTaskId, updateTaskDetails, t, toast, isNewTaskModalOpen]
-  );
 
   const handleTagChange = useCallback(
     async (newTags: ItemTag[]) => {
@@ -825,17 +835,21 @@ export default function TaskDetailsView({
 
   return (
     <DialogContent
-      className="rounded-md sm:max-w-[720px] xl:max-h-[750px] max-h-screen flex flex-col p-0"
-      onInteractOutside={() => {
-        if (!isNewTaskModalOpen) {
-          onClose();
+      onInteractOutside={(e) => {
+        if (
+          isNewTaskModalOpen &&
+          !(e.target as HTMLElement).closest('button, a, [role="button"], [role="menuitem"]')
+        ) {
+          resetForm();
         }
+        onClose();
       }}
-      onOpenAutoFocus={(e) => {
-        e.preventDefault();
-        setTimeout(() => {
-          descriptionRef.current?.focus();
-        }, 0);
+      className="rounded-md sm:max-w-[720px] xl:max-h-[750px] max-h-screen flex flex-col p-0"
+      onEscapeKeyDown={() => {
+        if (isNewTaskModalOpen) {
+          resetForm();
+        }
+        onClose();
       }}
     >
       <DialogHeader className="hidden">
@@ -955,11 +969,15 @@ export default function TaskDetailsView({
             </Popover>
           </div>
           <div>
-            <AssigneeSelector
-              availableAssignees={availableAssignees}
-              selectedAssignees={selectedAssignees}
-              onChange={handleAssigneeChange}
-            />
+            <div className="w-full">
+              <AssigneeSelector
+                key={`assignee-selector-${task?.ItemId ?? 'new'}`}
+                availableAssignees={availableAssignees}
+                selectedAssignees={selectedAssignees}
+                isEditMode={!isNewTaskModalOpen}
+                onChange={handleAssigneeChange}
+              />
+            </div>
           </div>
         </div>
         <div className="mt-6">

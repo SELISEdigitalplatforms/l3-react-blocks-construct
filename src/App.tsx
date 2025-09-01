@@ -69,6 +69,7 @@ function AppContent() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/verify-key" element={<VerifyOtpKey />} />
               </Route>
+
               <Route element={<MainLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/finance" element={<Finance />} />
@@ -76,6 +77,7 @@ function AppContent() {
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/inventory/add" element={<InventoryForm />} />
                 <Route path="/inventory/:itemId" element={<InventoryDetails />} />
+
                 <Route path="/activity-log" element={<ActivityLogPage1 />} />
                 <Route path="/timeline" element={<ActivityLogPage2 />} />
                 <Route path="/mail" element={<Email />} />
@@ -88,9 +90,50 @@ function AppContent() {
                 <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
+                {/* 
+                To implement permissions for feature Invoices
+
+                <Route
+                  path="/invoices"
+                  element={
+                    <PermissionGuard
+                      permissions={[MENU_PERMISSIONS.INVOICE_READ, MENU_PERMISSIONS.INVOICE_WRITE]}
+                      fallbackType="dialog"
+                    >
+                      <InvoicesPage />
+                    </PermissionGuard>
+                  }
+                />
+
+                <Route
+                  path="/invoices/create-invoice"
+                  element={
+                    <PermissionGuard
+                      permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
+                      fallbackType="dialog"
+                    >
+                      <CreateInvoice />
+                    </PermissionGuard>
+                  }
+                />
+
+                <Route
+                  path="/invoices/:invoiceId/edit"
+                  element={
+                    <PermissionGuard
+                      permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
+                      fallbackType="dialog"
+                    >
+                      <EditInvoice />
+                    </PermissionGuard
+                  }
+                />
+                */}
+
                 <Route path="/invoices" element={<InvoicesPage />} />
                 <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
                 <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
+
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
                 <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
