@@ -26,6 +26,11 @@ const processApiError = (err: any): ErrorResponse => {
   };
 
   if (errorInfo.error === 'invalid_refresh_token') {
+    const overlay = document.createElement('div');
+    overlay.id = 'session-expired-overlay';
+    overlay.className = 'fixed inset-0 bg-black/50 z-50';
+    document.body.appendChild(overlay);
+
     apiError.error = {
       error: 'invalid_refresh_token',
       message: 'LOGGED_OUT_DUE_SESSION_EXPIRATION',
@@ -46,6 +51,12 @@ const handleSessionExpiration = (
   setTimeout(() => {
     logout();
     navigate('/login');
+
+    const overlay = document.getElementById('session-expired-overlay');
+    if (overlay) {
+      overlay.remove();
+    }
+
     handleError('LOGGED_OUT_DUE_SESSION_EXPIRATION', {
       variant: 'destructive',
       duration,
