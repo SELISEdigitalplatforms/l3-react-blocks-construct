@@ -137,7 +137,7 @@ jobs:
           helm upgrade \
           --install ${{inputs.CONTAINER_NAME}} ./new-templates/ecap3-${{env.SERVICE_TYPE}}/ \
           --namespace=${{inputs.NAMESPACE}} \
-          --values ./${{inputs.CLUSTER_VALUES${{ secrets.CLUSTER_NAME }}}}/${{inputs.SERVICE_NAME}}-storybook.values.yaml \
+          --values ./${{inputs.CLUSTER_VALUES}}${{ secrets.CLUSTER_NAME }}/${{inputs.SERVICE_NAME}}-storybook.values.yaml \
           --set image.repository=${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ inputs.CONTAINER_NAME }} \
           --set image.tag=${{ github.sha }} \
           --set fullnameOverride=${{inputs.CONTAINER_NAME}} \
