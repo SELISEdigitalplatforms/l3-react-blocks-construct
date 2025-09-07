@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '../../ui/sidebar';
-import { menuItems } from '../../../constant/sidebar-menu';
 import { useTheme } from 'styles/theme/theme-provider';
 import { LogoSection } from '../sidebar/logo-section';
 import { MenuSection } from '../sidebar/menu-section';
 import { getSidebarStyle } from 'utils/sidebar-utils';
 import { useTranslation } from 'react-i18next';
-import { useFilteredMenu } from 'hooks/use-filtered-menu';
+import { useDynamicMenu } from 'hooks/use-dynamic-menu';
 
 /**
  * AppSidebar Component
@@ -52,11 +51,10 @@ export function AppSidebar(): JSX.Element | null {
   const { pathname } = useLocation();
   const { t } = useTranslation();
   const { setOpenMobile, open, isMobile, openMobile } = useSidebar();
+  const { menuItems: dynamicMenuItems, isLoading, error } = useDynamicMenu();
 
-  const filteredMenuItems = useFilteredMenu(menuItems);
-
-  const integratedMenuItems = filteredMenuItems.filter((item) => item.isIntegrated === true);
-  const designOnlyMenuItems = filteredMenuItems.filter((item) => item.isIntegrated !== true);
+  const integratedMenuItems = dynamicMenuItems.filter((item) => item.isIntegrated === true);
+  const designOnlyMenuItems = dynamicMenuItems.filter((item) => item.isIntegrated !== true);
 
   useEffect(() => {
     if (!isMobile) {
@@ -68,6 +66,35 @@ export function AppSidebar(): JSX.Element | null {
 
   if (isMobile && !openMobile) {
     return null;
+  }
+
+  // Show loading state or error handling
+  if (isLoading) {
+    return (
+      <Sidebar
+        className={`bg-card h-full ${isMobile ? 'mobile-sidebar' : ''}`}
+        collapsible={isMobile ? 'none' : 'icon'}
+        style={sidebarStyle}
+      >
+        <SidebarHeader className="p-2">
+          <LogoSection
+            theme={theme}
+            open={open}
+            isMobile={isMobile}
+            onClose={() => setOpenMobile(false)}
+          />
+        </SidebarHeader>
+        <SidebarContent className="text-base ml-4 mr-2 my-3 text-high-emphasis font-normal">
+          <div className="flex items-center justify-center p-4">
+            <div className="text-sm text-muted-foreground">Loading menu...</div>
+          </div>
+        </SidebarContent>
+      </Sidebar>
+    );
+  }
+
+  if (error) {
+    // Continue with empty menu items - the hook already provides fallback
   }
 
   return (

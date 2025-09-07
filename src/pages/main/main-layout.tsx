@@ -6,9 +6,9 @@ import { SidebarTrigger, useSidebar } from 'components/ui/sidebar';
 import LanguageSelector from '../../components/blocks/language-selector/language-selector';
 import { Button } from 'components/ui/button';
 import { Menubar, MenubarMenu, MenubarTrigger } from 'components/ui/menubar';
-import { Notification } from 'features/notification/component/notification/notification';
-import { useGetNotifications } from 'features/notification/hooks/use-notification';
-import { useGetAccount } from 'features/profile/hooks/use-account';
+import { Notification } from 'features/core/notification/component/notification/notification';
+import { useGetNotifications } from 'features/core/notification/hooks/use-notification';
+import { useGetAccount } from 'features/core/profile/hooks/use-account';
 import { PermissionsProvider } from 'providers/permission-provider';
 
 export default function MainLayout() {

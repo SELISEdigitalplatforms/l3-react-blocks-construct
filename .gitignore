@@ -59,3 +59,10 @@ logs
 # System Files
 .DS_Store
 Thumbs.db
+
+# Dynamic menu configuration
+public/blocks_constructs_selected
+blocks_constructs_selected
+
+*storybook.log
+storybook-static
