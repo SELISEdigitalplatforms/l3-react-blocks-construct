@@ -4,7 +4,7 @@ import './manager.css';
 
 addons.setConfig({
   theme: {
-    ...themes.dark,
+    ...themes.normal,
     brandTitle: 'Selise Blocks',
     brandImage: './selise-logo.svg',
   },
