@@ -2,8 +2,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { Button } from 'components/ui/button';
-import { PermissionGuard } from 'components/blocks/gurads/permission-guard/permission-guard';
-import { MENU_PERMISSIONS } from 'config/roles-permissions';
 
 interface InvoicesHeaderToolbarProps {
   title?: string;
@@ -19,11 +17,8 @@ export function InvoicesHeaderToolbar({
       <div className="flex items-center text-base text-high-emphasis">
         <h3 className="text-2xl font-bold tracking-tight">{t(title)}</h3>
       </div>
-      <PermissionGuard
-        permissions={[MENU_PERMISSIONS.INVOICE_WRITE]}
-        fallbackType="dialog"
-        showFallback={false}
-      >
+      {/* To hide edit button for users without write access use permissions={[MENU_PERMISSIONS.INVOICE_WRITE]} 
+      <PermissionGuard permissions={[]} fallbackType="dialog" showFallback={false}>
         <Link to="/invoices/create-invoice">
           <Button size="sm" className="text-sm font-bold">
             <Plus />
@@ -31,6 +26,14 @@ export function InvoicesHeaderToolbar({
           </Button>
         </Link>
       </PermissionGuard>
+      */}
+
+      <Link to="/invoices/create-invoice">
+        <Button size="sm" className="text-sm font-bold">
+          <Plus />
+          {t('NEW_INVOICE')}
+        </Button>
+      </Link>
     </div>
   );
 }

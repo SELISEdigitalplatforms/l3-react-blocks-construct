@@ -1,0 +1,11 @@
+/* Target the logo image in the sidebar header */
+.sidebar-header img {
+  max-height: 40px !important; /* Control the height */
+  width: auto !important; /* Maintain aspect ratio */
+}
+
+/* Alternative: Set a specific width instead */
+/* .sidebar-header img {
+  max-width: 150px !important;
+  height: auto !important;
+} */

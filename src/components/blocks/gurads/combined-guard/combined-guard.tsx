@@ -142,7 +142,6 @@ export const CombinedGuard: React.FC<
     </div>
   );
 
-  // Early returns for simple cases
   if (isLoading) {
     return renderLoadingSpinner();
   }
@@ -161,5 +160,5 @@ export const CombinedGuard: React.FC<
     return <>{fallback}</>;
   }
 
-  return showFallback && !isToastMode && fallbackType !== 'hidden' ? null : null;
+  return null;
 };
