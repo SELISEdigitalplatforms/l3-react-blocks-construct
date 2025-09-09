@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from 'components/ui/button';
 import { UPasswordInput } from 'components/core/u-password-input';
 import { SharedPasswordStrengthChecker } from '../../core/shared-password-strength-checker';
-import { Captcha } from 'features/captcha';
+import { Captcha } from 'features/core/captcha';
 import { useTranslation } from 'react-i18next';
 
 /**

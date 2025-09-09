@@ -9,11 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'components/ui/dropdown-menu';
-import { useSignoutMutation } from 'features/auth/hooks/use-auth';
+import { useSignoutMutation } from 'features/core/auth/hooks/use-auth';
 import { useAuthStore } from 'state/store/auth';
 import DummyProfile from 'assets/images/dummy_profile.png';
 import { Skeleton } from 'components/ui/skeleton';
-import { useGetAccount } from 'features/profile/hooks/use-account';
+import { useGetAccount } from 'features/core/profile/hooks/use-account';
 import { useTheme } from 'styles/theme/theme-provider';
 
 /**

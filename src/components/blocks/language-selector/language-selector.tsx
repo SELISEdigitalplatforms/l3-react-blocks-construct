@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { cn } from 'lib/utils';
-import { useLanguageContext } from '../../../i18n/language-context';
+import { useLanguageContext } from 'i18n/language-context';
 import {
   DropdownMenu,
   DropdownMenuContent,

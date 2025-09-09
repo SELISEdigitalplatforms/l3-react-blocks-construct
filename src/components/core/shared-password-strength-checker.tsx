@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { usePasswordStrength } from 'features/auth/hooks/use-password-strength/use-password-strength';
+import { usePasswordStrength } from 'features/core/auth/hooks/use-password-strength/use-password-strength';
 
 /**
  * SharedPasswordStrengthChecker Component

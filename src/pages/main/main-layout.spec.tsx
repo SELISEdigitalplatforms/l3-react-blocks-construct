@@ -126,7 +126,7 @@ jest.mock('features/notification/hooks/use-notification', () => ({
   }),
 }));
 
-jest.mock('features/profile/hooks/use-account', () => ({
+jest.mock('features/core/profile/hooks/use-account', () => ({
   useGetAccount: jest.fn().mockReturnValue({
     data: {
       id: 'test-user-id',
