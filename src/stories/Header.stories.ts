@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { fn } from 'storybook/test';
 
-import { Header } from './header';
+import { Header } from './Header';
 
 const meta = {
   title: 'Example/Header',
