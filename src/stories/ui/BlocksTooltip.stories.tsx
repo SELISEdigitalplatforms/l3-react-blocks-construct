@@ -1,15 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../components/ui/tooltip';
 import { Button } from '../../components/ui/button';
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'UI Components/Tooltip',
+  title: 'Tooltip',
   component: Tooltip,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.',
+        component:
+          'A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.',
       },
     },
   },

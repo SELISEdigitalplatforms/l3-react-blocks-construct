@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Separator } from '../../components/ui/separator';
 
 const meta: Meta<typeof Separator> = {
-  title: 'UI Components/Separator',
+  title: 'Separator',
   component: Separator,
   tags: ['autodocs'],
   parameters: {

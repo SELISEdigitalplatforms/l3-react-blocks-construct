@@ -1,18 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 
 const meta: Meta<typeof Tabs> = {
-  title: 'UI Components/Tabs',
+  title: 'Tabs',
   component: Tabs,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A set of layered sections of content—known as tab panels—that are displayed one at a time.',
+        component:
+          'A set of layered sections of content—known as tab panels—that are displayed one at a time.',
       },
     },
   },

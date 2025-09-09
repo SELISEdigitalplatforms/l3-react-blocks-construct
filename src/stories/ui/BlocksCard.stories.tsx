@@ -1,10 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 
 const meta: Meta<typeof Card> = {
-  title: 'UI Components/Card',
+  title: 'Card',
   component: Card,
   tags: ['autodocs'],
   parameters: {

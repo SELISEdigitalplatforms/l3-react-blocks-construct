@@ -1,15 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../../components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../components/ui/dropdown-menu';
 import { ChevronDown, Moon, Sun, User } from 'lucide-react';
 
 // Simplified mock component that demonstrates the UProfileMenu functionality
-const MockUProfileMenu = ({ 
-  userName = "John Doe", 
-  userEmail = "john.doe@example.com",
+const MockUProfileMenu = ({
+  userName = 'John Doe',
+  userEmail = 'john.doe@example.com',
   profileImage,
   isLoading = false,
-  theme = "light"
+  theme = 'light',
 }: {
   userName?: string;
   userEmail?: string;
@@ -62,7 +68,9 @@ const MockUProfileMenu = ({
             <div className="text-sm font-medium text-gray-900 truncate">{userName}</div>
             <div className="text-xs text-gray-500 truncate">{userEmail}</div>
           </div>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+          />
         </div>
       </DropdownMenuTrigger>
 
@@ -71,9 +79,9 @@ const MockUProfileMenu = ({
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">
           {currentTheme === 'light' ? (
             <Moon className="mr-2 h-4 w-4" />
@@ -82,9 +90,9 @@ const MockUProfileMenu = ({
           )}
           <span>{currentTheme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
         </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
           <span>Sign Out</span>
         </DropdownMenuItem>
@@ -94,13 +102,14 @@ const MockUProfileMenu = ({
 };
 
 const meta: Meta<typeof MockUProfileMenu> = {
-  title: 'Block Components/UProfileMenu',
+  title: 'UProfileMenu',
   component: MockUProfileMenu,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A user profile dropdown menu component that displays user information and provides navigation and account management options.',
+        component:
+          'A user profile dropdown menu component that displays user information and provides navigation and account management options.',
       },
     },
   },

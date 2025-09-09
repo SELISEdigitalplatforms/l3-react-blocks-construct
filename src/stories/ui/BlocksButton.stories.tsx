@@ -3,7 +3,7 @@ import { Button, ButtonProps } from '../../components/ui/button';
 import { Mail, Plus } from 'lucide-react';
 
 const meta: Meta<ButtonProps> = {
-  title: 'UI Components/Button',
+  title: 'Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {

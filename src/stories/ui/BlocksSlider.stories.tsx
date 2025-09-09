@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Slider } from '../../components/ui/slider';
 
 const meta: Meta<typeof Slider> = {
-  title: 'UI Components/Slider',
+  title: 'Slider',
   component: Slider,
   tags: ['autodocs'],
   parameters: {

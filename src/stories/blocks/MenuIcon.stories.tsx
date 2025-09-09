@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Icon, type IconName } from '../../components/blocks/menu-icon/menu-icon';
 
 const meta: Meta<typeof Icon> = {
-  title: 'Block Components/MenuIcon',
+  title: 'MenuIcon',
   component: Icon,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A reusable icon component that maps string names to Lucide icons. This abstraction allows for consistent icon usage throughout the application by referencing icons by name.',
+        component:
+          'A reusable icon component that maps string names to Lucide icons. This abstraction allows for consistent icon usage throughout the application by referencing icons by name.',
       },
     },
   },

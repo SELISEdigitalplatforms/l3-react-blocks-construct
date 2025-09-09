@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import CustomAvatar from '../../components/blocks/custom-avatar/custom-avatar';
 
 const meta: Meta<typeof CustomAvatar> = {
-  title: 'Block Components/CustomAvatar',
+  title: 'CustomAvatar',
   component: CustomAvatar,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'EmailAvatar component displays a user&apos;s avatar image in a circular frame with optional grid lines and customizable size.',
+        component:
+          'EmailAvatar component displays a user&apos;s avatar image in a circular frame with optional grid lines and customizable size.',
       },
     },
   },

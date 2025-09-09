@@ -1,14 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../components/ui/accordion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../../components/ui/accordion';
 
 const meta: Meta<typeof Accordion> = {
-  title: 'UI Components/Accordion',
+  title: 'Accordion',
   component: Accordion,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A vertically stacked set of interactive headings that each reveal an associated section of content.',
+        component:
+          'A vertically stacked set of interactive headings that each reveal an associated section of content.',
       },
     },
   },
@@ -16,9 +22,7 @@ const meta: Meta<typeof Accordion> = {
     <Accordion {...args}>
       <AccordionItem value="item-1">
         <AccordionTrigger>Is it accessible?</AccordionTrigger>
-        <AccordionContent>
-          Yes. It adheres to the WAI-ARIA design pattern.
-        </AccordionContent>
+        <AccordionContent>Yes. It adheres to the WAI-ARIA design pattern.</AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2">
         <AccordionTrigger>Is it styled?</AccordionTrigger>

@@ -13,13 +13,14 @@ import {
 import { Button } from '../../components/ui/button';
 
 const meta: Meta<typeof AlertDialog> = {
-  title: 'UI Components/AlertDialog',
+  title: 'AlertDialog',
   component: AlertDialog,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A modal dialog that interrupts the user with important content and expects a response.',
+        component:
+          'A modal dialog that interrupts the user with important content and expects a response.',
       },
     },
   },
@@ -32,7 +33,8 @@ const meta: Meta<typeof AlertDialog> = {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+            This action cannot be undone. This will permanently delete your account and remove your
+            data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -61,7 +63,8 @@ export const Destructive: Story = {
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Account</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete your account? This action is permanent and cannot be undone.
+            Are you sure you want to delete your account? This action is permanent and cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

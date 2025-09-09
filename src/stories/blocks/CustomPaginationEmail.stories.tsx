@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CustomPaginationEmail from '../../components/blocks/custom-pagination-email/custom-pagination-email';
 
 const meta: Meta<typeof CustomPaginationEmail> = {
-  title: 'Block Components/CustomPaginationEmail',
+  title: 'CustomPaginationEmail',
   component: CustomPaginationEmail,
   tags: ['autodocs'],
   parameters: {

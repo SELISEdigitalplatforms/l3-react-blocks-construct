@@ -3,11 +3,11 @@ import React from 'react';
 import { X } from 'lucide-react';
 
 // Mock simplified LogoSection component to demonstrate functionality
-const MockLogoSection = ({ 
+const MockLogoSection = ({
   theme = 'light',
   open = true,
   isMobile = false,
-  onClose
+  onClose,
 }: {
   theme?: 'light' | 'dark';
   open?: boolean;
@@ -33,14 +33,14 @@ const MockLogoSection = ({
           open || isMobile ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className={`w-6 h-6 rounded flex items-center justify-center mr-2 ${
-          theme === 'dark' ? 'bg-white text-black' : 'bg-blue-600 text-white'
-        }`}>
+        <div
+          className={`w-6 h-6 rounded flex items-center justify-center mr-2 ${
+            theme === 'dark' ? 'bg-white text-black' : 'bg-blue-600 text-white'
+          }`}
+        >
           <span className="text-sm font-bold">{logoIcon}</span>
         </div>
-        <span className={`text-lg font-bold ${
-          theme === 'dark' ? 'text-white' : 'text-gray-900'
-        }`}>
+        <span className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
           {logoText}
         </span>
       </div>
@@ -51,9 +51,11 @@ const MockLogoSection = ({
           open || isMobile ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
       >
-        <div className={`w-5 h-5 rounded flex items-center justify-center ${
-          theme === 'dark' ? 'bg-white text-black' : 'bg-blue-600 text-white'
-        }`}>
+        <div
+          className={`w-5 h-5 rounded flex items-center justify-center ${
+            theme === 'dark' ? 'bg-white text-black' : 'bg-blue-600 text-white'
+          }`}
+        >
           <span className="text-xs font-bold">{logoIcon}</span>
         </div>
       </div>
@@ -75,13 +77,14 @@ const MockLogoSection = ({
 };
 
 const meta: Meta<typeof MockLogoSection> = {
-  title: 'Block Components/LogoSection',
+  title: 'LogoSection',
   component: MockLogoSection,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A responsive logo section component that displays different logo variants based on sidebar state and theme. Shows full logo when expanded and compact logo when collapsed.',
+        component:
+          'A responsive logo section component that displays different logo variants based on sidebar state and theme. Shows full logo when expanded and compact logo when collapsed.',
       },
     },
   },
@@ -93,7 +96,7 @@ const meta: Meta<typeof MockLogoSection> = {
   },
   decorators: [
     (Story, context) => (
-      <div 
+      <div
         className={`w-64 border rounded-lg p-2 ${
           context.args.theme === 'dark' ? 'bg-gray-900' : 'bg-white'
         }`}
@@ -176,7 +179,7 @@ const InteractiveComponent = (args: any) => {
           Toggle Theme
         </button>
       </div>
-      <div 
+      <div
         className={`w-64 border rounded-lg p-2 transition-colors ${
           currentTheme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
         }`}
@@ -214,14 +217,14 @@ export const ResponsiveDemo: Story = {
           <MockLogoSection {...args} open={true} isMobile={false} />
         </div>
       </div>
-      
+
       <div>
         <h3 className="text-sm font-medium mb-2">Desktop - Collapsed</h3>
         <div className="w-16 bg-white border rounded-lg p-2" style={{ minHeight: '60px' }}>
           <MockLogoSection {...args} open={false} isMobile={false} />
         </div>
       </div>
-      
+
       <div>
         <h3 className="text-sm font-medium mb-2">Mobile</h3>
         <div className="w-64 bg-white border rounded-lg p-2" style={{ minHeight: '60px' }}>

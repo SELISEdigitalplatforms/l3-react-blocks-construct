@@ -4,13 +4,14 @@ import ConfirmationModal from '../../components/blocks/confirmation-modal/confir
 import { Button } from '../../components/ui/button';
 
 const meta: Meta<typeof ConfirmationModal> = {
-  title: 'Block Components/ConfirmationModal',
+  title: 'ConfirmationModal',
   component: ConfirmationModal,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A reusable modal dialog that prompts users to confirm or cancel an action. Built using AlertDialog components for accessibility and consistent styling.',
+        component:
+          'A reusable modal dialog that prompts users to confirm or cancel an action. Built using AlertDialog components for accessibility and consistent styling.',
       },
     },
   },
@@ -29,7 +30,7 @@ type Story = StoryObj<typeof ConfirmationModal>;
 
 const DefaultComponent = (args: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Open Confirmation Modal</Button>
@@ -55,10 +56,12 @@ export const Default: Story = {
 
 const DeleteConfirmationComponent = (args: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <>
-      <Button variant="destructive" onClick={() => setIsOpen(true)}>Delete Item</Button>
+      <Button variant="destructive" onClick={() => setIsOpen(true)}>
+        Delete Item
+      </Button>
       <ConfirmationModal
         {...args}
         open={isOpen}
@@ -83,7 +86,7 @@ export const DeleteConfirmation: Story = {
 
 const CustomButtonsComponent = (args: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Publish Article</Button>
@@ -112,7 +115,7 @@ export const CustomButtons: Story = {
 const PreventAutoCloseComponent = (args: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   const handleConfirm = () => {
     setIsProcessing(true);
     // Simulate async operation
@@ -122,7 +125,7 @@ const PreventAutoCloseComponent = (args: any) => {
       alert('Operation completed!');
     }, 2000);
   };
-  
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Async Action</Button>
@@ -131,8 +134,12 @@ const PreventAutoCloseComponent = (args: any) => {
         open={isOpen}
         onOpenChange={setIsOpen}
         title="Processing Action"
-        description={isProcessing ? "Please wait while we process your request..." : "This action will take a few seconds to complete. Do you want to continue?"}
-        confirmText={isProcessing ? "Processing..." : "Start Process"}
+        description={
+          isProcessing
+            ? 'Please wait while we process your request...'
+            : 'This action will take a few seconds to complete. Do you want to continue?'
+        }
+        confirmText={isProcessing ? 'Processing...' : 'Start Process'}
         cancelText="Cancel"
         preventAutoClose={true}
         onConfirm={handleConfirm}
@@ -147,7 +154,7 @@ export const PreventAutoClose: Story = {
 
 const LongContentComponent = (args: any) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>Terms and Conditions</Button>

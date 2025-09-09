@@ -181,7 +181,7 @@ const MockDataTable = ({
 };
 
 const meta: Meta<typeof MockDataTable> = {
-  title: 'Block Components/DataTable',
+  title: 'DataTable',
   component: MockDataTable,
   tags: ['autodocs'],
   parameters: {

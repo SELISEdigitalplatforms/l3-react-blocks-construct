@@ -3,13 +3,14 @@ import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
 import { Label } from '../../components/ui/label';
 
 const meta: Meta<typeof RadioGroup> = {
-  title: 'UI Components/RadioGroup',
+  title: 'RadioGroup',
   component: RadioGroup,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.',
+        component:
+          'A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.',
       },
     },
   },

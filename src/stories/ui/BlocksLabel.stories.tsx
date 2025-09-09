@@ -4,7 +4,7 @@ import { Input } from '../../components/ui/input';
 import { Checkbox } from '../../components/ui/checkbox';
 
 const meta: Meta<typeof Label> = {
-  title: 'UI Components/Label',
+  title: 'Label',
   component: Label,
   tags: ['autodocs'],
   parameters: {
@@ -28,7 +28,9 @@ export const Default: Story = {
 export const WithInput: Story = {
   render: (args) => (
     <div className="grid w-full max-w-sm items-center gap-1.5">
-      <Label {...args} htmlFor="email">Email</Label>
+      <Label {...args} htmlFor="email">
+        Email
+      </Label>
       <Input type="email" id="email" placeholder="Email" />
     </div>
   ),

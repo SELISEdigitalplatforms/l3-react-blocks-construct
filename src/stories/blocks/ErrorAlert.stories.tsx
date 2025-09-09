@@ -3,13 +3,14 @@ import React from 'react';
 import ErrorAlert from '../../components/blocks/error-alert/error-alert';
 
 const meta: Meta<typeof ErrorAlert> = {
-  title: 'Block Components/ErrorAlert',
+  title: 'ErrorAlert',
   component: ErrorAlert,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A reusable alert component that displays error messages with automatic timeout functionality. The alert will automatically disappear after 5 seconds when an error is triggered.',
+        component:
+          'A reusable alert component that displays error messages with automatic timeout functionality. The alert will automatically disappear after 5 seconds when an error is triggered.',
       },
     },
   },
@@ -63,17 +64,17 @@ export const Hidden: Story = {
 
 const InteractiveComponent = (args: any) => {
   const [showError, setShowError] = React.useState(false);
-  
+
   return (
     <div>
-      <button 
+      <button
         onClick={() => setShowError(true)}
         className="mb-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
       >
         Trigger Error
       </button>
-      <ErrorAlert 
-        {...args} 
+      <ErrorAlert
+        {...args}
         isError={showError}
         title="Interactive Error"
         message="This error was triggered by clicking the button above."

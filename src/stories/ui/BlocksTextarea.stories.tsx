@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Textarea, TextareaProps } from '../../components/ui/textarea';
 
 const meta: Meta<TextareaProps> = {
-  title: 'UI Components/Textarea',
+  title: 'Textarea',
   component: Textarea,
   tags: ['autodocs'],
   parameters: {

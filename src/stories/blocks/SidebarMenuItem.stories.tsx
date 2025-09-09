@@ -2,13 +2,17 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../components/ui/collapsible';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../../components/ui/collapsible';
 
 // Mock simplified SidebarMenuItem component to demonstrate functionality
-const MockSidebarMenuItem = ({ 
+const MockSidebarMenuItem = ({
   item,
   showText = true,
-  isActive = false 
+  isActive = false,
 }: {
   item: {
     id: string;
@@ -35,9 +39,7 @@ const MockSidebarMenuItem = ({
 
   const renderIcon = (iconName: string) => (
     <div className="flex items-center justify-center w-6 h-6">
-      <span className={`text-lg ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
-        {iconName}
-      </span>
+      <span className={`text-lg ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>{iconName}</span>
     </div>
   );
 
@@ -56,19 +58,21 @@ const MockSidebarMenuItem = ({
               {renderIcon(item.icon)}
               {showText && (
                 <>
-                  <span className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}>
+                  <span
+                    className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}
+                  >
                     {item.name}
                   </span>
-                  <ChevronRight 
+                  <ChevronRight
                     className={`ml-auto h-4 w-4 transition-transform ${isOpen ? 'rotate-90' : ''} ${
                       isActive ? 'text-blue-600' : 'text-gray-400'
-                    }`} 
+                    }`}
                   />
                 </>
               )}
             </button>
           </CollapsibleTrigger>
-          
+
           <CollapsibleContent>
             <div className="ml-6 mt-1 space-y-1">
               {item.children?.map((child) => (
@@ -82,11 +86,7 @@ const MockSidebarMenuItem = ({
                   }}
                 >
                   {renderIcon(child.icon)}
-                  {showText && (
-                    <span className="ml-3 text-sm text-gray-600">
-                      {child.name}
-                    </span>
-                  )}
+                  {showText && <span className="ml-3 text-sm text-gray-600">{child.name}</span>}
                 </button>
               ))}
             </div>
@@ -107,7 +107,9 @@ const MockSidebarMenuItem = ({
       >
         {renderIcon(item.icon)}
         {showText && (
-          <span className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}>
+          <span
+            className={`ml-3 text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-700'}`}
+          >
             {item.name}
           </span>
         )}
@@ -117,13 +119,14 @@ const MockSidebarMenuItem = ({
 };
 
 const meta: Meta<typeof MockSidebarMenuItem> = {
-  title: 'Block Components/SidebarMenuItem',
+  title: 'SidebarMenuItem',
   component: MockSidebarMenuItem,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A flexible sidebar menu item component that supports single-level items and expandable menu items with children.',
+        component:
+          'A flexible sidebar menu item component that supports single-level items and expandable menu items with children.',
       },
     },
   },
@@ -234,31 +237,27 @@ export const LongText: Story = {
 export const MultipleItems: Story = {
   render: (args) => (
     <div className="w-64 bg-white border border-gray-200 rounded-lg p-2 space-y-1">
-      <MockSidebarMenuItem 
+      <MockSidebarMenuItem
         item={{ id: '1', name: 'Dashboard', path: '/dashboard', icon: '📊' }}
         showText={args.showText}
         isActive={false}
       />
-      <MockSidebarMenuItem 
-        item={sampleItemWithChildren}
-        showText={args.showText}
-        isActive={true}
-      />
-      <MockSidebarMenuItem 
+      <MockSidebarMenuItem item={sampleItemWithChildren} showText={args.showText} isActive={true} />
+      <MockSidebarMenuItem
         item={{ id: '3', name: 'Settings', path: '/settings', icon: '⚙️' }}
         showText={args.showText}
         isActive={false}
       />
-      <MockSidebarMenuItem 
-        item={{ 
-          id: '4', 
-          name: 'Reports', 
-          path: '/reports', 
+      <MockSidebarMenuItem
+        item={{
+          id: '4',
+          name: 'Reports',
+          path: '/reports',
           icon: '📈',
           children: [
             { id: '4-1', name: 'Analytics', path: '/reports/analytics', icon: '📊' },
             { id: '4-2', name: 'Export', path: '/reports/export', icon: '📤' },
-          ]
+          ],
         }}
         showText={args.showText}
         isActive={false}

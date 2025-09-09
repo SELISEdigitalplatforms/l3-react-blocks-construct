@@ -11,7 +11,7 @@ import {
 import { Slash } from 'lucide-react';
 
 const meta: Meta<typeof Breadcrumb> = {
-  title: 'UI Components/Breadcrumb',
+  title: 'Breadcrumb',
   component: Breadcrumb,
   tags: ['autodocs'],
   parameters: {

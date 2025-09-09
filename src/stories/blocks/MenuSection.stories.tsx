@@ -195,7 +195,7 @@ const MockMenuSection = ({
 };
 
 const meta: Meta<typeof MockMenuSection> = {
-  title: 'Block Components/MenuSection',
+  title: 'MenuSection',
   component: MockMenuSection,
   tags: ['autodocs'],
   parameters: {

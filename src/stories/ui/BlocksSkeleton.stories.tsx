@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Skeleton } from '../../components/ui/skeleton';
 
 const meta: Meta<typeof Skeleton> = {
-  title: 'UI Components/Skeleton',
+  title: 'Skeleton',
   component: Skeleton,
   tags: ['autodocs'],
   parameters: {

@@ -11,7 +11,7 @@ import {
 } from '../../components/ui/select';
 
 const meta: Meta<typeof Select> = {
-  title: 'UI Components/Select',
+  title: 'Select',
   component: Select,
   tags: ['autodocs'],
   parameters: {

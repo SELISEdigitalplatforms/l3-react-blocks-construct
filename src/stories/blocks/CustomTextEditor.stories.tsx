@@ -3,13 +3,14 @@ import React, { useState } from 'react';
 import CustomTextEditor from '../../components/blocks/custom-text-editor/custom-text-editor';
 
 const meta: Meta<typeof CustomTextEditor> = {
-  title: 'Block Components/CustomTextEditor',
+  title: 'CustomTextEditor',
   component: CustomTextEditor,
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
-        component: 'A rich text editor component built with Quill that provides formatting options and custom submission controls.',
+        component:
+          'A rich text editor component built with Quill that provides formatting options and custom submission controls.',
       },
     },
   },
@@ -26,19 +27,19 @@ type Story = StoryObj<typeof CustomTextEditor>;
 
 const DefaultComponent = (args: any) => {
   const [content, setContent] = useState('<p>Start typing your content here...</p>');
-  
+
   const handleSubmit = () => {
     // eslint-disable-next-line no-console
     console.log('Editor content submitted:', content);
     alert('Content submitted! Check console for details.');
   };
-  
+
   const handleCancel = () => {
     setContent('');
     // eslint-disable-next-line no-console
     console.log('Editor content cleared');
   };
-  
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
       <h3 className="text-lg font-semibold mb-4">Rich Text Editor</h3>
@@ -64,20 +65,22 @@ export const Default: Story = {
 };
 
 const BlogPostComponent = (args: any) => {
-  const [content, setContent] = useState('<h2>Blog Post Title</h2><p>Write your blog post content here. You can use <strong>bold</strong>, <em>italic</em>, and other formatting options.</p>');
-  
+  const [content, setContent] = useState(
+    '<h2>Blog Post Title</h2><p>Write your blog post content here. You can use <strong>bold</strong>, <em>italic</em>, and other formatting options.</p>'
+  );
+
   const handlePublish = () => {
     // eslint-disable-next-line no-console
     console.log('Blog post published:', content);
     alert('Blog post published successfully!');
   };
-  
+
   const handleSaveDraft = () => {
     // eslint-disable-next-line no-console
     console.log('Blog post saved as draft:', content);
     alert('Draft saved!');
   };
-  
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
       <h3 className="text-xl font-semibold mb-6">Create Blog Post</h3>
@@ -101,7 +104,7 @@ export const BlogPost: Story = {
 
 const CommentEditorComponent = (args: any) => {
   const [content, setContent] = useState('');
-  
+
   const handlePost = () => {
     if (!content.trim()) {
       alert('Please enter a comment');
@@ -112,11 +115,11 @@ const CommentEditorComponent = (args: any) => {
     alert('Comment posted successfully!');
     setContent('');
   };
-  
+
   const handleCancel = () => {
     setContent('');
   };
-  
+
   return (
     <div className="max-w-xl mx-auto p-4 bg-white rounded-lg border">
       <h4 className="font-medium mb-4">Add a comment</h4>
@@ -140,7 +143,7 @@ export const CommentEditor: Story = {
 
 const WithoutIconsComponent = (args: any) => {
   const [content, setContent] = useState('<p>This editor has no media icons displayed.</p>');
-  
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
       <h3 className="text-lg font-semibold mb-4">Minimal Editor</h3>
@@ -164,15 +167,18 @@ export const WithoutIcons: Story = {
 
 export const ReadOnly: Story = {
   render: (args) => {
-    const content = '<h3>Read-Only Content</h3><p>This content is <strong>read-only</strong> and cannot be edited. The editor is used purely for display purposes.</p><ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>';
-    
+    const content =
+      '<h3>Read-Only Content</h3><p>This content is <strong>read-only</strong> and cannot be edited. The editor is used purely for display purposes.</p><ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>';
+
     return (
       <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
         <h3 className="text-lg font-semibold mb-4">Display Mode</h3>
         <CustomTextEditor
           {...args}
           value={content}
-          onChange={() => { /* no-op for read-only */ }}
+          onChange={() => {
+            /* no-op for read-only */
+          }}
           showIcons={false}
         />
       </div>
