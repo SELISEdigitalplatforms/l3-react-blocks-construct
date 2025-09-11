@@ -1,3 +1,4 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FilterConfig, FilterType } from '../../types/header-toolbar.type';
 import { DateRangeFilter, SelectFilter, UserFilter } from '../common-filters';
@@ -32,66 +33,83 @@ export const FilterControls = <T extends FilterType>({
     <div className={`${isMobile ? 'space-y-4' : 'flex items-center gap-2'}`}>
       {visibleConfigs.map((config) => {
         const commonProps = {
-          key: config.key,
           title: config.label,
           className: isMobile ? 'w-full' : config.width,
         };
+
+        const filterComponent = renderFilterComponent(
+          config,
+          filters,
+          handleFilterChange,
+          commonProps
+        );
 
         if (isMobile) {
           return (
             <div key={config.key} className="w-full">
               <label className="text-sm font-medium block mb-2">{t(config.label)}</label>
-              {renderFilterComponent(config, filters, handleFilterChange, commonProps)}
+              {filterComponent}
             </div>
           );
         }
 
-        return renderFilterComponent(config, filters, handleFilterChange, commonProps);
+        return <React.Fragment key={config.key}>{filterComponent}</React.Fragment>;
       })}
     </div>
   );
+};
+
+type CommonFilterProps = {
+  title: string;
+  className?: string;
 };
 
 const renderFilterComponent = (
   config: FilterConfig,
   filters: FilterType,
   handleFilterChange: (key: string, value: any) => void,
-  commonProps: any
+  commonProps: CommonFilterProps
 ) => {
   const filterValue = (filters as any)[config.key];
 
   switch (config.type) {
     case 'select':
       return (
-        <SelectFilter
-          {...commonProps}
-          value={filterValue}
-          onValueChange={(value) => {
-            const newValue = value === 'all' ? undefined : value;
-            handleFilterChange(config.key, newValue);
-          }}
-          options={config.options || []}
-          allLabel="ALL_TYPES"
-        />
+        <div className={commonProps.className}>
+          <SelectFilter
+            title={commonProps.title}
+            value={filterValue}
+            onValueChange={(value) => {
+              const newValue = value === 'all' ? undefined : value;
+              handleFilterChange(config.key, newValue);
+            }}
+            options={config.options || []}
+            allLabel="ALL_TYPES"
+          />
+        </div>
       );
 
     case 'dateRange':
       return (
-        <DateRangeFilter
-          {...commonProps}
-          date={filterValue}
-          onDateChange={(dateRange) => handleFilterChange(config.key, dateRange)}
-        />
+        <div className={commonProps.className}>
+          <DateRangeFilter
+            title={commonProps.title}
+            date={filterValue}
+            onDateChange={(dateRange) => handleFilterChange(config.key, dateRange)}
+          />
+        </div>
       );
 
     case 'user':
       return (
-        <UserFilter
-          {...commonProps}
-          value={filterValue}
-          onValueChange={(userId) => handleFilterChange(config.key, userId)}
-          users={config.users || []}
-        />
+        <div className={commonProps.className}>
+          <UserFilter
+            title={commonProps.title}
+            value={filterValue}
+            onValueChange={(userId) => handleFilterChange(config.key, userId)}
+            users={config.users || []}
+          />
+        </div>
       );
 
     default:

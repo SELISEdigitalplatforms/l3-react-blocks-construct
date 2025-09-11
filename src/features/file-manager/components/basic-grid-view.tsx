@@ -3,15 +3,30 @@ import { Folder } from 'lucide-react';
 import { getFileTypeIcon, getFileTypeInfo, IFileDataWithSharing } from '../utils/file-manager';
 
 import { CommonGridView } from './common-grid-view';
-import { FileProcessingProps, useFileProcessing } from '../hooks/use-file-processing';
+import { useFileProcessing } from '../hooks/use-file-processing';
 import { useGridViewData } from '../hooks/use-grid-view-data';
-import { FileActionProps, useFileActions, useFileDetailsSheet } from './common-grid-view-helpers';
+import { useFileActions } from './common-grid-view-helpers';
 
-export interface BaseGridViewProps extends FileActionProps, FileProcessingProps {
-  filters: any;
+export interface BaseGridViewProps {
   onViewDetails?: (file: IFileDataWithSharing) => void;
+  onFilePreview?: (file: IFileDataWithSharing) => void;
+  onNavigateToFolder?: (folderId: string) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
+
+  filters: any;
   queryBuilder: (params: any) => any;
   filterFiles: (files: IFileDataWithSharing[], filters: any) => IFileDataWithSharing[];
+  currentFolderId?: string;
+
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: Record<string, any[]>;
+  filePermissions?: Record<string, any>;
 }
 
 export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
@@ -24,17 +39,19 @@ export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
 
   const { processFiles } = useFileProcessing(props);
   const { renderActions } = useFileActions(props);
-  const { renderDetailsSheet } = useFileDetailsSheet(t);
 
   return (
-    <CommonGridView
+    <CommonGridView<IFileDataWithSharing>
       onViewDetails={props.onViewDetails}
+      onFilePreview={props.onFilePreview}
+      onNavigateToFolder={props.onNavigateToFolder}
       filters={props.filters}
       data={data ?? undefined}
       isLoading={isLoading}
       error={error}
       onLoadMore={handleLoadMore}
-      renderDetailsSheet={renderDetailsSheet}
+      renderDetailsSheet={() => null}
+      renderPreviewSheet={() => null}
       getFileTypeIcon={getFileTypeIcon}
       getFileTypeInfo={getFileTypeInfo}
       renderActions={renderActions}
@@ -52,6 +69,7 @@ export const BaseGridView: React.FC<BaseGridViewProps> = (props) => {
       loadMoreLabel={t('LOAD_MORE')}
       processFiles={processFiles}
       filterFiles={props.filterFiles}
+      currentFolderId={props.currentFolderId}
     />
   );
 };

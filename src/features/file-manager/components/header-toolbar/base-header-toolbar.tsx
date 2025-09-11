@@ -56,7 +56,7 @@ export const BaseHeaderToolbar = <T extends FilterType>({
 
   if (isMobile) {
     return (
-      <div className="flex flex-col gap-3 w-full">
+      <div className="flex flex-col gap-3 w-full ">
         <div className="flex justify-between w-full">
           <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">{t(title)}</h3>
           <div className="flex gap-2">

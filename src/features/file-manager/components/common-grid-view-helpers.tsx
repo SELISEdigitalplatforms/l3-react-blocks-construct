@@ -65,9 +65,9 @@ export interface FileActionProps {
   onDelete?: (file: IFileDataWithSharing) => void;
   onRename?: (file: IFileDataWithSharing) => void;
   onMove?: (file: IFileDataWithSharing) => void;
+  onCopy?: (file: IFileDataWithSharing) => void;
 }
 
-// Alternative 1: Create a proper mock row factory
 export const createTableRowMock = (file: IFileDataWithSharing): Row<IFileData> => {
   return {
     original: file as IFileData,
@@ -182,6 +182,7 @@ export const useFileActions = (props: FileActionProps) => {
           onDelete={props.onDelete}
           onRename={props.onRename}
           onMove={props.onMove}
+          onCopy={props.onCopy}
         />
       );
     },
@@ -210,7 +211,6 @@ export const useFileActions = (props: FileActionProps) => {
 };
 
 // utils/fileDetailsSheet.ts
-
 export const useFileDetailsSheet = (t: any) => {
   const renderDetailsSheet = useCallback(
     (file: IFileDataWithSharing | null, isOpen: boolean, onClose: () => void) => (
@@ -237,7 +237,3 @@ export const useFileDetailsSheet = (t: any) => {
 
   return { renderDetailsSheet };
 };
-
-// hooks/useGridViewData.ts
-
-// components/BaseGridView.tsx

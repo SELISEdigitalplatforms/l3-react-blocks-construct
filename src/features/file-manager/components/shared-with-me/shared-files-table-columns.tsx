@@ -26,12 +26,52 @@ const normalizeDate = (date: Date) => {
   return normalized;
 };
 
+const createDateRangeFilter = (getDate: (row: any) => Date | null | undefined) => {
+  return (row: any, id: string, value: DateRange) => {
+    if (!value) return true;
+
+    const rowDate = getDate(row);
+    if (!rowDate) return false;
+
+    const normalizedRowDate = normalizeDate(rowDate);
+
+    if (value.from && !value.to) {
+      const normalizedFrom = normalizeDate(value.from);
+      return normalizedRowDate >= normalizedFrom;
+    }
+
+    if (!value.from && value.to) {
+      const normalizedTo = normalizeDate(value.to);
+      return normalizedRowDate <= normalizedTo;
+    }
+
+    if (value.from && value.to) {
+      const normalizedFrom = normalizeDate(value.from);
+      const normalizedTo = normalizeDate(value.to);
+      return normalizedRowDate >= normalizedFrom && normalizedRowDate <= normalizedTo;
+    }
+
+    return true;
+  };
+};
+
+const DateCell = ({ date }: { date: Date | null | undefined }) => {
+  if (!date) return <span className="text-muted-foreground">-</span>;
+
+  return (
+    <div className="flex items-center">
+      <span className="text-sm">{CustomtDateFormat(date)}</span>
+    </div>
+  );
+};
+
 export const SharedFileTableColumns = ({
   onViewDetails,
   onDownload,
   onShare,
   onDelete,
   onMove,
+  onCopy,
   onRename,
   t,
 }: ColumnFactoryProps): ColumnDef<IFileData, any>[] => [
@@ -137,92 +177,25 @@ export const SharedFileTableColumns = ({
     id: 'sharedDate',
     accessorFn: (row) => row.sharedDate,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('SHARED_DATE')} />,
-    cell: ({ row }) => {
-      const date = row.original.sharedDate;
-      if (!date) return <span className="text-muted-foreground">-</span>;
-
-      return (
-        <div className="flex items-center">
-          <span className="text-sm">{CustomtDateFormat(date)}</span>
-        </div>
-      );
-    },
+    cell: ({ row }) => <DateCell date={row.original.sharedDate} />,
     sortingFn: (rowA, rowB) => {
       const a = rowA.original.sharedDate?.getTime() ?? 0;
       const b = rowB.original.sharedDate?.getTime() ?? 0;
       return compareValues(a, b);
     },
-    filterFn: (row, id, value: DateRange) => {
-      if (!value) return true;
-
-      const rowDate = row.original.sharedDate;
-      if (!rowDate) return false;
-
-      const normalizedRowDate = normalizeDate(rowDate);
-
-      if (value.from && !value.to) {
-        const normalizedFrom = normalizeDate(value.from);
-        return normalizedRowDate >= normalizedFrom;
-      }
-
-      if (!value.from && value.to) {
-        const normalizedTo = normalizeDate(value.to);
-        return normalizedRowDate <= normalizedTo;
-      }
-
-      if (value.from && value.to) {
-        const normalizedFrom = normalizeDate(value.from);
-        const normalizedTo = normalizeDate(value.to);
-        return normalizedRowDate >= normalizedFrom && normalizedRowDate <= normalizedTo;
-      }
-
-      return true;
-    },
+    filterFn: createDateRangeFilter((row) => row.original.sharedDate),
   },
   {
     id: 'lastModified',
     accessorFn: (row) => row.lastModified,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('LAST_MODIFIED')} />,
-    cell: ({ row }) => {
-      const date = row.original.lastModified;
-
-      return (
-        <div className="flex items-center">
-          <span className="text-sm">{CustomtDateFormat(date)}</span>
-        </div>
-      );
-    },
-    sortingFn: (row) => {
-      const a = row.original.lastModified.getTime();
-      const b = row.original.lastModified.getTime();
+    cell: ({ row }) => <DateCell date={row.original.lastModified} />,
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.original.lastModified.getTime();
+      const b = rowB.original.lastModified.getTime();
       return compareValues(a, b);
     },
-    filterFn: (row, id, value: DateRange) => {
-      if (!value) return true;
-
-      const rowDate = row.original.lastModified;
-      if (!rowDate) return false;
-
-      const normalizedRowDate = normalizeDate(rowDate);
-
-      if (value.from && !value.to) {
-        const normalizedFrom = normalizeDate(value.from);
-        return normalizedRowDate >= normalizedFrom;
-      }
-
-      if (!value.from && value.to) {
-        const normalizedTo = normalizeDate(value.to);
-        return normalizedRowDate <= normalizedTo;
-      }
-
-      if (value.from && value.to) {
-        const normalizedFrom = normalizeDate(value.from);
-        const normalizedTo = normalizeDate(value.to);
-        return normalizedRowDate >= normalizedFrom && normalizedRowDate <= normalizedTo;
-      }
-
-      return true;
-    },
+    filterFn: createDateRangeFilter((row) => row.original.lastModified),
   },
   {
     id: 'size',
@@ -266,23 +239,18 @@ export const SharedFileTableColumns = ({
       </div>
     ),
     cell: ({ row }) => (
-      <button
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        type="button"
-      >
+      <div className="flex justify-end">
         <FileTableRowActions
           row={row}
           onViewDetails={onViewDetails}
           onDownload={onDownload}
           onShare={onShare}
           onDelete={onDelete}
-          onMove={onMove}
           onRename={onRename}
+          onCopy={onCopy}
+          onMove={onMove}
         />
-      </button>
+      </div>
     ),
   },
 ];

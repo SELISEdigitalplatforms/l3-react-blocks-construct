@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useTaskContext } from '../contexts/task-context';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DragEndEvent,
   DragOverEvent,
@@ -10,9 +10,24 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
 import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
-import { ITask } from '../types/task';
+import {
+  ItemTag,
+  TaskItem,
+  TaskPriority,
+  TaskSection,
+  TaskSectionWithTasks,
+} from '../types/task-manager.types';
+import {
+  useGetTasks,
+  useGetTaskSections,
+  useCreateTaskItem,
+  useUpdateTaskItem,
+  useCreateTaskSection,
+  useUpdateTaskSection,
+  useDeleteTaskSection,
+} from './use-task-manager';
+import { useToast } from 'hooks/use-toast';
 
 /**
  * useCardTasks Hook
@@ -44,23 +59,214 @@ import { ITask } from '../types/task';
  * } = useCardTasks();
  */
 
-export function useCardTasks() {
+interface UseCardTasksProps {
+  searchQuery?: string;
+  filters?: {
+    priorities?: string[];
+    statuses?: string[];
+    assignees?: string[];
+    tags?: Array<{ ItemId: string; TagLabel: string }>;
+    dueDate?: {
+      from?: Date;
+      to?: Date;
+    };
+  };
+}
+
+export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksProps = {}) {
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const [columnTasks, setColumnTasks] = useState<TaskSectionWithTasks[]>([]);
+  const [activeColumn, setActiveColumn] = useState<string | null>(null);
+  const [activeTask, setActiveTask] = useState<TaskItem | null>(null);
+  const { mutateAsync: createTask } = useCreateTaskItem();
+  const { mutateAsync: updateTask } = useUpdateTaskItem();
+  const { mutateAsync: createSection } = useCreateTaskSection();
+  const { mutateAsync: updateSection } = useUpdateTaskSection();
+  const { mutateAsync: deleteSection } = useDeleteTaskSection();
+
+  const { data: sectionsData } = useGetTaskSections({
+    pageNo: 1,
+    pageSize: 100,
+  });
+
+  const ensureTaskItem = useCallback((task: TaskItem): TaskItem => {
+    return {
+      ItemId: task.ItemId ?? '',
+      Title: task.Title ?? '',
+      Description: task.Description ?? '',
+      IsCompleted: task.IsCompleted ?? false,
+      Priority: task.Priority ?? TaskPriority.MEDIUM,
+      Section: task.Section ?? '',
+      ItemTag: task.ItemTag ?? [],
+      Assignee: task.Assignee ?? [],
+      AttachmentField: task.AttachmentField ?? [],
+      CreatedBy: task.CreatedBy ?? '',
+      CreatedDate: task.CreatedDate ?? new Date().toISOString(),
+      LastUpdatedBy: task.LastUpdatedBy ?? '',
+      LastUpdatedDate: task.LastUpdatedDate ?? new Date().toISOString(),
+      DueDate: task.DueDate ?? '',
+      IsDeleted: task.IsDeleted ?? false,
+      Language: task.Language ?? '',
+      OrganizationIds: task.OrganizationIds ?? [],
+    };
+  }, []);
+
   const {
-    columnTasks,
-    setColumnTasks,
-    addTask,
-    moveTask,
-    updateTask,
-    addColumn,
-    updateColumn,
-    deleteColumn,
-  } = useTaskContext();
+    data: tasksData,
+    isLoading: isLoadingTasks,
+    refetch: refetchTasks,
+  } = useGetTasks({
+    pageNo: 1,
+    pageSize: 100,
+  });
 
   const { touchEnabled, screenSize } = useDeviceCapabilities();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [nextColumnId, setNextColumnId] = useState<number>(4);
-  const [activeColumn, setActiveColumn] = useState<string | null>(null);
-  const [activeTask, setActiveTask] = useState<ITask | null>(null);
+
+  useEffect(() => {
+    if (!sectionsData?.TaskManagerSections?.items) return;
+
+    const currentFilters = {
+      priorities: filters.priorities ?? [],
+      statuses: filters.statuses ?? [],
+      assignees: filters.assignees ?? [],
+      tags: filters.tags ?? [],
+      dueDate: filters.dueDate ?? {},
+    };
+
+    setColumnTasks(() => {
+      const filteredSections = sectionsData.TaskManagerSections.items.filter(
+        (section: TaskSection) =>
+          !currentFilters.statuses.length ||
+          (section.Title && currentFilters.statuses.includes(section.Title))
+      );
+
+      const sectionsByTitle = new Map<string, TaskSection>();
+      filteredSections.forEach((section: TaskSection) => {
+        if (section.Title) {
+          sectionsByTitle.set(section.Title, section);
+        }
+      });
+
+      const tasksBySectionId: Record<string, TaskItem[]> = {};
+      filteredSections.forEach((section: TaskSection) => {
+        tasksBySectionId[section.ItemId] = [];
+      });
+
+      const hasMatchingLabel = (label: string | undefined, query: string): boolean => {
+        if (!label) return false;
+        return label.toLowerCase().includes(query.toLowerCase());
+      };
+
+      const hasMatchingTag = (tags: ItemTag[] | undefined, query: string): boolean => {
+        if (!tags?.length || !query) return false;
+        return tags.some((tag) => hasMatchingLabel(tag.TagLabel, query));
+      };
+
+      const matchesSearchQuery = (task: TaskItem, query: string): boolean => {
+        if (!query) return true;
+
+        const queryLower = query.toLowerCase();
+        const titleMatch = task.Title?.toLowerCase().includes(queryLower) || false;
+        const descriptionMatch = task.Description?.toLowerCase().includes(queryLower) || false;
+        const tagMatch = hasMatchingTag(task.ItemTag, queryLower);
+
+        return titleMatch || descriptionMatch || tagMatch;
+      };
+
+      const matchesPriorityFilter = (task: TaskItem): boolean => {
+        return !(
+          currentFilters.priorities.length &&
+          task.Priority &&
+          !currentFilters.priorities.includes(task.Priority)
+        );
+      };
+
+      const isAssigneeInFilter = (assignee: { ItemId?: string | null }): boolean => {
+        return Boolean(assignee.ItemId && currentFilters.assignees.includes(assignee.ItemId));
+      };
+
+      const matchesAssigneeFilter = (task: TaskItem): boolean => {
+        if (!currentFilters.assignees.length || !task.Assignee?.length) return true;
+        return task.Assignee.some(isAssigneeInFilter);
+      };
+
+      const hasMatchingTagInFilter = (tag: ItemTag): boolean => {
+        const { ItemId } = tag;
+        if (!ItemId) return false;
+
+        return currentFilters.tags.some((filterTag) => filterTag.ItemId === ItemId);
+      };
+
+      const matchesTagsFilter = (task: TaskItem): boolean => {
+        if (!currentFilters.tags.length || !task.ItemTag?.length) return true;
+        return task.ItemTag.some(hasMatchingTagInFilter);
+      };
+
+      const matchesDueDateFilter = (task: TaskItem): boolean => {
+        if ((!currentFilters.dueDate?.from && !currentFilters.dueDate?.to) || !task.DueDate) {
+          return true;
+        }
+        const dueDate = new Date(task.DueDate);
+        if (currentFilters.dueDate?.from && dueDate < currentFilters.dueDate.from) return false;
+        if (currentFilters.dueDate?.to && dueDate > currentFilters.dueDate.to) return false;
+        return true;
+      };
+
+      const findSectionByTitle = (title: string): TaskSection | undefined => {
+        if (!title) return undefined;
+
+        const sections = Array.from(sectionsByTitle.values());
+        return sections.find((section) => section.Title === title);
+      };
+
+      const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
+        if (!tasksBySectionId[sectionId]) {
+          tasksBySectionId[sectionId] = [];
+        }
+        return tasksBySectionId[sectionId];
+      };
+
+      const addTaskToSection = (task: TaskItem): void => {
+        if (!task.Section) return;
+
+        const section = findSectionByTitle(task.Section);
+        if (!section) return;
+
+        const sectionTasks = ensureSectionTasksArray(section.ItemId);
+        sectionTasks.push(ensureTaskItem(task));
+      };
+
+      if (tasksData?.TaskManagerItems?.items) {
+        tasksData.TaskManagerItems.items.forEach((task: TaskItem) => {
+          if (!matchesSearchQuery(task, searchQuery)) return;
+          if (!matchesPriorityFilter(task)) return;
+          if (!matchesAssigneeFilter(task)) return;
+          if (!matchesTagsFilter(task)) return;
+          if (!matchesDueDateFilter(task)) return;
+
+          addTaskToSection(task);
+        });
+      }
+
+      const newColumns = filteredSections.map((section: TaskSection) => ({
+        ...section,
+        tasks: tasksBySectionId[section.ItemId] || [],
+      }));
+
+      return newColumns;
+    });
+  }, [
+    sectionsData,
+    tasksData,
+    searchQuery,
+    filters.priorities,
+    filters.statuses,
+    filters.assignees,
+    filters.tags,
+    filters.dueDate,
+    ensureTaskItem,
+  ]);
 
   const getColumnCount = (size: string) => {
     return size === 'tablet' ? 5 : 3;
@@ -91,46 +297,199 @@ export function useCardTasks() {
     pointerSensor
   );
 
-  const createColumn = (title: string) => {
-    if (title.trim()) {
-      const id = addColumn(title);
-      setNextColumnId((prev) => prev + 1);
-      return id;
-    }
-    return null;
-  };
+  const createColumn = useCallback(
+    async (title: string) => {
+      if (!title.trim()) return null;
 
-  const renameColumn = (columnId: string, newTitle: string) => {
-    if (newTitle.trim()) {
-      updateColumn(columnId, newTitle);
-    }
-  };
+      try {
+        const response = await createSection({ Title: title });
+        const newSectionId = response?.insertTaskManagerSection?.itemId;
 
-  const removeColumn = (columnId: string) => {
-    deleteColumn(columnId);
-  };
+        if (!newSectionId) {
+          console.error('No section ID found in response. Full response:', response);
+          throw new Error('No section ID returned in the response');
+        }
 
-  const addTaskToColumn = (columnId: string, content: string) => {
-    if (content.trim()) {
-      const column = columnTasks.find((col) => col.id === columnId);
+        const newColumn: TaskSectionWithTasks = {
+          ItemId: newSectionId,
+          Title: title,
+          CreatedBy: '',
+          CreatedDate: new Date().toISOString(),
+          IsDeleted: false,
+          Language: 'en',
+          OrganizationIds: [],
+          tasks: [],
+        };
 
-      if (!column) {
-        console.error(`Column with ID ${columnId} not found.`);
-        return null;
+        setColumnTasks((prev) => [...prev, newColumn]);
+        return newSectionId;
+      } catch (error) {
+        console.error('Error in createColumn:', error);
+        throw error;
       }
+    },
+    [createSection, setColumnTasks]
+  );
 
-      const section = column.title;
+  const renameColumn = useCallback(
+    async (columnId: string, newTitle: string) => {
+      if (!newTitle.trim()) return;
 
-      const taskId = addTask({
-        title: content,
-        section,
-        isCompleted: false,
-      });
+      try {
+        await updateSection({
+          sectionId: columnId,
+          input: { Title: newTitle },
+        });
 
-      return taskId;
-    }
-    return null;
-  };
+        setColumnTasks((prev) =>
+          prev.map((column) =>
+            column.ItemId === columnId ? { ...column, Title: newTitle } : column
+          )
+        );
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: t('SECTION_UPDATE_FAILED'),
+          description: t('FAILED_UPDATE_SECTION'),
+        });
+        console.error('Error updating section:', error);
+      }
+    },
+    [updateSection, toast, t]
+  );
+
+  const removeColumn = useCallback(
+    async (columnId: string) => {
+      try {
+        await deleteSection(columnId);
+        setColumnTasks((prev) => prev.filter((column) => column.ItemId !== columnId));
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: t('SECTION_DELETION_FAILED'),
+          description: t('FAILED_DELETE_SECTION'),
+        });
+        console.error('Error deleting section:', error);
+      }
+    },
+    [deleteSection, toast, t]
+  );
+
+  const addTaskToColumn = useCallback(
+    async (columnId: string, content: string): Promise<string | null> => {
+      if (!content.trim()) return null;
+
+      try {
+        const section = columnTasks.find((col: TaskSection) => col.ItemId === columnId);
+        if (!section) {
+          const errorMessage = `Section not found for column ${columnId}`;
+          console.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        const sectionTitle = section.Title;
+        if (!sectionTitle) {
+          throw new Error(`Section title is empty for column ${columnId}`);
+        }
+
+        const tempTask: TaskItem = {
+          ItemId: `temp-${Date.now()}`,
+          Title: content,
+          Description: '',
+          Section: sectionTitle,
+          IsCompleted: false,
+          Language: 'en',
+          OrganizationIds: [],
+          Priority: TaskPriority.MEDIUM,
+          ItemTag: [],
+          CreatedBy: '',
+          CreatedDate: new Date().toISOString(),
+          DueDate: new Date().toISOString(),
+          IsDeleted: false,
+        };
+
+        setColumnTasks((prev) =>
+          prev.map((column) =>
+            column.ItemId === columnId ? { ...column, tasks: [...column.tasks, tempTask] } : column
+          )
+        );
+
+        try {
+          const taskData = {
+            Title: content,
+            Description: '',
+            Section: sectionTitle,
+            IsCompleted: false,
+            Language: 'en',
+            OrganizationIds: [],
+            Priority: TaskPriority.MEDIUM,
+            ItemTag: [],
+            DueDate: new Date().toISOString(),
+          };
+
+          const response = await createTask(taskData);
+
+          const taskId = response?.insertTaskManagerItem?.itemId;
+
+          if (!taskId) {
+            const removeTaskIfMatches = (tasks: TaskItem[]): TaskItem[] =>
+              tasks.filter((task) => task.ItemId !== tempTask.ItemId);
+
+            const removeTempTask = (prevColumns: TaskSectionWithTasks[]): TaskSectionWithTasks[] =>
+              prevColumns.map((column) => {
+                if (column.ItemId !== columnId) {
+                  return column;
+                }
+                return {
+                  ...column,
+                  tasks: removeTaskIfMatches(column.tasks),
+                };
+              });
+
+            setColumnTasks(removeTempTask);
+            throw new Error('Failed to create task: No task ID returned from server');
+          }
+
+          const updateTaskId = (task: TaskItem): TaskItem =>
+            task.ItemId === tempTask.ItemId ? { ...task, ItemId: taskId } : task;
+
+          const updateColumnTasks = (column: TaskSectionWithTasks): TaskSectionWithTasks =>
+            column.ItemId === columnId
+              ? { ...column, tasks: column.tasks.map(updateTaskId) }
+              : column;
+
+          setColumnTasks((prev) => prev.map(updateColumnTasks));
+
+          await refetchTasks();
+
+          return taskId;
+        } catch (error) {
+          console.error('Error in createTask mutation:', error);
+          const filterOutTempTask = (tasks: TaskItem[]): TaskItem[] =>
+            tasks.filter((task) => task.ItemId !== tempTask.ItemId);
+
+          const updateColumnOnError = (column: TaskSectionWithTasks): TaskSectionWithTasks =>
+            column.ItemId === columnId
+              ? { ...column, tasks: filterOutTempTask(column.tasks) }
+              : column;
+
+          setColumnTasks((prev) => prev.map(updateColumnOnError));
+          throw new Error(
+            error instanceof Error ? error.message : 'Failed to create task on the server'
+          );
+        }
+      } catch (error) {
+        console.error('Error in addTaskToColumn:', error);
+        toast({
+          variant: 'destructive',
+          title: t('TASK_CREATION_FAILED'),
+          description: error instanceof Error ? error.message : t('FAILED_CREATE_TASK'),
+        });
+        throw error;
+      }
+    },
+    [createTask, toast, columnTasks, refetchTasks, t]
+  );
 
   const handleDragStart = (event: DragStartEvent) => {
     if (event.active.data.current?.isScrolling) {
@@ -144,77 +503,166 @@ export function useCardTasks() {
       const taskId = activeId.replace('task-', '');
 
       for (const column of columnTasks) {
-        const task = column.tasks.find((t) => t.id === taskId);
+        const task = column.tasks.find((t) => t.ItemId === taskId);
         if (task) {
-          setActiveTask(task);
+          setActiveTask(ensureTaskItem(task));
           break;
         }
       }
     }
   };
 
-  const handleColumnDrag = (
-    activeTaskId: string,
-    targetColumnId: string,
-    sourceColumnIndex: number
-  ) => {
-    const targetColumnIndex = columnTasks.findIndex((col) => col.id === targetColumnId);
+  const handleColumnDrag = useCallback(
+    async (activeTaskId: string, targetColumnId: string, sourceColumnIndex: number) => {
+      const targetColumnIndex = columnTasks.findIndex((col) => col.ItemId === targetColumnId);
 
-    if (targetColumnIndex === -1 || sourceColumnIndex === targetColumnIndex) return;
+      if (targetColumnIndex === -1 || sourceColumnIndex === targetColumnIndex) return;
 
-    const newColumns = [...columnTasks];
-    const activeTaskIndex = newColumns[sourceColumnIndex].tasks.findIndex(
-      (task) => task.id === activeTaskId
-    );
+      // Create a deep copy of the columns to avoid reference issues
+      const newColumns = JSON.parse(JSON.stringify(columnTasks));
+      const sourceTasks = [...newColumns[sourceColumnIndex].tasks];
+      const activeTaskIndex = sourceTasks.findIndex((task) => task.ItemId === activeTaskId);
 
-    if (activeTaskIndex === -1) return;
+      if (activeTaskIndex === -1) return;
 
-    const [movedTask] = newColumns[sourceColumnIndex].tasks.splice(activeTaskIndex, 1);
+      // Remove the task from the source column
+      const [movedTask] = sourceTasks.splice(activeTaskIndex, 1);
+      if (!movedTask) return;
 
-    newColumns[targetColumnIndex].tasks.push({
-      ...movedTask,
-      status: movedTask.status,
-    });
-    moveTask(movedTask.id, newColumns[targetColumnIndex].title);
-    setColumnTasks(newColumns);
-  };
+      // Get the target column's title
+      const targetSectionTitle = newColumns[targetColumnIndex].Title;
 
-  const handleTaskDrag = (activeTaskId: string, overTaskId: string, sourceColumnIndex: number) => {
-    const targetColumnIndex = columnTasks.findIndex((col) =>
-      col.tasks.some((task) => task.id === overTaskId)
-    );
+      try {
+        // Update the task on the server first
+        await updateTask({
+          itemId: movedTask.ItemId,
+          input: {
+            Section: targetSectionTitle,
+          },
+        });
 
-    if (targetColumnIndex === -1) return;
+        // Get the target tasks and remove any existing task with the same ID
+        const targetTasks = [...(newColumns[targetColumnIndex].tasks || [])];
+        const existingTaskIndex = targetTasks.findIndex((task) => task.ItemId === movedTask.ItemId);
+        if (existingTaskIndex !== -1) {
+          targetTasks.splice(existingTaskIndex, 1);
+        }
 
-    const sourceTaskIndex = columnTasks[sourceColumnIndex].tasks.findIndex(
-      (task) => task.id === activeTaskId
-    );
-    const targetTaskIndex = columnTasks[targetColumnIndex].tasks.findIndex(
-      (task) => task.id === overTaskId
-    );
+        // Create the updated task with the new section
+        const updatedTask = {
+          ...movedTask,
+          Section: targetSectionTitle,
+        };
 
-    if (sourceTaskIndex === -1 || targetTaskIndex === -1) return;
+        // Add the task to the target column
+        targetTasks.push(updatedTask);
 
-    const newColumns = [...columnTasks];
+        // Update the state
+        setColumnTasks((prevColumns) => {
+          const newState = [...prevColumns];
+          newState[sourceColumnIndex] = {
+            ...newState[sourceColumnIndex],
+            tasks: sourceTasks,
+          };
+          newState[targetColumnIndex] = {
+            ...newState[targetColumnIndex],
+            tasks: targetTasks,
+          };
+          return newState;
+        });
 
-    if (sourceColumnIndex === targetColumnIndex) {
-      newColumns[sourceColumnIndex].tasks = arrayMove(
-        newColumns[sourceColumnIndex].tasks,
-        sourceTaskIndex,
-        targetTaskIndex
+        // Refetch tasks to ensure everything is in sync
+        await refetchTasks();
+      } catch (error) {
+        console.error('Error moving task to column:', error);
+        toast({
+          variant: 'destructive',
+          title: t('TASK_MOVE_FAILED'),
+          description: t('FAILED_MOVE_THE_TASK'),
+        });
+        refetchTasks();
+      }
+    },
+    [columnTasks, updateTask, toast, refetchTasks, t]
+  );
+
+  const handleTaskDrag = useCallback(
+    async (activeTaskId: string, overTaskId: string, sourceColumnIndex: number) => {
+      const targetColumnIndex = columnTasks.findIndex((col) =>
+        col.tasks.some((task) => task.ItemId === overTaskId)
       );
-    } else {
-      const [movedTask] = newColumns[sourceColumnIndex].tasks.splice(sourceTaskIndex, 1);
 
-      newColumns[targetColumnIndex].tasks.splice(targetTaskIndex, 0, {
-        ...movedTask,
-        status: movedTask.status,
-      });
-      moveTask(movedTask.id, newColumns[targetColumnIndex].title);
-    }
+      if (targetColumnIndex === -1 || sourceColumnIndex === -1) return;
 
-    setColumnTasks(newColumns);
-  };
+      const newColumns = JSON.parse(JSON.stringify(columnTasks));
+      const sourceTasks = [...newColumns[sourceColumnIndex].tasks];
+      const sourceTaskIndex = sourceTasks.findIndex((task) => task.ItemId === activeTaskId);
+
+      if (sourceTaskIndex === -1) return;
+
+      // Remove the task from the source column
+      const [movedTask] = sourceTasks.splice(sourceTaskIndex, 1);
+      if (!movedTask) return;
+
+      // Get the target column's title
+      const targetSectionTitle = newColumns[targetColumnIndex].Title;
+
+      try {
+        // Update the task on the server first
+        await updateTask({
+          itemId: movedTask.ItemId,
+          input: {
+            Section: targetSectionTitle,
+          },
+        });
+
+        // Get the target tasks and remove any existing task with the same ID
+        const targetTasks = [...(newColumns[targetColumnIndex].tasks || [])];
+        const existingTaskIndex = targetTasks.findIndex((task) => task.ItemId === movedTask.ItemId);
+        if (existingTaskIndex !== -1) {
+          targetTasks.splice(existingTaskIndex, 1);
+        }
+
+        // Find the position to insert the task
+        const overTaskIndex = targetTasks.findIndex((task) => task.ItemId === overTaskId);
+        const insertIndex = overTaskIndex !== -1 ? overTaskIndex : targetTasks.length;
+
+        // Create the updated task with the new section
+        const updatedTask = {
+          ...movedTask,
+          Section: targetSectionTitle,
+        };
+
+        // Insert the task at the correct position
+        targetTasks.splice(insertIndex, 0, updatedTask);
+
+        // Update the state
+        setColumnTasks((prevColumns) => {
+          const newState = [...prevColumns];
+          newState[sourceColumnIndex] = {
+            ...newState[sourceColumnIndex],
+            tasks: sourceTasks,
+          };
+          newState[targetColumnIndex] = {
+            ...newState[targetColumnIndex],
+            tasks: targetTasks,
+          };
+          return newState;
+        });
+
+        await refetchTasks();
+      } catch (error) {
+        console.error('Error moving task:', error);
+        toast({
+          variant: 'destructive',
+          title: t('TASK_MOVE_FAILED'),
+          description: t('FAILED_MOVE_THE_TASK'),
+        });
+        refetchTasks();
+      }
+    },
+    [columnTasks, updateTask, toast, refetchTasks, t]
+  );
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
@@ -224,27 +672,38 @@ export function useCardTasks() {
     const activeId = active.id.toString();
     const overId = over.id.toString();
 
-    if (typeof activeId !== 'string' || !activeId.startsWith('task-')) return;
+    if (activeId === overId) return;
 
+    const isActiveATask = activeId.startsWith('task-');
+    const isOverATask = overId.startsWith('task-');
+    const isOverAColumn = overId.startsWith('column-');
+
+    if (!isActiveATask) return;
+
+    // Find the task being dragged
     const activeTaskId = activeId.replace('task-', '');
     const sourceColumnIndex = columnTasks.findIndex((col) =>
-      col.tasks.some((task) => task.id === activeTaskId)
+      col.tasks.some((task) => task.ItemId === activeTaskId)
     );
 
     if (sourceColumnIndex === -1) return;
 
-    if (typeof overId === 'string' && overId.startsWith('column-')) {
-      const targetColumnId = overId.replace('column-', '');
-      handleColumnDrag(activeTaskId, targetColumnId, sourceColumnIndex);
-    } else if (typeof overId === 'string' && overId.startsWith('task-')) {
+    if (isOverATask) {
       const overTaskId = overId.replace('task-', '');
       handleTaskDrag(activeTaskId, overTaskId, sourceColumnIndex);
+    } else if (isOverAColumn) {
+      const targetColumnId = overId.replace('column-', '');
+      const targetColumnIndex = columnTasks.findIndex((col) => col.ItemId === targetColumnId);
+
+      if (targetColumnIndex !== -1) {
+        handleColumnDrag(activeTaskId, targetColumnId, sourceColumnIndex);
+      }
     }
   };
 
   const findTaskLocation = (taskId: string) => {
     for (let i = 0; i < columnTasks.length; i++) {
-      const taskIndex = columnTasks[i].tasks.findIndex((t) => t.id === taskId);
+      const taskIndex = columnTasks[i].tasks.findIndex((t) => t.ItemId === taskId);
       if (taskIndex !== -1) {
         return { columnIndex: i, taskIndex };
       }
@@ -259,13 +718,7 @@ export function useCardTasks() {
   ) => {
     const newColumns = [...columnTasks];
     const [movedTask] = newColumns[sourceColumnIndex].tasks.splice(sourceTaskIndex, 1);
-
-    newColumns[targetColumnIndex].tasks.push({
-      ...movedTask,
-      status: movedTask.status,
-    });
-
-    moveTask(movedTask.id, newColumns[targetColumnIndex].title);
+    newColumns[targetColumnIndex].tasks.push(movedTask);
     setColumnTasks(newColumns);
   };
 
@@ -295,7 +748,7 @@ export function useCardTasks() {
       return;
     }
 
-    const targetColumnIndex = columnTasks.findIndex((col) => col.id === targetColumnId);
+    const targetColumnIndex = columnTasks.findIndex((col) => col.ItemId === targetColumnId);
 
     if (targetColumnIndex === -1 || sourceColumnIndex === targetColumnIndex) {
       setActiveTask(null);
@@ -306,12 +759,35 @@ export function useCardTasks() {
     setActiveTask(null);
   };
 
-  const updateTaskCompletion = (taskId: string, isCompleted: boolean) => {
-    updateTask(taskId, { isCompleted });
-  };
+  const updateTaskCompletion = useCallback(
+    async (taskId: string, isCompleted: boolean) => {
+      try {
+        await updateTask({
+          itemId: taskId,
+          input: {
+            IsCompleted: isCompleted,
+          },
+        });
+
+        await refetchTasks();
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: t('TASK_UPDATE_FAILED'),
+          description: t('FAILED_UPDATE_TASK_STATUS'),
+        });
+        console.error('Error updating task:', error);
+      }
+    },
+    [updateTask, refetchTasks, toast, t]
+  );
+
+  const mappedColumns = columnTasks.map((column) => ({
+    ...column,
+  }));
 
   return {
-    columns: columnTasks,
+    columns: mappedColumns,
     activeColumn,
     activeTask,
     sensors,
@@ -324,5 +800,6 @@ export function useCardTasks() {
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    isLoading: isLoadingTasks,
   };
 }

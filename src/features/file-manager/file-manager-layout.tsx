@@ -12,7 +12,7 @@ export const FileManagerLayout: React.FC<FileManagerLayoutProps> = ({
   modals,
 }) => {
   return (
-    <div className="flex flex-col h-full w-full space-y-4 p-4 md:p-6">
+    <div className="flex flex-col h-full w-full space-y-4">
       {headerToolbar}
 
       <div className="flex-1 overflow-hidden">{children}</div>

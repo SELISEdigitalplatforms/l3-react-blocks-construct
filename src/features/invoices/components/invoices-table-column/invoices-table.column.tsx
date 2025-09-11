@@ -1,16 +1,17 @@
-import { ColumnDef } from '@tanstack/react-table';
+import { Trash } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
-import { format, startOfDay, isAfter, isBefore, isSameDay } from 'date-fns';
+import { ColumnDef } from '@tanstack/react-table';
+import { format, startOfDay, isAfter, isBefore, isSameDay, parseISO } from 'date-fns';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import { Invoice, InvoiceStatus, statusColors } from '../../data/invoice-data';
+import { InvoiceItem, getStatusColors } from '../../types/invoices.types';
+import { Button } from 'components/ui/button';
+import { useState } from 'react';
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { useDeleteInvoiceItem } from '../../hooks/use-invoices';
 
 interface ColumnFactoryProps {
   t: (key: string) => string;
 }
-
-const formatDateOnly = (date: Date) => {
-  return format(date, 'dd/MM/yyyy');
-};
 
 const isWithinRange = (date: Date, from: Date, to: Date) => {
   const normalizedDate = startOfDay(date);
@@ -23,108 +24,184 @@ const isWithinRange = (date: Date, from: Date, to: Date) => {
   );
 };
 
-export const createInvoiceTableColumns = ({ t }: ColumnFactoryProps): ColumnDef<Invoice, any>[] => [
+export const createInvoiceTableColumns = ({
+  t,
+}: ColumnFactoryProps): ColumnDef<InvoiceItem, any>[] => [
   {
-    id: 'id',
+    id: 'ItemId',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('INVOICE_ID')} />,
-    accessorFn: (row) => row.id,
+    accessorFn: (row) => row.ItemId,
     enableSorting: false,
     cell: ({ row }) => (
       <div className="flex items-center">
-        <span className="min-w-[100px] truncate font-medium">{row.original.id}</span>
+        <span className="min-w-[100px] truncate font-medium uppercase">{row.original.ItemId}</span>
       </div>
     ),
   },
   {
-    id: 'customerName',
+    id: 'Customer',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('CUSTOMER')} />,
-    accessorFn: (row) => row.customerName,
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <img
-          src={row.original.customerImg}
-          alt={row.original.customerName}
-          className="h-8 w-8 rounded-full object-cover"
-        />
-        <span className="min-w-[150px] truncate">{row.original.customerName}</span>
-      </div>
-    ),
+    accessorFn: (row) => row.Customer?.[0]?.CustomerName || '',
+    cell: ({ row }) => {
+      const customer = row.original.Customer?.[0];
+      return (
+        <div className="flex items-center gap-2">
+          <span className="min-w-[150px] truncate">{customer?.CustomerName || 'N/A'}</span>
+        </div>
+      );
+    },
   },
   {
-    id: 'dateIssued',
-    accessorFn: (row) => row.dateIssued,
+    id: 'DateIssued',
+    accessorFn: (row) => row.DateIssued,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('DATE_ISSUED')} />,
     filterFn: (row, id, filterValue: DateRange | undefined) => {
       if (!filterValue?.from) return true;
-      const date = new Date(row.original.dateIssued);
-      const from = new Date(filterValue.from);
-      const to = filterValue.to ? new Date(filterValue.to) : from;
+      const date = parseISO(row.original.DateIssued);
+      const from = startOfDay(new Date(filterValue.from));
+      const to = filterValue.to ? startOfDay(new Date(filterValue.to)) : from;
       return isWithinRange(date, from, to);
     },
     cell: ({ row }) => {
-      const date = new Date(row.original.dateIssued);
+      const date = parseISO(row.original.DateIssued);
       return (
         <div className="flex items-center">
-          <span>{formatDateOnly(date)}</span>
+          <span>{format(date, 'dd/MM/yyyy')}</span>
         </div>
       );
     },
     sortingFn: (rowA, rowB) => {
-      const a = new Date(rowA.original.dateIssued);
-      const b = new Date(rowB.original.dateIssued);
+      const a = parseISO(rowA.original.DateIssued);
+      const b = parseISO(rowB.original.DateIssued);
       return a.getTime() - b.getTime();
     },
   },
   {
-    id: 'amount',
-    accessorFn: (row) => row.amount,
+    id: 'Amount',
+    accessorFn: (row) => row.Amount,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('AMOUNT')} />,
     cell: ({ row }) => (
       <div className="flex items-center">
-        <span>CHF {row.original.amount.toFixed(2)}</span>
+        <span className="text-medium-emphasis uppercase">
+          {row.original.Currency} {row.original.Amount.toFixed(2)}
+        </span>
       </div>
     ),
   },
   {
-    id: 'dueDate',
-    accessorFn: (row) => row.dueDate,
+    id: 'DueDate',
+    accessorFn: (row) => row.DueDate,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('DUE_DATE')} />,
     filterFn: (row, id, filterValue: DateRange | undefined) => {
       if (!filterValue?.from) return true;
-      const date = new Date(row.original.dueDate);
-      const from = new Date(filterValue.from);
-      const to = filterValue.to ? new Date(filterValue.to) : from;
+      const date = parseISO(row.original.DueDate);
+      const from = startOfDay(new Date(filterValue.from));
+      const to = filterValue.to ? startOfDay(new Date(filterValue.to)) : from;
       return isWithinRange(date, from, to);
     },
     cell: ({ row }) => {
-      const date = new Date(row.original.dueDate);
+      const date = parseISO(row.original.DueDate);
       return (
         <div className="flex items-center">
-          <span>{formatDateOnly(date)}</span>
+          <span>{format(date, 'dd/MM/yyyy')}</span>
         </div>
       );
     },
     sortingFn: (rowA, rowB) => {
-      const a = new Date(rowA.original.dueDate);
-      const b = new Date(rowB.original.dueDate);
+      const a = parseISO(rowA.original.DueDate);
+      const b = parseISO(rowB.original.DueDate);
       return a.getTime() - b.getTime();
     },
   },
   {
-    id: 'status',
-    accessorFn: (row) => row.status,
+    id: 'Status',
+    accessorKey: 'Status',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('STATUS')} />,
-    filterFn: (row, id, value: InvoiceStatus[] | undefined) => {
-      if (!value?.length) return true;
-      const status = row.getValue(id);
-      return value.includes(status as InvoiceStatus);
+    filterFn: (row, columnId, value: string | string[]) => {
+      if (!value || (Array.isArray(value) && value.length === 0)) return true;
+      const rowValue = row.getValue(columnId);
+      return Array.isArray(value)
+        ? value.some((v) => v.toLowerCase() === String(rowValue).toLowerCase())
+        : String(value).toLowerCase() === String(rowValue).toLowerCase();
+    },
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = String(rowA.getValue(columnId) || '').toLowerCase();
+      const b = String(rowB.getValue(columnId) || '').toLowerCase();
+      return a.localeCompare(b);
+    },
+    meta: {
+      filterVariant: 'select',
+      filterSelectOptions: [
+        { label: t('PAID'), value: 'Paid' },
+        { label: t('PENDING'), value: 'Pending' },
+        { label: t('OVERDUE'), value: 'Overdue' },
+        { label: t('DRAFT'), value: 'Draft' },
+      ],
     },
     cell: ({ row }) => {
-      const status = row.original.status;
-      const color = statusColors[status];
+      const status = row.original.Status;
+      if (!status) return null;
+
+      const { text } = getStatusColors(status);
       return (
         <div className="flex items-center">
-          <span className={`font-semibold ${color.text}`}>{status}</span>
+          <span className={`font-semibold ${text}`}>{status}</span>
+        </div>
+      );
+    },
+  },
+  {
+    id: 'actions',
+    cell: function ActionsCell({ row }) {
+      const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+      const { mutate: deleteInvoice, isPending: isDeleting } = useDeleteInvoiceItem();
+      const invoice = row.original;
+
+      const handleDelete = () => {
+        deleteInvoice(
+          {
+            filter: JSON.stringify({ _id: invoice.ItemId }),
+            input: { isHardDelete: true },
+          },
+          {
+            onSuccess: () => {
+              setShowDeleteDialog(false);
+            },
+            onError: (error) => {
+              console.error('Delete error:', error);
+            },
+          }
+        );
+      };
+
+      return (
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDeleteDialog(true);
+            }}
+            disabled={isDeleting}
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+
+          <button onClick={(e) => e.stopPropagation()}>
+            <ConfirmationModal
+              open={showDeleteDialog}
+              onOpenChange={(open: boolean) => {
+                setShowDeleteDialog(open);
+              }}
+              title="Delete Invoice"
+              description="Are you sure you want to delete this invoice?"
+              onConfirm={() => {
+                handleDelete();
+              }}
+              confirmText="DELETE"
+            />
+          </button>
         </div>
       );
     },

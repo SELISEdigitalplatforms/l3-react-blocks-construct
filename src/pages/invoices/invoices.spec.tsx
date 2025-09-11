@@ -1,23 +1,75 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { createInvoiceTableColumns } from 'features/invoices';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { InvoicesPage } from './invoices';
-import { invoiceData } from 'features/invoices/data/invoice-data';
+import { InvoiceItem } from 'features/invoices/types/invoices.types';
 
-// Mock the react-router-dom's useNavigate
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
+// Mock the useGetInvoiceItems hook
+const mockData = {
+  items: [
+    {
+      ItemId: '1',
+      Customer: [
+        {
+          CustomerName: 'Test Customer 1',
+          Email: 'test1@example.com',
+          PhoneNo: '+41123456789',
+          BillingAddress: 'Test Address 1',
+        },
+      ],
+      Status: 'Draft',
+      DateIssued: '2025-06-15',
+      DueDate: '2025-07-15',
+      Amount: 1000,
+      currency: 'CHF',
+      ItemDetails: [],
+    },
+    {
+      ItemId: '2',
+      Customer: [
+        {
+          CustomerName: 'Test Customer 2',
+          Email: 'test2@example.com',
+          PhoneNo: '+41987654321',
+          BillingAddress: 'Test Address 2',
+        },
+      ],
+      Status: 'Paid',
+      DateIssued: '2025-07-15',
+      DueDate: '2025-08-15',
+      Amount: 2000,
+      currency: 'CHF',
+      ItemDetails: [],
+    },
+  ],
+  totalCount: 2,
+  pageNo: 1,
+  pageSize: 10,
+};
+
+const mockUseGetInvoiceItems = jest.fn();
+
+jest.mock('features/invoices/hooks/use-invoices', () => ({
+  useGetInvoiceItems: () => mockUseGetInvoiceItems(),
 }));
 
-// Mock the invoice components
+// Mock the features/invoices components
 jest.mock('features/invoices', () => ({
-  InvoicesOverviewTable: ({ data, onRowClick, toolbar }: { 
-    data: Array<typeof invoiceData[0]>; 
-    onRowClick: (invoice: typeof invoiceData[0]) => void; 
-    toolbar: (table: { getState: () => { pagination: { pageIndex: number; pageSize: number } } }) => React.ReactNode;
+  __esModule: true,
+  createInvoiceTableColumns: jest.fn(() => [
+    { id: 'customerName', header: 'Customer Name' },
+    { id: 'status', header: 'Status' },
+  ]),
+  InvoicesOverviewTable: ({
+    data,
+    onRowClick,
+    toolbar,
+  }: {
+    data: InvoiceItem[];
+    onRowClick: (invoice: InvoiceItem) => void;
+    toolbar: (table: any) => React.ReactNode;
   }) => (
     <div data-testid="invoices-table">
       <div data-testid="table-toolbar">
@@ -25,14 +77,14 @@ jest.mock('features/invoices', () => ({
       </div>
       <table>
         <tbody>
-          {data.map((invoice: typeof invoiceData[0]) => (
-            <tr 
-              key={invoice.id} 
-              data-testid={`invoice-row-${invoice.id}`} 
+          {data.map((invoice: InvoiceItem) => (
+            <tr
+              key={invoice.ItemId}
+              data-testid={`invoice-row-${invoice.ItemId}`}
               onClick={() => onRowClick(invoice)}
             >
-              <td>{invoice.id}</td>
-              <td>{invoice.customerName}</td>
+              <td>{invoice.Customer?.[0]?.CustomerName}</td>
+              <td>{invoice.Status}</td>
             </tr>
           ))}
         </tbody>
@@ -41,10 +93,13 @@ jest.mock('features/invoices', () => ({
   ),
   InvoicesHeaderToolbar: () => <div data-testid="invoices-header-toolbar">Header Toolbar</div>,
   InvoicesFilterToolbar: () => <div data-testid="invoices-filter-toolbar">Filter Toolbar</div>,
-  createInvoiceTableColumns: () => [
-    { id: 'id', header: 'ID' },
-    { id: 'customerName', header: 'Customer Name' },
-  ],
+}));
+
+// Mock the react-router-dom's useNavigate
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
 }));
 
 // Mock the translation hook
@@ -72,11 +127,21 @@ describe('InvoicesPage', () => {
   });
 
   test('renders the invoices page with header toolbar', () => {
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+    });
     renderInvoicesPage();
     expect(screen.getByTestId('invoices-header-toolbar')).toBeInTheDocument();
   });
 
   test('renders the invoices table with filter toolbar', () => {
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+    });
     renderInvoicesPage();
     expect(screen.getByTestId('invoices-table')).toBeInTheDocument();
     expect(screen.getByTestId('table-toolbar')).toBeInTheDocument();
@@ -84,37 +149,58 @@ describe('InvoicesPage', () => {
   });
 
   test('shows loading state initially and then loads data', async () => {
-    renderInvoicesPage();
+    // Set up the mock to return loading state first
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+    });
+
+    const { rerender } = renderInvoicesPage();
 
     // Initially no invoice rows should be visible (loading state)
-    expect(screen.queryByTestId(/invoice-row-/)).not.toBeInTheDocument();
+    expect(screen.queryAllByTestId(/invoice-row-.*/)).toHaveLength(0);
 
-    // Advance timers to complete the loading
-    jest.advanceTimersByTime(500);
+    // Update the mock to return data
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+    });
+
+    // Re-render with the new mock data
+    rerender(
+      <MemoryRouter>
+        <InvoicesPage />
+      </MemoryRouter>
+    );
 
     // After loading, invoice rows should be visible
     await waitFor(() => {
-      const invoiceRows = screen.getAllByTestId(/invoice-row-/);
-      expect(invoiceRows.length).toBeGreaterThan(0);
+      const invoiceRows = screen.getAllByTestId(/invoice-row-.*/);
+      expect(invoiceRows).toHaveLength(2);
     });
   });
 
   test('navigates to invoice detail page when clicking on a row', async () => {
-    renderInvoicesPage();
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+    });
 
-    // Advance timers to complete the loading
-    jest.advanceTimersByTime(500);
+    renderInvoicesPage();
 
     // Wait for the invoice rows to be rendered
     await waitFor(() => {
-      const invoiceRows = screen.getAllByTestId(/invoice-row-/);
-      expect(invoiceRows.length).toBeGreaterThan(0);
+      const invoiceRows = screen.getAllByTestId(/invoice-row-.*/);
+      expect(invoiceRows).toHaveLength(2);
     });
 
     // Get all invoice rows and click on the first one
-    const invoiceRows = screen.getAllByTestId(/invoice-row-/);
-    const firstInvoiceId = invoiceRows[0].getAttribute('data-testid')?.replace('invoice-row-', '');
-    
+    const invoiceRows = screen.getAllByTestId(/invoice-row-.*/);
+    const firstInvoiceId = '1'; // We know this from our mock data
+
     // Click on the first invoice row
     fireEvent.click(invoiceRows[0]);
 
@@ -122,7 +208,26 @@ describe('InvoicesPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith(`/invoices/${firstInvoiceId}`);
   });
 
+  test('calls createInvoiceTableColumns with translation function', () => {
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+    });
+    renderInvoicesPage();
+    expect(createInvoiceTableColumns).toHaveBeenCalledWith(
+      expect.objectContaining({
+        t: expect.any(Function),
+      })
+    );
+  });
+
   test('renders with correct container structure', () => {
+    mockUseGetInvoiceItems.mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      error: null,
+    });
     const { container } = renderInvoicesPage();
 
     const outerDiv = container.firstChild;

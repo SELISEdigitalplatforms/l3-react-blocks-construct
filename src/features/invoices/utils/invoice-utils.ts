@@ -1,61 +1,73 @@
 import { v4 as uuidv4 } from 'uuid';
-
-import { InvoiceItem } from '../schemas/invoice-form-schema';
-import { Invoice, InvoiceStatus } from '../data/invoice-data';
+import { InvoiceItem, InvoiceItemDetails, InvoiceStatus } from '../types/invoices.types';
 
 export const generateInvoiceId = (): string => {
-  return `INV-${uuidv4().substring(0, 5).replace(/-/g, '').toUpperCase()}`;
+  return `inv-${uuidv4().substring(0, 9).replace(/-/g, '')}`;
 };
 
-export function calculateInvoiceTotals(items: InvoiceItem[], taxRate: number, discount: number) {
-  const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-  const taxes = (subtotal * taxRate) / 100;
-  const totalAmount = subtotal + taxes - discount;
+interface InvoiceTotals {
+  Subtotal: number;
+  Taxes: number;
+  TotalAmount: number;
+}
+
+export function calculateInvoiceTotals(
+  items: InvoiceItemDetails[],
+  taxes: number,
+  discount: number
+): InvoiceTotals {
+  const Subtotal = items.reduce((acc, item) => acc + (item.Amount || 0), 0);
+  const Taxes = (Subtotal * taxes) / 100;
+  const TotalAmount = Subtotal + Taxes - discount;
 
   return {
-    subtotal,
-    taxes,
-    totalAmount,
+    Subtotal,
+    Taxes,
+    TotalAmount,
   };
 }
 
 export function createInvoiceFromForm(
   invoiceId: string,
   formValues: any,
-  items: InvoiceItem[],
+  items: InvoiceItemDetails[],
   action: 'draft' | 'send'
-): Invoice {
-  const { subtotal, taxes, totalAmount } = calculateInvoiceTotals(items, 7.5, 50);
+): InvoiceItem {
+  const taxes = Number(formValues.taxes) || 0;
+  const discount = Number(formValues.discount) || 0;
+  const { TotalAmount, Subtotal, Taxes } = calculateInvoiceTotals(
+    items,
+    taxes,
+    discount
+  );
+  const status = action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT;
 
   return {
-    id: invoiceId,
-    customerName: formValues.customerName,
-    customerImg: '', // You can add profile image support later
-    dateIssued: new Date().toISOString(),
-    amount: totalAmount,
-    dueDate: formValues.dueDate?.toISOString() ?? '',
-    status: action === 'send' ? InvoiceStatus.Pending : InvoiceStatus.Draft,
-    currency: formValues.currency?.toUpperCase() ?? 'CHF',
-    billingInfo: {
-      address: formValues.billingAddress,
-      email: formValues.email,
-      phone: formValues.phoneNumber,
-    },
-    orderDetails: {
-      items: items.map((item) => ({
-        name: item.name,
-        description: item.note,
-        category: item.category,
-        quantity: item.quantity,
-        unitPrice: item.price,
-        amount: item.total,
-      })),
-      subtotal,
-      taxes,
-      taxRate: 7.5,
-      discount: 50,
-      totalAmount,
-      note: formValues.generalNote,
-    },
+    ItemId: invoiceId,
+    DateIssued: new Date().toISOString(),
+    Amount: TotalAmount,
+    DueDate: formValues.dueDate?.toISOString() ?? new Date().toISOString(),
+    Status: status,
+    GeneralNote: formValues.generalNote,
+    Customer: [
+      {
+        CustomerName: formValues.customerName ?? '',
+        BillingAddress: formValues.billingAddress ?? '',
+        Email: formValues.email ?? '',
+        PhoneNo: formValues.phoneNumber ?? '',
+      },
+    ],
+    ItemDetails: items.map((item) => ({
+      ItemId: item.ItemId,
+      ItemName: item.ItemName,
+      Note: item.Note,
+      Category: item.Category ?? '',
+      Quantity: item.Quantity,
+      UnitPrice: item.UnitPrice ?? 0,
+      Amount: item.Amount ?? 0,
+    })),
+    Subtotal,
+    Taxes,
+    TotalAmount,
   };
 }

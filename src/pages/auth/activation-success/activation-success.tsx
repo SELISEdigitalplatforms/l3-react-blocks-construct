@@ -25,7 +25,7 @@ export function ActivationSuccess() {
         </div>
       </div>
 
-      <Link to="/login">
+      <Link to={'/login'}>
         <Button className="font-extrabold w-full" size="lg" type="submit">
           {t('LOG_IN')}
         </Button>

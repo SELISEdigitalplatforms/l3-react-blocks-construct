@@ -1,61 +1,106 @@
-import { useToast } from 'hooks/use-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
-import { useInvoice } from '../../store/invoice-store';
+import { useNavigate } from 'react-router-dom';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
-import { type InvoiceFormValues, type InvoiceItem } from '../../schemas/invoice-form-schema';
+import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-helpers';
 import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
+import { CustomerDetails, InvoiceItemDetails, InvoiceStatus } from '../../types/invoices.types';
+import { useUpdateInvoiceItem } from '../../hooks/use-invoices';
+import { useInvoiceDetails } from '../../hooks/use-invoice-details';
 
 export function EditInvoice() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { invoiceId } = useParams();
-  const { invoices, updateInvoice } = useInvoice();
-  const invoice = invoices.find((inv) => inv.id === invoiceId);
-  const { toast } = useToast();
+  const { mutate: updateInvoiceItem } = useUpdateInvoiceItem();
+  const { invoice, invoiceId, isLoading, toast } = useInvoiceDetails();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <Loader2 className="mr-2 h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!invoice) {
-    return null;
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-medium-emphasis">{t('INVOICE_NOT_FOUND')}</p>
+      </div>
+    );
   }
 
   const defaultValues = {
-    customerName: invoice.customerName ?? '',
-    email: invoice.billingInfo?.email ?? '',
-    phoneNumber: formatPhoneToE164(invoice.billingInfo?.phone ?? ''),
-    billingAddress: invoice.billingInfo?.address ?? '',
-    currency: invoice.currency?.toLowerCase() ?? '',
-    dueDate: invoice.dueDate ? new Date(invoice.dueDate) : undefined,
-    generalNote: invoice.orderDetails?.note ?? '',
+    customerName: invoice.Customer[0].CustomerName ?? '',
+    email: invoice.Customer[0].Email ?? '',
+    phoneNumber: formatPhoneToE164(invoice.Customer[0].PhoneNo ?? ''),
+    billingAddress: invoice.Customer[0].BillingAddress ?? '',
+    currency: invoice.Currency ?? '',
+    dueDate: invoice.DueDate ? new Date(invoice.DueDate) : undefined,
+    generalNote: invoice.GeneralNote ?? '',
+    taxes: invoice.Taxes ?? 0,
+    discount: invoice.Discount ?? 0,
   };
 
   const defaultItems =
-    invoice.orderDetails?.items?.map((item) => ({
-      id: crypto.randomUUID(),
-      name: item.name,
-      category: normalizeCategoryValue(item.category),
-      quantity: item.quantity,
-      price: item.unitPrice,
-      total: item.amount,
-      showNote: Boolean(item.description),
-      note: item.description,
-    })) || [];
+    invoice.ItemDetails?.map(
+      (item) =>
+        ({
+          ItemId: item.ItemId,
+          ItemName: item.ItemName,
+          Category: normalizeCategoryValue(item.Category) ?? '',
+          Quantity: item.Quantity,
+          UnitPrice: item.UnitPrice,
+          Amount: item.Amount,
+          Note: item.Note,
+          showNote: Boolean(item.Note),
+          note: item.Note,
+        }) as InvoiceItemDetails
+    ) || [];
 
   const handleSubmit = (
     values: InvoiceFormValues,
-    items: InvoiceItem[],
+    items: InvoiceItemDetails[],
     action: 'draft' | 'send'
   ) => {
     if (!invoiceId) return;
 
     const updatedInvoice = createInvoiceFromForm(invoiceId, values, items, action);
-    updateInvoice(invoiceId, updatedInvoice);
-    toast({
-      title: t(action === 'send' ? 'INVOICE_UPDATED' : 'INVOICE_SAVE_DRAFT'),
-      description: t(
-        action === 'send' ? 'INVOICE_UPDATED_SUCCESSFULLY' : 'INVOICE_SAVED_DRAFT_SUCCESSFULLY'
-      ),
-      variant: 'success',
+
+    const customer: CustomerDetails = {
+      CustomerName: values.customerName,
+      BillingAddress: values.billingAddress ?? '',
+      Email: values.email ?? '',
+      PhoneNo: values.phoneNumber ?? '',
+    };
+
+    updateInvoiceItem({
+      filter: `{"_id": "${invoiceId}"}`,
+      input: {
+        ItemId: invoiceId,
+        DateIssued: new Date().toISOString(),
+        DueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
+        Amount: updatedInvoice.Amount,
+        Customer: [customer],
+        Currency: values.currency,
+        Status: (action === 'send'
+          ? InvoiceStatus.PENDING
+          : InvoiceStatus.DRAFT) as unknown as InvoiceStatus[],
+        GeneralNote: values.generalNote ?? '',
+        Taxes: values.taxes,
+        Discount: values.discount,
+        ItemDetails: items.map((item) => ({
+          ItemId: item.ItemId ?? uuidv4(),
+          ItemName: item.ItemName,
+          Note: item.Note ?? '',
+          Category: item.Category ?? '0',
+          Quantity: Number(item.Quantity) || 0,
+          UnitPrice: Number(item.UnitPrice) || 0,
+          Amount: Number(item.Amount) || 0,
+        })),
+      },
     });
 
     navigate(`/invoices/${invoiceId}`);
@@ -69,9 +114,9 @@ export function EditInvoice() {
       onSubmit={handleSubmit}
       showSuccessToast={(action) => {
         toast({
-          title: t(action === 'send' ? 'INVOICE_UPDATED' : 'INVOICE_SAVE_DRAFT'),
+          title: t(action === 'send' ? 'INVOICE_UPDATED' : 'DRAFT_SAVED'),
           description: t(
-            action === 'send' ? 'INVOICE_UPDATED_SUCCESSFULLY' : 'INVOICE_SAVED_DRAFT_SUCCESSFULLY'
+            action === 'send' ? 'INVOICE_UPDATED_SUCCESSFULLY' : 'INVOICE_DRAFT_SAVED_SUCCESSFULLY'
           ),
           variant: 'success',
         });
