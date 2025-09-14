@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Command,
   CommandDialog,
@@ -13,7 +13,6 @@ import {
 } from '../../components/ui/command';
 import { Button } from '../../components/ui/button';
 import { Calendar, Calculator, CreditCard, Settings, Smile, User, Search } from 'lucide-react';
-import React from 'react';
 
 const meta = {
   title: 'Command',
@@ -269,8 +268,8 @@ const MultipleGroupsCommandDemo = () => {
 
           {filteredTeam.length > 0 && (
             <CommandGroup heading="Team Members">
-              {filteredTeam.map((member, index) => (
-                <CommandItem key={index} value={member.name}>
+              {filteredTeam.map((member) => (
+                <CommandItem key={member.name} value={member.name}>
                   <User className="mr-2 h-4 w-4" />
                   <span>{member.name}</span>
                   <span className="text-muted-foreground ml-2">— {member.role}</span>
@@ -283,8 +282,8 @@ const MultipleGroupsCommandDemo = () => {
 
           {filteredProjects.length > 0 && (
             <CommandGroup heading="Projects">
-              {filteredProjects.map((project, index) => (
-                <CommandItem key={index} value={project.name}>
+              {filteredProjects.map((project) => (
+                <CommandItem key={project.name} value={project.name}>
                   <span>{project.name}</span>
                   <span className="text-muted-foreground ml-2">— {project.status}</span>
                 </CommandItem>
@@ -403,12 +402,12 @@ export const WithActions: Story = {
 };
 
 // Command with Async Loading
+// ...existing code...
 const AsyncCommandDemo = () => {
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<string[]>([]);
 
-  // Simulate async search
   React.useEffect(() => {
     if (searchValue.length < 2) {
       setResults([]);
@@ -430,6 +429,25 @@ const AsyncCommandDemo = () => {
     return () => clearTimeout(timer);
   }, [searchValue]);
 
+  let commandContent;
+  if (isLoading) {
+    commandContent = <CommandEmpty>Searching...</CommandEmpty>;
+  } else if (results.length === 0 && searchValue.length >= 2) {
+    commandContent = <CommandEmpty>No results found.</CommandEmpty>;
+  } else if (results.length === 0) {
+    commandContent = <CommandEmpty>Type at least 2 characters to search.</CommandEmpty>;
+  } else {
+    commandContent = (
+      <CommandGroup heading="Search Results">
+        {results.map((result) => (
+          <CommandItem key={result} value={result}>
+            {result}
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    );
+  }
+
   return (
     <div className="w-full max-w-md">
       <Command className="rounded-lg border shadow-md">
@@ -438,23 +456,7 @@ const AsyncCommandDemo = () => {
           value={searchValue}
           onValueChange={setSearchValue}
         />
-        <CommandList>
-          {isLoading ? (
-            <CommandEmpty>Searching...</CommandEmpty>
-          ) : results.length === 0 && searchValue.length >= 2 ? (
-            <CommandEmpty>No results found.</CommandEmpty>
-          ) : results.length === 0 ? (
-            <CommandEmpty>Type at least 2 characters to search.</CommandEmpty>
-          ) : (
-            <CommandGroup heading="Search Results">
-              {results.map((result, index) => (
-                <CommandItem key={index} value={result}>
-                  {result}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
-        </CommandList>
+        <CommandList>{commandContent}</CommandList>
       </Command>
     </div>
   );
