@@ -113,56 +113,62 @@ export const WithShortcuts: Story = {
   ),
 };
 
-export const WithCheckboxItems: Story = {
-  render: () => {
-    const [showStatusBar, setShowStatusBar] = useState(true);
-    const [showActivityBar, setShowActivityBar] = useState(false);
-    const [showPanel, setShowPanel] = useState(false);
+// Refactored: Move hooks into components
 
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">View Options</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
-            Status Bar
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={showActivityBar} onCheckedChange={setShowActivityBar}>
-            Activity Bar
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
-            Panel
-          </DropdownMenuCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  },
+const WithCheckboxItemsDemo = () => {
+  const [showStatusBar, setShowStatusBar] = useState(true);
+  const [showActivityBar, setShowActivityBar] = useState(false);
+  const [showPanel, setShowPanel] = useState(false);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">View Options</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
+          Status Bar
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={showActivityBar} onCheckedChange={setShowActivityBar}>
+          Activity Bar
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
+          Panel
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+export const WithCheckboxItems: Story = {
+  render: () => <WithCheckboxItemsDemo />,
+};
+
+const WithRadioGroupDemo = () => {
+  const [position, setPosition] = useState('bottom');
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Panel Position</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+          <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 export const WithRadioGroup: Story = {
-  render: () => {
-    const [position, setPosition] = useState('bottom');
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Panel Position</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-            <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  },
+  render: () => <WithRadioGroupDemo />,
 };
 
 export const WithSubmenu: Story = {
@@ -297,44 +303,43 @@ export const WithGroups: Story = {
   ),
 };
 
-export const InteractiveExample: Story = {
-  render: () => {
-    const [selectedTeam, setSelectedTeam] = useState('personal');
-    const [notifications, setNotifications] = useState(true);
-    const [analytics, setAnalytics] = useState(false);
+const InteractiveExampleDemo = () => {
+  const [selectedTeam, setSelectedTeam] = useState('personal');
+  const [notifications, setNotifications] = useState(true);
+  const [analytics, setAnalytics] = useState(false);
 
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Dashboard Settings</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel>Team Selection</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={selectedTeam} onValueChange={setSelectedTeam}>
-            <DropdownMenuRadioItem value="personal">Personal</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="team">Team</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="enterprise">Enterprise</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Preferences</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuCheckboxItem checked={notifications} onCheckedChange={setNotifications}>
-            Enable notifications
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={analytics} onCheckedChange={setAnalytics}>
-            Enable analytics
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Advanced Settings</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  },
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Dashboard Settings</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Team Selection</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup value={selectedTeam} onValueChange={setSelectedTeam}>
+          <DropdownMenuRadioItem value="personal">Personal</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="team">Team</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="enterprise">Enterprise</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Preferences</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuCheckboxItem checked={notifications} onCheckedChange={setNotifications}>
+          Enable notifications
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={analytics} onCheckedChange={setAnalytics}>
+          Enable analytics
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Advanced Settings</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
-// 👇 Ensures this file is always a module under --isolatedModules
-export {};
+export const InteractiveExample: Story = {
+  render: () => <InteractiveExampleDemo />,
+};
