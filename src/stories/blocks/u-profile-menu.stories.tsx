@@ -104,7 +104,7 @@ const MockUProfileMenu = ({
 const meta: Meta<typeof MockUProfileMenu> = {
   title: 'UProfileMenu',
   component: MockUProfileMenu,
-  tags: ['autodocs'],
+  tags: ['!dev'],
   parameters: {
     docs: {
       description: {
