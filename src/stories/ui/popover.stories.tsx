@@ -61,22 +61,24 @@ export const WithCloseButton: Story = {
 };
 
 /* -------------------- WithAnchor -------------------- */
+const WithAnchorPopover = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverAnchor />
+      <PopoverTrigger asChild>
+        <Button>Toggle Popover</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <p>This popover uses an anchor for positioning.</p>
+        <Button onClick={() => setOpen(false)}>Close</Button>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 export const WithAnchor: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
-    return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverAnchor />
-        <PopoverTrigger asChild>
-          <Button>Toggle Popover</Button>
-        </PopoverTrigger>
-        <PopoverContent>
-          <p>This popover uses an anchor for positioning.</p>
-          <Button onClick={() => setOpen(false)}>Close</Button>
-        </PopoverContent>
-      </Popover>
-    );
-  },
+  render: () => <WithAnchorPopover />,
 };
 
 export {};

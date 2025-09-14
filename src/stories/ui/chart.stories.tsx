@@ -176,8 +176,8 @@ export const PieChartExample: Story = {
           nameKey="name"
           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
         >
-          {pieData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={`var(--color-${entry.name.replace(' ', '')})`} />
+          {pieData.map((entry) => (
+            <Cell key={`cell-${entry.name}`} fill={`var(--color-${entry.name.replace(' ', '')})`} />
           ))}
         </Pie>
         <ChartTooltip content={<ChartTooltipContent />} />

@@ -26,7 +26,6 @@ import {
   Mail,
   MessageSquare,
   PlusCircle,
-  Github,
   LifeBuoy,
   Cloud,
   CreditCard,
@@ -279,10 +278,6 @@ export const WithGroups: Story = {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Github className="mr-2 h-4 w-4" />
-          <span>GitHub</span>
-        </DropdownMenuItem>
         <DropdownMenuItem>
           <LifeBuoy className="mr-2 h-4 w-4" />
           <span>Support</span>
