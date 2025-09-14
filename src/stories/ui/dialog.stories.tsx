@@ -53,31 +53,35 @@ export const Basic: Story = {
   ),
 };
 
+// Refactored: Move hooks into components
+
+const InteractiveDialog = () => {
+  const [count, setCount] = useState(0);
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Counter Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Counter Example</DialogTitle>
+          <DialogDescription>
+            Click the button to increase the count. Current count: {count}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button onClick={() => setCount((c) => c + 1)}>Increment</Button>
+          <DialogClose asChild>
+            <Button variant="outline">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export const Interactive: Story = {
-  render: () => {
-    const [count, setCount] = useState(0);
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button>Open Counter Dialog</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Counter Example</DialogTitle>
-            <DialogDescription>
-              Click the button to increase the count. Current count: {count}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setCount((c) => c + 1)}>Increment</Button>
-            <DialogClose asChild>
-              <Button variant="outline">Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  },
+  render: () => <InteractiveDialog />,
 };
 
 export const WithVariations: Story = {
@@ -103,37 +107,39 @@ export const WithVariations: Story = {
   ),
 };
 
+const EdgeCasesDialog = () => {
+  const [loading, setLoading] = useState(false);
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Loading Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Async Operation</DialogTitle>
+          <DialogDescription>Simulating an async process with loading state.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            onClick={() => {
+              setLoading(true);
+              setTimeout(() => setLoading(false), 2000);
+            }}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Start'}
+          </Button>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export const EdgeCases: Story = {
-  render: () => {
-    const [loading, setLoading] = useState(false);
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button>Open Loading Dialog</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Async Operation</DialogTitle>
-            <DialogDescription>Simulating an async process with loading state.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              onClick={() => {
-                setLoading(true);
-                setTimeout(() => setLoading(false), 2000);
-              }}
-              disabled={loading}
-            >
-              {loading ? 'Loading...' : 'Start'}
-            </Button>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  },
+  render: () => <EdgeCasesDialog />,
 };
 
 export const Confirmation: Story = {
@@ -162,48 +168,47 @@ export const Confirmation: Story = {
   ),
 };
 
-export const FormExample: Story = {
-  render: () => {
-    const [name, setName] = useState('');
-    const [submitted, setSubmitted] = useState(false);
+const FormDialog = () => {
+  const [name, setName] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button>Open Form</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Profile Form</DialogTitle>
-            <DialogDescription>Enter your name and submit.</DialogDescription>
-          </DialogHeader>
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSubmitted(true);
-            }}
-          >
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              className="w-full rounded border px-3 py-2"
-            />
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="submit">Submit</Button>
-            </DialogFooter>
-          </form>
-          {submitted && <p className="text-green-600 mt-2">Form submitted: {name}</p>}
-        </DialogContent>
-      </Dialog>
-    );
-  },
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Form</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Profile Form</DialogTitle>
+          <DialogDescription>Enter your name and submit.</DialogDescription>
+        </DialogHeader>
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSubmitted(true);
+          }}
+        >
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your name"
+            className="w-full rounded border px-3 py-2"
+          />
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit">Submit</Button>
+          </DialogFooter>
+        </form>
+        {submitted && <p className="text-green-600 mt-2">Form submitted: {name}</p>}
+      </DialogContent>
+    </Dialog>
+  );
 };
 
-// 👇 Ensures this file is always a module under --isolatedModules
-export {};
+export const FormExample: Story = {
+  render: () => <FormDialog />,
+};
