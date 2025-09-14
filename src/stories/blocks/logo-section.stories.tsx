@@ -79,7 +79,7 @@ const MockLogoSection = ({
 const meta: Meta<typeof MockLogoSection> = {
   title: 'LogoSection',
   component: MockLogoSection,
-  tags: ['autodocs'],
+  tags: ['!dev'],
   parameters: {
     docs: {
       description: {

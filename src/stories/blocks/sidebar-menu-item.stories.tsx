@@ -121,7 +121,7 @@ const MockSidebarMenuItem = ({
 const meta: Meta<typeof MockSidebarMenuItem> = {
   title: 'SidebarMenuItem',
   component: MockSidebarMenuItem,
-  tags: ['autodocs'],
+  tags: ['!dev'],
   parameters: {
     docs: {
       description: {

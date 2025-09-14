@@ -183,7 +183,7 @@ const MockDataTable = ({
 const meta: Meta<typeof MockDataTable> = {
   title: 'DataTable',
   component: MockDataTable,
-  tags: ['autodocs'],
+  tags: ['!dev'],
   parameters: {
     docs: {
       description: {

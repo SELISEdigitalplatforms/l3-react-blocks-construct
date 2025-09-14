@@ -172,7 +172,7 @@ const MockAppSidebar = ({
 const meta: Meta<typeof MockAppSidebar> = {
   title: 'AppSidebar',
   component: MockAppSidebar,
-  tags: ['autodocs'],
+  tags: ['!dev'],
   parameters: {
     docs: {
       description: {
