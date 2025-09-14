@@ -24,7 +24,7 @@ export const Basic: Story = {
   render: () => (
     <div className="h-64 w-64 border">
       <ScrollArea className="h-full w-full">
-        <div className="h-96 w-96 bg-gradient-to-br from-purple-200 to-pink-200 p-4">
+        <div className="h-96 w-96 bg-gradient-to-br from-purple-200 p-4">
           {[...Array(20)].map((_, i) => (
             <p key={i}>Line {i + 1}</p>
           ))}
@@ -35,23 +35,23 @@ export const Basic: Story = {
 };
 
 /* -------------------- HorizontalScroll -------------------- */
-export const HorizontalScroll: Story = {
-  render: () => (
-    <div className="h-40 w-64 border">
-      <ScrollArea className="h-full w-full">
-        <div className="flex min-w-[800px] bg-gradient-to-r from-green-200 to-blue-200 p-4">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="mr-4 flex h-24 w-24 items-center justify-center rounded bg-white shadow"
-            >
-              Box {i + 1}
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
-  ),
-};
+// export const HorizontalScroll: Story = {
+//   render: () => (
+//     <div className="h-40 w-64 border">
+//       <ScrollArea className="h-full w-full">
+//         <div className="flex min-w-[800px] bg-gradient-to-r from-green-200  p-4">
+//           {[...Array(20)].map((_, i) => (
+//             <div
+//               key={i}
+//               className="mr-4 flex h-24 w-24 items-center justify-center rounded bg-white shadow"
+//             >
+//               Box {i + 1}
+//             </div>
+//           ))}
+//         </div>
+//       </ScrollArea>
+//     </div>
+//   ),
+// };
 
 export {};
