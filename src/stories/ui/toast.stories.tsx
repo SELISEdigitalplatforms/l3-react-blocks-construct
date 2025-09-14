@@ -39,7 +39,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Toast>;
 
-function ToastContent({ title, description }: { title: string; description: string }) {
+function ToastContent(props: Readonly<{ title: string; description: string }>) {
+  const { title, description } = props;
   return (
     <div className="grid gap-1">
       <ToastTitle>{title}</ToastTitle>
@@ -48,19 +49,16 @@ function ToastContent({ title, description }: { title: string; description: stri
   );
 }
 
-function ToastDemo({
-  variant,
-  title,
-  description,
-  showAction,
-  showClose,
-}: {
-  variant?: ToastVariant;
-  title: string;
-  description: string;
-  showAction?: boolean;
-  showClose?: boolean;
-}) {
+function ToastDemo(
+  props: Readonly<{
+    variant?: ToastVariant;
+    title: string;
+    description: string;
+    showAction?: boolean;
+    showClose?: boolean;
+  }>
+) {
+  const { variant, title, description, showAction, showClose } = props;
   const [open, setOpen] = useState(false);
 
   return (
@@ -163,7 +161,8 @@ export const WithoutClose: Story = {
   ),
 };
 
-function MultipleToastButtons({ addToast }: { addToast: (variant: ToastVariant) => void }) {
+function MultipleToastButtons(props: Readonly<{ addToast: (variant: ToastVariant) => void }>) {
+  const { addToast } = props;
   return (
     <div className="flex flex-wrap gap-2">
       <Button onClick={() => addToast('default')}>Default</Button>
