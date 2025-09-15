@@ -5,7 +5,7 @@ import { Mail, Plus } from 'lucide-react';
 const meta: Meta<ButtonProps> = {
   title: 'Button',
   component: Button,
-  tags: ['autodocs'],
+  tags: ['!dev'],
   parameters: {
     docs: {
       description: {
