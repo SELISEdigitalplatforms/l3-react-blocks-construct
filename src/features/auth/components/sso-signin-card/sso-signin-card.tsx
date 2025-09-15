@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useNavigate } from 'react-router-dom';
 import { SocialAuthProvider, SSO_PROVIDERS } from 'constant/sso';
-import { SSOservice } from '../../services/sso.service';
+import { SSOservice, SSOLoginResponse } from '../../services/sso.service';
 import { Button } from 'components/ui/button';
 
 type SSOSigninCardProps = {
@@ -19,6 +19,7 @@ const SSOSigninCard = ({
   totalProviders = 1,
 }: SSOSigninCardProps) => {
   const ssoService = new SSOservice();
+  const navigate = useNavigate();
 
   const getButtonWidth = () => {
     if (showText) return 'w-full';
@@ -45,7 +46,8 @@ const SSOSigninCard = ({
       }
 
       if (!providerConfig?.audience || !providerConfig?.provider) {
-        console.error('Missing required provider config:', {
+        const errorMsg = 'Provider configuration is incomplete';
+        console.error('[SSO] Error:', errorMsg, {
           audience: providerConfig?.audience,
           provider: providerConfig?.provider,
           fullConfig: providerConfig,
@@ -60,12 +62,24 @@ const SSOSigninCard = ({
         sendAsResponse: true,
       };
 
-      const res = await ssoService.getSocialLoginEndpoint(requestPayload);
+      const res: SSOLoginResponse = await ssoService.getSocialLoginEndpoint(requestPayload);
 
-      if (res.error) return alert(`Authentication error: ${res.error}`);
+      if (res.error) {
+        console.error('[SSO] Authentication error:', res.error);
+        return alert(`Authentication error: ${res.error}`);
+      }
 
-      if (!res?.providerUrl)
+      // Handle MFA required case
+      if (res.requiresMfa && res.mfaToken && res.mfaType !== undefined) {
+        const redirectUrl = `/verify-key?mfa_id=${res.mfaToken}&mfa_type=${res.mfaType}&user_name=${encodeURIComponent(res.email || '')}&sso=true`;
+        navigate(redirectUrl);
+        return;
+      }
+
+      // Regular SSO flow
+      if (!res.providerUrl) {
         return alert('No redirect URL received from the authentication service.');
+      }
       window.location.href = res.providerUrl;
     } catch (error) {
       console.error('=== UNEXPECTED ERROR ===');

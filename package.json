@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build-and-deploy": "bash deploy.sh",
-    "start": "react-scripts start",
+    "start": "cross-env HOST=dev-construct.seliseblocks.com PORT=3000 BROWSER=none react-scripts start",
     "start:host": "HOST=construct.seliseblocks.com react-scripts start",
     "build": "react-scripts build",
     "set-env": "node set-env.js",
