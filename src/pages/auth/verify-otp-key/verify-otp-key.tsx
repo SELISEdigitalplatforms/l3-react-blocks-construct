@@ -27,7 +27,6 @@ export function VerifyOtpKey() {
   const userEmail = searchParams.get('user_name');
   const isSsoFlow = searchParams.get('sso') === 'true';
 
-
   const maskEmail = (email: string | undefined) => {
     if (!email) return '';
     const [name, domain] = email.split('@');
@@ -61,9 +60,7 @@ export function VerifyOtpKey() {
 
   const onVerify = useCallback(async () => {
     try {
-      // Use the same working MFA verification endpoint for both SSO and regular flows
       const currentMfaId = newMfaId ?? mfaId ?? '';
-      
       const res = (await mutateAsync({
         grantType: 'mfa_code',
         code: otpValue,
@@ -77,7 +74,7 @@ export function VerifyOtpKey() {
       console.error('MFA verification failed:', error);
       setOtpError(t('MFA_CODE_IS_NOT_VALID'));
     }
-  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, t, isSsoFlow]);
+  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, t]);
 
   useEffect(() => {
     const requiredLength = mfaType === UserMfaType.AUTHENTICATOR_APP ? 6 : 5;
