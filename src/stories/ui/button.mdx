@@ -1,0 +1,97 @@
+import { Canvas, Meta, Story, Controls, Primary } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from './button.stories.tsx';
+
+<Meta of={ButtonStories} />
+
+# {ButtonStories.default.title || 'Button'}
+
+## Overview
+
+The Button component is a key UI element used for triggering actions in the app. It supports various styles (primary, secondary, outline etc.), and states (loading, disabled, active) to help communicate importance and feedback to users.
+
+<Primary />
+## Properties
+<Controls />
+
+## Variants
+
+## States & Behavior
+
+The Button should clearly reflect different states:
+
+- **Default** — ready to click.
+- **Hover** — highlight or elevation to show interactivity.
+- **Active / Pressed** — visual feedback that the click is being registered.
+- **Disabled** — muted appearance, no click event.
+- **Loading** — spinner or indicator + disable to prevent duplicate clicks.
+
+---
+
+## Best Practices
+
+- Use action-oriented, concise text (verbs like **Submit**, **Confirm**, **Cancel**).
+- Only one **primary button** per view or flow to avoid confusing calls-to-action.
+- Provide sufficient padding and touch target size for click / tap.
+- Maintain **high contrast** between text and background for readability.
+- Ensure **focus styles** are visible for keyboard navigation.
+
+---
+
+## Accessibility
+
+- Use proper ARIA attributes where needed (`aria-label`, `aria-disabled`, etc.).
+- Buttons should be **reachable via keyboard** (Tab / Shift+Tab).
+- Active/focus state should be **clearly visible**.
+- For **icon-only buttons**, always provide a textual label for screen readers.
+
+---
+
+#### Primary: Use for main actions (e.g. “Submit”, “Save”).
+
+<Canvas of={ButtonStories.Default} />
+
+#### Secondary: For less prominent actions, often used alongside a primary action.
+
+<Canvas of={ButtonStories.Secondary} />
+
+#### Destructive: Use for actions with potentially negative consequences (e.g. “Delete”).
+
+<Canvas of={ButtonStories.Destructive} />
+
+#### Outline: A bordered button for neutral actions or when multiple buttons are grouped.
+
+<Canvas of={ButtonStories.Outline} />
+
+#### Ghost: Minimal styling, useful for subtle or tertiary actions.
+
+<Canvas of={ButtonStories.Ghost} />
+
+#### Link: Styled like a hyperlink, useful for inline actions or navigation.
+
+<Canvas of={ButtonStories.Link} />
+
+#### Small: A compact button for space-constrained areas like toolbars or cards.
+
+<Canvas of={ButtonStories.Small} />
+
+#### Large: A larger button for emphasis or when touch targets need to be more accessible.
+
+<Canvas of={ButtonStories.Large} />
+
+#### Icon: An icon-only button, commonly used for actions like edit, delete, or settings.
+
+<Canvas of={ButtonStories.Icon} />
+
+#### With Icon: A button combining text and an icon to reinforce meaning.
+
+<Canvas of={ButtonStories.WithIcon} />
+
+#### Loading: Indicates an action is in progress; prevents repeated clicks.
+
+<Canvas of={ButtonStories.Loading} />
+
+#### Disabled: Shows a non-interactive state when an action isn’t available.
+
+<Canvas of={ButtonStories.Disabled} />
+
+---
