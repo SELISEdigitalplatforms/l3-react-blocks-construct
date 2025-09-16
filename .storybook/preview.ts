@@ -11,6 +11,15 @@ const preview: Preview = {
     },
     options: {
       storySort: (a, b) => {
+        // If 'a' is the gettingStarted page, place it first
+        if (a.id.includes('gettingstarted') || a.title?.toLowerCase().includes('getting started')) {
+          return -1;
+        }
+        // If 'b' is the gettingStarted page, place it first
+        if (b.id.includes('gettingstarted') || b.title?.toLowerCase().includes('getting started')) {
+          return 1;
+        }
+
         // If 'a' is a docs page and 'b' is a story, place 'a' first.
         if (a.type === 'docs' && b.type !== 'docs') {
           return -1;
@@ -19,6 +28,7 @@ const preview: Preview = {
         if (b.type === 'docs' && a.type !== 'docs') {
           return 1;
         }
+
         // For all other cases, maintain default sorting (e.g., alphabetical).
         return a.id.localeCompare(b.id, undefined, { numeric: true });
       },
