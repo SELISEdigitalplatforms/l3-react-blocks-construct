@@ -1,32 +1,60 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Button, ButtonProps } from '../../components/ui/button';
 import { Mail, Plus } from 'lucide-react';
+import DocsPage from './button.mdx';
 
 const meta: Meta<ButtonProps> = {
   title: 'Button',
   component: Button,
-  tags: ['!dev'],
   parameters: {
     docs: {
-      description: {
-        component: 'Displays a button or a component that looks like a button.',
-      },
+      page: DocsPage,
     },
   },
   argTypes: {
     variant: {
       control: 'select',
       options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      description: 'Defines button style and visual prominence.',
+      table: {
+        type: { summary: 'enum(default, destructive, outline, secondary, ghost, link)' },
+        defaultValue: { summary: 'default' },
+      },
     },
     size: {
       control: 'select',
       options: ['default', 'sm', 'lg', 'icon'],
+      description: 'Controls padding and font-size.',
+      table: {
+        type: { summary: 'enum(default, sm, lg, icon)' },
+        defaultValue: { summary: 'default' },
+      },
     },
     loading: {
       control: 'boolean',
+      description: 'If true, shows spinner / progress indicator; disables click.',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     disabled: {
       control: 'boolean',
+      description: 'If true, button is not clickable; style communicates disabled state.',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    asChild: {
+      control: false,
+      table: { disable: true },
+    },
+    children: {
+      description: 'The text displayed on the button. Should ideally be 1–3 words.',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
     },
   },
 };
