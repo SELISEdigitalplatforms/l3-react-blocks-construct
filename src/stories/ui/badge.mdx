@@ -1,0 +1,70 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as BadgeStories from './badge.stories';
+
+<Meta of={BadgeStories} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+Badges are used to highlight statuses, categories, or counts with a small visual indicator.
+
+<Primary />
+
+## Properties
+
+<Controls />
+
+## Variants
+
+### States & Behavior
+
+Badges can represent different states or visual styles:
+
+- **Default** — standard badge for general use.
+- **Secondary** — for less prominent labels.
+- **Destructive** — indicates errors or warnings.
+- **Outline** — a minimal style variant.
+
+#### Default
+
+<Canvas of={BadgeStories.Default} />
+
+#### Secondary
+
+<Canvas of={BadgeStories.Secondary} />
+
+#### Destructive
+
+<Canvas of={BadgeStories.Destructive} />
+
+#### Outline
+
+<Canvas of={BadgeStories.Outline} />
+
+## Accessibility
+
+- Use concise text inside the badge so it’s clear to screen readers.
+- Ensure badge color contrast meets **WCAG AA** standards.
+- Do not rely on color alone to convey meaning — pair with text when status matters.
+
+## When to Use
+
+- To label items with statuses like _Active_, _Pending_, or _Error_.
+- To indicate categories or tags.
+- To highlight numeric counts in compact UI elements.
+
+Avoid using badges for long text strings or as standalone navigation elements.
+
+## Best Practices
+
+✅ **Do**
+
+- Keep badge text short (1–2 words).
+- Use consistent color meanings across your app.
+- Pair with icons when clarity is needed.
+
+❌ **Don’t**
+
+- Overuse badges — too many can dilute their impact.
+- Use them for critical alerts; rely on **Toasts** or **Modals** instead.

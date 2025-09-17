@@ -44,7 +44,7 @@ import { Button } from 'components/ui/button';
  * />
  */
 
-interface ConfirmationModalProps {
+export interface ConfirmationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string | React.ReactNode;
