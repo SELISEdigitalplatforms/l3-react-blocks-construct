@@ -71,7 +71,7 @@ const SSOSigninCard = ({
 
       // Handle MFA required case
       if (res.requiresMfa && res.mfaToken && res.mfaType !== undefined) {
-        const redirectUrl = `/verify-key?mfa_id=${res.mfaToken}&mfa_type=${res.mfaType}&user_name=${encodeURIComponent(res.email || '')}&sso=true`;
+        const redirectUrl = `/verify-key?mfa_id=${res.mfaToken}&mfa_type=${res.mfaType}&user_name=${encodeURIComponent(res.email ?? '')}&sso=true`;
         navigate(redirectUrl);
         return;
       }
