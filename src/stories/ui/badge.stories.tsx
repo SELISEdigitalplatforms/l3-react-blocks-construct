@@ -4,18 +4,12 @@ import { Badge, BadgeProps } from '../../components/ui/badge';
 const meta: Meta<BadgeProps> = {
   title: 'Badge',
   component: Badge,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component: 'Displays a badge or a component that looks like a badge.',
-      },
-    },
-  },
+  parameters: {},
   argTypes: {
     variant: {
       control: 'select',
       options: ['default', 'secondary', 'destructive', 'outline'],
+      description: 'Defines the badge style (e.g., default, secondary, destructive, outline).',
     },
   },
 };
