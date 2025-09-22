@@ -128,7 +128,7 @@ jobs:
         run: |
           kubelogin convert-kubeconfig -l azurecli
       - name: Setup Helm Installer
-        uses: Azure/setup-helm@v4.30
+        uses: Azure/setup-helm@v4.3.0
         with:
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
