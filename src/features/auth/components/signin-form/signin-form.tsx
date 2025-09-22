@@ -125,9 +125,19 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const signin = useCallback(
     async (code: string, state: string) => {
       try {
-        const res = await mutateAsync({ grantType: 'social', code, state });
-        login(res.access_token, res.refresh_token);
-        navigate('/');
+        const res = await mutateAsync({ grantType: 'social', code, state }) as SignInResponse;
+        
+        // Check if MFA is enabled for this user (same logic as password signin)
+        if (res?.enable_mfa) {
+          // For SSO, we use the state parameter or a generic identifier since email is not in the response
+          const userIdentifier = state || 'sso_user';
+          navigate(
+            `/verify-key?mfa_id=${res?.mfaId}&mfa_type=${res?.mfaType}&user_name=${encodeURIComponent(userIdentifier)}&sso=true`
+          );
+        } else {
+          login(res.access_token, res.refresh_token);
+          navigate('/');
+        }
       } catch (error) {
         handleError(error);
       }

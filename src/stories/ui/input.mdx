@@ -1,0 +1,67 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as InputStories from './input.stories';
+
+<Meta of={InputStories} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+Input fields allow users to enter and edit text data in forms and interactive workflows.
+
+<Primary />
+
+## Properties
+
+<Controls />
+
+## Variants
+
+### States & Behavior
+
+The Input should clearly reflect different states:
+
+- **Default** — ready to type.
+- **Hover** — highlight or elevation to show interactivity.
+- **Active / Focused** — visual feedback that the input is active.
+- **Disabled** — muted appearance, no typing possible.
+- **Password** — obscures typed characters for sensitive info.
+
+#### Default
+
+<Canvas of={InputStories.Default} />
+
+#### Disabled
+
+<Canvas of={InputStories.Disabled} />
+
+#### Password
+
+<Canvas of={InputStories.Password} />
+
+## Accessibility
+
+- Always provide a descriptive label (`<label for>` or `aria-label`).
+- Use `aria-invalid="true"` when displaying validation errors.
+- Ensure disabled and read-only states are conveyed to assistive technologies.
+
+---
+
+## When to Use
+
+- For freeform text entry like names, emails, or search queries.
+- For controlled form inputs where value management is required.
+- Avoid using inputs when the data should be constrained to a set of choices — use **Select** or **Radio** instead.
+
+## Best Practices
+
+✅ **Do**
+
+- Keep labels clear and concise.
+- Provide inline error messages when validation fails.
+- Use placeholder text only for examples, not as a substitute for labels.
+
+❌ **Don’t**
+
+- Leave required fields unlabeled.
+- Disable inputs without explanation.
