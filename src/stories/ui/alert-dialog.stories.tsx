@@ -15,14 +15,14 @@ import { Button } from '../../components/ui/button';
 const meta: Meta<typeof AlertDialog> = {
   title: 'AlertDialog',
   component: AlertDialog,
-  tags: ['autodocs'],
+  // tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component:
-          'A modal dialog that interrupts the user with important content and expects a response.',
-      },
-    },
+    // docs: {
+    //   description: {
+    //     component:
+    //       'A modal dialog that interrupts the user with important content and expects a response.',
+    //   },
+    // },
   },
   render: (args) => (
     <AlertDialog {...args}>

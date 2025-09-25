@@ -4,13 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 const meta: Meta<typeof Avatar> = {
   title: 'Avatar',
   component: Avatar,
-  tags: ['autodocs'],
+  // tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component: 'An image element with a fallback for representing the user.',
-      },
-    },
+    // docs: {
+    //   description: {
+    //     component: 'An image element with a fallback for representing the user.',
+    //   },
+    // },
   },
   render: (args) => (
     <Avatar {...args}>

@@ -5,13 +5,13 @@ import { Label } from '../../components/ui/label';
 const meta: Meta<typeof Switch> = {
   title: 'Switch',
   component: Switch,
-  tags: ['autodocs'],
+  // tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component: 'A control that allows the user to toggle between checked and not checked.',
-      },
-    },
+    // docs: {
+    //   description: {
+    //     component: 'A control that allows the user to toggle between checked and not checked.',
+    //   },
+    // },
   },
   argTypes: {
     disabled: {
