@@ -1,0 +1,30 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as Slider from './slider.stories';
+
+<Meta of={Slider} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+Slider allows users to select a numeric value or range by dragging a handle along a track.
+
+## Variants
+
+- **Single-value:** Selects one value.
+- **Range:** Selects a min and max range.
+
+## Props
+
+- **min:** Minimum value.
+- **max:** Maximum value.
+- **step:** Step interval.
+- **value:** Controlled value.
+- **defaultValue:** Initial value.
+- **onValueChange:** Callback when value changes.
+
+## Best Practices
+
+- Use for ranges or gradual adjustments.
+- Provide numeric labels for clarity.
+- Avoid very large ranges without clear intervals.

@@ -4,13 +4,13 @@ import { Slider } from '../../components/ui/slider';
 const meta: Meta<typeof Slider> = {
   title: 'Slider',
   component: Slider,
-  tags: ['autodocs'],
+  // tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component: 'An input where the user selects a value from within a given range.',
-      },
-    },
+    // docs: {
+    //   description: {
+    //     component: 'An input where the user selects a value from within a given range.',
+    //   },
+    // },
   },
   argTypes: {
     defaultValue: { control: 'object' },

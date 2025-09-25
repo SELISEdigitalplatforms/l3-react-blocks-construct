@@ -1,0 +1,30 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as Avatar from './avatar.stories';
+
+<Meta of={Avatar} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+The Avatar component visually represents a user, typically as an image, initials, or fallback icon.
+
+## Variants
+
+- **Image:** Displays user-provided image.
+- **Initials:** Displays user initials when no image is available.
+- **Fallback/Icon:** Displays a default icon if image or initials are unavailable.
+
+## Props
+
+- **src:** Image URL.
+- **alt:** Accessible text description.
+- **size:** Dimensions (sm, md, lg).
+- **fallback:** Content displayed if image fails to load.
+- **shape:** Circle or square.
+
+## Best Practices
+
+- Always provide alt text for accessibility.
+- Use consistent avatar sizes.
+- Do not rely solely on avatar for critical information.

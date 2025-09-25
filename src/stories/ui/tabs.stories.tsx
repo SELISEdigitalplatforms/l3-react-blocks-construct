@@ -15,14 +15,14 @@ import { Label } from '../../components/ui/label';
 const meta: Meta<typeof Tabs> = {
   title: 'Tabs',
   component: Tabs,
-  tags: ['autodocs'],
+  // tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component:
-          'A set of layered sections of content—known as tab panels—that are displayed one at a time.',
-      },
-    },
+    // docs: {
+    //   description: {
+    //     component:
+    //       'A set of layered sections of content—known as tab panels—that are displayed one at a time.',
+    //   },
+    // },
   },
   render: (args) => (
     <Tabs {...args} defaultValue="account" className="w-[400px]">
