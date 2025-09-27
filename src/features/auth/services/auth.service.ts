@@ -98,7 +98,7 @@ export interface SigninBySSOPayload {
 
 export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'password'>(
   payload: PasswordSigninPayload | MFASigninPayload | SigninBySSOPayload
-): Promise<T extends 'password' ? SignInResponse : MFASigninResponse> => {
+): Promise<T extends 'password' | 'social' ? SignInResponse : MFASigninResponse> => {
   const url = getApiUrl('/authentication/v1/OAuth/Token');
 
   // sign in flow

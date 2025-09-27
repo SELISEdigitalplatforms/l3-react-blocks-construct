@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
+import { generateUuid } from 'utils/uuid';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
@@ -231,7 +232,7 @@ const createBaseEvent = (
   selectedColor: string | null,
   selectedMembers: Member[]
 ): CalendarEvent => ({
-  eventId: crypto.randomUUID(),
+  eventId: generateUuid(),
   title,
   start,
   end,
@@ -405,7 +406,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
 
         events.push({
           ...baseEvent,
-          eventId: crypto.randomUUID(),
+          eventId: generateUuid(),
           start: newStart,
           end: newEnd,
         });
@@ -485,7 +486,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
             .filter((member): member is Member => member !== undefined);
 
           const updatedEvents: CalendarEvent[] = parsedEvents.map((event) => ({
-            eventId: event.id || crypto.randomUUID(),
+            eventId: event.id || generateUuid(),
             title: event.title || form.getValues('title') || 'New Event',
             start: new Date(event.start),
             end: new Date(event.end),

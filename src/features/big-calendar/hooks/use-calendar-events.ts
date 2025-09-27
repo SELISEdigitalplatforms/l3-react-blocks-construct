@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { generateUuid } from 'utils/uuid';
 import { CalendarEvent, myEventsList, Member } from 'features/big-calendar';
 import { MEMBER_STATUS } from 'features/big-calendar/enums/calendar.enum';
 
@@ -13,7 +14,7 @@ export const useCalendarEvents = () => {
   const lastDeletedEventRef = useRef<CalendarEvent | null>(null);
   // Store the original events list before deletion to ensure proper restoration
   const eventsBeforeDeletionRef = useRef<CalendarEvent[]>([]);
-  const currentUserId = crypto.randomUUID();
+  const currentUserId = generateUuid();
 
   /**
    * Update the status of a member in an event
@@ -74,7 +75,7 @@ export const useCalendarEvents = () => {
     }
 
     const newEvent: CalendarEvent = {
-      eventId: crypto.randomUUID(),
+      eventId: generateUuid(),
       title: data.title,
       start: new Date(data.start),
       end: new Date(data.end),

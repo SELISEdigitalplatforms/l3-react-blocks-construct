@@ -15,7 +15,8 @@ export function AuthLayout() {
   const { theme } = useTheme();
 
   useLayoutEffect(() => {
-    if (isAuthenticated) {
+    // Don't redirect if we're on the MFA verification page
+    if (isAuthenticated && !window.location.pathname.includes('/verify-key')) {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);

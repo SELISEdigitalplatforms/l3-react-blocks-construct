@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build-and-deploy": "bash deploy.sh",
-    "start": "react-scripts start",
+    "start": "cross-env HOST=dev-construct.seliseblocks.com PORT=3000 BROWSER=none react-scripts start",
     "start:host": "HOST=construct.seliseblocks.com react-scripts start",
     "build": "react-scripts build",
     "set-env": "node set-env.js",
@@ -103,6 +103,7 @@
     "@storybook/addon-docs": "^9.1.3",
     "@storybook/addon-onboarding": "^9.1.3",
     "@storybook/addon-styling-webpack": "^2.0.0",
+    "@storybook/addons": "^7.6.17",
     "@storybook/preset-create-react-app": "^9.1.3",
     "@storybook/react-webpack5": "^9.1.3",
     "@testing-library/dom": "^10.4.0",

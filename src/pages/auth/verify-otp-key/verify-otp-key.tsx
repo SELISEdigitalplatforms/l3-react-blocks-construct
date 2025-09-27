@@ -25,6 +25,7 @@ export function VerifyOtpKey() {
   const mfaId = searchParams.get('mfa_id');
   const mfaType = Number(searchParams.get('mfa_type'));
   const userEmail = searchParams.get('user_name');
+  const isSsoFlow = searchParams.get('sso') === 'true';
 
   const maskEmail = (email: string | undefined) => {
     if (!email) return '';
@@ -40,28 +41,37 @@ export function VerifyOtpKey() {
     initialTime: 120,
     onResend: () => {
       if (!mfaId) return;
-      resendOtp(mfaId, {
-        onSuccess: (data: { mfaId?: string }) => {
-          if (data?.mfaId) {
-            setNewMfaId(data.mfaId);
-          }
-        },
-      });
+
+      if (isSsoFlow) {
+        // For SSO flow, we can't resend OTP directly, just reset the timer
+        handleResendOTP();
+      } else {
+        // For regular MFA flow, use the existing resend logic
+        resendOtp(mfaId, {
+          onSuccess: (data: { mfaId?: string }) => {
+            if (data?.mfaId) {
+              setNewMfaId(data.mfaId);
+            }
+          },
+        });
+      }
     },
   });
 
   const onVerify = useCallback(async () => {
     try {
+      const currentMfaId = newMfaId ?? mfaId ?? '';
       const res = (await mutateAsync({
         grantType: 'mfa_code',
         code: otpValue,
-        mfaId: newMfaId ?? mfaId ?? '',
+        mfaId: currentMfaId,
         mfaType: mfaType,
       })) as MFASigninResponse;
 
       login(res.access_token, res.refresh_token);
       navigate('/');
-    } catch {
+    } catch (error) {
+      console.error('MFA verification failed:', error);
       setOtpError(t('MFA_CODE_IS_NOT_VALID'));
     }
   }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, t]);

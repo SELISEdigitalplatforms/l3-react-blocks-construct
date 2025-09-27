@@ -1,5 +1,6 @@
 import API_CONFIG from 'config/api';
 import { LoginOption } from 'constant/sso';
+import { MFASigninResponse } from './auth.service';
 
 const safeJsonParse = async (response: Response) => {
   try {
@@ -31,34 +32,86 @@ const safeJsonParse = async (response: Response) => {
   }
 };
 
+export interface SSOLoginResponse {
+  providerUrl?: string;
+  error?: string;
+  requiresMfa?: boolean;
+  mfaToken?: string;
+  mfaType?: number;
+  email?: string;
+  status?: number;
+}
+
 export class SSOservice {
-  async getSocialLoginEndpoint(payload: any) {
+  async getSocialLoginEndpoint(payload: any): Promise<SSOLoginResponse> {
     try {
-      const rawResponse = await fetch(
-        `${API_CONFIG.baseUrl}/authentication/v1/OAuth/GetSocialLogInEndPoint`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'x-blocks-key': API_CONFIG.blocksKey,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const url = `${API_CONFIG.baseUrl}/authentication/v1/OAuth/GetSocialLogInEndPoint`;
+
+      const rawResponse = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'x-blocks-key': API_CONFIG.blocksKey,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!rawResponse.ok) {
-        console.error('API responded with error status:', rawResponse.status);
+        const errorText = await rawResponse.text();
+        console.error('[SSO] API error response:', {
+          status: rawResponse.status,
+          statusText: rawResponse.statusText,
+          error: errorText,
+        });
+
         return {
-          error: `API error: ${rawResponse.status}`,
+          error: `API error: ${rawResponse.status} - ${rawResponse.statusText}`,
           status: rawResponse.status,
         };
       }
 
-      return await safeJsonParse(rawResponse);
+      const responseData = await safeJsonParse(rawResponse);
+
+      return responseData;
     } catch (error) {
       console.error('Request failed:', error);
       return { error: 'Failed to make request' };
+    }
+  }
+
+  async verifyMfaCode(mfaToken: string, code: string): Promise<MFASigninResponse> {
+    try {
+      const url = `${API_CONFIG.baseUrl}/authentication/v1/OAuth/VerifyMfaCode`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-blocks-key': API_CONFIG.blocksKey,
+        },
+        body: JSON.stringify({
+          mfaToken,
+          code,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[SSO] MFA verification failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+        });
+        throw new Error(errorText || 'Failed to verify MFA code');
+      }
+
+      const responseData = await response.json();
+
+      return responseData;
+    } catch (error) {
+      console.error('MFA verification failed:', error);
+      throw error;
     }
   }
 }
