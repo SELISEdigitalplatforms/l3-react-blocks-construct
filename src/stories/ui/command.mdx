@@ -1,0 +1,26 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as Command from './command.stories';
+
+<Meta of={Command} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+The Command component provides a command palette interface, allowing quick access to actions and navigation through keyboard or mouse.
+
+## Variants
+
+- **Default:** Full command palette with search and actions.
+
+## Props
+
+- **actions:** Array of available commands.
+- **onSelect:** Callback executed when a command is selected.
+- **placeholder:** Input placeholder text.
+
+## Best Practices
+
+- Use Command for advanced users who need keyboard shortcuts.
+- Keep command names concise and descriptive.
+- Support keyboard navigation for accessibility.

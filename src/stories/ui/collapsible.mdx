@@ -1,0 +1,26 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as Collapsible from './collapsible.stories';
+
+<Meta of={Collapsible} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+Collapsible is a container that allows sections of content to be expanded or collapsed. It is ideal for hiding optional content until needed.
+
+## Variants
+
+- **Default:** Standard collapsible section.
+
+## Props
+
+- **open:** Boolean to control open state.
+- **defaultOpen:** Initial open state for uncontrolled collapsible.
+- **onOpenChange:** Callback triggered when open state changes.
+
+## Best Practices
+
+- Use collapsibles to manage optional or less critical content.
+- Keep headers concise.
+- Avoid nesting multiple collapsibles for clarity.

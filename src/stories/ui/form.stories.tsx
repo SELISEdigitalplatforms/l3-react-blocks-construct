@@ -22,14 +22,7 @@ type FormValues = {
 const meta: Meta<typeof Form> = {
   title: 'Form',
   component: Form,
-  tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component:
-          'The Form component is a wrapper around `react-hook-form` providing accessible form field components with integrated error handling and descriptions. It ensures proper labeling, ARIA attributes, and context-driven form control management.',
-      },
-    },
     layout: 'centered',
   },
 };

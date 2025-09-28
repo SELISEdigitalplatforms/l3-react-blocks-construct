@@ -1,0 +1,29 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as Form from './form.stories';
+
+<Meta of={Form} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+Form provides a structured container for collecting and submitting user input with validation support.
+
+## Variants
+
+- **Default:** Standard form layout.
+- **Inline:** Form fields placed inline for compact input.
+
+## Props
+
+- **onSubmit:** Function triggered on form submission.
+- **defaultValues:** Initial values for form fields.
+- **validationSchema:** Schema to validate form data.
+- **children:** Form fields and controls.
+
+## Best Practices
+
+- Group related fields logically.
+- Provide inline validation and clear error messages.
+- Keep forms short and focused.
+- Ensure full keyboard accessibility and mobile usability.

@@ -13,7 +13,6 @@ import { Badge } from '../../components/ui/badge';
 const meta: Meta<typeof Card> = {
   title: 'Card',
   component: Card,
-  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

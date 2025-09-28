@@ -17,13 +17,7 @@ import { Calendar, Calculator, CreditCard, Settings, Smile, User, Search } from 
 const meta = {
   title: 'Command',
   component: Command,
-  tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component: 'A command menu component for quick actions and search functionality.',
-      },
-    },
     layout: 'centered',
   },
 } satisfies Meta<typeof Command>;

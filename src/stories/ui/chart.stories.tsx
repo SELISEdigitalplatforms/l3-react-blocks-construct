@@ -24,13 +24,7 @@ import {
 const meta = {
   title: 'Chart',
   component: ChartContainer,
-  tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component: 'A customizable chart component built on Recharts with theme support.',
-      },
-    },
     layout: 'centered',
   },
   argTypes: {
