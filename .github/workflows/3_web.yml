@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #Checks out the repository this file is in
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'true'
           token: ${{ secrets.SELISE_GITHUB_PAT }}
@@ -106,7 +106,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: pull helm repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: SELISEdigitalplatforms/l0-yml-infrastructure-helm
           token: ${{ secrets.SELISE_GITHUB_PAT }}
@@ -129,7 +129,7 @@ jobs:
         run: |
           kubelogin convert-kubeconfig -l azurecli
       - name: Setup Helm Installer
-        uses: Azure/setup-helm@v3.5
+        uses: Azure/setup-helm@v4.3.0
         with:
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
