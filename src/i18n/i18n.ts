@@ -119,7 +119,7 @@ const originalT = i18n.t.bind(i18n);
 (i18n as any).t = (key: string | string[], options?: Record<string, unknown>) => {
   if (typeof window !== 'undefined' && window.__i18nKeyMode) {
     if (Array.isArray(key)) return key[0];
-    return key as string;
+    return key;
   }
   return (originalT as any)(key, options);
 };
@@ -127,6 +127,8 @@ const originalT = i18n.t.bind(i18n);
 // Listen for messages coming from the browser extension
 if (typeof window !== 'undefined') {
   window.addEventListener('message', (event) => {
+    if (event.source !== window) return; // Ignore messages from iframes or other sources
+    if (event.origin !== window.location.origin) return; // Prevent cross-origin injections
     const { data } = event;
     if (!data || typeof data !== 'object') return;
 
