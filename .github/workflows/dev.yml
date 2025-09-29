@@ -59,7 +59,7 @@ jobs:
       CONTAINER_NAME: 'dev-$SERVICE_NAME-storybook'
       NAMESPACE: 'dev-$REPO_NAME'
       SERVICE_NAME: $SERVICE_NAME
-      CLUSTER_VALUES: "aks-blocks-stg"
+      CLUSTER_VALUES: "aks-blocks-dev"
       # CI_BUILD: 'build-dev'
       CI_BUILD: 'storybook-dev'
     secrets:
