@@ -6,17 +6,17 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from 'components/ui/sheet';
-import { Button } from 'components/ui/button';
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
-import { Label } from 'components/ui/label';
-import { useToast } from 'hooks/use-toast';
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import { useCalendarSettings } from '../../contexts/calendar-settings.context';
 import {
   EVENT_DURATIONS_SELECT,

@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { createInvoiceTableColumns } from 'features/invoices';
+import { createInvoiceTableColumns } from '@/features/invoices';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { InvoicesPage } from './invoices';
-import { InvoiceItem } from 'features/invoices/types/invoices.types';
+import { InvoiceItem } from '@/features/invoices/types/invoices.types';
 
 // Mock the useGetInvoiceItems hook
 const mockData = {

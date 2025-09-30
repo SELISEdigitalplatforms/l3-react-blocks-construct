@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PlusCircle, X, Check, Search } from 'lucide-react';
-import { Input } from 'components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
-import { Button } from 'components/ui/button';
-import { Calendar } from 'components/ui/calendar';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
-import { Badge } from 'components/ui/badge';
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { DateRange } from '../types/file-manager.type';
 import { IFileDataWithSharing } from '../utils/file-manager';
 

@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
-import { Dialog, DialogClose, DialogContent, DialogTitle } from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { useMediaQuery } from 'hooks/use-media-query';
+import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { InvoicesDetail } from '../invoices-detail/invoices-detail';
 import { InvoiceItem } from '../../types/invoices.types';
 

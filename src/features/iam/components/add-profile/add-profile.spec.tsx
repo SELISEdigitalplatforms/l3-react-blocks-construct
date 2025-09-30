@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AddUser } from './add-profile';
-import { useCreateAccount } from 'features/profile/hooks/use-account';
+import { useCreateAccount } from '@/features/profile/hooks/use-account';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Dialog from '@radix-ui/react-dialog';
 

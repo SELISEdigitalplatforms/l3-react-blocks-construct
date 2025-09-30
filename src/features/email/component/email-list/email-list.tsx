@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Paperclip, Star, SquarePen } from 'lucide-react';
 import { parseISO, format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TEmail } from '../../types/email.types';
-import { Checkbox } from 'components/ui/checkbox';
-import { Label } from 'components/ui/label';
-import CustomPaginationEmail from 'components/blocks/custom-pagination-email/custom-pagination-email';
-import { Button } from 'components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import CustomPaginationEmail from '@/components/blocks/custom-pagination-email/custom-pagination-email';
+import { Button } from '@/components/ui/button';
 import { htmlToPlainText } from '../../services/email';
 
 /**

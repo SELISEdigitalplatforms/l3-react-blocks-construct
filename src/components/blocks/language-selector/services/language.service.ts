@@ -1,5 +1,5 @@
-import API_CONFIG from 'config/api';
-import { clients } from 'lib/https';
+import API_CONFIG from '@/config/api';
+import { clients } from '@/lib/https';
 import { LanguageResponse, ModuleResponse, UilmFileParams } from '../types/language.types';
 
 /**

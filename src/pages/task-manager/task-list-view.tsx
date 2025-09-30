@@ -18,11 +18,11 @@ import {
   SortableTaskItem,
   StatusCircle,
   TableHeader,
-} from 'features/task-manager/components/list-view';
-import { Dialog } from 'components/ui/dialog';
-import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
-import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
-import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
+} from '@/features/task-manager/components/list-view';
+import { Dialog } from '@/components/ui/dialog';
+import TaskDetailsView from '@/features/task-manager/components/task-details-view/task-details-view';
+import { useListTasks } from '@/features/task-manager/hooks/use-list-tasks';
+import { useGetTaskSections } from '@/features/task-manager/hooks/use-task-manager';
 
 /**
  * TaskListView Component
@@ -49,7 +49,7 @@ import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager
  * <TaskListView taskService={new TaskService()} />
  */
 
-import { ItemTag } from 'features/task-manager/types/task-manager.types';
+import { ItemTag } from '@/features/task-manager/types/task-manager.types';
 
 interface TaskListViewProps {
   searchQuery?: string;

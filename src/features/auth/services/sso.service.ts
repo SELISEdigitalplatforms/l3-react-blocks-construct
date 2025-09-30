@@ -1,5 +1,5 @@
-import API_CONFIG from 'config/api';
-import { LoginOption } from 'constant/sso';
+import API_CONFIG from '@/config/api';
+import { LoginOption } from '@/constant/sso';
 import { MFASigninResponse } from './auth.service';
 
 const safeJsonParse = async (response: Response) => {

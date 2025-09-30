@@ -6,13 +6,13 @@ import {
   getForgotPasswordFormValidationSchema,
 } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
-import { Input } from 'components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { useForgotPassword } from '../../hooks/use-auth';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import { SetStateAction, useRef, useState, useEffect } from 'react';
-import { CaptchaRef } from 'features/captcha/index.type';
-import { Captcha } from 'features/captcha';
+import { CaptchaRef } from '@/features/captcha/index.type';
+import { Captcha } from '@/features/captcha';
 import { useTranslation } from 'react-i18next';
 
 /**

@@ -1,5 +1,5 @@
 import { useId, useMemo } from 'react';
-import { Skeleton } from 'components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const useSkeletonIds = (count: number) => {
   const baseId = useId();

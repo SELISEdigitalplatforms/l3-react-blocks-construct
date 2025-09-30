@@ -5,7 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +15,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from 'components/ui/alert-dialog';
-import { Button } from 'components/ui/button';
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { Info, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { IFileTrashData } from '../../utils/file-manager';

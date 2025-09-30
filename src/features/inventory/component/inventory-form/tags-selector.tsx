@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
-import { Checkbox } from 'components/ui/checkbox';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 /**
  * TagsSelector component allows users to filter and select tags from a list of available tags.

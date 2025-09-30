@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
-import { generateUuid } from 'utils/uuid';
-import { CalendarEvent, myEventsList, Member } from 'features/big-calendar';
-import { MEMBER_STATUS } from 'features/big-calendar/enums/calendar.enum';
+import { generateUuid } from '@/utils/uuid';
+import { CalendarEvent, myEventsList, Member } from '@/features/big-calendar';
+import { MEMBER_STATUS } from '@/features/big-calendar/enums/calendar.enum';
 
 /**
  * Hook for managing calendar events

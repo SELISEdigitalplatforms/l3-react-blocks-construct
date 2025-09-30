@@ -14,16 +14,16 @@ import {
   FileText,
   Download,
 } from 'lucide-react';
-import { cn } from 'lib/utils';
-import { Separator } from 'components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
-import { Button } from 'components/ui/button';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { ForwardMessage } from '../modals/forward-message/forward-message';
 import { ChatProfile } from '../chat-profile/chat-profile';
 import { ChatInput } from '../chat-input/chat-input';

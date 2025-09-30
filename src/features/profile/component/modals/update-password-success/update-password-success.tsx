@@ -5,15 +5,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import SecurityOn from 'assets/images/security_on.svg';
-import { Checkbox } from 'components/ui/checkbox';
-import { Label } from 'components/ui/label';
-import { useLogoutAllMutation, useSignoutMutation } from 'features/auth/hooks/use-auth';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import SecurityOn from '@/assets/images/security_on.svg';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { useLogoutAllMutation, useSignoutMutation } from '@/features/auth/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from 'state/store/auth';
-import { useToast } from 'hooks/use-toast';
+import { useAuthStore } from '@/state/store/auth';
+import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
 /**

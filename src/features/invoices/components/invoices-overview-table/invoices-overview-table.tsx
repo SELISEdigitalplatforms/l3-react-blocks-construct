@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import uuidv4 from 'utils/uuid';
+import uuidv4 from '@/utils/uuid';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import {
   ColumnDef,
@@ -17,12 +17,12 @@ import {
   useReactTable,
   Table as TableInstance,
 } from '@tanstack/react-table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
-import { Separator } from 'components/ui/separator';
-import { TableRow, TableCell, TableHeader, TableHead, Table, TableBody } from 'components/ui/table';
-import { Skeleton } from 'components/ui/skeleton';
-import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
-import { DataTablePagination } from 'components/blocks/data-table/data-table-pagination';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { TableRow, TableCell, TableHeader, TableHead, Table, TableBody } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { DataTablePagination } from '@/components/blocks/data-table/data-table-pagination';
 import { InvoiceItem, InvoiceStatus } from '../../types/invoices.types';
 
 interface RowType {

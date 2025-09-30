@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from 'hooks/use-toast';
-import { useErrorHandler } from 'hooks/use-error-handler';
-import { useGlobalMutation, useGlobalQuery } from 'state/query-client/hooks';
+import { useToast } from '@/hooks/use-toast';
+import { useErrorHandler } from '@/hooks/use-error-handler';
+import { useGlobalMutation, useGlobalQuery } from '@/state/query-client/hooks';
 import {
   changePassword,
   createAccount,

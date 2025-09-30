@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { ForgotpasswordForm } from 'features/auth/components/forgot-password';
-import { useTheme } from 'styles/theme/theme-provider';
-import darklogo from 'assets/images/construct_logo_dark.svg';
-import lightlogo from 'assets/images/construct_logo_light.svg';
+import { ForgotpasswordForm } from '@/features/auth/components/forgot-password';
+import { useTheme } from '@/styles/theme/theme-provider';
+import darklogo from '@/assets/images/construct_logo_dark.svg';
+import lightlogo from '@/assets/images/construct_logo_light.svg';
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation();

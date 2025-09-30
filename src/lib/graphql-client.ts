@@ -1,5 +1,5 @@
 import { clients } from './https';
-import API_CONFIG from 'config/api';
+import API_CONFIG from '@/config/api';
 
 /**
  * GraphQL Client Module

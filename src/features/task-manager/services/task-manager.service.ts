@@ -1,4 +1,4 @@
-import { graphqlClient } from 'lib/graphql-client';
+import { graphqlClient } from '@/lib/graphql-client';
 import {
   GET_TASK_COMMENTS_QUERY,
   GET_TASK_MANAGER_QUERY,
@@ -39,7 +39,7 @@ import {
   UPDATE_TASK_COMMENTS_MUTATION,
   DELETE_TASK_COMMENTS_MUTATION,
 } from '../graphql/mutations';
-import { clients } from 'lib/https';
+import { clients } from '@/lib/https';
 
 export interface BaseMutationResponse {
   itemId: string;

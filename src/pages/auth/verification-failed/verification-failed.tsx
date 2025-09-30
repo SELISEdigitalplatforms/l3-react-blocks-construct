@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
-import emailSentIcon from 'assets/images//verification-failed.svg';
+import { Button } from '@/components/ui/button';
+import emailSentIcon from '@/assets/images//verification-failed.svg';
 
 export function VerificationFailed() {
   const { t } = useTranslation();

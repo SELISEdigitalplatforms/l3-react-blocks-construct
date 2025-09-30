@@ -1,6 +1,6 @@
-import { SidebarMenu } from 'components/ui/sidebar';
+import { SidebarMenu } from '@/components/ui/sidebar';
 import { SidebarMenuItemComponent } from '../layout/sidebar-menu-Item';
-import { MenuItem } from 'models/sidebar';
+import { MenuItem } from '@/models/sidebar';
 
 interface MenuSectionProps {
   title: string;

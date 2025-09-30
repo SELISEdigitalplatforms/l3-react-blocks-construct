@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { DateRange } from 'react-day-picker';
 import { Check, PlusCircle, Search } from 'lucide-react';
 import { debounce } from 'lodash';
-import { cn } from 'lib/utils';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
-import { Calendar } from 'components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Command,
   CommandEmpty,
@@ -15,7 +15,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from 'components/ui/command';
+} from '@/components/ui/command';
 
 /**
  * ActivityLogToolbar Component

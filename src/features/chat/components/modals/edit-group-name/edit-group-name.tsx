@@ -6,11 +6,11 @@ import {
   DialogTitle,
   DialogDescription,
   Dialog,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { cn } from 'lib/utils';
-import { Label } from 'components/ui/label';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 interface EditGroupNameProps {
   isOpen: boolean;

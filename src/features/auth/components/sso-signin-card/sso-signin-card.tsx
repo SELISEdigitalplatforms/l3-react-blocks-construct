@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { SocialAuthProvider, SSO_PROVIDERS } from 'constant/sso';
+import { SocialAuthProvider, SSO_PROVIDERS } from '@/constant/sso';
 import { SSOservice, SSOLoginResponse } from '../../services/sso.service';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 
 type SSOSigninCardProps = {
   providerConfig: SocialAuthProvider & {

@@ -25,24 +25,9 @@
     "forceConsistentCasingInFileNames": true,
 
     /* Path mapping */
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "/*": ["*"],
-      "assets/*": ["assets/*"],
-      "components/*": ["components/*"],
-      "config/*": ["config/*"],
-      "context/*": ["context/*"],
-      "features/*": ["features/*"],
-      "hooks/*": ["hooks/*"],
-      "lib/*": ["lib/*"],
-      "constant/*": ["constant/*"],
-      "models/*": ["models/*"],
-      "pages/*": ["pages/*"],
-      "providers/*": ["providers/*"],
-      "state/*": ["state/*"],
-      "styles/*": ["styles/*"],
-      "types/*": ["types/*"],
-      "utils/*": ["utils/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["src"],

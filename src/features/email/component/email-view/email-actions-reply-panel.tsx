@@ -5,10 +5,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { TActiveAction, TEmail, TReply } from '../../types/email.types';
-import { Button } from 'components/ui/button';
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
+import { Button } from '@/components/ui/button';
+import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

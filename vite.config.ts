@@ -9,26 +9,10 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   
-  // Path aliases to match existing tsconfig paths
+  // Path aliases to match tsconfig paths
   resolve: {
     alias: {
-      // Match the baseUrl and paths from tsconfig.json
       '@': path.resolve(__dirname, './src'),
-      'assets': path.resolve(__dirname, './src/assets'),
-      'components': path.resolve(__dirname, './src/components'),
-      'config': path.resolve(__dirname, './src/config'),
-      'context': path.resolve(__dirname, './src/context'),
-      'features': path.resolve(__dirname, './src/features'),
-      'hooks': path.resolve(__dirname, './src/hooks'),
-      'lib': path.resolve(__dirname, './src/lib'),
-      'constant': path.resolve(__dirname, './src/constant'),
-      'models': path.resolve(__dirname, './src/models'),
-      'pages': path.resolve(__dirname, './src/pages'),
-      'providers': path.resolve(__dirname, './src/providers'),
-      'state': path.resolve(__dirname, './src/state'),
-      'styles': path.resolve(__dirname, './src/styles'),
-      'types': path.resolve(__dirname, './src/types'),
-      'utils': path.resolve(__dirname, './src/utils'),
     },
   },
 

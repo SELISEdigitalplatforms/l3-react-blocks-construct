@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
-import { User } from 'types/user.type';
-import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
+import { User } from '@/types/user.type';
+import { ACCOUNT_QUERY_KEY, useUpdateAccount } from '@/features/profile/hooks/use-account';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -11,23 +11,23 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
-import { Form, FormField, FormItem, FormControl, FormMessage } from 'components/ui/form';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
-import { IamData } from 'features/iam/services/user-service';
-import UIPhoneInput from 'components/core/phone-input/phone-input';
-import { Badge } from 'components/ui/badge';
+} from '@/components/ui/select';
+import { IamData } from '@/features/iam/services/user-service';
+import UIPhoneInput from '@/components/core/phone-input/phone-input';
+import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-import { useGetRolesQuery } from 'features/iam/hooks/use-iam';
+import { useGetRolesQuery } from '@/features/iam/hooks/use-iam';
 import { useTranslation } from 'react-i18next';
 
 // Constants

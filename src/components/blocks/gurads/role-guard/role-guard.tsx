@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect } from 'react';
-import { RoleGuardProps } from 'models/permission';
-import { usePermissions } from 'hooks/use-permissions';
-import { useToast } from 'hooks/use-toast';
+import { RoleGuardProps } from '@/models/permission';
+import { usePermissions } from '@/hooks/use-permissions';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
+} from '@/components/ui/dialog';
 import { UserX } from 'lucide-react';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 
 export const RoleGuard: React.FC<
   RoleGuardProps & {

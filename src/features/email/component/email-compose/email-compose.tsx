@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { EmailComposeHeader } from './email-compose-header';
 import { EmailInput } from '../email-ui/email-input';
 import EmailTextEditor from '../email-ui/email-text-editor';

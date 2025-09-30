@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
-import { Button } from 'components/ui/button';
-import { UPasswordInput } from 'components/core/u-password-input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { UPasswordInput } from '@/components/core/u-password-input';
 import { SharedPasswordStrengthChecker } from '../../core/shared-password-strength-checker';
-import { Captcha } from 'features/captcha';
+import { Captcha } from '@/features/captcha';
 import { useTranslation } from 'react-i18next';
 
 /**

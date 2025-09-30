@@ -5,10 +5,10 @@ import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { Trash, Upload } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
-import { User } from 'types/user.type';
-import { ACCOUNT_QUERY_KEY, useUpdateAccount } from 'features/profile/hooks/use-account';
+import { User } from '@/types/user.type';
+import { ACCOUNT_QUERY_KEY, useUpdateAccount } from '@/features/profile/hooks/use-account';
 import { ImageCropper } from '../image-cropper/image-cropper';
 import {
   DialogContent,
@@ -16,14 +16,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Separator } from 'components/ui/separator';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
-import { Form, FormField, FormItem, FormControl, FormMessage } from 'components/ui/form';
-import UIPhoneInput from 'components/core/phone-input/phone-input';
-import DummyProfile from 'assets/images/dummy_profile.png';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+import UIPhoneInput from '@/components/core/phone-input/phone-input';
+import DummyProfile from '@/assets/images/dummy_profile.png';
 
 /**
  * `EditProfile` component allows the user to edit their profile details, including their full name, email, phone number, and profile image.

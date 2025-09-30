@@ -3,20 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
-import { Separator } from 'components/ui/separator';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from 'components/ui/select';
-import { Switch } from 'components/ui/switch';
-import { Checkbox } from 'components/ui/checkbox';
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   categoryOptions,
   InventoryStatus,
@@ -28,12 +28,12 @@ import {
   useGetInventories,
   useUpdateInventoryItem,
   useDeleteInventoryItem,
-} from 'features/inventory/hooks/use-inventory';
-import { Skeleton } from 'components/ui/skeleton';
-import { useGetPreSignedUrlForUpload } from 'lib/api/hooks/use-storage';
-import API_CONFIG from 'config/api';
-import { GetPreSignedUrlForUploadResponse } from 'lib/api/types/storage.types';
-import PlaceHolderImage from 'assets/images/image_off_placeholder.webp';
+} from '@/features/inventory/hooks/use-inventory';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
+import API_CONFIG from '@/config/api';
+import { GetPreSignedUrlForUploadResponse } from '@/lib/api/types/storage.types';
+import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
 
 /**
  * A detailed view and editing interface for an individual inventory item.

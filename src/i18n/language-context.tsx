@@ -13,7 +13,7 @@ import { loadTranslations } from './i18n';
 import {
   useAvailableLanguages,
   useAvailableModules,
-} from 'components/blocks/language-selector/hooks/use-language';
+} from '@/components/blocks/language-selector/hooks/use-language';
 import { routeModuleMap } from './route-module-map';
 
 /**

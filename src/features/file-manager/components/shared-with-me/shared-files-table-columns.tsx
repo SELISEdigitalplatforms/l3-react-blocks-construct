@@ -1,8 +1,8 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { CustomtDateFormat } from 'lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 import { IFileData } from '../../hooks/use-mock-files-query';
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import { compareValues } from 'features/iam/services/user-service';
+import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
+import { compareValues } from '@/features/iam/services/user-service';
 import { getFileTypeIcon, getFileTypeInfo } from '../../utils/file-manager';
 import { Info, Users } from 'lucide-react';
 import { FileTableRowActions } from '../file-manager-row-actions';

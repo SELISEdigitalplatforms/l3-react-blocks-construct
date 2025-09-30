@@ -8,19 +8,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { UPasswordInput } from 'components/core/u-password-input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { UPasswordInput } from '@/components/core/u-password-input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import {
   changePasswordFormDefaultValue,
   changePasswordFormType,
   getValidationSchemas,
-} from 'features/profile/utils/utils';
+} from '@/features/profile/utils/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useChangePassword } from 'features/profile/hooks/use-account';
+import { useChangePassword } from '@/features/profile/hooks/use-account';
 import { UpdatePasswordSuccess } from '../update-password-success/update-password-success';
-import { SharedPasswordStrengthChecker } from 'components/core/shared-password-strength-checker';
+import { SharedPasswordStrengthChecker } from '@/components/core/shared-password-strength-checker';
 import { useTranslation } from 'react-i18next';
 
 type UpdatePasswordProps = {

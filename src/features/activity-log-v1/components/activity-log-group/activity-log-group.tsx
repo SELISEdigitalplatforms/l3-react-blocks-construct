@@ -1,4 +1,4 @@
-import { Separator } from 'components/ui/separator';
+import { Separator } from '@/components/ui/separator';
 import { ActivityGroup } from '../../services/activity-log.types';
 import ActivityLogItem from './activity-log-item';
 

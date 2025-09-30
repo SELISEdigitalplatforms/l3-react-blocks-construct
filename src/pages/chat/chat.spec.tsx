@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ChatPage } from './chat';
-import { Chat } from 'features/chat';
+import { Chat } from '@/features/chat';
 
 jest.mock('features/chat', () => ({
   Chat: jest.fn(() => <div data-testid="mock-chat" />),

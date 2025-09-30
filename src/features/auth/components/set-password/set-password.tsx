@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BasePasswordForm } from 'components/blocks/base-password-form/base-password-form';
+import { BasePasswordForm } from '@/components/blocks/base-password-form/base-password-form';
 import { useAccountActivation } from '../../hooks/use-auth';
 import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from './utils';
 

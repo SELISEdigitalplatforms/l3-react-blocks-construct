@@ -5,7 +5,7 @@ import { BaseGridView } from '../basic-grid-view';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 import { IFileData } from '../../hooks/use-mock-files-query';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from 'hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   matchesFileType,
   matchesModifiedDate,

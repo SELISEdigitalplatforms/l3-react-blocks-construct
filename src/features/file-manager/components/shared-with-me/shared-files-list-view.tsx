@@ -2,9 +2,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
-import { useIsMobile } from 'hooks/use-mobile';
-import DataTable from 'components/blocks/data-table/data-table';
+import { useMockFilesQuery } from '@/features/file-manager/hooks/use-mock-files-query';
+import { useIsMobile } from '@/hooks/use-mobile';
+import DataTable from '@/components/blocks/data-table/data-table';
 import { SharedFilesListViewProps } from '../../types/file-manager.type';
 import { SharedFileTableColumns } from './shared-files-table-columns';
 import { IFileDataWithSharing, PaginationState } from '../../utils/file-manager';

@@ -8,7 +8,7 @@ import { InvoicePreview } from '../invoice-preview/invoice-preview';
 import { InvoiceItemsTable } from '../invoice-items-table/invoice-items-table';
 import { formatPhoneToE164 } from '../../utils/invoice-helpers';
 import { invoiceFormSchema, type InvoiceFormValues } from '../../schemas/invoice-form-schema';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import {
   FormActionButtons,
