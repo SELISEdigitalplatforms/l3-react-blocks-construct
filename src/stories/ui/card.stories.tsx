@@ -13,13 +13,7 @@ import { Badge } from '../../components/ui/badge';
 const meta: Meta<typeof Card> = {
   title: 'Card',
   component: Card,
-  parameters: {
-    docs: {
-      description: {
-        component: 'Displays a card with header, content, and footer.',
-      },
-    },
-  },
+  parameters: {},
   render: (args) => (
     <Card {...args} className="w-[350px]">
       <CardHeader>
