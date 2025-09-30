@@ -1,9 +1,9 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DashboardOverview } from './dashboard-overview';
-
-jest.mock('components/ui/card', () => ({
+vi.mock('components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
   CardHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-header">{children}</div>
@@ -17,7 +17,7 @@ jest.mock('components/ui/card', () => ({
   CardDescription: () => <div data-testid="card-description" />,
 }));
 
-jest.mock('components/ui/select', () => ({
+vi.mock('components/ui/select', () => ({
   Select: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select">{children}</div>
   ),
@@ -38,14 +38,16 @@ jest.mock('components/ui/select', () => ({
   ),
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   TrendingUp: () => <div data-testid="icon-trending-up" />,
   Users: () => <div data-testid="icon-users" />,
   UserCog: () => <div data-testid="icon-user-cog" />,
   UserPlus: () => <div data-testid="icon-user-plus" />,
+  ChevronDown: () => <div data-testid="icon-chevron-down" />,
+  ChevronUp: () => <div data-testid="icon-chevron-up" />,
 }));
 
-jest.mock('../../services/dashboard-service', () => ({
+vi.mock('../../services/dashboard-service', () => ({
   monthsOfYear: [
     { value: 'january', label: 'January' },
     { value: 'february', label: 'February' },

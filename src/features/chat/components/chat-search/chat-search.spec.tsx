@@ -1,9 +1,11 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
@@ -35,12 +37,13 @@ const mockContacts = [
   },
 ];
 
-jest.mock('../../data/chat.data', () => ({
+vi.mock('../../data/chat.data', () => ({
   mockChatContacts: mockContacts,
 }));
 
 import { ChatSearch } from './chat-search';
 
+import { vi } from 'vitest'
 describe('ChatSearch', () => {
   it('renders input and label', () => {
     render(<ChatSearch />);
@@ -65,7 +68,7 @@ describe('ChatSearch', () => {
   });
 
   it('calls onSelectContact when a contact is clicked', () => {
-    const onSelectContact = jest.fn();
+    const onSelectContact = vi.fn();
     render(<ChatSearch onSelectContact={onSelectContact} />);
     const input = screen.getByPlaceholderText('ENTER_NAME_EMAIL_GROUP');
     fireEvent.change(input, { target: { value: 'Alice' } });
@@ -92,7 +95,7 @@ describe('ChatSearch', () => {
   });
 
   it('calls onClose when close button is clicked', () => {
-    const onClose = jest.fn();
+    const onClose = vi.fn();
     render(<ChatSearch onClose={onClose} />);
     fireEvent.click(screen.getByRole('button', { name: '' })); // The close X button
     expect(onClose).toHaveBeenCalled();

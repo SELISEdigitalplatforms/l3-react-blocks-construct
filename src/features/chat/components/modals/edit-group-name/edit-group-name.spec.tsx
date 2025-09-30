@@ -1,16 +1,18 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock Dialog and related UI components
-jest.mock('components/ui/dialog', () => ({
+vi.mock('components/ui/dialog', () => ({
   Dialog: ({ open, children }: any) => (open ? <div>{children}</div> : null),
   DialogContent: ({ children }: any) => <div>{children}</div>,
   DialogHeader: ({ children }: any) => <div>{children}</div>,
@@ -18,7 +20,7 @@ jest.mock('components/ui/dialog', () => ({
   DialogDescription: ({ children }: any) => <div>{children}</div>,
 }));
 
-jest.mock('components/ui/button', () => ({
+vi.mock('components/ui/button', () => ({
   Button: ({ children, loading, disabled, ...props }: any) => (
     <button disabled={!!loading || disabled} {...props}>
       {children}
@@ -26,23 +28,24 @@ jest.mock('components/ui/button', () => ({
   ),
 }));
 
-jest.mock('components/ui/input', () => ({
+vi.mock('components/ui/input', () => ({
   Input: (props: any) => <input {...props} />,
 }));
 
 import { EditGroupName } from './edit-group-name';
 
+import { vi } from 'vitest'
 describe('EditGroupName', () => {
   const defaultProps = {
     isOpen: true,
     currentName: 'My Group',
-    onClose: jest.fn(),
-    onSave: jest.fn(),
+    onClose: vi.fn(),
+    onSave: vi.fn(),
     isLoading: false,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders with current group name', () => {

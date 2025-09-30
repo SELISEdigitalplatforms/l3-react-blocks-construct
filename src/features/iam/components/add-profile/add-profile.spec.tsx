@@ -1,23 +1,23 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import { AddUser } from './add-profile';
 import { useCreateAccount } from '@/features/profile/hooks/use-account';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Dialog from '@radix-ui/react-dialog';
-
-jest.mock('features/profile/hooks/use-account', () => ({
-  useCreateAccount: jest.fn(),
+vi.mock('features/profile/hooks/use-account', () => ({
+  useCreateAccount: vi.fn(),
   ACCOUNT_QUERY_KEY: ['account'],
 }));
 
-jest.mock('@tanstack/react-query', () => ({
-  useQueryClient: jest.fn(),
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: vi.fn(),
 }));
 
 describe('AddUser Component', () => {
-  const mockOnClose = jest.fn();
-  const mockMutate = jest.fn();
-  const mockInvalidateQueries = jest.fn().mockResolvedValue(null);
-  const mockRefetchQueries = jest.fn().mockResolvedValue(null);
+  const mockOnClose = vi.fn();
+  const mockMutate = vi.fn();
+  const mockInvalidateQueries = vi.fn().mockResolvedValue(null);
+  const mockRefetchQueries = vi.fn().mockResolvedValue(null);
 
   const renderWithDialog = () => {
     return render(
@@ -28,20 +28,34 @@ describe('AddUser Component', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
-    (useCreateAccount as jest.Mock).mockReturnValue({
+    (useCreateAccount as any).mockReturnValue({
       mutate: mockMutate,
+      data: undefined,
+      error: null,
+      isError: false,
+      isIdle: true,
+      isLoading: false,
+      isSuccess: false,
+      variables: undefined,
+      reset: vi.fn(),
+      mutateAsync: vi.fn(),
+      isPending: false,
+      failureCount: 0,
+      failureReason: null,
+      status: 'idle',
+      submittedAt: 0,
     });
 
-    (useQueryClient as jest.Mock).mockReturnValue({
+    (useQueryClient as any).mockReturnValue({
       invalidateQueries: mockInvalidateQueries,
       refetchQueries: mockRefetchQueries,
     });
 
     Object.defineProperty(window, 'location', {
       configurable: true,
-      value: { reload: jest.fn() },
+      value: { reload: vi.fn() },
     });
   });
 

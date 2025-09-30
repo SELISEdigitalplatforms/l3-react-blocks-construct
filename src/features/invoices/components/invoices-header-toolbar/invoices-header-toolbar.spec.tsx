@@ -1,21 +1,25 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest'
 import { InvoicesHeaderToolbar } from './invoices-header-toolbar';
 
-jest.mock('react-i18next', () => ({
+import { vi } from 'vitest'
+vi.mock('react-i18next', () => ({
   useTranslation: () => {
     return {
       t: (key: string) => key,
       i18n: {
-        changeLanguage: jest.fn(),
+        changeLanguage: vi.fn(),
       },
     };
   },
 }));
 
-jest.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
+vi.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
   PermissionGuard: ({
     children,
     showFallback,
@@ -36,7 +40,7 @@ jest.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
   },
 }));
 
-jest.mock('config/roles-permissions', () => ({
+vi.mock('config/roles-permissions', () => ({
   MENU_PERMISSIONS: {
     INVOICE_WRITE: 'invoice:write',
   },

@@ -1,6 +1,6 @@
 // Mock the useInvoices hook to prevent any actual API calls
-jest.mock('../../hooks/use-invoices', () => ({
-  useGetInvoiceItems: jest.fn().mockReturnValue({
+vi.mock('../../hooks/use-invoices', () => ({
+  useGetInvoiceItems: vi.fn().mockReturnValue({
     data: { items: [] },
     isLoading: false,
     error: null,
@@ -9,13 +9,18 @@ jest.mock('../../hooks/use-invoices', () => ({
 
 // Now import React and other dependencies after mocks are set up
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 
 import { createInvoiceTableColumns } from './invoices-table.column';
+import { vi } from 'vitest'
 import { InvoiceItem, InvoiceStatus } from '../../types/invoices.types';
+import { vi } from 'vitest'
 import { type ColumnDef } from '@tanstack/react-table';
 
+import { vi } from 'vitest'
 type RowData = {
   original: InvoiceItem;
 };
@@ -26,7 +31,7 @@ type ColumnDefWithFilter = ColumnDef<InvoiceItem> & {
 };
 
 // Mock the DataTableColumnHeader component
-jest.mock('components/blocks/data-table/data-table-column-header', () => ({
+vi.mock('components/blocks/data-table/data-table-column-header', () => ({
   // eslint-disable-next-line react/prop-types
   DataTableColumnHeader: ({ title }: { title: string }) => (
     <div data-testid="column-header">{title}</div>

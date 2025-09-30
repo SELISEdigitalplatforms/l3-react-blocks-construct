@@ -1,16 +1,18 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock Dialog and related UI components
-jest.mock('components/ui/dialog', () => ({
+vi.mock('components/ui/dialog', () => ({
   Dialog: ({ open, children }: any) => (open ? <div>{children}</div> : null),
   DialogContent: ({ children }: any) => <div>{children}</div>,
   DialogHeader: ({ children }: any) => <div>{children}</div>,
@@ -18,7 +20,7 @@ jest.mock('components/ui/dialog', () => ({
   DialogFooter: ({ children }: any) => <div>{children}</div>,
 }));
 
-jest.mock('components/ui/button', () => ({
+vi.mock('components/ui/button', () => ({
   Button: ({ children, disabled, onClick, ...props }: any) => (
     <button disabled={disabled} onClick={onClick} {...props}>
       {children}
@@ -26,15 +28,15 @@ jest.mock('components/ui/button', () => ({
   ),
 }));
 
-jest.mock('components/ui/input', () => ({
+vi.mock('components/ui/input', () => ({
   Input: (props: any) => <input {...props} />,
 }));
 
-jest.mock('components/ui/textarea', () => ({
+vi.mock('components/ui/textarea', () => ({
   Textarea: (props: any) => <textarea {...props} />,
 }));
 
-jest.mock('components/ui/avatar', () => ({
+vi.mock('components/ui/avatar', () => ({
   Avatar: ({ children }: any) => <div>{children}</div>,
   AvatarImage: (props: any) => <img {...props} alt="profile" />,
   AvatarFallback: (props: any) => <span {...props} />,
@@ -42,6 +44,7 @@ jest.mock('components/ui/avatar', () => ({
 
 import { ForwardMessage } from './forward-message';
 
+import { vi } from 'vitest'
 const mockMessage = {
   senderName: 'Alice',
   avatarSrc: 'avatar.png',
@@ -58,13 +61,13 @@ const mockMessage = {
 describe('ForwardMessage', () => {
   const defaultProps = {
     open: true,
-    onOpenChange: jest.fn(),
+    onOpenChange: vi.fn(),
     message: mockMessage,
-    onForward: jest.fn(),
+    onForward: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders dialog with message details', () => {

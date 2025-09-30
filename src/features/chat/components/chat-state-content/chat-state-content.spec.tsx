@@ -1,19 +1,22 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock image import
-jest.mock('assets/images/chat.svg', () => 'chat.svg');
+vi.mock('assets/images/chat.svg', () => 'chat.svg');
 
 import { ChatStateContent } from './chat-state-content';
 
+import { vi } from 'vitest'
 describe('ChatStateContent', () => {
   it('renders default state (not search active)', () => {
     render(<ChatStateContent />);
@@ -33,7 +36,7 @@ describe('ChatStateContent', () => {
   });
 
   it('renders and handles start new conversation button', () => {
-    const handleStart = jest.fn();
+    const handleStart = vi.fn();
     render(<ChatStateContent onStartNewConversation={handleStart} />);
     const btn = screen.getByText('START_NEW_CONVERSATION');
     expect(btn).toBeInTheDocument();
@@ -42,7 +45,7 @@ describe('ChatStateContent', () => {
   });
 
   it('does not render start new conversation button if isSearchActive', () => {
-    const handleStart = jest.fn();
+    const handleStart = vi.fn();
     render(<ChatStateContent isSearchActive onStartNewConversation={handleStart} />);
     expect(screen.queryByText('START_NEW_CONVERSATION')).not.toBeInTheDocument();
   });

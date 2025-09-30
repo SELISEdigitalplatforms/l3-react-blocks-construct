@@ -30,6 +30,7 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "vitest.config.ts"],
+  "types": ["vitest/globals"],
   "exclude": ["node_modules", "vite.config.ts"]
 }

@@ -1,10 +1,10 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DashboardUserActivityGraph } from './dashboard-user-activity-graph';
-
-jest.mock('components/ui/chart', () => ({
-  ...jest.requireActual('components/ui/chart'),
+vi.mock('components/ui/chart', async () => ({
+  ...(await vi.importActual('components/ui/chart')),
   ChartContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ChartTooltip: ({ content }: { content: any }) => {
     const mockPayload = [{ value: 10 }];
@@ -17,8 +17,8 @@ interface MockComponentProps {
   children?: React.ReactNode;
 }
 
-jest.mock('recharts', () => ({
-  ...jest.requireActual('recharts'),
+vi.mock('recharts', async () => ({
+  ...(await vi.importActual('recharts')),
   ResponsiveContainer: ({ children }: MockComponentProps) => (
     <div data-testid="responsive-container">{children}</div>
   ),
@@ -30,7 +30,7 @@ jest.mock('recharts', () => ({
   ChartTooltip: ({ children }: MockComponentProps) => <div data-testid="tooltip">{children}</div>,
 }));
 
-jest.mock('../../services/dashboard-service', () => ({
+vi.mock('../../services/dashboard-service', () => ({
   chartConfig: {},
   chartData: [{ week: 'Week 1', noOfActions: 10 }],
   daysOfWeek: [
@@ -45,15 +45,15 @@ jest.mock('../../services/dashboard-service', () => ({
 }));
 
 // Setup ResizeObserver mock
-const mockResizeObserver = jest.fn(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
+const mockResizeObserver = vi.fn(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
 }));
 
 declare global {
   interface Window {
-    ResizeObserver: jest.Mock;
+    ResizeObserver: any;
   }
 }
 
@@ -67,7 +67,7 @@ afterAll(() => {
 
 describe('DashboardUserActivityGraph Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the chart with tooltip content', () => {

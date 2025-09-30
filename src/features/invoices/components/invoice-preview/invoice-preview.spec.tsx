@@ -1,27 +1,28 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InvoicePreview } from './invoice-preview';
 import { InvoiceStatus } from '../../types/invoices.types';
-
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // deprecated
-    removeListener: jest.fn(), // deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
   })),
 });
 
 // Mock the InvoicesDetail component
-jest.mock('../invoices-detail/invoices-detail', () => ({
-  InvoicesDetail: jest.fn(() => <div data-testid="invoices-detail" />),
+const InvoicesDetail = vi.fn(() => <div data-testid="invoices-detail" />);
+vi.mock('../invoices-detail/invoices-detail', () => ({
+  InvoicesDetail,
 }));
 
 describe('InvoicePreview', () => {
@@ -47,10 +48,10 @@ describe('InvoicePreview', () => {
     GeneralNote: 'Test Note',
   };
 
-  const mockOnOpenChange = jest.fn();
+  const mockOnOpenChange = vi.fn();
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders nothing when invoice is null', () => {
@@ -75,7 +76,6 @@ describe('InvoicePreview', () => {
     render(<InvoicePreview open={true} onOpenChange={mockOnOpenChange} invoice={mockInvoice} />);
 
     // Check if InvoicesDetail is called with correct props
-    const { InvoicesDetail } = jest.requireMock('../invoices-detail/invoices-detail');
     expect(InvoicesDetail).toHaveBeenCalledWith(
       expect.objectContaining({
         invoice: mockInvoice,

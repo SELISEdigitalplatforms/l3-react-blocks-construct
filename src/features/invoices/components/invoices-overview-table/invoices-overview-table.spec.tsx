@@ -1,11 +1,11 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ColumnDef } from '@tanstack/react-table';
-
 // Instead of importing the actual component with UUID dependencies,
 // we'll create a mock component for testing
-const MockInvoicesOverviewTable = jest.fn((props: any) => {
+const MockInvoicesOverviewTable = vi.fn((props: any) => {
   // Simulate the component's rendering behavior
   const { data, isLoading, error, toolbar, onRowClick, onPaginationChange } = props;
 
@@ -144,7 +144,7 @@ const MockInvoicesOverviewTable = jest.fn((props: any) => {
 });
 
 // Mock the actual component
-jest.mock('./invoices-overview-table', () => ({
+vi.mock('./invoices-overview-table', () => ({
   InvoicesOverviewTable: (props: any) => MockInvoicesOverviewTable(props),
 }));
 
@@ -153,7 +153,7 @@ jest.mock('./invoices-overview-table', () => ({
 import { InvoicesOverviewTable } from './invoices-overview-table';
 
 // Mock the required components
-jest.mock('components/ui/card', () => ({
+vi.mock('components/ui/card', () => ({
   Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="card" className={className}>
       {children}
@@ -177,11 +177,11 @@ jest.mock('components/ui/card', () => ({
   ),
 }));
 
-jest.mock('components/ui/separator', () => ({
+vi.mock('components/ui/separator', () => ({
   Separator: () => <hr data-testid="separator" />,
 }));
 
-jest.mock('components/ui/table', () => ({
+vi.mock('components/ui/table', () => ({
   Table: ({ children }: { children: React.ReactNode }) => (
     <table data-testid="table">{children}</table>
   ),
@@ -216,13 +216,13 @@ jest.mock('components/ui/table', () => ({
   ),
 }));
 
-jest.mock('components/ui/skeleton', () => ({
+vi.mock('components/ui/skeleton', () => ({
   Skeleton: ({ className }: { className: string }) => (
     <div data-testid="skeleton" className={className} />
   ),
 }));
 
-jest.mock('components/ui/scroll-area', () => ({
+vi.mock('components/ui/scroll-area', () => ({
   ScrollArea: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="scroll-area" className={className}>
       {children}
@@ -233,7 +233,7 @@ jest.mock('components/ui/scroll-area', () => ({
   ),
 }));
 
-jest.mock('components/blocks/data-table/data-table-pagination', () => ({
+vi.mock('components/blocks/data-table/data-table-pagination', () => ({
   DataTablePagination: ({
     showSelectedRowContent,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -255,7 +255,7 @@ jest.mock('components/blocks/data-table/data-table-pagination', () => ({
   ),
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   FileText: () => <div data-testid="icon-file-text" />,
   Clock: () => <div data-testid="icon-clock" />,
   CheckCircle: () => <div data-testid="icon-check-circle" />,
@@ -267,7 +267,7 @@ jest.mock('lucide-react', () => ({
 // This avoids the need to mock the module path which can be problematic
 
 // Mock the translation hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
@@ -334,8 +334,8 @@ describe('InvoicesOverviewTable', () => {
     totalCount: mockInvoices.length,
   };
 
-  const mockOnPaginationChange = jest.fn();
-  const mockOnRowClick = jest.fn();
+  const mockOnPaginationChange = vi.fn();
+  const mockOnRowClick = vi.fn();
 
   const renderTable = (props = {}) => {
     return render(
@@ -351,7 +351,7 @@ describe('InvoicesOverviewTable', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders the table with correct structure', () => {
@@ -438,7 +438,7 @@ describe('InvoicesOverviewTable', () => {
   });
 
   test('renders toolbar when provided', () => {
-    const mockToolbar = jest
+    const mockToolbar = vi
       .fn()
       .mockReturnValue(<div data-testid="custom-toolbar">Custom Toolbar</div>);
     renderTable({ toolbar: mockToolbar });

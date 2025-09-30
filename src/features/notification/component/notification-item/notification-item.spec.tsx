@@ -1,17 +1,17 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NotificationItem } from './notification-item';
-
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock mutation hook
-const mutateMock = jest.fn();
-jest.mock('../../hooks/use-notification', () => ({
+const mutateMock = vi.fn();
+vi.mock('../../hooks/use-notification', () => ({
   useMarkNotificationAsRead: () => ({
     mutate: mutateMock,
     isPending: false,
@@ -19,20 +19,33 @@ jest.mock('../../hooks/use-notification', () => ({
 }));
 
 // Mock DropdownMenu and Button
-jest.mock('components/ui/dropdown-menu', () => ({
-  DropdownMenu: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuItem: ({ children, ...props }: any) => (
-    <div role="menuitem" tabIndex={0} {...props}>
+vi.mock('components/ui/dropdown-menu', () => ({
+  DropdownMenu: ({ children }: any) => (
+    <div data-testid="dropdown-menu">{children}</div>
+  ),
+  DropdownMenuTrigger: ({ children, ...props }: any) => (
+    <div {...props} data-testid="dropdown-trigger">{children}</div>
+  ),
+  DropdownMenuContent: ({ children }: any) => (
+    <div data-testid="dropdown-content">{children}</div>
+  ),
+  DropdownMenuItem: ({ children, disabled, onClick, ...props }: any) => (
+    <div 
+      role="menuitem" 
+      tabIndex={0} 
+      onClick={disabled ? undefined : onClick}
+      data-disabled={disabled}
+      {...props}
+    >
       {children}
     </div>
   ),
-  DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
 }));
-jest.mock('components/ui/button', () => ({
+
+vi.mock('components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   EllipsisVertical: () => <span data-testid="ellipsis-icon" />,
   Loader2: () => <span data-testid="loader-icon" />,
 }));

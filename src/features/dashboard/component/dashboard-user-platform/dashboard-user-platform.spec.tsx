@@ -1,8 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 import { DashboardUserPlatform } from './dashboard-user-platform';
 
-jest.mock('components/ui/chart', () => ({
+import { vi } from 'vitest'
+vi.mock('components/ui/chart', () => ({
   ChartContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="chart-container">{children}</div>
   ),
@@ -29,7 +31,7 @@ jest.mock('components/ui/chart', () => ({
 }));
 
 // Valid PieChart mock with proper data handling
-jest.mock('recharts', () => ({
+vi.mock('recharts', () => ({
   PieChart: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
   ),
@@ -62,7 +64,7 @@ jest.mock('recharts', () => ({
   Label: () => <div data-testid="label" />,
 }));
 
-jest.mock('components/ui/card', () => ({
+vi.mock('components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
   CardHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-header">{children}</div>
@@ -76,7 +78,7 @@ jest.mock('components/ui/card', () => ({
   ),
 }));
 
-jest.mock('components/ui/select', () => ({
+vi.mock('components/ui/select', () => ({
   Select: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select">{children}</div>
   ),

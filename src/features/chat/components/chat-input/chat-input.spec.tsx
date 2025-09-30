@@ -1,15 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import { ChatInput } from './chat-input';
 
+import { vi } from 'vitest'
 // Mock the translation hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key, // simple translation mock
   }),
 }));
 
 // Mock the useDropzone hook
-jest.mock('react-dropzone', () => ({
+vi.mock('react-dropzone', () => ({
   useDropzone: (config: any) => {
     return {
       getInputProps: () => ({}),
@@ -19,11 +21,11 @@ jest.mock('react-dropzone', () => ({
 }));
 
 describe('ChatInput', () => {
-  const mockOnChange = jest.fn();
-  const mockOnSubmit = jest.fn((e) => e.preventDefault());
-  const mockOnEmojiClick = jest.fn();
-  const mockOnFileUpload = jest.fn();
-  const mockOnRemoveFile = jest.fn();
+  const mockOnChange = vi.fn();
+  const mockOnSubmit = vi.fn((e) => e.preventDefault());
+  const mockOnEmojiClick = vi.fn();
+  const mockOnFileUpload = vi.fn();
+  const mockOnRemoveFile = vi.fn();
 
   const defaultProps = {
     value: '',
@@ -36,7 +38,7 @@ describe('ChatInput', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders chat input with all buttons', () => {

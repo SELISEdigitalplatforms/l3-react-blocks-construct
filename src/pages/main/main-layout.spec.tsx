@@ -23,24 +23,24 @@ Object.defineProperty(window, 'location', {
 });
 
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import MainLayout from './main-layout';
-
-jest.mock('components/blocks/layout/app-sidebar', () => ({
+vi.mock('components/blocks/layout/app-sidebar', () => ({
   AppSidebar: () => <div data-testid="app-sidebar">App Sidebar</div>,
 }));
 
-jest.mock('components/blocks/u-profile-menu', () => ({
+vi.mock('components/blocks/u-profile-menu', () => ({
   UProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
 }));
 
-jest.mock('components/blocks/language-selector/language-selector', () => ({
+vi.mock('components/blocks/language-selector/language-selector', () => ({
   __esModule: true,
   default: () => <div data-testid="language-selector">Language Selector</div>,
 }));
 
-jest.mock('components/ui/sidebar', () => ({
+vi.mock('components/ui/sidebar', () => ({
   SidebarTrigger: ({ className }: { className?: string }) => (
     <button data-testid="sidebar-trigger" className={className}>
       Toggle Sidebar
@@ -49,21 +49,21 @@ jest.mock('components/ui/sidebar', () => ({
   useSidebar: () => ({
     open: true,
     isMobile: false,
-    toggle: jest.fn(),
+    toggle: vi.fn(),
   }),
 }));
 
-jest.mock('providers/permission-provider', () => ({
+vi.mock('providers/permission-provider', () => ({
   PermissionsProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="permissions-provider">{children}</div>
   ),
 }));
 
 // Mock react-router-dom
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
   Outlet: () => <div data-testid="outlet">Outlet Content</div>,
-  useLocation: jest.fn().mockReturnValue({
+  useLocation: vi.fn().mockReturnValue({
     pathname: '/',
     search: '',
     hash: '',
@@ -72,12 +72,12 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   Bell: () => <div data-testid="bell-icon">Bell Icon</div>,
   Library: () => <div data-testid="library-icon">Library Icon</div>,
 }));
 
-jest.mock('components/ui/button', () => ({
+vi.mock('components/ui/button', () => ({
   Button: ({ children, ...props }: { children: React.ReactNode }) => (
     <button data-testid="button" {...props}>
       {children}
@@ -85,7 +85,7 @@ jest.mock('components/ui/button', () => ({
   ),
 }));
 
-jest.mock('components/ui/menubar', () => ({
+vi.mock('components/ui/menubar', () => ({
   Menubar: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="menubar">{children}</div>
   ),
@@ -112,12 +112,12 @@ jest.mock('components/ui/menubar', () => ({
   ),
 }));
 
-jest.mock('features/notification/component/notification/notification', () => ({
+vi.mock('features/notification/component/notification/notification', () => ({
   Notification: () => <div data-testid="notification">Notification</div>,
 }));
 
-jest.mock('features/notification/hooks/use-notification', () => ({
-  useGetNotifications: jest.fn().mockReturnValue({
+vi.mock('features/notification/hooks/use-notification', () => ({
+  useGetNotifications: vi.fn().mockReturnValue({
     data: {
       notifications: [],
       unReadNotificationsCount: 0,
@@ -126,8 +126,8 @@ jest.mock('features/notification/hooks/use-notification', () => ({
   }),
 }));
 
-jest.mock('features/profile/hooks/use-account', () => ({
-  useGetAccount: jest.fn().mockReturnValue({
+vi.mock('features/profile/hooks/use-account', () => ({
+  useGetAccount: vi.fn().mockReturnValue({
     data: {
       id: 'test-user-id',
       name: 'Test User',

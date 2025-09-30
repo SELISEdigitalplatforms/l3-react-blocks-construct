@@ -1,20 +1,23 @@
 import { renderHook } from '@testing-library/react';
+import { vi } from 'vitest'
 import { useGetUsersQuery } from './use-iam';
+import { vi } from 'vitest'
 import { useGlobalQuery } from '@/state/query-client/hooks';
 
-jest.mock('state/query-client/hooks', () => ({
-  useGlobalQuery: jest.fn(),
+import { vi } from 'vitest'
+vi.mock('state/query-client/hooks', () => ({
+  useGlobalQuery: vi.fn(),
 }));
 
-jest.mock('../services/user-service', () => ({
-  getUsers: jest.fn(),
+vi.mock('../services/user-service', () => ({
+  getUsers: vi.fn(),
 }));
 
 describe('useGetUsersQuery', () => {
-  const mockUseGlobalQuery = useGlobalQuery as jest.Mock;
+  const mockUseGlobalQuery = useGlobalQuery as vi.mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call useGlobalQuery with correct parameters', () => {

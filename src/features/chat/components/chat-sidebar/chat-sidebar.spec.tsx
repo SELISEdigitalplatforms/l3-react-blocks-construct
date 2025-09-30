@@ -1,9 +1,11 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 
 // Mock DropdownMenu and related components to always render children
-jest.mock('components/ui/dropdown-menu', () => ({
+vi.mock('components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children }: any) => <div>{children}</div>,
   DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
   DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
@@ -11,7 +13,7 @@ jest.mock('components/ui/dropdown-menu', () => ({
 }));
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
@@ -22,12 +24,13 @@ const mockUserProfile = {
   name: 'User Name',
   status: { isOnline: true },
 };
-jest.mock('../../data/chat.data', () => ({
+vi.mock('../../data/chat.data', () => ({
   mockUserProfile,
 }));
 
 import { ChatSidebar } from './chat-sidebar';
 
+import { vi } from 'vitest'
 const contacts = [
   {
     id: '1',
@@ -57,19 +60,19 @@ const contacts = [
 
 describe('ChatSidebar', () => {
   it('renders sidebar and user profile', () => {
-    render(<ChatSidebar contacts={contacts} onEditClick={jest.fn()} onContactSelect={jest.fn()} />);
+    render(<ChatSidebar contacts={contacts} onEditClick={vi.fn()} onContactSelect={vi.fn()} />);
     expect(screen.getByText('CHAT')).toBeInTheDocument();
     expect(screen.getByText('User Name')).toBeInTheDocument();
   });
 
   it('renders contacts', () => {
-    render(<ChatSidebar contacts={contacts} onEditClick={jest.fn()} onContactSelect={jest.fn()} />);
+    render(<ChatSidebar contacts={contacts} onEditClick={vi.fn()} onContactSelect={vi.fn()} />);
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Bob')).toBeInTheDocument();
   });
 
   it('filters contacts by search', () => {
-    render(<ChatSidebar contacts={contacts} onEditClick={jest.fn()} onContactSelect={jest.fn()} />);
+    render(<ChatSidebar contacts={contacts} onEditClick={vi.fn()} onContactSelect={vi.fn()} />);
     const input = screen.getByPlaceholderText('SEARCH');
     fireEvent.change(input, { target: { value: 'Bob' } });
     expect(screen.getByText('Bob')).toBeInTheDocument();
@@ -77,18 +80,18 @@ describe('ChatSidebar', () => {
   });
 
   it('calls onEditClick when edit button is clicked', () => {
-    const onEditClick = jest.fn();
+    const onEditClick = vi.fn();
     render(
-      <ChatSidebar contacts={contacts} onEditClick={onEditClick} onContactSelect={jest.fn()} />
+      <ChatSidebar contacts={contacts} onEditClick={onEditClick} onContactSelect={vi.fn()} />
     );
     fireEvent.click(screen.getByTestId('edit-btn'));
     expect(onEditClick).toHaveBeenCalled();
   });
 
   it('calls onContactSelect when a contact is clicked', () => {
-    const onContactSelect = jest.fn();
+    const onContactSelect = vi.fn();
     render(
-      <ChatSidebar contacts={contacts} onEditClick={jest.fn()} onContactSelect={onContactSelect} />
+      <ChatSidebar contacts={contacts} onEditClick={vi.fn()} onContactSelect={onContactSelect} />
     );
     // Click Alice's contact item using data-testid
     fireEvent.click(screen.getByTestId('chat-contact-item-btn-1'));
@@ -96,12 +99,12 @@ describe('ChatSidebar', () => {
   });
 
   it('calls onDiscardClick when discard is clicked in search mode', () => {
-    const onDiscardClick = jest.fn();
+    const onDiscardClick = vi.fn();
     render(
       <ChatSidebar
         contacts={contacts}
-        onEditClick={jest.fn()}
-        onContactSelect={jest.fn()}
+        onEditClick={vi.fn()}
+        onContactSelect={vi.fn()}
         isSearchActive
         onDiscardClick={onDiscardClick}
       />
@@ -113,7 +116,7 @@ describe('ChatSidebar', () => {
   });
 
   it('shows NOTHING_FOUND when no contacts match', () => {
-    render(<ChatSidebar contacts={contacts} onEditClick={jest.fn()} onContactSelect={jest.fn()} />);
+    render(<ChatSidebar contacts={contacts} onEditClick={vi.fn()} onContactSelect={vi.fn()} />);
     const input = screen.getByPlaceholderText('SEARCH');
     fireEvent.change(input, { target: { value: 'Nonexistent' } });
     expect(screen.getByText('NOTHING_FOUND')).toBeInTheDocument();

@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { formatDate } from './custom-date';
 
 describe('Date formatting utilities', () => {
@@ -55,15 +56,15 @@ describe('Date formatting utilities', () => {
       expect(formatDate(fixedDate, true)).toBe('15/06/2023');
     });
 
-    test('should handle mocked current dates with jest.spyOn', () => {
-      // This is a better way to mock dates in Jest tests
+    test('should handle mocked current dates with vi.spyOn', () => {
+      // This is a better way to mock dates in Vitest tests
       const mockDate = new Date(2023, 5, 15, 15, 30);
-      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+      vi.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
       expect(formatDate(new Date())).toBe('15/06/2023, 15:30');
 
       // Clean up
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     test('should handle leap years correctly', () => {

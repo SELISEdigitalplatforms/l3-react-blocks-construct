@@ -1,19 +1,24 @@
 import React from 'react';
+import { vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest'
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 import { ChatContact } from '../../types/chat.types';
+import { vi } from 'vitest'
 import { ChatContactItem } from './chat-contact-item';
 
+import { vi } from 'vitest'
 // Mock i18n translation to return the key
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock the dropdown menu to make it easier to test
-jest.mock('components/ui/dropdown-menu', () => ({
+vi.mock('components/ui/dropdown-menu', () => ({
   DropdownMenu: ({
     children,
     open,
@@ -141,7 +146,7 @@ describe('ChatContactItem', () => {
   });
 
   it('calls onClick when clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(<ChatContactItem {...baseContact} onClick={onClick} />);
     const clickableElement =
       screen.getByRole('button', { name: /open chat with john doe/i }) ||
@@ -161,10 +166,10 @@ describe('ChatContactItem', () => {
   });
 
   it('displays dropdown on icon click and calls appropriate handlers', async () => {
-    const onMarkAsRead = jest.fn();
-    const onMarkAsUnread = jest.fn();
-    const onMuteToggle = jest.fn();
-    const onDeleteContact = jest.fn();
+    const onMarkAsRead = vi.fn();
+    const onMarkAsUnread = vi.fn();
+    const onMuteToggle = vi.fn();
+    const onDeleteContact = vi.fn();
 
     render(
       <ChatContactItem

@@ -1,30 +1,27 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { vi } from 'vitest'
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ClientMiddleware } from './client-middleware';
 import { useAuthStore } from './store/auth';
 import { InitialEntry } from '@remix-run/router';
 
-jest.mock('./store/auth', () => {
-  const originalModule = jest.requireActual('./store/auth');
-  return {
-    ...originalModule,
-    useAuthStore: jest.fn(),
-  };
-});
+vi.mock('./store/auth', () => ({
+  useAuthStore: vi.fn(),
+}));
 
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
   useNavigate: () => mockNavigate,
 }));
 
 describe('ClientMiddleware', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderWithRouter = (authenticated: boolean, path: InitialEntry) => {
-    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+    vi.mocked(useAuthStore).mockReturnValue({
       isAuthenticated: authenticated,
     });
 

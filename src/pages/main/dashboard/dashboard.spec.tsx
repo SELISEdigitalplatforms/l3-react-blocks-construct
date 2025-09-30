@@ -23,7 +23,7 @@ delete (global as any).window.location;
 };
 
 // 3. Mock the API config module directly (try different path formats)
-jest.mock('../../../config/api', () => ({
+vi.mock('../../../config/api', () => ({
   __esModule: true,
   default: {
     baseUrl: 'http://localhost:3000',
@@ -41,17 +41,21 @@ jest.mock('../../../config/api', () => ({
 
 // 4. Now safe to import React Testing Library and other modules
 import { render, screen, waitFor } from '@testing-library/react';
+import { vi } from 'vitest'
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { vi } from 'vitest'
 import { Dashboard } from './dashboard';
 
+import { vi } from 'vitest'
 // 5. Mock other components
-jest.mock('components/ui/button', () => ({
+vi.mock('components/ui/button', () => ({
   Button: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
 }));
 
-jest.mock('features/dashboard', () => ({
+vi.mock('features/dashboard', () => ({
   DashboardOverview: () => <div data-testid="dashboard-overview">Dashboard Overview</div>,
   DashboardSystemOverview: () => <div data-testid="dashboard-system-overview">System Overview</div>,
   DashboardUserActivityGraph: () => (
@@ -60,8 +64,8 @@ jest.mock('features/dashboard', () => ({
   DashboardUserPlatform: () => <div data-testid="dashboard-user-platform">User Platform</div>,
 }));
 
-jest.mock('features/profile/hooks/use-account', () => ({
-  useGetAccount: jest.fn(() => ({
+vi.mock('features/profile/hooks/use-account', () => ({
+  useGetAccount: vi.fn(() => ({
     data: { mfaEnabled: false },
     isLoading: false,
   })),
