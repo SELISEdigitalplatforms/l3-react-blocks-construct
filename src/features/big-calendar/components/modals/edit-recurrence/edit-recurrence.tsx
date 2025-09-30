@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { generateUuid } from 'utils/uuid';
 import { CalendarIcon } from 'lucide-react';
 import { format, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
@@ -398,7 +399,7 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
 
       return {
         ...baseEvent,
-        eventId: crypto.randomUUID(),
+        eventId: generateUuid(),
         start: newStart,
         end: newEnd,
         resource: {

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
 import { expect, userEvent, within } from 'storybook/test';
-
 import { Page } from './Page';
 
 const meta = {
