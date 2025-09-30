@@ -1,0 +1,34 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as AlertDialog from './alert-dialog.stories';
+
+<Meta of={AlertDialog} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+AlertDialog is a modal dialog that interrupts the user with important information or actions that require acknowledgment before proceeding.
+
+## Variants
+
+- **Default**: Standard confirm and cancel dialog.
+- **Destructive**: Styled to indicate critical actions like delete or irreversible changes.
+
+## Props
+
+- **open:** Boolean controlling whether the dialog is visible.
+- **defaultOpen:** Boolean for uncontrolled default state.
+- **onOpenChange:** Callback when open state changes.
+- **title:** Dialog title.
+- **description:** Additional contextual message.
+- **confirmText:** Label for confirm button.
+- **cancelText:** Label for cancel button.
+- **onConfirm:** Callback executed on confirmation.
+- **onCancel:** Callback executed on cancellation.
+
+## Best Practices
+
+- Use for high-priority decisions.
+- Provide clear action labels.
+- Keep description concise.
+- Default focus should be on cancel for safety.

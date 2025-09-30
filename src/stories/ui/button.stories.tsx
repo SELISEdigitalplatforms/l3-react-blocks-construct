@@ -1,16 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import { Button, ButtonProps } from '../../components/ui/button';
 import { Mail, Plus } from 'lucide-react';
-import DocsPage from './button.mdx';
 
 const meta: Meta<ButtonProps> = {
   title: 'Button',
   component: Button,
-  parameters: {
-    docs: {
-      page: DocsPage,
-    },
-  },
+  parameters: {},
   argTypes: {
     variant: {
       control: 'select',

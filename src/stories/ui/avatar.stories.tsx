@@ -4,14 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 const meta: Meta<typeof Avatar> = {
   title: 'Avatar',
   component: Avatar,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component: 'An image element with a fallback for representing the user.',
-      },
-    },
-  },
+  parameters: {},
   render: (args) => (
     <Avatar {...args}>
       <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />

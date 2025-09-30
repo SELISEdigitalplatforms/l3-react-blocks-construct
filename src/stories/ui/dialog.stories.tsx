@@ -16,14 +16,7 @@ import { AlertTriangle } from 'lucide-react';
 const meta: Meta<typeof Dialog> = {
   title: 'Dialog',
   component: Dialog,
-  tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component:
-          'Dialog is a modal component built on top of Radix UI. It provides accessible and customizable overlays for confirmation, alerts, forms, or complex UIs.',
-      },
-    },
     layout: 'centered',
   },
 };

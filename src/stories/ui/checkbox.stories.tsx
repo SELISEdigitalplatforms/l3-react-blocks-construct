@@ -3,15 +3,7 @@ import { Checkbox } from '../../components/ui/checkbox';
 const meta: Meta<typeof Checkbox> = {
   title: 'Checkbox',
   component: Checkbox,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component:
-          'A custom styled checkbox component built using Radix UI CheckboxPrimitive with support for disabled state, focus ring, and checked indicator.',
-      },
-    },
-  },
+  parameters: {},
 };
 export default meta;
 type Story = StoryObj<typeof Checkbox>;

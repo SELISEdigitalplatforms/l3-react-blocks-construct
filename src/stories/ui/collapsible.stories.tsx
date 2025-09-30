@@ -10,14 +10,7 @@ import { ChevronsUpDown } from 'lucide-react';
 const meta: Meta<typeof Collapsible> = {
   title: 'Collapsible',
   component: Collapsible,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component: 'An interactive component which expands/collapses a panel.',
-      },
-    },
-  },
+  parameters: {},
   render: (args) => (
     <Collapsible {...args} className="w-[350px] space-y-2">
       <div className="flex items-center justify-between space-x-4 px-4">
