@@ -1,7 +1,7 @@
-/** @type {Config} */
-/** @typedef {import('tailwindcss').Config} Config */
+import tailwindcssAnimate from 'tailwindcss-animate';
 
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+export default {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
     './public/index.html',
@@ -218,5 +218,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
-};
+  plugins: [tailwindcssAnimate],
+}

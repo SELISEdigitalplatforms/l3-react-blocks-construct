@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/react-webpack5';
+import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
   stories: [
@@ -7,15 +7,35 @@ const config: StorybookConfig = {
     '../src/**/*.mdx',
   ],
   addons: [
-    '@storybook/preset-create-react-app',
     '@storybook/addon-docs',
     '@storybook/addon-onboarding',
-    '@storybook/addon-styling-webpack',
   ],
   framework: {
-    name: '@storybook/react-webpack5',
+    name: '@storybook/react-vite',
     options: {},
   },
   staticDirs: ['../public'],
+  core: {
+    disableTelemetry: true,
+  },
+  viteFinal: async (config) => {
+    // Ensure path aliases work in Storybook
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'assets': '/src/assets',
+      'components': '/src/components',
+      'features': '/src/features',
+      'hooks': '/src/hooks',
+      'lib': '/src/lib',
+      'constant': '/src/constant',
+      'pages': '/src/pages',
+      'providers': '/src/providers',
+      'styles': '/src/styles',
+      'utils': '/src/utils',
+    };
+    
+    return config;
+  },
 };
 export default config;

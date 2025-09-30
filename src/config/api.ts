@@ -8,8 +8,8 @@ interface IAPIConfig {
 
 const getBaseUrl = (): string => {
   return isLocalhost()
-    ? (process.env.REACT_APP_PUBLIC_BLOCKS_API_URL ?? '')
-    : (process.env.REACT_APP_PUBLIC_API_URL ?? '');
+    ? (import.meta.env.VITE_PUBLIC_BLOCKS_API_URL || import.meta.env.REACT_APP_PUBLIC_BLOCKS_API_URL || '')
+    : (import.meta.env.VITE_PUBLIC_API_URL || import.meta.env.REACT_APP_PUBLIC_API_URL || '');
 };
 
 export const isLocalhost = (): boolean => {
@@ -21,13 +21,13 @@ export const isLocalhost = (): boolean => {
   );
 };
 
-if (!getBaseUrl() || !process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY) {
+if (!getBaseUrl() || !(import.meta.env.VITE_PUBLIC_X_BLOCKS_KEY || import.meta.env.REACT_APP_PUBLIC_X_BLOCKS_KEY)) {
   throw new Error('Required environment variables are not defined');
 }
 
 const API_CONFIG: IAPIConfig = {
   baseUrl: getBaseUrl(),
-  blocksKey: process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY,
+  blocksKey: import.meta.env.VITE_PUBLIC_X_BLOCKS_KEY || import.meta.env.REACT_APP_PUBLIC_X_BLOCKS_KEY || '',
   auth: {
     token: '/authentication/v1/OAuth/Token',
   },

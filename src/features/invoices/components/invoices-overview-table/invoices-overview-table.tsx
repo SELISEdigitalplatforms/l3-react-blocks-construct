@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import uuidv4 from 'utils/uuid';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import {
   ColumnDef,
@@ -59,8 +60,6 @@ function InvoicesOverviewTable<TData>({
   const [activeStatus, setActiveStatus] = React.useState<string | null>(null);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { default: uuidv4 } = require('utils/uuid');
   const { t } = useTranslation();
 
   const handleCellClick = (row: RowType): void => {

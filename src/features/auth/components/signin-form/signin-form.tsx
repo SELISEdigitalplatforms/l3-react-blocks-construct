@@ -67,7 +67,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
-  const googleSiteKey = process.env.REACT_APP_CAPTCHA_SITE_KEY ?? '';
+  const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '';
 
   const captchaEnabled = googleSiteKey !== '';
 
@@ -220,7 +220,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
               <div className="my-4">
                 <Captcha
                   type={
-                    process.env.REACT_APP_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'
+                    (import.meta.env.VITE_CAPTCHA_TYPE || import.meta.env.REACT_APP_CAPTCHA_TYPE) === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'
                   }
                   siteKey={googleSiteKey}
                   theme="light"

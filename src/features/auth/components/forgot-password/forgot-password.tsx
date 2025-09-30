@@ -62,7 +62,7 @@ export const ForgotpasswordForm = () => {
   const [captchaToken, setCaptchaToken] = useState('');
   const [showCaptcha, setShowCaptcha] = useState(false);
 
-  const googleSiteKey = process.env.REACT_APP_CAPTCHA_SITE_KEY ?? '';
+  const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '';
 
   const captchaEnabled = googleSiteKey !== '';
 
@@ -128,7 +128,7 @@ export const ForgotpasswordForm = () => {
         {captchaEnabled && showCaptcha && (
           <div className="my-4">
             <Captcha
-              type={process.env.REACT_APP_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'}
+              type={(import.meta.env.VITE_CAPTCHA_TYPE || import.meta.env.REACT_APP_CAPTCHA_TYPE) === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'}
               siteKey={googleSiteKey}
               theme="light"
               onVerify={handleCaptchaVerify}
