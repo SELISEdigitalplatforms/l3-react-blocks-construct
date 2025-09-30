@@ -7,12 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { Textarea } from 'components/ui/textarea';
-import { Avatar, AvatarImage, AvatarFallback } from 'components/ui/avatar';
-import { Label } from 'components/ui/label';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Label } from '@/components/ui/label';
 
 interface ForwardMessageProps {
   open: boolean;

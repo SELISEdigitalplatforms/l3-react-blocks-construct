@@ -6,7 +6,7 @@ import { Row } from '@tanstack/react-table';
 import { IFileDataWithSharing } from '../utils/file-manager';
 import { FileTableRowActions } from './file-manager-row-actions';
 import { IFileData } from '../hooks/use-mock-files-query';
-import { useIsMobile } from 'hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { RegularFileDetailsSheet } from './regular-file-details-sheet';
 
 export interface PaginationState {

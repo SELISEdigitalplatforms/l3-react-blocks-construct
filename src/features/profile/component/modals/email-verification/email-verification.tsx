@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,12 +7,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from 'components/ui/dialog';
-import emailSentIcon from 'assets/images/email_sent.svg';
-import UIOtpInput from 'components/core/otp-input/otp-input';
-import { User } from 'types/user.type';
-import { useToast } from 'hooks/use-toast';
-import useResendOTPTime from 'hooks/use-resend-otp';
+} from '@/components/ui/dialog';
+import emailSentIcon from '@/assets/images/email_sent.svg';
+import UIOtpInput from '@/components/core/otp-input/otp-input';
+import { User } from '@/types/user.type';
+import { useToast } from '@/hooks/use-toast';
+import useResendOTPTime from '@/hooks/use-resend-otp';
 import { useResendOtp, useVerifyOTP } from '../../../hooks/use-mfa';
 import { VerifyOTP } from '../../../types/mfa.types';
 import { useTranslation } from 'react-i18next';

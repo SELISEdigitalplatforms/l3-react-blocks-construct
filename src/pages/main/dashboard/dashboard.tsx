@@ -4,9 +4,9 @@ import {
   DashboardSystemOverview,
   DashboardUserActivityGraph,
   DashboardUserPlatform,
-} from 'features/dashboard';
-import { Button } from 'components/ui/button';
-import { useGetAccount } from 'features/profile/hooks/use-account';
+} from '@/features/dashboard';
+import { Button } from '@/components/ui/button';
+import { useGetAccount } from '@/features/profile/hooks/use-account';
 import { useTranslation } from 'react-i18next';
 
 export function Dashboard() {

@@ -2,18 +2,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect } from 'react';
-import { usePermissions } from 'hooks/use-permissions';
-import { useToast } from 'hooks/use-toast';
+import { usePermissions } from '@/hooks/use-permissions';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
+} from '@/components/ui/dialog';
 import { UserX } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { PermissionGuardProps } from 'models/permission';
+import { Button } from '@/components/ui/button';
+import { PermissionGuardProps } from '@/models/permission';
 
 export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   permissions,

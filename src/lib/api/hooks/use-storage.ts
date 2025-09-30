@@ -1,5 +1,5 @@
-import { useGlobalMutation } from 'state/query-client/hooks';
-import { useErrorHandler } from 'hooks/use-error-handler';
+import { useGlobalMutation } from '@/state/query-client/hooks';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import { getPreSignedUrlForUpload } from '../services/storage.service';
 import {
   GetPreSignedUrlForUploadPayload,

@@ -4,20 +4,20 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { signinFormDefaultValue, signinFormType, getSigninFormValidationSchema } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
-import { Input } from 'components/ui/input';
-import { Button } from 'components/ui/button';
-import { UPasswordInput } from 'components/core/u-password-input';
-import { Captcha } from 'features/captcha';
-import { useAuthStore } from 'state/store/auth';
-import { useErrorHandler } from 'hooks/use-error-handler';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { UPasswordInput } from '@/components/core/u-password-input';
+import { Captcha } from '@/features/captcha';
+import { useAuthStore } from '@/state/store/auth';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useSigninMutation } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
 import { SignInResponse } from '../../services/auth.service';
-import { SsoSignin } from 'pages/auth/signin/signin-sso';
-import { GRANT_TYPES } from 'constant/auth';
-import { LoginOption } from 'constant/sso';
-import { LoadingOverlay } from 'components/core/loading-overlay';
+import { SsoSignin } from '@/pages/auth/signin/signin-sso';
+import { GRANT_TYPES } from '@/constant/auth';
+import { LoginOption } from '@/constant/sso';
+import { LoadingOverlay } from '@/components/core/loading-overlay';
 
 /**
  * SigninForm Component
@@ -67,7 +67,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
-  const googleSiteKey = process.env.REACT_APP_CAPTCHA_SITE_KEY ?? '';
+  const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '';
 
   const captchaEnabled = googleSiteKey !== '';
 
@@ -220,7 +220,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
               <div className="my-4">
                 <Captcha
                   type={
-                    process.env.REACT_APP_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'
+                    (import.meta.env.VITE_CAPTCHA_TYPE || import.meta.env.REACT_APP_CAPTCHA_TYPE) === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'
                   }
                   siteKey={googleSiteKey}
                   theme="light"

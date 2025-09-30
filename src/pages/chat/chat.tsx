@@ -1,4 +1,4 @@
-import { Chat } from 'features/chat';
+import { Chat } from '@/features/chat';
 
 export function ChatPage() {
   return (

@@ -16,7 +16,7 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-jest.mock('styles/theme/theme-provider', () => ({
+jest.mock('@/styles/theme/theme-provider', () => ({
   __esModule: true,
   useTheme: () => ({
     theme: 'light',

@@ -7,13 +7,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import UIOtpInput from 'components/core/otp-input/otp-input';
-import { useToast } from 'hooks/use-toast';
-import { User } from 'types/user.type';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import UIOtpInput from '@/components/core/otp-input/otp-input';
+import { useToast } from '@/hooks/use-toast';
+import { User } from '@/types/user.type';
 import { useGetSetUpTotp, useVerifyOTP } from '../../../hooks/use-mfa';
-import QRCodeDummyImage from 'assets/images/image_off_placeholder.webp';
+import QRCodeDummyImage from '@/assets/images/image_off_placeholder.webp';
 import { SetUpTotp, VerifyOTP } from '../../../types/mfa.types';
 import API_CONFIG from '../../../../../config/api';
 import { useTranslation } from 'react-i18next';

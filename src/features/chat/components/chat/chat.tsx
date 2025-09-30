@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Menu, ArrowLeft } from 'lucide-react';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ChatStateContent } from '../chat-state-content/chat-state-content';
 import { ChatSidebar } from '../chat-sidebar/chat-sidebar';
 import { ChatSearch } from '../chat-search/chat-search';
 import { ChatUsers } from '../chat-users/chat-users';
 import { ChatContact } from '../../types/chat.types';
 import { mockChatContacts } from '../../data/chat.data';
-import { Sheet, SheetContent } from 'components/ui/sheet';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { ChatProfile } from '../chat-profile/chat-profile';
-import { Dialog, DialogContent, DialogHeader } from 'components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 
 function useIsMobile(breakpoint = 768) {

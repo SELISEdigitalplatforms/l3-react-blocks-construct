@@ -6,13 +6,13 @@ import {
   getForgotPasswordFormValidationSchema,
 } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
-import { Input } from 'components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { useForgotPassword } from '../../hooks/use-auth';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import { SetStateAction, useRef, useState, useEffect } from 'react';
-import { CaptchaRef } from 'features/captcha/index.type';
-import { Captcha } from 'features/captcha';
+import { CaptchaRef } from '@/features/captcha/index.type';
+import { Captcha } from '@/features/captcha';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -62,7 +62,7 @@ export const ForgotpasswordForm = () => {
   const [captchaToken, setCaptchaToken] = useState('');
   const [showCaptcha, setShowCaptcha] = useState(false);
 
-  const googleSiteKey = process.env.REACT_APP_CAPTCHA_SITE_KEY ?? '';
+  const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '';
 
   const captchaEnabled = googleSiteKey !== '';
 
@@ -128,7 +128,7 @@ export const ForgotpasswordForm = () => {
         {captchaEnabled && showCaptcha && (
           <div className="my-4">
             <Captcha
-              type={process.env.REACT_APP_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'}
+              type={(import.meta.env.VITE_CAPTCHA_TYPE || import.meta.env.REACT_APP_CAPTCHA_TYPE) === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'}
               siteKey={googleSiteKey}
               theme="light"
               onVerify={handleCaptchaVerify}

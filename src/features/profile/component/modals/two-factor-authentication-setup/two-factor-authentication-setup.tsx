@@ -8,14 +8,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Separator } from 'components/ui/separator';
-import { MfaDialogState } from 'features/profile/enums/mfa-dialog-state.enum';
-import { Skeleton } from 'components/ui/skeleton';
-import { User } from 'types/user.type';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { MfaDialogState } from '@/features/profile/enums/mfa-dialog-state.enum';
+import { Skeleton } from '@/components/ui/skeleton';
+import { User } from '@/types/user.type';
 import { useGetMfaTemplate, useGenerateOTP } from '../../../hooks/use-mfa';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Component to manage the 2-factor authentication settings for a user.

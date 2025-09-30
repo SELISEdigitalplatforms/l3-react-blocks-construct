@@ -5,11 +5,11 @@ import { TwoFactorAuthenticationSetup } from '../modals/two-factor-authenticatio
 import { AuthenticatorAppSetup } from '../modals/authenticator-app-setup/authenticator-app-setup';
 import { EmailVerification } from '../modals/email-verification/email-verification';
 import { ManageTwoFactorAuthentication } from '../modals/manage-two-factor-authentication/manage-two-factor-authentication';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
-import { Separator } from 'components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from 'components/ui/tooltip';
-import { Skeleton } from 'components/ui/skeleton';
-import { Button } from 'components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { UpdatePassword } from '../modals/update-password/update-password';
 import { useGetMfaTemplate } from '../../hooks/use-mfa';
 

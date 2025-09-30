@@ -1,4 +1,4 @@
-import { graphqlClient } from 'lib/graphql-client';
+import { graphqlClient } from '@/lib/graphql-client';
 import { GET_INVOICE_ITEMS_QUERY } from '../graphql/queries';
 import {
   INSERT_INVOICE_ITEM_MUTATION,

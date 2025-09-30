@@ -1,8 +1,8 @@
 import { X } from 'lucide-react';
-import darkLogo from 'assets/images/construct_logo_dark.svg';
-import lightLogo from 'assets/images/construct_logo_light.svg';
-import darksmallLogo from 'assets/images/construct_logo_small_dark.svg';
-import lightsmallLogo from 'assets/images/construct_logo_small_light.svg';
+import darkLogo from '@/assets/images/construct_logo_dark.svg';
+import lightLogo from '@/assets/images/construct_logo_light.svg';
+import darksmallLogo from '@/assets/images/construct_logo_small_dark.svg';
+import lightsmallLogo from '@/assets/images/construct_logo_small_light.svg';
 
 interface LogoSectionProps {
   theme: string;

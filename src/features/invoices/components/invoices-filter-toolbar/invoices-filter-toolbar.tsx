@@ -3,8 +3,8 @@ import { DateRange } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { InvoicesFilterControls } from '../invoices-filter-controls/invoices-filter-controls';
 
 interface InvoicesFilterToolbarProps<TData> {

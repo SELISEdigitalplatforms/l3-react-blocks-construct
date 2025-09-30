@@ -1,5 +1,5 @@
 import { clients } from './https';
-import API_CONFIG from 'config/api';
+import API_CONFIG from '@/config/api';
 
 /**
  * GraphQL Client Module
@@ -51,7 +51,7 @@ interface GraphQLClient {
 const cleanBaseUrl = API_CONFIG.baseUrl.endsWith('/')
   ? API_CONFIG.baseUrl.slice(0, -1)
   : API_CONFIG.baseUrl;
-const GRAPHQL_BASE_URL = `${cleanBaseUrl}/graphql/v1/graphql`;
+const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1/graphql`;
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {

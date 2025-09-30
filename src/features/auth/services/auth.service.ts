@@ -1,6 +1,6 @@
 import API_CONFIG, { getApiUrl } from '../../../config/api';
-import { clients, HttpError } from 'lib/https';
-import { useAuthStore } from 'state/store/auth';
+import { clients, HttpError } from '@/lib/https';
+import { useAuthStore } from '@/state/store/auth';
 
 /**
  * Authentication API Utilities

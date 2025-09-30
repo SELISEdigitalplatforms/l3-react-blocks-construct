@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ColumnDef } from '@tanstack/react-table';
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
+import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
 import { getFileTypeIcon, getFileTypeInfo, IFileTrashData } from '../../utils/file-manager';
 import { Info, Users } from 'lucide-react';
-import { CustomtDateFormat } from 'lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 import { TrashTableRowActions } from './trash-files-row-actions';
 
 interface ColumnFactoryProps {

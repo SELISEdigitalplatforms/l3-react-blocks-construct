@@ -1,24 +1,24 @@
 import { useEffect, useMemo, useCallback } from 'react';
 import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
-import { useCardTasks } from 'features/task-manager/hooks/use-card-tasks';
-import { useGetTaskSections } from 'features/task-manager/hooks/use-task-manager';
-import { useToast } from 'hooks/use-toast';
-import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
-import { Skeleton } from 'components/ui/skeleton';
+import { useCardTasks } from '@/features/task-manager/hooks/use-card-tasks';
+import { useGetTaskSections } from '@/features/task-manager/hooks/use-task-manager';
+import { useToast } from '@/hooks/use-toast';
+import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   TaskSection,
   TaskSectionWithTasks,
   TaskItem,
   ItemTag,
   GetSectionsResponse,
-} from 'features/task-manager/types/task-manager.types';
-import { TaskColumn } from 'features/task-manager/components/card-view/task-column';
+} from '@/features/task-manager/types/task-manager.types';
+import { TaskColumn } from '@/features/task-manager/components/card-view/task-column';
 import { AddColumn } from '../../features/task-manager/components/modals/add-column';
-import { TaskDragOverlay } from 'features/task-manager/components/card-view/task-drag-overlay';
+import { TaskDragOverlay } from '@/features/task-manager/components/card-view/task-drag-overlay';
 import { AddTask } from '../../features/task-manager/components/modals/add-task';
-import TaskDetailsView from 'features/task-manager/components/task-details-view/task-details-view';
-import { Dialog } from 'components/ui/dialog';
+import TaskDetailsView from '@/features/task-manager/components/task-details-view/task-details-view';
+import { Dialog } from '@/components/ui/dialog';
 
 /**
  * TaskCardView Component

@@ -4,30 +4,30 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { CalendarClock, CalendarIcon, Trash, ChevronDown } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from 'components/ui/form';
-import { Input } from 'components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
   Dialog,
-} from 'components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
   PopoverAnchor,
   Close as PopoverClose,
-} from 'components/ui/popover';
-import { Separator } from 'components/ui/separator';
-import { Switch } from 'components/ui/switch';
-import { Calendar } from 'components/ui/calendar';
-import { Label } from 'components/ui/label';
-import CustomTextEditor from 'components/blocks/custom-text-editor/custom-text-editor';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { useToast } from 'hooks/use-toast';
+} from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Label } from '@/components/ui/label';
+import CustomTextEditor from '@/components/blocks/custom-text-editor/custom-text-editor';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { useToast } from '@/hooks/use-toast';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
 import { CalendarEvent, Member } from '../../../types/calendar-event.types';

@@ -1,28 +1,28 @@
 import { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
-import { generateUuid } from 'utils/uuid';
+import { generateUuid } from '@/utils/uuid';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useToast } from 'hooks/use-toast';
-import { Button } from 'components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from 'components/ui/form';
-import { Input } from 'components/ui/input';
-import { DialogContent, DialogHeader, DialogTitle, DialogDescription } from 'components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
   PopoverAnchor,
   Close as PopoverClose,
-} from 'components/ui/popover';
-import { Separator } from 'components/ui/separator';
-import { Switch } from 'components/ui/switch';
-import { Calendar } from 'components/ui/calendar';
-import { Label } from 'components/ui/label';
+} from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Label } from '@/components/ui/label';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
-import CustomTextEditor from 'components/blocks/custom-text-editor/custom-text-editor';
+import CustomTextEditor from '@/components/blocks/custom-text-editor/custom-text-editor';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { generateTimePickerRange } from '../../../utils/date-utils';
 import { EventParticipant } from '../../event-participant/event-participant';

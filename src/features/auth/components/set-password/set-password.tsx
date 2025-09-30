@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BasePasswordForm } from 'components/blocks/base-password-form/base-password-form';
+import { BasePasswordForm } from '@/components/blocks/base-password-form/base-password-form';
 import { useAccountActivation } from '../../hooks/use-auth';
 import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from './utils';
 
@@ -37,7 +37,7 @@ export const SetpasswordForm = ({ code }: { code: string }) => {
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
 
   // Check if captcha is enabled
-  const captchaEnabled = (process.env.REACT_APP_CAPTCHA_SITE_KEY ?? '') !== '';
+  const captchaEnabled = (import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '') !== '';
 
   const handleSubmit = async (password: string, code: string, captchaToken?: string) => {
     if (captchaEnabled && !captchaToken) {

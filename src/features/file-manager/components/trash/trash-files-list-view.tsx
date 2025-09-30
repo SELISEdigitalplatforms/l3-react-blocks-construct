@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from 'hooks/use-mobile';
-import DataTable from 'components/blocks/data-table/data-table';
+import { useIsMobile } from '@/hooks/use-mobile';
+import DataTable from '@/components/blocks/data-table/data-table';
 import { IFileTrashData, PaginationState } from '../../utils/file-manager';
 import { TrashTableColumns } from './trash-files-table-columns';
 import { TrashDetailsSheet } from './trash-files-details';

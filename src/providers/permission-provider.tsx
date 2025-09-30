@@ -1,7 +1,7 @@
-import { usePermissionsLogic } from 'hooks/use-permissions';
+import { usePermissionsLogic } from '@/hooks/use-permissions';
 import { useMemo } from 'react';
-import { User } from 'types/user.type';
-import { PermissionsContext } from 'context/permissions-context';
+import { User } from '@/types/user.type';
+import { PermissionsContext } from '@/context/permissions-context';
 
 interface PermissionsProviderProps {
   user: User | null | undefined;

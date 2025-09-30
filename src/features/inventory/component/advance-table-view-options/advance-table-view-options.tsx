@@ -3,15 +3,15 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { Settings2 } from 'lucide-react';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from 'components/ui/dropdown-menu';
-import { Checkbox } from 'components/ui/checkbox';
-import { Label } from 'components/ui/label';
+} from '@/components/ui/dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 /**
  * A component for managing column visibility options in a table. This component provides a dropdown menu

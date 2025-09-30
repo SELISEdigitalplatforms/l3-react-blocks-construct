@@ -2,14 +2,14 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { AppSidebar } from '../../components/blocks/layout/app-sidebar';
 import { UProfileMenu } from '../../components/blocks/u-profile-menu';
-import { SidebarTrigger, useSidebar } from 'components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import LanguageSelector from '../../components/blocks/language-selector/language-selector';
-import { Button } from 'components/ui/button';
-import { Menubar, MenubarMenu, MenubarTrigger } from 'components/ui/menubar';
-import { Notification } from 'features/notification/component/notification/notification';
-import { useGetNotifications } from 'features/notification/hooks/use-notification';
-import { useGetAccount } from 'features/profile/hooks/use-account';
-import { PermissionsProvider } from 'providers/permission-provider';
+import { Button } from '@/components/ui/button';
+import { Menubar, MenubarMenu, MenubarTrigger } from '@/components/ui/menubar';
+import { Notification } from '@/features/notification/component/notification/notification';
+import { useGetNotifications } from '@/features/notification/hooks/use-notification';
+import { useGetAccount } from '@/features/profile/hooks/use-account';
+import { PermissionsProvider } from '@/providers/permission-provider';
 
 export default function MainLayout() {
   const { open, isMobile } = useSidebar();

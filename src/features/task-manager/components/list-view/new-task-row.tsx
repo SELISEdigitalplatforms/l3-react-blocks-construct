@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleIcon, GripVertical, Plus, X } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
+} from '@/components/ui/select';
 import { useCardTasks } from '../../hooks/use-card-tasks';
 
 /**

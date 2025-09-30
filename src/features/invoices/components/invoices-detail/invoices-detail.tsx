@@ -4,17 +4,17 @@ import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { ChevronLeft, Download, Pencil, Send } from 'lucide-react';
-import { Card, CardContent } from 'components/ui/card';
-import { Button } from 'components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
-import { Separator } from 'components/ui/separator';
-import darkLogo from 'assets/images/construct_logo_dark.svg';
-import lightLogo from 'assets/images/construct_logo_light.svg';
-import { Badge } from 'components/ui/badge';
-import { useToast } from 'hooks/use-toast';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Separator } from '@/components/ui/separator';
+import darkLogo from '@/assets/images/construct_logo_dark.svg';
+import lightLogo from '@/assets/images/construct_logo_light.svg';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';
-import { useTheme } from 'styles/theme/theme-provider';
+import { useTheme } from '@/styles/theme/theme-provider';
 
 interface InvoicesDetailProps {
   invoice: InvoiceItem;

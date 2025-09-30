@@ -1,5 +1,5 @@
 import { useGetAccount } from './use-account';
-import { useGlobalQuery } from 'state/query-client/hooks';
+import { useGlobalQuery } from '@/state/query-client/hooks';
 import API_CONFIG from '../../../config/api';
 import SessionsService, { IDeviceSessionResponse } from '../services/device.service';
 

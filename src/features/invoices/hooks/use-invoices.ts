@@ -1,8 +1,8 @@
-import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
+import { useGlobalQuery, useGlobalMutation } from '@/state/query-client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useToast } from 'hooks/use-toast';
-import { useErrorHandler } from 'hooks/use-error-handler';
+import { useToast } from '@/hooks/use-toast';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import {
   getInvoiceItems,
   addInvoiceItem,

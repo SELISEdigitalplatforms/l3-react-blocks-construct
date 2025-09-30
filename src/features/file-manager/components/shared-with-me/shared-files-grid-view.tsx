@@ -5,7 +5,7 @@ import { BaseGridView } from '../basic-grid-view';
 import { IFileDataWithSharing } from '../../utils/file-manager';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from 'hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { SharedFilesGridViewProps } from '../../types/file-manager.type';
 import {
   matchesFileType,

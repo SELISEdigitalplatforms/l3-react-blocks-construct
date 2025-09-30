@@ -1,8 +1,8 @@
-import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
+import { useGlobalQuery, useGlobalMutation } from '@/state/query-client/hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { useErrorHandler } from 'hooks/use-error-handler';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import { AddInventoryItemParams, UpdateInventoryItemParams } from '../types/inventory.types';
 import {
   getInventory,

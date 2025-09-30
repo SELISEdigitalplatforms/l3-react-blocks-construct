@@ -1,6 +1,6 @@
-import { useAuthStore } from 'state/store/auth';
-import { getRefreshToken } from 'features/auth/services/auth.service';
-import API_CONFIG, { isLocalhost } from 'config/api';
+import { useAuthStore } from '@/state/store/auth';
+import { getRefreshToken } from '@/features/auth/services/auth.service';
+import API_CONFIG, { isLocalhost } from '@/config/api';
 
 /**
  * HTTP Client Module

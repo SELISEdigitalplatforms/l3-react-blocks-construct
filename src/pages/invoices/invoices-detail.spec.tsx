@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
-import { useGetInvoiceItems } from 'features/invoices/hooks/use-invoices';
-import { InvoiceItem } from 'features/invoices/types/invoices.types';
+import { useGetInvoiceItems } from '@/features/invoices/hooks/use-invoices';
+import { InvoiceItem } from '@/features/invoices/types/invoices.types';
 
 // Mock the useGetInvoiceItems hook
 jest.mock('features/invoices/hooks/use-invoices', () => ({

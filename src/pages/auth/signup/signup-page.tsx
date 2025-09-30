@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Button } from 'components/ui/button';
-import githubIcon from 'assets/images/social_media_github.svg';
-import linkedinIcon from 'assets/images/social_media_in.svg';
-import microsoftIcon from 'assets/images/social_media_ms.svg';
-import googleIcon from 'assets/images/social_media_google.svg';
-import { SignupForm } from 'features/auth/components/signup-form';
-import darkLogo from 'assets/images/construct_logo_dark.svg';
-import lightLogo from 'assets/images/construct_logo_light.svg';
-import { useTheme } from 'styles/theme/theme-provider';
+import { Button } from '@/components/ui/button';
+import githubIcon from '@/assets/images/social_media_github.svg';
+import linkedinIcon from '@/assets/images/social_media_in.svg';
+import microsoftIcon from '@/assets/images/social_media_ms.svg';
+import googleIcon from '@/assets/images/social_media_google.svg';
+import { SignupForm } from '@/features/auth/components/signup-form';
+import darkLogo from '@/assets/images/construct_logo_dark.svg';
+import lightLogo from '@/assets/images/construct_logo_light.svg';
+import { useTheme } from '@/styles/theme/theme-provider';
 import { useTranslation } from 'react-i18next';
 
 export function SignupPage() {

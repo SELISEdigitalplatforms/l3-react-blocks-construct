@@ -1,18 +1,18 @@
 import React, { useCallback, useState } from 'react';
-import SharedFilesListView from 'features/file-manager/components/shared-with-me/shared-files-list-view';
-import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
-import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
-import SharedFilesGridView from 'features/file-manager/components/shared-with-me/shared-files-grid-view';
-import { useFileManager } from 'features/file-manager/hooks/use-file-manager';
-import { useFileFilters } from 'features/file-manager/hooks/use-file-filters';
-import { FileModals } from 'features/file-manager/components/modals/file-modals';
-import { FileManagerLayout } from 'features/file-manager/file-manager-layout';
-import { FileViewRenderer } from 'features/file-manager/components/file-view-renderer';
-import { SharedFilters } from 'features/file-manager/types/header-toolbar.type';
-import { SharedWithMeHeaderToolbar } from 'features/file-manager/components/shared-with-me/shared-files-header-toolbar';
+import SharedFilesListView from '@/features/file-manager/components/shared-with-me/shared-files-list-view';
+import { ShareWithMeModal } from '@/features/file-manager/components/modals/shared-user-modal';
+import { RenameModal } from '@/features/file-manager/components/modals/rename-modal';
+import SharedFilesGridView from '@/features/file-manager/components/shared-with-me/shared-files-grid-view';
+import { useFileManager } from '@/features/file-manager/hooks/use-file-manager';
+import { useFileFilters } from '@/features/file-manager/hooks/use-file-filters';
+import { FileModals } from '@/features/file-manager/components/modals/file-modals';
+import { FileManagerLayout } from '@/features/file-manager/file-manager-layout';
+import { FileViewRenderer } from '@/features/file-manager/components/file-view-renderer';
+import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
+import { SharedWithMeHeaderToolbar } from '@/features/file-manager/components/shared-with-me/shared-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FilePreview } from 'features/file-manager/components/file-preview';
-import { useViewMode } from 'hooks/use-view-mode';
+import { FilePreview } from '@/features/file-manager/components/file-preview';
+import { useViewMode } from '@/hooks/use-view-mode';
 
 interface SharedWithMeProps {
   onCreateFile?: () => void;

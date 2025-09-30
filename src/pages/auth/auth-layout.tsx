@@ -1,11 +1,11 @@
 import { useLayoutEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuthState } from 'state/client-middleware';
-import bgAuthLight from 'assets/images/bg_auth_light.svg';
-import bgAuthDark from 'assets/images/bg_auth_dark.svg';
-import { useTheme } from 'styles/theme/theme-provider';
-import LanguageSelector from 'components/blocks/language-selector/language-selector';
-import { useGetLoginOptions } from 'features/auth/hooks/use-auth';
+import { useAuthState } from '@/state/client-middleware';
+import bgAuthLight from '@/assets/images/bg_auth_light.svg';
+import bgAuthDark from '@/assets/images/bg_auth_dark.svg';
+import { useTheme } from '@/styles/theme/theme-provider';
+import LanguageSelector from '@/components/blocks/language-selector/language-selector';
+import { useGetLoginOptions } from '@/features/auth/hooks/use-auth';
 import { AlertTriangle } from 'lucide-react';
 
 export function AuthLayout() {
