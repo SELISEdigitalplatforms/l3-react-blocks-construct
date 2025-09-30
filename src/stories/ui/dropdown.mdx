@@ -1,0 +1,32 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as DropdownMenu from './dropdown.stories';
+
+<Meta of={DropdownMenu} />;
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+DropdownMenu displays a list of actions or options in a menu triggered by a control element, such as a button.
+
+## Variants
+
+- **Default:** Standard dropdown menu.
+- **Submenu:** Nested dropdowns for hierarchical options.
+- **With Groups:** Grouped items separated by labels or dividers.
+
+## Props
+
+- **DropdownMenuTrigger:** Defines the element that opens the menu.
+- **DropdownMenuContent:** The container for menu items.
+- **DropdownMenuItem:** Represents a single action or option.
+- **DropdownMenuLabel:** Label to categorize menu items.
+- **DropdownMenuSeparator:** Divider for logical grouping.
+- **DropdownMenuSub:** Creates nested menus.
+
+## Best Practices
+
+- Keep menu labels short and descriptive.
+- Use separators and labels to organize items.
+- Support keyboard navigation for accessibility.
+- Avoid deeply nested menus to maintain clarity.

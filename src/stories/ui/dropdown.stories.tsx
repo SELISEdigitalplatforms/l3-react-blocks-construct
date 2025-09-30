@@ -36,14 +36,7 @@ import {
 const meta: Meta<typeof DropdownMenu> = {
   title: 'DropdownMenu',
   component: DropdownMenu,
-  tags: ['autodocs'],
   parameters: {
-    docs: {
-      description: {
-        component:
-          'DropdownMenu is a versatile menu component built on top of Radix UI. It provides accessible dropdown menus with support for items, checkboxes, radio groups, submenus, and keyboard shortcuts.',
-      },
-    },
     layout: 'centered',
   },
 };

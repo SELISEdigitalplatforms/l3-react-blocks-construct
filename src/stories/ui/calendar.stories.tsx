@@ -7,15 +7,7 @@ import { addDays } from 'date-fns';
 const meta = {
   title: 'Calendar',
   component: Calendar,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component: 'A simple calendar component for date selection.',
-      },
-    },
-    layout: 'centered',
-  },
+  parameters: {},
   argTypes: {
     mode: {
       control: 'select',

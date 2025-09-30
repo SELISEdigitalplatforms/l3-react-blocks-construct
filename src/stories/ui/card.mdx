@@ -1,0 +1,30 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as Card from './card.stories';
+
+<Meta of={Card} />
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+Cards are flexible and extensible content containers that include options for headers, footers, and a variety of content types.
+
+## Variants
+
+- **Default:** Standard card with header, content, and footer.
+- **Image:** Card with an image at the top.
+- **Horizontal:** Card with content beside the image.
+
+## Props
+
+- **header:** Content displayed at the top of the card.
+- **footer:** Content displayed at the bottom of the card.
+- **image:** URL of the image to display.
+- **title:** Title of the card.
+- **content:** Main content of the card.
+
+## Best Practices
+
+- Use cards to group related content.
+- Ensure images are relevant and of high quality.
+- Keep content concise and to the point.
+- Use footers for actions related to the card's content.
