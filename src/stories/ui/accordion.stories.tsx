@@ -9,15 +9,7 @@ import {
 const meta: Meta<typeof Accordion> = {
   title: 'Accordion',
   component: Accordion,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component:
-          'A vertically stacked set of interactive headings that each reveal an associated section of content.',
-      },
-    },
-  },
+  parameters: {},
   render: (args) => (
     <Accordion {...args}>
       <AccordionItem value="item-1">

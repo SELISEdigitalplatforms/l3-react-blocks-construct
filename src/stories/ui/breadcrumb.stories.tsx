@@ -13,14 +13,7 @@ import { Slash } from 'lucide-react';
 const meta: Meta<typeof Breadcrumb> = {
   title: 'Breadcrumb',
   component: Breadcrumb,
-  tags: ['autodocs'],
-  parameters: {
-    docs: {
-      description: {
-        component: 'Displays the path to the current resource using a hierarchy of links.',
-      },
-    },
-  },
+  parameters: {},
   render: (args) => (
     <Breadcrumb {...args}>
       <BreadcrumbList>

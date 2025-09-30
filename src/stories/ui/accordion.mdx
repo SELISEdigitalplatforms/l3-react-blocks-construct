@@ -1,0 +1,29 @@
+import { Canvas, Meta, Controls, Primary, Title, Subtitle } from '@storybook/addon-docs/blocks';
+import * as AccordionStories from './accordion.stories';
+
+<Meta of={AccordionStories} />
+
+<Title />
+
+<Subtitle>Overview</Subtitle>
+
+The Accordion component allows users to toggle the visibility of content sections. It is commonly used to group related information and reduce visual clutter.
+
+## Variants
+
+- **Default** — Standard accordion with collapsible content.
+- **Multiple** — Allows more than one section to be open at the same time.
+- **Single** — Restricts to only one section being open at a time.
+
+## Props
+
+- type: Defines the behavior of the accordion. Can be single or multiple.
+- collapsible: (boolean) If true, allows closing all items, leaving none open.
+- disabled: (boolean) Disables interaction with the accordion item.
+
+## Best Practices
+
+- Use Accordions to organize related but optional content.
+- Keep section titles clear and concise.
+- Avoid nesting accordions inside other accordions.
+- Ensure keyboard navigation works as expected for accessibility.
