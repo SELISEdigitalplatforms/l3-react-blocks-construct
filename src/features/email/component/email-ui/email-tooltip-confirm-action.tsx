@@ -44,7 +44,7 @@ interface TooltipConfirmActionProps {
   confirmDescription: string | React.ReactNode;
   onConfirm: () => void;
   toastDescription: string;
-  children: React.ReactElement;
+  children: React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>;
 }
 
 const TooltipConfirmAction: React.FC<TooltipConfirmActionProps> = ({

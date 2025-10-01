@@ -179,7 +179,7 @@ export const useGlobalMutation = <
 
   return useMutation({
     ...option,
-    onError: (errorData, variables, context) => {
+    onError: (errorData, variables, onMutateResult, context) => {
       const err = errorData as any;
       const apiError = processApiError(err);
 
@@ -210,7 +210,7 @@ export const useGlobalMutation = <
       });
 
       // Call the original onError if provided
-      option.onError?.(errorData, variables, context);
+      option.onError?.(errorData, variables, onMutateResult as any, context as any);
     },
   });
 };
