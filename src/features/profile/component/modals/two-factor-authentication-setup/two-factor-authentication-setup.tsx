@@ -215,7 +215,7 @@ export const TwoFactorAuthenticationSetup: React.FC<
           <div className="p-2 bg-surface rounded-md">
             <Mail className="text-secondary" size={24} />
           </div>
-          <div>
+          <div className="text-left">
             <h3 className="text-sm font-semibold text-high-emphasis">{t('EMAIL_VERIFICATION')}</h3>
             <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
           </div>
