@@ -9,7 +9,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import {
   Popover,
   PopoverContent,
@@ -79,7 +84,7 @@ interface TimePickerProps {
   label: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   width: number;
   timePickerRange: string[];
 }
@@ -443,7 +448,8 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
 
     // Create a minimal temporary event for the recurrence modal
     const tempEventData = {
-      eventId: crypto.randomUUID(),
+      eventId:
+        crypto?.randomUUID?.() || `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: form.getValues('title') || 'New Event',
       start: fullStart.toISOString(),
       end: fullEnd.toISOString(),

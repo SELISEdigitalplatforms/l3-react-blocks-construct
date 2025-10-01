@@ -25,6 +25,6 @@ describe('ChatPage', () => {
     const chatComponent = screen.getByTestId('mock-chat');
     expect(chatComponent).toBeInTheDocument();
 
-    expect(Chat).toHaveBeenCalledWith({}, {});
+    expect(Chat).toHaveBeenCalledWith({}, undefined);
   });
 });

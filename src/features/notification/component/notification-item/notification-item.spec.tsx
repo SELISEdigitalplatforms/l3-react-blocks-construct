@@ -10,10 +10,10 @@ jest.mock('react-i18next', () => ({
 }));
 
 // Mock mutation hook
-const mutateMock = jest.fn();
+const mockMutate = jest.fn();
 jest.mock('../../hooks/use-notification', () => ({
   useMarkNotificationAsRead: () => ({
-    mutate: mutateMock,
+    mutate: mockMutate,
     isPending: false,
   }),
 }));
@@ -49,7 +49,7 @@ const mockNotification = {
 
 describe('NotificationItem', () => {
   beforeEach(() => {
-    mutateMock.mockClear();
+    mockMutate.mockClear();
   });
 
   it('renders notification details', () => {
@@ -67,7 +67,7 @@ describe('NotificationItem', () => {
     fireEvent.click(screen.getByTestId('ellipsis-icon'));
     // Click the Mark as Read menu item
     fireEvent.click(screen.getByText('MARKED_AS_READ'));
-    expect(mutateMock).toHaveBeenCalledWith(
+    expect(mockMutate).toHaveBeenCalledWith(
       'notif-1',
       expect.objectContaining({
         onError: expect.any(Function),

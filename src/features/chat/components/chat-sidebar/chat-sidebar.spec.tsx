@@ -15,18 +15,17 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-// Mock user profile
-const mockUserProfile = {
-  avatarSrc: '',
-  avatarFallback: 'U',
-  name: 'User Name',
-  status: { isOnline: true },
-};
-jest.mock('../../data/chat.data', () => ({
-  mockUserProfile,
-}));
-
 import { ChatSidebar } from './chat-sidebar';
+
+// Mock chat data
+jest.mock('../../data/chat.data', () => ({
+  mockUserProfile: {
+    avatarSrc: '',
+    avatarFallback: 'U',
+    name: 'User Name',
+    status: { isOnline: true },
+  },
+}));
 
 const contacts = [
   {

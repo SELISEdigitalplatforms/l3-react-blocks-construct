@@ -217,7 +217,7 @@ interface DateTimePickerProps {
   label: string;
   timeLabel: string;
   width: number;
-  elementRef: React.RefObject<HTMLDivElement>;
+  elementRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
@@ -402,7 +402,9 @@ export function EditEvent({
 
     const evts = recurringEvents.length > 0 ? recurringEvents : initialEventData.events || [];
     const targetDate = evts.length > 0 ? new Date(evts[0].start) : startDate;
-    return `${t('OCCURS_ON')} ${WEEK_DAYS[targetDate.getDay()]}`;
+    const dayIndex = targetDate.getDay();
+    const dayName = WEEK_DAYS[dayIndex] || 'Sunday';
+    return `${t('OCCURS_ON')} ${dayName}` || t('SET_RECURRENCE') || 'Set Recurrence';
   }, [form, recurringEvents, initialEventData.events, startDate, t]);
 
   const handleClose = () => {
@@ -602,6 +604,10 @@ export function EditEvent({
   };
 
   const handleRecurringClick = () => {
+    // Ensure recurring flag is enabled before proceeding
+    if (!form.getValues('recurring')) {
+      handleRecurringToggle(true);
+    }
     const memberIds = form.getValues('members') ?? [];
     const selectedMembers = getSelectedMembers(memberIds, initialEventData);
 
@@ -742,9 +748,9 @@ export function EditEvent({
                       <button
                         type="button"
                         onClick={handleRecurringClick}
-                        className="bg-transparent border-none p-0 underline text-primary text-base cursor-pointer font-semibold hover:text-primary-800"
+                        className="bg-transparent border-none p-0 underline text-primary text-base cursor-pointer font-semibold hover:text-primary-800 min-h-[20px]"
                       >
-                        {recurrenceText}
+                        {recurrenceText || t('SET_RECURRENCE') || 'Set Recurrence'}
                       </button>
                     </div>
                   )}

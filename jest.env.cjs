@@ -11,3 +11,9 @@ process.env.VITE_PUBLIC_BACKEND_URL = 'https://dev-api.seliseblocks.com';
 process.env.VITE_PUBLIC_X_BLOCKS_KEY = 'cf18dc87904c4e1485639242cda4a026';
 process.env.VITE_PUBLIC_BLOCKS_API_URL = 'https://dev-api.seliseblocks.com';
 process.env.VITE_PUBLIC_API_URL = 'https://dev-api.seliseblocks.com';
+process.env.VITE_CAPTCHA_SITE_KEY = 'test-site-key';
+process.env.VITE_CAPTCHA_TYPE = 'reCaptcha';
+
+// Legacy CRA captcha environment variables (for backward compatibility)
+process.env.REACT_APP_CAPTCHA_SITE_KEY = 'test-site-key';
+process.env.REACT_APP_CAPTCHA_TYPE = 'reCaptcha';

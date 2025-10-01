@@ -7,39 +7,37 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-// Mock data
-const mockContacts = [
-  {
-    id: '1',
-    name: 'Alice',
-    email: 'alice@example.com',
-    avatarSrc: '',
-    avatarFallback: 'A',
-    phoneNo: '',
-    members: [],
-    date: new Date().toISOString(),
-    status: {},
-    messages: [],
-  },
-  {
-    id: '2',
-    name: 'Bob',
-    email: 'bob@example.com',
-    avatarSrc: '',
-    avatarFallback: 'B',
-    phoneNo: '',
-    members: [],
-    date: new Date().toISOString(),
-    status: {},
-    messages: [],
-  },
-];
-
-jest.mock('../../data/chat.data', () => ({
-  mockChatContacts: mockContacts,
-}));
-
 import { ChatSearch } from './chat-search';
+
+// Mock chat data
+jest.mock('../../data/chat.data', () => ({
+  mockChatContacts: [
+    {
+      id: '1',
+      name: 'Alice',
+      email: 'alice@example.com',
+      avatarSrc: '',
+      avatarFallback: 'A',
+      phoneNo: '',
+      members: [],
+      date: new Date().toISOString(),
+      status: {},
+      messages: [],
+    },
+    {
+      id: '2',
+      name: 'Bob',
+      email: 'bob@example.com',
+      avatarSrc: '',
+      avatarFallback: 'B',
+      phoneNo: '',
+      members: [],
+      date: new Date().toISOString(),
+      status: {},
+      messages: [],
+    },
+  ],
+}));
 
 describe('ChatSearch', () => {
   it('renders input and label', () => {
