@@ -13,20 +13,23 @@ jest.mock('react-i18next', () => ({
 }));
 
 // Mock the dropdown menu to make it easier to test
-jest.mock('components/ui/dropdown-menu', () => ({
-  DropdownMenu: ({
-    children,
-    open,
-    onOpenChange,
-  }: {
-    children: React.ReactNode;
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
-  }) => {
-    const [isOpen, setIsOpen] = React.useState(open || false);
+jest.mock('components/ui/dropdown-menu', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react');
+  return {
+    DropdownMenu: ({
+      children,
+      open,
+      onOpenChange,
+    }: {
+      children: React.ReactNode;
+      open?: boolean;
+      onOpenChange?: (open: boolean) => void;
+    }) => {
+      const [isOpen, setIsOpen] = React.useState(open || false);
 
-    // Find the trigger element from children
-    const childrenArray = React.Children.toArray(children);
+      // Find the trigger element from children
+      const childrenArray = React.Children.toArray(children);
     const triggerElement = childrenArray.find(
       (child: any) => child.type?.name === 'DropdownMenuTrigger'
     );
@@ -105,7 +108,8 @@ jest.mock('components/ui/dropdown-menu', () => ({
       {children}
     </button>
   ),
-}));
+  };
+});
 
 const baseContact: ChatContact = {
   id: '1',

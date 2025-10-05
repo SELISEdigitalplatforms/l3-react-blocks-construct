@@ -1,5 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+// import { useTranslation } from 'react-i18next';
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: jest.fn(),
+    },
+  }),
+}));
 import '@testing-library/jest-dom';
 import { Storage } from './storage';
 

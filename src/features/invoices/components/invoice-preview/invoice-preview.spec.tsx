@@ -81,7 +81,7 @@ describe('InvoicePreview', () => {
         invoice: mockInvoice,
         isPreview: true,
       }),
-      {}
+      undefined
     );
   });
 });

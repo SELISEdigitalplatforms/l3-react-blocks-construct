@@ -8,6 +8,7 @@ const config: Config = {
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/file-mocks.cjs',
     '\\.css$': 'identity-obj-proxy',
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^/(.*)$': '<rootDir>/src/$1',
     '^assets/(.*)$': '<rootDir>/src/assets/$1',
     '^components/(.*)$': '<rootDir>/src/components/$1',
@@ -36,15 +37,7 @@ const config: Config = {
     '!**/node_modules/**',
   ],
   transform: {
-    '^.+\\.(t|j)sx?$': [
-      'ts-jest',
-      {
-        tsconfig: './tsconfig.jest.json',
-        isolatedModules: true,
-        esModuleInterop: true,
-        allowJs: true,
-      },
-    ],
+    '^.+\\.(t|j)sx?$': '<rootDir>/jest-transform.js',
   },
   transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
 };

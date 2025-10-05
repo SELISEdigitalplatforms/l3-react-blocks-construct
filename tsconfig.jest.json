@@ -5,6 +5,7 @@
     "types": ["jest", "@testing-library/jest-dom"],
     "baseUrl": "src",
     "paths": {
+      "@/*": ["*"],
       "/*": ["*"],
       "assets/*": ["assets/*"],
       "components/*": ["components/*"],
