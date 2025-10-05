@@ -1,15 +1,16 @@
+import { describe, test, beforeEach, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Profile } from './profile';
 import { GeneralInfo, DevicesTable } from '@/features/profile';
 
-jest.mock('features/profile', () => ({
-  GeneralInfo: jest.fn(() => <div data-testid="general-info">General Info Content</div>),
-  DevicesTable: jest.fn(() => <div data-testid="devices-table">Devices Table Content</div>),
+vi.mock('features/profile', () => ({
+  GeneralInfo: vi.fn(() => <div data-testid="general-info">General Info Content</div>),
+  DevicesTable: vi.fn(() => <div data-testid="devices-table">Devices Table Content</div>),
 }));
 
 describe('Profile Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders profile header', () => {

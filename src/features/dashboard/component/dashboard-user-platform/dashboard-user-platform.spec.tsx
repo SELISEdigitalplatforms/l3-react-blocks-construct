@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DashboardUserPlatform } from './dashboard-user-platform';
+import { vi, describe, it, expect } from 'vitest';
 
-jest.mock('components/ui/chart', () => ({
+vi.mock('components/ui/chart', () => ({
   ChartContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="chart-container">{children}</div>
   ),
@@ -29,7 +30,7 @@ jest.mock('components/ui/chart', () => ({
 }));
 
 // Valid PieChart mock with proper data handling
-jest.mock('recharts', () => ({
+vi.mock('recharts', () => ({
   PieChart: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
   ),
@@ -62,21 +63,25 @@ jest.mock('recharts', () => ({
   Label: () => <div data-testid="label" />,
 }));
 
-jest.mock('components/ui/card', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
+vi.mock('components/ui/card', () => ({
+  Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-testid="card" className={className}>
+      {children}
+    </div>
+  ),
   CardHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-header">{children}</div>
   ),
-  CardTitle: ({ children }: { children: React.ReactNode }) => (
-    <h2 data-testid="card-title">{children}</h2>
-  ),
-  CardDescription: () => <p data-testid="card-description">Description</p>,
   CardContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-content">{children}</div>
   ),
+  CardTitle: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="card-title">{children}</div>
+  ),
+  CardDescription: () => <div data-testid="card-description" />,
 }));
 
-jest.mock('components/ui/select', () => ({
+vi.mock('components/ui/select', () => ({
   Select: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select">{children}</div>
   ),
@@ -97,6 +102,12 @@ jest.mock('components/ui/select', () => ({
       {children}
     </div>
   ),
+}));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
 }));
 
 describe('DashboardUserPlatform', () => {
@@ -139,9 +150,7 @@ describe('DashboardUserPlatform', () => {
     ];
 
     mockMonths.forEach((month) => {
-      expect(screen.getByTestId(`select-item-${month}`)).toHaveTextContent(
-        month.toUpperCase()
-      );
+      expect(screen.getByTestId(`select-item-${month}`)).toHaveTextContent(month.toUpperCase());
     });
   });
 

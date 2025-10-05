@@ -2,8 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DashboardOverview } from './dashboard-overview';
+import { vi, describe, test, expect, beforeEach } from 'vitest';
 
-jest.mock('components/ui/card', () => ({
+vi.mock('components/ui/card', () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,
   CardHeader: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="card-header">{children}</div>
@@ -17,7 +18,7 @@ jest.mock('components/ui/card', () => ({
   CardDescription: () => <div data-testid="card-description" />,
 }));
 
-jest.mock('components/ui/select', () => ({
+vi.mock('components/ui/select', () => ({
   Select: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select">{children}</div>
   ),
@@ -38,14 +39,22 @@ jest.mock('components/ui/select', () => ({
   ),
 }));
 
-jest.mock('lucide-react', () => ({
-  TrendingUp: () => <div data-testid="icon-trending-up" />,
-  Users: () => <div data-testid="icon-users" />,
-  UserCog: () => <div data-testid="icon-user-cog" />,
-  UserPlus: () => <div data-testid="icon-user-plus" />,
+vi.mock('lucide-react', () => ({
+  TrendingUp: ({ className }: { className?: string }) => (
+    <svg data-testid="icon-trending-up" className={`lucide-trending-up ${className}`} />
+  ),
+  Users: ({ className }: { className?: string }) => (
+    <svg data-testid="icon-users" className={`lucide-users ${className}`} />
+  ),
+  UserCog: ({ className }: { className?: string }) => (
+    <svg data-testid="icon-user-cog" className={`lucide-user-cog ${className}`} />
+  ),
+  UserPlus: ({ className }: { className?: string }) => (
+    <svg data-testid="icon-user-plus" className={`lucide-user-plus ${className}`} />
+  ),
 }));
 
-jest.mock('../../services/dashboard-service', () => ({
+vi.mock('../../services/dashboard-service', () => ({
   monthsOfYear: [
     { value: 'january', label: 'January' },
     { value: 'february', label: 'February' },
@@ -60,6 +69,12 @@ jest.mock('../../services/dashboard-service', () => ({
     { value: 'november', label: 'November' },
     { value: 'december', label: 'December' },
   ],
+}));
+
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
 }));
 
 describe('DashboardOverview Component', () => {

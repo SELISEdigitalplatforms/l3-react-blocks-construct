@@ -4,9 +4,9 @@
  */
 
 // 1. Set up environment variables first
-process.env.REACT_APP_PUBLIC_BLOCKS_API_URL = 'http://localhost:3000';
-process.env.REACT_APP_PUBLIC_API_URL = 'http://localhost:3000';
-process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY = 'test-key';
+process.env.VITE_PUBLIC_BLOCKS_API_URL = 'http://localhost:3000';
+process.env.VITE_PUBLIC_API_URL = 'http://localhost:3000';
+process.env.VITE_PUBLIC_X_BLOCKS_KEY = 'test-key';
 
 // 2. Mock window.location before any imports
 delete (global as any).window.location;
@@ -23,7 +23,7 @@ delete (global as any).window.location;
 };
 
 // 3. Mock the API config module directly (try different path formats)
-jest.mock('../../../config/api', () => ({
+vi.mock('../../../config/api', () => ({
   __esModule: true,
   default: {
     baseUrl: 'http://localhost:3000',
@@ -40,6 +40,7 @@ jest.mock('../../../config/api', () => ({
 }));
 
 // 4. Now safe to import React Testing Library and other modules
+import { describe, test, beforeEach, afterEach, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
@@ -47,11 +48,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Dashboard } from './dashboard';
 
 // 5. Mock other components
-jest.mock('components/ui/button', () => ({
+vi.mock('components/ui/button', () => ({
   Button: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
 }));
 
-jest.mock('features/dashboard', () => ({
+vi.mock('features/dashboard', () => ({
   DashboardOverview: () => <div data-testid="dashboard-overview">Dashboard Overview</div>,
   DashboardSystemOverview: () => <div data-testid="dashboard-system-overview">System Overview</div>,
   DashboardUserActivityGraph: () => (
@@ -60,8 +61,8 @@ jest.mock('features/dashboard', () => ({
   DashboardUserPlatform: () => <div data-testid="dashboard-user-platform">User Platform</div>,
 }));
 
-jest.mock('features/profile/hooks/use-account', () => ({
-  useGetAccount: jest.fn(() => ({
+vi.mock('features/profile/hooks/use-account', () => ({
+  useGetAccount: vi.fn(() => ({
     data: { mfaEnabled: false },
     isLoading: false,
   })),

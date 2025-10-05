@@ -5,14 +5,21 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
 import { useGetInvoiceItems } from '@/features/invoices/hooks/use-invoices';
 import { InvoiceItem } from '@/features/invoices/types/invoices.types';
+import { vi, describe, test, beforeEach, expect } from 'vitest';
+
+// Mock UUID module
+vi.mock('uuid', () => ({
+  v4: () => 'mock-uuid-v4',
+  v1: () => 'mock-uuid-v1',
+}));
 
 // Mock the useGetInvoiceItems hook
-jest.mock('features/invoices/hooks/use-invoices', () => ({
-  useGetInvoiceItems: jest.fn(),
+vi.mock('features/invoices/hooks/use-invoices', () => ({
+  useGetInvoiceItems: vi.fn(),
 }));
 
 // Mock the InvoicesDetail component
-jest.mock('features/invoices', () => ({
+vi.mock('features/invoices', () => ({
   InvoicesDetail: ({ invoice }: { invoice: InvoiceItem }) => (
     <div data-testid="invoice-detail">
       <div data-testid="customer-name">{invoice.Customer[0].CustomerName}</div>
@@ -22,14 +29,14 @@ jest.mock('features/invoices', () => ({
 }));
 
 // Mock the translation hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 // Mock the useToast hook
-jest.mock('hooks/use-toast', () => ({
+vi.mock('hooks/use-toast', () => ({
   useToast: () => ({
-    toast: jest.fn(),
+    toast: vi.fn(),
   }),
 }));
 
@@ -65,11 +72,11 @@ const mockInvoice: InvoiceItem = {
 };
 
 describe('InvoiceDetailsPage', () => {
-  const mockUseGetInvoiceItems = useGetInvoiceItems as jest.Mock;
+  const mockUseGetInvoiceItems = useGetInvoiceItems as any;
 
   beforeEach(() => {
     // Reset all mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderWithRouter = (invoiceId: string) => {

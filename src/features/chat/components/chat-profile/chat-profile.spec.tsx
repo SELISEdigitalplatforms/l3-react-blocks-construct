@@ -1,22 +1,23 @@
+import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ChatProfile } from './chat-profile';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock useToast
-jest.mock('hooks/use-toast', () => ({
-  useToast: () => ({ toast: jest.fn() }),
+vi.mock('hooks/use-toast', () => ({
+  useToast: () => ({ toast: vi.fn() }),
 }));
 
 // Mock ConfirmationModal and EditGroupName to avoid side effects
-jest.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
+vi.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
   __esModule: true,
   default: ({ open, onOpenChange, onConfirm }: any) =>
     open ? (
@@ -31,7 +32,7 @@ jest.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
     ) : null,
 }));
 
-jest.mock('../modals/edit-group-name/edit-group-name', () => ({
+vi.mock('../modals/edit-group-name/edit-group-name', () => ({
   EditGroupName: ({ isOpen, onClose, onSave }: any) =>
     isOpen ? (
       <div data-testid="edit-group-name-modal">
@@ -123,14 +124,14 @@ describe('ChatProfile', () => {
   });
 
   it('calls onMuteToggle when mute/unmute button is clicked', () => {
-    const onMuteToggle = jest.fn();
+    const onMuteToggle = vi.fn();
     render(<ChatProfile contact={baseContact} onMuteToggle={onMuteToggle} />);
     fireEvent.click(screen.getByText('MUTE'));
     expect(onMuteToggle).toHaveBeenCalledWith(baseContact.id);
   });
 
   it('calls onDeleteMember when delete button is clicked and confirmed', () => {
-    const onDeleteMember = jest.fn();
+    const onDeleteMember = vi.fn();
     render(<ChatProfile contact={groupContact} onDeleteMember={onDeleteMember} />);
     // Click the delete button for Member 1
     fireEvent.click(screen.getByTestId('delete-member-btn-m1'));

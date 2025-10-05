@@ -1,9 +1,10 @@
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ChatPage } from './chat';
 import { Chat } from '@/features/chat';
 
-jest.mock('features/chat', () => ({
-  Chat: jest.fn(() => <div data-testid="mock-chat" />),
+vi.mock('features/chat', () => ({
+  Chat: vi.fn(() => <div data-testid="mock-chat" />),
 }));
 
 describe('ChatPage', () => {

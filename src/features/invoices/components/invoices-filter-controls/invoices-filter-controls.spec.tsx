@@ -3,16 +3,17 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InvoicesFilterControls } from './invoices-filter-controls';
 import { InvoiceStatus } from '../../types/invoices.types';
+import { vi, expect, describe, it, beforeEach } from 'vitest';
 
 // Mock the DateRangeFilter component
-jest.mock('components/blocks/data-table/data-table-date-filter', () => ({
+vi.mock('components/blocks/data-table/data-table-date-filter', () => ({
   DateRangeFilter: ({ title }: { title: string }) => (
     <div data-testid={`date-filter-${title}`}>{title} Filter</div>
   ),
 }));
 
 // Mock the DataTableFacetedFilter component
-jest.mock('components/blocks/data-table/data-table-faceted-filter', () => ({
+vi.mock('components/blocks/data-table/data-table-faceted-filter', () => ({
   DataTableFacetedFilter: ({ title, options }: { title: string; options: any[] }) => (
     <div data-testid={`faceted-filter-${title}`}>
       {title} Filter ({options.length} options)
@@ -21,11 +22,11 @@ jest.mock('components/blocks/data-table/data-table-faceted-filter', () => ({
 }));
 
 // Mock the react-i18next hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: {
-      changeLanguage: jest.fn(),
+      changeLanguage: vi.fn(),
     },
   }),
 }));
@@ -34,30 +35,38 @@ describe('InvoicesFilterControls', () => {
   // Create mock props
   const mockDateIssued = { from: new Date('2025-01-01'), to: new Date('2025-01-31') };
   const mockDueDate = { from: new Date('2025-02-01'), to: new Date('2025-02-28') };
-  const mockOnDateIssuedChange = jest.fn();
-  const mockOnDueDateChange = jest.fn();
+  const mockOnDateIssuedChange = vi.fn();
+  const mockOnDueDateChange = vi.fn();
 
   // Create a mock table for testing
   const mockTable = {
-    getColumn: jest.fn().mockImplementation((columnId) => {
-      if (columnId === 'status') {
+    getColumn: vi.fn().mockImplementation((columnId) => {
+      if (columnId === 'Status') {
         return {
-          id: 'status',
-          setFilterValue: jest.fn(),
+          id: 'Status',
+          setFilterValue: vi.fn(),
+          getFacetedUniqueValues: vi.fn().mockReturnValue(
+            new Map([
+              ['pending', 1],
+              ['paid', 2],
+              ['overdue', 1],
+            ])
+          ),
+          getFilterValue: vi.fn().mockReturnValue([]),
         };
       }
       return {
         id: columnId,
-        setFilterValue: jest.fn(),
+        setFilterValue: vi.fn(),
       };
     }),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
-  test('renders all filter components', () => {
+  it('renders all filter components', () => {
     render(
       <InvoicesFilterControls
         table={mockTable as any}
@@ -80,7 +89,7 @@ describe('InvoicesFilterControls', () => {
     expect(statusFilterText).toContain(`${Object.values(InvoiceStatus).length} options`);
   });
 
-  test('renders without date ranges when not provided', () => {
+  it('renders without date ranges when not provided', () => {
     render(
       <InvoicesFilterControls
         table={mockTable as any}
@@ -95,17 +104,16 @@ describe('InvoicesFilterControls', () => {
     expect(screen.getByTestId('faceted-filter-STATUS')).toBeInTheDocument();
   });
 
-  test('does not render status filter when column is not available', () => {
+  it('does not render status filter when column is not available', () => {
     // Mock table without status column
     const tableWithoutStatus = {
-      getColumn: jest.fn().mockImplementation((columnId) => {
+      getColumn: vi.fn().mockImplementation((columnId) => {
         if (columnId === 'Status') {
-          // Changed from 'status' to 'Status' to match component
           return null;
         }
         return {
           id: columnId,
-          setFilterValue: jest.fn(),
+          setFilterValue: vi.fn(),
         };
       }),
     };

@@ -5,6 +5,13 @@ import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { InvoicesPage } from './invoices';
 import { InvoiceItem } from '@/features/invoices/types/invoices.types';
+import { vi, describe, test, beforeEach, afterEach, expect } from 'vitest';
+
+// Mock UUID module
+vi.mock('uuid', () => ({
+  v4: () => 'mock-uuid-v4',
+  v1: () => 'mock-uuid-v1',
+}));
 
 // Mock the useGetInvoiceItems hook
 const mockData = {
@@ -49,16 +56,16 @@ const mockData = {
   pageSize: 10,
 };
 
-const mockUseGetInvoiceItems = jest.fn();
+const mockUseGetInvoiceItems = vi.fn();
 
-jest.mock('features/invoices/hooks/use-invoices', () => ({
+vi.mock('features/invoices/hooks/use-invoices', () => ({
   useGetInvoiceItems: () => mockUseGetInvoiceItems(),
 }));
 
 // Mock the features/invoices components
-jest.mock('features/invoices', () => ({
+vi.mock('features/invoices', () => ({
   __esModule: true,
-  createInvoiceTableColumns: jest.fn(() => [
+  createInvoiceTableColumns: vi.fn(() => [
     { id: 'customerName', header: 'Customer Name' },
     { id: 'status', header: 'Status' },
   ]),
@@ -96,14 +103,17 @@ jest.mock('features/invoices', () => ({
 }));
 
 // Mock the react-router-dom's useNavigate
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}));
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 // Mock the translation hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
@@ -117,13 +127,13 @@ describe('InvoicesPage', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     mockNavigate.mockClear();
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 
   test('renders the invoices page with header toolbar', () => {

@@ -1,12 +1,13 @@
+import { describe, test, expect, vi } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 // import { useTranslation } from 'react-i18next';
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: {
-      changeLanguage: jest.fn(),
+      changeLanguage: vi.fn(),
     },
   }),
 }));

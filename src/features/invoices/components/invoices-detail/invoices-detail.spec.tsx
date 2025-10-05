@@ -2,55 +2,61 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InvoicesDetail } from './invoices-detail';
 import { InvoiceStatus } from '../../types/invoices.types';
+import { renderWithProviders } from '@/test-utils/test-providers';
+import { vi, describe, test, beforeEach, expect } from 'vitest';
 
-jest.mock('react-router-dom', () => ({
-  useNavigate: () => jest.fn(),
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  };
+});
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: {
-      changeLanguage: jest.fn(),
+      changeLanguage: vi.fn(),
     },
   }),
 }));
 
-jest.mock('@/styles/theme/theme-provider', () => ({
+vi.mock('@/styles/theme/theme-provider', () => ({
   __esModule: true,
   useTheme: () => ({
     theme: 'light',
-    setTheme: jest.fn(),
+    setTheme: vi.fn(),
   }),
 }));
 
-jest.mock('html2canvas', () =>
-  jest.fn().mockResolvedValue({
-    toDataURL: jest.fn().mockReturnValue('data:image/png;base64,mockImageData'),
+vi.mock('html2canvas', () => ({
+  default: vi.fn().mockResolvedValue({
+    toDataURL: vi.fn().mockReturnValue('data:image/png;base64,mockImageData'),
     width: 800,
     height: 1200,
-  })
-);
-
-jest.mock('jspdf', () => {
-  return jest.fn().mockImplementation(() => ({
-    internal: {
-      pageSize: {
-        getWidth: jest.fn().mockReturnValue(210),
-      },
-    },
-    addImage: jest.fn(),
-    save: jest.fn(),
-  }));
-});
-
-jest.mock('hooks/use-toast', () => ({
-  useToast: () => ({
-    toast: jest.fn(),
   }),
 }));
 
-jest.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
+vi.mock('jspdf', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    internal: {
+      pageSize: {
+        getWidth: vi.fn().mockReturnValue(210),
+      },
+    },
+    addImage: vi.fn(),
+    save: vi.fn(),
+  })),
+}));
+
+vi.mock('hooks/use-toast', () => ({
+  useToast: () => ({
+    toast: vi.fn(),
+  }),
+}));
+
+vi.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
   __esModule: true,
   default: ({
     open,
@@ -74,7 +80,7 @@ jest.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
     ) : null,
 }));
 
-jest.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
+vi.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
   PermissionGuard: ({
     children,
     showFallback,
@@ -95,14 +101,18 @@ jest.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
   },
 }));
 
-jest.mock('config/roles-permissions', () => ({
+vi.mock('config/roles-permissions', () => ({
   MENU_PERMISSIONS: {
     INVOICE_WRITE: 'invoice:write',
   },
 }));
 
-jest.mock('assets/images/construct_logo_dark.svg', () => 'mock-logo-path');
-jest.mock('assets/images/construct_logo_light.svg', () => 'mock-logo-path');
+vi.mock('assets/images/construct_logo_dark.svg', () => ({
+  default: 'mock-logo-path',
+}));
+vi.mock('assets/images/construct_logo_light.svg', () => ({
+  default: 'mock-logo-path',
+}));
 
 describe('InvoicesDetail', () => {
   const mockInvoice = {
@@ -144,7 +154,7 @@ describe('InvoicesDetail', () => {
   });
 
   test('renders invoice details correctly', () => {
-    render(<InvoicesDetail invoice={mockInvoice} />);
+    renderWithProviders(<InvoicesDetail invoice={mockInvoice} />);
 
     expect(screen.getAllByText('INV-001').length).toBeGreaterThan(0);
 

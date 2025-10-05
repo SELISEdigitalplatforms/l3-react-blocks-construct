@@ -1,27 +1,32 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { vi, describe, it, expect } from 'vitest';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock dropdown menu to always render children
-jest.mock('components/ui/dropdown-menu', () => ({
+vi.mock('components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children }: any) => <div>{children}</div>,
   DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
   DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
-  DropdownMenuItem: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  DropdownMenuItem: ({ children, onClick, ...props }: any) => (
+    <div onClick={onClick} {...props}>
+      {children}
+    </div>
+  ),
 }));
 
 // Mock child components
-jest.mock('../chat-profile/chat-profile', () => ({
+vi.mock('../chat-profile/chat-profile', () => ({
   ChatProfile: () => <div data-testid="chat-profile" />,
 }));
-jest.mock('../modals/forward-message/forward-message', () => ({
+vi.mock('../modals/forward-message/forward-message', () => ({
   ForwardMessage: (props: any) =>
     props.open ? (
       <div data-testid="forward-modal">
@@ -30,7 +35,7 @@ jest.mock('../modals/forward-message/forward-message', () => ({
       </div>
     ) : null,
 }));
-jest.mock('../chat-input/chat-input', () => ({
+vi.mock('../chat-input/chat-input', () => ({
   ChatInput: ({ value, onChange, onSubmit }: any) => (
     <form
       onSubmit={(e) => {
@@ -111,8 +116,8 @@ describe('ChatUsers', () => {
   });
 
   it('calls onMuteToggle and onDeleteContact from dropdown', () => {
-    const onMuteToggle = jest.fn();
-    const onDeleteContact = jest.fn();
+    const onMuteToggle = vi.fn();
+    const onDeleteContact = vi.fn();
     render(
       <ChatUsers
         contact={baseContact}

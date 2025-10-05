@@ -1,11 +1,12 @@
 import { render, screen, act } from '@testing-library/react';
 import ErrorAlert from './error-alert';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-jest.mock('lucide-react', () => ({
-  TriangleAlert: jest.fn(() => <svg data-testid="triangle-alert-icon" />),
+vi.mock('lucide-react', () => ({
+  TriangleAlert: vi.fn(() => <svg data-testid="triangle-alert-icon" />),
 }));
 
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       switch (key) {
@@ -26,11 +27,11 @@ jest.mock('react-i18next', () => ({
 
 describe('ErrorAlert Component', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render the component when isError is true', () => {
@@ -47,7 +48,7 @@ describe('ErrorAlert Component', () => {
     expect(screen.getByText('Error')).toBeInTheDocument();
 
     act(() => {
-      jest.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(5000);
     });
 
     expect(screen.queryByText('Error')).not.toBeInTheDocument();

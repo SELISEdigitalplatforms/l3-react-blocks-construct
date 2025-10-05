@@ -1,17 +1,19 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NotificationItem } from './notification-item';
+import { QueryWrapper } from '@/test-utils/test-providers';
+import { vi, expect, it, describe, beforeEach } from 'vitest';
 
 // Mock translation
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock mutation hook
-const mockMutate = jest.fn();
-jest.mock('../../hooks/use-notification', () => ({
+const mockMutate = vi.fn();
+vi.mock('../../hooks/use-notification', () => ({
   useMarkNotificationAsRead: () => ({
     mutate: mockMutate,
     isPending: false,
@@ -19,7 +21,7 @@ jest.mock('../../hooks/use-notification', () => ({
 }));
 
 // Mock DropdownMenu and Button
-jest.mock('components/ui/dropdown-menu', () => ({
+vi.mock('components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   DropdownMenuContent: ({ children }: any) => <div>{children}</div>,
   DropdownMenuItem: ({ children, ...props }: any) => (
@@ -29,10 +31,10 @@ jest.mock('components/ui/dropdown-menu', () => ({
   ),
   DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
 }));
-jest.mock('components/ui/button', () => ({
+vi.mock('components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   EllipsisVertical: () => <span data-testid="ellipsis-icon" />,
   Loader2: () => <span data-testid="loader-icon" />,
 }));
@@ -53,7 +55,11 @@ describe('NotificationItem', () => {
   });
 
   it('renders notification details', () => {
-    render(<NotificationItem notification={mockNotification as any} />);
+    render(
+      <QueryWrapper>
+        <NotificationItem notification={mockNotification as any} />
+      </QueryWrapper>
+    );
     expect(screen.getByText('Test Type')).toBeInTheDocument();
     expect(screen.getByText('Test message')).toBeInTheDocument();
     expect(screen.getByText(/^TODAY, \d{1,2}:\d{2} [AP]M$/)).toBeInTheDocument();

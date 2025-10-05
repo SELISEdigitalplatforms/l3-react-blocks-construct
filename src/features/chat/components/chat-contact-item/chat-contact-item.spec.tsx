@@ -4,16 +4,17 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ChatContact } from '../../types/chat.types';
 import { ChatContactItem } from './chat-contact-item';
+import { vi, describe, it, expect } from 'vitest';
 
 // Mock i18n translation to return the key
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock the dropdown menu to make it easier to test
-jest.mock('components/ui/dropdown-menu', () => {
+vi.mock('components/ui/dropdown-menu', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react');
   return {
@@ -30,84 +31,84 @@ jest.mock('components/ui/dropdown-menu', () => {
 
       // Find the trigger element from children
       const childrenArray = React.Children.toArray(children);
-    const triggerElement = childrenArray.find(
-      (child: any) => child.type?.name === 'DropdownMenuTrigger'
-    );
+      const triggerElement = childrenArray.find(
+        (child: any) => child.type?.name === 'DropdownMenuTrigger'
+      );
 
-    const contentElement = childrenArray.find(
-      (child: any) => child.type?.name === 'DropdownMenuContent'
-    );
+      const contentElement = childrenArray.find(
+        (child: any) => child.type?.name === 'DropdownMenuContent'
+      );
 
-    return (
-      <div data-testid="dropdown-menu">
-        {triggerElement &&
-          React.cloneElement(triggerElement as React.ReactElement, {
-            onClick: (e: React.MouseEvent) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const newOpenState = !isOpen;
-              setIsOpen(newOpenState);
-              onOpenChange?.(newOpenState);
-            },
-            'data-testid': 'dropdown-trigger',
-          })}
-        {isOpen &&
-          contentElement &&
-          React.cloneElement(contentElement as React.ReactElement, {
-            'data-testid': 'dropdown-content',
-          })}
+      return (
+        <div data-testid="dropdown-menu">
+          {triggerElement &&
+            React.cloneElement(triggerElement as React.ReactElement, {
+              onClick: (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const newOpenState = !isOpen;
+                setIsOpen(newOpenState);
+                onOpenChange?.(newOpenState);
+              },
+              'data-testid': 'dropdown-trigger',
+            })}
+          {isOpen &&
+            contentElement &&
+            React.cloneElement(contentElement as React.ReactElement, {
+              'data-testid': 'dropdown-content',
+            })}
+        </div>
+      );
+    },
+    DropdownMenuTrigger: ({
+      children,
+      onClick,
+      ...props
+    }: {
+      children: React.ReactNode;
+      onClick?: (e: React.MouseEvent) => void;
+      [key: string]: any;
+    }) => (
+      <button type="button" data-testid="dropdown-trigger" onClick={onClick} {...props}>
+        {children}
+      </button>
+    ),
+    DropdownMenuContent: ({
+      children,
+      ...props
+    }: {
+      children: React.ReactNode;
+      [key: string]: any;
+    }) => (
+      <div data-testid="dropdown-content" {...props}>
+        {children}
       </div>
-    );
-  },
-  DropdownMenuTrigger: ({
-    children,
-    onClick,
-    ...props
-  }: {
-    children: React.ReactNode;
-    onClick?: (e: React.MouseEvent) => void;
-    [key: string]: any;
-  }) => (
-    <button type="button" data-testid="dropdown-trigger" onClick={onClick} {...props}>
-      {children}
-    </button>
-  ),
-  DropdownMenuContent: ({
-    children,
-    ...props
-  }: {
-    children: React.ReactNode;
-    [key: string]: any;
-  }) => (
-    <div data-testid="dropdown-content" {...props}>
-      {children}
-    </div>
-  ),
-  DropdownMenuItem: ({
-    children,
-    onClick,
-    className,
-    ...props
-  }: {
-    children: React.ReactNode;
-    onClick?: (e: React.MouseEvent) => void;
-    className?: string;
-    [key: string]: any;
-  }) => (
-    <button
-      type="button"
-      data-testid="dropdown-menu-item"
-      className={className}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onClick?.(e);
-      }}
-      {...props}
-    >
-      {children}
-    </button>
-  ),
+    ),
+    DropdownMenuItem: ({
+      children,
+      onClick,
+      className,
+      ...props
+    }: {
+      children: React.ReactNode;
+      onClick?: (e: React.MouseEvent) => void;
+      className?: string;
+      [key: string]: any;
+    }) => (
+      <button
+        type="button"
+        data-testid="dropdown-menu-item"
+        className={className}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onClick?.(e);
+        }}
+        {...props}
+      >
+        {children}
+      </button>
+    ),
   };
 });
 
@@ -145,7 +146,7 @@ describe('ChatContactItem', () => {
   });
 
   it('calls onClick when clicked', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     render(<ChatContactItem {...baseContact} onClick={onClick} />);
     const clickableElement =
       screen.getByRole('button', { name: /open chat with john doe/i }) ||
@@ -165,10 +166,10 @@ describe('ChatContactItem', () => {
   });
 
   it('displays dropdown on icon click and calls appropriate handlers', async () => {
-    const onMarkAsRead = jest.fn();
-    const onMarkAsUnread = jest.fn();
-    const onMuteToggle = jest.fn();
-    const onDeleteContact = jest.fn();
+    const onMarkAsRead = vi.fn();
+    const onMarkAsUnread = vi.fn();
+    const onMuteToggle = vi.fn();
+    const onDeleteContact = vi.fn();
 
     render(
       <ChatContactItem
