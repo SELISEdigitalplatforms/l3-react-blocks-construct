@@ -81,7 +81,12 @@ export function EditGroupName({
             >
               {t('CANCEL')}
             </Button>
-            <Button type="submit" loading={isLoading} className="min-w-[112px]">
+            <Button
+              type="submit"
+              loading={isLoading}
+              className="min-w-[112px]"
+              disabled={isLoading}
+            >
               {t('SAVE')}
             </Button>
           </div>

@@ -1,9 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { InvoicesDetail } from './invoices-detail';
 import { InvoiceStatus } from '../../types/invoices.types';
 import { renderWithProviders } from '@/test-utils/test-providers';
-import { vi, describe, test, beforeEach, expect } from 'vitest';
+import { vi } from 'vitest';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -48,6 +47,25 @@ vi.mock('jspdf', () => ({
     addImage: vi.fn(),
     save: vi.fn(),
   })),
+}));
+
+vi.mock('@/components/blocks/confirmation-modal/confirmation-modal', () => ({
+  default: ({ open, title, onConfirm, onOpenChange }: any) =>
+    open ? (
+      <div data-testid="confirmation-modal">
+        <h2>{title}</h2>
+        <button
+          data-testid="confirm-button"
+          onClick={() => {
+            onConfirm?.();
+            onOpenChange?.(false);
+          }}
+        >
+          Confirm
+        </button>
+        <button onClick={() => onOpenChange?.(false)}>Cancel</button>
+      </div>
+    ) : null,
 }));
 
 vi.mock('hooks/use-toast', () => ({

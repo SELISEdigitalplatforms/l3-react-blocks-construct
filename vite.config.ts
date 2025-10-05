@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 // Note: CJS deprecation warning is informational and doesn't affect functionality.
@@ -8,7 +8,7 @@ import path from 'path'
 // This is expected during the migration period from CRA to Vite.
 export default defineConfig({
   plugins: [react()],
-  
+
   // Path aliases to match tsconfig paths
   resolve: {
     alias: {
@@ -34,7 +34,11 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           query: ['@tanstack/react-query'],
-          ui: ['@radix-ui/react-accordion', '@radix-ui/react-alert-dialog', '@radix-ui/react-avatar'],
+          ui: [
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-alert-dialog',
+            '@radix-ui/react-avatar',
+          ],
         },
       },
     },
@@ -42,29 +46,38 @@ export default defineConfig({
 
   // Environment variables configuration
   // Vite automatically loads .env files and exposes variables prefixed with VITE_
-  envPrefix: ['VITE_', 'REACT_APP_'], // Support both prefixes during migration
-  
+  envPrefix: 'VITE_',
+
   // CSS configuration
   css: {
     postcss: './postcss.config.js', // Use existing PostCSS config
   },
 
-  // Define global constants
-  define: {
-    // Some libraries expect this global
-    global: 'globalThis',
+  // Vitest test configuration
+  test: {
+    globals: true, // so you can use 'describe', 'it', 'expect' without importing
+    environment: 'jsdom', // simulates browser for React components
+    setupFiles: ['./vitest.setup.ts'], // path to setup file
+    coverage: {
+      provider: 'v8',
+      reporter: ['lcov', 'text', 'html'],
+      reportsDirectory: 'coverage',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/**/*.spec.{ts,tsx}',
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.model.ts',
+        'src/**/*.module.ts',
+        'src/**/*.d.ts',
+        'src/stories/**',
+        'src/assets/**',
+        'node_modules/**',
+      ],
+    },
+    include: ['**/*.spec.{ts,tsx}'],
+    // Mock file imports (images, CSS, etc.)
+    // server.deps.inline removed (not needed unless you have ESM/CJS issues)
   },
 
-  // Optimize dependencies
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@tanstack/react-query',
-      'lucide-react',
-      'clsx',
-      'tailwind-merge',
-    ],
-  },
-})
+  // optimizeDeps.include removed (not needed unless you have pre-bundling issues)
+});

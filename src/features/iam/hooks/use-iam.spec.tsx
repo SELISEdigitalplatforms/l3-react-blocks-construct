@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
+import { vi, Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGetUsersQuery } from './use-iam';
 import { useGlobalQuery } from '@/state/query-client/hooks';
 
-vi.mock('state/query-client/hooks', () => ({
+vi.mock('@/state/query-client/hooks', () => ({
   useGlobalQuery: vi.fn(),
 }));
 

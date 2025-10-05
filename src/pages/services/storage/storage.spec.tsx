@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from 'vitest';
+import { vi } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 // import { useTranslation } from 'react-i18next';
@@ -11,7 +11,6 @@ vi.mock('react-i18next', () => ({
     },
   }),
 }));
-import '@testing-library/jest-dom';
 import { Storage } from './storage';
 
 describe('Storage Component', () => {

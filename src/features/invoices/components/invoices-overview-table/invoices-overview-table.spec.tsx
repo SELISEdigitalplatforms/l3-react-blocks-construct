@@ -1,8 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { ColumnDef } from '@tanstack/react-table';
-import { vi, describe, test, beforeEach, expect } from 'vitest';
+import { vi } from 'vitest';
 
 // Mock UUID module
 vi.mock('uuid', () => ({

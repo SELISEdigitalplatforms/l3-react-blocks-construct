@@ -3,9 +3,9 @@ import { AddUser } from './add-profile';
 import { useCreateAccount } from '@/features/profile/hooks/use-account';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Dialog from '@radix-ui/react-dialog';
-import { vi, describe, beforeEach, it, expect } from 'vitest';
+import { vi } from 'vitest';
 
-vi.mock('features/profile/hooks/use-account', () => ({
+vi.mock('@/features/profile/hooks/use-account', () => ({
   useCreateAccount: vi.fn(),
   ACCOUNT_QUERY_KEY: ['account'],
 }));

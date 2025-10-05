@@ -1,6 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import ErrorAlert from './error-alert';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi } from 'vitest';
 
 vi.mock('lucide-react', () => ({
   TriangleAlert: vi.fn(() => <svg data-testid="triangle-alert-icon" />),

@@ -1,9 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { InvoicePreview } from './invoice-preview';
 import { InvoiceStatus } from '../../types/invoices.types';
-import { vi, describe, it, expect, afterEach } from 'vitest';
+import { vi } from 'vitest';
 import { renderWithProviders } from '../../../../test-utils/test-providers';
 
 // Mock window.matchMedia

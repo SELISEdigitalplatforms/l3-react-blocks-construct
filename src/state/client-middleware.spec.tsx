@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect, vi, Mock } from 'vitest';
+import { vi, Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ClientMiddleware } from './client-middleware';
