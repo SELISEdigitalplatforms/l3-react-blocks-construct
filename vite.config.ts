@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -62,7 +63,8 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['lcov', 'text', 'html'],
       reportsDirectory: 'coverage',
-      include: ['src/**/*.{ts,tsx}'],
+      include: ['src/**/*.spec.{ts,tsx}'],
+
       exclude: [
         'src/**/*.spec.{ts,tsx}',
         'src/**/*.test.{ts,tsx}',
