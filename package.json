@@ -17,7 +17,7 @@
     "build:storybook-dev": "BUILD_ENV=dev npm run set-env && storybook build",
     "build:storybook-stg": "BUILD_ENV=stg npm run set-env && storybook build",
     "build:storybook-prod": "BUILD_ENV=prod npm run set-env && storybook build",
-    "test": "vitest",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:clear": "vitest --clearCache",
     "pretest:coverage": "rm -rf ./coverage",
