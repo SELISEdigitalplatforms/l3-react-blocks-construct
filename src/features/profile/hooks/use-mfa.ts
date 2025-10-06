@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useGlobalMutation } from 'state/query-client/hooks';
+import { useGlobalMutation } from '@/state/query-client/hooks';
 import {
   generateOTP,
   verifyOTP,
@@ -10,9 +10,9 @@ import {
   getMfaTemplate,
   disableUserMfa,
 } from '../services/mfa.services';
-import { useErrorHandler } from 'hooks/use-error-handler';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import { SetUpTotp, GenerateOTPPayload } from '../types/mfa.types';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Custom hook to generate a One-Time Password (OTP) for a given user.

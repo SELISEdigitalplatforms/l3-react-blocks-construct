@@ -12,12 +12,52 @@ import {
 } from '../../components/ui/alert-dialog';
 import { Button } from '../../components/ui/button';
 
-const meta: Meta<typeof AlertDialog> = {
+interface AlertDialogStoryProps {
+  confirmText?: string;
+  cancelText?: string;
+  open?: boolean;
+  onOpenChange?: boolean;
+  defaultOpen?: boolean;
+}
+
+const meta: Meta<any> = {
   title: 'AlertDialog',
   component: AlertDialog,
   parameters: {},
-  render: (args) => (
-    <AlertDialog {...args}>
+  argTypes: {
+    open: {
+      description: 'Boolean controlling whether the dialog is visible.',
+      control: 'boolean',
+      table: { disable: false },
+    },
+    defaultOpen: {
+      description: 'Boolean for uncontrolled default state.',
+      control: 'boolean',
+      table: { disable: false },
+    },
+    onOpenChange: {
+      description: 'Callback when open state changes.',
+      table: { disable: true },
+    },
+    confirmText: {
+      description: 'Label for confirm button.',
+      control: 'text',
+    },
+    cancelText: {
+      description: 'Label for cancel button.',
+      control: 'text',
+    },
+    onConfirm: {
+      description: 'Callback executed on confirmation.',
+      table: { disable: true },
+    },
+    onCancel: {
+      description: 'Callback executed on cancellation.',
+      table: { disable: true },
+    },
+  },
+  render: ({ open, defaultOpen, confirmText, cancelText }) => (
+    <AlertDialog open={open} defaultOpen={defaultOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="outline">Show Dialog</Button>
       </AlertDialogTrigger>
@@ -30,8 +70,8 @@ const meta: Meta<typeof AlertDialog> = {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogCancel>{cancelText || 'Cancel'}</AlertDialogCancel>
+          <AlertDialogAction>{confirmText || 'Continue'}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -39,15 +79,24 @@ const meta: Meta<typeof AlertDialog> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof AlertDialog>;
+type Story = StoryObj<any>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    open: false,
+    defaultOpen: false,
+    confirmText: 'Continue',
+    cancelText: 'Cancel',
+  },
 };
 
 export const Destructive: Story = {
-  render: (args) => (
-    <AlertDialog {...args}>
+  args: {
+    confirmText: 'Delete Account',
+    cancelText: 'Cancel',
+  },
+  render: ({ confirmText, cancelText }: AlertDialogStoryProps) => (
+    <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive">Delete Account</Button>
       </AlertDialogTrigger>
@@ -60,9 +109,9 @@ export const Destructive: Story = {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-            Delete Account
+            {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

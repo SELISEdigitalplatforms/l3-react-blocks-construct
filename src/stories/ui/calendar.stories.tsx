@@ -47,12 +47,11 @@ export const Range: Story = {
       to: addDays(new Date(), 7),
     },
     numberOfMonths: 2,
-    onSelect: () => console.log('Date range selected'), // Added console.log
+    onSelect: () => console.log('Date range selected'),
     className: 'rounded-md border',
   },
 };
 
-// Wrapper component for state management
 const CalendarWithState = (args: any) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [range, setRange] = useState<{ from: Date; to: Date | undefined } | undefined>({
@@ -83,7 +82,6 @@ export const InteractiveExample: Story = {
   },
 };
 
-// The original "Fallback" story, fixed to use static data.
 export const Fallback: Story = {
   args: {
     initialFocus: true,

@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '@tanstack/react-table';
-import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
-import AdvanceDataTable from 'features/inventory/component/advance-data-table/advance-data-table';
-import { createAdvanceTableColumns } from 'features/inventory/component/advance-table-columns/advance-table-columns';
-import { AdvanceTableFilterToolbar } from 'features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
-import { AdvanceExpandRowContent } from 'features/inventory/component/advance-expand-row-content/advance-expand-row-content';
-import { useGetInventories } from 'features/inventory/hooks/use-inventory';
-import { InventoryItem } from 'features/inventory/types/inventory.types';
+import { AdvancedTableColumnsToolbar } from '@/features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
+import AdvanceDataTable from '@/features/inventory/component/advance-data-table/advance-data-table';
+import { createAdvanceTableColumns } from '@/features/inventory/component/advance-table-columns/advance-table-columns';
+import { AdvanceTableFilterToolbar } from '@/features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
+import { AdvanceExpandRowContent } from '@/features/inventory/component/advance-expand-row-content/advance-expand-row-content';
+import { useGetInventories } from '@/features/inventory/hooks/use-inventory';
+import { InventoryItem } from '@/features/inventory/types/inventory.types';
 
 interface PaginationState {
   pageIndex: number;

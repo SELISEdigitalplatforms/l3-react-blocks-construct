@@ -1,8 +1,8 @@
 import { ToolbarProps, View } from 'react-big-calendar';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from 'components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 /**
  * CalendarToolbar Component

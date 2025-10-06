@@ -7,9 +7,9 @@ import {
   InvoicesHeaderToolbar,
   createInvoiceTableColumns,
   InvoicesFilterToolbar,
-} from 'features/invoices';
-import { InvoiceItem } from 'features/invoices/types/invoices.types';
-import { useGetInvoiceItems } from 'features/invoices/hooks/use-invoices';
+} from '@/features/invoices';
+import { InvoiceItem } from '@/features/invoices/types/invoices.types';
+import { useGetInvoiceItems } from '@/features/invoices/hooks/use-invoices';
 
 interface PaginationState {
   pageIndex: number;

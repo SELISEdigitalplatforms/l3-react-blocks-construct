@@ -2,16 +2,16 @@ import { useState, useMemo } from 'react';
 
 import TaskManagerToolbar, {
   ViewMode,
-} from 'features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
+} from '@/features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
 import TaskListView from './task-list-view';
-import { useListTasks } from 'features/task-manager/hooks/use-list-tasks';
+import { useListTasks } from '@/features/task-manager/hooks/use-list-tasks';
 import {
   useGetTaskSections,
   useGetTaskTags,
   useGetUsers,
-} from 'features/task-manager/hooks/use-task-manager';
-import { ItemTag } from 'features/task-manager/types/task-manager.types';
-import { TaskFilters } from 'features/task-manager/components/task-manager-filters-sheet/task-manager-filters-sheet';
+} from '@/features/task-manager/hooks/use-task-manager';
+import { ItemTag } from '@/features/task-manager/types/task-manager.types';
+import { TaskFilters } from '@/features/task-manager/components/task-manager-filters-sheet/task-manager-filters-sheet';
 import TaskCardView from './task-card-view';
 
 /**

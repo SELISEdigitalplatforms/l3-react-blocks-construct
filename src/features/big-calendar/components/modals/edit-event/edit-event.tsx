@@ -4,30 +4,30 @@ import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { CalendarClock, CalendarIcon, Trash, ChevronDown } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from 'components/ui/form';
-import { Input } from 'components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
   Dialog,
-} from 'components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
   PopoverAnchor,
   Close as PopoverClose,
-} from 'components/ui/popover';
-import { Separator } from 'components/ui/separator';
-import { Switch } from 'components/ui/switch';
-import { Calendar } from 'components/ui/calendar';
-import { Label } from 'components/ui/label';
-import CustomTextEditor from 'components/blocks/custom-text-editor/custom-text-editor';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { useToast } from 'hooks/use-toast';
+} from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Label } from '@/components/ui/label';
+import CustomTextEditor from '@/components/blocks/custom-text-editor/custom-text-editor';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { useToast } from '@/hooks/use-toast';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
 import { CalendarEvent, Member } from '../../../types/calendar-event.types';
@@ -217,7 +217,7 @@ interface DateTimePickerProps {
   label: string;
   timeLabel: string;
   width: number;
-  elementRef: React.RefObject<HTMLDivElement>;
+  elementRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
@@ -402,7 +402,9 @@ export function EditEvent({
 
     const evts = recurringEvents.length > 0 ? recurringEvents : initialEventData.events || [];
     const targetDate = evts.length > 0 ? new Date(evts[0].start) : startDate;
-    return `${t('OCCURS_ON')} ${WEEK_DAYS[targetDate.getDay()]}`;
+    const dayIndex = targetDate.getDay();
+    const dayName = WEEK_DAYS[dayIndex] || 'Sunday';
+    return `${t('OCCURS_ON')} ${dayName}` || t('SET_RECURRENCE') || 'Set Recurrence';
   }, [form, recurringEvents, initialEventData.events, startDate, t]);
 
   const handleClose = () => {
@@ -602,6 +604,10 @@ export function EditEvent({
   };
 
   const handleRecurringClick = () => {
+    // Ensure recurring flag is enabled before proceeding
+    if (!form.getValues('recurring')) {
+      handleRecurringToggle(true);
+    }
     const memberIds = form.getValues('members') ?? [];
     const selectedMembers = getSelectedMembers(memberIds, initialEventData);
 
@@ -742,9 +748,9 @@ export function EditEvent({
                       <button
                         type="button"
                         onClick={handleRecurringClick}
-                        className="bg-transparent border-none p-0 underline text-primary text-base cursor-pointer font-semibold hover:text-primary-800"
+                        className="bg-transparent border-none p-0 underline text-primary text-base cursor-pointer font-semibold hover:text-primary-800 min-h-[20px]"
                       >
-                        {recurrenceText}
+                        {recurrenceText || t('SET_RECURRENCE') || 'Set Recurrence'}
                       </button>
                     </div>
                   )}

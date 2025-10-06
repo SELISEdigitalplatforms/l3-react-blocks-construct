@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ChartNoAxesCombined, CreditCard, FileText, TrendingUp, Wallet } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'components/ui/select';
+} from '@/components/ui/select';
 
 const monthsOfYear = [
   { value: 'january', label: 'JANUARY' },

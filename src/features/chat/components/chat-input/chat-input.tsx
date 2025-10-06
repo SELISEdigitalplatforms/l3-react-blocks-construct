@@ -1,16 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Input } from 'components/ui/input';
-import { Button } from 'components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { CirclePlus, Image, Paperclip, Send, Smile, X } from 'lucide-react';
-import { Separator } from 'components/ui/separator';
+import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 
 interface ChatInputProps {
   value: string;

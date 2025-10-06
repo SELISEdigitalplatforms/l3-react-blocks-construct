@@ -3,16 +3,16 @@ import { Minus, Plus, Move } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Cropper from 'react-easy-crop';
 import { Area, Point } from 'react-easy-crop/types';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from 'components/ui/dialog';
-import { Slider } from 'components/ui/slider';
-import { Separator } from 'components/ui/separator';
+} from '@/components/ui/dialog';
+import { Slider } from '@/components/ui/slider';
+import { Separator } from '@/components/ui/separator';
 
 /**
  * Props for the ImageCropper component

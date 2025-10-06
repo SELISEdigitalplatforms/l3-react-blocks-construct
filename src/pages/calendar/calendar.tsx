@@ -10,9 +10,9 @@ import {
   EventDetails,
   useCalendarEvents,
   useCalendarUI,
-} from 'features/big-calendar';
-import { CalendarSettingsProvider } from 'features/big-calendar/contexts/calendar-settings.context';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+} from '@/features/big-calendar';
+import { CalendarSettingsProvider } from '@/features/big-calendar/contexts/calendar-settings.context';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 
 /**
  * CalendarPage Component

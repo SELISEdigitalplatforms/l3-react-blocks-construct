@@ -9,7 +9,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import {
   CircleCheckBig,
   CircleDashed,
@@ -18,8 +18,8 @@ import {
   EllipsisVertical,
   Check,
 } from 'lucide-react';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { TaskItem } from 'features/task-manager/types/task-manager.types';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { TaskItem } from '@/features/task-manager/types/task-manager.types';
 
 /**
  * TaskManagerDropdownMenu Component

@@ -7,10 +7,10 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
-} from 'components/ui/sidebar';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'components/ui/collapsible';
+} from '@/components/ui/sidebar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Icon, IconName } from '../menu-icon/menu-icon';
-import { SidebarMenuItemProps } from 'models/sidebar';
+import { SidebarMenuItemProps } from '@/models/sidebar';
 import { useTranslation } from 'react-i18next';
 
 export const SidebarMenuItemComponent: React.FC<SidebarMenuItemProps> = ({

@@ -1,5 +1,5 @@
-import { cn } from 'lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState } from 'react';
 import { EditGroupName } from '../modals/edit-group-name/edit-group-name';
 import { useTranslation } from 'react-i18next';
@@ -19,17 +19,17 @@ import {
   Trash,
   UserRoundX,
 } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { ScrollArea } from 'components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from 'components/ui/accordion';
+} from '@/components/ui/accordion';
 import { ChatContact } from '../../types/chat.types';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
-import { useToast } from 'hooks/use-toast';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatProfileProps {
   contact: ChatContact;

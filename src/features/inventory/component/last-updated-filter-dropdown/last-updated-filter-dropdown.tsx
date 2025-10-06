@@ -4,17 +4,17 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { Updater } from '@tanstack/react-table';
 import { Calendar as CalendarIcon } from 'lucide-react';
-import { Input } from 'components/ui/input';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
-import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
-import { Button } from 'components/ui/button';
-import { Label } from 'components/ui/label';
-import { Calendar } from 'components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+} from '@/components/ui/dropdown-menu';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 /**
  * LastUpdatedFilterDropdown is a dropdown component for filtering items based on their last updated date.

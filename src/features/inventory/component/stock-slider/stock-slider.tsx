@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
-import { cn } from 'lib/utils';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 /**
  * StockSlider is a customizable slider component for selecting a stock amount.

@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent } from 'components/ui/menubar';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { Checkbox } from 'components/ui/checkbox';
-import { Avatar, AvatarImage, AvatarFallback } from 'components/ui/avatar';
-import { Label } from 'components/ui/label';
+import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent } from '@/components/ui/menubar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Label } from '@/components/ui/label';
 import { members } from '../../services/calendar-services';
 import { Member } from '../../types/calendar-event.types';
 

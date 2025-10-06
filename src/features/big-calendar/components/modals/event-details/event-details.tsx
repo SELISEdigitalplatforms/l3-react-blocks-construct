@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar, ChevronDown, ChevronUp, Link, Trash, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogHeader,
@@ -10,9 +10,9 @@ import {
   DialogDescription,
   DialogFooter,
   Dialog,
-} from 'components/ui/dialog';
-import { useToast } from 'hooks/use-toast';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+} from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 import { CalendarEvent } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';
 import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring-event';

@@ -5,11 +5,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { useAuthStore } from 'state/store/auth';
-import { useSignoutMutation } from 'features/auth/hooks/use-auth';
-import { useToast } from 'hooks/use-toast';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/state/store/auth';
+import { useSignoutMutation } from '@/features/auth/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
 /**

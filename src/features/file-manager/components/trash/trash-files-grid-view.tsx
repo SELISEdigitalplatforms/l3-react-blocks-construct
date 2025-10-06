@@ -7,7 +7,7 @@ import {
   IFileTrashData,
   PaginationState,
 } from '../../utils/file-manager';
-import { useIsMobile } from 'hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useCallback, useEffect, useState } from 'react';
 import { TrashTableRowActions } from './trash-files-row-actions';
 import { TrashDetailsSheet } from './trash-files-details';

@@ -1,4 +1,4 @@
-import { ChartConfig } from 'components/ui/chart';
+import { ChartConfig } from '@/components/ui/chart';
 
 export const daysOfWeek = [
   { value: 'monday', label: 'MONDAY' },

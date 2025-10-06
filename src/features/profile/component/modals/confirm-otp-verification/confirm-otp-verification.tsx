@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,14 +7,14 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from 'components/ui/dialog';
-import UIOtpInput from 'components/core/otp-input/otp-input';
+} from '@/components/ui/dialog';
+import UIOtpInput from '@/components/core/otp-input/otp-input';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
-import { useToast } from 'hooks/use-toast';
-import useResendOTPTime from 'hooks/use-resend-otp';
+import { useToast } from '@/hooks/use-toast';
+import useResendOTPTime from '@/hooks/use-resend-otp';
 import { useGenerateOTP, useResendOtp, useVerifyOTP } from '../../../hooks/use-mfa';
 import { VerifyOTP } from '../../../types/mfa.types';
-import { User } from 'types/user.type';
+import { User } from '@/types/user.type';
 import { useTranslation } from 'react-i18next';
 
 /**

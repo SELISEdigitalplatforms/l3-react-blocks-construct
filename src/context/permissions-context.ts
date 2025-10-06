@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { User } from 'types/user.type';
+import { User } from '@/types/user.type';
 
 export interface PermissionsContextType {
   user: User | null | undefined;

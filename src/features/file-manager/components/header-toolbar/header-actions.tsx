@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { ActionConfig } from '../../types/header-toolbar.type';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 
 interface HeaderActionsProps {
   actions: ActionConfig[];

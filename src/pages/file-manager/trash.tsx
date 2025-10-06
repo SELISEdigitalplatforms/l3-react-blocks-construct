@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { IFileTrashData } from 'features/file-manager/utils/file-manager';
-import { TrashFilesListView } from 'features/file-manager/components/trash/trash-files-list-view';
-import { TrashGridView } from 'features/file-manager/components/trash/trash-files-grid-view';
-import { TrashFilters } from 'features/file-manager/types/header-toolbar.type';
-import { TrashHeaderToolbar } from 'features/file-manager/components/trash/trash-files-header-toolbar';
+import { IFileTrashData } from '@/features/file-manager/utils/file-manager';
+import { TrashFilesListView } from '@/features/file-manager/components/trash/trash-files-list-view';
+import { TrashGridView } from '@/features/file-manager/components/trash/trash-files-grid-view';
+import { TrashFilters } from '@/features/file-manager/types/header-toolbar.type';
+import { TrashHeaderToolbar } from '@/features/file-manager/components/trash/trash-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMockTrashFilesQuery } from 'features/file-manager/hooks/use-mock-trash-files-query';
-import { useViewMode } from 'hooks/use-view-mode';
+import { useMockTrashFilesQuery } from '@/features/file-manager/hooks/use-mock-trash-files-query';
+import { useViewMode } from '@/hooks/use-view-mode';
 
 interface TrashProps {
   onRestoreFile?: (file: IFileTrashData) => void;

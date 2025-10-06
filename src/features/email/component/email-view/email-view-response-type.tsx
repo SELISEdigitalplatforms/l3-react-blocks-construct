@@ -5,9 +5,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { parseISO, format } from 'date-fns';
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
+import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
 
 /**
  * EmailViewResponseType Component

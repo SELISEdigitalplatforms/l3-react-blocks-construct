@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
-import { Input } from 'components/ui/input';
-import { Button } from 'components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema } from './utils';
-import { UCheckbox } from 'components/core/uCheckbox';
+import { UCheckbox } from '@/components/core/uCheckbox';
 import { useTranslation } from 'react-i18next';
 
 /**

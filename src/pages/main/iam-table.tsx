@@ -2,18 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Table } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import ConfirmationModal from '../../components/blocks/confirmation-modal/confirmation-modal';
-import { useForgotPassword, useResendActivation } from 'features/auth/hooks/use-auth';
-import { useGetUsersQuery } from 'features/iam/hooks/use-iam';
-import { createIamTableColumns } from 'features/iam/components/iam-table/iam-table-columns';
-import { IamTableToolbar } from 'features/iam/components/iam-table/iam-table-toolbar';
-import { IamData } from 'features/iam/services/user-service';
+import { useForgotPassword, useResendActivation } from '@/features/auth/hooks/use-auth';
+import { useGetUsersQuery } from '@/features/iam/hooks/use-iam';
+import { createIamTableColumns } from '@/features/iam/components/iam-table/iam-table-columns';
+import { IamTableToolbar } from '@/features/iam/components/iam-table/iam-table-toolbar';
+import { IamData } from '@/features/iam/services/user-service';
 import { useIsMobile } from '../../hooks/use-mobile';
-import ExpandedUserDetails from 'features/iam/components/user-details-mobile-view/expanded-user-details';
+import ExpandedUserDetails from '@/features/iam/components/user-details-mobile-view/expanded-user-details';
 import DataTable from '../../components/blocks/data-table/data-table';
-import { Button } from 'components/ui/button';
-import { Dialog, DialogTrigger } from 'components/ui/dialog';
-import { AddUser } from 'features/iam/components/add-profile/add-profile';
-import { UserDetails } from 'features/iam';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { AddUser } from '@/features/iam/components/add-profile/add-profile';
+import { UserDetails } from '@/features/iam';
 import { useTranslation } from 'react-i18next';
 
 interface PaginationState {

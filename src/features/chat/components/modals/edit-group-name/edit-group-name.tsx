@@ -6,11 +6,11 @@ import {
   DialogTitle,
   DialogDescription,
   Dialog,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { cn } from 'lib/utils';
-import { Label } from 'components/ui/label';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 interface EditGroupNameProps {
   isOpen: boolean;
@@ -81,7 +81,12 @@ export function EditGroupName({
             >
               {t('CANCEL')}
             </Button>
-            <Button type="submit" loading={isLoading} className="min-w-[112px]">
+            <Button
+              type="submit"
+              loading={isLoading}
+              className="min-w-[112px]"
+              disabled={isLoading}
+            >
               {t('SAVE')}
             </Button>
           </div>

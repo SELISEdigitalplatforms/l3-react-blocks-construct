@@ -9,9 +9,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from 'components/ui/alert-dialog';
-import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
-import { Label } from 'components/ui/label';
+} from '@/components/ui/alert-dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 type UpdateOption = 'this' | 'thisAndFollowing' | 'all';
 

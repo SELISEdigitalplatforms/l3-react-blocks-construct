@@ -1,5 +1,5 @@
-import { clients } from 'lib/https';
-import { User } from 'types/user.type';
+import { clients } from '@/lib/https';
+import { User } from '@/types/user.type';
 import { CreateUserFormType, ProfileFormType } from '../utils/utils';
 import API_CONFIG from '../../../config/api';
 

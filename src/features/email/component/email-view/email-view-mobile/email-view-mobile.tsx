@@ -22,22 +22,22 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
-import { EmailViewProps, TReply } from 'features/email/types/email.types';
-import empty_email from 'assets/images/empty_email.svg';
-import { Checkbox } from 'components/ui/checkbox';
-import { Label } from 'components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from 'components/ui/tooltip';
+} from '@/components/ui/dropdown-menu';
+import { EmailViewProps, TReply } from '@/features/email/types/email.types';
+import empty_email from '@/assets/images/empty_email.svg';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import EmailViewResponseType from '../email-view-response-type';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import EmailActionsPanel from '../email-actions-panel';
 import EmailTextEditor from '../../email-ui/email-text-editor';
 import { EmailCompose } from '../../email-compose/email-compose';
-import { htmlToPlainText } from 'features/email/services/email';
+import { htmlToPlainText } from '@/features/email/services/email';
 import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
-import { sanitizeHTML } from 'utils/sanitizer';
+import { sanitizeHTML } from '@/utils/sanitizer';
 
 /**
  * EmailViewMobile Component

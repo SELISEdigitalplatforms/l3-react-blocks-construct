@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMockFilesQuery } from 'features/file-manager/hooks/use-mock-files-query';
+import { useMockFilesQuery } from '@/features/file-manager/hooks/use-mock-files-query';
 import { createFileTableColumns } from './my-files-table-columns';
-import { useIsMobile } from 'hooks/use-mobile';
-import DataTable from 'components/blocks/data-table/data-table';
+import { useIsMobile } from '@/hooks/use-mobile';
+import DataTable from '@/components/blocks/data-table/data-table';
 import {
   IFileDataWithSharing,
   MyFilesListViewProps,

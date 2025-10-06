@@ -2,14 +2,14 @@ import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Loader2 } from 'lucide-react';
-import { MenubarContent } from 'components/ui/menubar';
-import { Button } from 'components/ui/button';
+import { MenubarContent } from '@/components/ui/menubar';
+import { Button } from '@/components/ui/button';
 import { useGetNotifications, useMarkAllNotificationAsRead } from '../../hooks/use-notification';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationItem } from '../notification-item/notification-item';
 import { subscribeNotifications } from '@seliseblocks/notifications';
-import API_CONFIG from 'config/api';
-import { useAuthStore } from 'state/store/auth';
+import API_CONFIG from '@/config/api';
+import { useAuthStore } from '@/state/store/auth';
 import type { Notification as NotificationType } from '../../types/notification.types';
 import { NotificationSkeletonList } from '../notification-skeleton/notification-skeleton';
 
@@ -22,7 +22,7 @@ export function Notification() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accessToken = useAuthStore((state) => state.accessToken);
 
   const [tabData, setTabData] = useState<{

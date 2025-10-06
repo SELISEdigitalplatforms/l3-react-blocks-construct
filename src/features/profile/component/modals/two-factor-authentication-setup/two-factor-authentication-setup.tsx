@@ -8,14 +8,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { Separator } from 'components/ui/separator';
-import { MfaDialogState } from 'features/profile/enums/mfa-dialog-state.enum';
-import { Skeleton } from 'components/ui/skeleton';
-import { User } from 'types/user.type';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { MfaDialogState } from '@/features/profile/enums/mfa-dialog-state.enum';
+import { Skeleton } from '@/components/ui/skeleton';
+import { User } from '@/types/user.type';
 import { useGetMfaTemplate, useGenerateOTP } from '../../../hooks/use-mfa';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Component to manage the 2-factor authentication settings for a user.
@@ -215,7 +215,7 @@ export const TwoFactorAuthenticationSetup: React.FC<
           <div className="p-2 bg-surface rounded-md">
             <Mail className="text-secondary" size={24} />
           </div>
-          <div>
+          <div className="text-left">
             <h3 className="text-sm font-semibold text-high-emphasis">{t('EMAIL_VERIFICATION')}</h3>
             <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
           </div>

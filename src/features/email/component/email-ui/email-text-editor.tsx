@@ -1,6 +1,6 @@
 import Quill from 'quill';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Paperclip, Smile, Image, X } from 'lucide-react';
 import 'quill/dist/quill.snow.css';
 import { TFormData, TFormProps } from '../../types/email.types';

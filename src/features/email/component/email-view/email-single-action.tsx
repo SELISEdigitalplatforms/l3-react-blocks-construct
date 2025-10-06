@@ -1,13 +1,13 @@
 import { Star, Reply, EllipsisVertical, ReplyAll, Forward, PictureInPicture2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, TooltipTrigger, TooltipContent } from 'components/ui/tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { EmailSingleActionsProps } from '../../types/email.types';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 
 /**
  * EmailSingleActions Component

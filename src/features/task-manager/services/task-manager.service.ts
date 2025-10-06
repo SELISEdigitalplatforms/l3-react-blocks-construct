@@ -1,4 +1,4 @@
-import { graphqlClient } from 'lib/graphql-client';
+import { graphqlClient } from '@/lib/graphql-client';
 import {
   GET_TASK_COMMENTS_QUERY,
   GET_TASK_MANAGER_QUERY,
@@ -39,7 +39,8 @@ import {
   UPDATE_TASK_COMMENTS_MUTATION,
   DELETE_TASK_COMMENTS_MUTATION,
 } from '../graphql/mutations';
-import { clients } from 'lib/https';
+import { clients } from '@/lib/https';
+import type { Assignee } from '../types/task-manager.types';
 
 export interface BaseMutationResponse {
   itemId: string;
@@ -445,6 +446,12 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
  * @param input - Task item data
  * @returns Promise with creation result
  */
+// Helper function to prepare Assignee objects for mutations (backend expects AddressInfoInput, remove ItemId string)
+const transformAssigneesForMutation = (assignees?: Assignee[]): any[] | undefined => {
+  if (!assignees) return undefined;
+  return assignees.map(({ Name, ImageUrl }) => ({ Name, ImageUrl }));
+};
+
 // Helper function to normalize tags to ItemTag format
 const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
   if (typeof tag === 'string') {
@@ -520,6 +527,7 @@ export const updateTaskItem = async (
 
   const formattedInput = {
     ...inputWithoutComments,
+    Assignee: transformAssigneesForMutation(inputWithoutComments.Assignee),
     ...(inputWithoutComments.ItemTag === undefined &&
       inputWithoutComments.Tags && {
         ItemTag: inputWithoutComments.Tags.map(normalizeToItemTag),

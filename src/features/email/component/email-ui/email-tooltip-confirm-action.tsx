@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip, TooltipTrigger, TooltipContent } from 'components/ui/tooltip';
-import { useToast } from 'hooks/use-toast';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 
 /**
  * TooltipConfirmAction Component
@@ -44,7 +44,7 @@ interface TooltipConfirmActionProps {
   confirmDescription: string | React.ReactNode;
   onConfirm: () => void;
   toastDescription: string;
-  children: React.ReactElement;
+  children: React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>;
 }
 
 const TooltipConfirmAction: React.FC<TooltipConfirmActionProps> = ({

@@ -1,5 +1,5 @@
 import API_CONFIG from '../../../config/api';
-import { clients } from 'lib/https';
+import { clients } from '@/lib/https';
 
 export interface IDeviceSession {
   RefreshToken: string;

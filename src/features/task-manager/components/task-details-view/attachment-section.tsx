@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { TaskAttachments, FileType } from '../../types/task-manager.types';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Plus,
   Upload,
@@ -21,12 +21,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from 'components/ui/dialog';
-import { Label } from 'components/ui/label';
-import { Input } from 'components/ui/input';
-import { useGetPreSignedUrlForUpload } from 'lib/api/hooks/use-storage';
-import API_CONFIG from 'config/api';
-import { useErrorHandler } from 'hooks/use-error-handler';
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
+import API_CONFIG from '@/config/api';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 
 const getFileType = (file: File): FileType => {
   if (file.type.includes('pdf')) return 'pdf';

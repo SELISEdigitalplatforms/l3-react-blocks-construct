@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus, X } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { TaskCard } from './task-card';
-import { Dialog } from 'components/ui/dialog';
+import { Dialog } from '@/components/ui/dialog';
 import TaskDetailsView from '../task-details-view/task-details-view';
 import { ColumnMenu } from './column-menu';
-import { useDeviceCapabilities } from 'hooks/use-device-capabilities';
-import { getResponsiveContainerHeight } from 'lib/mobile-responsiveness';
+import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
+import { getResponsiveContainerHeight } from '@/lib/mobile-responsiveness';
 import { TaskSection } from '../../types/task-manager.types';
 
 /**

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import uuidv4 from '@/utils/uuid';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -16,12 +17,12 @@ import {
   Table as TableInstance,
 } from '@tanstack/react-table';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DataTablePagination } from './data-table-pagination';
-import { Card } from 'components/ui/card';
-import { Skeleton } from 'components/ui/skeleton';
-import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
-import { useIsMobile } from 'hooks/use-mobile';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -106,8 +107,7 @@ function DataTable<TData>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { default: uuidv4 } = require('utils/uuid');
+
   const { t } = useTranslation();
 
   const visibleColumns = React.useMemo(() => {

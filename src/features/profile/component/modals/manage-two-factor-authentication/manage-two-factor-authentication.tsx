@@ -8,16 +8,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from 'components/ui/dialog';
-import { Button } from 'components/ui/button';
-import { useAuthStore } from 'state/store/auth';
-import { useSignoutMutation } from 'features/auth/hooks/use-auth';
-import { useToast } from 'hooks/use-toast';
-import { MfaDialogState } from 'features/profile/enums/mfa-dialog-state.enum';
-import { User } from 'types/user.type';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/state/store/auth';
+import { useSignoutMutation } from '@/features/auth/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { MfaDialogState } from '@/features/profile/enums/mfa-dialog-state.enum';
+import { User } from '@/types/user.type';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
 import { useDisableUserMfa } from '../../../hooks/use-mfa';
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 // import { ConfirmOtpVerification } from '../confirm-otp-verification/confirm-otp-verification';
 import { useTranslation } from 'react-i18next';
 

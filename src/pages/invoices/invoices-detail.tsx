@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
-import { InvoicesDetail } from 'features/invoices';
-import { useInvoiceDetails } from 'features/invoices/hooks/use-invoice-details';
+import { InvoicesDetail } from '@/features/invoices';
+import { useInvoiceDetails } from '@/features/invoices/hooks/use-invoice-details';
 
 export function InvoiceDetailsPage() {
   const { t, invoice, isLoading } = useInvoiceDetails();

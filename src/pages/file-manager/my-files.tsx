@@ -1,18 +1,18 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import MyFilesListView from '../../features/file-manager/components/my-files/my-files-list-view';
-import { ShareWithMeModal } from 'features/file-manager/components/modals/shared-user-modal';
-import { RenameModal } from 'features/file-manager/components/modals/rename-modal';
-import MyFileGridView from 'features/file-manager/components/my-files/my-files-grid-view';
-import { FileManagerLayout } from 'features/file-manager/file-manager-layout';
-import { FileViewRenderer } from 'features/file-manager/components/file-view-renderer';
-import { useFileManager } from 'features/file-manager/hooks/use-file-manager';
-import { useFileFilters } from 'features/file-manager/hooks/use-file-filters';
-import { FileModals } from 'features/file-manager/components/modals/file-modals';
-import { FileFilters } from 'features/file-manager/components/common-filters';
-import { FileManagerHeaderToolbar } from 'features/file-manager/components/my-files/my-files-header-toolbar';
+import { ShareWithMeModal } from '@/features/file-manager/components/modals/shared-user-modal';
+import { RenameModal } from '@/features/file-manager/components/modals/rename-modal';
+import MyFileGridView from '@/features/file-manager/components/my-files/my-files-grid-view';
+import { FileManagerLayout } from '@/features/file-manager/file-manager-layout';
+import { FileViewRenderer } from '@/features/file-manager/components/file-view-renderer';
+import { useFileManager } from '@/features/file-manager/hooks/use-file-manager';
+import { useFileFilters } from '@/features/file-manager/hooks/use-file-filters';
+import { FileModals } from '@/features/file-manager/components/modals/file-modals';
+import { FileFilters } from '@/features/file-manager/components/common-filters';
+import { FileManagerHeaderToolbar } from '@/features/file-manager/components/my-files/my-files-header-toolbar';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FilePreview } from 'features/file-manager/components/file-preview';
-import { useViewMode } from 'hooks/use-view-mode';
+import { FilePreview } from '@/features/file-manager/components/file-preview';
+import { useViewMode } from '@/hooks/use-view-mode';
 
 interface FileManagerMyFilesProps {
   onCreateFile?: () => void;

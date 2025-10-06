@@ -1,6 +1,6 @@
-import { useGlobalQuery } from 'state/query-client/hooks';
+import { useGlobalQuery } from '@/state/query-client/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { GetNotificationsParams, Notification } from '../types/notification.types';
 import {

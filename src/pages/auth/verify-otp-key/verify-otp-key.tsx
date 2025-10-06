@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
-import UIOtpInput from 'components/core/otp-input/otp-input';
-import { useSigninMutation } from 'features/auth/hooks/use-auth';
-import { useAuthStore } from 'state/store/auth';
-import { MFASigninResponse } from 'features/auth/services/auth.service';
-import { UserMfaType } from 'features/profile/enums/user-mfa-type-enum';
-import useResendOTPTime from 'hooks/use-resend-otp';
-import { useResendOtp } from 'features/profile/hooks/use-mfa';
+import { Button } from '@/components/ui/button';
+import UIOtpInput from '@/components/core/otp-input/otp-input';
+import { useSigninMutation } from '@/features/auth/hooks/use-auth';
+import { useAuthStore } from '@/state/store/auth';
+import { MFASigninResponse } from '@/features/auth/services/auth.service';
+import { UserMfaType } from '@/features/profile/enums/user-mfa-type-enum';
+import useResendOTPTime from '@/hooks/use-resend-otp';
+import { useResendOtp } from '@/features/profile/hooks/use-mfa';
 
 export function VerifyOtpKey() {
   const { login } = useAuthStore();

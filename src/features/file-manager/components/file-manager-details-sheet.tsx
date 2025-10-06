@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from 'components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { X } from 'lucide-react';
 import {
   FileType,
@@ -8,9 +8,9 @@ import {
   getFileTypeInfo,
   getSharedUsers,
   SharedUser,
-} from 'features/file-manager/utils/file-manager';
-import { useIsMobile } from 'hooks/use-mobile';
-import { CustomtDateFormat } from 'lib/custom-date-formatter';
+} from '@/features/file-manager/utils/file-manager';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 
 export interface IFileDataWithSharing {
   id: string;

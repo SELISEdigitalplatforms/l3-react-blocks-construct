@@ -1,10 +1,10 @@
 import { Download, RefreshCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
-import FinanceOverview from 'features/finance/components/finance-overview/finance-overview';
-import FinanceProfitOverviewGraph from 'features/finance/components/finance-profit-overview-graph/finance-profit-overview-graph';
-import FinanceRevenueExpenseGraph from 'features/finance/components/finance-revenue-expense-graph/finance-revenue-expense-graph';
-import FinanceInvoices from 'features/finance/components/finance-invoices/finance-invoices';
+import { Button } from '@/components/ui/button';
+import FinanceOverview from '@/features/finance/components/finance-overview/finance-overview';
+import FinanceProfitOverviewGraph from '@/features/finance/components/finance-profit-overview-graph/finance-profit-overview-graph';
+import FinanceRevenueExpenseGraph from '@/features/finance/components/finance-revenue-expense-graph/finance-revenue-expense-graph';
+import FinanceInvoices from '@/features/finance/components/finance-invoices/finance-invoices';
 
 export default function Finance() {
   const { t } = useTranslation();

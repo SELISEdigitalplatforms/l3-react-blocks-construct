@@ -4,34 +4,43 @@ const meta: Meta<typeof Checkbox> = {
   title: 'Checkbox',
   component: Checkbox,
   parameters: {},
+  argTypes: {
+    checked: {
+      control: 'boolean',
+      description: 'Boolean indicating current state.',
+    },
+    defaultChecked: {
+      control: 'boolean',
+      description: 'Default state for uncontrolled checkboxes.',
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disables interaction.',
+    },
+  },
 };
 export default meta;
 type Story = StoryObj<typeof Checkbox>;
-// ---------------------------
-// Default unchecked
-// ---------------------------
+
 export const Default: Story = {
-  args: {},
+  args: {
+    checked: true,
+    disabled: true,
+  },
 };
-// ---------------------------
-// Checked
-// ---------------------------
+
 export const Checked: Story = {
   args: {
     defaultChecked: true,
   },
 };
-// ---------------------------
-// Disabled
-// ---------------------------
+
 export const Disabled: Story = {
   args: {
     disabled: true,
   },
 };
-// ---------------------------
-// Checked & Disabled
-// ---------------------------
+
 export const CheckedDisabled: Story = {
   args: {
     defaultChecked: true,

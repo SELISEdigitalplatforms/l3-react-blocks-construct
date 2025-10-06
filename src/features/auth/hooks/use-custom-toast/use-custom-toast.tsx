@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export type ErrorResponse = {
   status: number;

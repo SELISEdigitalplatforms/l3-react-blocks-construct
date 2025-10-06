@@ -1,8 +1,8 @@
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Trash, Plus } from 'lucide-react';
-import { Skeleton } from 'components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * ImageUploader component for handling image uploads and deletions.

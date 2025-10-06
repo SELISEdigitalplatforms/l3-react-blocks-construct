@@ -2,9 +2,9 @@ import { useAuthStore } from '.';
 
 // Mock localStorage before importing the store
 const mockStorage = {
-  getItem: jest.fn(() => null),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
+  getItem: vi.fn(() => null),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
 };
 
 // Mock localStorage
@@ -15,7 +15,7 @@ Object.defineProperty(window, 'localStorage', {
 
 describe('useAuthStore', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Reset the store state
     const { logout } = useAuthStore.getState();

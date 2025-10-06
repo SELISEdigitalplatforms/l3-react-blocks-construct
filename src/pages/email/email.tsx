@@ -1,10 +1,10 @@
-import { EmailView } from 'features/email/component/email-view/email-view';
-import { EmailList } from 'features/email/component/email-list/email-list';
-import { EmailSidebar } from 'features/email/component/email-sidebar/email-sidebar';
+import { EmailView } from '@/features/email/component/email-view/email-view';
+import { EmailList } from '@/features/email/component/email-list/email-list';
+import { EmailSidebar } from '@/features/email/component/email-sidebar/email-sidebar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { emailData } from 'features/email/services/email-data';
-import { TActiveAction, TEmail, TReply } from 'features/email/types/email.types';
+import { emailData } from '@/features/email/services/email-data';
+import { TActiveAction, TEmail, TReply } from '@/features/email/types/email.types';
 import {
   ArrowLeft,
   History,
@@ -17,13 +17,13 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Input } from 'components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from 'components/ui/tooltip';
-import { EmailCompose } from 'features/email';
-import { useDebounce } from 'features/email/services/use-debounce';
-import { makeFirstLetterUpperCase } from 'features/email/services/email';
+import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { EmailCompose } from '@/features/email';
+import { useDebounce } from '@/features/email/services/use-debounce';
+import { makeFirstLetterUpperCase } from '@/features/email/services/email';
 
-import EmailTooltipConfirmAction from 'features/email/component/email-ui/email-tooltip-confirm-action';
+import EmailTooltipConfirmAction from '@/features/email/component/email-ui/email-tooltip-confirm-action';
 
 /**
  * Email Component

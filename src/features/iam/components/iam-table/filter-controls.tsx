@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { DataTableFacetedFilter } from 'components/blocks/data-table/data-table-faceted-filter';
-import { DateRangeFilter } from 'components/blocks/data-table/data-table-date-filter';
+import { DataTableFacetedFilter } from '@/components/blocks/data-table/data-table-faceted-filter';
+import { DateRangeFilter } from '@/components/blocks/data-table/data-table-date-filter';
 import { getMfaEnabledOptions, getStatusOptions } from './iam-table-filter-data';
 import { DateRange } from 'react-day-picker';
 

@@ -1,4 +1,4 @@
-import { useGlobalQuery } from 'state/query-client/hooks';
+import { useGlobalQuery } from '@/state/query-client/hooks';
 import { getUsers, IamData, getRoles, RoleData } from '../services/user-service';
 
 export interface UserFilter {

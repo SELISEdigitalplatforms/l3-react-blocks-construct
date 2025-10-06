@@ -6,7 +6,7 @@ import { generateInvoiceId } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
 import { useAddInvoiceItem } from '../../hooks/use-invoices';
-import { useToast } from 'hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import {
   CustomerDetails,
   InvoiceItemDetails,

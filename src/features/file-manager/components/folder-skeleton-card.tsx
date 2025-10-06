@@ -1,4 +1,4 @@
-import { Skeleton } from 'components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const FolderSkeletonCard = () => (
   <div className="group relative bg-background rounded-lg border border-border p-3">

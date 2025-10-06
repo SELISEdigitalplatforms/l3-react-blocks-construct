@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Eye, Download } from 'lucide-react';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from 'components/ui/table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
-import { Button } from 'components/ui/button';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const INVOICE_AMOUNT = 'CHF 12,500.00';
 const PAYMENT_METHODS = {

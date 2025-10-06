@@ -1,4 +1,4 @@
-import { Card } from 'components/ui/card';
+import { Card } from '@/components/ui/card';
 import { ItemTag, TaskItem, priorityStyle } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';

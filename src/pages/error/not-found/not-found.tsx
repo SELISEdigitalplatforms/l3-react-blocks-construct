@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import notFound from 'assets/images/not_found.svg';
-import { Button } from 'components/ui/button';
+import notFound from '@/assets/images/not_found.svg';
+import { Button } from '@/components/ui/button';
 
 export default function NotFound() {
   const { t } = useTranslation();

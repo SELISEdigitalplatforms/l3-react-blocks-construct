@@ -1,12 +1,12 @@
 import { Loader2, Trash } from 'lucide-react';
-import { Button } from 'components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useState, useEffect, useRef } from 'react';
 import { IDeviceSession } from '../../../services/device.service';
 import { useGetSessions } from '../../../hooks/use-sessions';
-import { ScrollArea, ScrollBar } from 'components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useDeviceTableColumns } from '../devices-table-columns/devices-table-columns';
 import { useTranslation } from 'react-i18next';
 

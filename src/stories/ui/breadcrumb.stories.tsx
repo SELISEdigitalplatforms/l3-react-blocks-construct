@@ -14,6 +14,12 @@ const meta: Meta<typeof Breadcrumb> = {
   title: 'Breadcrumb',
   component: Breadcrumb,
   parameters: {},
+  argTypes: {
+    separator: {
+      control: 'text',
+      description: 'Defines the character or icon used to separate breadcrumb items.',
+    },
+  },
   render: (args) => (
     <Breadcrumb {...args}>
       <BreadcrumbList>
@@ -37,7 +43,9 @@ export default meta;
 type Story = StoryObj<typeof Breadcrumb>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    separator: 'ReactNode',
+  },
 };
 
 export const WithCustomSeparator: Story = {

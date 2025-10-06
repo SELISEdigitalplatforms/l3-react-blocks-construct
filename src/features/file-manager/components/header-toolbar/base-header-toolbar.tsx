@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 import { ListFilter, X } from 'lucide-react';
 import { FilterType, HeaderToolbarConfig } from '../../types/header-toolbar.type';
-import { useIsMobile } from 'hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { countActiveFilters, SearchInput } from '../common-filters';
 import { HeaderActions } from './header-actions';
 import AddDropdownMenu from '../file-manager-add-new-dropdown';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from 'components/ui/sheet';
-import { Button } from 'components/ui/button';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import { FilterControls } from './filter-controls';
 import { ActiveFilters } from './active-filters';
 import { ViewToggle } from './view-toggle';

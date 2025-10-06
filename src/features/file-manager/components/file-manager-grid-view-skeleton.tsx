@@ -1,6 +1,6 @@
 import { FileSkeletonCard } from './file-skeleton-card';
 import { FolderSkeletonCard } from './folder-skeleton-card';
-import { Skeleton } from 'components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const SkeletonGrid = ({
   count = 6,

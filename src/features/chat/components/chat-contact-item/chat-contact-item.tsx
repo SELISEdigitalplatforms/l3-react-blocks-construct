@@ -7,9 +7,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { ChatContact } from '../../types/chat.types';
-import { cn } from 'lib/utils';
+import { cn } from '@/lib/utils';
 
 interface ChatContactItemProps extends ChatContact {
   onClick?: (contact: ChatContact) => void;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { cn } from 'lib/utils';
+import { cn } from '@/lib/utils';
 import { useLanguageContext } from '../../../i18n/language-context';
 import {
   DropdownMenu,
@@ -10,8 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from 'components/ui/dropdown-menu';
-import { Skeleton } from 'components/ui/skeleton';
+} from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * LanguageSelector Component

@@ -1,4 +1,4 @@
-import { clients } from 'lib/https';
+import { clients } from '@/lib/https';
 import API_CONFIG from '../../../config/api';
 import {
   GenerateOTPResponse,

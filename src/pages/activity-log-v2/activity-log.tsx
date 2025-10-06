@@ -1,7 +1,7 @@
-import { ActivityLogToolbar } from 'features/activity-log-v1/components/activity-log-toobar/activity-log-toolbar';
-import ActivityLogTimeline from 'features/activity-log-v2/components/activity-log-timeline/activity-log-timeline';
-import { activities } from 'features/activity-log-v2/components/activity-log-timeline/activity-data';
-import { useActivityLogFilters } from 'features/activity-log-v1/hooks/use-activity-log-filters';
+import { ActivityLogToolbar } from '@/features/activity-log-v1/components/activity-log-toobar/activity-log-toolbar';
+import ActivityLogTimeline from '@/features/activity-log-v2/components/activity-log-timeline/activity-log-timeline';
+import { activities } from '@/features/activity-log-v2/components/activity-log-timeline/activity-data';
+import { useActivityLogFilters } from '@/features/activity-log-v1/hooks/use-activity-log-filters';
 import { useTranslation } from 'react-i18next';
 
 /**

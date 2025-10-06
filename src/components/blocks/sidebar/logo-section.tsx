@@ -1,8 +1,9 @@
+import React from 'react';
 import { X } from 'lucide-react';
-import darkLogo from 'assets/images/construct_logo_dark.svg';
-import lightLogo from 'assets/images/construct_logo_light.svg';
-import darksmallLogo from 'assets/images/construct_logo_small_dark.svg';
-import lightsmallLogo from 'assets/images/construct_logo_small_light.svg';
+import darkLogo from '@/assets/images/construct_logo_dark.svg';
+import lightLogo from '@/assets/images/construct_logo_light.svg';
+import darksmallLogo from '@/assets/images/construct_logo_small_dark.svg';
+import lightsmallLogo from '@/assets/images/construct_logo_small_light.svg';
 
 interface LogoSectionProps {
   theme: string;
@@ -16,7 +17,7 @@ export function LogoSection({
   open,
   isMobile,
   onClose,
-}: Readonly<LogoSectionProps>): JSX.Element {
+}: Readonly<LogoSectionProps>): React.JSX.Element {
   return (
     <div className="relative h-10 w-full">
       <img
