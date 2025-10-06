@@ -449,7 +449,7 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
     // Create a minimal temporary event for the recurrence modal
     const tempEventData = {
       eventId:
-        crypto?.randomUUID?.() || `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        crypto?.randomUUID?.() || `event-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       title: form.getValues('title') || 'New Event',
       start: fullStart.toISOString(),
       end: fullEnd.toISOString(),

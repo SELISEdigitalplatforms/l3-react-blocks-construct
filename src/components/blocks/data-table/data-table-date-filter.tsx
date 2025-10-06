@@ -138,7 +138,7 @@ export function DateRangeFilter<TData, TValue>({
           onClick={(e) => e.stopPropagation()}
         >
           <Calendar
-            initialFocus
+            autoFocus
             mode="range"
             month={month}
             onMonthChange={setMonth}
