@@ -1,7 +1,5 @@
 import { vi } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-// import { useTranslation } from 'react-i18next';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
