@@ -22,7 +22,7 @@ export function Notification() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout>();
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accessToken = useAuthStore((state) => state.accessToken);
 
   const [tabData, setTabData] = useState<{

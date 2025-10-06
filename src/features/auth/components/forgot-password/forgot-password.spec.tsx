@@ -1,25 +1,29 @@
+import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ForgotpasswordForm } from './forgot-password';
 import { BrowserRouter } from 'react-router-dom';
 
-const mockUseForgotPassword = jest.fn();
-jest.mock('../../hooks/use-auth', () => ({
+const mockUseForgotPassword = vi.fn();
+vi.mock('../../hooks/use-auth', () => ({
   useForgotPassword: () => mockUseForgotPassword(),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => jest.fn(),
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => vi.fn(),
+  };
+});
 
 describe('ForgotpasswordForm', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockUseForgotPassword.mockReturnValue({
       isPending: false,
-      mutateAsync: jest.fn().mockResolvedValue({}),
+      mutateAsync: vi.fn().mockResolvedValue({}),
     });
   });
 
@@ -43,7 +47,7 @@ describe('ForgotpasswordForm', () => {
   it('disables submit button while request is pending', () => {
     mockUseForgotPassword.mockReturnValue({
       isPending: true,
-      mutateAsync: jest.fn(),
+      mutateAsync: vi.fn(),
     });
 
     renderComponent();

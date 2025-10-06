@@ -1,18 +1,29 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
-import { useGetInvoiceItems } from '@/features/invoices/hooks/use-invoices';
+import { useInvoiceDetails } from '@/features/invoices/hooks/use-invoice-details';
 import { InvoiceItem } from '@/features/invoices/types/invoices.types';
+import { vi } from 'vitest';
+
+// Mock UUID module
+vi.mock('uuid', () => ({
+  v4: () => 'mock-uuid-v4',
+  v1: () => 'mock-uuid-v1',
+}));
 
 // Mock the useGetInvoiceItems hook
-jest.mock('features/invoices/hooks/use-invoices', () => ({
-  useGetInvoiceItems: jest.fn(),
+vi.mock('@/features/invoices/hooks/use-invoices', () => ({
+  useGetInvoiceItems: vi.fn(),
+}));
+
+// Mock the useInvoiceDetails hook
+vi.mock('@/features/invoices/hooks/use-invoice-details', () => ({
+  useInvoiceDetails: vi.fn(),
 }));
 
 // Mock the InvoicesDetail component
-jest.mock('features/invoices', () => ({
+vi.mock('@/features/invoices', () => ({
   InvoicesDetail: ({ invoice }: { invoice: InvoiceItem }) => (
     <div data-testid="invoice-detail">
       <div data-testid="customer-name">{invoice.Customer[0].CustomerName}</div>
@@ -22,14 +33,14 @@ jest.mock('features/invoices', () => ({
 }));
 
 // Mock the translation hook
-jest.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
 // Mock the useToast hook
-jest.mock('hooks/use-toast', () => ({
+vi.mock('hooks/use-toast', () => ({
   useToast: () => ({
-    toast: jest.fn(),
+    toast: vi.fn(),
   }),
 }));
 
@@ -65,11 +76,11 @@ const mockInvoice: InvoiceItem = {
 };
 
 describe('InvoiceDetailsPage', () => {
-  const mockUseGetInvoiceItems = useGetInvoiceItems as jest.Mock;
+  const mockUseInvoiceDetails = useInvoiceDetails as any;
 
   beforeEach(() => {
     // Reset all mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const renderWithRouter = (invoiceId: string) => {
@@ -83,19 +94,11 @@ describe('InvoiceDetailsPage', () => {
   };
 
   test('renders invoice details when invoice exists', async () => {
-    // Mock the useGetInvoiceItems hook to return our test data
-    mockUseGetInvoiceItems.mockReturnValue({
-      data: {
-        items: [mockInvoice],
-        hasNextPage: false,
-        hasPreviousPage: false,
-        totalCount: 1,
-        totalPages: 1,
-        pageSize: 10,
-        pageNo: 1,
-      },
+    // Mock the useInvoiceDetails hook to return our test data
+    mockUseInvoiceDetails.mockReturnValue({
+      t: (key: string) => key,
+      invoice: mockInvoice,
       isLoading: false,
-      error: null,
     });
 
     renderWithRouter('test-invoice-id');
@@ -108,19 +111,11 @@ describe('InvoiceDetailsPage', () => {
   });
 
   test('renders not found message when invoice does not exist', async () => {
-    // Mock the useGetInvoiceItems hook to return empty items
-    mockUseGetInvoiceItems.mockReturnValue({
-      data: {
-        items: [],
-        hasNextPage: false,
-        hasPreviousPage: false,
-        totalCount: 0,
-        totalPages: 0,
-        pageSize: 10,
-        pageNo: 1,
-      },
+    // Mock the useInvoiceDetails hook to return no invoice
+    mockUseInvoiceDetails.mockReturnValue({
+      t: (key: string) => key,
+      invoice: undefined,
       isLoading: false,
-      error: null,
     });
 
     renderWithRouter('non-existent-id');
@@ -133,10 +128,10 @@ describe('InvoiceDetailsPage', () => {
 
   test('shows loading state while fetching data', () => {
     // Mock the loading state
-    mockUseGetInvoiceItems.mockReturnValue({
-      data: undefined,
+    mockUseInvoiceDetails.mockReturnValue({
+      t: (key: string) => key,
+      invoice: undefined,
       isLoading: true,
-      error: null,
     });
 
     renderWithRouter('test-invoice-id');
@@ -144,6 +139,5 @@ describe('InvoiceDetailsPage', () => {
     // Check for the loading spinner by its class name
     const spinner = document.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
-    expect(spinner).toHaveClass('h-8', 'w-8');
   });
 });

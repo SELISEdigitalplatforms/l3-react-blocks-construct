@@ -1,11 +1,12 @@
+import { vi, Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ResetpasswordForm } from './reset-password';
 import { useResetPassword } from '../../hooks/use-auth';
 
 const TEST_PASSWORD = 'testPassword123';
 
-jest.mock('../../hooks/use-auth', () => ({
-  useResetPassword: jest.fn(),
+vi.mock('../../hooks/use-auth', () => ({
+  useResetPassword: vi.fn(),
 }));
 
 type BasePasswordFormProps = {
@@ -14,7 +15,7 @@ type BasePasswordFormProps = {
   code: string;
 };
 
-jest.mock('../../../../components/blocks/base-password-form/base-password-form', () => ({
+vi.mock('../../../../components/blocks/base-password-form/base-password-form', () => ({
   BasePasswordForm: ({ onSubmit, isPending, code }: BasePasswordFormProps) => (
     <form
       data-testid="base-password-form"
@@ -32,12 +33,12 @@ jest.mock('../../../../components/blocks/base-password-form/base-password-form',
 }));
 
 describe('ResetpasswordForm', () => {
-  const mockMutateAsync = jest.fn();
+  const mockMutateAsync = vi.fn();
   const mockCode = 'test-reset-code-123';
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useResetPassword as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    (useResetPassword as Mock).mockReturnValue({
       isPending: false,
       mutateAsync: mockMutateAsync,
     });
@@ -68,7 +69,7 @@ describe('ResetpasswordForm', () => {
   });
 
   it('disables form submission while request is pending', () => {
-    (useResetPassword as jest.Mock).mockReturnValue({
+    (useResetPassword as Mock).mockReturnValue({
       isPending: true,
       mutateAsync: mockMutateAsync,
     });
@@ -80,7 +81,7 @@ describe('ResetpasswordForm', () => {
   });
 
   it('enables form submission when not pending', () => {
-    (useResetPassword as jest.Mock).mockReturnValue({
+    (useResetPassword as Mock).mockReturnValue({
       isPending: false,
       mutateAsync: mockMutateAsync,
     });

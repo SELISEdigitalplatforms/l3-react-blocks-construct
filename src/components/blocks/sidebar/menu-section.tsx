@@ -1,3 +1,4 @@
+import React from 'react';
 import { SidebarMenu } from '@/components/ui/sidebar';
 import { SidebarMenuItemComponent } from '../layout/sidebar-menu-Item';
 import { MenuItem } from '@/models/sidebar';
@@ -20,7 +21,7 @@ export function MenuSection({
   isMobile,
   open,
   onItemClick,
-}: Readonly<MenuSectionProps>): JSX.Element {
+}: Readonly<MenuSectionProps>): React.JSX.Element {
   return (
     <>
       {showText && (

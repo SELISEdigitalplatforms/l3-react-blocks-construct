@@ -1,20 +1,21 @@
+import { vi, Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGetUsersQuery } from './use-iam';
 import { useGlobalQuery } from '@/state/query-client/hooks';
 
-jest.mock('state/query-client/hooks', () => ({
-  useGlobalQuery: jest.fn(),
+vi.mock('@/state/query-client/hooks', () => ({
+  useGlobalQuery: vi.fn(),
 }));
 
-jest.mock('../services/user-service', () => ({
-  getUsers: jest.fn(),
+vi.mock('../services/user-service', () => ({
+  getUsers: vi.fn(),
 }));
 
 describe('useGetUsersQuery', () => {
-  const mockUseGlobalQuery = useGlobalQuery as jest.Mock;
+  const mockUseGlobalQuery = useGlobalQuery as Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call useGlobalQuery with correct parameters', () => {
@@ -146,7 +147,7 @@ describe('useGetUsersQuery', () => {
     };
 
     // Mock the query hook to return the placeholder data
-    mockUseGlobalQuery.mockImplementation(({ placeholderData }) => ({
+    mockUseGlobalQuery.mockImplementation(({ placeholderData }: any) => ({
       data: placeholderData(previousData),
       isLoading: true,
       error: null,

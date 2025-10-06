@@ -1,3 +1,4 @@
+import React from 'react';
 import { X } from 'lucide-react';
 import darkLogo from '@/assets/images/construct_logo_dark.svg';
 import lightLogo from '@/assets/images/construct_logo_light.svg';
@@ -16,7 +17,7 @@ export function LogoSection({
   open,
   isMobile,
   onClose,
-}: Readonly<LogoSectionProps>): JSX.Element {
+}: Readonly<LogoSectionProps>): React.JSX.Element {
   return (
     <div className="relative h-10 w-full">
       <img
