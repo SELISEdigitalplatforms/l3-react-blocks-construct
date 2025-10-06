@@ -10,10 +10,28 @@ import {
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 
-const meta: Meta<typeof Card> = {
+const meta: Meta<any> = {
   title: 'Card',
   component: Card,
   parameters: {},
+  argTypes: {
+    header: {
+      control: 'text',
+      description: 'Content displayed at the top of the card.',
+    },
+    footer: {
+      control: 'text',
+      description: 'Content displayed at the bottom of the card.',
+    },
+    title: {
+      control: 'text',
+      description: 'Title of the card.',
+    },
+    content: {
+      control: 'text',
+      description: 'Main content of the card.',
+    },
+  },
   render: (args) => (
     <Card {...args} className="w-[350px]">
       <CardHeader>
@@ -32,10 +50,15 @@ const meta: Meta<typeof Card> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Card>;
+type Story = StoryObj<any>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    header: 'This is a header',
+    footer: 'This is a footer',
+    title: 'This is a title',
+    content: 'Main content',
+  },
 };
 
 export const Simple: Story = {

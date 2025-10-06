@@ -10,6 +10,21 @@ const meta: Meta<typeof Accordion> = {
   title: 'Accordion',
   component: Accordion,
   parameters: {},
+  argTypes: {
+    type: {
+      control: { type: 'select' },
+      options: ['single', 'multiple'],
+      description: 'Defines the behavior of the accordion. Can be single or multiple.',
+    },
+    collapsible: {
+      control: 'boolean',
+      description: 'If true, allows closing all items, leaving none open.',
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Disables interaction with the accordion item.',
+    },
+  },
   render: (args) => (
     <Accordion {...args}>
       <AccordionItem value="item-1">
@@ -39,11 +54,21 @@ export const Default: Story = {
   args: {
     type: 'single',
     collapsible: true,
+    disabled: false,
   },
 };
 
 export const Multiple: Story = {
   args: {
     type: 'multiple',
+    disabled: false,
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    type: 'single',
+    collapsible: true,
+    disabled: true,
   },
 };
