@@ -404,7 +404,7 @@ export function EditEvent({
     const targetDate = evts.length > 0 ? new Date(evts[0].start) : startDate;
     const dayIndex = targetDate.getDay();
     const dayName = WEEK_DAYS[dayIndex] || 'Sunday';
-    return `${t('OCCURS_ON')} ${dayName}` || t('SET_RECURRENCE') || 'Set Recurrence';
+    return dayName ? `${t('OCCURS_ON')} ${dayName}` : t('SET_RECURRENCE') || 'Set Recurrence';
   }, [form, recurringEvents, initialEventData.events, startDate, t]);
 
   const handleClose = () => {

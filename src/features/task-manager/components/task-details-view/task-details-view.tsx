@@ -37,7 +37,12 @@ import {
 import { Label } from '@/components/ui/label';
 import { EditableHeading } from './editable-heading';
 import { EditableComment } from './editable-comment';
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { EditableDescription, EditableDescriptionRef } from './editable-description';
 import { AttachmentsSection } from './attachment-section';
 import { Separator } from '@/components/ui/separator';
@@ -949,7 +954,7 @@ export default function TaskDetailsView({
                         });
                       }
                     }}
-                    initialFocus
+                    autoFocus
                   />
                   <div className="p-2 border-t">
                     <Button

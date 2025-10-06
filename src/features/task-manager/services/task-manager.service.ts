@@ -24,6 +24,7 @@ import type {
   GetTagsResponse,
   TaskTagInsertInput,
   TaskTagUpdateInput,
+  Assignee,
 } from '../types/task-manager.types';
 import {
   INSERT_TASK_MANAGER_ITEM_MUTATION,
@@ -40,7 +41,6 @@ import {
   DELETE_TASK_COMMENTS_MUTATION,
 } from '../graphql/mutations';
 import { clients } from '@/lib/https';
-import type { Assignee } from '../types/task-manager.types';
 
 export interface BaseMutationResponse {
   itemId: string;

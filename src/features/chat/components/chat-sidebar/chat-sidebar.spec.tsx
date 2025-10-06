@@ -8,9 +8,9 @@ vi.mock('components/ui/dropdown-menu', () => ({
   DropdownMenuTrigger: ({ children }: any) => <div>{children}</div>,
   DropdownMenuContent: ({ children }: any) => <div style={{ display: 'block' }}>{children}</div>,
   DropdownMenuItem: ({ children, onClick, ...props }: any) => (
-    <div onClick={onClick} {...props}>
+    <button onClick={onClick} {...props}>
       {children}
-    </div>
+    </button>
   ),
 }));
 
