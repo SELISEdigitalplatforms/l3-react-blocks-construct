@@ -59,7 +59,7 @@ jobs:
           projectName: ${{ github.event.repository.name }}
           projectVersion: ${{ github.ref_name }}
           bomFilename: 'bom.xml'
-          autoCreate: true 
+          autoCreate: true
 
       - name: Test and coverage
         run: npm run test -- --coverage
