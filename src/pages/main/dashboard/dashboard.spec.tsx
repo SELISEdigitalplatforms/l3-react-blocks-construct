@@ -4,9 +4,9 @@
  */
 
 // 1. Set up environment variables first
-process.env.VITE_PUBLIC_BLOCKS_API_URL = 'http://localhost:3000';
-process.env.VITE_PUBLIC_API_URL = 'http://localhost:3000';
-process.env.VITE_PUBLIC_X_BLOCKS_KEY = 'test-key';
+process.env.VITE_BLOCKS_API_URL = 'http://localhost:3000';
+process.env.VITE_API_BASE_URL = 'http://localhost:3000';
+process.env.VITE_X_BLOCKS_KEY = 'test-key';
 
 // 2. Mock window.location before any imports
 delete (global as any).window.location;

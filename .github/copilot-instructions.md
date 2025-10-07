@@ -9,14 +9,17 @@ This is a React TypeScript application using the SELISE Blocks ecosystem - a com
 ## Essential Architecture
 
 ### 3-Layer Component Hierarchy (CRITICAL)
+
 Always follow this order when building features:
+
 1. **Feature Components** (`src/features/*/components/`) - Complete business solutions
-2. **Block Components** (`src/components/blocks/`) - Reusable business patterns  
+2. **Block Components** (`src/components/blocks/`) - Reusable business patterns
 3. **UI Components** (`src/components/ui/`) - Foundation design system
 
 ## Key Development Patterns
 
 ### Data Tables
+
 ```typescript
 // Always use AdvanceDataTable (feature-level solution)
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
@@ -33,6 +36,7 @@ export const createTableColumns = ({ onEdit, onDelete }) => [
 ```
 
 ### GraphQL Operations (NOT Apollo Client)
+
 ```typescript
 // CRITICAL: Use graphqlClient, never Apollo
 import { graphqlClient } from 'lib/graphql-client';
@@ -44,17 +48,19 @@ import { graphqlClient } from 'lib/graphql-client';
 ```
 
 ### Forms & Validation
+
 ```typescript
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Form, FormField, FormControl } from 'components/ui/form'
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormField, FormControl } from 'components/ui/form';
 // Always use React Hook Form + Zod validation
 ```
 
 ### Confirmations
+
 ```typescript
 // Never create custom confirmations - always use this
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 ```
 
 ## File Structure Pattern
@@ -72,11 +78,13 @@ src/features/[feature-name]/
 ## Critical Import Rules
 
 ### ✅ Always Import (Never Recreate)
+
 - All UI components: `Button`, `Input`, `Card`, `Table`, etc.
 - Block patterns: `ConfirmationModal`, `DataTableColumnHeader`, `CustomAvatar`
 - Complete feature solutions when they fit exactly: `AdvanceDataTable`
 
 ### ❌ Never Import Across Features
+
 - Business logic: Create custom hooks/services per feature
 - Forms: Create feature-specific forms
 - Table columns: Create custom column definitions
@@ -105,16 +113,18 @@ npm run build-storybook # Build Storybook
 ## Vite-Specific Patterns
 
 ### Environment Variables
+
 ```typescript
 // Vite uses import.meta.env instead of process.env for client code
-const apiUrl = import.meta.env.VITE_PUBLIC_API_URL
-const blocksKey = import.meta.env.VITE_PUBLIC_X_BLOCKS_KEY
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
+const blocksKey = import.meta.env.VITE_X_BLOCKS_KEY;
 
 // Both REACT_APP_ and VITE_ prefixes are supported during migration
-const legacyApiUrl = import.meta.env.REACT_APP_PUBLIC_API_URL
+const legacyApiUrl = import.meta.env.REACT_APP_PUBLIC_API_URL;
 ```
 
 ### Hot Module Replacement (HMR)
+
 ```typescript
 // Vite provides excellent HMR out of the box
 // React Fast Refresh is automatically enabled
@@ -131,6 +141,7 @@ const legacyApiUrl = import.meta.env.REACT_APP_PUBLIC_API_URL
 ## Documentation Priority
 
 When implementing features, follow documentation in this order:
+
 1. **MCP automation** (CLAUDE.md) - For project/schema setup
 2. **Recipes** (`llm-docs/recipes/`) - For implementation patterns
 3. **Component hierarchy** (`llm-docs/component-catalog/`) - For component decisions
@@ -139,7 +150,7 @@ When implementing features, follow documentation in this order:
 ## Common Gotchas
 
 - **Schema Names**: Get exact names from MCP first, then apply naming patterns
-- **GraphQL Client**: Never use Apollo - use `graphqlClient` from `lib/graphql-client`  
+- **GraphQL Client**: Never use Apollo - use `graphqlClient` from `lib/graphql-client`
 - **Sidebar**: By default, hide ALL existing sidebar items - only show user's features
 - **Component Hierarchy**: Always check higher layers before creating custom solutions
 - **Import Paths**: Use absolute paths configured in `tsconfig.json` (e.g., `components/ui/button`)

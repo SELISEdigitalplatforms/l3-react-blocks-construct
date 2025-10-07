@@ -48,11 +48,8 @@ Object.defineProperty(import.meta, 'env', {
     // Add other environment variables as needed
     VITE_PUBLIC_BACKEND_URL:
       process.env.VITE_PUBLIC_BACKEND_URL || 'https://dev-api.seliseblocks.com',
-    VITE_PUBLIC_X_BLOCKS_KEY:
-      process.env.VITE_PUBLIC_X_BLOCKS_KEY || 'cf18dc87904c4e1485639242cda4a026',
-    VITE_PUBLIC_BLOCKS_API_URL:
-      process.env.VITE_PUBLIC_BLOCKS_API_URL || 'https://dev-api.seliseblocks.com',
-    VITE_PUBLIC_API_URL: process.env.VITE_PUBLIC_API_URL || 'https://dev-api.seliseblocks.com',
+    VITE_X_BLOCKS_KEY: process.env.VITE_X_BLOCKS_KEY || 'cf18dc87904c4e1485639242cda4a026',
+    VITE_API_BASE_URL: process.env.VITE_API_BASE_URL || 'https://dev-api.seliseblocks.com',
   },
   configurable: true,
 });
