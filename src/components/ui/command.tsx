@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
-function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
+function Command({ className, ...props }: Readonly<React.ComponentProps<typeof CommandPrimitive>>) {
   return (
     <CommandPrimitive
       data-slot="command"
@@ -21,7 +21,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
 Command.displayName = CommandPrimitive.displayName;
 Command.displayName = CommandPrimitive.displayName;
 
-const CommandDialog = ({ children, ...props }: DialogProps) => {
+const CommandDialog = ({ children, ...props }: Readonly<DialogProps>) => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
@@ -36,7 +36,7 @@ const CommandDialog = ({ children, ...props }: DialogProps) => {
 function CommandInput({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Input>) {
+}: Readonly<React.ComponentProps<typeof CommandPrimitive.Input>>) {
   return (
     <div data-slot="command-input-wrapper" className="flex items-center border-b px-3">
       <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -55,7 +55,10 @@ CommandInput.displayName = CommandPrimitive.Input.displayName;
 
 CommandInput.displayName = CommandPrimitive.Input.displayName;
 
-function CommandList({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.List>) {
+function CommandList({
+  className,
+  ...props
+}: Readonly<React.ComponentProps<typeof CommandPrimitive.List>>) {
   return (
     <CommandPrimitive.List
       data-slot="command-list"
@@ -68,7 +71,7 @@ CommandList.displayName = CommandPrimitive.List.displayName;
 
 CommandList.displayName = CommandPrimitive.List.displayName;
 
-function CommandEmpty(props: React.ComponentProps<typeof CommandPrimitive.Empty>) {
+function CommandEmpty(props: Readonly<React.ComponentProps<typeof CommandPrimitive.Empty>>) {
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
@@ -84,7 +87,7 @@ CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 function CommandGroup({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Group>) {
+}: Readonly<React.ComponentProps<typeof CommandPrimitive.Group>>) {
   return (
     <CommandPrimitive.Group
       data-slot="command-group"
@@ -103,7 +106,7 @@ CommandGroup.displayName = CommandPrimitive.Group.displayName;
 function CommandSeparator({
   className,
   ...props
-}: React.ComponentProps<typeof CommandPrimitive.Separator>) {
+}: Readonly<React.ComponentProps<typeof CommandPrimitive.Separator>>) {
   return (
     <CommandPrimitive.Separator
       data-slot="command-separator"
@@ -115,7 +118,10 @@ function CommandSeparator({
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
-function CommandItem({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
+function CommandItem({
+  className,
+  ...props
+}: Readonly<React.ComponentProps<typeof CommandPrimitive.Item>>) {
   return (
     <CommandPrimitive.Item
       data-slot="command-item"
@@ -131,7 +137,7 @@ CommandItem.displayName = CommandPrimitive.Item.displayName;
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;
 
-function CommandShortcut({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
+function CommandShortcut({ className, ...props }: Readonly<React.HTMLAttributes<HTMLSpanElement>>) {
   return (
     <span
       data-slot="command-shortcut"
