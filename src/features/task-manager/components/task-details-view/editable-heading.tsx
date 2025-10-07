@@ -69,10 +69,14 @@ export function EditableHeading({
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!initialValue && task?.Title) {
-      setValue(task.Title);
+    if (!isEditing) {
+      if (initialValue !== undefined && initialValue !== value) {
+        setValue(initialValue);
+      } else if (!initialValue && task?.Title) {
+        setValue(task.Title);
+      }
     }
-  }, [task, initialValue]);
+  }, [initialValue, task?.Title, isEditing, value]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {

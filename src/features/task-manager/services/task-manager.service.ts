@@ -24,7 +24,6 @@ import type {
   GetTagsResponse,
   TaskTagInsertInput,
   TaskTagUpdateInput,
-  Assignee,
 } from '../types/task-manager.types';
 import {
   INSERT_TASK_MANAGER_ITEM_MUTATION,
@@ -446,11 +445,11 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
  * @param input - Task item data
  * @returns Promise with creation result
  */
-// Helper function to prepare Assignee objects for mutations (backend expects AddressInfoInput, remove ItemId string)
-const transformAssigneesForMutation = (assignees?: Assignee[]): any[] | undefined => {
-  if (!assignees) return undefined;
-  return assignees.map(({ Name, ImageUrl }) => ({ Name, ImageUrl }));
-};
+// // Helper function to prepare Assignee objects for mutations (backend expects AddressInfoInput, remove ItemId string)
+// const transformAssigneesForMutation = (assignees?: Assignee[]): any[] | undefined => {
+//   if (!assignees) return undefined;
+//   return assignees.map(({ Name, ImageUrl }) => ({ Name, ImageUrl }));
+// };
 
 // Helper function to normalize tags to ItemTag format
 const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
@@ -527,7 +526,6 @@ export const updateTaskItem = async (
 
   const formattedInput = {
     ...inputWithoutComments,
-    Assignee: transformAssigneesForMutation(inputWithoutComments.Assignee),
     ...(inputWithoutComments.ItemTag === undefined &&
       inputWithoutComments.Tags && {
         ItemTag: inputWithoutComments.Tags.map(normalizeToItemTag),
