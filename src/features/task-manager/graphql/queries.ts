@@ -37,6 +37,7 @@ export const GET_TASK_MANAGER_QUERY = `
           TagLabel
         }
         Assignee {
+          ItemId
           Name
           ImageUrl
         }
