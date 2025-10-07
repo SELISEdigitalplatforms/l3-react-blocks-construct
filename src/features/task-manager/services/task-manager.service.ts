@@ -445,11 +445,6 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
  * @param input - Task item data
  * @returns Promise with creation result
  */
-// // Helper function to prepare Assignee objects for mutations (backend expects AddressInfoInput, remove ItemId string)
-// const transformAssigneesForMutation = (assignees?: Assignee[]): any[] | undefined => {
-//   if (!assignees) return undefined;
-//   return assignees.map(({ Name, ImageUrl }) => ({ Name, ImageUrl }));
-// };
 
 // Helper function to normalize tags to ItemTag format
 const normalizeToItemTag = (tag: string | ItemTag): ItemTag => {
