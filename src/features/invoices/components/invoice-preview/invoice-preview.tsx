@@ -1,5 +1,12 @@
 import { X } from 'lucide-react';
-import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { InvoicesDetail } from '../invoices-detail/invoices-detail';
@@ -34,9 +41,12 @@ export function InvoicePreview({
         <div
           className={`sticky top-0 z-10 flex items-center justify-between bg-background border-b ${isMobile ? 'p-4' : 'p-6 pb-4'}`}
         >
-          <DialogTitle className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>
-            Invoice Preview
-          </DialogTitle>
+          <DialogHeader className="flex-1">
+            <DialogTitle className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>
+              Invoice Preview
+            </DialogTitle>
+            <DialogDescription />
+          </DialogHeader>
           <DialogClose asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <X className="h-4 w-4" />

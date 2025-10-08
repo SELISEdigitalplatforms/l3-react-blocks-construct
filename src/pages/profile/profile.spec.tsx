@@ -6,6 +6,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Profile } from './profile';
 import { GeneralInfo, DevicesTable } from '@/features/profile';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 vi.mock('@/features/profile', () => ({
   GeneralInfo: vi.fn(() => <div data-testid="general-info">General Info Content</div>),
   DevicesTable: vi.fn(() => <div data-testid="devices-table">Devices Table Content</div>),

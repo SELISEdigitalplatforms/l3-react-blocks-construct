@@ -5,6 +5,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import * as Dialog from '@radix-ui/react-dialog';
 import { vi } from 'vitest';
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 vi.mock('@/features/profile/hooks/use-account', () => ({
   useCreateAccount: vi.fn(),
   ACCOUNT_QUERY_KEY: ['account'],
