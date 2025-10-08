@@ -75,6 +75,8 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
         aria-label={t('SEARCH_CONTACTS_INPUT_AREA')}
         aria-expanded={isDropdownOpen}
         aria-haspopup="listbox"
+        aria-controls="chat-search-suggestions"
+        aria-owns="chat-search-suggestions"
         className={`relative flex w-full items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 cursor-text ${isFocused ? 'border-primary' : 'border-muted'}`}
         onClick={() => inputRef.current?.focus()}
         onKeyDown={handleContainerKeyDown}
@@ -145,11 +147,18 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
       </div>
 
       {isDropdownOpen && (
-        <div className="suggestions-dropdown absolute z-50 w-full mt-1 bg-popover text-popover-foreground shadow-lg rounded-md border">
+        <div
+          id="chat-search-suggestions"
+          role="listbox"
+          aria-label={t('CONTACT_SUGGESTIONS')}
+          className="suggestions-dropdown absolute z-50 w-full mt-1 bg-popover text-popover-foreground shadow-lg rounded-md border"
+        >
           <ScrollArea className="max-h-60 overflow-auto">
             {filteredContacts.map((contact) => (
               <button
                 key={contact.id}
+                role="option"
+                aria-selected="false"
                 className="flex w-full items-center p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                 onMouseDown={(e) => {
                   e.preventDefault();
