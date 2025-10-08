@@ -70,10 +70,11 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
   return (
     <div className="relative" ref={containerRef}>
       <div
-        role="textbox"
+        role="combobox"
         tabIndex={0}
         aria-label={t('SEARCH_CONTACTS_INPUT_AREA')}
         aria-expanded={isDropdownOpen}
+        aria-haspopup="listbox"
         className={`relative flex w-full items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 cursor-text ${isFocused ? 'border-primary' : 'border-muted'}`}
         onClick={() => inputRef.current?.focus()}
         onKeyDown={handleContainerKeyDown}

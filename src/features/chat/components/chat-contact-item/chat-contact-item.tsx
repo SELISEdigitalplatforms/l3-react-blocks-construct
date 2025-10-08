@@ -182,16 +182,14 @@ export const ChatContactItem = ({
 
   if (isCollapsed) {
     return (
-      <div
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
         className={cn(
-          'group relative flex flex-col items-center w-full p-3 text-center hover:bg-surface transition-colors cursor-pointer',
+          'group relative flex flex-col items-center w-full p-3 text-center hover:bg-surface transition-colors',
           isSelected && 'bg-primary-50',
           className
         )}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
         aria-label={`Open chat with ${name}`}
         data-testid={`chat-contact-item-btn-${id}`}
         onMouseEnter={() => setIsHovered(true)}
@@ -199,7 +197,7 @@ export const ChatContactItem = ({
       >
         <div className="relative mb-1">{renderAvatar()}</div>
         <span className="text-xs font-medium text-high-emphasis truncate w-full">{name}</span>
-      </div>
+      </button>
     );
   }
 
