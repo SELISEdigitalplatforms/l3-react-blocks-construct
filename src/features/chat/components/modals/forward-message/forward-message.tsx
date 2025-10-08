@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ export function ForwardMessage({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('FORWARD_THIS_MESSAGE')}</DialogTitle>
+          <DialogDescription />
         </DialogHeader>
         <div className="flex flex-col gap-6">
           <Input

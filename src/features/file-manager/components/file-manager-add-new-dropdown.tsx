@@ -7,7 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -147,6 +153,7 @@ const AddDropdownMenu = ({
         <DialogContent className="sm:max-w-[500px] md:max-w-[600px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">Upload files</DialogTitle>
+            <DialogDescription />
           </DialogHeader>
 
           <div className="space-y-6">
@@ -234,6 +241,7 @@ const AddDropdownMenu = ({
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">Create new folder</DialogTitle>
+            <DialogDescription />
           </DialogHeader>
 
           <div className="space-y-6">

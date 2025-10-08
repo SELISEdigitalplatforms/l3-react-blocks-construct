@@ -60,11 +60,23 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
     }
   };
 
+  const handleContainerKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      inputRef.current?.focus();
+    }
+  };
+
   return (
     <div className="relative" ref={containerRef}>
-      <button
-        className={`relative flex w-full items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 ${isFocused ? 'border-primary' : 'border-muted'}`}
+      <div
+        role="textbox"
+        tabIndex={0}
+        aria-label={t('SEARCH_CONTACTS_INPUT_AREA')}
+        aria-expanded={isDropdownOpen}
+        className={`relative flex w-full items-center flex-wrap gap-2 pl-4 pt-2 pb-1 border-b-2 cursor-text ${isFocused ? 'border-primary' : 'border-muted'}`}
         onClick={() => inputRef.current?.focus()}
+        onKeyDown={handleContainerKeyDown}
       >
         <Label className="text-medium-emphasis mr-2" htmlFor="chat-search-to">
           {t('LABEL_TO')}:
@@ -129,7 +141,7 @@ export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
             <X className="h-5 w-5" />
           </button>
         )}
-      </button>
+      </div>
 
       {isDropdownOpen && (
         <div className="suggestions-dropdown absolute z-50 w-full mt-1 bg-popover text-popover-foreground shadow-lg rounded-md border">

@@ -2,7 +2,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { EllipsisVertical, SquarePen, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
@@ -165,6 +171,7 @@ export function ColumnMenu({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t('RENAME_LIST')}</DialogTitle>
+            <DialogDescription />
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <Input
