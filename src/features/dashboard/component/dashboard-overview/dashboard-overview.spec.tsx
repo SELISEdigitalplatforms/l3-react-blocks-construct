@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DashboardOverview } from './dashboard-overview';
 import { vi } from 'vitest';
@@ -118,6 +117,41 @@ vi.mock('../../services/dashboard-service', () => ({
     { value: 'october', label: 'October' },
     { value: 'november', label: 'November' },
     { value: 'december', label: 'December' },
+  ],
+  metricsConfigData: [
+    {
+      id: 'total-users',
+      title: 'TOTAL_USERS',
+      value: '10,000',
+      trend: '+2.5%',
+      icon: ({ className }: { className?: string }) => (
+        <svg data-testid="icon-users" className={className} />
+      ),
+      iconColor: 'text-chart-500',
+      bgColor: 'bg-surface',
+    },
+    {
+      id: 'active-users',
+      title: 'TOTAL_ACTIVE_USERS',
+      value: '7,000',
+      trend: '+5%',
+      icon: ({ className }: { className?: string }) => (
+        <svg data-testid="icon-user-cog" className={className} />
+      ),
+      iconColor: 'text-secondary',
+      bgColor: 'bg-surface',
+    },
+    {
+      id: 'new-signups',
+      title: 'NEW_SIGN_UPS',
+      value: '1,200',
+      trend: '+8%',
+      icon: ({ className }: { className?: string }) => (
+        <svg data-testid="icon-user-plus" className={className} />
+      ),
+      iconColor: 'text-green',
+      bgColor: 'bg-surface',
+    },
   ],
 }));
 

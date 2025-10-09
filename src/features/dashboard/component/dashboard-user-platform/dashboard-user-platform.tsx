@@ -11,9 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip } from '@/components/ui/chart';
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+} from '@/components/ui/chart';
 import { monthsOfYear, pieChartConfig, pieChartData } from '../../services/dashboard-service';
-import { ChartTooltipWrapper } from './dashboard-user-platform-tooltip';
+import { ChartTooltipWrapper } from '../chart-tooltip-wrapper/chart-tooltip-wrapper';
 
 /**
  * DashboardUserPlatform component displays a pie chart of users by platform and provides a selection
@@ -28,7 +33,7 @@ import { ChartTooltipWrapper } from './dashboard-user-platform-tooltip';
  * @returns {JSX.Element} - The rendered JSX component with a pie chart and month selector.
  */
 
-export const DashboardUserPlatform = () => {
+export const DashboardUserPlatform = (): React.JSX.Element => {
   const { t } = useTranslation();
 
   const totalUsers = useMemo(() => {
@@ -85,7 +90,12 @@ export const DashboardUserPlatform = () => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <ChartContainer config={translatedConfig} className="mx-auto aspect-square max-h-[250px]">
+        <ChartContainer
+          config={translatedConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+          role="img"
+          aria-label={t('USER_PLATFORM_DISTRIBUTION_CHART')}
+        >
           <PieChart>
             <ChartTooltip cursor={false} content={ChartTooltipWrapper} />
             <ChartLegend content={<ChartLegendContent />} />

@@ -1,6 +1,14 @@
 import { ChartConfig } from '@/components/ui/chart';
+import { UserCog, UserPlus, Users } from 'lucide-react';
+import type { 
+  MetricConfig, 
+  SelectOption, 
+  ChartDataPoint, 
+  PieChartDataPoint, 
+  StatisticData 
+} from '../types/dashboard.types';
 
-export const daysOfWeek = [
+export const daysOfWeek: SelectOption[] = [
   { value: 'monday', label: 'MONDAY' },
   { value: 'tuesday', label: 'TUESDAY' },
   { value: 'wednesday', label: 'WEDNESDAY' },
@@ -10,7 +18,7 @@ export const daysOfWeek = [
   { value: 'sunday', label: 'SUNDAY' },
 ];
 
-export const monthsOfYear = [
+export const monthsOfYear: SelectOption[] = [
   { value: 'january', label: 'JANUARY' },
   { value: 'february', label: 'FEBRUARY' },
   { value: 'march', label: 'MARCH' },
@@ -25,7 +33,37 @@ export const monthsOfYear = [
   { value: 'december', label: 'DECEMBER' },
 ];
 
-export const chartData = [
+export const metricsConfigData: MetricConfig[] = [
+  {
+    id: 'total-users',
+    title: 'TOTAL_USERS',
+    value: '10,000',
+    trend: '+2.5%',
+    icon: Users,
+    iconColor: 'text-chart-500',
+    bgColor: 'bg-surface',
+  },
+  {
+    id: 'active-users',
+    title: 'TOTAL_ACTIVE_USERS',
+    value: '7,000',
+    trend: '+5%',
+    icon: UserCog,
+    iconColor: 'text-secondary',
+    bgColor: 'bg-surface',
+  },
+  {
+    id: 'new-signups',
+    title: 'NEW_SIGN_UPS',
+    value: '1,200',
+    trend: '+8%',
+    icon: UserPlus,
+    iconColor: 'text-green',
+    bgColor: 'bg-surface',
+  },
+];
+
+export const chartData: ChartDataPoint[] = [
   { week: 'Sunday', noOfActions: 10 },
   { week: 'Monday', noOfActions: 70 },
   { week: 'Tuesday', noOfActions: 30 },
@@ -42,7 +80,7 @@ export const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const pieChartData = [
+export const pieChartData: PieChartDataPoint[] = [
   { devices: 'windows', users: 200, fill: 'var(--color-windows)' },
   { devices: 'mac', users: 110, fill: 'var(--color-mac)' },
   { devices: 'ios', users: 60, fill: 'var(--color-ios)' },
@@ -70,7 +108,7 @@ export const pieChartConfig = {
   },
 } satisfies ChartConfig;
 
-export const statsData = [
+export const statsData: StatisticData[] = [
   {
     title: 'API_CALLS',
     value: '12,345',
