@@ -11,9 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip } from '@/components/ui/chart';
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+} from '@/components/ui/chart';
 import { monthsOfYear, pieChartConfig, pieChartData } from '../../services/dashboard-service';
-import { ChartTooltipWrapper } from './dashboard-user-platform-tooltip';
+import { ChartTooltipWrapper } from '../chart-tooltip-wrapper/chart-tooltip-wrapper';
 
 /**
  * DashboardUserPlatform component displays a pie chart of users by platform and provides a selection

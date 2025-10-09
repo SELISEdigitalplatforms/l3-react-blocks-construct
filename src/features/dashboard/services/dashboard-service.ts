@@ -1,4 +1,5 @@
 import { ChartConfig } from '@/components/ui/chart';
+import { UserCog, UserPlus, Users } from 'lucide-react';
 
 export const daysOfWeek = [
   { value: 'monday', label: 'MONDAY' },
@@ -23,6 +24,36 @@ export const monthsOfYear = [
   { value: 'october', label: 'OCTOBER' },
   { value: 'november', label: 'NOVEMBER' },
   { value: 'december', label: 'DECEMBER' },
+];
+
+export const metricsConfigData = [
+  {
+    id: 'total-users',
+    title: 'TOTAL_USERS',
+    value: '10,000',
+    trend: '+2.5%',
+    icon: Users,
+    iconColor: 'text-chart-500',
+    bgColor: 'bg-surface',
+  },
+  {
+    id: 'active-users',
+    title: 'TOTAL_ACTIVE_USERS',
+    value: '7,000',
+    trend: '+5%',
+    icon: UserCog,
+    iconColor: 'text-secondary',
+    bgColor: 'bg-surface',
+  },
+  {
+    id: 'new-signups',
+    title: 'NEW_SIGN_UPS',
+    value: '1,200',
+    trend: '+8%',
+    icon: UserPlus,
+    iconColor: 'text-green',
+    bgColor: 'bg-surface',
+  },
 ];
 
 export const chartData = [

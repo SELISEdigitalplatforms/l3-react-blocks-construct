@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { chartConfig, chartData, daysOfWeek } from '../../services/dashboard-service';
-import { DashboardUserActivityGraphTooltip } from './dashboard-user-activity-graph-tooltip';
+import { DashboardUserActivityGraphTooltip } from '../dashboard-user-activity-graph-tooltip/dashboard-user-activity-graph-tooltip';
 
 const TooltipContent = (props: TooltipProps<ValueType, NameType>) => {
   const { payload, label } = props;
