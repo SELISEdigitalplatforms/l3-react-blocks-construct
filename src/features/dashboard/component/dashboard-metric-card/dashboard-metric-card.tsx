@@ -32,9 +32,14 @@ export function DashboardMetricCard({
   icon: Icon,
   iconColor,
   bgColor,
-}: Readonly<MetricCardProps>) {
+}: Readonly<MetricCardProps>): React.JSX.Element {
   return (
-    <div className="flex justify-between hover:bg-primary-50 hover:rounded-[4px] cursor-pointer p-2">
+    <div 
+      className="flex justify-between hover:bg-primary-50 hover:rounded-[4px] cursor-pointer p-2"
+      role="button"
+      tabIndex={0}
+      aria-label={`${title}: ${value}, ${trend} ${trendLabel}`}
+    >
       <div>
         <h3 className="text-sm font-normal text-high-emphasis">{title}</h3>
         <h1 className="text-[32px] font-semibold text-high-emphasis">{value}</h1>

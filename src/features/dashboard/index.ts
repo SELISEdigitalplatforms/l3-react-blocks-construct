@@ -7,3 +7,13 @@ export { DashboardHeader } from './component/dashboard-header/dashboard-header';
 export { DashboardMetricCard } from './component/dashboard-metric-card/dashboard-metric-card';
 export { DashboardSystemOverviewStatisticItem } from './component/dashboard-system-overview-statistic-item/dashboard-system-overview-statistic-item';
 export { ChartTooltipWrapper } from './component/chart-tooltip-wrapper/chart-tooltip-wrapper';
+export type {
+  MetricConfig,
+  SelectOption,
+  ChartDataPoint,
+  PieChartDataPoint,
+  StatisticData,
+  DashboardOverviewProps,
+  DashboardUserPlatformProps,
+  DashboardUserActivityGraphProps,
+} from './types/dashboard.types';

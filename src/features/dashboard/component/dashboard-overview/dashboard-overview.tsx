@@ -24,7 +24,7 @@ import { DashboardMetricCard } from '../dashboard-metric-card/dashboard-metric-c
  *
  * @returns {JSX.Element} - The rendered JSX component displaying key user statistics with trend information and a month selector.
  */
-export const DashboardOverview = () => {
+export const DashboardOverview = (): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -50,7 +50,11 @@ export const DashboardOverview = () => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          role="region"
+          aria-label={t('METRICS_OVERVIEW')}
+        >
           {metricsConfigData.map((metric) => (
             <DashboardMetricCard
               key={metric.id}

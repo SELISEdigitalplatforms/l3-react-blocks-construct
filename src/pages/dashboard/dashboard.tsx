@@ -8,7 +8,7 @@ import {
 } from '@/features/dashboard';
 import { useGetAccount } from '@/features/profile/hooks/use-account';
 
-export function Dashboard() {
+export function Dashboard(): React.JSX.Element {
   const { isLoading } = useGetAccount();
 
   return (
@@ -18,7 +18,7 @@ export function Dashboard() {
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="flex w-full flex-col">
+        <main className="flex w-full flex-col" role="main" aria-label="Dashboard Content">
           <DashboardHeader />
           <div className="flex flex-col gap-4">
             <DashboardOverview />
@@ -28,7 +28,7 @@ export function Dashboard() {
             </div>
             <DashboardSystemOverview />
           </div>
-        </div>
+        </main>
       )}
     </>
   );

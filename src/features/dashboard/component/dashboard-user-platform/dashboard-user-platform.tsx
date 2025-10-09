@@ -33,7 +33,7 @@ import { ChartTooltipWrapper } from '../chart-tooltip-wrapper/chart-tooltip-wrap
  * @returns {JSX.Element} - The rendered JSX component with a pie chart and month selector.
  */
 
-export const DashboardUserPlatform = () => {
+export const DashboardUserPlatform = (): React.JSX.Element => {
   const { t } = useTranslation();
 
   const totalUsers = useMemo(() => {
@@ -90,7 +90,12 @@ export const DashboardUserPlatform = () => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <ChartContainer config={translatedConfig} className="mx-auto aspect-square max-h-[250px]">
+        <ChartContainer
+          config={translatedConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+          role="img"
+          aria-label={t('USER_PLATFORM_DISTRIBUTION_CHART')}
+        >
           <PieChart>
             <ChartTooltip cursor={false} content={ChartTooltipWrapper} />
             <ChartLegend content={<ChartLegendContent />} />

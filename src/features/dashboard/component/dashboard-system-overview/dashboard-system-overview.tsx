@@ -24,7 +24,7 @@ import { daysOfWeek } from '../../services/dashboard-service';
  *
  * @returns {JSX.Element} - The rendered JSX component showing system usage statistics with circular progress indicators and a day selector.
  */
-export const DashboardSystemOverview = () => {
+export const DashboardSystemOverview = (): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -50,7 +50,11 @@ export const DashboardSystemOverview = () => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          role="region"
+          aria-label={t('SYSTEM_STATISTICS_OVERVIEW')}
+        >
           {statsData.map((stat) => (
             <DashboardSystemOverviewStatisticItem key={stat.title} stat={stat} t={t} />
           ))}

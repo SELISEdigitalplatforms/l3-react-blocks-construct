@@ -1,7 +1,14 @@
 import { ChartConfig } from '@/components/ui/chart';
 import { UserCog, UserPlus, Users } from 'lucide-react';
+import type { 
+  MetricConfig, 
+  SelectOption, 
+  ChartDataPoint, 
+  PieChartDataPoint, 
+  StatisticData 
+} from '../types/dashboard.types';
 
-export const daysOfWeek = [
+export const daysOfWeek: SelectOption[] = [
   { value: 'monday', label: 'MONDAY' },
   { value: 'tuesday', label: 'TUESDAY' },
   { value: 'wednesday', label: 'WEDNESDAY' },
@@ -11,7 +18,7 @@ export const daysOfWeek = [
   { value: 'sunday', label: 'SUNDAY' },
 ];
 
-export const monthsOfYear = [
+export const monthsOfYear: SelectOption[] = [
   { value: 'january', label: 'JANUARY' },
   { value: 'february', label: 'FEBRUARY' },
   { value: 'march', label: 'MARCH' },
@@ -26,7 +33,7 @@ export const monthsOfYear = [
   { value: 'december', label: 'DECEMBER' },
 ];
 
-export const metricsConfigData = [
+export const metricsConfigData: MetricConfig[] = [
   {
     id: 'total-users',
     title: 'TOTAL_USERS',
@@ -56,7 +63,7 @@ export const metricsConfigData = [
   },
 ];
 
-export const chartData = [
+export const chartData: ChartDataPoint[] = [
   { week: 'Sunday', noOfActions: 10 },
   { week: 'Monday', noOfActions: 70 },
   { week: 'Tuesday', noOfActions: 30 },
@@ -73,7 +80,7 @@ export const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const pieChartData = [
+export const pieChartData: PieChartDataPoint[] = [
   { devices: 'windows', users: 200, fill: 'var(--color-windows)' },
   { devices: 'mac', users: 110, fill: 'var(--color-mac)' },
   { devices: 'ios', users: 60, fill: 'var(--color-ios)' },
@@ -101,7 +108,7 @@ export const pieChartConfig = {
   },
 } satisfies ChartConfig;
 
-export const statsData = [
+export const statsData: StatisticData[] = [
   {
     title: 'API_CALLS',
     value: '12,345',

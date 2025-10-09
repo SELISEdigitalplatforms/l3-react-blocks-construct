@@ -20,12 +20,19 @@ interface CircularProgressBarProps {
   strokeColor?: string;
 }
 
-export const CircularProgress = (props: CircularProgressBarProps) => {
+export const CircularProgress = (props: CircularProgressBarProps): React.JSX.Element => {
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference - (props.percentage / 100) * circumference;
 
   return (
-    <div className="relative w-24 h-24">
+    <div 
+      className="relative w-24 h-24"
+      role="progressbar"
+      aria-valuenow={props.percentage}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Progress: ${props.percentage}%`}
+    >
       <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" strokeWidth="8" fill="transparent" stroke="#F3F5F9" />
         <circle
