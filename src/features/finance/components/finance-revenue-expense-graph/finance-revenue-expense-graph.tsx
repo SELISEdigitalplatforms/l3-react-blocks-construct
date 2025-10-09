@@ -11,46 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
-import { TooltipContent } from './finance-revenue-expense-graph-tooltip';
-
-interface DataPoint {
-  month: string;
-  revenue: number;
-  expenses: number;
-}
-
-const chartData: DataPoint[] = [
-  { month: 'Jan', revenue: 25000, expenses: 9000 },
-  { month: 'Feb', revenue: 82000, expenses: 23000 },
-  { month: 'Mar', revenue: 41000, expenses: 15000 },
-  { month: 'Apr', revenue: 74000, expenses: 20000 },
-  { month: 'May', revenue: 90000, expenses: 26000 },
-  { month: 'Jun', revenue: 76000, expenses: 21000 },
-  { month: 'Jul', revenue: 28000, expenses: 10000 },
-  { month: 'Aug', revenue: 12000, expenses: 5000 },
-  { month: 'Sep', revenue: 82000, expenses: 24000 },
-  { month: 'Oct', revenue: 41000, expenses: 15000 },
-  { month: 'Nov', revenue: 74000, expenses: 20000 },
-  { month: 'Dec', revenue: 90000, expenses: 26000 },
-];
-
-const chartConfig = {
-  revenue: {
-    label: 'REVENUE',
-    color: 'hsl(var(--secondary-600))',
-  },
-  expenses: {
-    label: 'EXPENSES',
-    color: 'hsl(var(--burgundy-100))',
-  },
-};
-
-const timePeriods = [
-  { value: 'this-year', label: 'THIS_YEAR' },
-  { value: 'last-year', label: 'LAST_YEAR' },
-  { value: 'last-6-months', label: 'LAST_SIX_MONTHS' },
-  { value: 'last-3-months', label: 'LAST_THREE_MONTHS' },
-];
+import { FinanceRevenueExpenseTooltipContent } from '../finance-revenue-expense-graph-tooltip/finance-revenue-expense-graph-tooltip';
+import { chartConfig, expenseChartData, timePeriods } from '../../services/finance-services';
 
 type ChartTooltipContentProps = {
   hoveredKey: keyof typeof chartConfig | null;
@@ -58,14 +20,14 @@ type ChartTooltipContentProps = {
 };
 
 const ChartTooltipContent = ({ hoveredKey, ...props }: ChartTooltipContentProps) => {
-  return <TooltipContent {...props} hoveredKey={hoveredKey} />;
+  return <FinanceRevenueExpenseTooltipContent {...props} hoveredKey={hoveredKey} />;
 };
 
 const ChartTooltipWrapper = ({ hoveredKey, ...props }: ChartTooltipContentProps) => {
   return <ChartTooltipContent {...props} hoveredKey={hoveredKey} />;
 };
 
-export default function FinanceRevenueExpenseGraph() {
+export const FinanceRevenueExpenseGraph = () => {
   const [hoveredKey, setHoveredKey] = React.useState<keyof typeof chartConfig | null>(null);
   const { t } = useTranslation();
 
@@ -100,7 +62,7 @@ export default function FinanceRevenueExpenseGraph() {
 
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[400px] w-full">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+          <BarChart data={expenseChartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
             <CartesianGrid
               vertical={false}
               strokeDasharray="3 3"
@@ -171,4 +133,4 @@ export default function FinanceRevenueExpenseGraph() {
       </CardContent>
     </Card>
   );
-}
+};

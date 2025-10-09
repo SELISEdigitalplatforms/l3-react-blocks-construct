@@ -1,100 +1,20 @@
 import { useTranslation } from 'react-i18next';
 import { Eye, Download } from 'lucide-react';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Invoice, STATUS_COLORS, TABLE_HEADERS } from '../../types/finance.type';
+import { invoices } from '../../services/finance-services';
 
-const INVOICE_AMOUNT = 'CHF 12,500.00';
-const PAYMENT_METHODS = {
-  BANK_TRANSFER: 'Bank Transfer',
-  PAYPAL: 'PayPal',
-  CREDIT_CARD: 'Credit Card',
-} as const;
-
-const INVOICE_STATUS = {
-  OVERDUE: 'Overdue',
-  UNPAID: 'Unpaid',
-  PAID: 'Paid',
-} as const;
-
-const TABLE_HEADERS = [
-  'INVOICES_ID',
-  'CUSTOMER',
-  'ISSUE_DATE',
-  'DUE_DATE',
-  'AMOUNT',
-  'STATUS',
-  'PAYMENT_METHOD',
-  'ACTION',
-] as const;
-
-// Status color mapping
-const STATUS_COLORS = {
-  [INVOICE_STATUS.OVERDUE]: 'text-error font-semibold',
-  [INVOICE_STATUS.UNPAID]: 'text-warning font-semibold',
-  [INVOICE_STATUS.PAID]: 'text-success font-semibold',
-} as const;
-
-interface Invoice {
-  id: string;
-  customer: string;
-  issueDate: string;
-  dueDate: string;
-  amount: string;
-  status: keyof typeof STATUS_COLORS;
-  paymentMethod: string;
-}
-
-export default function FinanceInvoices() {
+export const FinanceInvoices = () => {
   const { t } = useTranslation();
-
-  const invoices: Invoice[] = [
-    {
-      id: 'INV-1005',
-      customer: 'Acme Corp',
-      issueDate: '15/02/2025',
-      dueDate: '15/03/2025',
-      amount: INVOICE_AMOUNT,
-      status: INVOICE_STATUS.OVERDUE,
-      paymentMethod: PAYMENT_METHODS.BANK_TRANSFER,
-    },
-    {
-      id: 'INV-1004',
-      customer: 'Beta Industries',
-      issueDate: '20/01/2025',
-      dueDate: '20/02/2025',
-      amount: INVOICE_AMOUNT,
-      status: INVOICE_STATUS.UNPAID,
-      paymentMethod: PAYMENT_METHODS.BANK_TRANSFER,
-    },
-    {
-      id: 'INV-1003',
-      customer: 'Global Solutions',
-      issueDate: '01/03/2025',
-      dueDate: '20/01/2025',
-      amount: INVOICE_AMOUNT,
-      status: INVOICE_STATUS.PAID,
-      paymentMethod: PAYMENT_METHODS.PAYPAL,
-    },
-    {
-      id: 'INV-1002',
-      customer: 'Tech Innovators',
-      issueDate: '05/02/2025',
-      dueDate: '05/02/2025',
-      amount: INVOICE_AMOUNT,
-      status: INVOICE_STATUS.PAID,
-      paymentMethod: PAYMENT_METHODS.CREDIT_CARD,
-    },
-    {
-      id: 'INV-1001',
-      customer: 'DesignWorks',
-      issueDate: '10/02/2025',
-      dueDate: '10/02/2025',
-      amount: INVOICE_AMOUNT,
-      status: INVOICE_STATUS.PAID,
-      paymentMethod: PAYMENT_METHODS.BANK_TRANSFER,
-    },
-  ];
 
   const getStatusColor = (status: keyof typeof STATUS_COLORS): string => {
     return STATUS_COLORS[status] || '';
@@ -149,4 +69,4 @@ export default function FinanceInvoices() {
       </CardContent>
     </Card>
   );
-}
+};
