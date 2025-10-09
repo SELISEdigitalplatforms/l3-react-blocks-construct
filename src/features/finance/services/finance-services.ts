@@ -1,8 +1,10 @@
+import { ChartNoAxesCombined, CreditCard, FileText, TrendingUp, Wallet } from 'lucide-react';
 import {
   DataPoint,
   Invoice,
   INVOICE_AMOUNT,
   INVOICE_STATUS,
+  MetricData,
   PAYMENT_METHODS,
 } from '../types/finance.type';
 
@@ -138,3 +140,51 @@ export const chartConfig = {
     color: 'hsl(var(--burgundy-100))',
   },
 };
+
+export const metricsData: MetricData[] = [
+  {
+    titleKey: 'NET_PROFIT',
+    amount: '44,450.00',
+    icon: ChartNoAxesCombined,
+    iconColor: 'text-primary',
+    trend: {
+      icon: TrendingUp,
+      value: '+8%',
+      color: 'text-success',
+      textKey: 'FROM_LAST_MONTH',
+    },
+  },
+  {
+    titleKey: 'TOTAL_REVENUE',
+    amount: '142,300.00',
+    icon: Wallet,
+    iconColor: 'text-secondary',
+    iconBg: 'bg-surface rounded-[4px]',
+    trend: {
+      icon: TrendingUp,
+      value: '+10.2%',
+      color: 'text-success',
+      textKey: 'FROM_LAST_MONTH',
+    },
+  },
+  {
+    titleKey: 'TOTAL_EXPENSES',
+    amount: '97,850.00',
+    icon: CreditCard,
+    iconColor: 'text-rose-500',
+    iconBg: 'bg-surface rounded-[4px]',
+    trend: {
+      icon: TrendingUp,
+      value: '+2.5%',
+      color: 'text-error',
+      textKey: 'FROM_LAST_MONTH',
+    },
+  },
+  {
+    titleKey: 'OUTSTANDING_INVOICES',
+    amount: '11,200.00',
+    icon: FileText,
+    iconColor: 'text-purple-500',
+    iconBg: 'bg-surface rounded-[4px]',
+  },
+];

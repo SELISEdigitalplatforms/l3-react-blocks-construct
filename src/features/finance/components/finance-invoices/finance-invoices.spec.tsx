@@ -116,209 +116,201 @@ vi.mock('../../types/finance.type', () => ({
   ],
 }));
 
+// Helper functions to reduce duplication
+const renderComponent = () => render(<FinanceInvoices />);
+
+const expectElementWithClasses = (testId: string, classes: string[]) => {
+  const element = screen.getByTestId(testId);
+  expect(element).toBeInTheDocument();
+  expect(element).toHaveClass(...classes);
+  return element;
+};
+
+const expectTextElements = (texts: string[]) => {
+  texts.forEach((text) => {
+    expect(screen.getByText(text)).toBeInTheDocument();
+  });
+};
+
+const expectTableStructure = (elements: string[]) => {
+  elements.forEach((element) => {
+    expect(screen.getByTestId(element)).toBeInTheDocument();
+  });
+};
+
+const expectIconsWithClasses = (testId: string, expectedCount: number, classes: string[]) => {
+  const icons = screen.getAllByTestId(testId);
+  expect(icons).toHaveLength(expectedCount);
+  icons.forEach((icon) => {
+    expect(icon).toHaveClass(...classes);
+  });
+};
+
+const expectElementsWithClasses = (testId: string, classes: string[]) => {
+  const elements = screen.getAllByTestId(testId);
+  elements.forEach((element) => {
+    expect(element).toHaveClass(...classes);
+  });
+};
+
+// Test data constants
+const MOCK_INVOICE_DATA = {
+  ids: ['INV-1001', 'INV-1002', 'INV-1003'],
+  customers: ['Test Customer 1', 'Test Customer 2', 'Test Customer 3'],
+  amounts: ['CHF 1,000.00', 'CHF 2,000.00', 'CHF 3,000.00'],
+  dates: ['01/01/2025', '01/02/2025', '02/01/2025'],
+  paymentMethods: ['Bank Transfer', 'PayPal', 'Credit Card'],
+  statuses: ['Paid', 'Unpaid', 'Overdue'],
+};
+
+const TABLE_HEADERS = [
+  'INVOICES_ID',
+  'CUSTOMER',
+  'ISSUE_DATE',
+  'DUE_DATE',
+  'AMOUNT',
+  'STATUS',
+  'PAYMENT_METHOD',
+  'ACTION',
+];
+
+const TRANSLATION_KEYS = ['INVOICES', 'VIEW_ALL', ...TABLE_HEADERS];
+
 describe('FinanceInvoices Component', () => {
-  it('should render without crashing', () => {
-    render(<FinanceInvoices />);
-    expect(screen.getByTestId('card')).toBeInTheDocument();
-  });
+  describe('Basic Rendering', () => {
+    it('should render without crashing', () => {
+      renderComponent();
+      expect(screen.getByTestId('card')).toBeInTheDocument();
+    });
 
-  it('should render the card with correct structure', () => {
-    render(<FinanceInvoices />);
-
-    const card = screen.getByTestId('card');
-    expect(card).toHaveClass('w-full', 'border-none', 'rounded-[8px]', 'shadow-sm');
-
-    expect(screen.getByTestId('card-header')).toBeInTheDocument();
-    expect(screen.getByTestId('card-content')).toBeInTheDocument();
-  });
-
-  it('should render the title and view all button', () => {
-    render(<FinanceInvoices />);
-
-    const title = screen.getByTestId('card-title');
-    expect(title).toBeInTheDocument();
-    expect(title).toHaveClass('text-xl', 'text-high-emphasis');
-    expect(title).toHaveTextContent('INVOICES');
-
-    const viewAllButton = screen.getByTestId('view-all-button');
-    expect(viewAllButton).toBeInTheDocument();
-    expect(viewAllButton).toHaveClass('text-primary', 'font-bold', 'text-sm', 'border');
-    expect(viewAllButton).toHaveTextContent('VIEW_ALL');
-  });
-
-  it('should render table with correct structure', () => {
-    render(<FinanceInvoices />);
-
-    expect(screen.getByTestId('table')).toBeInTheDocument();
-    expect(screen.getByTestId('table-header')).toBeInTheDocument();
-    expect(screen.getByTestId('table-body')).toBeInTheDocument();
-  });
-
-  it('should render all table headers', () => {
-    render(<FinanceInvoices />);
-
-    const expectedHeaders = [
-      'INVOICES_ID',
-      'CUSTOMER',
-      'ISSUE_DATE',
-      'DUE_DATE',
-      'AMOUNT',
-      'STATUS',
-      'PAYMENT_METHOD',
-      'ACTION',
-    ];
-
-    expectedHeaders.forEach((header) => {
-      expect(screen.getByText(header)).toBeInTheDocument();
+    it('should render the card with correct structure', () => {
+      renderComponent();
+      expectElementWithClasses('card', ['w-full', 'border-none', 'rounded-[8px]', 'shadow-sm']);
+      expectTableStructure(['card-header', 'card-content']);
     });
   });
 
-  it('should render table headers with correct styling', () => {
-    render(<FinanceInvoices />);
+  describe('Header Section', () => {
+    it('should render the title and view all button', () => {
+      renderComponent();
 
-    const tableHeads = screen.getAllByTestId('table-head');
-    tableHeads.forEach((head) => {
-      expect(head).toHaveClass('text-high-emphasis', 'font-semibold');
-    });
-  });
+      const title = expectElementWithClasses('card-title', ['text-xl', 'text-high-emphasis']);
+      expect(title).toHaveTextContent('INVOICES');
 
-  it('should render invoice data rows', () => {
-    render(<FinanceInvoices />);
-
-    // Check for invoice IDs
-    expect(screen.getByText('INV-1001')).toBeInTheDocument();
-    expect(screen.getByText('INV-1002')).toBeInTheDocument();
-    expect(screen.getByText('INV-1003')).toBeInTheDocument();
-
-    // Check for customer names
-    expect(screen.getByText('Test Customer 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Customer 2')).toBeInTheDocument();
-    expect(screen.getByText('Test Customer 3')).toBeInTheDocument();
-  });
-
-  it('should render invoice amounts and dates', () => {
-    render(<FinanceInvoices />);
-
-    // Check amounts
-    expect(screen.getByText('CHF 1,000.00')).toBeInTheDocument();
-    expect(screen.getByText('CHF 2,000.00')).toBeInTheDocument();
-    expect(screen.getByText('CHF 3,000.00')).toBeInTheDocument();
-
-    // Check dates
-    expect(screen.getByText('01/01/2025')).toBeInTheDocument();
-    expect(screen.getByText('01/02/2025')).toBeInTheDocument();
-    expect(screen.getByText('02/01/2025')).toBeInTheDocument();
-  });
-
-  it('should render payment methods', () => {
-    render(<FinanceInvoices />);
-
-    expect(screen.getByText('Bank Transfer')).toBeInTheDocument();
-    expect(screen.getByText('PayPal')).toBeInTheDocument();
-    expect(screen.getByText('Credit Card')).toBeInTheDocument();
-  });
-
-  it('should render status with correct styling', () => {
-    render(<FinanceInvoices />);
-
-    const paidStatus = screen.getByText('Paid');
-    const unpaidStatus = screen.getByText('Unpaid');
-    const overdueStatus = screen.getByText('Overdue');
-
-    expect(paidStatus).toBeInTheDocument();
-    expect(unpaidStatus).toBeInTheDocument();
-    expect(overdueStatus).toBeInTheDocument();
-  });
-
-  it('should render action icons for each row', () => {
-    render(<FinanceInvoices />);
-
-    const eyeIcons = screen.getAllByTestId('eye-icon');
-    const downloadIcons = screen.getAllByTestId('download-icon');
-
-    // Should have 3 of each icon (one per invoice row)
-    expect(eyeIcons).toHaveLength(3);
-    expect(downloadIcons).toHaveLength(3);
-
-    // Check icon styling
-    eyeIcons.forEach((icon) => {
-      expect(icon).toHaveClass('text-primary', 'h-5', 'w-5');
+      const button = expectElementWithClasses('view-all-button', [
+        'text-primary',
+        'font-bold',
+        'text-sm',
+        'border',
+      ]);
+      expect(button).toHaveTextContent('VIEW_ALL');
     });
 
-    downloadIcons.forEach((icon) => {
-      expect(icon).toHaveClass('text-primary', 'h-5', 'w-5');
-    });
-  });
-
-  it('should render correct number of table rows', () => {
-    render(<FinanceInvoices />);
-
-    const tableRows = screen.getAllByTestId('table-row');
-    // 1 header row + 3 data rows = 4 total rows
-    expect(tableRows).toHaveLength(4);
-  });
-
-  describe('Status Color Functionality', () => {
-    it('should apply correct status colors', () => {
-      render(<FinanceInvoices />);
-
-      // Note: In a real test, you'd check the actual className applied to the status cells
-      // This is limited by our mock implementation
-      expect(screen.getByText('Paid')).toBeInTheDocument();
-      expect(screen.getByText('Unpaid')).toBeInTheDocument();
-      expect(screen.getByText('Overdue')).toBeInTheDocument();
-    });
-  });
-
-  describe('Translation Integration', () => {
-    it('should use translation keys correctly', () => {
-      render(<FinanceInvoices />);
-
-      // Check that translation keys are used (mocked to return the key itself)
-      expect(screen.getByText('INVOICES')).toBeInTheDocument();
-      expect(screen.getByText('VIEW_ALL')).toBeInTheDocument();
-
-      // Check table headers
-      expect(screen.getByText('INVOICES_ID')).toBeInTheDocument();
-      expect(screen.getByText('CUSTOMER')).toBeInTheDocument();
-      expect(screen.getByText('ISSUE_DATE')).toBeInTheDocument();
-      expect(screen.getByText('DUE_DATE')).toBeInTheDocument();
-      expect(screen.getByText('AMOUNT')).toBeInTheDocument();
-      expect(screen.getByText('STATUS')).toBeInTheDocument();
-      expect(screen.getByText('PAYMENT_METHOD')).toBeInTheDocument();
-      expect(screen.getByText('ACTION')).toBeInTheDocument();
-    });
-  });
-
-  describe('Component Structure', () => {
     it('should have proper header layout', () => {
-      render(<FinanceInvoices />);
-
+      renderComponent();
       const cardHeader = screen.getByTestId('card-header');
-      expect(cardHeader).toBeInTheDocument();
-
-      // Check that title and button are in the header
       const title = screen.getByTestId('card-title');
       const button = screen.getByTestId('view-all-button');
 
       expect(cardHeader).toContain(title);
       expect(cardHeader).toContain(button);
     });
+  });
+
+  describe('Table Structure', () => {
+    it('should render table with correct structure', () => {
+      renderComponent();
+      expectTableStructure(['table', 'table-header', 'table-body']);
+    });
+
+    it('should render all table headers', () => {
+      renderComponent();
+      expectTextElements(TABLE_HEADERS);
+    });
+
+    it('should render table headers with correct styling', () => {
+      renderComponent();
+      expectElementsWithClasses('table-head', ['text-high-emphasis', 'font-semibold']);
+    });
+
+    it('should render correct number of table rows', () => {
+      renderComponent();
+      const tableRows = screen.getAllByTestId('table-row');
+      expect(tableRows).toHaveLength(4); // 1 header + 3 data rows
+    });
 
     it('should have table inside card content', () => {
-      render(<FinanceInvoices />);
-
+      renderComponent();
       const cardContent = screen.getByTestId('card-content');
       const table = screen.getByTestId('table');
-
       expect(cardContent).toContain(table);
+    });
+  });
+
+  describe('Data Rendering', () => {
+    it('should render invoice data rows', () => {
+      renderComponent();
+      expectTextElements([...MOCK_INVOICE_DATA.ids, ...MOCK_INVOICE_DATA.customers]);
+    });
+
+    it('should render invoice amounts and dates', () => {
+      renderComponent();
+      expectTextElements([...MOCK_INVOICE_DATA.amounts, ...MOCK_INVOICE_DATA.dates]);
+    });
+
+    it('should render payment methods', () => {
+      renderComponent();
+      expectTextElements(MOCK_INVOICE_DATA.paymentMethods);
+    });
+
+    it('should render status with correct styling', () => {
+      renderComponent();
+      expectTextElements(MOCK_INVOICE_DATA.statuses);
+    });
+
+    it('should render all invoice fields correctly', () => {
+      renderComponent();
+      const invoiceData = [
+        { id: 'INV-1001', customer: 'Test Customer 1', amount: 'CHF 1,000.00' },
+        { id: 'INV-1002', customer: 'Test Customer 2', amount: 'CHF 2,000.00' },
+        { id: 'INV-1003', customer: 'Test Customer 3', amount: 'CHF 3,000.00' },
+      ];
+
+      invoiceData.forEach((invoice) => {
+        expectTextElements([invoice.id, invoice.customer, invoice.amount]);
+      });
+    });
+  });
+
+  describe('Action Icons', () => {
+    it('should render action icons for each row', () => {
+      renderComponent();
+      expectIconsWithClasses('eye-icon', 3, ['text-primary', 'h-5', 'w-5']);
+      expectIconsWithClasses('download-icon', 3, ['text-primary', 'h-5', 'w-5']);
+    });
+
+    it('should render action icons in correct container', () => {
+      renderComponent();
+      const tableCells = screen.getAllByTestId('table-cell');
+      const actionCells = tableCells.filter(
+        (cell) =>
+          cell.querySelector('[data-testid="eye-icon"]') ||
+          cell.querySelector('[data-testid="download-icon"]')
+      );
+      expect(actionCells.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Translation Integration', () => {
+    it('should use translation keys correctly', () => {
+      renderComponent();
+      expectTextElements(TRANSLATION_KEYS);
     });
   });
 
   describe('Accessibility', () => {
     it('should have proper table structure', () => {
-      render(<FinanceInvoices />);
-
+      renderComponent();
       const table = screen.getByTestId('table');
       const tableHeader = screen.getByTestId('table-header');
       const tableBody = screen.getByTestId('table-body');
@@ -329,9 +321,7 @@ describe('FinanceInvoices Component', () => {
     });
 
     it('should have accessible icon titles', () => {
-      render(<FinanceInvoices />);
-
-      // Icons should have titles for accessibility (from our mock)
+      renderComponent();
       const eyeIcons = screen.getAllByTestId('eye-icon');
       const downloadIcons = screen.getAllByTestId('download-icon');
 
@@ -346,8 +336,7 @@ describe('FinanceInvoices Component', () => {
         // Mock implementation to suppress console errors during testing
       });
 
-      render(<FinanceInvoices />);
-
+      renderComponent();
       expect(consoleSpy).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -358,46 +347,8 @@ describe('FinanceInvoices Component', () => {
     });
 
     it('should handle empty invoice data gracefully', () => {
-      // This test would require mocking the invoices array as empty
-      // For now, we just ensure the component structure renders
-      render(<FinanceInvoices />);
-
-      expect(screen.getByTestId('table')).toBeInTheDocument();
-      expect(screen.getByTestId('table-header')).toBeInTheDocument();
-      expect(screen.getByTestId('table-body')).toBeInTheDocument();
-    });
-  });
-
-  describe('Data Rendering', () => {
-    it('should render all invoice fields correctly', () => {
-      render(<FinanceInvoices />);
-
-      // Test that all data fields from the mock are rendered
-      const invoiceData = [
-        { id: 'INV-1001', customer: 'Test Customer 1', amount: 'CHF 1,000.00' },
-        { id: 'INV-1002', customer: 'Test Customer 2', amount: 'CHF 2,000.00' },
-        { id: 'INV-1003', customer: 'Test Customer 3', amount: 'CHF 3,000.00' },
-      ];
-
-      invoiceData.forEach((invoice) => {
-        expect(screen.getByText(invoice.id)).toBeInTheDocument();
-        expect(screen.getByText(invoice.customer)).toBeInTheDocument();
-        expect(screen.getByText(invoice.amount)).toBeInTheDocument();
-      });
-    });
-
-    it('should render action icons in correct container', () => {
-      render(<FinanceInvoices />);
-
-      const tableCells = screen.getAllByTestId('table-cell');
-      const actionCells = tableCells.filter(
-        (cell) =>
-          cell.querySelector('[data-testid="eye-icon"]') ||
-          cell.querySelector('[data-testid="download-icon"]')
-      );
-
-      // Should have 3 action cells (one per invoice row)
-      expect(actionCells.length).toBeGreaterThan(0);
+      renderComponent();
+      expectTableStructure(['table', 'table-header', 'table-body']);
     });
   });
 });

@@ -43,3 +43,17 @@ export type DataPoint = {
   revenue: number;
   expenses: number;
 };
+
+export type MetricData = {
+  titleKey: string;
+  amount: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconColor: string;
+  iconBg?: string;
+  trend?: {
+    icon: React.ComponentType<{ className?: string }>;
+    value: string;
+    color: string;
+    textKey: string;
+  };
+};
