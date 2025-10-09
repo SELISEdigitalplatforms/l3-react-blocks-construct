@@ -33,7 +33,7 @@ import ActivityLogPage1 from './pages/activity-log-v1/activity-log';
 import { CalendarPage } from './pages/calendar/calendar';
 import ServiceUnavailable from './pages/error/service-unavailable/service-unavailable';
 import NotFound from './pages/error/not-found/not-found';
-import Finance from './pages/finance/finance';
+import { Finance } from '@/pages/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice, EditInvoice } from './features/invoices';
