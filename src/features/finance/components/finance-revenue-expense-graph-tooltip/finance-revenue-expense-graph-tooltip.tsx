@@ -1,23 +1,17 @@
 import { useTranslation } from 'react-i18next';
-import { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 import { TooltipProps } from 'recharts';
+import { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
+import { chartConfig } from '../../services/finance-services';
 
-const chartConfig = {
-  revenue: {
-    label: 'REVENUE',
-    color: 'hsl(var(--secondary-600))',
-  },
-  expenses: {
-    label: 'EXPENSES',
-    color: 'hsl(var(--burgundy-100))',
-  },
-};
-
-interface TooltipContentProps extends TooltipProps<ValueType, NameType> {
+interface FinanceRevenueExpenseTooltipContentProps extends TooltipProps<ValueType, NameType> {
   hoveredKey: keyof typeof chartConfig | null;
 }
 
-export const TooltipContent = ({ payload, label, hoveredKey }: TooltipContentProps) => {
+export const FinanceRevenueExpenseTooltipContent = ({
+  payload,
+  label,
+  hoveredKey,
+}: FinanceRevenueExpenseTooltipContentProps) => {
   const { t } = useTranslation();
 
   if (!payload || !hoveredKey) return null;

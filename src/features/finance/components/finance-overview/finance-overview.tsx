@@ -9,23 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { monthsOfYear } from '../../services/finance-services';
 
-const monthsOfYear = [
-  { value: 'january', label: 'JANUARY' },
-  { value: 'february', label: 'FEBRUARY' },
-  { value: 'march', label: 'MARCH' },
-  { value: 'april', label: 'APRIL' },
-  { value: 'may', label: 'MAY' },
-  { value: 'june', label: 'JUNE' },
-  { value: 'july', label: 'JULY' },
-  { value: 'august', label: 'AUGUST' },
-  { value: 'september', label: 'SEPTEMBER' },
-  { value: 'october', label: 'OCTOBER' },
-  { value: 'november', label: 'NOVEMBER' },
-  { value: 'december', label: 'DECEMBER' },
-];
-
-export default function FinanceOverview() {
+export const FinanceOverview = () => {
   const { t } = useTranslation();
 
   return (
@@ -117,4 +103,4 @@ export default function FinanceOverview() {
       </CardContent>
     </Card>
   );
-}
+};
