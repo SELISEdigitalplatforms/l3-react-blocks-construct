@@ -13,7 +13,7 @@ interface MenuSectionProps {
   onItemClick?: () => void;
 }
 
-export function MenuSection({
+export const MenuSection = ({
   title,
   items,
   showText,
@@ -21,7 +21,7 @@ export function MenuSection({
   isMobile,
   open,
   onItemClick,
-}: Readonly<MenuSectionProps>): React.JSX.Element {
+}: Readonly<MenuSectionProps>) => {
   return (
     <>
       {showText && (
@@ -48,4 +48,4 @@ export function MenuSection({
       ))}
     </>
   );
-}
+};

@@ -6,10 +6,10 @@ interface DashboardUserActivityGraphTooltipProps {
   label: string;
 }
 
-export function DashboardUserActivityGraphTooltip({
+export const DashboardUserActivityGraphTooltip = ({
   payload,
   label,
-}: Readonly<DashboardUserActivityGraphTooltipProps>) {
+}: Readonly<DashboardUserActivityGraphTooltipProps>) => {
   const { t } = useTranslation();
   const data = payload?.[0]?.value;
 
@@ -23,4 +23,4 @@ export function DashboardUserActivityGraphTooltip({
       </p>
     </div>
   );
-}
+};

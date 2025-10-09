@@ -47,7 +47,7 @@ import { useFilteredMenu } from '@/hooks/use-filtered-menu';
  * </SidebarProvider>
  */
 
-export function AppSidebar(): React.JSX.Element | null {
+export const AppSidebar = () => {
   const { theme } = useTheme();
   const { pathname } = useLocation();
   const { t } = useTranslation();
@@ -108,4 +108,4 @@ export function AppSidebar(): React.JSX.Element | null {
       </SidebarContent>
     </Sidebar>
   );
-}
+};

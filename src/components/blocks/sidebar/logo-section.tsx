@@ -12,12 +12,7 @@ interface LogoSectionProps {
   onClose: () => void;
 }
 
-export function LogoSection({
-  theme,
-  open,
-  isMobile,
-  onClose,
-}: Readonly<LogoSectionProps>): React.JSX.Element {
+export const LogoSection = ({ theme, open, isMobile, onClose }: Readonly<LogoSectionProps>) => {
   return (
     <div className="relative h-10 w-full">
       <img
@@ -47,4 +42,4 @@ export function LogoSection({
       )}
     </div>
   );
-}
+};

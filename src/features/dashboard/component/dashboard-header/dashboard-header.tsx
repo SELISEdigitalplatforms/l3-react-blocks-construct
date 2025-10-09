@@ -2,7 +2,7 @@ import { Download, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
-export function DashboardHeader(): React.JSX.Element {
+export const DashboardHeader = () => {
   const { t } = useTranslation();
 
   return (
@@ -19,10 +19,7 @@ export function DashboardHeader(): React.JSX.Element {
             {t('SYNC')}
           </span>
         </Button>
-        <Button 
-          className="font-bold"
-          aria-label={t('EXPORT_DASHBOARD_DATA')}
-        >
+        <Button className="font-bold" aria-label={t('EXPORT_DASHBOARD_DATA')}>
           <Download className="w-2.5 h-2.5" />
           <span className="text-sm font-bold sr-only sm:not-sr-only sm:whitespace-nowrap">
             {t('EXPORT')}
@@ -31,4 +28,4 @@ export function DashboardHeader(): React.JSX.Element {
       </div>
     </div>
   );
-}
+};
