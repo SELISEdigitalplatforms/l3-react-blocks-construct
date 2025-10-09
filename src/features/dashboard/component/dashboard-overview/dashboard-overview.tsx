@@ -15,16 +15,8 @@ import { DashboardMetricCard } from '../dashboard-metric-card/dashboard-metric-c
  * DashboardOverview component displays a high-level overview of key user statistics.
  * It shows the total number of users, total active users, and new sign-ups, along with trends compared to the previous month.
  * The data can be filtered by month using the dropdown selector.
- *
- * @component
- * @example
- * return (
- *   <DashboardOverview />
- * )
- *
- * @returns {JSX.Element} - The rendered JSX component displaying key user statistics with trend information and a month selector.
  */
-export const DashboardOverview = (): React.JSX.Element => {
+export const DashboardOverview = () => {
   const { t } = useTranslation();
 
   return (
@@ -50,11 +42,7 @@ export const DashboardOverview = (): React.JSX.Element => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          role="region"
-          aria-label={t('METRICS_OVERVIEW')}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {metricsConfigData.map((metric) => (
             <DashboardMetricCard
               key={metric.id}

@@ -10,7 +10,6 @@ import { AuthLayout } from './pages/auth/auth-layout';
 import { SigninPage } from '@/pages/auth/signin/signin-page';
 import { SignupPage } from '@/pages/auth/signup/signup-page';
 import { EmailVerification } from '@/pages/auth/email-verification/email-verification';
-import { Dashboard } from '@/pages/dashboard/dashboard';
 import { SetPasswordPage } from './pages/auth/set-password/set-password';
 import { ActivationSuccess } from './pages/auth/activation-success/activation-success';
 import { VerificationFailed } from './pages/auth/verification-failed/verification-failed';
@@ -42,6 +41,7 @@ import SharedWithMe from '@/pages/file-manager/shared-files';
 import Trash from '@/pages/file-manager/trash';
 import { ChatPage } from './pages/chat/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
+import { Dashboard } from '@/pages/dashboard';
 
 const queryClient = new QueryClient();
 

@@ -9,7 +9,9 @@ interface DashboardUserPlatformTooltipProps {
   };
 }
 
-export const DashboardUserPlatformTooltip = ({ data }: DashboardUserPlatformTooltipProps) => {
+export const DashboardUserPlatformTooltip = ({
+  data,
+}: Readonly<DashboardUserPlatformTooltipProps>) => {
   const { t } = useTranslation();
 
   return (

@@ -22,17 +22,9 @@ const TooltipContent = (props: TooltipProps<ValueType, NameType>) => {
 /**
  * DashboardUserActivityGraph component displays a bar chart visualizing user activity trends.
  * It allows users to filter the chart data by week or specific days of the week.
- *
- * @component
- * @example
- * return (
- *   <DashboardUserActivityGraph />
- * )
- *
- * @returns {JSX.Element} - The rendered JSX component showing user activity trends over time with a selectable time period.
  */
 
-export const DashboardUserActivityGraph = (): React.JSX.Element => {
+export const DashboardUserActivityGraph = () => {
   const { t } = useTranslation();
 
   return (
@@ -58,12 +50,7 @@ export const DashboardUserActivityGraph = (): React.JSX.Element => {
         <CardDescription>{t('TRACK_ENGAGEMENT_PATTERN')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer 
-          config={chartConfig} 
-          className="min-h-[200px] w-full"
-          role="img"
-          aria-label={t('USER_ACTIVITY_TRENDS_CHART')}
-        >
+        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
           <BarChart
             accessibilityLayer
             data={chartData.map((item) => ({

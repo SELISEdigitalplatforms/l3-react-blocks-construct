@@ -2,17 +2,7 @@ import { TrendingUp } from 'lucide-react';
 
 /**
  * MetricCard component displays a single metric with its value, trend, and icon.
- *
- * @param {Object} props - The component props
- * @param {string} props.title - The metric title
- * @param {string|number} props.value - The metric value
- * @param {string} props.trend - The trend percentage
- * @param {string} props.trendLabel - The trend label text
- * @param {React.ComponentType} props.icon - The icon component
- * @param {string} props.iconColor - The icon color class
- * @param {string} props.bgColor - The background color class for icon container
- * @returns {JSX.Element} - The rendered metric card
- */
+ **/
 
 interface MetricCardProps {
   title: string;
@@ -24,7 +14,7 @@ interface MetricCardProps {
   bgColor: string;
 }
 
-export function DashboardMetricCard({
+export const DashboardMetricCard = ({
   title,
   value,
   trend,
@@ -32,14 +22,9 @@ export function DashboardMetricCard({
   icon: Icon,
   iconColor,
   bgColor,
-}: Readonly<MetricCardProps>): React.JSX.Element {
+}: Readonly<MetricCardProps>) => {
   return (
-    <div 
-      className="flex justify-between hover:bg-primary-50 hover:rounded-[4px] cursor-pointer p-2"
-      role="button"
-      tabIndex={0}
-      aria-label={`${title}: ${value}, ${trend} ${trendLabel}`}
-    >
+    <div className="flex justify-between hover:bg-primary-50 hover:rounded-[4px] cursor-pointer p-2">
       <div>
         <h3 className="text-sm font-normal text-high-emphasis">{title}</h3>
         <h1 className="text-[32px] font-semibold text-high-emphasis">{value}</h1>
@@ -54,4 +39,4 @@ export function DashboardMetricCard({
       </div>
     </div>
   );
-}
+};

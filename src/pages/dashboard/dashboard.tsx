@@ -8,15 +8,21 @@ import {
 } from '@/features/dashboard';
 import { useGetAccount } from '@/features/profile/hooks/use-account';
 
-export function Dashboard(): React.JSX.Element {
+const DashboardLoader = () => {
+  return (
+    <div className="flex items-center justify-center h-full w-full">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  );
+};
+
+export const Dashboard = () => {
   const { isLoading } = useGetAccount();
 
   return (
     <>
       {isLoading ? (
-        <div className="flex items-center justify-center h-full w-full">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
+        <DashboardLoader />
       ) : (
         <main className="flex w-full flex-col" role="main" aria-label="Dashboard Content">
           <DashboardHeader />
@@ -32,4 +38,4 @@ export function Dashboard(): React.JSX.Element {
       )}
     </>
   );
-}
+};

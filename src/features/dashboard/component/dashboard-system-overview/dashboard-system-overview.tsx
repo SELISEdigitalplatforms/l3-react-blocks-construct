@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { statsData } from '../../services/dashboard-service';
+import { statsData, daysOfWeek } from '../../services/dashboard-service';
 import { useTranslation } from 'react-i18next';
 import { DashboardSystemOverviewStatisticItem } from '../dashboard-system-overview-statistic-item/dashboard-system-overview-statistic-item';
 import {
@@ -10,21 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { daysOfWeek } from '../../services/dashboard-service';
 
 /**
  * DashboardSystemOverview component displays an overview of system usage with key statistics.
  * It includes a selector to filter by day and shows circular progress indicators for various system stats.
- *
- * @component
- * @example
- * return (
- *   <DashboardSystemOverview />
- * )
- *
- * @returns {JSX.Element} - The rendered JSX component showing system usage statistics with circular progress indicators and a day selector.
  */
-export const DashboardSystemOverview = (): React.JSX.Element => {
+export const DashboardSystemOverview = () => {
   const { t } = useTranslation();
 
   return (
@@ -50,11 +41,7 @@ export const DashboardSystemOverview = (): React.JSX.Element => {
         <CardDescription />
       </CardHeader>
       <CardContent>
-        <div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          role="region"
-          aria-label={t('SYSTEM_STATISTICS_OVERVIEW')}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {statsData.map((stat) => (
             <DashboardSystemOverviewStatisticItem key={stat.title} stat={stat} t={t} />
           ))}
