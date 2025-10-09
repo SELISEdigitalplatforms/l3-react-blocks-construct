@@ -4,3 +4,4 @@ export { FinanceProfitOverviewGraph } from './components/finance-profit-overview
 export { FinanceRevenueExpenseGraph } from './components/finance-revenue-expense-graph/finance-revenue-expense-graph';
 export { FinanceRevenueExpenseTooltipContent } from './components/finance-revenue-expense-graph-tooltip/finance-revenue-expense-graph-tooltip';
 export { FinanceDashboardHeader } from './components/finance-dashboard-header/finance-dashboard-header';
+export { FinanceOverviewMetricCard } from './components/finance-overview-metric-card/finance-overview-metric-card';

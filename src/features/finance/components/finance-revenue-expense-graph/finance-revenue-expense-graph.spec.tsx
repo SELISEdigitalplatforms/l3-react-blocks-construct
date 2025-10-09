@@ -70,14 +70,8 @@ vi.mock('../finance-revenue-expense-graph-tooltip/finance-revenue-expense-graph-
 // Mock finance services
 vi.mock('../../services/finance-services', () => ({
   chartConfig: {
-    revenue: {
-      label: 'REVENUE',
-      color: 'hsl(var(--secondary-600))',
-    },
-    expenses: {
-      label: 'EXPENSES',
-      color: 'hsl(var(--burgundy-100))',
-    },
+    revenue: { label: 'REVENUE', color: 'hsl(var(--secondary-600))' },
+    expenses: { label: 'EXPENSES', color: 'hsl(var(--burgundy-100))' },
   },
   expenseChartData: [
     { month: 'Jan', revenue: 25000, expenses: 9000 },
@@ -91,94 +85,113 @@ vi.mock('../../services/finance-services', () => ({
   ],
 }));
 
+// Helper functions to reduce duplication
+const renderComponent = () => render(<FinanceRevenueExpenseGraph />);
+
+const expectElementWithClasses = (testId: string, classes: string[]) => {
+  const element = screen.getByTestId(testId);
+  expect(element).toBeInTheDocument();
+  expect(element).toHaveClass(...classes);
+  return element;
+};
+
+const expectChartComponents = (components: string[]) => {
+  components.forEach((component) => {
+    expect(screen.getByTestId(component)).toBeInTheDocument();
+  });
+};
+
+const expectSelectItems = (expectedCount: number, values: string[]) => {
+  const items = screen.getAllByTestId('select-item');
+  expect(items).toHaveLength(expectedCount);
+  values.forEach((value, index) => {
+    expect(items[index]).toHaveAttribute('data-value', value);
+  });
+};
+
+const expectBarsWithAttributes = (
+  expectedCount: number,
+  barData: Array<{ key: string; name: string }>
+) => {
+  const bars = screen.getAllByTestId('bar');
+  expect(bars).toHaveLength(expectedCount);
+  barData.forEach((data, index) => {
+    expect(bars[index]).toHaveAttribute('data-key', data.key);
+    expect(bars[index]).toHaveAttribute('data-name', data.name);
+  });
+};
+
 describe('FinanceRevenueExpenseGraph Component', () => {
   it('should render without crashing', () => {
-    render(<FinanceRevenueExpenseGraph />);
+    renderComponent();
     expect(screen.getByTestId('card')).toBeInTheDocument();
   });
 
   it('should render the card with correct structure', () => {
-    render(<FinanceRevenueExpenseGraph />);
-
-    const card = screen.getByTestId('card');
-    expect(card).toHaveClass('w-full', 'border-none', 'rounded-[8px]', 'shadow-sm');
-
+    renderComponent();
+    expectElementWithClasses('card', ['w-full', 'border-none', 'rounded-[8px]', 'shadow-sm']);
     expect(screen.getByTestId('card-header')).toBeInTheDocument();
     expect(screen.getByTestId('card-content')).toBeInTheDocument();
   });
 
   it('should render the title and time period selector', () => {
-    render(<FinanceRevenueExpenseGraph />);
+    renderComponent();
 
-    const title = screen.getByTestId('card-title');
-    expect(title).toBeInTheDocument();
-    expect(title).toHaveClass('text-2xl', 'font-semibold', 'text-high-emphasis');
+    const title = expectElementWithClasses('card-title', [
+      'text-2xl',
+      'font-semibold',
+      'text-high-emphasis',
+    ]);
     expect(title).toHaveTextContent('REVENUE_EXPENSE_TREND');
 
     const description = screen.getByTestId('card-description');
     expect(description).toBeInTheDocument();
     expect(description).toHaveTextContent('COMPARE_TOTAL_REVENUE_EXPENSES_ACROSS');
 
-    const selectTrigger = screen.getByTestId('select-trigger');
-    expect(selectTrigger).toBeInTheDocument();
-    expect(selectTrigger).toHaveClass('w-[105px]', 'h-[28px]', 'px-2', 'py-1');
+    expectElementWithClasses('select-trigger', ['w-[105px]', 'h-[28px]', 'px-2', 'py-1']);
   });
 
   it('should render chart components correctly', () => {
-    render(<FinanceRevenueExpenseGraph />);
-
-    expect(screen.getByTestId('chart-container')).toBeInTheDocument();
-    expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
-    expect(screen.getByTestId('cartesian-grid')).toBeInTheDocument();
-    expect(screen.getByTestId('x-axis')).toBeInTheDocument();
-    expect(screen.getByTestId('y-axis')).toBeInTheDocument();
-    expect(screen.getByTestId('chart-tooltip')).toBeInTheDocument();
+    renderComponent();
+    expectChartComponents([
+      'chart-container',
+      'bar-chart',
+      'cartesian-grid',
+      'x-axis',
+      'y-axis',
+      'chart-tooltip',
+    ]);
   });
 
   it('should render both revenue and expense bars', () => {
-    render(<FinanceRevenueExpenseGraph />);
-
-    const bars = screen.getAllByTestId('bar');
-    expect(bars).toHaveLength(2);
-
-    // Check revenue bar
-    expect(bars[0]).toHaveAttribute('data-key', 'revenue');
-    expect(bars[0]).toHaveAttribute('data-name', 'REVENUE');
-
-    // Check expenses bar
-    expect(bars[1]).toHaveAttribute('data-key', 'expenses');
-    expect(bars[1]).toHaveAttribute('data-name', 'EXPENSES');
+    renderComponent();
+    expectBarsWithAttributes(2, [
+      { key: 'revenue', name: 'REVENUE' },
+      { key: 'expenses', name: 'EXPENSES' },
+    ]);
   });
 
   it('should render time period selector with correct options', () => {
-    render(<FinanceRevenueExpenseGraph />);
+    renderComponent();
+    expectSelectItems(3, ['this-year', 'last-year', 'last-6-months']);
 
-    const selectItems = screen.getAllByTestId('select-item');
-    expect(selectItems).toHaveLength(3); // 3 time periods
-
-    // Check time period values
-    expect(selectItems[0]).toHaveAttribute('data-value', 'this-year');
-    expect(selectItems[1]).toHaveAttribute('data-value', 'last-year');
-    expect(selectItems[2]).toHaveAttribute('data-value', 'last-6-months');
-
-    // Check time period labels (using getAllByText since some appear in both select value and items)
-    expect(screen.getAllByText('THIS_YEAR')).toHaveLength(2); // Select value + select item
-    expect(screen.getByText('LAST_YEAR')).toBeInTheDocument();
-    expect(screen.getByText('LAST_SIX_MONTHS')).toBeInTheDocument();
+    // Check labels with duplicate handling
+    expect(screen.getAllByText('THIS_YEAR')).toHaveLength(2);
+    ['LAST_YEAR', 'LAST_SIX_MONTHS'].forEach((label) => {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    });
   });
 
   it('should render legend with revenue and expense labels', () => {
-    render(<FinanceRevenueExpenseGraph />);
-
-    expect(screen.getByText('REVENUE')).toBeInTheDocument();
-    expect(screen.getByText('EXPENSES')).toBeInTheDocument();
+    renderComponent();
+    ['REVENUE', 'EXPENSES'].forEach((label) => {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    });
   });
 
   it('should have correct chart data key', () => {
-    render(<FinanceRevenueExpenseGraph />);
-
-    const xAxis = screen.getByTestId('x-axis');
-    expect(xAxis).toHaveAttribute('data-key', 'month');
+    renderComponent();
+    expect(screen.getByTestId('x-axis')).toHaveAttribute('data-key', 'month');
   });
 
   it('should export component correctly', () => {
