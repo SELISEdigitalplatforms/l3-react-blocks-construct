@@ -43,126 +43,125 @@ vi.mock('@/components/ui/select', () => ({
   ),
 }));
 
-// Mock Lucide React icons
+// Mock Lucide React icons using factory to reduce duplication
+const createMockIcon = (testId: string, title: string) => {
+  const MockIcon = ({ className }: { className?: string }) => (
+    <svg data-testid={testId} className={className}>
+      <title>{title}</title>
+    </svg>
+  );
+  MockIcon.displayName = `MockIcon_${testId}`;
+  return MockIcon;
+};
+
 vi.mock('lucide-react', () => ({
-  ChartNoAxesCombined: ({ className }: { className?: string }) => (
-    <svg data-testid="chart-icon" className={className}>
-      <title>Chart</title>
-    </svg>
-  ),
-  Wallet: ({ className }: { className?: string }) => (
-    <svg data-testid="wallet-icon" className={className}>
-      <title>Wallet</title>
-    </svg>
-  ),
-  CreditCard: ({ className }: { className?: string }) => (
-    <svg data-testid="credit-card-icon" className={className}>
-      <title>Credit Card</title>
-    </svg>
-  ),
-  FileText: ({ className }: { className?: string }) => (
-    <svg data-testid="file-text-icon" className={className}>
-      <title>File Text</title>
-    </svg>
-  ),
-  TrendingUp: ({ className }: { className?: string }) => (
-    <svg data-testid="trending-up-icon" className={className}>
-      <title>Trending Up</title>
-    </svg>
-  ),
+  ChartNoAxesCombined: createMockIcon('chart-icon', 'Chart'),
+  Wallet: createMockIcon('wallet-icon', 'Wallet'),
+  CreditCard: createMockIcon('credit-card-icon', 'Credit Card'),
+  FileText: createMockIcon('file-text-icon', 'File Text'),
+  TrendingUp: createMockIcon('trending-up-icon', 'Trending Up'),
 }));
 
-// Mock finance services with compressed structure
-vi.mock('../../services/finance-services', () => ({
-  monthsOfYear: Array.from({ length: 12 }, (_, i) => {
-    const months = [
-      'january',
-      'february',
-      'march',
-      'april',
-      'may',
-      'june',
-      'july',
-      'august',
-      'september',
-      'october',
-      'november',
-      'december',
-    ];
-    return { value: months[i], label: months[i].toUpperCase() };
-  }),
-  metricsData: [
-    {
-      titleKey: 'NET_PROFIT',
-      amount: '44,450.00',
-      icon: ({ className }: { className?: string }) => (
-        <svg data-testid="chart-icon" className={className}><title>Chart</title></svg>
-      ),
-      iconColor: 'text-primary',
-      trend: {
-        icon: ({ className }: { className?: string }) => (
-          <svg data-testid="trending-up-icon" className={className}><title>Trending Up</title></svg>
-        ),
+// Mock finance services with inline definitions to avoid hoisting issues
+vi.mock('../../services/finance-services', () => {
+  const months = [
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
+  ];
+
+  const createInlineMockIcon = (testId: string, title: string) => {
+    const InlineMockIcon = ({ className }: { className?: string }) => (
+      <svg data-testid={testId} className={className}>
+        <title>{title}</title>
+      </svg>
+    );
+    InlineMockIcon.displayName = `InlineMockIcon_${testId}`;
+    return InlineMockIcon;
+  };
+
+  const createInlineMetric = (
+    titleKey: string,
+    amount: string,
+    iconTestId: string,
+    iconColor: string,
+    iconBg?: string,
+    trend?: any
+  ) => ({
+    titleKey,
+    amount,
+    icon: createInlineMockIcon(iconTestId, titleKey),
+    iconColor,
+    ...(iconBg && { iconBg }),
+    ...(trend && {
+      trend: { ...trend, icon: createInlineMockIcon('trending-up-icon', 'Trending Up') },
+    }),
+  });
+
+  return {
+    monthsOfYear: months.map((month: string) => ({ value: month, label: month.toUpperCase() })),
+    metricsData: [
+      createInlineMetric('NET_PROFIT', '44,450.00', 'chart-icon', 'text-primary', undefined, {
         value: '+8%',
         color: 'text-success',
         textKey: 'FROM_LAST_MONTH',
-      },
-    },
-    {
-      titleKey: 'TOTAL_REVENUE',
-      amount: '142,300.00',
-      icon: ({ className }: { className?: string }) => (
-        <svg data-testid="wallet-icon" className={className}><title>Wallet</title></svg>
+      }),
+      createInlineMetric(
+        'TOTAL_REVENUE',
+        '142,300.00',
+        'wallet-icon',
+        'text-secondary',
+        'bg-surface rounded-[4px]',
+        {
+          value: '+10.2%',
+          color: 'text-success',
+          textKey: 'FROM_LAST_MONTH',
+        }
       ),
-      iconColor: 'text-secondary',
-      iconBg: 'bg-surface rounded-[4px]',
-      trend: {
-        icon: ({ className }: { className?: string }) => (
-          <svg data-testid="trending-up-icon" className={className}><title>Trending Up</title></svg>
-        ),
-        value: '+10.2%',
-        color: 'text-success',
-        textKey: 'FROM_LAST_MONTH',
-      },
-    },
-    {
-      titleKey: 'TOTAL_EXPENSES',
-      amount: '97,850.00',
-      icon: ({ className }: { className?: string }) => (
-        <svg data-testid="credit-card-icon" className={className}><title>Credit Card</title></svg>
+      createInlineMetric(
+        'TOTAL_EXPENSES',
+        '97,850.00',
+        'credit-card-icon',
+        'text-rose-500',
+        'bg-surface rounded-[4px]',
+        {
+          value: '+2.5%',
+          color: 'text-error',
+          textKey: 'FROM_LAST_MONTH',
+        }
       ),
-      iconColor: 'text-rose-500',
-      iconBg: 'bg-surface rounded-[4px]',
-      trend: {
-        icon: ({ className }: { className?: string }) => (
-          <svg data-testid="trending-up-icon" className={className}><title>Trending Up</title></svg>
-        ),
-        value: '+2.5%',
-        color: 'text-error',
-        textKey: 'FROM_LAST_MONTH',
-      },
-    },
-    {
-      titleKey: 'OUTSTANDING_INVOICES',
-      amount: '11,200.00',
-      icon: ({ className }: { className?: string }) => (
-        <svg data-testid="file-text-icon" className={className}><title>File Text</title></svg>
+      createInlineMetric(
+        'OUTSTANDING_INVOICES',
+        '11,200.00',
+        'file-text-icon',
+        'text-purple-500',
+        'bg-surface rounded-[4px]'
       ),
-      iconColor: 'text-purple-500',
-      iconBg: 'bg-surface rounded-[4px]',
-    },
-  ],
-}));
+    ],
+  };
+});
 
 // Mock FinanceOverviewMetricCard component
 vi.mock('../finance-overview-metric-card/finance-overview-metric-card', () => ({
   FinanceOverviewMetricCard: ({ metric, t }: any) => {
     const IconComponent = metric.icon;
     const TrendIcon = metric.trend?.icon;
-    
+
     return (
-      <div data-testid="metric-card" className="flex flex-col hover:bg-primary-50 cursor-pointer gap-4 rounded-lg px-3 py-2">
-        <div className={`flex h-14 w-14 items-center justify-center ${metric.iconBg || ''}`}>
+      <div
+        data-testid="metric-card"
+        className="flex flex-col hover:bg-primary-50 cursor-pointer gap-4 rounded-lg px-3 py-2"
+      >
+        <div className={`flex h-14 w-14 items-center justify-center ${metric.iconBg ?? ''}`}>
           <IconComponent className={`h-7 w-7 ${metric.iconColor}`} />
         </div>
         <div>
@@ -195,89 +194,114 @@ vi.mock('../finance-overview-metric-card/finance-overview-metric-card', () => ({
   },
 }));
 
+// Test data constants to reduce duplication
+const TEST_DATA = {
+  cardClasses: ['w-full', 'border-none', 'rounded-[8px]', 'shadow-sm'],
+  titleClasses: ['text-xl', 'text-high-emphasis'],
+  selectTriggerClasses: ['w-[120px]', 'h-[28px]', 'px-2', 'py-1'],
+  metricTitles: ['NET_PROFIT', 'TOTAL_REVENUE', 'TOTAL_EXPENSES', 'OUTSTANDING_INVOICES'],
+  amountPatterns: [/44,450\.00/, /142,300\.00/, /97,850\.00/, /11,200\.00/],
+  iconIds: ['chart-icon', 'wallet-icon', 'credit-card-icon', 'file-text-icon'],
+  textContent: {
+    title: 'OVERVIEW',
+  },
+  monthsCount: 12,
+  trendingIconsCount: 3,
+  boundaryMonths: { first: 'january', last: 'december' },
+} as const;
+
 // Helper functions to reduce duplication
 const renderComponent = () => render(<FinanceOverview />);
 
-const expectElementWithClasses = (testId: string, classes: string[]) => {
+const expectElementWithClasses = (testId: string, classes: readonly string[]) => {
   const element = screen.getByTestId(testId);
   expect(element).toBeInTheDocument();
   expect(element).toHaveClass(...classes);
   return element;
 };
 
-const expectMetricTexts = (texts: string[]) => {
-  texts.forEach((text) => {
-    expect(screen.getByText(text)).toBeInTheDocument();
+const expectElementsExist = (testIds: readonly string[]) => {
+  testIds.forEach((testId) => {
+    expect(screen.getByTestId(testId)).toBeInTheDocument();
   });
 };
 
-const expectAmountPatterns = (patterns: RegExp[]) => {
+const expectTextElements = (texts: readonly string[]) => {
+  texts.forEach((text) => {
+    const elements = screen.getAllByText(text);
+    expect(elements.length).toBeGreaterThan(0);
+    elements.forEach((element) => {
+      expect(element).toBeInTheDocument();
+    });
+  });
+};
+
+const expectPatternElements = (patterns: readonly RegExp[]) => {
   patterns.forEach((pattern) => {
     expect(screen.getByText(pattern)).toBeInTheDocument();
   });
 };
 
-const expectIcons = (iconIds: string[]) => {
-  iconIds.forEach((iconId) => {
-    expect(screen.getByTestId(iconId)).toBeInTheDocument();
-  });
+const expectElementsWithCount = (testId: string, expectedCount: number) => {
+  const elements = screen.getAllByTestId(testId);
+  expect(elements).toHaveLength(expectedCount);
+  return elements;
 };
 
 describe('FinanceOverview Component', () => {
-  it('should render without crashing', () => {
-    renderComponent();
-    expect(screen.getByTestId('card')).toBeInTheDocument();
+  describe('Basic Rendering', () => {
+    it('should render without crashing', () => {
+      renderComponent();
+      expect(screen.getByTestId('card')).toBeInTheDocument();
+    });
+
+    it('should render the card with correct structure', () => {
+      renderComponent();
+      expectElementWithClasses('card', TEST_DATA.cardClasses);
+      expectElementsExist(['card-header', 'card-content']);
+    });
   });
 
-  it('should render the card with correct structure', () => {
-    renderComponent();
-    expectElementWithClasses('card', ['w-full', 'border-none', 'rounded-[8px]', 'shadow-sm']);
-    expect(screen.getByTestId('card-header')).toBeInTheDocument();
-    expect(screen.getByTestId('card-content')).toBeInTheDocument();
+  describe('Header Section', () => {
+    it('should render the title and month selector', () => {
+      renderComponent();
+
+      const title = expectElementWithClasses('card-title', TEST_DATA.titleClasses);
+      expect(title).toHaveTextContent(TEST_DATA.textContent.title);
+
+      expectElementWithClasses('select-trigger', TEST_DATA.selectTriggerClasses);
+    });
   });
 
-  it('should render the title and month selector', () => {
-    renderComponent();
+  describe('Metric Cards', () => {
+    it('should render all metric cards', () => {
+      renderComponent();
+      expectTextElements(TEST_DATA.metricTitles);
+      expectPatternElements(TEST_DATA.amountPatterns);
+    });
 
-    const title = expectElementWithClasses('card-title', ['text-xl', 'text-high-emphasis']);
-    expect(title).toHaveTextContent('OVERVIEW');
-
-    expectElementWithClasses('select-trigger', ['w-[120px]', 'h-[28px]', 'px-2', 'py-1']);
+    it('should render all icons correctly', () => {
+      renderComponent();
+      expectElementsExist(TEST_DATA.iconIds);
+      expectElementsWithCount('trending-up-icon', TEST_DATA.trendingIconsCount);
+    });
   });
 
-  it('should render all metric cards', () => {
-    renderComponent();
+  describe('Month Selector', () => {
+    it('should render month selector with correct options', () => {
+      renderComponent();
+      const selectItems = expectElementsWithCount('select-item', TEST_DATA.monthsCount);
 
-    // Check metric titles using helper
-    expectMetricTexts(['NET_PROFIT', 'TOTAL_REVENUE', 'TOTAL_EXPENSES', 'OUTSTANDING_INVOICES']);
-
-    // Check amounts using helper
-    expectAmountPatterns([/44,450\.00/, /142,300\.00/, /97,850\.00/, /11,200\.00/]);
+      // Check boundary month values
+      expect(selectItems[0]).toHaveAttribute('data-value', TEST_DATA.boundaryMonths.first);
+      expect(selectItems[11]).toHaveAttribute('data-value', TEST_DATA.boundaryMonths.last);
+    });
   });
 
-  it('should render all icons correctly', () => {
-    renderComponent();
-
-    expectIcons(['chart-icon', 'wallet-icon', 'credit-card-icon', 'file-text-icon']);
-
-    // Trending icons count validation
-    const trendingIcons = screen.getAllByTestId('trending-up-icon');
-    expect(trendingIcons).toHaveLength(3);
-  });
-
-  it('should render month selector with correct options', () => {
-    renderComponent();
-
-    const selectItems = screen.getAllByTestId('select-item');
-    expect(selectItems).toHaveLength(12);
-
-    // Check boundary month values
-    expect(selectItems[0]).toHaveAttribute('data-value', 'january');
-    expect(selectItems[11]).toHaveAttribute('data-value', 'december');
-  });
-
-  it('should export component correctly', () => {
-    expect(FinanceOverview).toBeDefined();
-    expect(typeof FinanceOverview).toBe('function');
+  describe('Component Export', () => {
+    it('should export component correctly', () => {
+      expect(FinanceOverview).toBeDefined();
+      expect(typeof FinanceOverview).toBe('function');
+    });
   });
 });
