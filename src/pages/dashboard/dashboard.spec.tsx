@@ -58,6 +58,13 @@ vi.mock('@/components/ui/button', () => ({
 
 // Mock features/dashboard module - using correct import path with @/ alias
 vi.mock('@/features/dashboard', () => ({
+  DashboardHeader: () => (
+    <div data-testid="dashboard-header">
+      <h3>DASHBOARD</h3>
+      <button>SYNC</button>
+      <button>EXPORT</button>
+    </div>
+  ),
   DashboardOverview: () => <div data-testid="dashboard-overview">Dashboard Overview</div>,
   DashboardSystemOverview: () => (
     <div data-testid="dashboard-system-overview">Dashboard System Overview</div>

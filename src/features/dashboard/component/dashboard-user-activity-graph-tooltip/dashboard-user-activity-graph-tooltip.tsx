@@ -6,14 +6,14 @@ interface DashboardUserActivityGraphTooltipProps {
   label: string;
 }
 
-export const DashboardUserActivityGraphTooltip = ({
+export function DashboardUserActivityGraphTooltip({
   payload,
   label,
-}: DashboardUserActivityGraphTooltipProps) => {
+}: Readonly<DashboardUserActivityGraphTooltipProps>) {
   const { t } = useTranslation();
   const data = payload?.[0]?.value;
 
-  if (!data) return null;
+  if (data === undefined || data === null) return null;
 
   return (
     <div className="flex flex-col gap-1 bg-white p-2 shadow-md rounded-[4px]">
@@ -23,4 +23,4 @@ export const DashboardUserActivityGraphTooltip = ({
       </p>
     </div>
   );
-};
+}

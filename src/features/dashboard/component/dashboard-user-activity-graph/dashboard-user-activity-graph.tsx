@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
 import { chartConfig, chartData, daysOfWeek } from '../../services/dashboard-service';
-import { DashboardUserActivityGraphTooltip } from './dashboard-user-activity-graph-tooltip';
+import { DashboardUserActivityGraphTooltip } from '../dashboard-user-activity-graph-tooltip/dashboard-user-activity-graph-tooltip';
 
 const TooltipContent = (props: TooltipProps<ValueType, NameType>) => {
   const { payload, label } = props;
@@ -32,7 +32,7 @@ const TooltipContent = (props: TooltipProps<ValueType, NameType>) => {
  * @returns {JSX.Element} - The rendered JSX component showing user activity trends over time with a selectable time period.
  */
 
-export const DashboardUserActivityGraph = () => {
+export const DashboardUserActivityGraph = (): React.JSX.Element => {
   const { t } = useTranslation();
 
   return (
@@ -58,7 +58,12 @@ export const DashboardUserActivityGraph = () => {
         <CardDescription>{t('TRACK_ENGAGEMENT_PATTERN')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+        <ChartContainer 
+          config={chartConfig} 
+          className="min-h-[200px] w-full"
+          role="img"
+          aria-label={t('USER_ACTIVITY_TRENDS_CHART')}
+        >
           <BarChart
             accessibilityLayer
             data={chartData.map((item) => ({
