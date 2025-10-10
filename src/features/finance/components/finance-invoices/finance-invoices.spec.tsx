@@ -1,31 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { expectElementWithClasses } from '../../../../test-utils/shared-test-utils';
 import { FinanceInvoices } from './finance-invoices';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-// Mock UI components
-vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: any) => (
-    <div data-testid="card" className={className}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
-  CardTitle: ({ children, className }: any) => (
-    <h2 data-testid="card-title" className={className}>
-      {children}
-    </h2>
-  ),
-  CardDescription: ({ children }: any) => <div data-testid="card-description">{children}</div>,
-  CardContent: ({ children }: any) => <div data-testid="card-content">{children}</div>,
-}));
-
+// Local mocks (must come before shared test utils import)
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, className, ...props }: any) => (
     <button data-testid="view-all-button" className={className} {...props}>
@@ -116,15 +94,8 @@ vi.mock('../../types/finance.type', () => ({
   ],
 }));
 
-// Helper functions to reduce duplication
+// Helper functions - render helper and component-specific helpers remain local
 const renderComponent = () => render(<FinanceInvoices />);
-
-const expectElementWithClasses = (testId: string, classes: string[]) => {
-  const element = screen.getByTestId(testId);
-  expect(element).toBeInTheDocument();
-  expect(element).toHaveClass(...classes);
-  return element;
-};
 
 const expectTextElements = (texts: string[]) => {
   texts.forEach((text) => {

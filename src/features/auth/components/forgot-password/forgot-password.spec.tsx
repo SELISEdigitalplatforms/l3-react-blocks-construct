@@ -1,14 +1,9 @@
 import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import '../../../../test-utils/shared-test-utils';
 import { ForgotpasswordForm } from './forgot-password';
 import { BrowserRouter } from 'react-router-dom';
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
 
 const mockUseForgotPassword = vi.fn();
 vi.mock('../../hooks/use-auth', () => ({

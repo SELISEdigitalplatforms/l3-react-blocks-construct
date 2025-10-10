@@ -2,13 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FinanceOverviewMetricCard } from './finance-overview-metric-card';
 import { MetricData } from '../../types/finance.type';
-
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../../../test-utils/shared-test-utils';
 
 // Helper functions to reduce duplication
 const createMockTranslation = () => (key: string) => key;
@@ -48,6 +42,7 @@ const createMetricWithoutTrend = (overrides: Partial<MetricData> = {}): MetricDa
 const renderMetricCard = (metric: MetricData, t = createMockTranslation()) =>
   render(<FinanceOverviewMetricCard metric={metric} t={t} />);
 
+// Helper functions for element assertions
 const expectElementWithClasses = (element: HTMLElement, classes: string[]) => {
   expect(element).toBeInTheDocument();
   expect(element).toHaveClass(...classes);

@@ -2,12 +2,7 @@ import { vi, Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ResetpasswordForm } from './reset-password';
 import { useResetPassword } from '../../hooks/use-auth';
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../../../test-utils/shared-test-utils';
 
 const TEST_PASSWORD = 'testPassword123';
 

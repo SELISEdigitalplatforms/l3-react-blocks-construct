@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '../../../../test-utils/shared-test-utils';
 import { Chat } from './chat';
 
 vi.mock('../chat-sidebar/chat-sidebar', () => ({

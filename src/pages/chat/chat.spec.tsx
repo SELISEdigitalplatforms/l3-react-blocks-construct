@@ -1,12 +1,7 @@
 import { vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { ChatPage } from './chat';
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../test-utils/shared-test-utils';
 
 vi.mock('features/chat', () => ({
   Chat: vi.fn(() => <div data-testid="mock-chat" />),

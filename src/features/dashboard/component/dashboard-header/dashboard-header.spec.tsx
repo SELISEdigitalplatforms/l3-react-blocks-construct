@@ -2,13 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { DashboardHeader } from './dashboard-header';
-
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../../../test-utils/shared-test-utils';
 
 // Mock UI components
 vi.mock('@/components/ui/button', () => ({

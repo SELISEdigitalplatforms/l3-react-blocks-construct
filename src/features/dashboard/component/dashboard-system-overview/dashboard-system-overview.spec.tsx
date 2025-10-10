@@ -1,79 +1,20 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
+import '../../../../test-utils/shared-test-utils';
 import { DashboardSystemOverview } from './dashboard-system-overview';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-// Mock Card components
-vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card" {...props}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card-header" {...props}>
-      {children}
-    </div>
-  ),
-  CardContent: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card-content" {...props}>
-      {children}
-    </div>
-  ),
-  CardTitle: ({ children, className, ...props }: any) => (
-    <h2 className={className} data-testid="card-title" {...props}>
-      {children}
-    </h2>
-  ),
-  CardDescription: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card-description" {...props}>
-      {children}
-    </div>
-  ),
-}));
-
-// Mock Select components
-vi.mock('@/components/ui/select', () => ({
-  Select: ({ children, ...props }: any) => <div data-testid="select" {...props}>{children}</div>,
-  SelectTrigger: ({ children, className, ...props }: any) => (
-    <button className={className} data-testid="select-trigger" {...props}>
-      {children}
-    </button>
-  ),
-  SelectValue: ({ placeholder, ...props }: any) => (
-    <span data-testid="select-value" {...props}>
-      {placeholder}
-    </span>
-  ),
-  SelectContent: ({ children, ...props }: any) => (
-    <div data-testid="select-content" {...props}>{children}</div>
-  ),
-  SelectGroup: ({ children, ...props }: any) => (
-    <div data-testid="select-group" {...props}>{children}</div>
-  ),
-  SelectItem: ({ children, value, ...props }: any) => (
-    <div data-testid="select-item" data-value={value} {...props}>
-      {children}
-    </div>
-  ),
-}));
-
-// Mock DashboardSystemOverviewStatisticItem
-vi.mock('../dashboard-system-overview-statistic-item/dashboard-system-overview-statistic-item', () => ({
-  DashboardSystemOverviewStatisticItem: ({ stat, t }: any) => (
-    <div data-testid="statistic-item" data-title={stat.title} data-value={stat.value}>
-      <span data-testid="stat-title">{t(stat.title)}</span>
-      <span data-testid="stat-value">{stat.value}</span>
-      <span data-testid="stat-percentage">{stat.percentage}</span>
-    </div>
-  ),
-}));
+vi.mock(
+  '../dashboard-system-overview-statistic-item/dashboard-system-overview-statistic-item',
+  () => ({
+    DashboardSystemOverviewStatisticItem: ({ stat, t }: any) => (
+      <div data-testid="statistic-item" data-title={stat.title} data-value={stat.value}>
+        <span data-testid="stat-title">{t(stat.title)}</span>
+        <span data-testid="stat-value">{stat.value}</span>
+        <span data-testid="stat-percentage">{stat.percentage}</span>
+      </div>
+    ),
+  })
+);
 
 // Mock dashboard service data
 vi.mock('../../services/dashboard-service', () => ({
@@ -208,7 +149,7 @@ describe('DashboardSystemOverview', () => {
 
     // Test CPU usage item using getAllByTestId
     const statisticItems = screen.getAllByTestId('statistic-item');
-    const cpuItem = statisticItems.find(item => item.getAttribute('data-title') === 'CPU_USAGE');
+    const cpuItem = statisticItems.find((item) => item.getAttribute('data-title') === 'CPU_USAGE');
     expect(cpuItem).toHaveAttribute('data-title', 'CPU_USAGE');
     expect(cpuItem).toHaveAttribute('data-value', '75%');
 

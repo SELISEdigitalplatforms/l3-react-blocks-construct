@@ -1,13 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FinanceRevenueExpenseTooltipContent } from './finance-revenue-expense-graph-tooltip';
-
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../../../test-utils/shared-test-utils';
 
 // Mock finance services
 vi.mock('../../services/finance-services', () => ({

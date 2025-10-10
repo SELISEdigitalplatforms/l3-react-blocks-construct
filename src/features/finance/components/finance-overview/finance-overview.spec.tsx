@@ -1,47 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import {
+  expectElementWithClasses,
+  expectElementsExist,
+} from '../../../../test-utils/shared-test-utils';
 import { FinanceOverview } from './finance-overview';
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-// Mock UI components
-vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: any) => (
-    <div data-testid="card" className={className}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
-  CardTitle: ({ children, className }: any) => (
-    <h2 data-testid="card-title" className={className}>
-      {children}
-    </h2>
-  ),
-  CardDescription: ({ children }: any) => <div data-testid="card-description">{children}</div>,
-  CardContent: ({ children }: any) => <div data-testid="card-content">{children}</div>,
-}));
-
-vi.mock('@/components/ui/select', () => ({
-  Select: ({ children }: any) => <div data-testid="select">{children}</div>,
-  SelectTrigger: ({ children, className }: any) => (
-    <button data-testid="select-trigger" className={className}>
-      {children}
-    </button>
-  ),
-  SelectValue: ({ placeholder }: any) => <span data-testid="select-value">{placeholder}</span>,
-  SelectContent: ({ children }: any) => <div data-testid="select-content">{children}</div>,
-  SelectGroup: ({ children }: any) => <div data-testid="select-group">{children}</div>,
-  SelectItem: ({ children, value }: any) => (
-    <div data-testid="select-item" data-value={value}>
-      {children}
-    </div>
-  ),
-}));
 
 // Mock Lucide React icons using factory to reduce duplication
 const createMockIcon = (testId: string, title: string) => {
@@ -210,21 +174,8 @@ const TEST_DATA = {
   boundaryMonths: { first: 'january', last: 'december' },
 } as const;
 
-// Helper functions to reduce duplication
+// Helper functions - render helper remains local, others from test-utils
 const renderComponent = () => render(<FinanceOverview />);
-
-const expectElementWithClasses = (testId: string, classes: readonly string[]) => {
-  const element = screen.getByTestId(testId);
-  expect(element).toBeInTheDocument();
-  expect(element).toHaveClass(...classes);
-  return element;
-};
-
-const expectElementsExist = (testIds: readonly string[]) => {
-  testIds.forEach((testId) => {
-    expect(screen.getByTestId(testId)).toBeInTheDocument();
-  });
-};
 
 const expectTextElements = (texts: readonly string[]) => {
   texts.forEach((text) => {

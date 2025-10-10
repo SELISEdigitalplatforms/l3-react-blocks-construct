@@ -1,47 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+// Shared mocks & helpers (react-i18next, UI components, generic assertions)
+import {
+  expectElementWithClasses,
+  expectElementsExist,
+  expectTextContent,
+  expectElementsWithAttributes,
+  expectLabelsInDocument,
+} from '../../../../test-utils/shared-test-utils';
 import { FinanceRevenueExpenseGraph } from './finance-revenue-expense-graph';
-
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-// Mock UI components with inline factory functions to avoid hoisting issues
-vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, className }: any) => (
-    <div data-testid="card" className={className}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
-  CardTitle: ({ children, className }: any) => (
-    <h2 data-testid="card-title" className={className}>
-      {children}
-    </h2>
-  ),
-  CardDescription: ({ children }: any) => <div data-testid="card-description">{children}</div>,
-  CardContent: ({ children }: any) => <div data-testid="card-content">{children}</div>,
-}));
-
-vi.mock('@/components/ui/select', () => ({
-  Select: ({ children }: any) => <div data-testid="select">{children}</div>,
-  SelectTrigger: ({ children, className }: any) => (
-    <button data-testid="select-trigger" className={className}>
-      {children}
-    </button>
-  ),
-  SelectValue: ({ placeholder }: any) => <span data-testid="select-value">{placeholder}</span>,
-  SelectContent: ({ children }: any) => <div data-testid="select-content">{children}</div>,
-  SelectGroup: ({ children }: any) => <div data-testid="select-group">{children}</div>,
-  SelectItem: ({ children, value }: any) => (
-    <div data-testid="select-item" data-value={value}>
-      {children}
-    </div>
-  ),
-}));
 
 // Mock Recharts components
 vi.mock('recharts', () => ({
@@ -85,7 +52,7 @@ vi.mock('../../services/finance-services', () => ({
   ],
 }));
 
-// Test data constants to reduce duplication
+// Test data constants
 const TEST_DATA = {
   cardClasses: ['w-full', 'border-none', 'rounded-[8px]', 'shadow-sm'],
   titleClasses: ['text-2xl', 'font-semibold', 'text-high-emphasis'],
@@ -112,46 +79,8 @@ const TEST_DATA = {
   },
 } as const;
 
-// Helper functions to reduce duplication
+// Render helper remains local as it depends on component
 const renderComponent = () => render(<FinanceRevenueExpenseGraph />);
-
-const expectElementWithClasses = (testId: string, classes: readonly string[]) => {
-  const element = screen.getByTestId(testId);
-  expect(element).toBeInTheDocument();
-  expect(element).toHaveClass(...classes);
-  return element;
-};
-
-const expectElementsExist = (testIds: readonly string[]) => {
-  testIds.forEach((testId) => {
-    expect(screen.getByTestId(testId)).toBeInTheDocument();
-  });
-};
-
-const expectTextContent = (testId: string, content: string) => {
-  const element = screen.getByTestId(testId);
-  expect(element).toBeInTheDocument();
-  expect(element).toHaveTextContent(content);
-  return element;
-};
-
-const expectElementsWithAttributes = (
-  testId: string,
-  expectedCount: number,
-  attributeChecks: Array<{ attribute: string; value: string }>
-) => {
-  const elements = screen.getAllByTestId(testId);
-  expect(elements).toHaveLength(expectedCount);
-  attributeChecks.forEach((check, index) => {
-    expect(elements[index]).toHaveAttribute(check.attribute, check.value);
-  });
-};
-
-const expectLabelsInDocument = (labels: readonly string[]) => {
-  labels.forEach((label) => {
-    expect(screen.getByText(label)).toBeInTheDocument();
-  });
-};
 
 describe('FinanceRevenueExpenseGraph Component', () => {
   describe('Basic Rendering', () => {

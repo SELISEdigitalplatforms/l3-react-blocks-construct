@@ -4,6 +4,9 @@ import { vi } from 'vitest';
 import { Users } from 'lucide-react';
 import { DashboardMetricCard } from './dashboard-metric-card';
 
+// Import shared test utilities (provides react-i18next, card, select mocks)
+import '../../../../test-utils/shared-test-utils';
+
 // Mock lucide-react icons
 vi.mock('lucide-react', () => ({
   TrendingUp: ({ className }: any) => <div data-testid="trending-up-icon" className={className} />,
