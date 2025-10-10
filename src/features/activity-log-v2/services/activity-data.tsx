@@ -1,4 +1,4 @@
-import { ActivityGroup } from '../../services/activity-log.types';
+import { ActivityGroup } from '../types/activity-log.types';
 
 // Shared reusable items (centralized for deduplication)
 const sharedActivities = {

@@ -28,8 +28,6 @@ import { Email } from './pages/email/email';
 import { VerifyOtpKey } from './pages/auth/verify-otp-key/verify-otp-key';
 import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
 import TaskManager from './pages/task-manager/task-manager';
-import ActivityLogPage2 from './pages/activity-log-v2/activity-log';
-import ActivityLogPage1 from './pages/activity-log-v1/activity-log';
 import { CalendarPage } from './pages/calendar/calendar';
 import { Finance } from '@/pages/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
@@ -41,6 +39,8 @@ import { ChatPage } from './pages/chat/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
 import { Dashboard } from '@/pages/dashboard';
 import { NotFound, ServiceUnavailable } from '@/pages/error';
+import { ActivityLog } from '@/pages/activity-log';
+import { Timeline } from '@/pages/timeline';
 
 const queryClient = new QueryClient();
 
@@ -77,8 +77,8 @@ function AppContent() {
                 <Route path="/inventory/add" element={<InventoryForm />} />
                 <Route path="/inventory/:itemId" element={<InventoryDetails />} />
 
-                <Route path="/activity-log" element={<ActivityLogPage1 />} />
-                <Route path="/timeline" element={<ActivityLogPage2 />} />
+                <Route path="/activity-log" element={<ActivityLog />} />
+                <Route path="/timeline" element={<Timeline />} />
                 <Route path="/mail" element={<Email />} />
                 <Route path="/mail/:category" element={<Email />} />
                 <Route path="/mail/:category/:emailId" element={<Email />} />

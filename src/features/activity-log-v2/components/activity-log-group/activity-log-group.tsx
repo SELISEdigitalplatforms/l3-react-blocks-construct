@@ -1,6 +1,5 @@
-import type { ActivityGroup } from '../../services/activity-log.types';
-import ActivityLogItem from './activity-log-item';
-
+import type { ActivityGroup } from '../../types/activity-log.types';
+import { ActivityLogItem } from './activity-log-item';
 
 /**
  * ActivityLogGroup Component
@@ -63,7 +62,7 @@ interface ActivityLogGroupProps extends ActivityGroup {
   isFirstIndex: boolean;
 }
 
-const ActivityLogGroup = ({ date, items, isLastIndex }: ActivityLogGroupProps) => (
+export const ActivityLogGroup = ({ date, items, isLastIndex }: ActivityLogGroupProps) => (
   <div className="mb-8 relative">
     <div className="flex justify-center mb-4 relative z-10">
       <div className="bg-secondary-50 text-secondary-800 text-xs font-medium py-1 px-2 rounded">
@@ -84,5 +83,3 @@ const ActivityLogGroup = ({ date, items, isLastIndex }: ActivityLogGroupProps) =
     </div>
   </div>
 );
-
-export default ActivityLogGroup;

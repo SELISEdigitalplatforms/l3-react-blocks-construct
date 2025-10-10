@@ -1,4 +1,4 @@
-import { ActivityGroup } from '../../services/activity-log.types';
+import { ActivityGroup } from '../types/activity-log.types';
 
 // Shared activity items (de-duplicated)
 const shared = {
@@ -91,14 +91,10 @@ export const activities: ActivityGroup[] = [
   },
   {
     date: '2025-03-07T00:00:00Z',
-    items: [
-      { time: '2025-03-07T10:00:00Z', ...shared.deleteAdhesives },
-    ],
+    items: [{ time: '2025-03-07T10:00:00Z', ...shared.deleteAdhesives }],
   },
   {
     date: '2025-03-06T00:00:00Z',
-    items: [
-      { time: '2025-03-06T10:10:00Z', ...shared.reviewMeeting },
-    ],
+    items: [{ time: '2025-03-06T10:10:00Z', ...shared.reviewMeeting }],
   },
 ];
