@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { ActivityGroup } from '../../types/activity-log.types';
-import './activity-log-timeline.css';
 import no_activity from '@/assets/images/Illustration.svg';
 import { useInfiniteScroll } from '../../hooks/use-infinite-scroll';
 import { ActivityLogGroup } from '../activity-log-group/activity-log-group';
