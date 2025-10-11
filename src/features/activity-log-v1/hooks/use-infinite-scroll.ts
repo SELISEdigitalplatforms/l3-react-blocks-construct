@@ -13,7 +13,7 @@ import { debounce } from 'lodash';
  *   containerRef: React.RefObject<HTMLDivElement>
  * }}
  */
-export function useInfiniteScroll(totalItems: number, batchSize = 5, threshold = 200) {
+export const useInfiniteScroll = (totalItems: number, batchSize = 5, threshold = 200) => {
   const [visibleCount, setVisibleCount] = useState(batchSize);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -44,4 +44,4 @@ export function useInfiniteScroll(totalItems: number, batchSize = 5, threshold =
   }, [handleScroll]);
 
   return { visibleCount, containerRef };
-}
+};

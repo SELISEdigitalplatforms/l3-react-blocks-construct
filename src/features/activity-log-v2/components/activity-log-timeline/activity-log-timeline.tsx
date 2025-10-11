@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
-import ActivityLogGroup from '../activity-log-group/activity-log-group';
-import type { ActivityGroup } from '../../services/activity-log.types';
-import './activity-log-timeline.css';
+import type { ActivityGroup } from '../../types/activity-log.types';
 import no_activity from '@/assets/images/Illustration.svg';
-import { useInfiniteScroll } from '@/features/activity-log-v1/hooks/use-infinite-scroll';
+import { useInfiniteScroll } from '@/features/activity-log-v1';
+import { ActivityLogGroup } from '../activity-log-group/activity-log-group';
 
 /**
  * ActivityLogTimeline Component
@@ -33,7 +32,7 @@ import { useInfiniteScroll } from '@/features/activity-log-v1/hooks/use-infinite
  * <ActivityLogTimeline activities={activities} />
  */
 
-const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) => {
+export const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) => {
   const { t } = useTranslation();
   const { visibleCount, containerRef } = useInfiniteScroll(activities.length);
 
@@ -71,5 +70,3 @@ const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[] }) =>
     </>
   );
 };
-
-export default ActivityLogTimeline;

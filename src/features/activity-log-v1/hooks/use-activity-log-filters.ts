@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
-import { ActivityGroup } from '../services/activity-log.types';
+import { ActivityGroup } from '../types/activity-log.types';
 
 const transformCategory = (category: string): string => category.toLowerCase().replace(/\s+/g, '_');
 
