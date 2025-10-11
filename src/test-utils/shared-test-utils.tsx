@@ -340,14 +340,14 @@ export const expectFinanceCardStructure = (titleText: string, descriptionText: s
   // Test basic card structure
   expectElementWithClasses('card', FINANCE_COMPONENT_CLASSES.card);
   expectElementsExist(['card-header', 'card-content']);
-  
+
   // Test title
   const title = expectElementWithClasses('card-title', FINANCE_COMPONENT_CLASSES.title);
   expect(title).toHaveTextContent(titleText);
-  
+
   // Test description
   expectTextContent('card-description', descriptionText);
-  
+
   return { title };
 };
 
@@ -360,20 +360,25 @@ export const expectFinanceChartDataKeys = (areaDataKey: string, xAxisDataKey: st
   expect(screen.getByTestId('x-axis')).toHaveAttribute('data-key', xAxisDataKey);
 };
 
-export const expectFinanceBarChartDataKeys = (xAxisDataKey: string, barData: readonly { key: string; name: string }[]) => {
+export const expectFinanceBarChartDataKeys = (
+  xAxisDataKey: string,
+  barData: readonly { key: string; name: string }[]
+) => {
   expect(screen.getByTestId('x-axis')).toHaveAttribute('data-key', xAxisDataKey);
-  
+
   // Check bar elements
-  expectElementsWithAttributes('bar', barData.length, 
-    barData.map(bar => ({ attribute: 'data-key', value: bar.key }))
+  expectElementsWithAttributes(
+    'bar',
+    barData.length,
+    barData.map((bar) => ({ attribute: 'data-key', value: bar.key }))
   );
 };
 
 export const expectFinanceTimePeriodSelector = (timePeriodValues: readonly string[]) => {
   expectElementWithClasses('select-trigger', FINANCE_COMPONENT_CLASSES.selectTrigger);
-  
+
   // Check select items with values - create attribute checks for all values at once
-  const attributeChecks = timePeriodValues.map(value => ({ attribute: 'data-value', value }));
+  const attributeChecks = timePeriodValues.map((value) => ({ attribute: 'data-value', value }));
   expectElementsWithAttributes('select-item', timePeriodValues.length, attributeChecks);
 };
 
@@ -389,12 +394,18 @@ export const expectPatternElements = (patterns: readonly RegExp[]) => {
   });
 };
 
-export const expectFinanceOverviewMetrics = (metricTitles: readonly string[], amountPatterns: readonly RegExp[]) => {
+export const expectFinanceOverviewMetrics = (
+  metricTitles: readonly string[],
+  amountPatterns: readonly RegExp[]
+) => {
   expectTextElements(metricTitles);
   expectPatternElements(amountPatterns);
 };
 
-export const expectFinanceOverviewIcons = (iconIds: readonly string[], trendingIconsCount: number) => {
+export const expectFinanceOverviewIcons = (
+  iconIds: readonly string[],
+  trendingIconsCount: number
+) => {
   expectElementsExist(iconIds);
   expectElementsWithCount('trending-up-icon', trendingIconsCount);
 };
@@ -403,31 +414,45 @@ export const expectFinanceOverviewCardStructure = (titleText: string) => {
   // Test basic card structure
   expectElementWithClasses('card', COMMON_CARD_CLASSES);
   expectElementsExist(['card-header', 'card-content']);
-  
+
   // Test title
   const title = expectElementWithClasses('card-title', COMMON_TITLE_CLASSES);
   expect(title).toHaveTextContent(titleText);
-  
+
   return { title };
 };
 
-export const expectFinanceOverviewMonthSelector = (monthsCount: number, firstMonth: string, lastMonth: string) => {
+export const expectFinanceOverviewMonthSelector = (
+  monthsCount: number,
+  firstMonth: string,
+  lastMonth: string
+) => {
   expectElementWithClasses('select-trigger', ['w-[120px]', 'h-[28px]', 'px-2', 'py-1']);
-  
+
   const selectItems = expectElementsWithCount('select-item', monthsCount);
-  
+
   // Check boundary month values
   expect(selectItems[0]).toHaveAttribute('data-value', firstMonth);
   expect(selectItems[monthsCount - 1]).toHaveAttribute('data-value', lastMonth);
-  
+
   return selectItems;
 };
 
 // Finance overview mock factories
 export const createFinanceOverviewServicesMock = () => {
   const months = [
-    'january', 'february', 'march', 'april', 'may', 'june',
-    'july', 'august', 'september', 'october', 'november', 'december',
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
   ];
 
   const createInlineMetric = (
@@ -548,3 +573,115 @@ export const createFinanceUtilsMock = () => ({
   formatTooltipValue: (value: number) => `CHF ${value.toLocaleString()}`,
   formatYAxisValue: (value: number) => `${value / 1000}k`,
 });
+
+// ------------------ Error Page Test Suite ------------------
+// Comprehensive test suite for error pages to eliminate duplication
+
+export interface ErrorPageTestData {
+  title: string;
+  description: string;
+  buttonText: string;
+  imageSrc: string;
+  imageAlt: string;
+  iconTestId: string;
+  iconTitle: string;
+}
+
+export const createErrorPageTestSuite = (
+  componentName: string,
+  testData: ErrorPageTestData,
+  renderComponent: () => any,
+  additionalTests?: {
+    specificFeatures?: Array<{
+      name: string;
+      test: () => void;
+    }>;
+    semanticDifferences?: Array<{
+      name: string;
+      test: () => void;
+    }>;
+  }
+) => {
+  return () => {
+    describe(`${componentName} Component`, () => {
+      describe('Basic Rendering', () => {
+        it('should render without crashing and have correct structure', () => {
+          renderComponent();
+          expectErrorPageStructure(testData.title);
+        });
+      });
+
+      describe('Image Section', () => {
+        it('should render the error image correctly', () => {
+          renderComponent();
+          expectErrorPageImage(testData.imageAlt, testData.imageSrc);
+        });
+      });
+
+      describe('Text Content', () => {
+        it('should render title and description with correct styling', () => {
+          renderComponent();
+          expectErrorPageTextContent(testData.title, testData.description);
+        });
+      });
+
+      describe('Button Section', () => {
+        it('should render button with correct icon', () => {
+          renderComponent();
+          expectErrorPageButton(testData.buttonText, testData.iconTestId);
+        });
+      });
+
+      describe('Translation Integration', () => {
+        it('should use translation keys for all text content', () => {
+          renderComponent();
+          expectTextElements([testData.title, testData.description, testData.buttonText]);
+        });
+      });
+
+      describe('Accessibility', () => {
+        it('should meet accessibility requirements', () => {
+          renderComponent();
+          expectErrorPageAccessibility(
+            testData.title,
+            testData.imageAlt,
+            testData.buttonText,
+            testData.iconTitle
+          );
+        });
+      });
+
+      describe('Layout Structure', () => {
+        it('should have correct layout structure', () => {
+          renderComponent();
+          expectErrorPageLayoutStructure(
+            testData.title,
+            testData.description,
+            testData.buttonText,
+            testData.imageAlt
+          );
+        });
+      });
+
+      // Component-specific features if provided
+      const specificFeatures = additionalTests?.specificFeatures;
+      if (specificFeatures && specificFeatures.length > 0) {
+        describe('Component-Specific Features', () => {
+          specificFeatures.forEach(({ name, test }) => {
+            it(name, test);
+          });
+        });
+      }
+
+      // Semantic differences if provided
+      const semanticDifferences = additionalTests?.semanticDifferences;
+      if (semanticDifferences && semanticDifferences.length > 0) {
+        describe('Semantic Differences', () => {
+          semanticDifferences.forEach(({ name, test }) => {
+            it(name, test);
+          });
+        });
+      }
+    });
+  };
+};

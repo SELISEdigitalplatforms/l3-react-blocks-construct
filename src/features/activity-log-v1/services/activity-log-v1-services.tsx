@@ -1,4 +1,4 @@
-import { ActivityGroup } from '../../services/activity-log.types';
+import { ActivityGroup, Module } from '../types/activity-log.types';
 
 // Shared activity items (de-duplicated)
 const shared = {
@@ -45,7 +45,7 @@ const shared = {
 };
 
 // Final de-duplicated array
-export const activities: ActivityGroup[] = [
+export const activitiesData: ActivityGroup[] = [
   {
     date: '2025-03-24T00:00:00Z',
     items: [
@@ -91,14 +91,19 @@ export const activities: ActivityGroup[] = [
   },
   {
     date: '2025-03-07T00:00:00Z',
-    items: [
-      { time: '2025-03-07T10:00:00Z', ...shared.deleteAdhesives },
-    ],
+    items: [{ time: '2025-03-07T10:00:00Z', ...shared.deleteAdhesives }],
   },
   {
     date: '2025-03-06T00:00:00Z',
-    items: [
-      { time: '2025-03-06T10:10:00Z', ...shared.reviewMeeting },
-    ],
+    items: [{ time: '2025-03-06T10:10:00Z', ...shared.reviewMeeting }],
   },
+];
+
+export const availableModulesData: Module[] = [
+  { id: 'task_manager', label: 'TASK_MANAGER' },
+  { id: 'calendar', label: 'CALENDAR' },
+  { id: 'mail', label: 'MAIL' },
+  { id: 'iam', label: 'IAM' },
+  { id: 'inventory', label: 'INVENTORY' },
+  { id: 'dashboard', label: 'DASHBOARD' },
 ];

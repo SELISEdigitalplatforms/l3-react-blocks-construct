@@ -1,4 +1,4 @@
-import { ActivityGroup } from '../../services/activity-log.types';
+import { ActivityGroup } from '../types/activity-log.types';
 
 // Shared reusable items (centralized for deduplication)
 const sharedActivities = {
@@ -44,7 +44,7 @@ const sharedActivities = {
   },
 };
 
-export const activities: ActivityGroup[] = [
+export const activitiesData: ActivityGroup[] = [
   {
     date: '2025-03-24T00:00:00Z',
     items: [
