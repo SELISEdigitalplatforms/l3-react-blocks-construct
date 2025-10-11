@@ -1,5 +1,6 @@
 import type { ActivityGroup } from '../../types/activity-log.types';
-import { ActivityLogItem } from './activity-log-item';
+import { getFormattedDateLabel } from '../../utils/activity-log-utils';
+import { ActivityLogItem } from '../activity-log-item/activity-log-item';
 
 /**
  * ActivityLogGroup Component
@@ -30,39 +31,12 @@ import { ActivityLogItem } from './activity-log-item';
  * />
  */
 
-const getFormattedDateLabel = (date: string) => {
-  const activityDate = new Date(date);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-
-  today.setHours(0, 0, 0, 0);
-  yesterday.setHours(0, 0, 0, 0);
-  activityDate.setHours(0, 0, 0, 0);
-
-  const formattedDate = new Date(date).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-
-  if (activityDate.getTime() === today.getTime()) {
-    return `TODAY - ${formattedDate}`;
-  } else if (activityDate.getTime() === yesterday.getTime()) {
-    return `YESTERDAY - ${formattedDate}`;
-  } else {
-    const weekdays = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-    const weekdayName = weekdays[activityDate.getDay()];
-    return `${weekdayName} - ${formattedDate}`;
-  }
-};
-
 interface ActivityLogGroupProps extends ActivityGroup {
   isLastIndex: boolean;
   isFirstIndex: boolean;
 }
 
-export const ActivityLogGroup = ({ date, items, isLastIndex }: ActivityLogGroupProps) => (
+export const ActivityLogGroup = ({ date, items, isLastIndex }: Readonly<ActivityLogGroupProps>) => (
   <div className="mb-8 relative">
     <div className="flex justify-center mb-4 relative z-10">
       <div className="bg-secondary-50 text-secondary-800 text-xs font-medium py-1 px-2 rounded">

@@ -16,6 +16,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { availableModulesData } from '../../services/activity-log-v1-services';
 
 /**
  * ActivityLogToolbar Component
@@ -56,20 +57,6 @@ interface ActivityLogToolbarProps {
   selectedCategory: string[];
   title?: string;
 }
-
-type Module = {
-  id: string;
-  label: string;
-};
-
-const availableModules: Module[] = [
-  { id: 'task_manager', label: 'TASK_MANAGER' },
-  { id: 'calendar', label: 'CALENDAR' },
-  { id: 'mail', label: 'MAIL' },
-  { id: 'iam', label: 'IAM' },
-  { id: 'inventory', label: 'INVENTORY' },
-  { id: 'dashboard', label: 'DASHBOARD' },
-];
 
 export const ActivityLogToolbar = ({
   onSearchChange,
@@ -174,7 +161,7 @@ export const ActivityLogToolbar = ({
               <CommandList>
                 <CommandEmpty>{t('NO_MODULES_FOUND')}</CommandEmpty>
                 <CommandGroup>
-                  {availableModules.map((module) => {
+                  {availableModulesData.map((module) => {
                     const isSelected = selectedCategory.includes(module.id);
                     return (
                       <CommandItem

@@ -45,7 +45,7 @@ export const ActivityLogItem = ({
   isEven,
   isFirst,
   isLast,
-}: ActivityLogItemProps) => (
+}: Readonly<ActivityLogItemProps>) => (
   <div
     className={`relative flex items-start mb-4 ${isLast ? 'mb-0' : ''} ${isFirst ? 'mt-0' : ''}`}
   >

@@ -44,7 +44,7 @@ const sharedActivities = {
   },
 };
 
-export const activities: ActivityGroup[] = [
+export const activitiesData: ActivityGroup[] = [
   {
     date: '2025-03-24T00:00:00Z',
     items: [

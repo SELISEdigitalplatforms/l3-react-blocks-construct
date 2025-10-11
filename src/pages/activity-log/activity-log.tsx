@@ -1,5 +1,5 @@
 import {
-  activities,
+  activitiesData,
   ActivityLogTimeline,
   ActivityLogToolbar,
   useActivityLogFilters,
@@ -19,7 +19,7 @@ export const ActivityLog = () => {
     selectedCategory,
     setSelectedCategory,
     filteredActivities,
-  } = useActivityLogFilters(activities);
+  } = useActivityLogFilters(activitiesData);
 
   return (
     <div className="flex w-full flex-col">

@@ -1,6 +1,6 @@
 import { Separator } from '@/components/ui/separator';
 import { ActivityGroup } from '../../types/activity-log.types';
-import { ActivityLogItem } from './activity-log-item';
+import { ActivityLogItem } from '../activity-log-item/activity-log-item';
 import { getFormattedDateLabel } from '../../utils/activity-log-utils';
 
 /**

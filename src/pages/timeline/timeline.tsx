@@ -1,5 +1,5 @@
 import { ActivityLogToolbar, useActivityLogFilters } from '@/features/activity-log-v1';
-import { activities, ActivityLogTimeline } from '@/features/activity-log-v2';
+import { activitiesData, ActivityLogTimeline } from '@/features/activity-log-v2';
 
 /**
  * Timeline Component
@@ -15,7 +15,7 @@ export function Timeline() {
     selectedCategory,
     setSelectedCategory,
     filteredActivities,
-  } = useActivityLogFilters(activities);
+  } = useActivityLogFilters(activitiesData);
 
   return (
     <div className="flex w-full flex-col">
