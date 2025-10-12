@@ -87,6 +87,56 @@ vi.mock('@/features/activity-log-v1', () => {
   };
 });
 
+// Helper functions to reduce code duplication
+const renderActivityLog = () => render(<ActivityLog />);
+
+const expectComponentToBeInDocument = (testId: string) => {
+  expect(screen.getByTestId(testId)).toBeInTheDocument();
+};
+
+const expectMainContainerStructure = (container: HTMLElement) => {
+  const mainContainer = container.firstChild as HTMLElement;
+  expect(mainContainer).toHaveClass('flex', 'w-full', 'flex-col');
+};
+
+const expectToolbarContent = (title = 'ACTIVITY_LOG', category = 'all') => {
+  expect(screen.getByTestId('toolbar-title')).toHaveTextContent(title);
+  expect(screen.getByTestId('selected-category')).toHaveTextContent(category);
+};
+
+const expectTimelineActivities = (activities = mockActivitiesData) => {
+  activities.forEach((activity) => {
+    expect(screen.getByTestId(`activity-${activity.id}`)).toHaveTextContent(activity.title);
+  });
+};
+
+const expectBothComponentsRendered = () => {
+  expectComponentToBeInDocument('activity-log-toolbar');
+  expectComponentToBeInDocument('activity-log-timeline');
+};
+
+const expectEventHandlerCall = (buttonText: string, mockFn: any, expectedArgs?: any) => {
+  const button = screen.getByText(buttonText);
+  button.click();
+
+  if (expectedArgs) {
+    expect(mockFn).toHaveBeenCalledWith(expectedArgs);
+  } else {
+    expect(mockFn).toHaveBeenCalled();
+  }
+};
+
+const mockFilteredActivitiesReturn = (overrides = {}) => {
+  return {
+    setSearchQuery: mockSetSearchQuery,
+    setDateRange: mockSetDateRange,
+    selectedCategory: 'all',
+    setSelectedCategory: mockSetSelectedCategory,
+    filteredActivities: mockFilteredActivities,
+    ...overrides,
+  };
+};
+
 describe('ActivityLog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -94,124 +144,88 @@ describe('ActivityLog', () => {
 
   describe('Component Rendering', () => {
     it('should render the main container with correct structure', () => {
-      const { container } = render(<ActivityLog />);
-
-      const mainContainer = container.firstChild as HTMLElement;
-      expect(mainContainer).toHaveClass('flex', 'w-full', 'flex-col');
+      const { container } = renderActivityLog();
+      expectMainContainerStructure(container);
     });
 
     it('should render ActivityLogToolbar component', () => {
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('activity-log-toolbar')).toBeInTheDocument();
+      renderActivityLog();
+      expectComponentToBeInDocument('activity-log-toolbar');
     });
 
     it('should render ActivityLogTimeline component', () => {
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('activity-log-timeline')).toBeInTheDocument();
+      renderActivityLog();
+      expectComponentToBeInDocument('activity-log-timeline');
     });
 
     it('should display the correct title in toolbar', () => {
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('toolbar-title')).toHaveTextContent('ACTIVITY_LOG');
+      renderActivityLog();
+      expectToolbarContent();
     });
   });
 
   describe('Hook Integration', () => {
     it('should call useActivityLogFilters hook with activitiesData', () => {
-      render(<ActivityLog />);
-
+      renderActivityLog();
       expect(mockUseActivityLogFilters).toHaveBeenCalled();
     });
 
     it('should pass filtered activities to timeline component', () => {
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('activity-1')).toHaveTextContent('Test Activity 1');
-      expect(screen.getByTestId('activity-2')).toHaveTextContent('Test Activity 2');
+      renderActivityLog();
+      expectTimelineActivities();
     });
 
     it('should display selected category from hook', () => {
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('selected-category')).toHaveTextContent('all');
+      renderActivityLog();
+      expectToolbarContent('ACTIVITY_LOG', 'all');
     });
   });
 
   describe('Props Passing', () => {
     it('should pass correct props to ActivityLogToolbar', () => {
-      render(<ActivityLog />);
-
-      const toolbar = screen.getByTestId('activity-log-toolbar');
-      expect(toolbar).toBeInTheDocument();
-
-      // Verify title prop
-      expect(screen.getByTestId('toolbar-title')).toHaveTextContent('ACTIVITY_LOG');
-
-      // Verify selectedCategory prop
-      expect(screen.getByTestId('selected-category')).toHaveTextContent('all');
+      renderActivityLog();
+      expectComponentToBeInDocument('activity-log-toolbar');
+      expectToolbarContent();
     });
 
     it('should pass filtered activities to ActivityLogTimeline', () => {
-      render(<ActivityLog />);
-
-      const timeline = screen.getByTestId('activity-log-timeline');
-      expect(timeline).toBeInTheDocument();
-
-      // Verify activities are passed correctly
-      expect(screen.getByTestId('activity-1')).toBeInTheDocument();
-      expect(screen.getByTestId('activity-2')).toBeInTheDocument();
+      renderActivityLog();
+      expectComponentToBeInDocument('activity-log-timeline');
+      expectTimelineActivities();
     });
   });
 
   describe('Event Handlers', () => {
     it('should pass setSearchQuery as onSearchChange to toolbar', () => {
-      render(<ActivityLog />);
-
-      const searchButton = screen.getByText('Search');
-      searchButton.click();
-
-      expect(mockSetSearchQuery).toHaveBeenCalledWith('test search');
+      renderActivityLog();
+      expectEventHandlerCall('Search', mockSetSearchQuery, 'test search');
     });
 
     it('should pass setDateRange as onDateRangeChange to toolbar', () => {
-      render(<ActivityLog />);
-
-      const dateRangeButton = screen.getByText('Date Range');
-      dateRangeButton.click();
-
-      expect(mockSetDateRange).toHaveBeenCalledWith({
+      renderActivityLog();
+      expectEventHandlerCall('Date Range', mockSetDateRange, {
         from: expect.any(Date),
         to: expect.any(Date),
       });
     });
 
     it('should pass setSelectedCategory as onCategoryChange to toolbar', () => {
-      render(<ActivityLog />);
-
-      const categoryButton = screen.getByText('Category');
-      categoryButton.click();
-
-      expect(mockSetSelectedCategory).toHaveBeenCalledWith('system');
+      renderActivityLog();
+      expectEventHandlerCall('Category', mockSetSelectedCategory, 'system');
     });
   });
 
   describe('Component Integration', () => {
     it('should render both toolbar and timeline components together', () => {
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('activity-log-toolbar')).toBeInTheDocument();
-      expect(screen.getByTestId('activity-log-timeline')).toBeInTheDocument();
+      renderActivityLog();
+      expectBothComponentsRendered();
     });
 
     it('should maintain proper component hierarchy', () => {
-      const { container } = render(<ActivityLog />);
+      const { container } = renderActivityLog();
+      expectMainContainerStructure(container);
 
       const mainDiv = container.firstChild;
-      expect(mainDiv).toHaveClass('flex', 'w-full', 'flex-col');
-
       const toolbar = screen.getByTestId('activity-log-toolbar');
       const timeline = screen.getByTestId('activity-log-timeline');
 
@@ -222,15 +236,11 @@ describe('ActivityLog', () => {
 
   describe('Data Flow', () => {
     it('should handle empty filtered activities', () => {
-      mockUseActivityLogFilters.mockReturnValueOnce({
-        setSearchQuery: mockSetSearchQuery,
-        setDateRange: mockSetDateRange,
-        selectedCategory: 'all',
-        setSelectedCategory: mockSetSelectedCategory,
-        filteredActivities: [],
-      });
+      mockUseActivityLogFilters.mockReturnValueOnce(
+        mockFilteredActivitiesReturn({ filteredActivities: [] })
+      );
 
-      render(<ActivityLog />);
+      renderActivityLog();
 
       const timeline = screen.getByTestId('activity-log-timeline');
       expect(timeline).toBeInTheDocument();
@@ -238,17 +248,12 @@ describe('ActivityLog', () => {
     });
 
     it('should handle different selected categories', () => {
-      mockUseActivityLogFilters.mockReturnValueOnce({
-        setSearchQuery: mockSetSearchQuery,
-        setDateRange: mockSetDateRange,
-        selectedCategory: 'system',
-        setSelectedCategory: mockSetSelectedCategory,
-        filteredActivities: mockFilteredActivities,
-      });
+      mockUseActivityLogFilters.mockReturnValueOnce(
+        mockFilteredActivitiesReturn({ selectedCategory: 'system' })
+      );
 
-      render(<ActivityLog />);
-
-      expect(screen.getByTestId('selected-category')).toHaveTextContent('system');
+      renderActivityLog();
+      expectToolbarContent('ACTIVITY_LOG', 'system');
     });
   });
 });

@@ -33,31 +33,119 @@ vi.mock('@/components/ui/input', () => ({
 }));
 
 vi.mock('@/components/ui/popover', () => ({
-  Popover: ({ children, open, onOpenChange }: any) => (
-    <div data-testid="popover" data-open={open} onClick={() => onOpenChange?.(!open)}>
-      {children}
-    </div>
-  ),
-  PopoverTrigger: ({ children }: any) => <div data-testid="popover-trigger">{children}</div>,
+  Popover: ({ children, open, onOpenChange }: any) => {
+    const handleClick = () => onOpenChange?.(!open);
+    const handleKeyDown = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleClick();
+      }
+      if (e.key === 'Escape' && open) {
+        e.preventDefault();
+        onOpenChange?.(false);
+      }
+    };
+
+    return (
+      <div
+        data-testid="popover"
+        data-open={open}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onKeyUp={(e: any) => {
+          // Additional keyboard support for accessibility
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-expanded={open}
+        aria-haspopup="true"
+        aria-label="Toggle popover"
+      >
+        {children}
+      </div>
+    );
+  },
+  PopoverTrigger: ({ children }: any) => {
+    const handleKeyDown = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.currentTarget.click();
+      }
+    };
+
+    const handleKeyUp = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+      }
+    };
+
+    return (
+      <div
+        data-testid="popover-trigger"
+        role="button"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
+        aria-label="Open popover"
+      >
+        {children}
+      </div>
+    );
+  },
   PopoverContent: ({ children, className }: any) => (
-    <div data-testid="popover-content" className={className}>
+    <div data-testid="popover-content" className={className} role="dialog" aria-modal="false">
       {children}
     </div>
   ),
 }));
 
 vi.mock('@/components/ui/calendar', () => ({
-  Calendar: ({ mode, onSelect, numberOfMonths, className }: any) => (
-    <div
-      data-testid="calendar"
-      data-mode={mode}
-      data-months={numberOfMonths}
-      className={className}
-      onClick={() => onSelect?.({ from: new Date('2024-01-01'), to: new Date('2024-01-31') })}
-    >
-      Calendar Component
-    </div>
-  ),
+  Calendar: ({ mode, onSelect, numberOfMonths, className }: any) => {
+    const handleDateSelect = () => {
+      onSelect?.({ from: new Date('2024-01-01'), to: new Date('2024-01-31') });
+    };
+
+    const handleKeyDown = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleDateSelect();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        // Calendar escape behavior - could close or clear selection
+      }
+    };
+
+    const handleKeyUp = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+      }
+    };
+
+    return (
+      <div
+        data-testid="calendar"
+        data-mode={mode}
+        data-months={numberOfMonths}
+        className={className}
+        onClick={handleDateSelect}
+        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
+        role="application"
+        tabIndex={0}
+        aria-label={`Calendar picker in ${mode} mode`}
+        aria-describedby="calendar-instructions"
+      >
+        <div id="calendar-instructions" className="sr-only">
+          Use arrow keys to navigate dates, Enter or Space to select
+        </div>
+        Calendar Component
+      </div>
+    );
+  },
 }));
 
 vi.mock('@/components/ui/command', () => ({
@@ -68,11 +156,35 @@ vi.mock('@/components/ui/command', () => ({
   CommandList: ({ children }: any) => <div data-testid="command-list">{children}</div>,
   CommandEmpty: ({ children }: any) => <div data-testid="command-empty">{children}</div>,
   CommandGroup: ({ children }: any) => <div data-testid="command-group">{children}</div>,
-  CommandItem: ({ children, onSelect, className }: any) => (
-    <div data-testid="command-item" className={className} onClick={onSelect}>
-      {children}
-    </div>
-  ),
+  CommandItem: ({ children, onSelect, className }: any) => {
+    const handleKeyDown = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onSelect?.();
+      }
+    };
+
+    const handleKeyUp = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+      }
+    };
+
+    return (
+      <div
+        data-testid="command-item"
+        className={className}
+        onClick={onSelect}
+        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
+        role="button"
+        tabIndex={0}
+        aria-label="Select item"
+      >
+        {children}
+      </div>
+    );
+  },
 }));
 
 // Mock Lucide icons

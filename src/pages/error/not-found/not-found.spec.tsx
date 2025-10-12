@@ -43,6 +43,31 @@ const TEST_DATA: ErrorPageTestData = {
 // Render helper
 const renderComponent = () => render(<NotFound />);
 
+// Helper functions to reduce code duplication
+const expectNotFoundMessaging = () => {
+  expectTextElements([TEST_DATA.title, TEST_DATA.description]);
+};
+
+const expectArrowRightIconAndButton = () => {
+  expectErrorPageButton(TEST_DATA.buttonText, TEST_DATA.iconTestId);
+};
+
+const expectNotFoundImageAttributes = () => {
+  expectErrorPageImage(TEST_DATA.imageAlt, TEST_DATA.imageSrc);
+};
+
+const expectNavigationFocusedButton = () => {
+  expectErrorPageButton(TEST_DATA.buttonText);
+};
+
+const expectPermanentNotFoundMessaging = () => {
+  expectTextElements(['COULDNT_FIND_WHAT_YOU_LOOKING_FOR', 'PAGE_MAY_MOVED_NO_LONGER_EXISTS']);
+};
+
+const expectNavigationActionInsteadOfReload = () => {
+  expectErrorPageButton('TAKE_ME_BACK', 'arrow-right-icon');
+};
+
 // Create and execute the test suite using shared factory
 const testSuite = createErrorPageTestSuite('NotFound', TEST_DATA, renderComponent, {
   specificFeatures: [
@@ -50,28 +75,28 @@ const testSuite = createErrorPageTestSuite('NotFound', TEST_DATA, renderComponen
       name: 'should display not found messaging',
       test: () => {
         renderComponent();
-        expectTextElements([TEST_DATA.title, TEST_DATA.description]);
+        expectNotFoundMessaging();
       },
     },
     {
       name: 'should use arrow right icon instead of refresh icon',
       test: () => {
         renderComponent();
-        expectErrorPageButton(TEST_DATA.buttonText, TEST_DATA.iconTestId);
+        expectArrowRightIconAndButton();
       },
     },
     {
       name: 'should use not found image with correct attributes',
       test: () => {
         renderComponent();
-        expectErrorPageImage(TEST_DATA.imageAlt, TEST_DATA.imageSrc);
+        expectNotFoundImageAttributes();
       },
     },
     {
       name: 'should have navigation-focused button text',
       test: () => {
         renderComponent();
-        expectErrorPageButton(TEST_DATA.buttonText);
+        expectNavigationFocusedButton();
       },
     },
   ],
@@ -80,17 +105,14 @@ const testSuite = createErrorPageTestSuite('NotFound', TEST_DATA, renderComponen
       name: 'should convey permanent not found vs temporary unavailability',
       test: () => {
         renderComponent();
-        expectTextElements([
-          'COULDNT_FIND_WHAT_YOU_LOOKING_FOR',
-          'PAGE_MAY_MOVED_NO_LONGER_EXISTS',
-        ]);
+        expectPermanentNotFoundMessaging();
       },
     },
     {
       name: 'should use navigation action instead of reload action',
       test: () => {
         renderComponent();
-        expectErrorPageButton('TAKE_ME_BACK', 'arrow-right-icon');
+        expectNavigationActionInsteadOfReload();
       },
     },
   ],
