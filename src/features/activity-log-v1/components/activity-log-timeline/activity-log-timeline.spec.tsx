@@ -82,6 +82,63 @@ const mockActivityGroups: ActivityGroup[] = [
   },
 ];
 
+// Helper functions to reduce code duplication
+const renderActivityLogTimeline = (activities: ActivityGroup[] = mockActivityGroups) => {
+  return render(<ActivityLogTimeline activities={activities} />);
+};
+
+const expectEmptyStateToBeRendered = () => {
+  // Should show illustration (using presentation role since alt="")
+  const illustration = screen.getByRole('presentation');
+  expect(illustration).toBeInTheDocument();
+  expect(illustration).toHaveAttribute('src', 'mocked-illustration.svg');
+  expect(illustration).toHaveAttribute('alt', '');
+  expect(illustration).toHaveClass('h-[160px]', 'w-[240px]');
+
+  // Should show empty message
+  expect(screen.getByText('COULDNT_FIND_ANYTHING_MATCHING')).toBeInTheDocument();
+
+  // Should not render Card component
+  expect(screen.queryByTestId('card')).not.toBeInTheDocument();
+};
+
+const expectCardToBeRendered = () => {
+  const card = screen.getByTestId('card');
+  expect(card).toBeInTheDocument();
+  expect(card).toHaveClass('w-full', 'border-none', 'rounded-[8px]', 'shadow-sm');
+};
+
+const expectActivityGroupsToBeRendered = (expectedGroups: ActivityGroup[]) => {
+  const activityGroups = screen.queryAllByTestId('activity-log-group');
+  expect(activityGroups).toHaveLength(expectedGroups.length);
+
+  expectedGroups.forEach((group, index) => {
+    expect(activityGroups[index]).toHaveAttribute('data-date', group.date);
+    expect(activityGroups[index]).toHaveAttribute(
+      'data-is-last',
+      String(index === expectedGroups.length - 1)
+    );
+  });
+};
+
+const expectGroupDatesAndItemCounts = (expectedGroups: ActivityGroup[]) => {
+  // Check dates are displayed
+  expectedGroups.forEach((group) => {
+    expect(screen.getByText(group.date)).toBeInTheDocument();
+  });
+
+  // Check item counts (from our mock)
+  const itemCounts = screen.getAllByTestId('group-items-count');
+  expectedGroups.forEach((group, index) => {
+    expect(itemCounts[index]).toHaveTextContent(String(group.items.length));
+  });
+};
+
+const expectInfiniteScrollToBeCalledWith = (mockFn: any, totalItems: number) => {
+  expect(mockFn).toHaveBeenCalledTimes(1);
+  expect(mockFn).toHaveBeenCalledWith(totalItems);
+};
+
 describe('ActivityLogTimeline V1', () => {
   const mockUseInfiniteScroll = vi.mocked(useInfiniteScroll);
 
@@ -96,24 +153,12 @@ describe('ActivityLogTimeline V1', () => {
 
   describe('Empty State', () => {
     it('should render empty state when no activities provided', () => {
-      render(<ActivityLogTimeline activities={[]} />);
-
-      // Should show illustration (using presentation role since alt="")
-      const illustration = screen.getByRole('presentation');
-      expect(illustration).toBeInTheDocument();
-      expect(illustration).toHaveAttribute('src', 'mocked-illustration.svg');
-      expect(illustration).toHaveAttribute('alt', '');
-      expect(illustration).toHaveClass('h-[160px]', 'w-[240px]');
-
-      // Should show empty message
-      expect(screen.getByText('COULDNT_FIND_ANYTHING_MATCHING')).toBeInTheDocument();
-
-      // Should not render Card component
-      expect(screen.queryByTestId('card')).not.toBeInTheDocument();
+      renderActivityLogTimeline([]);
+      expectEmptyStateToBeRendered();
     });
 
     it('should render empty state with correct styling', () => {
-      const { container } = render(<ActivityLogTimeline activities={[]} />);
+      const { container } = renderActivityLogTimeline([]);
 
       const emptyStateContainer = container.querySelector(
         '.flex.h-full.w-full.flex-col.gap-6.items-center.justify-center.p-8.text-center'
@@ -127,15 +172,12 @@ describe('ActivityLogTimeline V1', () => {
 
   describe('Timeline with Activities', () => {
     it('should render Card component when activities are provided', () => {
-      render(<ActivityLogTimeline activities={mockActivityGroups} />);
-
-      const card = screen.getByTestId('card');
-      expect(card).toBeInTheDocument();
-      expect(card).toHaveClass('w-full', 'border-none', 'rounded-[8px]', 'shadow-sm');
+      renderActivityLogTimeline();
+      expectCardToBeRendered();
     });
 
     it('should render scrollable container with correct styling', () => {
-      const { container } = render(<ActivityLogTimeline activities={mockActivityGroups} />);
+      const { container } = renderActivityLogTimeline();
 
       const scrollContainer = container.querySelector(
         '.px-12.py-8.h-\\[800px\\].overflow-y-auto.scrollbar-hide'
@@ -144,7 +186,7 @@ describe('ActivityLogTimeline V1', () => {
     });
 
     it('should render timeline visual indicator', () => {
-      const { container } = render(<ActivityLogTimeline activities={mockActivityGroups} />);
+      const { container } = renderActivityLogTimeline();
 
       // Main timeline line
       const timelineLine = container.querySelector(
@@ -164,50 +206,25 @@ describe('ActivityLogTimeline V1', () => {
 
   describe('Activity Groups Rendering', () => {
     it('should render all activity groups', () => {
-      render(<ActivityLogTimeline activities={mockActivityGroups} />);
-
-      const activityGroups = screen.getAllByTestId('activity-log-group');
-      expect(activityGroups).toHaveLength(3);
-
-      // Verify each group is rendered with correct date
-      expect(activityGroups[0]).toHaveAttribute('data-date', '2024-01-15');
-      expect(activityGroups[1]).toHaveAttribute('data-date', '2024-01-14');
-      expect(activityGroups[2]).toHaveAttribute('data-date', '2024-01-13');
+      renderActivityLogTimeline();
+      expectActivityGroupsToBeRendered(mockActivityGroups);
     });
 
     it('should pass correct isLastIndex prop to groups', () => {
-      render(<ActivityLogTimeline activities={mockActivityGroups} />);
-
-      const activityGroups = screen.getAllByTestId('activity-log-group');
-
-      // Only the last group should have isLastIndex=true
-      expect(activityGroups[0]).toHaveAttribute('data-is-last', 'false');
-      expect(activityGroups[1]).toHaveAttribute('data-is-last', 'false');
-      expect(activityGroups[2]).toHaveAttribute('data-is-last', 'true');
+      renderActivityLogTimeline();
+      expectActivityGroupsToBeRendered(mockActivityGroups);
     });
 
     it('should render group dates and item counts correctly', () => {
-      render(<ActivityLogTimeline activities={mockActivityGroups} />);
-
-      // Check dates are displayed
-      expect(screen.getByText('2024-01-15')).toBeInTheDocument();
-      expect(screen.getByText('2024-01-14')).toBeInTheDocument();
-      expect(screen.getByText('2024-01-13')).toBeInTheDocument();
-
-      // Check item counts (from our mock)
-      const itemCounts = screen.getAllByTestId('group-items-count');
-      expect(itemCounts[0]).toHaveTextContent('2'); // First group has 2 items
-      expect(itemCounts[1]).toHaveTextContent('1'); // Second group has 1 item
-      expect(itemCounts[2]).toHaveTextContent('1'); // Third group has 1 item
+      renderActivityLogTimeline();
+      expectGroupDatesAndItemCounts(mockActivityGroups);
     });
   });
 
   describe('Infinite Scroll Integration', () => {
     it('should call useInfiniteScroll hook with correct parameters', () => {
-      render(<ActivityLogTimeline activities={mockActivityGroups} />);
-
-      expect(mockUseInfiniteScroll).toHaveBeenCalledTimes(1);
-      expect(mockUseInfiniteScroll).toHaveBeenCalledWith(3);
+      renderActivityLogTimeline();
+      expectInfiniteScrollToBeCalledWith(mockUseInfiniteScroll, mockActivityGroups.length);
     });
 
     it('should render only visible activities based on visibleCount', () => {
@@ -217,12 +234,19 @@ describe('ActivityLogTimeline V1', () => {
         containerRef: { current: null },
       });
 
-      render(<ActivityLogTimeline activities={mockActivityGroups} />);
+      renderActivityLogTimeline();
 
-      const activityGroups = screen.getAllByTestId('activity-log-group');
-      expect(activityGroups).toHaveLength(2); // Only first 2 should be visible
+      // Check that only 2 activities are rendered
+      const activityGroups = screen.queryAllByTestId('activity-log-group');
+      expect(activityGroups).toHaveLength(2);
       expect(activityGroups[0]).toHaveAttribute('data-date', '2024-01-15');
       expect(activityGroups[1]).toHaveAttribute('data-date', '2024-01-14');
+
+      // The isLastIndex is based on the original array length, not visible count
+      // So with 3 total activities, only index 2 would have isLastIndex=true
+      // Since we only render index 0 and 1, both should have isLastIndex=false
+      expect(activityGroups[0]).toHaveAttribute('data-is-last', 'false');
+      expect(activityGroups[1]).toHaveAttribute('data-is-last', 'false');
     });
 
     it('should handle large number of activities', () => {
@@ -231,22 +255,16 @@ describe('ActivityLogTimeline V1', () => {
         items: [{ time: '10:00', category: 'test', description: `Activity ${i + 1}` }],
       }));
 
-      render(<ActivityLogTimeline activities={largeActivityList} />);
-
-      // Should call useInfiniteScroll with total count
-      expect(mockUseInfiniteScroll).toHaveBeenCalledTimes(1);
-      expect(mockUseInfiniteScroll).toHaveBeenCalledWith(20);
+      renderActivityLogTimeline(largeActivityList);
+      expectInfiniteScrollToBeCalledWith(mockUseInfiniteScroll, 20);
     });
   });
 
   describe('Edge Cases', () => {
     it('should handle single activity group', () => {
       const singleGroup = [mockActivityGroups[0]];
-      render(<ActivityLogTimeline activities={singleGroup} />);
-
-      const activityGroups = screen.getAllByTestId('activity-log-group');
-      expect(activityGroups).toHaveLength(1);
-      expect(activityGroups[0]).toHaveAttribute('data-is-last', 'true');
+      renderActivityLogTimeline(singleGroup);
+      expectActivityGroupsToBeRendered(singleGroup);
     });
 
     it('should handle activities with no items', () => {
@@ -257,20 +275,14 @@ describe('ActivityLogTimeline V1', () => {
         },
       ];
 
-      render(<ActivityLogTimeline activities={emptyItemsGroup} />);
-
-      const activityGroups = screen.getAllByTestId('activity-log-group');
-      expect(activityGroups).toHaveLength(1);
-
-      const itemCount = screen.getByTestId('group-items-count');
-      expect(itemCount).toHaveTextContent('0');
+      renderActivityLogTimeline(emptyItemsGroup);
+      expectActivityGroupsToBeRendered(emptyItemsGroup);
+      expectGroupDatesAndItemCounts(emptyItemsGroup);
     });
 
     it('should use translation for empty state message', () => {
-      render(<ActivityLogTimeline activities={[]} />);
-
-      // The translation mock should return the key as-is
-      expect(screen.getByText('COULDNT_FIND_ANYTHING_MATCHING')).toBeInTheDocument();
+      renderActivityLogTimeline([]);
+      expectEmptyStateToBeRendered();
     });
   });
 });

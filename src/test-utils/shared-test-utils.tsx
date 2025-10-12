@@ -587,6 +587,102 @@ export interface ErrorPageTestData {
   iconTitle: string;
 }
 
+// Helper function to create specific feature tests (reduces nesting)
+const createSpecificFeatureTests = (features: Array<{ name: string; test: () => void }>) => {
+  features.forEach(({ name, test }) => {
+    it(name, test);
+  });
+};
+
+// Helper function to create semantic difference tests (reduces nesting)
+const createSemanticDifferenceTests = (differences: Array<{ name: string; test: () => void }>) => {
+  differences.forEach(({ name, test }) => {
+    it(name, test);
+  });
+};
+
+// Helper function to create core test suites (reduces nesting)
+const createCoreTestSuites = (testData: ErrorPageTestData, renderComponent: () => any) => {
+  describe('Basic Rendering', () => {
+    it('should render without crashing and have correct structure', () => {
+      renderComponent();
+      expectErrorPageStructure(testData.title);
+    });
+  });
+
+  describe('Image Section', () => {
+    it('should render the error image correctly', () => {
+      renderComponent();
+      expectErrorPageImage(testData.imageAlt, testData.imageSrc);
+    });
+  });
+
+  describe('Text Content', () => {
+    it('should render title and description with correct styling', () => {
+      renderComponent();
+      expectErrorPageTextContent(testData.title, testData.description);
+    });
+  });
+
+  describe('Button Section', () => {
+    it('should render button with correct icon', () => {
+      renderComponent();
+      expectErrorPageButton(testData.buttonText, testData.iconTestId);
+    });
+  });
+
+  describe('Translation Integration', () => {
+    it('should use translation keys for all text content', () => {
+      renderComponent();
+      expectTextElements([testData.title, testData.description, testData.buttonText]);
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should meet accessibility requirements', () => {
+      renderComponent();
+      expectErrorPageAccessibility(
+        testData.title,
+        testData.imageAlt,
+        testData.buttonText,
+        testData.iconTitle
+      );
+    });
+  });
+
+  describe('Layout Structure', () => {
+    it('should have correct layout structure', () => {
+      renderComponent();
+      expectErrorPageLayoutStructure(
+        testData.title,
+        testData.description,
+        testData.buttonText,
+        testData.imageAlt
+      );
+    });
+  });
+};
+
+// Helper function to create additional test suites (reduces nesting)
+const createAdditionalTestSuites = (additionalTests?: {
+  specificFeatures?: Array<{ name: string; test: () => void }>;
+  semanticDifferences?: Array<{ name: string; test: () => void }>;
+}) => {
+  const specificFeatures = additionalTests?.specificFeatures;
+  if (specificFeatures && specificFeatures.length > 0) {
+    describe('Component-Specific Features', () => {
+      createSpecificFeatureTests(specificFeatures);
+    });
+  }
+
+  const semanticDifferences = additionalTests?.semanticDifferences;
+  if (semanticDifferences && semanticDifferences.length > 0) {
+    describe('Semantic Differences', () => {
+      createSemanticDifferenceTests(semanticDifferences);
+    });
+  }
+};
+
 export const createErrorPageTestSuite = (
   componentName: string,
   testData: ErrorPageTestData,
@@ -604,84 +700,8 @@ export const createErrorPageTestSuite = (
 ) => {
   return () => {
     describe(`${componentName} Component`, () => {
-      describe('Basic Rendering', () => {
-        it('should render without crashing and have correct structure', () => {
-          renderComponent();
-          expectErrorPageStructure(testData.title);
-        });
-      });
-
-      describe('Image Section', () => {
-        it('should render the error image correctly', () => {
-          renderComponent();
-          expectErrorPageImage(testData.imageAlt, testData.imageSrc);
-        });
-      });
-
-      describe('Text Content', () => {
-        it('should render title and description with correct styling', () => {
-          renderComponent();
-          expectErrorPageTextContent(testData.title, testData.description);
-        });
-      });
-
-      describe('Button Section', () => {
-        it('should render button with correct icon', () => {
-          renderComponent();
-          expectErrorPageButton(testData.buttonText, testData.iconTestId);
-        });
-      });
-
-      describe('Translation Integration', () => {
-        it('should use translation keys for all text content', () => {
-          renderComponent();
-          expectTextElements([testData.title, testData.description, testData.buttonText]);
-        });
-      });
-
-      describe('Accessibility', () => {
-        it('should meet accessibility requirements', () => {
-          renderComponent();
-          expectErrorPageAccessibility(
-            testData.title,
-            testData.imageAlt,
-            testData.buttonText,
-            testData.iconTitle
-          );
-        });
-      });
-
-      describe('Layout Structure', () => {
-        it('should have correct layout structure', () => {
-          renderComponent();
-          expectErrorPageLayoutStructure(
-            testData.title,
-            testData.description,
-            testData.buttonText,
-            testData.imageAlt
-          );
-        });
-      });
-
-      // Component-specific features if provided
-      const specificFeatures = additionalTests?.specificFeatures;
-      if (specificFeatures && specificFeatures.length > 0) {
-        describe('Component-Specific Features', () => {
-          specificFeatures.forEach(({ name, test }) => {
-            it(name, test);
-          });
-        });
-      }
-
-      // Semantic differences if provided
-      const semanticDifferences = additionalTests?.semanticDifferences;
-      if (semanticDifferences && semanticDifferences.length > 0) {
-        describe('Semantic Differences', () => {
-          semanticDifferences.forEach(({ name, test }) => {
-            it(name, test);
-          });
-        });
-      }
+      createCoreTestSuites(testData, renderComponent);
+      createAdditionalTestSuites(additionalTests);
     });
   };
 };

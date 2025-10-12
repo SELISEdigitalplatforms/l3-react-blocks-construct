@@ -113,7 +113,7 @@ export const ActivityLogToolbar = ({
   return (
     <div className="mb-[18px] flex flex-col sm:flex-row sm:items-center sm:justify-between md:mb-[32px]">
       <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
-        {t(title || 'ACTIVITY_LOG')}
+        {t(title ?? 'ACTIVITY_LOG')}
       </h3>
       <div className="flex flex-col gap-2 mt-2 sm:mt-0 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative  w-full sm:w-64">

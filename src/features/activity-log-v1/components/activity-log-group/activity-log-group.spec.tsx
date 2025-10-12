@@ -59,6 +59,38 @@ const mockProps = {
   isLastIndex: false,
 };
 
+// Helper functions to reduce code duplication
+const renderActivityLogGroup = (props = mockProps) => {
+  return render(<ActivityLogGroup {...props} />);
+};
+
+const getExpectedDateLabel = (date: string) => `MOCK_WEEKDAY - ${date}`;
+
+const expectActivityItemsToBeRendered = (items: ActivityItem[]) => {
+  const activityItems = screen.queryAllByTestId('activity-log-item');
+  expect(activityItems).toHaveLength(items.length);
+  
+  items.forEach((item, index) => {
+    expect(activityItems[index]).toHaveAttribute('data-time', item.time);
+    expect(activityItems[index]).toHaveAttribute('data-category', item.category);
+    expect(activityItems[index]).toHaveTextContent(item.description);
+  });
+};
+
+const expectDateLabelToBeDisplayed = (date: string) => {
+  const expectedLabel = getExpectedDateLabel(date);
+  expect(screen.getByText(expectedLabel)).toBeInTheDocument();
+};
+
+const expectSeparatorVisibility = (shouldBeVisible: boolean) => {
+  const separator = screen.queryByTestId('separator');
+  if (shouldBeVisible) {
+    expect(separator).toBeInTheDocument();
+  } else {
+    expect(separator).not.toBeInTheDocument();
+  }
+};
+
 describe('ActivityLogGroup', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -66,22 +98,22 @@ describe('ActivityLogGroup', () => {
 
   describe('Component Rendering', () => {
     it('should render the main container with correct structure', () => {
-      const { container } = render(<ActivityLogGroup {...mockProps} />);
+      const { container } = renderActivityLogGroup();
 
       const mainContainer = container.firstChild as HTMLElement;
       expect(mainContainer).toHaveClass('mb-6', 'relative');
     });
 
     it('should render the date label container with correct styling', () => {
-      render(<ActivityLogGroup {...mockProps} />);
+      renderActivityLogGroup();
 
-      const dateLabel = screen.getByText('MOCK_WEEKDAY - 2024-01-15');
+      const dateLabel = screen.getByText(getExpectedDateLabel(mockProps.date));
       expect(dateLabel).toBeInTheDocument();
       expect(dateLabel).toHaveClass('text-low-emphasis', 'font-medium', 'text-xs', 'mb-2', 'pb-1');
     });
 
     it('should render the items container with correct styling', () => {
-      const { container } = render(<ActivityLogGroup {...mockProps} />);
+      const { container } = renderActivityLogGroup();
 
       const itemsContainer = container.querySelector('.relative:last-child');
       expect(itemsContainer).toBeInTheDocument();
@@ -89,23 +121,8 @@ describe('ActivityLogGroup', () => {
     });
 
     it('should render all activity items', () => {
-      render(<ActivityLogGroup {...mockProps} />);
-
-      const activityItems = screen.getAllByTestId('activity-log-item');
-      expect(activityItems).toHaveLength(3);
-
-      // Verify each item is rendered with correct props
-      expect(activityItems[0]).toHaveAttribute('data-time', '10:30');
-      expect(activityItems[0]).toHaveAttribute('data-category', 'system');
-      expect(activityItems[0]).toHaveTextContent('User logged in successfully');
-
-      expect(activityItems[1]).toHaveAttribute('data-time', '11:45');
-      expect(activityItems[1]).toHaveAttribute('data-category', 'task');
-      expect(activityItems[1]).toHaveTextContent('Task completed: Review documents');
-
-      expect(activityItems[2]).toHaveAttribute('data-time', '14:20');
-      expect(activityItems[2]).toHaveAttribute('data-category', 'notification');
-      expect(activityItems[2]).toHaveTextContent('New message received');
+      renderActivityLogGroup();
+      expectActivityItemsToBeRendered(mockActivityItems);
     });
   });
 
@@ -113,82 +130,66 @@ describe('ActivityLogGroup', () => {
     it('should call getFormattedDateLabel with the correct date', async () => {
       const { getFormattedDateLabel } = vi.mocked(await import('../../utils/activity-log-utils'));
 
-      render(<ActivityLogGroup {...mockProps} />);
+      renderActivityLogGroup();
 
-      expect(getFormattedDateLabel).toHaveBeenCalledWith('2024-01-15');
+      expect(getFormattedDateLabel).toHaveBeenCalledWith(mockProps.date);
     });
 
     it('should display the formatted date label', () => {
-      render(<ActivityLogGroup {...mockProps} />);
-
-      expect(screen.getByText('MOCK_WEEKDAY - 2024-01-15')).toBeInTheDocument();
+      renderActivityLogGroup();
+      expectDateLabelToBeDisplayed(mockProps.date);
     });
 
     it('should handle different date formats', () => {
-      const propsWithDifferentDate = {
-        ...mockProps,
-        date: '2024-12-25',
-      };
+      const testDate = '2024-12-25';
+      const propsWithDifferentDate = { ...mockProps, date: testDate };
 
-      render(<ActivityLogGroup {...propsWithDifferentDate} />);
-
-      expect(screen.getByText('MOCK_WEEKDAY - 2024-12-25')).toBeInTheDocument();
+      renderActivityLogGroup(propsWithDifferentDate);
+      expectDateLabelToBeDisplayed(testDate);
     });
   });
 
   describe('Activity Items Rendering', () => {
     it('should render items with unique keys', () => {
-      const { container } = render(<ActivityLogGroup {...mockProps} />);
+      const { container } = renderActivityLogGroup();
 
       const activityItems = container.querySelectorAll('[data-testid="activity-log-item"]');
-      expect(activityItems).toHaveLength(3);
+      expect(activityItems).toHaveLength(mockActivityItems.length);
 
       // Verify items are rendered in correct order
-      expect(activityItems[0]).toHaveTextContent('User logged in successfully');
-      expect(activityItems[1]).toHaveTextContent('Task completed: Review documents');
-      expect(activityItems[2]).toHaveTextContent('New message received');
+      mockActivityItems.forEach((item, index) => {
+        expect(activityItems[index]).toHaveTextContent(item.description);
+      });
     });
 
     it('should handle empty items array', () => {
-      const propsWithEmptyItems = {
-        ...mockProps,
-        items: [],
-      };
+      const emptyItems: ActivityItem[] = [];
+      const propsWithEmptyItems = { ...mockProps, items: emptyItems };
 
-      render(<ActivityLogGroup {...propsWithEmptyItems} />);
+      renderActivityLogGroup(propsWithEmptyItems);
 
-      const activityItems = screen.queryAllByTestId('activity-log-item');
-      expect(activityItems).toHaveLength(0);
-
-      // Date label should still be rendered
-      expect(screen.getByText('MOCK_WEEKDAY - 2024-01-15')).toBeInTheDocument();
+      expectActivityItemsToBeRendered(emptyItems);
+      expectDateLabelToBeDisplayed(mockProps.date);
     });
 
     it('should handle single item', () => {
-      const propsWithSingleItem = {
-        ...mockProps,
-        items: [mockActivityItems[0]],
-      };
+      const singleItem = [mockActivityItems[0]];
+      const propsWithSingleItem = { ...mockProps, items: singleItem };
 
-      render(<ActivityLogGroup {...propsWithSingleItem} />);
-
-      const activityItems = screen.getAllByTestId('activity-log-item');
-      expect(activityItems).toHaveLength(1);
-      expect(activityItems[0]).toHaveTextContent('User logged in successfully');
+      renderActivityLogGroup(propsWithSingleItem);
+      expectActivityItemsToBeRendered(singleItem);
     });
   });
 
   describe('Separator Rendering', () => {
     it('should render separator when isLastIndex is false', () => {
-      render(<ActivityLogGroup {...mockProps} isLastIndex={false} />);
-
-      expect(screen.getByTestId('separator')).toBeInTheDocument();
+      renderActivityLogGroup({ ...mockProps, isLastIndex: false });
+      expectSeparatorVisibility(true);
     });
 
     it('should not render separator when isLastIndex is true', () => {
-      render(<ActivityLogGroup {...mockProps} isLastIndex={true} />);
-
-      expect(screen.queryByTestId('separator')).not.toBeInTheDocument();
+      renderActivityLogGroup({ ...mockProps, isLastIndex: true });
+      expectSeparatorVisibility(false);
     });
   });
 
@@ -206,30 +207,22 @@ describe('ActivityLogGroup', () => {
         isLastIndex: true,
       };
 
-      render(<ActivityLogGroup {...testProps} />);
+      renderActivityLogGroup(testProps);
 
-      expect(screen.getByText('MOCK_WEEKDAY - 2024-06-15')).toBeInTheDocument();
-      expect(screen.getByTestId('activity-log-item')).toHaveTextContent('Team standup meeting');
-      expect(screen.queryByTestId('separator')).not.toBeInTheDocument();
+      expectDateLabelToBeDisplayed(testProps.date);
+      expectActivityItemsToBeRendered(testProps.items);
+      expectSeparatorVisibility(false);
     });
 
     it('should pass correct props to ActivityLogItem components', () => {
-      render(<ActivityLogGroup {...mockProps} />);
-
-      const activityItems = screen.getAllByTestId('activity-log-item');
-
-      // Verify props are passed correctly to each ActivityLogItem
-      mockActivityItems.forEach((item, index) => {
-        expect(activityItems[index]).toHaveAttribute('data-time', item.time);
-        expect(activityItems[index]).toHaveAttribute('data-category', item.category);
-        expect(activityItems[index]).toHaveTextContent(item.description);
-      });
+      renderActivityLogGroup();
+      expectActivityItemsToBeRendered(mockActivityItems);
     });
   });
 
   describe('Component Structure', () => {
     it('should maintain proper DOM hierarchy', () => {
-      const { container } = render(<ActivityLogGroup {...mockProps} />);
+      const { container } = renderActivityLogGroup();
 
       const mainContainer = container.firstChild as HTMLElement;
 
@@ -245,18 +238,17 @@ describe('ActivityLogGroup', () => {
       expect(itemsContainer).toHaveClass('relative');
 
       // Check separator is last child (when not isLastIndex)
-      const separator = screen.getByTestId('separator');
-      expect(mainContainer).toContainElement(separator);
+      expectSeparatorVisibility(true);
     });
 
     it('should render components in correct order', () => {
-      const { container } = render(<ActivityLogGroup {...mockProps} />);
+      const { container } = renderActivityLogGroup();
 
       const mainContainer = container.firstChild as HTMLElement;
       const children = Array.from(mainContainer.children);
 
       // First child: date label
-      expect(children[0]).toHaveTextContent('MOCK_WEEKDAY - 2024-01-15');
+      expect(children[0]).toHaveTextContent(getExpectedDateLabel(mockProps.date));
 
       // Second child: items container
       expect(children[1]).toHaveClass('relative');
@@ -268,58 +260,40 @@ describe('ActivityLogGroup', () => {
 
   describe('Edge Cases', () => {
     it('should handle very long descriptions', () => {
-      const propsWithLongDescription = {
-        ...mockProps,
-        items: [
-          {
-            time: '10:30',
-            category: 'system',
-            description:
-              'This is a very long description that might wrap to multiple lines and should be handled gracefully by the component without breaking the layout or functionality',
-          },
-        ],
+      const longDescriptionItem = {
+        time: '10:30',
+        category: 'system',
+        description:
+          'This is a very long description that might wrap to multiple lines and should be handled gracefully by the component without breaking the layout or functionality',
       };
+      const propsWithLongDescription = { ...mockProps, items: [longDescriptionItem] };
 
-      render(<ActivityLogGroup {...propsWithLongDescription} />);
-
-      const activityItem = screen.getByTestId('activity-log-item');
-      expect(activityItem).toHaveTextContent(propsWithLongDescription.items[0].description);
+      renderActivityLogGroup(propsWithLongDescription);
+      expectActivityItemsToBeRendered([longDescriptionItem]);
     });
 
     it('should handle special characters in descriptions', () => {
-      const propsWithSpecialChars = {
-        ...mockProps,
-        items: [
-          {
-            time: '10:30',
-            category: 'system',
-            description: 'Special chars: @#$%^&*()_+-=[]{}|;:,.<>?',
-          },
-        ],
+      const specialCharsItem = {
+        time: '10:30',
+        category: 'system',
+        description: 'Special chars: @#$%^&*()_+-=[]{}|;:,.<>?',
       };
+      const propsWithSpecialChars = { ...mockProps, items: [specialCharsItem] };
 
-      render(<ActivityLogGroup {...propsWithSpecialChars} />);
-
-      const activityItem = screen.getByTestId('activity-log-item');
-      expect(activityItem).toHaveTextContent('Special chars: @#$%^&*()_+-=[]{}|;:,.<>?');
+      renderActivityLogGroup(propsWithSpecialChars);
+      expectActivityItemsToBeRendered([specialCharsItem]);
     });
 
     it('should handle different time formats', () => {
-      const propsWithDifferentTimes = {
-        ...mockProps,
-        items: [
-          { time: '9:05', category: 'system', description: 'Morning activity' },
-          { time: '13:30', category: 'task', description: 'Afternoon activity' },
-          { time: '23:59', category: 'notification', description: 'Late night activity' },
-        ],
-      };
+      const differentTimeItems = [
+        { time: '9:05', category: 'system', description: 'Morning activity' },
+        { time: '13:30', category: 'task', description: 'Afternoon activity' },
+        { time: '23:59', category: 'notification', description: 'Late night activity' },
+      ];
+      const propsWithDifferentTimes = { ...mockProps, items: differentTimeItems };
 
-      render(<ActivityLogGroup {...propsWithDifferentTimes} />);
-
-      const activityItems = screen.getAllByTestId('activity-log-item');
-      expect(activityItems[0]).toHaveAttribute('data-time', '9:05');
-      expect(activityItems[1]).toHaveAttribute('data-time', '13:30');
-      expect(activityItems[2]).toHaveAttribute('data-time', '23:59');
+      renderActivityLogGroup(propsWithDifferentTimes);
+      expectActivityItemsToBeRendered(differentTimeItems);
     });
   });
 });

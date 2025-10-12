@@ -43,63 +43,80 @@ const TEST_DATA: ErrorPageTestData = {
 // Render helper
 const renderComponent = () => render(<ServiceUnavailable />);
 
+// Helper functions to reduce code duplication
+const expectMaintenanceMessaging = () => {
+  expectTextElements([TEST_DATA.title, TEST_DATA.description]);
+};
+
+const expectRefreshIconAndButton = () => {
+  expectErrorPageButton(TEST_DATA.buttonText, TEST_DATA.iconTestId);
+};
+
+const expectUnavailableImageAttributes = () => {
+  expectErrorPageImage(TEST_DATA.imageAlt, TEST_DATA.imageSrc);
+};
+
+const expectReloadFocusedButton = () => {
+  expectErrorPageButton(TEST_DATA.buttonText);
+};
+
+const expectTemporaryUnavailabilityMessaging = () => {
+  expectTextElements(['PAGE_TEMPORARILY_UNAVAILABLE', 'SCHEDULED_MAINTENANCE_IN_PROGRESS']);
+};
+
+const expectReloadActionInsteadOfNavigation = () => {
+  expectErrorPageButton('RELOAD_PAGE', 'refresh-icon');
+};
+
 // Create and execute the test suite using shared factory
-const testSuite = createErrorPageTestSuite(
-  'ServiceUnavailable',
-  TEST_DATA,
-  renderComponent,
-  {
-    specificFeatures: [
-      {
-        name: 'should display maintenance-related messaging',
-        test: () => {
-          renderComponent();
-          expectTextElements([TEST_DATA.title, TEST_DATA.description]);
-        },
+const testSuite = createErrorPageTestSuite('ServiceUnavailable', TEST_DATA, renderComponent, {
+  specificFeatures: [
+    {
+      name: 'should display maintenance-related messaging',
+      test: () => {
+        renderComponent();
+        expectMaintenanceMessaging();
       },
-      {
-        name: 'should use refresh icon instead of arrow icon',
-        test: () => {
-          renderComponent();
-          expectErrorPageButton(TEST_DATA.buttonText, TEST_DATA.iconTestId);
-        },
+    },
+    {
+      name: 'should use refresh icon instead of arrow icon',
+      test: () => {
+        renderComponent();
+        expectRefreshIconAndButton();
       },
-      {
-        name: 'should use unavailable image with correct attributes',
-        test: () => {
-          renderComponent();
-          expectErrorPageImage(TEST_DATA.imageAlt, TEST_DATA.imageSrc);
-        },
+    },
+    {
+      name: 'should use unavailable image with correct attributes',
+      test: () => {
+        renderComponent();
+        expectUnavailableImageAttributes();
       },
-      {
-        name: 'should have reload-focused button text',
-        test: () => {
-          renderComponent();
-          expectErrorPageButton(TEST_DATA.buttonText);
-        },
+    },
+    {
+      name: 'should have reload-focused button text',
+      test: () => {
+        renderComponent();
+        expectReloadFocusedButton();
       },
-    ],
-    semanticDifferences: [
-      {
-        name: 'should convey temporary unavailability vs permanent not found',
-        test: () => {
-          renderComponent();
-          expectTextElements([
-            'PAGE_TEMPORARILY_UNAVAILABLE',
-            'SCHEDULED_MAINTENANCE_IN_PROGRESS',
-          ]);
-        },
+    },
+  ],
+  semanticDifferences: [
+    {
+      name: 'should convey temporary unavailability vs permanent not found',
+      test: () => {
+        renderComponent();
+        expectTemporaryUnavailabilityMessaging();
       },
-      {
-        name: 'should use reload action instead of navigation action',
-        test: () => {
-          renderComponent();
-          expectErrorPageButton('RELOAD_PAGE', 'refresh-icon');
-        },
+    },
+    {
+      name: 'should use reload action instead of navigation action',
+      test: () => {
+        renderComponent();
+        expectReloadActionInsteadOfNavigation();
       },
-    ],
-  }
-);
+    },
+  ],
+});
 
 // Execute the test suite
 testSuite();

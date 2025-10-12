@@ -4,6 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { ActivityLogToolbar } from './activity-log-toolbar';
 import '../../../../test-utils/shared-test-utils';
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 // Mock dependencies
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, className, variant, size, ...props }: any) => (
@@ -33,31 +40,85 @@ vi.mock('@/components/ui/input', () => ({
 }));
 
 vi.mock('@/components/ui/popover', () => ({
-  Popover: ({ children, open, onOpenChange }: any) => (
-    <div data-testid="popover" data-open={open} onClick={() => onOpenChange?.(!open)}>
-      {children}
-    </div>
-  ),
-  PopoverTrigger: ({ children }: any) => <div data-testid="popover-trigger">{children}</div>,
+  Popover: ({ children, open, onOpenChange }: any) => {
+    const handleKeyDown = (e: any) => {
+      if (e.key === 'Escape' && open) {
+        e.preventDefault();
+        onOpenChange?.(false);
+      }
+    };
+
+    return (
+      <div
+        data-testid="popover"
+        data-open={open}
+        onKeyDown={handleKeyDown}
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        {children}
+      </div>
+    );
+  },
+  PopoverTrigger: ({ children, asChild }: any) => {
+    if (asChild) {
+      return children;
+    }
+    return (
+      <button type="button" data-testid="popover-trigger" aria-label="Open popover">
+        {children}
+      </button>
+    );
+  },
   PopoverContent: ({ children, className }: any) => (
-    <div data-testid="popover-content" className={className}>
+    <dialog data-testid="popover-content" className={className} aria-modal="false" open>
       {children}
-    </div>
+    </dialog>
   ),
 }));
 
 vi.mock('@/components/ui/calendar', () => ({
-  Calendar: ({ mode, onSelect, numberOfMonths, className }: any) => (
-    <div
-      data-testid="calendar"
-      data-mode={mode}
-      data-months={numberOfMonths}
-      className={className}
-      onClick={() => onSelect?.({ from: new Date('2024-01-01'), to: new Date('2024-01-31') })}
-    >
-      Calendar Component
-    </div>
-  ),
+  Calendar: ({ mode, onSelect, numberOfMonths, className }: any) => {
+    const handleDateSelect = () => {
+      onSelect?.({ from: new Date('2024-01-01'), to: new Date('2024-01-31') });
+    };
+
+    const handleKeyDown = (e: any) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleDateSelect();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        // Calendar escape behavior - could close or clear selection
+      }
+    };
+
+    return (
+      <div
+        data-testid="calendar"
+        data-mode={mode}
+        data-months={numberOfMonths}
+        className={className}
+        role="application"
+        aria-label={`Calendar picker in ${mode} mode`}
+        aria-describedby="calendar-instructions"
+        onClick={handleDateSelect}
+      >
+        <div id="calendar-instructions" className="sr-only">
+          Use arrow keys to navigate dates, Enter or Space to select
+        </div>
+        <button
+          type="button"
+          onClick={handleDateSelect}
+          onKeyDown={handleKeyDown}
+          aria-label="Select date range"
+        >
+          Calendar Component
+        </button>
+      </div>
+    );
+  },
 }));
 
 vi.mock('@/components/ui/command', () => ({
@@ -68,11 +129,19 @@ vi.mock('@/components/ui/command', () => ({
   CommandList: ({ children }: any) => <div data-testid="command-list">{children}</div>,
   CommandEmpty: ({ children }: any) => <div data-testid="command-empty">{children}</div>,
   CommandGroup: ({ children }: any) => <div data-testid="command-group">{children}</div>,
-  CommandItem: ({ children, onSelect, className }: any) => (
-    <div data-testid="command-item" className={className} onClick={onSelect}>
-      {children}
-    </div>
-  ),
+  CommandItem: ({ children, onSelect, className }: any) => {
+    return (
+      <button
+        type="button"
+        data-testid="command-item"
+        className={className}
+        onClick={onSelect}
+        aria-label="Select item"
+      >
+        {children}
+      </button>
+    );
+  },
 }));
 
 // Mock Lucide icons
