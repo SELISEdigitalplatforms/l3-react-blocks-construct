@@ -4,6 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { ActivityLogToolbar } from './activity-log-toolbar';
 import '../../../../test-utils/shared-test-utils';
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 // Mock dependencies
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, className, variant, size, ...props }: any) => (
@@ -34,12 +41,7 @@ vi.mock('@/components/ui/input', () => ({
 
 vi.mock('@/components/ui/popover', () => ({
   Popover: ({ children, open, onOpenChange }: any) => {
-    const handleClick = () => onOpenChange?.(!open);
     const handleKeyDown = (e: any) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handleClick();
-      }
       if (e.key === 'Escape' && open) {
         e.preventDefault();
         onOpenChange?.(false);
@@ -50,55 +52,28 @@ vi.mock('@/components/ui/popover', () => ({
       <div
         data-testid="popover"
         data-open={open}
-        onClick={handleClick}
         onKeyDown={handleKeyDown}
-        onKeyUp={(e: any) => {
-          // Additional keyboard support for accessibility
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-          }
-        }}
-        role="button"
-        tabIndex={0}
         aria-expanded={open}
         aria-haspopup="true"
-        aria-label="Toggle popover"
       >
         {children}
       </div>
     );
   },
-  PopoverTrigger: ({ children }: any) => {
-    const handleKeyDown = (e: any) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        e.currentTarget.click();
-      }
-    };
-
-    const handleKeyUp = (e: any) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-      }
-    };
-
+  PopoverTrigger: ({ children, asChild }: any) => {
+    if (asChild) {
+      return children;
+    }
     return (
-      <div
-        data-testid="popover-trigger"
-        role="button"
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
-        aria-label="Open popover"
-      >
+      <button type="button" data-testid="popover-trigger" aria-label="Open popover">
         {children}
-      </div>
+      </button>
     );
   },
   PopoverContent: ({ children, className }: any) => (
-    <div data-testid="popover-content" className={className} role="dialog" aria-modal="false">
+    <dialog data-testid="popover-content" className={className} aria-modal="false" open>
       {children}
-    </div>
+    </dialog>
   ),
 }));
 
@@ -119,30 +94,28 @@ vi.mock('@/components/ui/calendar', () => ({
       }
     };
 
-    const handleKeyUp = (e: any) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-      }
-    };
-
     return (
       <div
         data-testid="calendar"
         data-mode={mode}
         data-months={numberOfMonths}
         className={className}
-        onClick={handleDateSelect}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
         role="application"
-        tabIndex={0}
         aria-label={`Calendar picker in ${mode} mode`}
         aria-describedby="calendar-instructions"
+        onClick={handleDateSelect}
       >
         <div id="calendar-instructions" className="sr-only">
           Use arrow keys to navigate dates, Enter or Space to select
         </div>
-        Calendar Component
+        <button
+          type="button"
+          onClick={handleDateSelect}
+          onKeyDown={handleKeyDown}
+          aria-label="Select date range"
+        >
+          Calendar Component
+        </button>
       </div>
     );
   },
@@ -157,32 +130,16 @@ vi.mock('@/components/ui/command', () => ({
   CommandEmpty: ({ children }: any) => <div data-testid="command-empty">{children}</div>,
   CommandGroup: ({ children }: any) => <div data-testid="command-group">{children}</div>,
   CommandItem: ({ children, onSelect, className }: any) => {
-    const handleKeyDown = (e: any) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onSelect?.();
-      }
-    };
-
-    const handleKeyUp = (e: any) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-      }
-    };
-
     return (
-      <div
+      <button
+        type="button"
         data-testid="command-item"
         className={className}
         onClick={onSelect}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
-        role="button"
-        tabIndex={0}
         aria-label="Select item"
       >
         {children}
-      </div>
+      </button>
     );
   },
 }));
