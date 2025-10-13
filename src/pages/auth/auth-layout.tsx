@@ -156,7 +156,7 @@ export function AuthLayout() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button variant="outline" size="sm" className="gap-3">
+            <Button variant="outline" size="sm" className="!gap-0">
               <span className="capitalize font-bold text-sm hidden sm:inline">Get Extension</span>
               <SquareArrowOutUpRight className="h-4 w-4 sm:ml-2" />
             </Button>
