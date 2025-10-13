@@ -1,3 +1,7 @@
+import { getProjectKey } from '../utils/project-key';
+
+const projectKey = getProjectKey();
+
 interface IAPIConfig {
   baseUrl: string;
   blocksKey: string;
@@ -21,13 +25,13 @@ export const isLocalhost = (): boolean => {
   );
 };
 
-if (!getBaseUrl() || !process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY) {
+if (!getBaseUrl() || !getProjectKey()) {
   throw new Error('Required environment variables are not defined');
 }
 
 const API_CONFIG: IAPIConfig = {
   baseUrl: getBaseUrl(),
-  blocksKey: process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY,
+  blocksKey: projectKey,
   auth: {
     token: '/authentication/v1/OAuth/Token',
   },
