@@ -149,17 +149,15 @@ export function AuthLayout() {
       <div className="w-full bg-surface flex-shrink-0">
         <div className="flex items-center justify-center p-3 gap-2">
           <span className="text-sm">
-            UILM Extension available for multi-language translation support.
+            Experience UILM — test it in Blocks Construct with the extension.
           </span>
           <a
             href="https://chromewebstore.google.com/detail/ehnhmdghlkaeaiinoahgipdeogkikjem?utm_source=item-share-cb"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button variant="outline" size="sm">
-              <span className="capitalize font-bold text-sm hidden sm:inline">
-                Chrome web store
-              </span>
+            <Button variant="outline" size="sm" className="gap-3">
+              <span className="capitalize font-bold text-sm hidden sm:inline">Get Extension</span>
               <SquareArrowOutUpRight className="h-4 w-4 sm:ml-2" />
             </Button>
           </a>
