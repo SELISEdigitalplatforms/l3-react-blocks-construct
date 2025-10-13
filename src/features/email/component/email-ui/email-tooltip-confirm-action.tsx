@@ -47,14 +47,14 @@ interface TooltipConfirmActionProps {
   children: React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>;
 }
 
-const TooltipConfirmAction: React.FC<TooltipConfirmActionProps> = ({
+export const TooltipConfirmAction = ({
   tooltipLabel,
   confirmTitle,
   confirmDescription,
   onConfirm,
   toastDescription,
   children,
-}) => {
+}: Readonly<TooltipConfirmActionProps>) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -99,5 +99,3 @@ const TooltipConfirmAction: React.FC<TooltipConfirmActionProps> = ({
     </>
   );
 };
-
-export default TooltipConfirmAction;

@@ -32,11 +32,11 @@ import { Button } from '@/components/ui/button';
 import EmailActionsPanel from '../email-actions-panel';
 import EmailTextEditor from '../../email-ui/email-text-editor';
 import { EmailCompose } from '../../email-compose/email-compose';
-import { htmlToPlainText } from '@/features/email/services/email';
-import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
 import { sanitizeHTML } from '@/utils/sanitizer';
+import { TooltipConfirmAction } from '../../email-ui/email-tooltip-confirm-action';
+import { htmlToPlainText } from '@/features/email';
 
 interface AttachmentDisplayProps {
   attachments?: string[];
@@ -155,7 +155,7 @@ const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
 
       {(category === 'trash' || category === 'spam') && (
         <>
-          <EmailTooltipConfirmAction
+          <TooltipConfirmAction
             tooltipLabel={t('RESTORE_ITEM')}
             confirmTitle={t('RESTORE_ITEM')}
             confirmDescription={t('CONFIRM_RESTORE_SELECTED_ITEM')}
@@ -163,9 +163,9 @@ const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
             toastDescription={t('MAIL_RESTORED')}
           >
             <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-          </EmailTooltipConfirmAction>
+          </TooltipConfirmAction>
 
-          <EmailTooltipConfirmAction
+          <TooltipConfirmAction
             tooltipLabel={t('DELETE_ITEM_PERMANENTLY')}
             confirmTitle={t('DELETE_ITEM_PERMANENTLY')}
             confirmDescription={t('CONFIRM_PERMANENTLY_DELETE_SELECTED_ITEM')}
@@ -173,7 +173,7 @@ const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
             toastDescription={t('MAIL_DELETED_PERMANENTLY')}
           >
             <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-          </EmailTooltipConfirmAction>
+          </TooltipConfirmAction>
         </>
       )}
     </div>

@@ -1,10 +1,6 @@
-import { EmailView } from '@/features/email/component/email-view/email-view';
-import { EmailList } from '@/features/email/component/email-list/email-list';
-import { EmailSidebar } from '@/features/email/component/email-sidebar/email-sidebar';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { emailData } from '@/features/email/services/email-data';
-import { TActiveAction, TEmail, TReply } from '@/features/email/types/email.types';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
 import {
   ArrowLeft,
   History,
@@ -17,13 +13,20 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { EmailCompose } from '@/features/email';
-import { useDebounce } from '@/features/email/services/use-debounce';
-import { makeFirstLetterUpperCase } from '@/features/email/services/email';
-
-import EmailTooltipConfirmAction from '@/features/email/component/email-ui/email-tooltip-confirm-action';
+import {
+  EmailCompose,
+  emailData,
+  EmailList,
+  EmailSidebar,
+  EmailView,
+  TActiveAction,
+  TEmail,
+  TReply,
+  TooltipConfirmAction,
+  useDebounce,
+  makeFirstLetterUpperCase,
+} from '@/features/email';
 
 /**
  * Email Component
@@ -73,7 +76,7 @@ const updateSingleEmailReplies = (
   return { ...email, reply: updatedReplies };
 };
 
-export function Email() {
+export const Email = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -624,7 +627,7 @@ export function Email() {
                   )}
                   {(category === 'trash' || category === 'spam') && (
                     <>
-                      <EmailTooltipConfirmAction
+                      <TooltipConfirmAction
                         tooltipLabel={`${t('RESTORE')} ${checkedEmailIds.length} ${t('ITEMS')}`}
                         confirmTitle={t('RESTORE_EMAILS')}
                         confirmDescription={`${t('ARE_YOU_SURE_WANT_RESTORE')} ${checkedEmailIds.length} ${t('SELECTED_ITEMS')}?`}
@@ -632,9 +635,9 @@ export function Email() {
                         toastDescription={`${t('RESTORED')} ${checkedEmailIds.length} ${t('ITEMS')}`}
                       >
                         <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-                      </EmailTooltipConfirmAction>
+                      </TooltipConfirmAction>
 
-                      <EmailTooltipConfirmAction
+                      <TooltipConfirmAction
                         tooltipLabel={`${t('DELETE')} ${checkedEmailIds.length} ${t('ITEMS_PERMANENTLY')}`}
                         confirmTitle={t('DELETE_EMAILS_PERMANENTLY')}
                         confirmDescription={`${t('ARE_YOU_SURE_WANT_DELETE_PERMANENTLY')} ${checkedEmailIds.length} ${t('SELECTED_ITEMS')}? ${t('THIS_ACTION_CANNOT_BE_UNDONE')}`}
@@ -642,7 +645,7 @@ export function Email() {
                         toastDescription={`${t('Deleted')} ${checkedEmailIds.length} ${t('ITEMS')}`}
                       >
                         <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-                      </EmailTooltipConfirmAction>
+                      </TooltipConfirmAction>
                     </>
                   )}
                   {category !== 'trash' && category !== 'spam' && (
@@ -906,7 +909,7 @@ export function Email() {
                     )}
                     {(category === 'trash' || category === 'spam') && (
                       <>
-                        <EmailTooltipConfirmAction
+                        <TooltipConfirmAction
                           tooltipLabel={`${t('RESTORE')} ${checkedEmailIds.length} ${t('ITEMS')}`}
                           confirmTitle={t('RESTORE_EMAILS')}
                           confirmDescription={`${t('ARE_YOU_SURE_WANT_RESTORE')} ${checkedEmailIds.length} ${t('SELECTED_ITEMS')}?`}
@@ -914,9 +917,9 @@ export function Email() {
                           toastDescription={`${t('RESTORED')} ${checkedEmailIds.length} ${t('ITEMS')}`}
                         >
                           <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-                        </EmailTooltipConfirmAction>
+                        </TooltipConfirmAction>
 
-                        <EmailTooltipConfirmAction
+                        <TooltipConfirmAction
                           tooltipLabel={`${t('DELETE')} ${checkedEmailIds.length} ${t('ITEMS_PERMANENTLY')}`}
                           confirmTitle={t('DELETE_EMAILS_PERMANENTLY')}
                           confirmDescription={`${t('ARE_YOU_SURE_WANT_DELETE_PERMANENTLY')} ${checkedEmailIds.length} ${t('SELECTED_ITEMS')}? ${t('THIS_ACTION_CANNOT_BE_UNDONE')}`}
@@ -924,7 +927,7 @@ export function Email() {
                           toastDescription={`${t('DELETED')} ${checkedEmailIds.length} ${t('ITEMS')}`}
                         >
                           <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-                        </EmailTooltipConfirmAction>
+                        </TooltipConfirmAction>
                       </>
                     )}
                   </div>
@@ -995,4 +998,4 @@ export function Email() {
       )}
     </>
   );
-}
+};

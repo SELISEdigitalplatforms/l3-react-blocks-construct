@@ -33,11 +33,11 @@ import { Button } from '@/components/ui/button';
 import EmailActionsPanel from '../email-actions-panel';
 import EmailTextEditor from '../../email-ui/email-text-editor';
 import { EmailCompose } from '../../email-compose/email-compose';
-import { htmlToPlainText } from '@/features/email/services/email';
-import EmailTooltipConfirmAction from '../../email-ui/email-tooltip-confirm-action';
+import { TooltipConfirmAction } from '../../email-ui/email-tooltip-confirm-action';
 import EmailSingleActions from '../email-single-action';
 import EmailActionsReplyPanel from '../email-actions-reply-panel';
 import { sanitizeHTML } from '@/utils/sanitizer';
+import { htmlToPlainText } from '@/features/email';
 
 /**
  * EmailViewMobile Component
@@ -249,7 +249,7 @@ export function EmailViewMobile({
                 )}
                 {(category === 'trash' || category === 'spam') && (
                   <>
-                    <EmailTooltipConfirmAction
+                    <TooltipConfirmAction
                       tooltipLabel={t('RESTORE_ITEM')}
                       confirmTitle={t('RESTORE_ITEM')}
                       confirmDescription={t('CONFIRM_RESTORE_SELECTED_ITEM')}
@@ -257,8 +257,8 @@ export function EmailViewMobile({
                       toastDescription={t('ITEM_RESTORED_SUCCESSFULLY')}
                     >
                       <History className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-                    </EmailTooltipConfirmAction>
-                    <EmailTooltipConfirmAction
+                    </TooltipConfirmAction>
+                    <TooltipConfirmAction
                       tooltipLabel={t('DELETE_ITEM_PERMANENTLY')}
                       confirmTitle={t('DELETE_ITEM_PERMANENTLY')}
                       confirmDescription={t('CONFIRM_PERMANENTLY_DELETE_SELECTED_ITEM')}
@@ -266,7 +266,7 @@ export function EmailViewMobile({
                       toastDescription={t('ITEM_DELETED_SUCCESSFULLY')}
                     >
                       <Trash2 className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis" />
-                    </EmailTooltipConfirmAction>
+                    </TooltipConfirmAction>
                   </>
                 )}
               </div>

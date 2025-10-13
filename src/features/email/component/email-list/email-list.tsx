@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import CustomPaginationEmail from '@/components/blocks/custom-pagination-email/custom-pagination-email';
 import { Button } from '@/components/ui/button';
-import { htmlToPlainText } from '../../services/email';
+import { htmlToPlainText } from '../../utils/email-utils';
 
 /**
  * EmailList Component
