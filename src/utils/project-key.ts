@@ -26,16 +26,14 @@ export const setProjectKey = (key: string): void => {
 
 /**
  * Ensures that the project key is available in localStorage.
+ * Always updates localStorage with the current environment variable to handle multiple projects.
  * This should be executed once at application startup (e.g., in `src/index.tsx`).
  */
 export const initializeProjectKey = (): void => {
   if (typeof window === 'undefined') return;
 
-  const existing = window.localStorage.getItem(LOCAL_STORAGE_PROJECT_KEY);
-  if (!existing) {
-    const envKey = process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY;
-    if (envKey) {
-      setProjectKey(envKey);
-    }
+  const envKey = process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY;
+  if (envKey) {
+    setProjectKey(envKey);
   }
 };
