@@ -5,6 +5,7 @@ You are a specialized AI agent for building applications using the Selise Blocks
 ## Project Setup Requirements
 
 ### 1. MCP Automated Project Creation (Agent Handles)
+
 **CRITICAL**: Project creation is now automated via MCP tools - follow CLAUDE.md workflow:
 
 ```python
@@ -21,15 +22,18 @@ create_local_repository(project_name="UserProvidedName")
 ```
 
 **MCP Handles:**
+
 - Selise Cloud project creation
 - GitHub repository integration
 - Application domain generation
 - Local repository setup via Blocks CLI
 
 ### 2. Component Library Access (Automatic)
+
 The MCP-created project automatically includes the Selise Blocks component library.
 
 **Development Workflow:**
+
 1. Agent uses MCP to create project (user provides names only)
 2. Agent creates schemas via MCP (`create_schema`, `list_schemas`)
 3. Agent builds features using auto-included Selise components
@@ -38,7 +42,9 @@ The MCP-created project automatically includes the Selise Blocks component libra
 **Important**: Agent works in MCP-created Selise React project with component library ready to use.
 
 ### 2. Project Detection
+
 A project uses Selise if you find:
+
 - Imports from `features/*/component/`
 - Imports from `components/blocks/` or `components/ui/`
 - `AdvanceDataTable` or `ConfirmationModal` in the codebase
@@ -47,29 +53,32 @@ A project uses Selise if you find:
 ## Core Development Principles
 
 ### The 3-Layer Hierarchy Rule
+
 **Always follow this order when building components:**
 
 1. **Feature Level First** - Check `features/*/components/` for existing solutions
-2. **Block Level Second** - Use `components/blocks/` for business patterns  
+2. **Block Level Second** - Use `components/blocks/` for business patterns
 3. **UI Level Last** - Use `components/ui/` as the foundation
 
 ### Import Decision Matrix
 
 #### ✅ Always Import (Never Recreate)
+
 ```typescript
 // All UI components
-import { Button, Input, Card, Table, Dialog, Badge } from 'components/ui/*'
+import { Button, Input, Card, Table, Dialog, Badge } from 'components/ui/*';
 
 // Proven block patterns
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
+import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
 
 // Complete feature solutions (when they fit exactly)
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
+import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
 ```
 
 #### ❌ Never Import (Create Custom)
+
 ```typescript
 // Business logic - always feature-specific
 // ❌ import { createAdvanceTableColumns } from 'features/inventory/...'
@@ -87,6 +96,7 @@ import { AdvanceDataTable } from 'features/inventory/component/advance-data-tabl
 ## Standard Development Patterns
 
 ### Data Table Implementation
+
 When building data tables, follow this exact pattern:
 
 ```typescript
@@ -122,6 +132,7 @@ export const createYourTableColumns = ({ t, onEdit, onDelete }) => [
 ```
 
 ### Confirmation Dialogs
+
 **Always use ConfirmationModal - never create custom confirmation dialogs:**
 
 ```typescript
@@ -139,6 +150,7 @@ const [deleteModal, setDeleteModal] = useState({ open: false, item: null });
 ```
 
 ### Form Development
+
 Use React Hook Form with Zod validation:
 
 ```typescript
@@ -177,6 +189,7 @@ const form = useForm({
 ## Feature Development Workflow
 
 ### 1. Data Layer Setup
+
 ```typescript
 // types/your-feature.types.ts
 export interface YourDataItem {
@@ -185,7 +198,7 @@ export interface YourDataItem {
   // ... other fields
 }
 
-// services/your-feature.service.ts  
+// services/your-feature.service.ts
 export const getData = async (params) => {
   return graphqlClient.query({
     query: YOUR_QUERY,
@@ -203,11 +216,12 @@ export const useGetData = (params) => {
 ```
 
 ### 2. Component Implementation
+
 ```typescript
 // components/your-main-component.tsx
 export function YourMainComponent() {
   const { data, isLoading } = useGetData(params);
-  
+
   return (
     <AdvanceDataTable
       data={data || []}
@@ -219,6 +233,7 @@ export function YourMainComponent() {
 ```
 
 ### 3. Page Integration
+
 ```typescript
 // pages/your-feature/your-feature.tsx
 export function YourFeaturePage() {
@@ -233,9 +248,10 @@ export function YourFeaturePage() {
 ## State Management Patterns
 
 ### React Query Integration
+
 ```typescript
-import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks'
-import { useToast } from 'hooks/use-toast'
+import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
+import { useToast } from 'hooks/use-toast';
 
 // Queries
 const { data, isLoading, error } = useGlobalQuery({
@@ -255,6 +271,7 @@ const { mutate, isPending } = useGlobalMutation({
 ```
 
 ### Local State Patterns
+
 ```typescript
 // UI state
 const [isOpen, setIsOpen] = useState(false);
@@ -270,6 +287,7 @@ const [modal, setModal] = useState({ open: false, item: null });
 ## Error Handling & Loading States
 
 ### Standard Error Patterns
+
 ```typescript
 const { data, isLoading, error } = useGetData(params);
 
@@ -285,6 +303,7 @@ if (error) {
 ```
 
 ### Loading States
+
 ```typescript
 // Buttons
 <Button loading={isPending}>
@@ -309,6 +328,7 @@ if (error) {
 ## Common Implementation Tasks
 
 ### "Build a data management interface"
+
 1. Use `AdvanceDataTable` for the main table
 2. Create custom columns with `DataTableColumnHeader`
 3. Add CRUD buttons in action column
@@ -317,18 +337,21 @@ if (error) {
 6. Implement React Query hooks for data operations
 
 ### "Add authentication/authorization"
+
 1. Check existing auth patterns in `features/auth/`
 2. Use `PermissionGuard` if available in blocks
 3. Follow existing authentication flows
 4. Use standard form patterns for login/signup
 
 ### "Create a dashboard"
+
 1. Use `Card` components for sections
 2. Check for existing dashboard patterns in features
 3. Use appropriate charts/visualizations
 4. Follow grid layout patterns
 
 ### "Build a file management interface"
+
 1. Check `features/file-manager/` for existing patterns
 2. Use `CustomAvatar` for profile pictures
 3. Handle file uploads with proper validation
@@ -337,19 +360,53 @@ if (error) {
 ## Integration with Selise Cloud (MCP Ready)
 
 Selise Cloud MCP server is now available:
+
 - **ALWAYS use MCP** for schema management (`create_schema`, `list_schemas`)
-- **ALWAYS use MCP** for project creation (`create_project`) 
+- **ALWAYS use MCP** for project creation (`create_project`)
 - **Use MCP** for authentication setup (`activate_social_login`)
+- **ALWAYS use MCP** for translation management (`get_translation_languages`, `save_module_keys_with_translations`)
 - **Follow MCP patterns** documented in CLAUDE.md
 
 Implementation:
+
 - Use MCP tools for backend setup
 - Use GraphQL endpoints for data operations
 - **Follow graphql-crud.md recipe** for data operations (NOT inventory patterns!)
 
+## 🌐 Static Content Translation (MANDATORY)
+
+**AFTER implementing any feature with user-facing text, you MUST translate all static content using MCP translation tools.**
+
+### Translation Workflow:
+
+1. **Extract ALL hardcoded strings** from components and replace with `t('KEY_NAME')`
+2. **Get available languages:** `get_translation_languages()`
+3. **Check/create translation module:** `get_translation_modules()` / `create_module()`
+4. **Get existing keys:** `get_module_keys(module_id)`
+5. **Save translations:** `save_module_keys_with_translations(request)`
+
+### Translation Key Structure:
+
+```typescript
+// Example from MEGA-shop components:
+t('MEGA_SHOPS'); // Page title
+t('MEGA_SHOP_ADD'); // Add button
+t('MEGA_SHOP_ITEM_NAME'); // Column header
+t('MEGA_SHOP_PRICE'); // Column header
+t('MEGA_SHOP_CREATE'); // Submit button
+```
+
+### Critical Rules:
+
+- **ALWAYS translate static content** after feature implementation
+- **Include translations for ALL available languages**
+- **Use descriptive key names** with feature prefix
+- **Document translation keys** in TASKS.md
+
 ## TypeScript Best Practices
 
 ### Interface Definitions
+
 ```typescript
 // Always define proper interfaces
 interface ComponentProps {
@@ -366,28 +423,30 @@ interface TableProps<T> {
 ```
 
 ### Import Organization
+
 ```typescript
 // 1. External libraries
-import React, { useState, useCallback } from 'react'
-import { useForm } from 'react-hook-form'
+import React, { useState, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
 
 // 2. Feature level imports
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
+import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
 
 // 3. Block level imports
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
 
 // 4. UI level imports
-import { Button, Input, Card } from 'components/ui/*'
+import { Button, Input, Card } from 'components/ui/*';
 
 // 5. Local imports
-import { useYourFeature } from '../hooks/use-your-feature'
-import { YourDataItem } from '../types/your-feature.types'
+import { useYourFeature } from '../hooks/use-your-feature';
+import { YourDataItem } from '../types/your-feature.types';
 ```
 
 ## Quality Guidelines
 
 ### Code Quality
+
 - Use TypeScript strictly - no `any` types
 - Follow existing naming conventions
 - Use proper error boundaries
@@ -395,12 +454,14 @@ import { YourDataItem } from '../types/your-feature.types'
 - Add proper accessibility attributes
 
 ### Component Quality
+
 - Make components reusable when appropriate
 - Export reusable components in feature `index.ts`
 - Follow single responsibility principle
 - Use composition over inheritance
 
 ### Testing
+
 - Write unit tests for business logic
 - Test component interactions
 - Test error states
@@ -409,18 +470,21 @@ import { YourDataItem } from '../types/your-feature.types'
 ## Decision Points
 
 ### "Should I create a new component?"
+
 1. Check if existing feature components solve this
 2. Check if block components provide the pattern
 3. Only create custom if business logic is unique
 4. Always export if potentially reusable
 
 ### "Should I use this existing component?"
+
 1. If it's from UI layer → Always use
 2. If it's from Block layer → Use if it fits your pattern
 3. If it's from Feature layer → Use only if it solves your exact problem
 4. If it's business logic → Never import, create custom
 
 ### "How do I handle this complex requirement?"
+
 1. Study existing similar implementations in other features
 2. Break down into smaller, manageable components
 3. Use established patterns from inventory/invoices features
