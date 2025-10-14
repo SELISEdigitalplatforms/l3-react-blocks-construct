@@ -83,8 +83,9 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
    - Create schemas using MCP:
      ```python
      # For each entity the app needs:
+     # Use prefix format: <projectName><schemaName> (e.g., "MyAppTasks")
      create_schema(
-         schema_name="Tasks",
+         schema_name="<projectName>Tasks",
          fields=[
              {"name": "Title", "type": "String"},
              {"name": "Status", "type": "String"},
