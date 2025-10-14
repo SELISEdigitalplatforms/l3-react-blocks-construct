@@ -1,12 +1,13 @@
 import { useLayoutEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { AlertTriangle, SquareArrowOutUpRight } from 'lucide-react';
 import { useAuthState } from 'state/client-middleware';
 import bgAuthLight from 'assets/images/bg_auth_light.svg';
 import bgAuthDark from 'assets/images/bg_auth_dark.svg';
 import { useTheme } from 'styles/theme/theme-provider';
 import LanguageSelector from 'components/blocks/language-selector/language-selector';
 import { useGetLoginOptions } from 'features/auth/hooks/use-auth';
-import { AlertTriangle } from 'lucide-react';
+import { Button } from 'components/ui/button';
 
 export function AuthLayout() {
   const { isLoading, error: loginOptionsError } = useGetLoginOptions();
@@ -144,20 +145,39 @@ export function AuthLayout() {
   if (isLoading) return null;
 
   return (
-    <div className="flex w-full h-screen">
-      <div className="hidden md:block w-[36%] relative bg-primary-50">
-        <img
-          src={getBackgroundImage()}
-          alt="bg auth"
-          className="w-full h-full object-cover"
-          key={theme ?? 'default'}
-        />
-      </div>
-      <div className="flex items-center justify-center w-full px-6 sm:px-20 md:w-[64%] md:px-[14%] lg:px-[16%] 2xl:px-[20%]">
-        <div className="absolute top-2 right-4">
-          <LanguageSelector />
+    <div className="flex w-full flex-col h-screen">
+      <div className="w-full bg-surface flex-shrink-0">
+        <div className="flex items-center justify-center p-3 gap-2">
+          <span className="text-sm">
+            Experience UILM — test it in Blocks Construct with the extension.
+          </span>
+          <a
+            href="https://chromewebstore.google.com/detail/ehnhmdghlkaeaiinoahgipdeogkikjem?utm_source=item-share-cb"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="outline" size="sm" className="!gap-0">
+              <span className="capitalize font-bold text-sm hidden sm:inline">Get Extension</span>
+              <SquareArrowOutUpRight className="h-4 w-4 sm:ml-2" />
+            </Button>
+          </a>
         </div>
-        {renderAuthContent()}
+      </div>
+      <div className="flex w-full flex-1 min-h-0 relative">
+        <div className="hidden md:block w-[36%] relative bg-primary-50">
+          <img
+            src={getBackgroundImage()}
+            alt="bg auth"
+            className="w-full h-full object-cover"
+            key={theme ?? 'default'}
+          />
+        </div>
+        <div className="flex items-center justify-center w-full px-6 sm:px-20 md:w-[64%] md:px-[14%] lg:px-[16%] 2xl:px-[20%]">
+          <div className="absolute top-2 right-4">
+            <LanguageSelector />
+          </div>
+          {renderAuthContent()}
+        </div>
       </div>
     </div>
   );

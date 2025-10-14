@@ -12,14 +12,11 @@ This project uses a FastMCP (Model Context Protocol) server for automating Selis
 
 **Authentication (Required First):**
 
-- `login`: Authenticate with Selise Blocks API (ask for username, password, GitHub username, repo name)
 - `get_auth_status`: Check authentication status
 
 **Project Management:**
 
-- `create_project`: Create new Selise Cloud project (ALWAYS use for new projects)
 - `get_projects`: List existing projects
-- `create_local_repository`: Create local repository after cloud project
 
 **Schema Management:**
 
@@ -81,23 +78,7 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
    - Document everything in FEATURELIST.md
    - Get user confirmation before proceeding
 
-3. **Project Setup** (After user confirms features):
-
-   - Project Creation Flow:
-
-     ```python
-     # ALWAYS create new project - don't look for existing domains
-     create_project(
-         project_name="UserProvidedName",
-         github_username="from_step_1",
-         repository_name="from_step_1"
-     )
-
-     # If user wants local setup:
-     create_local_repository(project_name="UserProvidedName")
-     ```
-
-4. **Feature Planning & Schema Design** (AFTER user confirmation):
+3. **Feature Planning & Schema Design** (AFTER user confirmation):
    - Break down confirmed features into technical requirements
    - Analyze what schemas are needed based on FEATURELIST.md
    - Document schema plan in CLOUD.md
@@ -105,10 +86,12 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
      ```python
      # For each entity the app needs:
      create_schema(
-         schema_name="Tasks",
+         schema_name="<projectName>Tasks",
          fields=[
-             {"name": "title", "type": "String", "required": True},
-             {"name": "status", "type": "String", "required": True}
+             {"name": "Title", "type": "String"},
+             {"name": "Status", "type": "String"},
+             {"name": "Point", "type": "Float"},
+             {"name": "Priority", "type": "Int"}
          ]
      )
      ```

@@ -1,8 +1,6 @@
-# CLAUDE.md
+# AI Agent Instructions for Selise Blocks Projects
 
-**MUST DO: READ LLM DOCS: llm-docs/ as per the usage guidelines in this file. Don't implement or do anything without following this step. if you fail to find it, do a full directory search first. dont just start path guidance: ~/Desktop/selise-demo via ❯ ls CLAUDE.md llm-docs selise_mcp_server.py user-info.txt**
-
-This file provides guidance to Claude Code (claude.ai/code) when working with Selise Blocks applications.
+This file provides guidance for AI agents and IDEs (such as VSCode with Copilot, Kilo Code, Trae AI, and similar tools) when working with Selise Blocks applications.
 
 ## 🚨 CRITICAL: MCP Server Integration
 
@@ -60,7 +58,7 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 
 ## 📋 Project Setup Workflow (MCP-First)
 
-### Vibecoding Experience Flow (MUST FOLLOW IN ORDER):
+### Development Experience Flow (MUST FOLLOW IN ORDER):
 
 **When User Wants to Create Any Webapp/Website:**
 
@@ -85,6 +83,7 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
    - Create schemas using MCP:
      ```python
      # For each entity the app needs:
+     # Use prefix format: <projectName><schemaName> (e.g., "MyAppTasks")
      create_schema(
          schema_name="<projectName>Tasks",
          fields=[
@@ -144,9 +143,9 @@ llm-docs/
 
 ## 🔄 Development Workflow
 
-**FOLLOW THE VIBECODING EXPERIENCE FLOW ABOVE FIRST!**
+**FOLLOW THE DEVELOPMENT EXPERIENCE FLOW ABOVE FIRST!**
 
-After completing steps 1-4 of the Vibecoding Experience Flow, continue with implementation:
+After completing steps 1-4 of the Development Experience Flow, continue with implementation:
 
 ### 5. Implementation Process (Using Your Tracking Files)
 
@@ -316,7 +315,6 @@ src/features/[feature-name]/
 
 Before ANY implementation:
 
-- [ ] Authenticated with MCP login tool
 - [ ] Created project with MCP create_project
 - [ ] Read ALL recipes in llm-docs/recipes/
 - [ ] Understood 3-layer component hierarchy

@@ -160,14 +160,40 @@ After publishing, verify translations are working:
 - `MEGA_SHOP_CREATE` - Submit button text
 - `MEGA_SHOP_CREATING` - Loading state text
 
+**Menu/Sidebar Keys (common module):**
+
+- `MEGA_SHOP` - Menu item text (goes in 'common' module)
+- `DASHBOARD` - Dashboard menu item (goes in 'common' module)
+- `INVENTORY` - Inventory menu item (goes in 'common' module)
+
 ### Critical Rules:
 
 - **ALWAYS translate static content** after implementing new features
 - **Extract ALL hardcoded strings** from components and replace with `t('KEY_NAME')`
 - **Include translations for ALL available languages** returned by `get_translation_languages()`
 - **Use descriptive key names** that indicate context (e.g., `MEGA_SHOP_ITEM_NAME` not just `ITEM_NAME`)
+
+- **Menu/sidebar keys MUST go in 'common' module** - never in feature modules
+- **Module names use hyphens** (e.g., `mega-shop`) - **Key names use underscores** (e.g., `MEGA_SHOP_ITEM_NAME`)
 - **PUBLISH translations** using `publish_translation()` after saving keys to make them live
 - **Document translation keys** in your TASKS.md file
+
+### Module ID Requirements (CRITICAL):
+
+**Every translation key MUST have a valid module ID:**
+
+```python
+# ✅ Correct - Get module ID dynamically
+modules = get_translation_modules()
+common_module = next(m for m in modules if m['moduleName'] == 'common')
+feature_module = next(m for m in modules if m['moduleName'] == 'mega-shop')
+
+# Use the actual itemId from the response
+common_module_id = common_module['itemId']  # e.g., '25b40560-43b1-4263-88e7-407099e3b075'
+feature_module_id = feature_module['itemId']  # e.g., '44d2021e-fd1e-4562-8902-9877bd8a1397'
+```
+
+**NEVER hardcode module IDs - always get them dynamically from `get_translation_modules()`**
 
 ## Route-Based Translation Loading
 
@@ -223,6 +249,60 @@ When creating new features:
 
 ## Translation Key Naming Conventions
 
+### Module Names (CRITICAL)
+
+**Module names MUST follow strict conventions:**
+
+- ✅ **Use hyphens only**: `mega-shop`, `user-management`, `data-export`
+- ❌ **No underscores**: `mega_shop`, `user_management`, `data_export`
+- ❌ **No special characters**: `mega@shop`, `user#management`
+- ✅ **Lowercase only**: `mega-shop`, not `Mega-Shop`
+
+**Examples:**
+
+```typescript
+// ✅ Correct module names
+'mega-shop';
+'user-management';
+'data-export';
+'inventory-management';
+
+// ❌ Incorrect module names
+'mega_shop'; // underscore not allowed
+'Mega-Shop'; // uppercase not allowed
+'mega@shop'; // special characters not allowed
+```
+
+### Key Names (CRITICAL)
+
+**Translation keys MUST follow strict conventions:**
+
+- ✅ **Use underscores only**: `MEGA_SHOP_ITEM_NAME`
+- ❌ **No hyphens in keys**: `MEGA-SHOP-ITEM-NAME`
+- ❌ **No special characters**: `MEGA@SHOP_ITEM_NAME`
+- ✅ **Uppercase with underscores**: `MEGA_SHOP_ITEM_NAME`
+
+**Examples:**
+
+```typescript
+// ✅ Correct key names
+'TIME_TRACKER_DASHBOARD_TITLE';
+'MEGA_SHOP_ADD_BUTTON';
+'USER_PROFILE_EDIT_FORM';
+
+// ❌ Incorrect key names
+'mega-shop-item-name'; // hyphens not allowed in keys
+'MEGA-SHOP-ITEM-NAME'; // hyphens not allowed in keys
+'mega_shop_item_name'; // lowercase not allowed
+```
+
+### Module vs Key Separation
+
+**IMPORTANT: Module names and key names have different rules:**
+
+- **Module names**: Use hyphens, lowercase (`mega-shop`)
+- **Key names**: Use underscores, uppercase (`MEGA_SHOP_ITEM_NAME`)
+
 ### Module Prefixes
 
 Always prefix keys with the module name to avoid conflicts:
@@ -245,6 +325,35 @@ t('ADD_BUTTON');
 - **Placeholders**: `FEATURE_FIELD_PLACEHOLDER` (e.g., `MEGA_SHOP_ITEM_NAME_PLACEHOLDER`)
 - **Messages**: `FEATURE_MESSAGE_TYPE` (e.g., `MEGA_SHOP_CREATED_SUCCESS`)
 
+### Menu/Sidebar Keys (CRITICAL)
+
+**Menu and sidebar navigation keys MUST be placed in the 'common' module:**
+
+```typescript
+// ✅ Correct - MEGA_SHOP key in 'common' module
+// Module ID: '25b40560-43b1-4263-88e7-407099e3b075' (common module)
+{
+  "KeyName": "MEGA_SHOP",
+  "ModuleId": "25b40560-43b1-4263-88e7-407099e3b075", // common module ID
+  "Resources": [{"Value": "Mega Shop", "Culture": "en"}]
+}
+
+// ❌ Incorrect - MEGA_SHOP key in feature module
+{
+  "KeyName": "MEGA_SHOP",
+  "ModuleId": "feature-module-id", // wrong - should be common
+  "Resources": [{"Value": "Mega Shop", "Culture": "en"}]
+}
+```
+
+**How to find the common module ID:**
+
+```python
+modules = get_translation_modules()
+common_module = next(m for m in modules if m['moduleName'] == 'common')
+common_module_id = common_module['itemId']  # Use this ID for menu keys
+```
+
 ### Common Suffixes
 
 - `_LABEL` - Form field labels
@@ -259,12 +368,53 @@ t('ADD_BUTTON');
 After implementing new features:
 
 - [ ] Extract all hardcoded strings to translation keys
-- [ ] Add route mapping in `route-module-map.ts`
-- [ ] Create translation module using MCP
+- [ ] Add route mapping in `route-module-map.ts` (use hyphens in module names)
+- [ ] Create translation module using MCP (use hyphens: `mega-shop`, not `mega_shop`)
+- [ ] Add menu/sidebar keys to **'common' module** (get module ID dynamically)
+- [ ] Add feature keys to **feature module** (get module ID dynamically)
 - [ ] Add translations for all supported languages
 - [ ] **Publish translations using `publish_translation()` MCP tool**
 - [ ] Test translation loading on the route
 - [ ] Document keys in TASKS.md
+
+### Module ID Workflow (MANDATORY):
+
+```python
+# Step 1: Get all modules
+modules = get_translation_modules()
+
+# Step 2: Find common module ID
+common_module = next(m for m in modules if m['moduleName'] == 'common')
+common_module_id = common_module['itemId']
+
+# Step 3: Find/create feature module ID
+feature_module = next((m for m in modules if m['moduleName'] == 'mega-shop'), None)
+if not feature_module:
+    create_module(module_name="mega-shop")  # Use hyphens
+    # Then get the module again
+    modules = get_translation_modules()
+    feature_module = next(m for m in modules if m['moduleName'] == 'mega-shop')
+feature_module_id = feature_module['itemId']
+
+# Step 4: Save translations with correct module IDs
+save_module_keys_with_translations(request={
+    "ProjectKey": project_key,
+    "Translations": [
+        # Menu keys go to common module
+        {
+            "KeyName": "MEGA_SHOP",  # Underscores in keys
+            "ModuleId": common_module_id,
+            "Resources": [{"Value": "MEGA Shop", "Culture": "en"}]
+        },
+        # Feature keys go to feature module
+        {
+            "KeyName": "MEGA_SHOP_ADD_DESCRIPTION",
+            "ModuleId": feature_module_id,
+            "Resources": [{"Value": "Add Description", "Culture": "en"}]
+        }
+    ]
+})
+```
 
 ## Troubleshooting
 
