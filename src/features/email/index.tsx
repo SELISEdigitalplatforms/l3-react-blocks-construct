@@ -3,6 +3,7 @@ export { EmailList } from './component/email-list/email-list';
 export { EmailView } from './component/email-view/email-view';
 export { EmailCompose } from './component/email-compose/email-compose';
 export { EmailViewGrid } from './component/email-view/email-view-grid/email-view-grid';
+export { EmailHeaderTool } from './component/email-header-tool/email-header-tool';
 export { TooltipConfirmAction } from './component/email-ui/email-tooltip-confirm-action';
 export { emailData } from './services/email-data';
 export type { TActiveAction, TEmail, TReply } from './types/email.types';
