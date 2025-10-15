@@ -1,6 +1,6 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { AlertTriangle, SquareArrowOutUpRight } from 'lucide-react';
+import { AlertTriangle, SquareArrowOutUpRight, X } from 'lucide-react';
 import { useAuthState } from 'state/client-middleware';
 import bgAuthLight from 'assets/images/bg_auth_light.svg';
 import bgAuthDark from 'assets/images/bg_auth_dark.svg';
@@ -14,6 +14,7 @@ export function AuthLayout() {
   const navigate = useNavigate();
   const { isMounted, isAuthenticated } = useAuthState();
   const { theme } = useTheme();
+  const [showBanner, setShowBanner] = useState(true);
 
   useLayoutEffect(() => {
     // Don't redirect if we're on the MFA verification page
@@ -143,27 +144,52 @@ export function AuthLayout() {
   };
 
   if (isLoading) return null;
+  const isBannerAllowedToVisible = [
+    'https://construct.seliseblocks.com/',
+    'https://stg-construct.seliseblocks.com',
+    'http://dev-construct.seliseblocks.com',
+  ].some((path) => window.location.href.startsWith(path));
 
   return (
     <div className="flex w-full flex-col h-screen">
-      <div className="w-full bg-surface flex-shrink-0">
-        <div className="flex items-center justify-center p-3 gap-2">
-          <span className="text-sm">
-            Experience UILM — test it in Blocks Construct with the extension.
-          </span>
-          <a
-            href="https://chromewebstore.google.com/detail/ehnhmdghlkaeaiinoahgipdeogkikjem?utm_source=item-share-cb"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button variant="outline" size="sm" className="!gap-0">
-              <span className="capitalize font-bold text-sm hidden sm:inline">Get Extension</span>
-              <SquareArrowOutUpRight className="h-4 w-4 sm:ml-2" />
+      {isBannerAllowedToVisible && showBanner && (
+        <div className="sm:relative w-full flex items-center sm:justify-between bg-surface py-3 px-4">
+          <div className="flex w-full items-center justify-center gap-2">
+            <span className="text-sm">
+              Experience UILM — explore its capabilities in Blocks Construct using the extension.{' '}
+              <a
+                href="https://selisegroup.com/blocks/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-semibold underline hover:text-primary"
+              >
+                Learn more
+              </a>
+            </span>
+            <a
+              href="https://chromewebstore.google.com/detail/ehnhmdghlkaeaiinoahgipdeogkikjem?utm_source=item-share-cb"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" size="sm" className="!gap-0">
+                <span className="capitalize font-bold text-sm hidden sm:inline">Get Extension</span>
+                <SquareArrowOutUpRight className="h-4 w-4 sm:ml-2" />
+              </Button>
+            </a>
+          </div>
+          <div className="sm:absolute sm:top-4 sm:right-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowBanner(false)}
+              className="h-fit w-fit p-1 rounded hover:bg-neutral-100 text-medium-emphasis"
+            >
+              <X className="h-4 w-4" />
             </Button>
-          </a>
+          </div>
         </div>
-      </div>
-      <div className="flex w-full flex-1 min-h-0 relative">
+      )}
+      <div className="flex w-full min-h-screen relative">
         <div className="hidden md:block w-[36%] relative bg-primary-50">
           <img
             src={getBackgroundImage()}
