@@ -75,6 +75,7 @@ const EmailSingleActions = ({
           <TooltipTrigger asChild>
             <Star
               className={`h-5 w-5 ${selectedEmail?.isStarred && 'text-warning'} ${reply?.isStarred && 'text-warning'} cursor-pointer text-medium-emphasis`}
+              fill={selectedEmail?.isStarred || reply?.isStarred ? 'currentColor' : 'none'}
               onClick={() => {
                 if (selectedEmail && onToggleStar) {
                   if (reply) {

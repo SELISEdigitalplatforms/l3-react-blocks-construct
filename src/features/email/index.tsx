@@ -9,3 +9,7 @@ export { emailData } from './services/email-data';
 export type { TActiveAction, TEmail, TReply } from './types/email.types';
 export { useDebounce } from './services/use-debounce';
 export { htmlToPlainText, makeFirstLetterUpperCase } from './utils/email-utils';
+export { useEmailState } from './hooks/use-email-state';
+export { useEmailSelection } from './hooks/use-email-selection';
+export { useEmailCompose } from './hooks/use-email-compose';
+export { useEmailUI } from './hooks/use-email-ui';

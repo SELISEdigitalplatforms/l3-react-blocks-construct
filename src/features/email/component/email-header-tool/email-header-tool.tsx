@@ -87,23 +87,6 @@ export const EmailHeaderTool = ({
               {hasUnreadSelected && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Mail
-                      className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
-                      onClick={() => updateReadStatus(false)}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent
-                    className="bg-surface text-medium-emphasis "
-                    side="top"
-                    align="center"
-                  >
-                    <p>{t('MARK_AS_UNREAD')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              {!hasUnreadSelected && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <MailOpen
                       className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
                       onClick={() => updateReadStatus(true)}
@@ -115,6 +98,23 @@ export const EmailHeaderTool = ({
                     align="center"
                   >
                     <p>{t('MARK_AS_READ')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              {!hasUnreadSelected && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Mail
+                      className="h-5 w-5 cursor-pointer text-medium-emphasis hover:text-high-emphasis"
+                      onClick={() => updateReadStatus(false)}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent
+                    className="bg-surface text-medium-emphasis "
+                    side="top"
+                    align="center"
+                  >
+                    <p>{t('MARK_AS_UNREAD')}</p>
                   </TooltipContent>
                 </Tooltip>
               )}

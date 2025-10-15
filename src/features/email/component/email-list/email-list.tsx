@@ -221,7 +221,7 @@ export function EmailList({
                           {email.subject}
                         </p>
                         <div className="flex gap-2 items-center">
-                          {(email.images.length > 0 || email.attachments?.length > 0) && (
+                          {email.attachments && email.attachments.length > 0 && (
                             <Paperclip className="h-4 w-4 text-medium-emphasis" />
                           )}
 
@@ -359,7 +359,7 @@ export function EmailList({
                                 <Paperclip className="h-4 w-4 text-medium-emphasis" />
                               )}
 
-                              {email.isStarred && <Star className="h-4 w-4 text-warning" />}
+                              {email.isStarred && <Star className="h-4 w-4 text-warning" fill="currentColor" />}
                             </div>
                           </div>
                           <div className="line-clamp-2 text-sm text-medium-emphasis">

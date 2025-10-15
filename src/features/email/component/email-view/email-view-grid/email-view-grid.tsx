@@ -8,6 +8,7 @@ import {
   Forward,
   History,
   Image,
+  Mail,
   MailOpen,
   Paperclip,
   Reply,
@@ -137,10 +138,13 @@ const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
 
   return (
     <div className="flex gap-4">
-      {selectedEmail.isRead &&
-        renderTooltipAction(MailOpen, t('MARK_AS_UNREAD'), () =>
-          updateEmailReadStatus(selectedEmail.id, category, false)
-        )}
+      {selectedEmail.isRead
+        ? renderTooltipAction(Mail, t('MARK_AS_UNREAD'), () =>
+            updateEmailReadStatus(selectedEmail.id, category, false)
+          )
+        : renderTooltipAction(MailOpen, t('MARK_AS_READ'), () =>
+            updateEmailReadStatus(selectedEmail.id, category, true)
+          )}
 
       {category !== 'spam' &&
         renderTooltipAction(TriangleAlert, t('SPAM'), () =>

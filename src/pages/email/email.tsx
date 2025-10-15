@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Input } from '@/components/ui/input';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   History,
@@ -12,20 +11,20 @@ import {
   TriangleAlert,
   X,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   EmailCompose,
-  emailData,
   EmailHeaderTool,
   EmailList,
   EmailSidebar,
   EmailView,
   TActiveAction,
-  TEmail,
-  TReply,
   TooltipConfirmAction,
-  useDebounce,
+  useEmailState,
+  useEmailSelection,
+  useEmailCompose,
+  useEmailUI,
 } from '@/features/email';
 
 /**
@@ -59,482 +58,107 @@ import {
  * <Email />
  */
 
-// Helper function to update a single reply's attribute
-const updateReplyAttribute = (reply: TReply, replyId: string, attribute: keyof TReply): TReply => {
-  if (reply.id !== replyId) return reply;
-  return { ...reply, [attribute]: !reply[attribute] };
-};
-
-// Helper function to update replies within a single email
-const updateSingleEmailReplies = (
-  email: TEmail,
-  replyId: string,
-  attribute: keyof TReply
-): TEmail => {
-  const updatedReplies =
-    email.reply?.map((reply) => updateReplyAttribute(reply, replyId, attribute)) || [];
-  return { ...email, reply: updatedReplies };
-};
-
 export const Email = () => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const { category, emailId } = useParams<{
-    category: string;
-    emailId?: string;
-  }>();
-  const [emails, setEmails] = useState<Record<string, TEmail[]>>(
-    Object.fromEntries(
-      Object.entries(emailData)
-        .filter(([, value]) => Array.isArray(value))
-        .map(([key, value]) => [key, (value as TEmail[]).filter((email) => !email.isDeleted)])
-    ) as Record<string, TEmail[]>
-  );
+  // UI State and Navigation
+  const {
+    category,
+    emailId,
+    navigate,
+    isSearching,
+    searchTerm,
+    searchRef,
+    isCollapsedEmailSidebar,
+    setIsSearching,
+    setSearchTerm,
+    setIsCollapsedEmailSidebar,
+    handleClearInput,
+    handleEmailSelection,
+    onGoBack,
+  } = useEmailUI();
 
-  const [selectedEmail, setSelectedEmail] = useState<TEmail | null>(null);
-  const [filteredEmails, setFilteredEmails] = useState<Array<TEmail>>([]);
-  const [isComposing, setIsComposing] = useState({
-    isCompose: false,
-    isForward: false,
-    replyData: {} as TReply | null,
-  });
-  const [activeAction, setActiveAction] = useState<TActiveAction>({
-    reply: false,
-    replyAll: false,
-    forward: false,
-  });
-  const [isAllSelected, setIsAllSelected] = useState<boolean>(false);
-  const [checkedEmailIds, setCheckedEmailIds] = useState<string[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const searchRef = useRef<HTMLInputElement | null>(null);
-  const [hasUnreadSelected, setHasUnreadSelected] = useState(false);
-  const [isReplyVisible, setIsReplyVisible] = useState(false);
-  const [isCollapsedEmailSidebar, setIsCollapsedEmailSidebar] = useState(false);
-  const [isReplySingleAction, setIsReplySingleAction] = useState({
-    isReplyEditor: false,
-    replyId: '',
-  });
+  // Email State and Operations
+  const {
+    emails,
+    selectedEmail,
+    filteredEmails,
+    setEmails,
+    setSelectedEmail,
+    updateEmail,
+    moveEmailToCategory,
+    addOrUpdateEmailInSent,
+    restoreEmailsToCategory,
+    deleteEmailsPermanently,
+  } = useEmailState(category, emailId);
 
-  const debouncedSearch = useDebounce(searchTerm, 500);
+  // Email Selection Logic
+  const {
+    isAllSelected,
+    checkedEmailIds,
+    hasUnreadSelected,
+    setIsAllSelected,
+    setCheckedEmailIds,
+    updateReadStatus,
+    resetSelection,
+  } = useEmailSelection(filteredEmails, updateEmail);
 
-  const sortEmailsByTime = (emailsToSort: TEmail[]): TEmail[] => {
-    return [...emailsToSort].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-  };
+  // Email Compose Logic
+  const {
+    isComposing,
+    activeAction,
+    isReplyVisible,
+    isReplySingleAction,
+    setIsComposing,
+    setActiveAction,
+    setIsReplyVisible,
+    setIsReplySingleAction,
+    handleComposeEmail,
+    handleComposeEmailForward,
+    handleCloseCompose,
+    onSetActiveActionFalse,
+    handleReplyAction,
+    updateReplyInEmail,
+  } = useEmailCompose(setEmails, selectedEmail, setSelectedEmail);
 
+  // Reset selection when category changes
   useEffect(() => {
-    if (category) {
-      if (category === 'labels' && emailId) {
-        const emailDataToSort = emails[emailId];
-        setFilteredEmails(Array.isArray(emailDataToSort) ? sortEmailsByTime(emailDataToSort) : []);
-      } else if (Object.hasOwn(emails, category)) {
-        const emailDataToSort = emails[category];
-        setFilteredEmails(Array.isArray(emailDataToSort) ? sortEmailsByTime(emailDataToSort) : []);
-      } else {
-        setFilteredEmails([]);
-      }
-      setCheckedEmailIds([]);
-    }
-  }, [category, emailId, emails]);
+    resetSelection();
+  }, [category, resetSelection]);
 
-  useEffect(() => {
-    if (emailId && filteredEmails.length > 0) {
-      const foundEmail = filteredEmails.find((email) => email.id === emailId) || null;
-      setSelectedEmail(foundEmail);
-    }
-  }, [emailId, filteredEmails]);
+  // Wrapper functions to match EmailView component interface
+  const toggleEmailAttribute = (emailId: string, attribute: 'isStarred') => {
+    // First try to find in filteredEmails (current view)
+    let currentEmail = filteredEmails.find((email) => email.id === emailId);
 
-  const handleComposeEmail = () => {
-    setIsComposing({
-      isCompose: true,
-      isForward: false,
-      replyData: {} as TReply | null,
-    });
-    onSetActiveActionFalse();
-  };
-  const handleComposeEmailForward = (replyData?: TReply) => {
-    setIsComposing({
-      isCompose: false,
-      isForward: true,
-      replyData: replyData ?? ({} as TReply),
-    });
-    onSetActiveActionFalse();
-  };
-  const handleCloseCompose = () => {
-    setIsComposing({
-      isCompose: false,
-      isForward: false,
-      replyData: {} as TReply,
-    });
-    setIsReplySingleAction({ isReplyEditor: false, replyId: '' });
-  };
-
-  const updateEmail = (emailId: string, updates: Partial<TEmail>) => {
-    setEmails((prevEmails) => {
-      const updatedEmails = { ...prevEmails };
-
-      let targetEmail: TEmail | undefined;
-
-      for (const cat in updatedEmails) {
-        const found = updatedEmails[cat]?.find((email) => email.id === emailId);
+    // If not found in filtered emails, search through all categories
+    if (!currentEmail) {
+      for (const category in emails) {
+        const found = emails[category]?.find((email) => email.id === emailId);
         if (found) {
-          targetEmail = found;
+          currentEmail = found;
           break;
         }
       }
-
-      if (!targetEmail) return prevEmails;
-
-      const updatedEmail = { ...targetEmail, ...updates };
-
-      for (const cat in updatedEmails) {
-        updatedEmails[cat] = updatedEmails[cat]?.map((email) =>
-          email.id === emailId ? updatedEmail : email
-        );
-      }
-
-      if (updatedEmail.isStarred) {
-        if (!updatedEmails.starred?.some((email) => email.id === emailId)) {
-          updatedEmails.starred = [...(updatedEmails.starred || []), updatedEmail];
-        }
-      } else {
-        updatedEmails.starred = (updatedEmails.starred || []).filter(
-          (email) => email.id !== emailId
-        );
-      }
-
-      return updatedEmails;
-    });
-
-    if (selectedEmail?.id === emailId) {
-      setSelectedEmail((prev) => (prev ? { ...prev, ...updates } : null));
-    }
-  };
-
-  const moveEmailToCategory = (
-    emailIds: string | string[],
-    destination: 'spam' | 'trash' | 'inbox' | 'sent'
-  ) => {
-    const idsToMove = Array.isArray(emailIds) ? emailIds : [emailIds];
-
-    setEmails((prevEmails) => {
-      const updatedEmails: { [key: string]: TEmail[] } = {};
-      const movedEmailMap: { [id: string]: TEmail } = {};
-
-      for (const category in prevEmails) {
-        const emailsInCategory = prevEmails[category] || [];
-        const remainingEmails = emailsInCategory.filter((email) => {
-          if (idsToMove.includes(email.id)) {
-            if (!movedEmailMap[email.id]) {
-              movedEmailMap[email.id] = { ...email, [destination]: true };
-            }
-            return false;
-          }
-          return true;
-        });
-        updatedEmails[category] = remainingEmails;
-      }
-
-      updatedEmails[destination] = [
-        ...(updatedEmails[destination] || []),
-        ...Object.values(movedEmailMap),
-      ];
-
-      setCheckedEmailIds([]);
-
-      return updatedEmails;
-    });
-
-    if (selectedEmail && idsToMove.includes(selectedEmail.id)) {
-      setSelectedEmail(null);
-    }
-  };
-
-  const addOrUpdateEmailInSent = (newEmail: TEmail) => {
-    setEmails((prevEmails) => {
-      const updatedEmails = { ...prevEmails };
-      const sentEmails = updatedEmails.sent || [];
-
-      const existingIndex = sentEmails.findIndex((email) => email.id === newEmail.id);
-
-      if (existingIndex !== -1) {
-        sentEmails[existingIndex] = { ...sentEmails[existingIndex], ...newEmail };
-      } else {
-        sentEmails.unshift(newEmail);
-      }
-
-      updatedEmails.sent = sentEmails;
-      return updatedEmails;
-    });
-  };
-
-  const updateEmailsByTags = () => {
-    setEmails((prevEmails) => {
-      const inbox = prevEmails.inbox || [];
-      return {
-        ...prevEmails,
-        personal: inbox.filter((email: TEmail) => email?.tags?.personal),
-        work: inbox.filter((email: TEmail) => email?.tags?.work),
-        payments: inbox.filter((email: TEmail) => email?.tags?.payments),
-        invoices: inbox.filter((email: TEmail) => email?.tags?.invoices),
-      };
-    });
-  };
-
-  const toggleEmailAttribute = (emailId: string, attribute: 'isStarred') => {
-    setEmails((prevEmails) => {
-      const updatedEmails: Record<string, TEmail[]> = {};
-      let toggledEmail: TEmail | null = null;
-
-      for (const category in prevEmails) {
-        const emailsInCategory = prevEmails[category] || [];
-
-        updatedEmails[category] = emailsInCategory.map((email) => {
-          if (email.id === emailId) {
-            const updated = { ...email, [attribute]: !email[attribute] };
-            toggledEmail = updated;
-            return updated;
-          }
-          return email;
-        });
-      }
-
-      if (!toggledEmail) return prevEmails;
-
-      const targetCategory = 'starred';
-      const targetList = updatedEmails[targetCategory] ?? [];
-
-      if (toggledEmail['isStarred']) {
-        if (!targetList.some((email) => email.id === emailId)) {
-          updatedEmails[targetCategory] = [...targetList, toggledEmail];
-        }
-      } else {
-        updatedEmails[targetCategory] = targetList.filter((email) => email.id !== emailId);
-      }
-
-      return updatedEmails;
-    });
-
-    if (category === 'starred' && selectedEmail?.id === emailId) {
-      setSelectedEmail(null);
-    } else if (selectedEmail?.id === emailId) {
-      setSelectedEmail((prev) => (prev ? { ...prev, [attribute]: !prev[attribute] } : prev));
-    }
-  };
-
-  const toggleReplyAttribute = (emailId: string, replyId: string, attribute: 'isStarred') => {
-    setEmails((prevEmails) => {
-      const updatedEmails: Record<string, TEmail[]> = { ...prevEmails };
-
-      for (const category in prevEmails) {
-        const emailsInCategory = prevEmails[category] || [];
-
-        updatedEmails[category] = emailsInCategory.map((email: TEmail) =>
-          updateSingleEmailReplies(email, replyId, attribute)
-        );
-      }
-
-      return updatedEmails;
-    });
-  };
-
-  useEffect(() => {
-    updateEmailsByTags();
-  }, [emails.inbox]);
-
-  useEffect(() => {
-    if (!category || category === 'labels') return;
-
-    const allEmails = emails[category] || [];
-    const sortedEmails = sortEmailsByTime(allEmails);
-
-    if (!debouncedSearch.trim()) {
-      setFilteredEmails(sortedEmails);
-      return;
     }
 
-    setSelectedEmail(null);
-
-    const lowerSearch = debouncedSearch.toLowerCase();
-
-    const filtered = sortedEmails.filter((email) => {
-      return (
-        email.subject?.toLowerCase().includes(lowerSearch) ||
-        email.sender?.join(' ').toLowerCase().includes(lowerSearch)
-      );
-    });
-
-    setFilteredEmails(filtered);
-  }, [debouncedSearch, category, emails]);
-
-  const onGoBack = () => {
-    setCheckedEmailIds([]);
-    navigate(-1);
-  };
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (isSearching && searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearching(false);
-      }
+    if (currentEmail) {
+      // Toggle the current state
+      const newValue = !currentEmail[attribute];
+      updateEmail(emailId, { [attribute]: newValue });
     }
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isSearching, searchRef]);
+  };
 
   const updateEmailReadStatus = (emailId: string, category: string, isRead: boolean) => {
-    setEmails((prevEmails) => {
-      const updatedEmails = { ...prevEmails };
-      if (updatedEmails[category]) {
-        updatedEmails[category] = updatedEmails[category].map((email) => {
-          if (email.id === emailId) {
-            return { ...email, isRead: isRead };
-          }
-          return email;
-        });
-      }
-      return updatedEmails;
-    });
-
-    const currentPath = window.location.pathname;
-    const newPath = currentPath.replace(`/${emailId}`, '');
-    navigate(newPath, { replace: true });
-
-    setSelectedEmail(null);
-  };
-
-  const handleClearInput = () => {
-    setSearchTerm('');
-    if (searchRef.current) {
-      searchRef.current.focus();
-    }
-  };
-
-  useEffect(() => {
-    const allUnread = checkedEmailIds.every((id) => {
-      const foundEmail = Object.values(emails)
-        .flat()
-        .find((email) => email.id === id);
-      return foundEmail?.isRead === true;
-    });
-
-    setHasUnreadSelected(allUnread);
-  }, [checkedEmailIds, emails]);
-
-  const updateReadStatus = (status: boolean) => {
-    const updatedEmails = Object.fromEntries(
-      Object.entries(emails).map(([category, emailList]) => [
-        category,
-        emailList.map((email) =>
-          checkedEmailIds.includes(email.id) ? { ...email, isRead: status } : email
-        ),
-      ])
-    );
-
-    setEmails(updatedEmails);
-  };
-
-  const restoreEmailsToCategory = (emailIds: string | string[]) => {
-    const idsToRestore = Array.isArray(emailIds) ? emailIds : [emailIds];
-
-    idsToRestore.forEach((id) => {
-      for (const category in emails) {
-        const email = emails[category]?.find((e) => e.id === id);
-
-        if (
-          email?.sectionCategory &&
-          ['inbox', 'trash', 'spam', 'sent'].includes(email.sectionCategory)
-        ) {
-          moveEmailToCategory(id, email.sectionCategory as 'inbox' | 'trash' | 'spam' | 'sent');
-          break;
-        }
-      }
-    });
-
-    if (emailId && idsToRestore.includes(emailId)) {
-      setSelectedEmail(null);
-      if (category) {
-        navigate(`/mail/${category}`, { replace: true });
-      }
-    }
-  };
-
-  const deleteEmailsPermanently = (emailIds: string | string[]) => {
-    const idsToDelete = Array.isArray(emailIds) ? emailIds : [emailIds];
-
-    setEmails((prevEmails) => {
-      const updatedEmails: Record<string, TEmail[]> = {};
-
-      for (const category in prevEmails) {
-        const updatedCategoryEmails = prevEmails[category]
-          .map((email) => (idsToDelete.includes(email.id) ? { ...email, isDeleted: true } : email))
-          .filter((email) => !email.isDeleted);
-
-        updatedEmails[category] = updatedCategoryEmails;
-      }
-
-      return updatedEmails;
-    });
-    setCheckedEmailIds((prev) => prev.filter((id) => !idsToDelete.includes(id)));
-    if (selectedEmail && idsToDelete.includes(selectedEmail?.id)) {
-      setSelectedEmail(null);
-      if (emailId && category) {
-        navigate(`/mail/${category}`, { replace: true });
-      }
-    }
-  };
-
-  const handleEmailSelection = (email: TEmail) => {
-    setSelectedEmail(email);
-
-    setEmails((prev) => {
-      if (category && Object.hasOwn(prev, category)) {
-        return {
-          ...prev,
-          [category]: prev[category]?.map((e) => (e.id === email.id ? { ...e, isRead: true } : e)),
-        };
-      }
-      return prev;
-    });
-
-    onSetActiveActionFalse();
-    setIsReplyVisible(false);
-    setCheckedEmailIds([]);
-    setIsComposing({
-      isCompose: false,
-      isForward: false,
-      replyData: {} as TReply,
-    });
-    navigate(`/mail/${category}/${email.id}`);
+    updateEmail(emailId, { isRead });
   };
 
   const handleSetActive = (actionType: keyof TActiveAction) => {
-    setActiveAction((prevState) => {
-      const newState: TActiveAction = {
-        reply: false,
-        replyAll: false,
-        forward: false,
-      };
-      newState[actionType] = !prevState[actionType];
-      handleCloseCompose();
-      return newState;
-    });
+    handleReplyAction(actionType);
   };
 
-  const onSetActiveActionFalse = () => {
-    setActiveAction({
-      reply: false,
-      replyAll: false,
-      forward: false,
-    });
-    setIsReplySingleAction({ isReplyEditor: false, replyId: '' });
+  const toggleReplyAttribute = (emailId: string, replyId: string, attribute: 'isStarred') => {
+    updateReplyInEmail(emailId, replyId, attribute);
   };
 
   return (
