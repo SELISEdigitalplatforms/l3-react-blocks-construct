@@ -148,9 +148,9 @@ export function AuthLayout() {
     <div className="flex w-full flex-col h-screen">
       <div className="w-full bg-surface flex-shrink-0">
         <div className="flex items-center justify-center p-3 gap-2">
-          <span className="text-sm">
-            Experience UILM — test it in Blocks Construct with the extension.
-          </span>
+          <a href="" target="_blank" rel="noopener noreferrer" className="text-sm">
+            Experience UILM — explore its capabilities in Blocks Construct using the extension.{' '}
+          </a>
           <a
             href="https://chromewebstore.google.com/detail/ehnhmdghlkaeaiinoahgipdeogkikjem?utm_source=item-share-cb"
             target="_blank"
