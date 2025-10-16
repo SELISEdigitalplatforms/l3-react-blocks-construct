@@ -13,17 +13,15 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
-import { CalendarEvent } from '../../../types/calendar-event.types';
+import { CalendarEvent, DeleteUpdateEventOption } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';
 import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring-event';
-
-type DeleteOption = 'this' | 'thisAndFollowing' | 'all';
 
 interface EventDetailsProps {
   event: CalendarEvent;
   onClose: () => void;
   onNext: () => void;
-  onDelete: (eventId: string, deleteOption?: DeleteOption) => void;
+  onDelete: (eventId: string, deleteOption?: DeleteUpdateEventOption) => void;
   onRestore?: () => boolean;
 }
 
@@ -140,7 +138,7 @@ export const EventDetails = ({
     showDeletionSuccessToast();
   };
 
-  const handleRecurringDeleteConfirm = (deleteOption: DeleteOption) => {
+  const handleRecurringDeleteConfirm = (deleteOption: DeleteUpdateEventOption) => {
     onDelete(event.eventId ?? '', deleteOption);
     closeDialogsAndParent();
     showDeletionSuccessToast();

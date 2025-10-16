@@ -1,6 +1,11 @@
 import { useState, useRef } from 'react';
 import { generateUuid } from '@/utils/uuid';
-import { CalendarEvent, myEventsList, Member } from '@/features/big-calendar';
+import {
+  CalendarEvent,
+  myEventsList,
+  Member,
+  DeleteUpdateEventOption,
+} from '@/features/big-calendar';
 import { MEMBER_STATUS } from '@/features/big-calendar/enums/calendar.enum';
 
 /**
@@ -109,7 +114,7 @@ export const useCalendarEvents = () => {
    * @param eventId - ID of the event to delete
    * @param deleteOption - Option for recurring events ('this', 'thisAndFollowing', 'all')
    */
-  const deleteEvent = (eventId: string, deleteOption?: 'this' | 'thisAndFollowing' | 'all') => {
+  const deleteEvent = (eventId: string, deleteOption?: DeleteUpdateEventOption) => {
     // Find the event to delete
     const eventToDelete = events.find((event) => event.eventId === eventId);
     if (!eventToDelete) {
@@ -175,10 +180,7 @@ export const useCalendarEvents = () => {
   /**
    * Update an event or a recurring series of events
    */
-  const updateEvent = (
-    updatedEvent: CalendarEvent,
-    updateOption?: 'this' | 'thisAndFollowing' | 'all'
-  ) => {
+  const updateEvent = (updatedEvent: CalendarEvent, updateOption?: DeleteUpdateEventOption) => {
     const eventToUpdate = events.find((event) => event.eventId === updatedEvent.eventId);
     if (!eventToUpdate) return;
 

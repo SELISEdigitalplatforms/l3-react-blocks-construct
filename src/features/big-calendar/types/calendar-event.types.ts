@@ -38,3 +38,5 @@ export interface CalendarEvent extends Event {
 
 export type EventContentTextColor =
   (typeof EventContentTextColor)[keyof typeof EventContentTextColor];
+
+export type DeleteUpdateEventOption = 'this' | 'thisAndFollowing' | 'all';
