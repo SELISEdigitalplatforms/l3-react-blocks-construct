@@ -60,8 +60,6 @@ import {
 
 export const Email = () => {
   const { t } = useTranslation();
-
-  // UI State and Navigation
   const {
     category,
     emailId,
@@ -76,9 +74,8 @@ export const Email = () => {
     handleClearInput,
     handleEmailSelection,
     onGoBack,
+    filterEmailsBySearch,
   } = useEmailUI();
-
-  // Email State and Operations
   const {
     emails,
     selectedEmail,
@@ -91,8 +88,6 @@ export const Email = () => {
     restoreEmailsToCategory,
     deleteEmailsPermanently,
   } = useEmailState(category, emailId);
-
-  // Email Selection Logic
   const {
     isAllSelected,
     checkedEmailIds,
@@ -102,8 +97,6 @@ export const Email = () => {
     updateReadStatus,
     resetSelection,
   } = useEmailSelection(filteredEmails, updateEmail);
-
-  // Email Compose Logic
   const {
     isComposing,
     activeAction,
@@ -121,17 +114,13 @@ export const Email = () => {
     updateReplyInEmail,
   } = useEmailCompose(setEmails, selectedEmail, setSelectedEmail);
 
-  // Reset selection when category changes
   useEffect(() => {
     resetSelection();
   }, [category, resetSelection]);
 
-  // Wrapper functions to match EmailView component interface
   const toggleEmailAttribute = (emailId: string, attribute: 'isStarred') => {
-    // First try to find in filteredEmails (current view)
     let currentEmail = filteredEmails.find((email) => email.id === emailId);
 
-    // If not found in filtered emails, search through all categories
     if (!currentEmail) {
       for (const category in emails) {
         const found = emails[category]?.find((email) => email.id === emailId);
@@ -143,7 +132,6 @@ export const Email = () => {
     }
 
     if (currentEmail) {
-      // Toggle the current state
       const newValue = !currentEmail[attribute];
       updateEmail(emailId, { [attribute]: newValue });
     }
@@ -197,7 +185,7 @@ export const Email = () => {
             <div className="flex w-full border-t border-Low-Emphasis">
               <div className="flex flex-1 flex-col border-x w-full border-Low-Emphasis">
                 <EmailList
-                  emails={filteredEmails}
+                  emails={filterEmailsBySearch(filteredEmails)}
                   setEmails={setEmails}
                   onSelectEmail={setSelectedEmail}
                   selectedEmail={selectedEmail}
@@ -420,7 +408,7 @@ export const Email = () => {
             {!selectedEmail && (
               <div className="flex flex-1 flex-col border-x w-full border-Low-Emphasis">
                 <EmailList
-                  emails={filteredEmails}
+                  emails={filterEmailsBySearch(filteredEmails)}
                   setEmails={setEmails}
                   onSelectEmail={setSelectedEmail}
                   selectedEmail={selectedEmail}

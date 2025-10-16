@@ -79,7 +79,7 @@ const MENU_ITEM_CLASSES = 'flex p-3 gap-2 hover:bg-surface';
 const TEXT_CLASSES = 'text-high-emphasis font-normal';
 const ICON_TEXT_CLASSES = 'h-5 w-5 text-medium-emphasis';
 
-const EmailActionsPanel = ({
+export const EmailActionsPanel = ({
   selectedEmail,
   activeAction,
   handleSetActive,
@@ -193,5 +193,3 @@ const EmailActionsPanel = ({
     </div>
   );
 };
-
-export default EmailActionsPanel;

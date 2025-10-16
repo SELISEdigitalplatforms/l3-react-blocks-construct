@@ -81,7 +81,7 @@ const TEXT_STYLING_CLASSES = 'text-high-emphasis font-normal';
 const ICON_MEDIUM_EMPHASIS_CLASSES = 'h-5 w-5 text-medium-emphasis';
 const AVATAR_SIZE = { height: 24, width: 24 };
 
-const EmailActionsReplyPanel = ({
+export const EmailActionsReplyPanel = ({
   selectedEmail,
   activeActionReply,
   handleSetActiveReply,
@@ -211,5 +211,3 @@ const EmailActionsReplyPanel = ({
     </div>
   );
 };
-
-export default EmailActionsReplyPanel;

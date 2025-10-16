@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { EmailComposeHeader } from './email-compose-header';
-import { EmailInput } from '../email-ui/email-input';
-import EmailTextEditor from '../email-ui/email-text-editor';
+import { EmailComposeHeader } from '../email-compose-header/email-compose-header';
+import { EmailInput } from '../email-input/email-input';
+import { EmailTextEditor } from '../email-text-editor/email-text-editor';
 import { TEmail, TFormData, TFormProps, TIsComposing } from '../../types/email.types';
-import { EmailTagInput } from '../email-ui/email-tag-input';
+import { EmailTagInput } from '../../email-tag-input/email-tag-input';
 
 /**
  * EmailCompose Component
@@ -48,12 +48,12 @@ interface EmailComposeProps {
   isComposing: TIsComposing;
 }
 
-export function EmailCompose({
+export const EmailCompose = ({
   onClose,
   addOrUpdateEmailInSent,
   selectedEmail,
   isComposing,
-}: Readonly<EmailComposeProps>) {
+}: Readonly<EmailComposeProps>) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [showCc, setShowCc] = useState(false);
@@ -336,4 +336,4 @@ export function EmailCompose({
       </div>
     </>
   );
-}
+};

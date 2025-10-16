@@ -3,7 +3,7 @@ import { TActiveAction, TEmail, TReply } from '../types/email.types';
 
 /**
  * Custom hook for managing email compose, reply, and forward functionality
- * 
+ *
  * Handles:
  * - Compose email state
  * - Reply and forward functionality
@@ -34,7 +34,11 @@ export const useEmailCompose = (
   });
 
   // Helper function to update a single reply's attribute
-  const updateReplyAttribute = (reply: TReply, replyId: string, attribute: keyof TReply): TReply => {
+  const updateReplyAttribute = (
+    reply: TReply,
+    replyId: string,
+    attribute: keyof TReply
+  ): TReply => {
     if (reply.id !== replyId) return reply;
     return { ...reply, [attribute]: !reply[attribute] };
   };
@@ -128,19 +132,14 @@ export const useEmailCompose = (
   };
 
   return {
-    // State
     isComposing,
     activeAction,
     isReplyVisible,
     isReplySingleAction,
-    
-    // Setters
     setIsComposing,
     setActiveAction,
     setIsReplyVisible,
     setIsReplySingleAction,
-    
-    // Operations
     handleComposeEmail,
     handleComposeEmailForward,
     handleCloseCompose,
@@ -148,8 +147,6 @@ export const useEmailCompose = (
     handleReplyAction,
     handleSingleReplyAction,
     updateReplyInEmail,
-    
-    // Utilities
     updateReplyAttribute,
     updateSingleEmailReplies,
   };

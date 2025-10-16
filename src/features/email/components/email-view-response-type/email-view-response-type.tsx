@@ -38,7 +38,7 @@ interface EmailViewResponseTypeProps {
   selectedEmail: TEmail;
 }
 
-const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseTypeProps>) => {
+export const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseTypeProps>) => {
   const { t } = useTranslation();
 
   function formatDateTime(dateString: string) {
@@ -116,5 +116,3 @@ const EmailViewResponseType = ({ selectedEmail }: Readonly<EmailViewResponseType
     </div>
   );
 };
-
-export default EmailViewResponseType;

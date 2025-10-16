@@ -13,7 +13,6 @@ import { TEmail } from '../types/email.types';
  */
 export const useEmailState = (category?: string, emailId?: string) => {
   const [emails, setEmails] = useState<Record<string, TEmail[]>>(() => {
-    // Try to restore from localStorage to persist state across remounts/navigation
     try {
       const saved = localStorage.getItem('emails-state');
       if (saved) {
@@ -23,7 +22,6 @@ export const useEmailState = (category?: string, emailId?: string) => {
       // noop: ignore JSON parse/localStorage access errors
     }
 
-    // Fallback to initial seed data
     return Object.fromEntries(
       Object.entries(emailData)
         .filter(([, value]) => Array.isArray(value))
@@ -34,7 +32,6 @@ export const useEmailState = (category?: string, emailId?: string) => {
   const [selectedEmail, setSelectedEmail] = useState<TEmail | null>(null);
   const [filteredEmails, setFilteredEmails] = useState<Array<TEmail>>([]);
 
-  // Persist emails to localStorage whenever they change
   useEffect(() => {
     try {
       localStorage.setItem('emails-state', JSON.stringify(emails));
@@ -53,9 +50,23 @@ export const useEmailState = (category?: string, emailId?: string) => {
   // Filter emails based on category and emailId
   useEffect(() => {
     if (category) {
+      const allowedLabelKeys = ['personal', 'work', 'payments', 'invoices'] as const;
+      type LabelKey = (typeof allowedLabelKeys)[number];
+
       if (category === 'labels' && emailId) {
-        const emailDataToSort = emails[emailId];
-        setFilteredEmails(Array.isArray(emailDataToSort) ? sortEmailsByTime(emailDataToSort) : []);
+        const source = emails.inbox || [];
+        if (allowedLabelKeys.includes(emailId as LabelKey)) {
+          const key = emailId as LabelKey;
+          const labelFiltered = source.filter((e) => Boolean(e.tags?.[key]));
+          setFilteredEmails(sortEmailsByTime(labelFiltered));
+        } else {
+          setFilteredEmails([]);
+        }
+      } else if (allowedLabelKeys.includes(category as LabelKey)) {
+        const key = category as LabelKey;
+        const source = emails.inbox || [];
+        const labelFiltered = source.filter((e) => Boolean(e.tags?.[key]));
+        setFilteredEmails(sortEmailsByTime(labelFiltered));
       } else if (Object.hasOwn(emails, category)) {
         const emailDataToSort = emails[category];
         setFilteredEmails(Array.isArray(emailDataToSort) ? sortEmailsByTime(emailDataToSort) : []);
@@ -75,7 +86,6 @@ export const useEmailState = (category?: string, emailId?: string) => {
         const shouldAutoMarkRead =
           !foundEmail.isRead && lastMarkedReadIdRef.current !== foundEmail.id;
         if (shouldAutoMarkRead) {
-          // Update emails state to mark this email as read across all categories
           setEmails((prev) => {
             const updated = { ...prev } as Record<string, TEmail[]>;
             for (const cat in updated) {
@@ -251,24 +261,17 @@ export const useEmailState = (category?: string, emailId?: string) => {
   );
 
   return {
-    // State
     emails,
     selectedEmail,
     filteredEmails,
-
-    // Setters
     setEmails,
     setSelectedEmail,
     setFilteredEmails,
-
-    // Operations
     updateEmail,
     moveEmailToCategory,
     addOrUpdateEmailInSent,
     restoreEmailsToCategory,
     deleteEmailsPermanently,
-
-    // Utilities
     sortEmailsByTime,
   };
 };

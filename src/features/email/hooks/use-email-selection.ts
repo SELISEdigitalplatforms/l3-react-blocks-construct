@@ -3,7 +3,7 @@ import { TEmail } from '../types/email.types';
 
 /**
  * Custom hook for managing email selection and bulk operations
- * 
+ *
  * Handles:
  * - Individual and bulk email selection
  * - Read/unread status management
@@ -64,7 +64,7 @@ export const useEmailSelection = (
     checkedEmailIds.forEach((emailId) => {
       updateEmail(emailId, { isRead });
     });
-    
+
     // Reset selection after updating
     resetSelection();
   };
@@ -80,17 +80,12 @@ export const useEmailSelection = (
   };
 
   return {
-    // State
     isAllSelected,
     checkedEmailIds,
     hasUnreadSelected,
-    
-    // Setters
     setIsAllSelected,
     setCheckedEmailIds,
     setHasUnreadSelected,
-    
-    // Operations
     handleSingleEmailCheck,
     handleSelectAllEmails,
     updateReadStatus,

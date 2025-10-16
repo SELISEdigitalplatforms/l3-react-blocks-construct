@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { TEmail, TEmailData } from '../../types/email.types';
-import EmailTextEditor from '../email-ui/email-text-editor';
 import { useNavItems } from '../../constants/nav-items';
 import { useLabelItems } from '../../constants/label-items';
+import { EmailTextEditor } from '../email-text-editor/email-text-editor';
 
 /**
  * NavItem Component
@@ -122,12 +122,12 @@ function NavItem({
  * />
  */
 
-export function EmailSidebar({
+export const EmailSidebar = ({
   handleComposeEmail,
   setSelectedEmail,
   emails,
   isCollapsedEmailSidebar,
-}: Readonly<EmailSidebarProps>) {
+}: Readonly<EmailSidebarProps>) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isEditModalOpen] = useState(false);
@@ -194,4 +194,4 @@ export function EmailSidebar({
       )}
     </>
   );
-}
+};

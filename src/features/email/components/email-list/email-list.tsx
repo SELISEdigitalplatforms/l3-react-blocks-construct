@@ -68,7 +68,7 @@ interface EmailListProps {
   handleEmailSelection: (email: TEmail) => void;
 }
 
-export function EmailList({
+export const EmailList = ({
   selectedEmail,
   emails,
   setIsAllSelected,
@@ -76,7 +76,7 @@ export function EmailList({
   checkedEmailIds,
   handleComposeEmail,
   handleEmailSelection,
-}: Readonly<EmailListProps>) {
+}: Readonly<EmailListProps>) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -359,7 +359,9 @@ export function EmailList({
                                 <Paperclip className="h-4 w-4 text-medium-emphasis" />
                               )}
 
-                              {email.isStarred && <Star className="h-4 w-4 text-warning" fill="currentColor" />}
+                              {email.isStarred && (
+                                <Star className="h-4 w-4 text-warning" fill="currentColor" />
+                              )}
                             </div>
                           </div>
                           <div className="line-clamp-2 text-sm text-medium-emphasis">
@@ -398,4 +400,4 @@ export function EmailList({
       </div>
     </>
   );
-}
+};

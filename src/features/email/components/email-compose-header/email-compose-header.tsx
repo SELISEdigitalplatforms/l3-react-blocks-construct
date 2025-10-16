@@ -41,12 +41,12 @@ interface EmailComposeHeaderProps {
   isMaximized: boolean;
 }
 
-export function EmailComposeHeader({
+export const EmailComposeHeader = ({
   onMinimize,
   onMaximize,
   onClose,
   isMaximized,
-}: Readonly<EmailComposeHeaderProps>) {
+}: Readonly<EmailComposeHeaderProps>) => {
   const { t } = useTranslation();
 
   return (
@@ -76,4 +76,4 @@ export function EmailComposeHeader({
       </div>
     </div>
   );
-}
+};

@@ -28,16 +28,18 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import EmailViewResponseType from '../email-view-response-type';
 import { Button } from '@/components/ui/button';
-import EmailActionsPanel from '../email-actions-panel';
-import EmailTextEditor from '../../email-ui/email-text-editor';
-import { EmailCompose } from '../../email-compose/email-compose';
-import EmailSingleActions from '../email-single-action';
-import EmailActionsReplyPanel from '../email-actions-reply-panel';
+import { EmailTextEditor } from '../email-text-editor/email-text-editor';
+import { EmailCompose } from '../email-compose/email-compose';
 import { sanitizeHTML } from '@/utils/sanitizer';
-import { TooltipConfirmAction } from '../../email-ui/email-tooltip-confirm-action';
-import { htmlToPlainText } from '@/features/email';
+import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tooltip-confirm-action';
+import {
+  EmailActionsPanel,
+  EmailActionsReplyPanel,
+  EmailSingleActions,
+  EmailViewResponseType,
+  htmlToPlainText,
+} from '@/features/email';
 
 interface AttachmentDisplayProps {
   attachments?: string[];
@@ -308,7 +310,7 @@ const MainActionButtons: React.FC<{
  *   ...
  * />
  */
-export function EmailViewGrid({
+export const EmailViewGrid = ({
   selectedEmail,
   statusLabels,
   viewState,
@@ -344,7 +346,7 @@ export function EmailViewGrid({
   handleSetActiveReply,
   formData,
   setFormData,
-}: Readonly<EmailViewProps>) {
+}: Readonly<EmailViewProps>) => {
   const [replyData, setReplyData] = useState<TReply | null>(null);
   const { t } = useTranslation();
 
@@ -475,7 +477,7 @@ export function EmailViewGrid({
               })
             }
             isReplySingleAction={isReplySingleAction ?? { isReplyEditor: false, replyId: '' }}
-            onToggleStar={(emailId, replyId) => {
+            onToggleStar={(emailId: any, replyId: any) => {
               if (replyId) {
                 toggleReplyAttribute(emailId, replyId, 'isStarred');
               } else {
@@ -635,4 +637,4 @@ export function EmailViewGrid({
       )}
     </div>
   );
-}
+};

@@ -11,8 +11,8 @@ import {
   TViewState,
 } from '../../types/email.types';
 import { useNavigate } from 'react-router-dom';
-import { EmailViewGrid } from './email-view-grid/email-view-grid';
-import { EmailViewMobile } from './email-view-mobile/email-view-mobile';
+import { EmailViewGrid } from '../email-view-grid/email-view-grid';
+import { EmailViewMobile } from '../email-view-mobile/email-view-mobile';
 
 /**
  * EmailView Component
@@ -103,7 +103,7 @@ const statusLabels: Record<string, { label: string; border: string; text: string
   invoices: { label: 'Invoices', border: 'border-blue-500', text: 'text-blue-500' },
 };
 
-export function EmailView({
+export const EmailView = ({
   selectedEmail,
   isComposing,
   handleCloseCompose,
@@ -130,7 +130,7 @@ export function EmailView({
   isReplySingleAction,
   setIsReplySingleAction,
   setIsComposing,
-}: Readonly<EmailViewProps>) {
+}: Readonly<EmailViewProps>) => {
   const navigate = useNavigate();
   const [viewState, setViewState] = useState<TViewState>({});
   const [formData, setFormData] = useState<TFormData>({
@@ -383,4 +383,4 @@ export function EmailView({
       />
     </>
   );
-}
+};

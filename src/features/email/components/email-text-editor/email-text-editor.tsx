@@ -60,7 +60,7 @@ interface EmailTextEditorProps {
   formData?: TFormData | TFormProps;
 }
 
-const EmailTextEditor = ({
+export const EmailTextEditor = ({
   value,
   onChange,
   submitName,
@@ -292,5 +292,3 @@ const EmailTextEditor = ({
     </div>
   );
 };
-
-export default EmailTextEditor;

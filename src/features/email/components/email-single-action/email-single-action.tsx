@@ -51,7 +51,7 @@ import {
  * )
  */
 
-const EmailSingleActions = ({
+export const EmailSingleActions = ({
   selectedEmail,
   formatDateTime,
   onToggleStar,
@@ -194,5 +194,3 @@ const EmailSingleActions = ({
     </div>
   );
 };
-
-export default EmailSingleActions;

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDebounce } from '../services/use-debounce';
+import { useDebounce } from './use-debounce';
 import { TEmail } from '../types/email.types';
 
 /**
@@ -80,26 +80,17 @@ export const useEmailUI = () => {
   };
 
   return {
-    // Navigation
     navigate,
     category,
     emailId,
-
-    // Search state
     isSearching,
     searchTerm,
     debouncedSearch,
     searchRef,
-
-    // UI state
     isCollapsedEmailSidebar,
-
-    // Setters
     setIsSearching,
     setSearchTerm,
     setIsCollapsedEmailSidebar,
-
-    // Operations
     handleClearInput,
     handleEmailSelection,
     onGoBack,
