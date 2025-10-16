@@ -1,5 +1,6 @@
 import { Event } from 'react-big-calendar';
 import { MEMBER_STATUS } from '../enums/calendar.enum';
+import { EventContentTextColor } from '../constants/calendar.constants';
 
 export interface Member {
   id: string;
@@ -34,3 +35,6 @@ export interface CalendarEvent extends Event {
     recurrencePattern?: RecurrencePattern;
   };
 }
+
+export type EventContentTextColor =
+  (typeof EventContentTextColor)[keyof typeof EventContentTextColor];

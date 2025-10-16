@@ -25,7 +25,7 @@ import { Email } from '@/pages/email';
 import { VerifyOtpKey } from './pages/auth/verify-otp-key/verify-otp-key';
 import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
 import TaskManager from './pages/task-manager/task-manager';
-import { CalendarPage } from './pages/calendar/calendar';
+import { CalendarPage } from '@/pages/calendar';
 import { Finance } from '@/pages/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';

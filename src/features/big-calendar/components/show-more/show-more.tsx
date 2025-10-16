@@ -6,6 +6,6 @@ interface ShowMoreProps {
   remainingEvents: CalendarEvent[];
 }
 
-export function ShowMore({ count, remainingEvents }: Readonly<ShowMoreProps>) {
+export const ShowMore = ({ count, remainingEvents }: Readonly<ShowMoreProps>) => {
   return <ShowMorePopup count={count} remainingEvents={remainingEvents} />;
-}
+};

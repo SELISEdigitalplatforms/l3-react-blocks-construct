@@ -336,14 +336,14 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
  *
  * @returns {JSX.Element} Edit event modal dialog with form fields and action buttons
  */
-export function EditEvent({
+export const EditEvent = ({
   event,
   onClose,
   onNext,
   onUpdate,
   onDelete,
   onRestore,
-}: Readonly<EditEventProps>) {
+}: Readonly<EditEventProps>) => {
   const { toast, dismiss } = useToast();
   const { t } = useTranslation();
 
@@ -820,4 +820,4 @@ export function EditEvent({
       )}
     </>
   );
-}
+};

@@ -56,13 +56,13 @@ const TEXT_LOW_EMPHASIS = 'text-low-emphasis';
  * @param {EventDetailsProps} props - The props for configuring the event details dialog.
  * @returns {JSX.Element} The rendered JSX element for the event details dialog.
  */
-export function EventDetails({
+export const EventDetails = ({
   event,
   onClose,
   onNext,
   onDelete,
   onRestore,
-}: Readonly<EventDetailsProps>) {
+}: Readonly<EventDetailsProps>) => {
   const { toast, dismiss } = useToast();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -312,4 +312,4 @@ export function EventDetails({
       />
     </>
   );
-}
+};

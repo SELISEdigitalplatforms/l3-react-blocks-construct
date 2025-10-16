@@ -141,7 +141,7 @@ const analyzeRecurringPattern = (events: CalendarEvent[]) => {
   };
 };
 
-export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurrenceProps>) {
+export const EditRecurrence = ({ event, onNext, setEvents }: Readonly<EditRecurrenceProps>) => {
   const { t } = useTranslation();
   // Load any temp event data saved before navigating here
   const [initialRecurrenceEvent] = useState<CalendarEvent>(() => {
@@ -683,4 +683,4 @@ export function EditRecurrence({ event, onNext, setEvents }: Readonly<EditRecurr
       </DialogContent>
     </Dialog>
   );
-}
+};

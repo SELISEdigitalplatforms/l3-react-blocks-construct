@@ -60,12 +60,12 @@ const DELETE_OPTIONS: Array<{ value: DeleteOption; labelKey: string }> = [
  *   onConfirm={(option) => handleRecurringDelete(eventId, option)}
  * />
  */
-export function DeleteRecurringEvent({
+export const DeleteRecurringEvent = ({
   open,
   onOpenChange,
   eventTitle,
   onConfirm,
-}: Readonly<DeleteRecurringEventProps>) {
+}: Readonly<DeleteRecurringEventProps>) => {
   const [deleteOption, setDeleteOption] = useState<DeleteOption>('this');
   const { t } = useTranslation();
 
@@ -113,4 +113,4 @@ export function DeleteRecurringEvent({
       </AlertDialogContent>
     </AlertDialog>
   );
-}
+};

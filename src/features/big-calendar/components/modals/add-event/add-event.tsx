@@ -282,7 +282,7 @@ const createBaseEvent = (
  *   onCancel={() => handleCloseForm()}
  * />
  */
-export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventProps>) {
+export const AddEvent = ({ start, end, onCancel, onSubmit }: Readonly<AddEventProps>) => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [startDate, setStartDate] = useState<Date | undefined>(start);
@@ -698,4 +698,4 @@ export function AddEvent({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
       )}
     </>
   );
-}
+};

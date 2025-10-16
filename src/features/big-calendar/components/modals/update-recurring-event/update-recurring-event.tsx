@@ -68,12 +68,12 @@ const DEFAULT_UPDATE_OPTION: UpdateOption = 'this';
  *   onConfirm={(option) => handleRecurringUpdate(eventId, option)}
  * />
  */
-export function UpdateRecurringEvent({
+export const UpdateRecurringEvent = ({
   open,
   onOpenChange,
   eventTitle,
   onConfirm,
-}: Readonly<UpdateRecurringEventProps>) {
+}: Readonly<UpdateRecurringEventProps>) => {
   const { t } = useTranslation();
   const [updateOption, setUpdateOption] = useState<UpdateOption>(DEFAULT_UPDATE_OPTION);
 
@@ -131,4 +131,4 @@ export function UpdateRecurringEvent({
       </AlertDialogContent>
     </AlertDialog>
   );
-}
+};
