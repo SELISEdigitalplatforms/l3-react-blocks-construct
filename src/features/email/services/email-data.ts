@@ -1,10 +1,10 @@
-import { TEmailData } from '../types/email.types';
-
-const COMMON_PREVIEW_CONTENT = `<p>Dear,</p><p>I hope this message finds you well. I am writing to follow up on the progress of [specific project/task] and to discuss the next steps. As per our last meeting, we aimed to achieve.</p><p><br></p><p>Could you please provide an update on the current status? Additionally, if there are any challenges or adjustments required, I would be happy to assist in addressing them.</p><p><br></p><p>Looking forward to your reply.</p><p><br></p><p>Best regards, Md</p>`;
-
-const REPLY_CONTENT_1 = `<p>Best regards,</p><p><br></p><p>Looking forward to your reply.</p><p><br></p><p>Additionally, if there are any challenges or adjustments required, I would be happy to assist in addressing them.</p><p><br></p><p>Could you please provide an update on the current status? Additionally, if there are any challenges or adjustments required, I would be happy to assist in addressing them.</p><p><br></p><p>As per our last meeting, we aimed to achieve.</p><p>I hope this message finds you well. I am writing to follow up on the progress of [specific project/task] and to discuss the next steps. As per our last meeting, we aimed to achieve.</p><p>Dear,</p>`;
-
-const REPLY_CONTENT_2 = `<p>Sincerely,</p><p><br></p><p>Awaiting your response.</p><p><br></p><p>Furthermore, should any difficulties arise or modifications be needed, please do not hesitate to inform me, and I will gladly offer my support.</p><p><br></p><p>Could you please share the current standing? Furthermore, should any difficulties arise or modifications be needed, please do not hesitate to inform me, and I will gladly offer my support.</p><p><br></p><p>Following our previous conversation, our objective was to accomplish.</p><p>Hello,</p><p>I trust this email finds you in good health. I am reaching out to inquire about the advancement of [designated undertaking/assignment] and to deliberate on the subsequent actions. Following our previous conversation, our objective was to accomplish.</p>`;
+import { Forward, PictureInPicture2, Reply, ReplyAll } from 'lucide-react';
+import { MenuAction, TEmailData, TReply } from '../types/email.types';
+import {
+  COMMON_PREVIEW_CONTENT,
+  REPLY_CONTENT_1,
+  REPLY_CONTENT_2,
+} from '../constants/email.constants';
 
 const DEFAULT_TAGS = {
   personal: false,
@@ -211,3 +211,48 @@ export const emailData: TEmailData = {
   personal: [],
   work: [],
 };
+
+export const ReplyAllAvatars = [
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
+    alt: 'Profile avatar',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    alt: 'Profile avatar',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    alt: 'Profile avatar',
+  },
+];
+
+export const createMenuActions = (handlers: {
+  handleSetActive: (action: 'reply' | 'replyAll' | 'forward') => void;
+  handleComposeEmailForward: (replyData?: TReply) => void;
+}): MenuAction[] => [
+  {
+    type: 'reply',
+    icon: Reply,
+    labelKey: 'REPLY',
+    onClick: () => handlers.handleSetActive('reply'),
+  },
+  {
+    type: 'replyAll',
+    icon: ReplyAll,
+    labelKey: 'REPLY_ALL',
+    onClick: () => handlers.handleSetActive('replyAll'),
+  },
+  {
+    type: 'forward',
+    icon: Forward,
+    labelKey: 'FORWARD',
+    onClick: () => handlers.handleComposeEmailForward({} as TReply),
+  },
+  {
+    type: 'popOutReply',
+    icon: PictureInPicture2,
+    labelKey: 'POP_OUT_REPLY',
+    onClick: () => handlers.handleComposeEmailForward({} as TReply),
+  },
+];

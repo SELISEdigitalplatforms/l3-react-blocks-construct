@@ -1,15 +1,16 @@
-import { ChevronDown, Forward, PictureInPicture2, Reply, ReplyAll } from 'lucide-react';
+import { ChevronDown, Forward, Reply, ReplyAll } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { v4 as uuidv4 } from 'uuid';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { TActiveAction, TEmail, TReply } from '../../types/email.types';
+import { MenuAction, TActiveAction, TEmail, TReply } from '../../types/email.types';
 import { Button } from '@/components/ui/button';
 import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
-import { v4 as uuidv4 } from 'uuid';
+import { createMenuActions, ReplyAllAvatars } from '../../services/email-data';
 /**
  * EmailActionsPanel Component
  *
@@ -50,30 +51,6 @@ interface EmailActionsPanelTypeProps {
   handleSetActive: (action: 'reply' | 'replyAll' | 'forward') => void;
 }
 
-type ActionType = 'reply' | 'replyAll' | 'forward' | 'popOutReply';
-
-interface MenuAction {
-  type: ActionType;
-  icon: React.ComponentType<{ className?: string }>;
-  labelKey: string;
-  onClick: () => void;
-}
-
-const REPLY_ALL_AVATARS = [
-  {
-    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/avator.JPG-eY44OKHv1M9ZlInG6sSFJSz2UMlimG.jpeg',
-    alt: 'Profile avatar',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    alt: 'Profile avatar',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    alt: 'Profile avatar',
-  },
-];
-
 const ICON_CLASSES = 'h-5 w-5';
 const MENU_ITEM_CLASSES = 'flex p-3 gap-2 hover:bg-surface';
 const TEXT_CLASSES = 'text-high-emphasis font-normal';
@@ -87,33 +64,10 @@ export const EmailActionsPanel = ({
 }: Readonly<EmailActionsPanelTypeProps>) => {
   const { t } = useTranslation();
 
-  // Create menu actions configuration
-  const menuActions: MenuAction[] = [
-    {
-      type: 'reply',
-      icon: Reply,
-      labelKey: 'REPLY',
-      onClick: () => handleSetActive('reply'),
-    },
-    {
-      type: 'replyAll',
-      icon: ReplyAll,
-      labelKey: 'REPLY_ALL',
-      onClick: () => handleSetActive('replyAll'),
-    },
-    {
-      type: 'forward',
-      icon: Forward,
-      labelKey: 'FORWARD',
-      onClick: () => handleComposeEmailForward({} as TReply),
-    },
-    {
-      type: 'popOutReply',
-      icon: PictureInPicture2,
-      labelKey: 'POP_OUT_REPLY',
-      onClick: () => handleComposeEmailForward({} as TReply),
-    },
-  ];
+  const actions = createMenuActions({
+    handleSetActive,
+    handleComposeEmailForward,
+  });
 
   const renderActiveIcon = () => {
     if (activeAction.reply) return <Reply className={ICON_CLASSES} />;
@@ -143,8 +97,8 @@ export const EmailActionsPanel = ({
   const renderReplyButtons = () => {
     if (activeAction.reply) {
       return renderAvatarButton(
-        REPLY_ALL_AVATARS[0].src,
-        REPLY_ALL_AVATARS[0].alt,
+        ReplyAllAvatars[0].src,
+        ReplyAllAvatars[0].alt,
         Array.isArray(selectedEmail?.sender)
           ? selectedEmail?.sender.join(', ')
           : selectedEmail?.sender
@@ -154,7 +108,7 @@ export const EmailActionsPanel = ({
     if (activeAction.replyAll) {
       return (
         <div className="flex gap-2">
-          {REPLY_ALL_AVATARS.map((avatar) => (
+          {ReplyAllAvatars.map((avatar) => (
             <div key={uuidv4()}>
               {renderAvatarButton(
                 avatar.src,
@@ -183,7 +137,7 @@ export const EmailActionsPanel = ({
               <ChevronDown className={`${ICON_CLASSES} cursor-pointer`} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="min-w-52">
-              {menuActions.map(renderMenuItem)}
+              {actions.map(renderMenuItem)}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
