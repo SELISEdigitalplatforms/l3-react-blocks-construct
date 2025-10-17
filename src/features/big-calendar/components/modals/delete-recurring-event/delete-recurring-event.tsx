@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { DeleteUpdateEventOption } from '@/features/big-calendar';
+import { DeleteUpdateEventOption, DeleteUpdateRecurringEventOption } from '@/features/big-calendar';
+import { DELETE_UPDATE_RECURRING_EVENT_OPTIONS } from '@/features/big-calendar/constants/calendar.constants';
 
 interface DeleteRecurringEventProps {
   open: boolean;
@@ -20,13 +21,6 @@ interface DeleteRecurringEventProps {
   eventTitle: string;
   onConfirm: (deleteOption: DeleteUpdateEventOption) => void;
 }
-
-// Moved to module level to avoid recreation on each render
-const DELETE_OPTIONS: Array<{ value: DeleteUpdateEventOption; labelKey: string }> = [
-  { value: 'this', labelKey: 'THIS_EVENT_ONLY' },
-  { value: 'thisAndFollowing', labelKey: 'THIS_AND_FOLLOWING_EVENTS' },
-  { value: 'all', labelKey: 'ALL_EVENTS_SERIES' },
-];
 
 /**
  * DeleteRecurringEvent Component
@@ -92,14 +86,16 @@ export const DeleteRecurringEvent = ({
               value={deleteOption}
               onValueChange={(value) => setDeleteOption(value as DeleteUpdateEventOption)}
             >
-              {DELETE_OPTIONS.map(({ value, labelKey }) => (
-                <div key={value} className="flex items-center gap-2">
-                  <RadioGroupItem value={value} id={`delete-option-${value}`} />
-                  <Label htmlFor={`delete-option-${value}`} className="cursor-pointer">
-                    {t(labelKey)}
-                  </Label>
-                </div>
-              ))}
+              {DELETE_UPDATE_RECURRING_EVENT_OPTIONS.map(
+                ({ value, labelKey }: DeleteUpdateRecurringEventOption) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <RadioGroupItem value={value} id={`delete-option-${value}`} />
+                    <Label htmlFor={`delete-option-${value}`} className="cursor-pointer">
+                      {t(labelKey)}
+                    </Label>
+                  </div>
+                )
+              )}
             </RadioGroup>
           </div>
         </div>

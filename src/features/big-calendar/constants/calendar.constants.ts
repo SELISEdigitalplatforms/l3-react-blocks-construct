@@ -1,3 +1,5 @@
+import { DeleteUpdateRecurringEventOption } from '../types/calendar-event.types';
+
 export const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const WEEK_DAYS_RRULE = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -40,3 +42,9 @@ export const EventContentTextColor = {
   DEEPPURPLE100: 'hsl(var(--high-emphasis))' as const,
   BURGUNDY100: 'hsl(var(--high-emphasis))' as const,
 } as const;
+
+export const DELETE_UPDATE_RECURRING_EVENT_OPTIONS: DeleteUpdateRecurringEventOption[] = [
+  { value: 'this', labelKey: 'THIS_EVENT_ONLY' },
+  { value: 'thisAndFollowing', labelKey: 'THIS_AND_FOLLOWING_EVENTS' },
+  { value: 'all', labelKey: 'ALL_EVENTS_SERIES' },
+];

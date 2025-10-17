@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { DeleteUpdateEventOption } from '@/features/big-calendar';
+import { DeleteUpdateEventOption, DeleteUpdateRecurringEventOption } from '@/features/big-calendar';
+import { DELETE_UPDATE_RECURRING_EVENT_OPTIONS } from '@/features/big-calendar/constants/calendar.constants';
 
 interface UpdateRecurringEventProps {
   open: boolean;
@@ -20,18 +21,6 @@ interface UpdateRecurringEventProps {
   eventTitle: string;
   onConfirm: (updateOption: DeleteUpdateEventOption) => void;
 }
-
-interface RadioOption {
-  value: DeleteUpdateEventOption;
-  labelKey: string;
-}
-
-// Constants to eliminate magic strings
-const RADIO_OPTIONS: RadioOption[] = [
-  { value: 'this', labelKey: 'THIS_EVENT_ONLY' },
-  { value: 'thisAndFollowing', labelKey: 'THIS_AND_FOLLOWING_EVENTS' },
-  { value: 'all', labelKey: 'ALL_EVENTS_SERIES' },
-];
 
 const BUTTON_CLASSES = 'rounded-[6px]';
 const DEFAULT_UPDATE_OPTION: DeleteUpdateEventOption = 'this';
@@ -85,7 +74,7 @@ export const UpdateRecurringEvent = ({
     setUpdateOption(value as DeleteUpdateEventOption);
   };
 
-  const renderRadioOption = ({ value, labelKey }: RadioOption) => {
+  const renderRadioOption = ({ value, labelKey }: DeleteUpdateRecurringEventOption) => {
     const radioId = `status-${value}`;
 
     return (
@@ -117,7 +106,7 @@ export const UpdateRecurringEvent = ({
               value={updateOption}
               onValueChange={handleValueChange}
             >
-              {RADIO_OPTIONS.map(renderRadioOption)}
+              {DELETE_UPDATE_RECURRING_EVENT_OPTIONS.map(renderRadioOption)}
             </RadioGroup>
           </div>
         </div>

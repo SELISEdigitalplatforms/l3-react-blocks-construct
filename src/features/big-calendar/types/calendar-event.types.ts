@@ -40,3 +40,8 @@ export type EventContentTextColor =
   (typeof EventContentTextColor)[keyof typeof EventContentTextColor];
 
 export type DeleteUpdateEventOption = 'this' | 'thisAndFollowing' | 'all';
+
+export interface DeleteUpdateRecurringEventOption {
+  value: DeleteUpdateEventOption;
+  labelKey: string;
+}
