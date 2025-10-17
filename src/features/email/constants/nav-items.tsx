@@ -1,23 +1,6 @@
 import { Mail, Star, Send, AlertTriangle, Trash2, File } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-type NavItem = {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  count: number;
-  isActive?: boolean;
-  onClick?: () => void;
-};
-
-type EmailCounts = {
-  inbox?: any[];
-  starred?: any[];
-  sent?: any[];
-  draft?: any[];
-  spam?: any[];
-  trash?: any[];
-};
+import { EmailCounts, NavItem } from '../types/email.types';
 
 export const useNavItems = (
   emails: EmailCounts,
