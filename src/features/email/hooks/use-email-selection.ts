@@ -38,25 +38,24 @@ export const useEmailSelection = (
   }, [checkedEmailIds, filteredEmails]);
 
   // Handle single email selection
-  const handleSingleEmailCheck = (emailId: string, isChecked: boolean) => {
-    setCheckedEmailIds((prev) => {
-      if (isChecked) {
-        return [...prev, emailId];
-      } else {
-        return prev.filter((id) => id !== emailId);
-      }
-    });
+  const checkEmail = (emailId: string) => {
+    setCheckedEmailIds((prev) => (prev.includes(emailId) ? prev : [...prev, emailId]));
+  };
+
+  const uncheckEmail = (emailId: string) => {
+    setCheckedEmailIds((prev) => prev.filter((id) => id !== emailId));
   };
 
   // Handle select all emails
-  const handleSelectAllEmails = (isChecked: boolean) => {
-    setIsAllSelected(isChecked);
-    if (isChecked) {
-      const allEmailIds = filteredEmails.map((email) => email.id);
-      setCheckedEmailIds(allEmailIds);
-    } else {
-      setCheckedEmailIds([]);
-    }
+  const selectAllEmails = () => {
+    setIsAllSelected(true);
+    const allEmailIds = filteredEmails.map((email) => email.id);
+    setCheckedEmailIds(allEmailIds);
+  };
+
+  const clearAllSelections = () => {
+    setIsAllSelected(false);
+    setCheckedEmailIds([]);
   };
 
   // Update read status for selected emails
@@ -86,8 +85,10 @@ export const useEmailSelection = (
     setIsAllSelected,
     setCheckedEmailIds,
     setHasUnreadSelected,
-    handleSingleEmailCheck,
-    handleSelectAllEmails,
+    checkEmail,
+    uncheckEmail,
+    selectAllEmails,
+    clearAllSelections,
     updateReadStatus,
     updateSingleEmailReadStatus,
     toggleEmailStar,
