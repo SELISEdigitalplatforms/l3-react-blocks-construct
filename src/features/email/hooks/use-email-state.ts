@@ -217,17 +217,18 @@ export const useEmailState = (category?: string, emailId?: string) => {
       const emailsToRestore: TEmail[] = [];
 
       // Find emails to restore from trash and spam
-      ['trash', 'spam'].forEach((cat) => {
+      for (const cat of ['trash', 'spam'] as const) {
         const categoryEmails = updatedEmails[cat] || [];
-        const remainingEmails = categoryEmails.filter((email) => {
+        const remainingEmails: TEmail[] = [];
+        for (const email of categoryEmails) {
           if (emailIds.includes(email.id)) {
             emailsToRestore.push({ ...email, [cat]: false });
-            return false;
+          } else {
+            remainingEmails.push(email);
           }
-          return true;
-        });
+        }
         updatedEmails[cat] = remainingEmails;
-      });
+      }
 
       // Restore emails to inbox by default
       if (emailsToRestore.length > 0) {

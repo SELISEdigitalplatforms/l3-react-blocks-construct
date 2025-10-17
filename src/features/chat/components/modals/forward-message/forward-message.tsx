@@ -22,12 +22,12 @@ interface ForwardMessageProps {
   onForward: (recipient: string, note: string, message: any) => void;
 }
 
-export function ForwardMessage({
+export const ForwardMessage = ({
   open,
   onOpenChange,
   message,
   onForward,
-}: Readonly<ForwardMessageProps>) {
+}: Readonly<ForwardMessageProps>) => {
   const [recipient, setRecipient] = useState('');
   const [note, setNote] = useState('');
   const { t } = useTranslation();
@@ -118,4 +118,4 @@ export function ForwardMessage({
       </DialogContent>
     </Dialog>
   );
-}
+};

@@ -66,9 +66,9 @@ export const useEmailUI = () => {
     const searchLower = debouncedSearch.toLowerCase();
     return emails.filter((email) => {
       const sender = email.sender ? email.sender.join(' ').toLowerCase() : '';
-      const recipient = email.recipient?.toLowerCase() || '';
-      const subject = email.subject?.toLowerCase() || '';
-      const preview = email.preview?.toLowerCase() || '';
+      const recipient = email.recipient?.toLowerCase() ?? '';
+      const subject = email.subject?.toLowerCase() ?? '';
+      const preview = email.preview?.toLowerCase() ?? '';
 
       return (
         sender.includes(searchLower) ||

@@ -20,13 +20,13 @@ interface EditGroupNameProps {
   isLoading?: boolean;
 }
 
-export function EditGroupName({
+export const EditGroupName = ({
   isOpen,
   currentName,
   onClose,
   onSave,
   isLoading = false,
-}: Readonly<EditGroupNameProps>) {
+}: Readonly<EditGroupNameProps>) => {
   const { t } = useTranslation();
   const [groupName, setGroupName] = useState(currentName);
   const [error, setError] = useState('');
@@ -94,4 +94,4 @@ export function EditGroupName({
       </DialogContent>
     </Dialog>
   );
-}
+};

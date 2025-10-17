@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { ChatContactItem } from '../chat-contact-item/chat-contact-item';
-import { mockUserProfile } from '../../data/chat.data';
+import { mockUserProfile } from '../../services/chat.services';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
