@@ -52,12 +52,12 @@ const FONT_NORMAL = 'font-normal';
  * @param props.onRespond - Callback fired when user responds; receives (eventId, status).
  * @returns JSX.Element - Rendered EventInvitation dialog.
  */
-export function EventInvitation({
+export const EventInvitation = ({
   event,
   onClose,
   currentUserId,
   onRespond,
-}: Readonly<EventInvitationProps>) {
+}: Readonly<EventInvitationProps>) => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -292,4 +292,4 @@ export function EventInvitation({
       </DialogContent>
     </Dialog>
   );
-}
+};

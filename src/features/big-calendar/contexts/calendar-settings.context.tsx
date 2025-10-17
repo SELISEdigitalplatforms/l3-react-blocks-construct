@@ -94,11 +94,11 @@ const CalendarSettingsContext = createContext<CalendarSettingsContextType | unde
  * - `timeScale`: `{number}` – Defaults to `30` minutes.
  * - `defaultDuration`: `{number}` – Defaults to `30` minutes.
  */
-type CalendarSettingsProviderProps = Readonly<{
+type CalendarSettingsProviderProps = {
   children: ReactNode;
-}>;
+};
 
-export function CalendarSettingsProvider({ children }: CalendarSettingsProviderProps) {
+export const CalendarSettingsProvider = ({ children }: Readonly<CalendarSettingsProviderProps>) => {
   const [settings, setSettings] = useState<CalendarSettings>(defaultSettings);
 
   const updateSettings = (newSettings: Partial<CalendarSettings>) => {
@@ -123,7 +123,7 @@ export function CalendarSettingsProvider({ children }: CalendarSettingsProviderP
       {children}
     </CalendarSettingsContext.Provider>
   );
-}
+};
 
 export function useCalendarSettings() {
   const context = useContext(CalendarSettingsContext);

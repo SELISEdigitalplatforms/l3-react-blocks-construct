@@ -13,17 +13,15 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
-import { CalendarEvent } from '../../../types/calendar-event.types';
+import { CalendarEvent, DeleteUpdateEventOption } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';
 import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring-event';
-
-type DeleteOption = 'this' | 'thisAndFollowing' | 'all';
 
 interface EventDetailsProps {
   event: CalendarEvent;
   onClose: () => void;
   onNext: () => void;
-  onDelete: (eventId: string, deleteOption?: DeleteOption) => void;
+  onDelete: (eventId: string, deleteOption?: DeleteUpdateEventOption) => void;
   onRestore?: () => boolean;
 }
 
@@ -56,13 +54,13 @@ const TEXT_LOW_EMPHASIS = 'text-low-emphasis';
  * @param {EventDetailsProps} props - The props for configuring the event details dialog.
  * @returns {JSX.Element} The rendered JSX element for the event details dialog.
  */
-export function EventDetails({
+export const EventDetails = ({
   event,
   onClose,
   onNext,
   onDelete,
   onRestore,
-}: Readonly<EventDetailsProps>) {
+}: Readonly<EventDetailsProps>) => {
   const { toast, dismiss } = useToast();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -140,7 +138,7 @@ export function EventDetails({
     showDeletionSuccessToast();
   };
 
-  const handleRecurringDeleteConfirm = (deleteOption: DeleteOption) => {
+  const handleRecurringDeleteConfirm = (deleteOption: DeleteUpdateEventOption) => {
     onDelete(event.eventId ?? '', deleteOption);
     closeDialogsAndParent();
     showDeletionSuccessToast();
@@ -312,4 +310,4 @@ export function EventDetails({
       />
     </>
   );
-}
+};

@@ -10,8 +10,8 @@ import {
   EventDetails,
   useCalendarEvents,
   useCalendarUI,
+  CalendarSettingsProvider,
 } from '@/features/big-calendar';
-import { CalendarSettingsProvider } from '@/features/big-calendar/contexts/calendar-settings.context';
 import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 
 /**
@@ -23,7 +23,7 @@ import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmati
  *
  * @returns {JSX.Element} The rendered JSX element for the calendar page.
  */
-export function CalendarPage() {
+export const CalendarPage = () => {
   const { t } = useTranslation();
   const {
     events,
@@ -149,4 +149,4 @@ export function CalendarPage() {
       </div>
     </CalendarSettingsProvider>
   );
-}
+};
