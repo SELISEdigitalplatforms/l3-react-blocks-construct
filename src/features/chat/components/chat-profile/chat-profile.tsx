@@ -39,13 +39,13 @@ interface ChatProfileProps {
   onLeaveGroup?: (contactId: string) => void;
 }
 
-export function ChatProfile({
+export const ChatProfile = ({
   contact,
   onGroupNameUpdate,
   onMuteToggle,
   onDeleteMember,
   onLeaveGroup,
-}: Readonly<ChatProfileProps>) {
+}: Readonly<ChatProfileProps>) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [isEditGroupNameOpen, setIsEditGroupNameOpen] = useState(false);
@@ -350,4 +350,4 @@ export function ChatProfile({
       />
     </div>
   );
-}
+};
