@@ -12,6 +12,11 @@ import { FilePreview } from '../../file-preview/file-preview';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
 import { createFileTableColumns } from '../my-files-table-columns/my-files-table-columns';
 import { FileType } from '@/features/file-manager/types/file-manager.type';
+import {
+  enhanceNewEntries,
+  enhanceFileWithSharing,
+  mergeUniqueById,
+} from '@/features/file-manager/utils/list-view-utils';
 
 export interface MyFilesListViewProps {
   onViewDetails: (file: IFileDataWithSharing) => void;
@@ -68,19 +73,7 @@ export const MyFilesListView = ({
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
 
   const localFiles = useMemo(() => {
-    const enhancedNewFiles = newFiles.map((file) => ({
-      ...file,
-      sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
-      sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
-    }));
-
-    const enhancedNewFolders = newFolders.map((folder) => ({
-      ...folder,
-      sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
-      sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
-    }));
-
-    return [...enhancedNewFiles, ...enhancedNewFolders];
+    return enhanceNewEntries(newFiles, newFolders, fileSharedUsers, filePermissions);
   }, [newFiles, newFolders, fileSharedUsers, filePermissions]);
 
   const combinedData = useMemo(() => {
@@ -89,14 +82,7 @@ export const MyFilesListView = ({
     const processedServerFiles = serverFiles.map((file: any) => {
       const renamedVersion = renamedFiles.get(file.id);
       const baseFile = renamedVersion || file;
-
-      const enhancedFile: IFileDataWithSharing = {
-        ...baseFile,
-        sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
-        sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
-      };
-
-      return enhancedFile;
+      return enhanceFileWithSharing(baseFile, fileSharedUsers, filePermissions);
     });
 
     const filteredLocalFiles = localFiles.filter((file) => {
@@ -119,10 +105,7 @@ export const MyFilesListView = ({
       return true;
     });
 
-    const localFileIds = new Set(filteredLocalFiles.map((f) => f.id));
-    const uniqueServerFiles = filteredServerFiles.filter((f) => !localFileIds.has(f.id));
-
-    return [...filteredLocalFiles, ...uniqueServerFiles];
+    return mergeUniqueById(filteredLocalFiles, filteredServerFiles);
   }, [localFiles, data?.data, filters, renamedFiles, fileSharedUsers, filePermissions]);
 
   const handlePaginationChange = useCallback(
