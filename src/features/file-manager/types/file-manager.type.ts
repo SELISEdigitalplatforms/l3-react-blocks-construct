@@ -38,3 +38,9 @@ export type FilterOption = {
   value: string;
   label: string;
 };
+
+export type WithLastModified = {
+  lastModified?: string | Date;
+  isShared?: boolean;
+  [key: string]: any;
+};
