@@ -1,46 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FileType, IFileDataWithSharing } from '../utils/file-manager';
+import { IFileDataWithSharing } from '../utils/file-manager';
 import { filesFolderContents, mockFileData } from '../utils/mock-data';
-
-export interface IFileData {
-  id: string;
-  name: string;
-  lastModified: Date;
-  fileType: FileType;
-  size: string;
-  isShared?: boolean;
-  sharedBy?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  sharedDate?: Date;
-  parentFolderId?: string;
-}
-
-export const FILE_BREADCRUMB_TITLES = {
-  '/files': 'MY_FILES',
-  '/files/1': 'MEETING_NOTES',
-  '/files/2': 'RESEARCH_DATA',
-  '/files/3': 'CLIENT_DOCUMENTS',
-  '/files/4': 'PROJECT_FILES',
-  '/files/5': 'DESIGN_ASSETS',
-  '/files/11': 'MARKETING_ASSETS',
-};
-
-interface QueryParams {
-  filter: {
-    name?: string;
-    fileType?: FileType;
-    lastModified?: {
-      from?: Date;
-      to?: Date;
-    };
-  };
-  page: number;
-  pageSize: number;
-  folderId?: string;
-}
+import { IFileData, QueryParams } from '../types/file-manager.type';
 
 export const useMockFilesQuery = (queryParams: QueryParams) => {
   const [data, setData] = useState<null | { data: IFileDataWithSharing[]; totalCount: number }>(

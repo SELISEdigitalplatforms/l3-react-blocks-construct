@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { ListFilter, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ListFilter, X } from 'lucide-react';
+import { FilterType, HeaderToolbarConfig } from '@/features/file-manager/types/header-toolbar.type';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { ViewToggle } from './view-toggle/view-toggle';
-import { countActiveFilters, SearchInput } from '../common-filters/common-filters';
-import { HeaderActions } from './header-actions/header-actions';
-import { AddDropdownMenu } from '../file-manager-add-new-dropdown/file-manager-add-new-dropdown';
-import { ActiveFilters } from './active-filters/active-filters';
-import { FilterControls } from './filter-controls/filter-controls';
-import { FilterType, HeaderToolbarConfig } from '../../types/header-toolbar.type';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  ActiveFilters,
+  AddDropdownMenu,
+  countActiveFilters,
+  FilterControls,
+  HeaderActions,
+  SearchInput,
+  ViewToggle,
+} from '@/features/file-manager';
 
 export const BaseHeaderToolbar = <T extends FilterType>({
   title,
@@ -27,7 +30,7 @@ export const BaseHeaderToolbar = <T extends FilterType>({
   onFiltersChange,
   onFileUpload,
   onFolderCreate,
-}: HeaderToolbarConfig<T>) => {
+}: Readonly<HeaderToolbarConfig<T>>) => {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
   const [openSheet, setOpenSheet] = useState(false);

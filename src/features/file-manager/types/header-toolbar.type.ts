@@ -1,4 +1,4 @@
-import { DateRange } from '../components/common-filters';
+import { DateRange } from '../components/common-filters/common-filters';
 
 export interface BaseFilters {
   name?: string;
