@@ -272,7 +272,7 @@ export const SharedFilesListView = ({
     <div className="flex h-full w-full rounded-xl relative">
       {!shouldHideMainContent && (
         <div
-          className={`flex flex-col h-full transition-all duration-300 ${
+          className={`flex flex-col h-full transition-all duration-150 ${
             isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
           }`}
         >

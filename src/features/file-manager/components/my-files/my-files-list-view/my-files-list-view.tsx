@@ -17,6 +17,7 @@ import {
   enhanceFileWithSharing,
   mergeUniqueById,
 } from '@/features/file-manager/utils/list-view-utils';
+import { ResponsiveMainPane } from '@/features/file-manager/components/layout/responsive-main-pane';
 
 export interface MyFilesListViewProps {
   onViewDetails: (file: IFileDataWithSharing) => void;
@@ -204,35 +205,29 @@ export const MyFilesListView = ({
     return <div className="p-4 text-error">{t('ERROR_LOADING_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
-
   return (
-    <div className="flex h-full w-full rounded-xl relative">
-      {!shouldHideMainContent && (
-        <div
-          className={`flex flex-col h-full transition-all duration-300 ${
-            isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
-          }`}
-        >
-          <div className="h-full flex-col flex w-full gap-6 md:gap-8">
-            <DataTable
-              data={combinedData}
-              columns={columns}
-              onRowClick={handleRowClick}
-              isLoading={isLoading}
-              pagination={{
-                pageIndex: paginationState.pageIndex,
-                pageSize: paginationState.pageSize,
-                totalCount: paginationState.totalCount,
-              }}
-              onPaginationChange={handlePaginationChange}
-              manualPagination={true}
-              expandable={false}
-              mobileColumns={['name']}
-            />
-          </div>
-        </div>
-      )}
+    <ResponsiveMainPane
+      isMobile={isMobile}
+      isDetailsOpen={isDetailsOpen}
+      isPreviewOpen={isPreviewOpen}
+    >
+      <div className="h-full flex-col flex w-full gap-6 md:gap-8">
+        <DataTable
+          data={combinedData}
+          columns={columns}
+          onRowClick={handleRowClick}
+          isLoading={isLoading}
+          pagination={{
+            pageIndex: paginationState.pageIndex,
+            pageSize: paginationState.pageSize,
+            totalCount: paginationState.totalCount,
+          }}
+          onPaginationChange={handlePaginationChange}
+          manualPagination={true}
+          expandable={false}
+          mobileColumns={['name']}
+        />
+      </div>
 
       <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
@@ -253,6 +248,6 @@ export const MyFilesListView = ({
         }
         t={t}
       />
-    </div>
+    </ResponsiveMainPane>
   );
 };
