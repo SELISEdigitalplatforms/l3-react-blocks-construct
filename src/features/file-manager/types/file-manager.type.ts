@@ -33,3 +33,8 @@ export interface QueryParams {
   pageSize: number;
   folderId?: string;
 }
+
+export type FilterOption = {
+  value: string;
+  label: string;
+};

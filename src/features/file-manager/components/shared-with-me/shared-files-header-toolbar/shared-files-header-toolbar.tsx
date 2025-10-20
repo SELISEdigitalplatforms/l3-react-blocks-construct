@@ -3,8 +3,8 @@ import { BaseHeaderToolbar } from '@/features/file-manager';
 import {
   fileTypeFilterConfig,
   FilterConfig,
+  SharedFilters,
 } from '@/features/file-manager/types/header-toolbar.type';
-import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
 
 export interface SharedWithMeHeaderToolbarProps {
   viewMode?: string;
