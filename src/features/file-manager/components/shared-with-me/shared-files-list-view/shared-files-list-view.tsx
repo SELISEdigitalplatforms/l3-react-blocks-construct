@@ -15,6 +15,11 @@ import { FilePreview } from '../../file-preview/file-preview';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
 import { IFileData } from '@/features/file-manager/types/file-manager.type';
 import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
+import {
+  enhanceNewEntries,
+  enhanceFileWithSharing,
+  mergeUniqueById,
+} from '@/features/file-manager/utils/list-view-utils';
 
 export interface SharedFilesListViewProps {
   onDownload: ((file: IFileData) => void) | undefined;
@@ -52,7 +57,6 @@ export const SharedFilesListView = ({
 }: Readonly<SharedFilesListViewProps>) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
@@ -98,22 +102,37 @@ export const SharedFilesListView = ({
   ]);
 
   const localFiles = useMemo(() => {
-    const enhancedNewFiles = newFiles.map((file) => ({
-      ...file,
-      sharedWith: fileSharedUsers[file.id] || file.sharedWith || [],
-      sharePermissions: filePermissions[file.id] || file.sharePermissions || {},
-    }));
-
-    const enhancedNewFolders = newFolders.map((folder) => ({
-      ...folder,
-      sharedWith: fileSharedUsers[folder.id] || folder.sharedWith || [],
-      sharePermissions: filePermissions[folder.id] || folder.sharePermissions || {},
-    }));
-
-    return [...enhancedNewFiles, ...enhancedNewFolders];
+    return enhanceNewEntries(newFiles, newFolders, fileSharedUsers, filePermissions);
   }, [newFiles, newFolders, fileSharedUsers, filePermissions]);
 
   const { data, isLoading, error } = useMockFilesQuery(queryParams);
+
+  const matchesTypeAndModified = useCallback(
+    (file: IFileDataWithSharing) => {
+      if (filters.fileType && file.fileType !== filters.fileType) {
+        return false;
+      }
+
+      if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
+        const modifiedDate = file.lastModified ? new Date(file.lastModified) : null;
+        if (!modifiedDate) return false;
+
+        if (filters.modifiedDate.from && modifiedDate < new Date(filters.modifiedDate.from)) {
+          return false;
+        }
+        if (filters.modifiedDate.to) {
+          const endOfDay = new Date(filters.modifiedDate.to);
+          endOfDay.setHours(23, 59, 59, 999);
+          if (modifiedDate > endOfDay) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    },
+    [filters.fileType, filters.modifiedDate]
+  );
 
   const combinedData = useMemo(() => {
     const serverFiles = data?.data || [];
@@ -121,69 +140,15 @@ export const SharedFilesListView = ({
     const processedServerFiles = serverFiles.map((file: any) => {
       const renamedVersion = renamedFiles.get(file.id);
       const baseFile = renamedVersion || file;
-
-      const enhancedFile: IFileDataWithSharing = {
-        ...baseFile,
-        sharedWith: fileSharedUsers[file.id] || baseFile.sharedWith || [],
-        sharePermissions: filePermissions[file.id] || baseFile.sharePermissions || {},
-      };
-
-      return enhancedFile;
+      return enhanceFileWithSharing(baseFile, fileSharedUsers, filePermissions);
     });
 
-    const filteredLocalFiles = localFiles.filter((file) => {
-      if (filters.fileType && file.fileType !== filters.fileType) {
-        return false;
-      }
+    const filteredLocalFiles = localFiles.filter(matchesTypeAndModified);
 
-      if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
-        const modifiedDate = file.lastModified ? new Date(file.lastModified) : null;
-        if (!modifiedDate) return false;
+    const filteredServerFiles = processedServerFiles.filter(matchesTypeAndModified);
 
-        if (filters.modifiedDate.from && modifiedDate < new Date(filters.modifiedDate.from)) {
-          return false;
-        }
-        if (filters.modifiedDate.to) {
-          const endOfDay = new Date(filters.modifiedDate.to);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (modifiedDate > endOfDay) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    });
-
-    const filteredServerFiles = processedServerFiles.filter((file: IFileDataWithSharing) => {
-      if (filters.fileType && file.fileType !== filters.fileType) {
-        return false;
-      }
-
-      if (filters.modifiedDate?.from || filters.modifiedDate?.to) {
-        const modifiedDate = file.lastModified ? new Date(file.lastModified) : null;
-        if (!modifiedDate) return false;
-
-        if (filters.modifiedDate.from && modifiedDate < new Date(filters.modifiedDate.from)) {
-          return false;
-        }
-        if (filters.modifiedDate.to) {
-          const endOfDay = new Date(filters.modifiedDate.to);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (modifiedDate > endOfDay) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    });
-
-    const localFileIds = new Set(filteredLocalFiles.map((f) => f.id));
-    const uniqueServerFiles = filteredServerFiles.filter((f) => !localFileIds.has(f.id));
-
-    return [...filteredLocalFiles, ...uniqueServerFiles];
-  }, [localFiles, data?.data, filters, renamedFiles, fileSharedUsers, filePermissions]);
+    return mergeUniqueById(filteredLocalFiles, filteredServerFiles);
+  }, [localFiles, data?.data, filters, renamedFiles, fileSharedUsers, filePermissions, matchesTypeAndModified]);
 
   const paginationProps = useMemo(
     () => ({

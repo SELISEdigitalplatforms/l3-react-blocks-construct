@@ -34,3 +34,4 @@ export { FileSkeletonCard } from './components/file-skeleton-card/file-skeleton-
 export { FileViewRenderer } from './components/file-view-renderer/file-view-renderer';
 export { FolderSkeletonCard } from './components/folder-skeleton-card/folder-skeleton-card';
 export { RegularFileDetailsSheet } from './components/regular-file-details-sheet/regular-file-details-sheet';
+export { GridViewCard } from './components/grid-view-card/grid-view-card';
