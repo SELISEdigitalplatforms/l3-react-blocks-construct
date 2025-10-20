@@ -2,16 +2,12 @@ import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
 import { compareValues } from '@/features/iam/services/user-service';
 import { FileTableRowActions } from '../../file-manager-row-actions/file-manager-row-actions';
-import {
-  getFileTypeIcon,
-  getFileTypeInfo,
-  getFileTypeOptions,
-  IFileDataWithSharing,
-} from '@/features/file-manager/utils/file-manager';
-import { Info, Users } from 'lucide-react';
+import { getFileTypeOptions, IFileDataWithSharing } from '@/features/file-manager/utils/file-manager';
+import { Info } from 'lucide-react';
 import { DateCell } from '@/features/file-manager/components/table-cells/date-cell';
 import { createDateRangeFilter } from '@/features/file-manager/utils/table-filters';
 import { parseFileSize } from '@/features/file-manager/utils/file-size';
+import { NameCell } from '@/features/file-manager/components/table-cells/name-cell';
 
 /**
  * Creates the columns for the File Management table.
@@ -71,25 +67,14 @@ export const createFileTableColumns = ({
     id: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('NAME')} />,
     accessorFn: (row) => row.name,
-    cell: ({ row }) => {
-      const IconComponent = getFileTypeIcon(row.original.fileType);
-      const { iconColor, backgroundColor } = getFileTypeInfo(row.original.fileType);
-      const isShared =
-        row.original.isShared || (row.original.sharedWith && row.original.sharedWith.length > 0);
-      return (
-        <div className="flex items-center gap-2">
-          <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${backgroundColor}`}>
-            <IconComponent className={`w-4 h-4 ${iconColor}`} />
-          </div>
-          <span className="max-w-[300px] truncate font-medium">{row.original.name}</span>
-          {isShared && (
-            <span title={t('SHARED')}>
-              <Users className="h-4 w-4 text-low-emphasis" />
-            </span>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <NameCell
+        name={row.original.name}
+        fileType={row.original.fileType}
+        isShared={Boolean(row.original.isShared || (row.original.sharedWith && row.original.sharedWith.length > 0))}
+        t={t}
+      />
+    ),
   },
   {
     id: 'lastModified',

@@ -5,14 +5,11 @@ import { BaseGridView } from '../../base-grid-view/base-grid-view';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
-import {
-  matchesFileType,
-  matchesModifiedDate,
-  matchesName,
-} from '../../../utils/grid-view-filter-files';
+import { createGridFilter, createGridQueryBuilder } from '@/features/file-manager/utils/grid-view-helpers';
 import { IFileData } from '@/features/file-manager/types/file-manager.type';
 import { useDetailsPane } from '@/features/file-manager/hooks/use-details-pane';
 import { ResponsiveMainPane } from '@/features/file-manager/components/layout/responsive-main-pane';
+import { normalizeDetailsFile } from '@/features/file-manager/utils/normalize-details-file';
 
 interface MyFileGridViewProps {
   onViewDetails?: (file: IFileData) => void;
@@ -43,25 +40,8 @@ export const MyFileGridView = (props: Readonly<MyFileGridViewProps>) => {
     handleCloseDetails,
   } = useDetailsPane<IFileData>(isMobile, props.onViewDetails);
 
-  const queryBuilder = useCallback(
-    (params: any) => ({
-      page: params.page,
-      pageSize: params.pageSize,
-      filter: params.filters,
-      folderId: props.currentFolderId,
-    }),
-    [props.currentFolderId]
-  );
-
-  const filterFiles = useCallback((files: IFileData[], filters: any): IFileData[] => {
-    return files.filter((file) => {
-      return (
-        matchesFileType(file, filters.fileType) &&
-        matchesName(file, filters.name) &&
-        matchesModifiedDate(file, filters.modifiedDate)
-      );
-    });
-  }, []);
+  const queryBuilder = useCallback(createGridQueryBuilder(props.currentFolderId), [props.currentFolderId]);
+  const filterFiles = useCallback(createGridFilter(), []);
 
   return (
     <ResponsiveMainPane isMobile={isMobile} isDetailsOpen={isDetailsOpen}>
@@ -88,18 +68,7 @@ export const MyFileGridView = (props: Readonly<MyFileGridViewProps>) => {
       <RegularFileDetailsSheet
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
-        file={
-          selectedFileForDetails
-            ? {
-                ...selectedFileForDetails,
-                lastModified:
-                  typeof selectedFileForDetails.lastModified === 'string'
-                    ? selectedFileForDetails.lastModified
-                    : (selectedFileForDetails.lastModified?.toISOString?.() ?? ''),
-                isShared: selectedFileForDetails.isShared ?? false,
-              }
-            : null
-        }
+        file={normalizeDetailsFile(selectedFileForDetails)}
         t={t}
       />
     </ResponsiveMainPane>

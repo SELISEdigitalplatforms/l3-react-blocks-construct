@@ -527,6 +527,51 @@ export const createMockFile = (
   );
 };
 
+// ============================================================================
+// TRASH HELPERS
+// ============================================================================
+
+const createTrashFile = (
+  id: string,
+  name: string,
+  fileType: FileType,
+  trashedDate: string,
+  size = '21.4 MB',
+  isShared = false,
+  parentFolderId?: string
+): IFileTrashData => ({
+  id,
+  name,
+  fileType,
+  size,
+  trashedDate: new Date(trashedDate),
+  isShared,
+  parentFolderId,
+});
+
+const createTrashFolderContents = (
+  folderId: string,
+  items: Array<{
+    idSuffix: string;
+    name: string;
+    fileType: FileType;
+    trashedDate: string;
+    size?: string;
+    isShared?: boolean;
+  }>
+): IFileTrashData[] =>
+  items.map((it) =>
+    createTrashFile(
+      `${folderId}-${it.idSuffix}`,
+      it.name,
+      it.fileType,
+      it.trashedDate,
+      it.size ?? '21.4 MB',
+      it.isShared ?? true,
+      folderId
+    )
+  );
+
 /**
  * Add a new folder to the folder contents
  */
@@ -550,115 +595,61 @@ export const addFolderContent = (folderId: string, files: FolderContentDefinitio
 export type { FolderContentDefinition, RootFileDefinition };
 
 export const trashMockData: IFileTrashData[] = [
-  {
-    id: '1',
-    name: 'Adventure_Video.mp4',
-    fileType: 'Video',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-01-03'),
-    isShared: false,
-  },
-  {
-    id: '2',
-    name: 'Cat.jpg',
-    fileType: 'Image',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
-    isShared: false,
-  },
-  {
-    id: '3',
-    name: 'Design Assets',
-    fileType: 'Folder',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-03-03'),
-    isShared: true,
-  },
-  {
-    id: '4',
-    name: 'Design Assets 2',
-    fileType: 'Folder',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-04-03'),
-    isShared: true,
-  },
-  {
-    id: '5',
-    name: 'Ftoof.jpg',
-    fileType: 'Image',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-05-03'),
-    isShared: false,
-  },
-  {
-    id: '6',
-    name: 'Project Documents.doc',
-    fileType: 'File',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-05-05'),
-    isShared: false,
-  },
+  createTrashFile('1', 'Adventure_Video.mp4', 'Video', '2025-01-03', '21.4 MB', false),
+  createTrashFile('2', 'Cat.jpg', 'Image', '2025-02-03', '21.4 MB', false),
+  createTrashFile('3', 'Design Assets', 'Folder', '2025-03-03', '21.4 MB', true),
+  createTrashFile('4', 'Design Assets 2', 'Folder', '2025-04-03', '21.4 MB', true),
+  createTrashFile('5', 'Ftoof.jpg', 'Image', '2025-05-03', '21.4 MB', false),
+  createTrashFile('6', 'Project Documents.doc', 'File', '2025-05-05', '21.4 MB', false),
 ];
 
 export const folderContents: Record<string, IFileTrashData[]> = {
-  '3': [
+  '3': createTrashFolderContents('3', [
     {
-      id: '3-1',
+      idSuffix: '1',
       name: 'Logo_Design.png',
       fileType: 'Image',
+      trashedDate: '2025-01-03',
       size: '2.1 MB',
-      trashedDate: new Date('2025-01-03'),
-      isShared: true,
-      parentFolderId: '3',
     },
     {
-      id: '3-2',
+      idSuffix: '2',
       name: 'Brand_Guidelines.pdf',
       fileType: 'File',
+      trashedDate: '2025-06-03',
       size: '5.3 MB',
-      trashedDate: new Date('2025-06-03'),
-      isShared: true,
-      parentFolderId: '3',
     },
     {
-      id: '3-3',
+      idSuffix: '3',
       name: 'Icon_Set.svg',
       fileType: 'Image',
+      trashedDate: '2025-03-03',
       size: '1.8 MB',
-      trashedDate: new Date('2025-03-03'),
-      isShared: true,
-      parentFolderId: '3',
     },
-  ],
-  '4': [
+  ]),
+  '4': createTrashFolderContents('4', [
     {
-      id: '4-1',
+      idSuffix: '1',
       name: 'Mockup_Design.jpg',
       fileType: 'Image',
+      trashedDate: '2025-01-10',
       size: '4.2 MB',
-      trashedDate: new Date('2025-01-10'),
-      isShared: true,
-      parentFolderId: '4',
     },
     {
-      id: '4-2',
+      idSuffix: '2',
       name: 'Style_Guide.docx',
       fileType: 'File',
+      trashedDate: '2025-04-03',
       size: '3.1 MB',
-      trashedDate: new Date('2025-04-03'),
-      isShared: true,
-      parentFolderId: '4',
     },
     {
-      id: '4-3',
+      idSuffix: '3',
       name: 'Color_Palette.png',
       fileType: 'Image',
+      trashedDate: '2025-04-03',
       size: '0.9 MB',
-      trashedDate: new Date('2025-04-03'),
-      isShared: true,
-      parentFolderId: '4',
     },
-  ],
+  ]),
 };
 
 export const getFileTypeFilters = (t: (key: string) => string): FilterOption[] => [
