@@ -30,6 +30,7 @@ import {
 import { ChatContact } from '../../types/chat.types';
 import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
 import { useToast } from '@/hooks/use-toast';
+import { attachments, getAttachmentBackgroundColor } from '../../services/chat.services';
 
 interface ChatProfileProps {
   contact: ChatContact;
@@ -76,29 +77,6 @@ export const ChatProfile = ({
       setIsSaving(false);
     }
   };
-
-  const getAttachmentBackgroundColor = (type: string): string => {
-    switch (type) {
-      case 'pdf':
-        return 'bg-blue-50';
-      case 'image':
-        return 'bg-red-50';
-      case 'audio':
-        return 'bg-purple-50';
-      case 'video':
-        return 'bg-green-50';
-      default:
-        return 'bg-surface';
-    }
-  };
-
-  const attachments = [
-    { id: '1', name: 'acceptance criteria final.pdf', size: '600.00 KB', type: 'pdf' },
-    { id: '2', name: 'Sunset_View_Image.jpg', size: '600.00 KB', type: 'image' },
-    { id: '3', name: 'acceptance criteria preview vers...', size: '600.00 KB', type: 'pdf' },
-    { id: '4', name: 'discussion.mp3', size: '600.00 KB', type: 'audio' },
-    { id: '5', name: 'meeting_notes.mp4', size: '500.00 MB', type: 'video' },
-  ];
 
   const getFileIcon = (type: string) => {
     switch (type) {

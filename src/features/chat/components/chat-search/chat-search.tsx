@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { mockChatContacts } from '../../services/chat.services';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
 import { ChatContact } from '../../types/chat.types';
 
 interface ChatSearchProps {
@@ -14,7 +13,7 @@ interface ChatSearchProps {
   onSelectContact?: (contact: ChatContact) => void;
 }
 
-export const ChatSearch = ({ onClose, onSelectContact }: ChatSearchProps) => {
+export const ChatSearch = ({ onClose, onSelectContact }: Readonly<ChatSearchProps>) => {
   const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
