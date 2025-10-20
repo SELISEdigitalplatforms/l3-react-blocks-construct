@@ -6,11 +6,11 @@ interface FileManagerLayoutProps {
   modals: React.ReactNode;
 }
 
-export const FileManagerLayout: React.FC<FileManagerLayoutProps> = ({
+export const FileManagerLayout = ({
   children,
   headerToolbar,
   modals,
-}) => {
+}: Readonly<FileManagerLayoutProps>) => {
   return (
     <div className="flex flex-col h-full w-full space-y-4">
       {headerToolbar}
