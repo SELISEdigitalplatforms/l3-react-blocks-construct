@@ -1,5 +1,4 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
 import { compareValues } from '@/features/iam/services/user-service';
 import { FileTableRowActions } from '../../file-manager-row-actions/file-manager-row-actions';
@@ -10,6 +9,9 @@ import {
   IFileDataWithSharing,
 } from '@/features/file-manager/utils/file-manager';
 import { Info, Users } from 'lucide-react';
+import { DateCell } from '@/features/file-manager/components/table-cells/date-cell';
+import { createDateRangeFilter } from '@/features/file-manager/utils/table-filters';
+import { parseFileSize } from '@/features/file-manager/utils/file-size';
 
 /**
  * Creates the columns for the File Management table.
@@ -93,39 +95,13 @@ export const createFileTableColumns = ({
     id: 'lastModified',
     accessorFn: (row) => row.lastModified,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('LAST_MODIFIED')} />,
-    cell: ({ row }) => {
-      const date = row.original.lastModified;
-
-      return (
-        <div className="flex items-center">
-          <span>{CustomtDateFormat(date)}</span>
-        </div>
-      );
-    },
+    cell: ({ row }) => <DateCell date={row.original.lastModified} />,
     sortingFn: (rowA, rowB) => {
       const a = rowA.original.lastModified.getTime();
       const b = rowB.original.lastModified.getTime();
       return compareValues(a, b);
     },
-    filterFn: (row, id, value) => {
-      if (!value) return true;
-
-      const rowDate = row.original.lastModified;
-
-      if (value.from && !value.to) {
-        return rowDate >= value.from;
-      }
-
-      if (!value.from && value.to) {
-        return rowDate <= value.to;
-      }
-
-      if (value.from && value.to) {
-        return rowDate >= value.from && rowDate <= value.to;
-      }
-
-      return true;
-    },
+    filterFn: createDateRangeFilter((row) => row.original.lastModified),
   },
   {
     id: 'fileType',
@@ -159,28 +135,8 @@ export const createFileTableColumns = ({
       </div>
     ),
     sortingFn: (rowA, rowB) => {
-      const parseSize = (size: string): number => {
-        const regex = /^([\d.]+)\s*([KMGT]?B)$/i;
-        const match = regex.exec(size);
-
-        if (!match) return 0;
-
-        const value = parseFloat(match[1]);
-        const unit = match[2].toUpperCase();
-
-        const multipliers: { [key: string]: number } = {
-          B: 1,
-          KB: 1024,
-          MB: 1024 * 1024,
-          GB: 1024 * 1024 * 1024,
-          TB: 1024 * 1024 * 1024 * 1024,
-        };
-
-        return value * (multipliers[unit] || 1);
-      };
-
-      const a = parseSize(rowA.original.size);
-      const b = parseSize(rowB.original.size);
+      const a = parseFileSize(rowA.original.size);
+      const b = parseFileSize(rowB.original.size);
       return compareValues(a, b);
     },
   },

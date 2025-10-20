@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useFileManager } from '@/features/file-manager/hooks/use-file-manager';
 import { useFileFilters } from '@/features/file-manager/hooks/use-file-filters';
-import { FileManagerLayout } from '@/features/file-manager/file-manager-layout';
+import { FileManagerLayout } from '@/features/file-manager/components/layout/file-manager-layout';
 import { FileViewRenderer } from '@/features/file-manager/components/file-view-renderer/file-view-renderer';
 import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
 import { useNavigate, useParams } from 'react-router-dom';

@@ -1,6 +1,6 @@
 export * from './components/common-filters/common-filters';
 export * from './components/common-grid-view-helpers/common-grid-view-helpers';
-export { FileManagerLayout } from './file-manager-layout';
+export { FileManagerLayout } from './components/layout/file-manager-layout';
 export { DynamicFileModal } from './components/modals/dynamic-file-modal/dynamic-file-modal';
 export { ShareWithMeModal } from './components/modals/shared-user/shared-user';
 export { RenameFile } from './components/modals/rename-file/rename-file';

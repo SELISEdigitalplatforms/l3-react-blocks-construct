@@ -1,12 +1,13 @@
-import { DateRange } from 'react-day-picker';
 import { ColumnDef } from '@tanstack/react-table';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
 import { compareValues } from '@/features/iam/services/user-service';
 import { Info, Users } from 'lucide-react';
 import { getFileTypeIcon, getFileTypeInfo } from '@/features/file-manager/utils/file-manager';
 import { FileTableRowActions } from '@/features/file-manager';
 import { IFileData } from '@/features/file-manager/types/file-manager.type';
+import { DateCell } from '../../table-cells/date-cell';
+import { createDateRangeFilter } from '@/features/file-manager/utils/table-filters';
+import { parseFileSize } from '@/features/file-manager/utils/file-size';
 
 interface ColumnFactoryProps {
   onViewDetails: (file: IFileData) => void;
@@ -19,51 +20,6 @@ interface ColumnFactoryProps {
   onDelete: (file: IFileData) => void;
   t: (key: string) => string;
 }
-
-const normalizeDate = (date: Date) => {
-  const normalized = new Date(date);
-  normalized.setHours(0, 0, 0, 0);
-  return normalized;
-};
-
-const createDateRangeFilter = (getDate: (row: any) => Date | null | undefined) => {
-  return (row: any, id: string, value: DateRange) => {
-    if (!value) return true;
-
-    const rowDate = getDate(row);
-    if (!rowDate) return false;
-
-    const normalizedRowDate = normalizeDate(rowDate);
-
-    if (value.from && !value.to) {
-      const normalizedFrom = normalizeDate(value.from);
-      return normalizedRowDate >= normalizedFrom;
-    }
-
-    if (!value.from && value.to) {
-      const normalizedTo = normalizeDate(value.to);
-      return normalizedRowDate <= normalizedTo;
-    }
-
-    if (value.from && value.to) {
-      const normalizedFrom = normalizeDate(value.from);
-      const normalizedTo = normalizeDate(value.to);
-      return normalizedRowDate >= normalizedFrom && normalizedRowDate <= normalizedTo;
-    }
-
-    return true;
-  };
-};
-
-const DateCell = ({ date }: { date: Date | null | undefined }) => {
-  if (!date) return <span className="text-muted-foreground">-</span>;
-
-  return (
-    <div className="flex items-center">
-      <span className="text-sm">{CustomtDateFormat(date)}</span>
-    </div>
-  );
-};
 
 export const SharedFileTableColumns = ({
   onViewDetails,
@@ -207,27 +163,8 @@ export const SharedFileTableColumns = ({
       </div>
     ),
     sortingFn: (rowA, rowB) => {
-      const parseSize = (size: string): number => {
-        const regex = /^([\d.]+)\s*([KMGT]?B)$/i;
-        const match = regex.exec(size);
-        if (!match) return 0;
-
-        const value = parseFloat(match[1]);
-        const unit = match[2].toUpperCase();
-
-        const multipliers: { [key: string]: number } = {
-          B: 1,
-          KB: 1024,
-          MB: 1024 * 1024,
-          GB: 1024 * 1024 * 1024,
-          TB: 1024 * 1024 * 1024 * 1024,
-        };
-
-        return value * (multipliers[unit] ?? 1);
-      };
-
-      const a = parseSize(rowA.original.size);
-      const b = parseSize(rowB.original.size);
+      const a = parseFileSize(rowA.original.size);
+      const b = parseFileSize(rowB.original.size);
       return compareValues(a, b);
     },
   },
