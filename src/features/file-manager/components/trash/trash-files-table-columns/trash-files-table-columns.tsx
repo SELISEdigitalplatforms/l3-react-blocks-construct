@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ColumnDef } from '@tanstack/react-table';
-import { Info, Users } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
-import { getFileTypeIcon, getFileTypeInfo, IFileTrashData } from '../../../utils/file-manager';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { IFileTrashData } from '../../../utils/file-manager';
 import { TrashTableRowActions } from '@/features/file-manager';
+import { NameCell } from '@/features/file-manager/components/table-cells/name-cell';
+import { DateCell } from '@/features/file-manager/components/table-cells/date-cell';
 
 interface ColumnFactoryProps {
   onViewDetails?: (file: IFileTrashData) => void;
@@ -23,36 +24,20 @@ export const TrashTableColumns = ({
     id: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('NAME')} />,
     accessorFn: (row) => row.name,
-    cell: ({ row }) => {
-      const IconComponent = getFileTypeIcon(row.original.fileType);
-      const { iconColor, backgroundColor } = getFileTypeInfo(row.original.fileType);
-      return (
-        <div className="flex items-center gap-2">
-          <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${backgroundColor}`}>
-            <IconComponent className={`w-4 h-4 ${iconColor}`} />
-          </div>
-          <span className="max-w-[300px] truncate font-medium">{row.original.name}</span>
-          {row.original.isShared && (
-            <span title={t('SHARED')}>
-              <Users className="h-4 w-4 text-low-emphasis" />
-            </span>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <NameCell
+        name={row.original.name}
+        fileType={row.original.fileType}
+        isShared={row.original.isShared}
+        t={t}
+      />
+    ),
   },
   {
     id: 'deletedDate',
     accessorFn: (row) => row.trashedDate,
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('DELETED_DATE')} />,
-    cell: ({ row }) => {
-      const date = row.original.trashedDate;
-      return (
-        <div className="flex items-center">
-          <span className="text-sm">{CustomtDateFormat(date)}</span>
-        </div>
-      );
-    },
+    cell: ({ row }) => <DateCell date={row.original.trashedDate as unknown as Date} />,
   },
   {
     id: 'fileType',

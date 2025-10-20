@@ -1,13 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
 import { compareValues } from '@/features/iam/services/user-service';
-import { Info, Users } from 'lucide-react';
-import { getFileTypeIcon, getFileTypeInfo } from '@/features/file-manager/utils/file-manager';
+import { Info } from 'lucide-react';
 import { FileTableRowActions } from '@/features/file-manager';
 import { IFileData } from '@/features/file-manager/types/file-manager.type';
 import { DateCell } from '../../table-cells/date-cell';
 import { createDateRangeFilter } from '@/features/file-manager/utils/table-filters';
 import { parseFileSize } from '@/features/file-manager/utils/file-size';
+import { NameCell } from '@/features/file-manager/components/table-cells/name-cell';
+import { SharedByCell } from '@/features/file-manager/components/table-cells/shared-by-cell';
 
 interface ColumnFactoryProps {
   onViewDetails: (file: IFileData) => void;
@@ -35,23 +36,14 @@ export const SharedFileTableColumns = ({
     id: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('NAME')} />,
     accessorFn: (row) => row.name,
-    cell: ({ row }) => {
-      const IconComponent = getFileTypeIcon(row.original.fileType);
-      const { iconColor, backgroundColor } = getFileTypeInfo(row.original.fileType);
-      return (
-        <div className="flex items-center gap-2">
-          <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${backgroundColor}`}>
-            <IconComponent className={`w-4 h-4 ${iconColor}`} />
-          </div>
-          <span className="max-w-[300px] truncate font-medium">{row.original.name}</span>
-          {row.original.isShared && (
-            <span title={t('SHARED')}>
-              <Users className="h-4 w-4 text-low-emphasis" />
-            </span>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <NameCell
+        name={row.original.name}
+        fileType={row.original.fileType}
+        isShared={row.original.isShared}
+        t={t}
+      />
+    ),
     filterFn: (row, id, value: string) => {
       if (!value) return true;
       const name = row.original.name.toLowerCase();
@@ -62,54 +54,9 @@ export const SharedFileTableColumns = ({
     id: 'sharedBy',
     accessorFn: (row) => row.sharedBy?.name ?? '',
     header: ({ column }) => <DataTableColumnHeader column={column} title={t('SHARED_BY')} />,
-    cell: ({ row }) => {
-      const sharedBy = row.original.sharedBy;
-      if (!sharedBy) {
-        return (
-          <div className="flex items-center">
-            <span className="text-muted-foreground text-sm">-</span>
-          </div>
-        );
-      }
-
-      const getInitials = (name: string): string => {
-        return name
-          .split(' ')
-          .map((n) => n[0])
-          .join('')
-          .toUpperCase()
-          .substring(0, 2);
-      };
-
-      return (
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-            {sharedBy.avatar ? (
-              <img
-                src={sharedBy.avatar}
-                alt={sharedBy.name}
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                    parent.innerHTML = `<span class="text-xs font-medium text-gray-600">${getInitials(sharedBy.name)}</span>`;
-                  }
-                }}
-              />
-            ) : (
-              <span className="text-xs font-medium text-gray-600">
-                {getInitials(sharedBy.name)}
-              </span>
-            )}
-          </div>
-          <span className="text-sm truncate" title={sharedBy.name}>
-            {sharedBy.name}
-          </span>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <SharedByCell name={row.original.sharedBy?.name} avatar={row.original.sharedBy?.avatar} />
+    ),
     filterFn: (row, id, value: string | string[]) => {
       if (!value) return true;
 
