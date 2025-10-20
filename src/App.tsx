@@ -32,7 +32,7 @@ import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice, EditInvoice } from './features/invoices';
 import SharedWithMe from '@/pages/file-manager/shared-files';
 import Trash from '@/pages/file-manager/trash';
-import { ChatPage } from './pages/chat/chat';
+import { ChatPage } from '@/pages/chat';
 import { FileManagerMyFiles } from './pages/file-manager/my-files';
 import { Dashboard } from '@/pages/dashboard';
 import { NotFound, ServiceUnavailable } from '@/pages/error';
