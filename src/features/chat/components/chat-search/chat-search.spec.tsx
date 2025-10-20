@@ -1,16 +1,12 @@
 import { vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-
-// Mock translation
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
+import '@/test-utils/shared-test-utils';
 
 import { ChatSearch } from './chat-search';
 
-// Mock chat data
-vi.mock('../../data/chat.data', () => ({
+// Mock chat services to match component import path
+vi.mock('../../services/chat.services', () => ({
   mockChatContacts: [
     {
       id: '1',

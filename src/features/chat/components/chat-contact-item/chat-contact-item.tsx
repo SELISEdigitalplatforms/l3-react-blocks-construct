@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import { BellOff, EllipsisVertical, Mail, MailOpen, Trash, Users } from 'lucide-react';
+import { BellOff, EllipsisVertical, Mail, MailOpen, Trash } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChatContact } from '../../types/chat.types';
 import { cn } from '@/lib/utils';
+import { ChatAvatarContent } from '../chat-avatar-content/chat-avatar-content';
 
 interface ChatContactItemProps extends ChatContact {
   onClick?: (contact: ChatContact) => void;
@@ -22,29 +23,6 @@ interface ChatContactItemProps extends ChatContact {
   className?: string;
   showIcon?: boolean;
 }
-
-const AvatarContent = ({
-  status,
-  avatarSrc,
-  name,
-  avatarFallback,
-}: {
-  status?: any;
-  avatarSrc: string;
-  name: string;
-  avatarFallback: string;
-}) => {
-  if (status?.isMuted) {
-    return <BellOff className="w-5 h-5 text-low-emphasis" />;
-  }
-  if (status?.isGroup) {
-    return <Users className="w-5 h-5 text-secondary" />;
-  }
-  if (avatarSrc) {
-    return <img src={avatarSrc} alt={name} className="w-full h-full rounded-full object-cover" />;
-  }
-  return <span className="text-xs font-medium text-medium-emphasis">{avatarFallback}</span>;
-};
 
 export const ChatContactItem = ({
   id,
@@ -104,7 +82,7 @@ export const ChatContactItem = ({
           status?.isGroup ? 'bg-secondary-50' : 'bg-neutral-100'
         )}
       >
-        <AvatarContent
+        <ChatAvatarContent
           status={status}
           avatarSrc={avatarSrc}
           name={name}

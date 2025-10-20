@@ -1,4 +1,4 @@
-export interface ChatContact {
+export type ChatContact = {
   id: string;
   name: string;
   email: string;
@@ -9,25 +9,25 @@ export interface ChatContact {
   status?: ChatStatus;
   messages?: Message[];
   members?: GroupMember[];
-}
+};
 
-export interface GroupMember {
+export type GroupMember = {
   id: string;
   name: string;
   email: string;
   isMe?: boolean;
   avatarSrc: string;
   avatarFallback: string;
-}
+};
 
-export interface ChatStatus {
+export type ChatStatus = {
   isOnline?: boolean;
   isUnread?: boolean;
   isGroup?: boolean;
   isMuted?: boolean;
-}
+};
 
-export interface Message {
+export type Message = {
   id: string;
   sender: 'me' | 'other';
   content: string;
@@ -38,11 +38,11 @@ export interface Message {
     size: number;
     url: string;
   };
-}
+};
 
-export interface UserProfile {
+export type UserProfile = {
   name: string;
   avatarSrc: string;
   avatarFallback: string;
   status: ChatStatus;
-}
+};

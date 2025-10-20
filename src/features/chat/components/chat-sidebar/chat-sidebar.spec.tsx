@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
+import '@/test-utils/shared-test-utils';
 
 // Mock DropdownMenu and related components to always render children
 vi.mock('components/ui/dropdown-menu', () => ({
@@ -23,17 +24,12 @@ vi.mock('components/ui/button', () => ({
   ),
 }));
 
-// Mock translation
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+// Translation mock is provided by shared-test-utils
 
 import { ChatSidebar } from './chat-sidebar';
 
-// Mock chat data
-vi.mock('../../data/chat.data', () => ({
+// Mock chat services to match component import path
+vi.mock('../../services/chat.services', () => ({
   mockUserProfile: {
     avatarSrc: '',
     avatarFallback: 'U',
