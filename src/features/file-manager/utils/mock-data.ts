@@ -1,4 +1,5 @@
-import { FileType, IFileDataWithSharing, SharedUser } from './file-manager';
+import { FileType } from '../types/file-manager.type';
+import { IFileDataWithSharing, IFileTrashData, SharedUser } from './file-manager';
 
 interface BaseFileDefinition {
   id: string;
@@ -547,3 +548,115 @@ export const addFolderContent = (folderId: string, files: FolderContentDefinitio
 };
 
 export type { FolderContentDefinition, RootFileDefinition };
+
+export const trashMockData: IFileTrashData[] = [
+  {
+    id: '1',
+    name: 'Adventure_Video.mp4',
+    fileType: 'Video',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-01-03'),
+    isShared: false,
+  },
+  {
+    id: '2',
+    name: 'Cat.jpg',
+    fileType: 'Image',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-02-03'),
+    isShared: false,
+  },
+  {
+    id: '3',
+    name: 'Design Assets',
+    fileType: 'Folder',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-03-03'),
+    isShared: true,
+  },
+  {
+    id: '4',
+    name: 'Design Assets 2',
+    fileType: 'Folder',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-04-03'),
+    isShared: true,
+  },
+  {
+    id: '5',
+    name: 'Ftoof.jpg',
+    fileType: 'Image',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-05-03'),
+    isShared: false,
+  },
+  {
+    id: '6',
+    name: 'Project Documents.doc',
+    fileType: 'File',
+    size: '21.4 MB',
+    trashedDate: new Date('2025-05-05'),
+    isShared: false,
+  },
+];
+
+export const folderContents: Record<string, IFileTrashData[]> = {
+  '3': [
+    {
+      id: '3-1',
+      name: 'Logo_Design.png',
+      fileType: 'Image',
+      size: '2.1 MB',
+      trashedDate: new Date('2025-01-03'),
+      isShared: true,
+      parentFolderId: '3',
+    },
+    {
+      id: '3-2',
+      name: 'Brand_Guidelines.pdf',
+      fileType: 'File',
+      size: '5.3 MB',
+      trashedDate: new Date('2025-06-03'),
+      isShared: true,
+      parentFolderId: '3',
+    },
+    {
+      id: '3-3',
+      name: 'Icon_Set.svg',
+      fileType: 'Image',
+      size: '1.8 MB',
+      trashedDate: new Date('2025-03-03'),
+      isShared: true,
+      parentFolderId: '3',
+    },
+  ],
+  '4': [
+    {
+      id: '4-1',
+      name: 'Mockup_Design.jpg',
+      fileType: 'Image',
+      size: '4.2 MB',
+      trashedDate: new Date('2025-01-10'),
+      isShared: true,
+      parentFolderId: '4',
+    },
+    {
+      id: '4-2',
+      name: 'Style_Guide.docx',
+      fileType: 'File',
+      size: '3.1 MB',
+      trashedDate: new Date('2025-04-03'),
+      isShared: true,
+      parentFolderId: '4',
+    },
+    {
+      id: '4-3',
+      name: 'Color_Palette.png',
+      fileType: 'Image',
+      size: '0.9 MB',
+      trashedDate: new Date('2025-04-03'),
+      isShared: true,
+      parentFolderId: '4',
+    },
+  ],
+};

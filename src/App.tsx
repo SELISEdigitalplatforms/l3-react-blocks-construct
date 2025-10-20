@@ -30,14 +30,12 @@ import { Finance } from '@/pages/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice, EditInvoice } from './features/invoices';
-import SharedWithMe from '@/pages/file-manager/shared-files';
-import Trash from '@/pages/file-manager/trash';
 import { ChatPage } from '@/pages/chat';
-import { FileManagerMyFiles } from './pages/file-manager/my-files';
 import { Dashboard } from '@/pages/dashboard';
 import { NotFound, ServiceUnavailable } from '@/pages/error';
 import { ActivityLog } from '@/pages/activity-log';
 import { Timeline } from '@/pages/timeline';
+import { FileManagerMyFiles, SharedWithMe, Trash } from '@/pages/file-manager';
 
 const queryClient = new QueryClient();
 
