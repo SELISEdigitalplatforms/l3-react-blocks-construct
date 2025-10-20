@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { IFileDataWithSharing, SharedUser } from '@/features/file-manager/utils/file-manager';
@@ -11,6 +11,8 @@ import {
 } from '@/features/file-manager/utils/grid-view-filter-files';
 import { BaseGridView } from '../../base-grid-view/base-grid-view';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
+import { useDetailsPane } from '@/features/file-manager/hooks/use-details-pane';
+import { ResponsiveMainPane } from '@/features/file-manager/components/layout/responsive-main-pane';
 
 export interface SharedFilesGridViewProps {
   onViewDetails?: (file: IFileDataWithSharing) => void;
@@ -34,25 +36,12 @@ export interface SharedFilesGridViewProps {
 export const SharedFilesGridView = (props: Readonly<SharedFilesGridViewProps>) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedFileForDetails, setSelectedFileForDetails] = useState<IFileDataWithSharing | null>(
-    null
-  );
-
-  const handleViewDetails = useCallback(
-    (file: IFileDataWithSharing) => {
-      setSelectedFileForDetails(file);
-      setIsDetailsOpen(true);
-      props.onViewDetails?.(file);
-    },
-    [props.onViewDetails, props.fileSharedUsers]
-  );
-
-  const handleCloseDetails = useCallback(() => {
-    setIsDetailsOpen(false);
-    setSelectedFileForDetails(null);
-  }, []);
+  const {
+    isDetailsOpen,
+    selectedItem: selectedFileForDetails,
+    handleOpenDetails: handleViewDetails,
+    handleCloseDetails,
+  } = useDetailsPane<IFileDataWithSharing>(isMobile, props.onViewDetails);
 
   const queryBuilder = useCallback(
     (params: any) => ({
@@ -86,37 +75,27 @@ export const SharedFilesGridView = (props: Readonly<SharedFilesGridViewProps>) =
     []
   );
 
-  const shouldHideMainContent = isMobile && isDetailsOpen;
-
   return (
-    <div className="flex h-full w-full rounded-xl relative">
-      {!shouldHideMainContent && (
-        <div
-          className={`flex flex-col h-full transition-all duration-300 ${
-            isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
-          }`}
-        >
-          <BaseGridView
-            onNavigateToFolder={props.onNavigateToFolder}
-            onFilePreview={props.onFilePreview}
-            onViewDetails={handleViewDetails}
-            filters={props.filters}
-            newFiles={props.newFiles}
-            newFolders={props.newFolders}
-            renamedFiles={props.renamedFiles}
-            fileSharedUsers={props.fileSharedUsers}
-            filePermissions={props.filePermissions}
-            currentFolderId={props.currentFolderId}
-            onShare={props.onShare}
-            onDelete={props.onDelete}
-            onMove={props.onMove}
-            onCopy={props.onCopy}
-            onRename={props.onRename}
-            queryBuilder={queryBuilder}
-            filterFiles={filterFiles}
-          />
-        </div>
-      )}
+    <ResponsiveMainPane isMobile={isMobile} isDetailsOpen={isDetailsOpen}>
+      <BaseGridView
+        onNavigateToFolder={props.onNavigateToFolder}
+        onFilePreview={props.onFilePreview}
+        onViewDetails={handleViewDetails}
+        filters={props.filters}
+        newFiles={props.newFiles}
+        newFolders={props.newFolders}
+        renamedFiles={props.renamedFiles}
+        fileSharedUsers={props.fileSharedUsers}
+        filePermissions={props.filePermissions}
+        currentFolderId={props.currentFolderId}
+        onShare={props.onShare}
+        onDelete={props.onDelete}
+        onMove={props.onMove}
+        onCopy={props.onCopy}
+        onRename={props.onRename}
+        queryBuilder={queryBuilder}
+        filterFiles={filterFiles}
+      />
 
       <RegularFileDetailsSheet
         isOpen={isDetailsOpen}
@@ -145,6 +124,6 @@ export const SharedFilesGridView = (props: Readonly<SharedFilesGridViewProps>) =
         }
         t={t}
       />
-    </div>
+    </ResponsiveMainPane>
   );
 };

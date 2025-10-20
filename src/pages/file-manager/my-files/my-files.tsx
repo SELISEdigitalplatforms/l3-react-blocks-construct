@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FileManagerLayout } from '@/features/file-manager/file-manager-layout';
+import { FileManagerLayout } from '@/features/file-manager/components/layout/file-manager-layout';
 import { FileViewRenderer } from '@/features/file-manager/components/file-view-renderer/file-view-renderer';
 import { useFileManager } from '@/features/file-manager/hooks/use-file-manager';
 import { useFileFilters } from '@/features/file-manager/hooks/use-file-filters';
