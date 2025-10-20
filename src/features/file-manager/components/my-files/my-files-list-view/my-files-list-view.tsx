@@ -5,12 +5,33 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import DataTable from '@/components/blocks/data-table/data-table';
 import {
   IFileDataWithSharing,
-  MyFilesListViewProps,
   PaginationState,
+  SharedUser,
 } from '@/features/file-manager/utils/file-manager';
 import { FilePreview } from '../../file-preview/file-preview';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
 import { createFileTableColumns } from '../my-files-table-columns/my-files-table-columns';
+import { FileType } from '@/features/file-manager/types/file-manager.type';
+
+export interface MyFilesListViewProps {
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+
+  onRename: (file: IFileDataWithSharing) => void;
+  onRenameUpdate?: (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => void;
+  filters: {
+    name?: string;
+    fileType?: FileType;
+  };
+  newFiles: IFileDataWithSharing[];
+  newFolders: IFileDataWithSharing[];
+  renamedFiles: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
+}
 
 export const MyFilesListView = ({
   onShare,

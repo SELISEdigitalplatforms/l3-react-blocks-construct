@@ -2,8 +2,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { SharedFilesGridViewProps } from '@/features/file-manager/types/file-manager.type';
-import { IFileDataWithSharing } from '@/features/file-manager/utils/file-manager';
+import { IFileDataWithSharing, SharedUser } from '@/features/file-manager/utils/file-manager';
 import {
   matchesFileType,
   matchesModifiedDate,
@@ -12,6 +11,25 @@ import {
 } from '@/features/file-manager/utils/grid-view-filter-files';
 import { BaseGridView } from '../../base-grid-view/base-grid-view';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
+
+export interface SharedFilesGridViewProps {
+  onViewDetails?: (file: IFileDataWithSharing) => void;
+  onFilePreview?: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
+  filters: any;
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
+  onNavigateBack?: () => void;
+}
 
 export const SharedFilesGridView = (props: Readonly<SharedFilesGridViewProps>) => {
   const { t } = useTranslation();

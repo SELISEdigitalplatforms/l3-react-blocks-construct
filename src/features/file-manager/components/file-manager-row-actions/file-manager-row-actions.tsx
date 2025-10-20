@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { IFileData } from '../../hooks/use-mock-files-query';
+import { IFileData } from '../../types/file-manager.type';
 
 interface FileTableRowActionsProps {
   row: Row<IFileData>;

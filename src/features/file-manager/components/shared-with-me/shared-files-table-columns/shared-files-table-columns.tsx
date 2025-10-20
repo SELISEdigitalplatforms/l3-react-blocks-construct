@@ -4,9 +4,9 @@ import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
 import { compareValues } from '@/features/iam/services/user-service';
 import { Info, Users } from 'lucide-react';
-import { IFileData } from '@/features/file-manager/hooks/use-mock-files-query';
 import { getFileTypeIcon, getFileTypeInfo } from '@/features/file-manager/utils/file-manager';
-import { FileTableRowActions } from '../../file-manager-row-actions/file-manager-row-actions';
+import { FileTableRowActions } from '@/features/file-manager';
+import { IFileData } from '@/features/file-manager/types/file-manager.type';
 
 interface ColumnFactoryProps {
   onViewDetails: (file: IFileData) => void;

@@ -4,7 +4,19 @@ import {
   fileTypeFilterConfig,
   FilterConfig,
 } from '@/features/file-manager/types/header-toolbar.type';
-import { SharedWithMeHeaderToolbarProps } from '@/features/file-manager/utils/file-manager';
+import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
+
+export interface SharedWithMeHeaderToolbarProps {
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  filters: SharedFilters;
+  onFiltersChange: (filters: SharedFilters) => void;
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
+  sharedUsers?: Array<{ id: string; name: string }>;
+}
 
 export const SharedWithMeHeaderToolbar = (props: Readonly<SharedWithMeHeaderToolbarProps>) => {
   const filterConfigs: FilterConfig[] = [

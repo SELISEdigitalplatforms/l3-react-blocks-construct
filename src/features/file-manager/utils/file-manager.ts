@@ -1,7 +1,6 @@
 import { FolderIcon, FileTextIcon, ImageIcon, FileMusic, FileVideo2 } from 'lucide-react';
-import { IFileData } from '../hooks/use-mock-files-query';
 import { t } from 'i18next';
-import { FileManagerFilters, SharedFilters, TrashFilters } from '../types/header-toolbar.type';
+import { FileType, IFileData } from '../types/file-manager.type';
 
 export interface PaginationState {
   pageIndex: number;
@@ -129,8 +128,6 @@ export const getFileTypeInfo = (fileType: string) => {
   return config[fileType as keyof typeof config] || config.File;
 };
 
-export type FileType = 'Folder' | 'File' | 'Image' | 'Audio' | 'Video';
-
 export interface IFileTrashData {
   id: string;
   name: string;
@@ -140,124 +137,6 @@ export interface IFileTrashData {
   isShared?: boolean;
   parentFolderId?: string;
 }
-
-export const DYNAMIC_BREADCRUMB_TITLES = {
-  '/trash': 'TRASH',
-  '/trash/3': 'DESIGN_ASSETS',
-  '/trash/4': 'DESIGN_ASSETS_2',
-};
-
-export const folderContents: Record<string, IFileTrashData[]> = {
-  '3': [
-    {
-      id: '3-1',
-      name: 'Logo_Design.png',
-      fileType: 'Image',
-      size: '2.1 MB',
-      trashedDate: new Date('2025-01-03'),
-      isShared: true,
-      parentFolderId: '3',
-    },
-    {
-      id: '3-2',
-      name: 'Brand_Guidelines.pdf',
-      fileType: 'File',
-      size: '5.3 MB',
-      trashedDate: new Date('2025-06-03'),
-      isShared: true,
-      parentFolderId: '3',
-    },
-    {
-      id: '3-3',
-      name: 'Icon_Set.svg',
-      fileType: 'Image',
-      size: '1.8 MB',
-      trashedDate: new Date('2025-03-03'),
-      isShared: true,
-      parentFolderId: '3',
-    },
-  ],
-  '4': [
-    {
-      id: '4-1',
-      name: 'Mockup_Design.jpg',
-      fileType: 'Image',
-      size: '4.2 MB',
-      trashedDate: new Date('2025-01-10'),
-      isShared: true,
-      parentFolderId: '4',
-    },
-    {
-      id: '4-2',
-      name: 'Style_Guide.docx',
-      fileType: 'File',
-      size: '3.1 MB',
-      trashedDate: new Date('2025-04-03'),
-      isShared: true,
-      parentFolderId: '4',
-    },
-    {
-      id: '4-3',
-      name: 'Color_Palette.png',
-      fileType: 'Image',
-      size: '0.9 MB',
-      trashedDate: new Date('2025-04-03'),
-      isShared: true,
-      parentFolderId: '4',
-    },
-  ],
-};
-
-export const trashMockData: IFileTrashData[] = [
-  {
-    id: '1',
-    name: 'Adventure_Video.mp4',
-    fileType: 'Video',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-01-03'),
-    isShared: false,
-  },
-  {
-    id: '2',
-    name: 'Cat.jpg',
-    fileType: 'Image',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-02-03'),
-    isShared: false,
-  },
-  {
-    id: '3',
-    name: 'Design Assets',
-    fileType: 'Folder',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-03-03'),
-    isShared: true,
-  },
-  {
-    id: '4',
-    name: 'Design Assets 2',
-    fileType: 'Folder',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-04-03'),
-    isShared: true,
-  },
-  {
-    id: '5',
-    name: 'Ftoof.jpg',
-    fileType: 'Image',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-05-03'),
-    isShared: false,
-  },
-  {
-    id: '6',
-    name: 'Project Documents.doc',
-    fileType: 'File',
-    size: '21.4 MB',
-    trashedDate: new Date('2025-05-05'),
-    isShared: false,
-  },
-];
 
 export interface PreviewProps {
   file: IFileTrashData;
@@ -326,90 +205,3 @@ export const getSharedUsers = (file: IFileData | null): SharedUser[] => {
 
   return users;
 };
-
-export interface FileCardProps {
-  file: IFileData;
-  onViewDetails?: (file: IFileData) => void;
-  onDownload?: (file: IFileData) => void;
-  onShare?: (file: IFileData) => void;
-  onDelete?: (file: IFileData) => void;
-  onMove?: (file: IFileData) => void;
-  onCopy?: (file: IFileData) => void;
-  onOpen?: (file: IFileData) => void;
-  onRename?: (file: IFileData) => void;
-  t: (key: string) => string;
-}
-
-export interface FileGridViewProps {
-  onViewDetails: (file: IFileDataWithSharing) => void;
-  onDownload: (file: IFileDataWithSharing) => void;
-  onShare: (file: IFileDataWithSharing) => void;
-  onDelete: (file: IFileDataWithSharing) => void;
-
-  onRename: (file: IFileDataWithSharing) => void;
-  filters: {
-    name: string;
-    fileType?: FileType;
-  };
-  newFiles?: IFileDataWithSharing[];
-  newFolders?: IFileDataWithSharing[];
-  renamedFiles?: Map<string, IFileDataWithSharing>;
-  fileSharedUsers?: { [key: string]: SharedUser[] };
-  filePermissions?: { [key: string]: { [key: string]: string } };
-}
-
-export interface MyFilesListViewProps {
-  onViewDetails: (file: IFileDataWithSharing) => void;
-  onShare: (file: IFileDataWithSharing) => void;
-  onDelete: (file: IFileDataWithSharing) => void;
-
-  onRename: (file: IFileDataWithSharing) => void;
-  onRenameUpdate?: (oldFile: IFileDataWithSharing, newFile: IFileDataWithSharing) => void;
-  filters: {
-    name?: string;
-    fileType?: FileType;
-  };
-  newFiles: IFileDataWithSharing[];
-  newFolders: IFileDataWithSharing[];
-  renamedFiles: Map<string, IFileDataWithSharing>;
-  fileSharedUsers?: { [key: string]: SharedUser[] };
-  filePermissions?: { [key: string]: { [key: string]: string } };
-  currentFolderId?: string;
-  onNavigateToFolder?: (folderId: string) => void;
-}
-
-export interface FileManagerHeaderToolbarProps {
-  viewMode?: string;
-  handleViewMode: (view: string) => void;
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
-  filters: FileManagerFilters;
-  onFiltersChange: (filters: FileManagerFilters) => void;
-  onFileUpload?: (files: File[]) => void;
-  onFolderCreate?: (folderName: string) => void;
-  sharedUsers?: Array<{ id: string; name: string }>;
-}
-
-export interface SharedWithMeHeaderToolbarProps {
-  viewMode?: string;
-  handleViewMode: (view: string) => void;
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
-  filters: SharedFilters;
-  onFiltersChange: (filters: SharedFilters) => void;
-  onFileUpload?: (files: File[]) => void;
-  onFolderCreate?: (folderName: string) => void;
-  sharedUsers?: Array<{ id: string; name: string }>;
-}
-
-export interface TrashHeaderToolbarProps {
-  viewMode?: string;
-  handleViewMode: (view: string) => void;
-  searchQuery?: string;
-  onSearchChange?: (query: string) => void;
-  filters: TrashFilters;
-  onFiltersChange: (filters: TrashFilters) => void;
-  onClearTrash?: () => void;
-  onRestoreSelected?: () => void;
-  selectedItems?: string[];
-}

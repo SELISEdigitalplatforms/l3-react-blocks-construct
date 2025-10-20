@@ -1,12 +1,24 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { Recycle, RotateCcw } from 'lucide-react';
 import { BaseHeaderToolbar } from '@/features/file-manager';
 import {
   ActionConfig,
   fileTypeFilterConfig,
   FilterConfig,
+  TrashFilters,
 } from '@/features/file-manager/types/header-toolbar.type';
-import { TrashHeaderToolbarProps } from '@/features/file-manager/utils/file-manager';
-import { Recycle, RotateCcw } from 'lucide-react';
+
+export interface TrashHeaderToolbarProps {
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  filters: TrashFilters;
+  onFiltersChange: (filters: TrashFilters) => void;
+  onClearTrash?: () => void;
+  onRestoreSelected?: () => void;
+  selectedItems?: string[];
+}
 
 export const TrashHeaderToolbar = (props: Readonly<TrashHeaderToolbarProps>) => {
   const filterConfigs: FilterConfig[] = [

@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import { BaseGridView } from '../../base-grid-view/base-grid-view';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
-import { IFileData } from '../../../hooks/use-mock-files-query';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
@@ -11,6 +10,7 @@ import {
   matchesModifiedDate,
   matchesName,
 } from '../../../utils/grid-view-filter-files';
+import { IFileData } from '@/features/file-manager/types/file-manager.type';
 
 interface MyFileGridViewProps {
   onViewDetails?: (file: IFileData) => void;

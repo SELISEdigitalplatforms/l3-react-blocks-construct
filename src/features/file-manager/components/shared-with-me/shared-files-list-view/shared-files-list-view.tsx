@@ -5,11 +5,35 @@ import { useTranslation } from 'react-i18next';
 import { useMockFilesQuery } from '@/features/file-manager/hooks/use-mock-files-query';
 import { useIsMobile } from '@/hooks/use-mobile';
 import DataTable from '@/components/blocks/data-table/data-table';
-import { SharedFilesListViewProps } from '@/features/file-manager/types/file-manager.type';
-import { IFileDataWithSharing, PaginationState } from '@/features/file-manager/utils/file-manager';
+import {
+  IFileDataWithSharing,
+  PaginationState,
+  SharedUser,
+} from '@/features/file-manager/utils/file-manager';
 import { SharedFileTableColumns } from '../shared-files-table-columns/shared-files-table-columns';
 import { FilePreview } from '../../file-preview/file-preview';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
+import { IFileData } from '@/features/file-manager/types/file-manager.type';
+import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
+
+export interface SharedFilesListViewProps {
+  onDownload: ((file: IFileData) => void) | undefined;
+  onViewDetails: (file: IFileDataWithSharing) => void;
+  onShare: (file: IFileDataWithSharing) => void;
+  onDelete: (file: IFileDataWithSharing) => void;
+  onMove: (file: IFileDataWithSharing) => void;
+  onCopy: (file: IFileDataWithSharing) => void;
+  onOpen: (file: IFileDataWithSharing) => void;
+  onRename: (file: IFileDataWithSharing) => void;
+  filters: SharedFilters;
+  newFiles?: IFileDataWithSharing[];
+  newFolders?: IFileDataWithSharing[];
+  renamedFiles?: Map<string, IFileDataWithSharing>;
+  fileSharedUsers?: { [key: string]: SharedUser[] };
+  filePermissions?: { [key: string]: { [key: string]: string } };
+  currentFolderId?: string;
+  onNavigateToFolder?: (folderId: string) => void;
+}
 
 export const SharedFilesListView = ({
   onShare,

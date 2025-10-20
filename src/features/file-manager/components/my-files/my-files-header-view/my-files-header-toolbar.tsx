@@ -1,10 +1,22 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {
+  FileManagerFilters,
   fileTypeFilterConfig,
   FilterConfig,
 } from '@/features/file-manager/types/header-toolbar.type';
-import { FileManagerHeaderToolbarProps } from '@/features/file-manager/utils/file-manager';
 import { BaseHeaderToolbar } from '@/features/file-manager';
+
+export interface FileManagerHeaderToolbarProps {
+  viewMode?: string;
+  handleViewMode: (view: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  filters: FileManagerFilters;
+  onFiltersChange: (filters: FileManagerFilters) => void;
+  onFileUpload?: (files: File[]) => void;
+  onFolderCreate?: (folderName: string) => void;
+  sharedUsers?: Array<{ id: string; name: string }>;
+}
 
 export const FileManagerHeaderToolbar = (props: Readonly<FileManagerHeaderToolbarProps>) => {
   const filterConfigs: FilterConfig[] = [

@@ -2,7 +2,6 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { X } from 'lucide-react';
 import {
-  FileType,
   getFileTypeDisplayName,
   getFileTypeIcon,
   getFileTypeInfo,
@@ -11,6 +10,7 @@ import {
 } from '@/features/file-manager/utils/file-manager';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { FileType } from '../../types/file-manager.type';
 
 export interface IFileDataWithSharing {
   id: string;
