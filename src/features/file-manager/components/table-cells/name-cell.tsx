@@ -4,14 +4,14 @@ import { FileType } from '@/features/file-manager/types/file-manager.type';
 
 interface NameCellProps {
   name: string;
-  fileType: FileType | string;
+  fileType: FileType;
   isShared?: boolean;
   t: (key: string) => string;
 }
 
 export const NameCell = ({ name, fileType, isShared = false, t }: Readonly<NameCellProps>) => {
-  const IconComponent = getFileTypeIcon(fileType as FileType);
-  const { iconColor, backgroundColor } = getFileTypeInfo(fileType as FileType);
+  const IconComponent = getFileTypeIcon(fileType);
+  const { iconColor, backgroundColor } = getFileTypeInfo(fileType);
 
   return (
     <div className="flex items-center gap-2">
