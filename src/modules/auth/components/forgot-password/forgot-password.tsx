@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   forgotPasswordFormDefaultValue,
   forgotPasswordFormType,
@@ -37,27 +37,17 @@ import { useTranslation } from 'react-i18next';
  * - Navigation to confirmation page on successful submission
  * - Conditional button enabling based on form validity
  *
- * @returns {JSX.Element} The rendered form component with email input, captcha, and action buttons
- *
- * @example
- * // Basic usage
- * <ForgotPasswordForm />
- *
- * // Within a password recovery page
- * <div className="auth-container">
- *   <h1>Reset Password</h1>
- *   <p>Enter your email to receive a password reset link</p>
- *   <ForgotPasswordForm />
- * </div>
  */
 
 export const ForgotpasswordForm = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
   const form = useForm<forgotPasswordFormType>({
     defaultValues: forgotPasswordFormDefaultValue,
     resolver: zodResolver(getForgotPasswordFormValidationSchema(t)),
   });
+
   const { isPending, mutateAsync } = useForgotPassword();
 
   const captchaRef = useRef<CaptchaRef>(null);
@@ -92,28 +82,20 @@ export const ForgotpasswordForm = () => {
   };
 
   const onSubmitHandler = async (values: forgotPasswordFormType) => {
-    if (captchaEnabled && showCaptcha && !captchaToken) {
-      return;
-    }
-
+    if (captchaEnabled && showCaptcha && !captchaToken) return;
     try {
-      await mutateAsync({
+      const res = await mutateAsync({
         email: values.email,
         captchaCode: captchaToken || '',
+        projectKey: import.meta.env.VITE_X_BLOCKS_KEY || '',
       });
-
-      navigate('/sent-email');
+      if (res.isSuccess) navigate('/sent-email');
     } catch (_error) {
       resetCaptcha();
     }
   };
 
-  const emailError = form.formState.errors.email;
-
-  const isEmailValid = emailValue && emailValue.trim() !== '' && !emailError;
-
-  const isButtonDisabled =
-    isPending || !isEmailValid || (captchaEnabled && showCaptcha && !captchaToken);
+  const isButtonDisabled = isPending || (captchaEnabled && showCaptcha && !captchaToken);
 
   return (
     <Form {...form}>
@@ -154,11 +136,6 @@ export const ForgotpasswordForm = () => {
         >
           {t('SEND_RESET_LINK')}
         </Button>
-        <Link to={'/login'}>
-          <Button className="font-extrabold text-primary w-full" size="lg" variant="ghost">
-            {t('GO_TO_LOGIN')}
-          </Button>
-        </Link>
       </form>
     </Form>
   );

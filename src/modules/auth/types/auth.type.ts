@@ -27,3 +27,14 @@ export interface SigninEmailResponse {
   mfaType?: number;
   mfaId?: string;
 }
+
+export interface ForgotPasswordPayload {
+  email: string;
+  captchaCode?: string;
+  projectKey: string;
+}
+
+export interface ForgotPasswordResponse {
+  errors: unknown;
+  isSuccess: boolean;
+}
