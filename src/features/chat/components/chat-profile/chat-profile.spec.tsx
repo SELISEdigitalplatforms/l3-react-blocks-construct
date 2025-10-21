@@ -1,7 +1,6 @@
 // Test for ChatProfile component
 // Note: jest-dom matchers and browser polyfills are set up globally in vitest.setup.ts
 import { vi } from 'vitest';
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ChatProfile } from './chat-profile';
 

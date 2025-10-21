@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   forgotPasswordFormDefaultValue,
   forgotPasswordFormType,
@@ -20,7 +21,6 @@ import { Button } from '@/components/ui/button';
 import { SetStateAction, useRef, useState, useEffect } from 'react';
 import { CaptchaRef } from '@/features/captcha/index.type';
 import { Captcha } from '@/features/captcha';
-import { useTranslation } from 'react-i18next';
 
 /**
  * ForgotPasswordForm Component
