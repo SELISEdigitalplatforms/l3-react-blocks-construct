@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { UCheckboxProps } from './index.type';
 
 /**
- * UCheckbox Component
+ * CustomCheckbox Component
  *
  * A styled checkbox input with an optional label, designed for consistent
  * UI appearance across forms and user interfaces.
@@ -22,10 +22,10 @@ import { UCheckboxProps } from './index.type';
  *
  * @example
  * // Basic usage with label
- * <UCheckbox label="I agree to the terms and conditions" />
+ * <CustomCheckbox label="I agree to the terms and conditions" />
  *
  * // With custom label styling
- * <UCheckbox
+ * <CustomCheckbox
  *   label="Remember me"
  *   labelClassName="text-primary font-bold"
  * />
@@ -34,7 +34,7 @@ import { UCheckboxProps } from './index.type';
  * if multiple checkboxes are used on the same page
  */
 
-export const UCheckbox = ({ label, labelClassName }: Readonly<UCheckboxProps>) => {
+export const CustomCheckbox = ({ label, labelClassName }: Readonly<UCheckboxProps>) => {
   return (
     <div className="flex items-center space-x-2">
       <Checkbox

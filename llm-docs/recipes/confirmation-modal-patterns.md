@@ -16,7 +16,7 @@ Standardized confirmation dialogs for destructive and important actions using Se
 ### Import Path
 ```typescript
 // Always use this component - never create custom confirmation dialogs
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 ```
 
 ### Component Props
@@ -38,7 +38,7 @@ interface ConfirmationModalProps {
 ### Pattern 1: Basic Delete Confirmation
 ```typescript
 import React, { useState } from 'react'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { Button } from 'components/ui/button'
 
 export function BasicDeleteExample() {
@@ -83,7 +83,7 @@ export function BasicDeleteExample() {
 ### Pattern 2: Custom Button Text
 ```typescript
 import React, { useState } from 'react'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 
 export function CustomButtonExample() {
   const [publishModal, setPublishModal] = useState({ open: false, draft: null });
@@ -110,7 +110,7 @@ export function CustomButtonExample() {
 ### Pattern 3: Async Operations (Prevent Auto-Close)
 ```typescript
 import React, { useState } from 'react'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 
 export function AsyncOperationExample() {
   const [processModal, setProcessModal] = useState({ open: false });
@@ -188,7 +188,7 @@ export function ComplexContentExample() {
 ### Pattern 5: Integration with React Query Mutations
 ```typescript
 import React, { useState } from 'react'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { useDeleteItem } from '../hooks/use-items'
 
 export function ReactQueryIntegration() {

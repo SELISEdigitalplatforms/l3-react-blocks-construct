@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UPasswordInput, SharedPasswordStrengthChecker } from '@/components/core';
+import { PasswordInput, SharedPasswordStrengthChecker } from '@/components/shared';
 import {
   Form,
   FormControl,
@@ -116,7 +116,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                         {t('CURRENT_PASSWORD')}
                       </FormLabel>
                       <FormControl>
-                        <UPasswordInput placeholder={t('ENTER_YOUR_CURRENT_PASSWORD')} {...field} />
+                        <PasswordInput placeholder={t('ENTER_YOUR_CURRENT_PASSWORD')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -131,7 +131,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                         {t('NEW_PASSWORD')}
                       </FormLabel>
                       <FormControl>
-                        <UPasswordInput placeholder={t('ENTER_YOUR_NEW_PASSWORD')} {...field} />
+                        <PasswordInput placeholder={t('ENTER_YOUR_NEW_PASSWORD')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -146,7 +146,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                         {t('CONFIRM_NEW_PASSWORD')}
                       </FormLabel>
                       <FormControl>
-                        <UPasswordInput placeholder={t('CONFIRM_YOUR_NEW_PASSWORD')} {...field} />
+                        <PasswordInput placeholder={t('CONFIRM_YOUR_NEW_PASSWORD')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

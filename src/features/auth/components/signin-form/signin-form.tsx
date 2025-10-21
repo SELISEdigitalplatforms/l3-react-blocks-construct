@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { LoadingOverlay, UPasswordInput } from '@/components/core';
+import { LoadingOverlay, PasswordInput } from '@/components/shared';
 import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
@@ -207,7 +207,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
                 <FormItem>
                   <FormLabel>{t('PASSWORD')}</FormLabel>
                   <FormControl>
-                    <UPasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
+                    <PasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

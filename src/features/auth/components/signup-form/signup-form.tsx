@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { CustomCheckbox } from '@/components/shared';
 import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema } from './utils';
-import { UCheckbox } from '@/components/core';
 
 /**
  * SignupForm Component
@@ -83,7 +83,7 @@ export const SignupForm = () => {
         />
 
         <div className="flex justify-between items-center">
-          <UCheckbox
+          <CustomCheckbox
             label={
               <>
                 {t('I_AGREE_TO')}{' '}

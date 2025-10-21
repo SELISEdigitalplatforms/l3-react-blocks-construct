@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { SharedPasswordStrengthChecker, UPasswordInput } from '@/components/core';
+import { SharedPasswordStrengthChecker, PasswordInput } from '@/components/shared';
 import { Captcha } from '@/features/captcha';
 
 /**
@@ -159,7 +159,7 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
             <FormItem>
               <FormLabel className="text-high-emphasis font-normal">{t('PASSWORD')}</FormLabel>
               <FormControl>
-                <UPasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
+                <PasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -175,7 +175,7 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
                 {t('CONFIRM_PASSWORD')}
               </FormLabel>
               <FormControl>
-                <UPasswordInput placeholder={t('CONFIRM_YOUR_PASSWORD')} {...field} />
+                <PasswordInput placeholder={t('CONFIRM_YOUR_PASSWORD')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

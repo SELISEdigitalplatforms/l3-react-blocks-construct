@@ -35,7 +35,7 @@ import { NotFound, ServiceUnavailable } from '@/pages/error';
 import { ActivityLog } from '@/pages/activity-log';
 import { Timeline } from '@/pages/timeline';
 import { FileManagerMyFiles, SharedWithMe, Trash } from '@/pages/file-manager';
-import { LoadingOverlay } from '@/components/core';
+import { LoadingOverlay } from '@/components/shared';
 
 const queryClient = new QueryClient();
 

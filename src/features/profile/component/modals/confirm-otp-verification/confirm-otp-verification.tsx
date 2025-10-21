@@ -8,7 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { UIOtpInput } from '@/components/core';
+import { UIOtpInput } from '@/components/shared';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
 import { useToast } from '@/hooks/use-toast';
 import useResendOTPTime from '@/hooks/use-resend-otp';
