@@ -26,7 +26,7 @@ import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import CustomTextEditor from '@/components/blocks/custom-text-editor/custom-text-editor';
-import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import { useToast } from '@/hooks/use-toast';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';

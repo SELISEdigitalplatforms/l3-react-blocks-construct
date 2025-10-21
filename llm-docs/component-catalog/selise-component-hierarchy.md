@@ -63,7 +63,7 @@ These are business patterns and reusable compound components.
 **ConfirmationModal** - All confirmation dialogs
 ```typescript
 // Path: components/blocks/confirmation-modal/confirmation-modal.tsx
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 
 // What you get:
 // - Accessible dialog with ARIA attributes
@@ -285,7 +285,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'c
 import { Button, Input, Card, Table, Dialog, Badge, Avatar } from 'components/ui/*'
 
 // Proven block patterns - use when applicable
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
 import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
 
@@ -326,7 +326,7 @@ import { AdvanceDataTable } from 'features/inventory/component/advance-data-tabl
 
 // 2. Use Block Patterns
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 
 // 3. Use UI Foundation
 import { Button, Badge } from 'components/ui/button'

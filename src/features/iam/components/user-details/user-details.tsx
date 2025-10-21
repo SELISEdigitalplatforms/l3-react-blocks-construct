@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { IamData } from '../../services/user-service';
-import ConfirmationModal from '../../../../components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import { Calendar, Clock, Mail, Phone, Shield, User } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useForgotPassword, useResendActivation } from '@/features/auth/hooks/use-auth';

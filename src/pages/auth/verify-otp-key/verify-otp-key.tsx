@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import UIOtpInput from '@/components/core/otp-input/otp-input';
+import { UIOtpInput } from '@/components/shared';
 import { useSigninMutation } from '@/features/auth/hooks/use-auth';
 import { useAuthStore } from '@/state/store/auth';
 import { MFASigninResponse } from '@/features/auth/services/auth.service';
