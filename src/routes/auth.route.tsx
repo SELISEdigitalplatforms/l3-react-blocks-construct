@@ -5,7 +5,7 @@ import { EmailVerification } from '@/pages/auth/email-verification/email-verific
 import { ForgotPasswordPage } from '@/modules/auth/pages/forgot-password';
 import { ResetPasswordPage } from '@/pages/auth/reset-password/reset-password';
 import { SetPasswordPage } from '@/pages/auth/set-password/set-password';
-import { SignupPage } from '@/pages/auth/signup/signup-page';
+import { SignupPage } from '@/modules/auth/pages/signup';
 import { VerificationFailed } from '@/pages/auth/verification-failed/verification-failed';
 import { VerifyOtpKey } from '@/pages/auth/verify-otp-key/verify-otp-key';
 import { Route } from 'react-router-dom';
