@@ -19,31 +19,36 @@ Object.defineProperty(window, 'location', {
 });
 
 import { vi } from 'vitest';
+import '../../test-utils/shared-test-utils';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-vi.mock('components/blocks/layout/app-sidebar', () => ({
+vi.mock('components/core/app-sidebar', () => ({
   AppSidebar: () => <div data-testid="app-sidebar">App Sidebar</div>,
 }));
 
-vi.mock('components/blocks/u-profile-menu', () => ({
-  UProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
+vi.mock('components/core/profile-menu', () => ({
+  ProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
 }));
 
-vi.mock('@/components/blocks/language-selector/language-selector', () => ({
+vi.mock('components/core/language-selector', () => ({
   __esModule: true,
   default: () => <div data-testid="language-selector">Language Selector</div>,
+}));
+
+// Mock the core barrel so named imports in MainLayout resolve to test doubles
+vi.mock('@/components/core', () => ({
+  LanguageSelector: () => <div data-testid="language-selector">Language Selector</div>,
+  ProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
+  AppSidebar: () => <div data-testid="app-sidebar">App Sidebar</div>,
 }));
 
 vi.mock('@/i18n/language-context', () => ({
   useLanguageContext: vi.fn(() => ({
     currentLanguage: 'en',
     setLanguage: vi.fn(),
-    languages: [{ code: 'en', name: 'English' }],
+    availableLanguages: [
+      { languageCode: 'en', languageName: 'English', isDefault: true, itemId: 'en' },
+    ],
+    isLoading: false,
   })),
   LanguageProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="language-provider">{children}</div>
@@ -128,21 +133,7 @@ vi.mock('providers/permission-provider', () => ({
   ),
 }));
 
-// Mock react-router-dom
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    Outlet: () => <div data-testid="outlet">Outlet Content</div>,
-    useLocation: vi.fn().mockReturnValue({
-      pathname: '/',
-      search: '',
-      hash: '',
-      state: null,
-      key: 'test-key',
-    }),
-  };
-});
+// Note: Use a real router in tests instead of mocking react-router-dom
 
 vi.mock('lucide-react', () => ({
   Bell: () => <div data-testid="bell-icon">Bell Icon</div>,
@@ -242,8 +233,9 @@ vi.mock('features/profile/hooks/use-account', () => ({
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import MainLayout from './main-layout';
 
 const renderWithProviders = (component: React.ReactElement) => {
@@ -257,7 +249,15 @@ const renderWithProviders = (component: React.ReactElement) => {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{component}</BrowserRouter>
+      <MemoryRouter initialEntries={['/']}>
+        <SidebarProvider>
+          <Routes>
+            <Route path="/" element={component}>
+              <Route index element={<div data-testid="outlet">Outlet Content</div>} />
+            </Route>
+          </Routes>
+        </SidebarProvider>
+      </MemoryRouter>
     </QueryClientProvider>
   );
 };
@@ -265,7 +265,7 @@ const renderWithProviders = (component: React.ReactElement) => {
 describe('MainLayout', () => {
   it('renders the component correctly', () => {
     renderWithProviders(<MainLayout />);
-    expect(screen.getByTestId('sidebar')).toBeInTheDocument();
+    expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
     expect(screen.getByTestId('sidebar-trigger')).toBeInTheDocument();
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });

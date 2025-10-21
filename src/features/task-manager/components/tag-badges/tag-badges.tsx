@@ -17,8 +17,6 @@ import { v4 as uuidv4 } from 'uuid';
  * @param {string} [className=''] - Additional CSS classes for styling
  * @param {(name: string) => void} [onClick] - Callback triggered when the tag is clicked
  *
- * @returns {JSX.Element} The tag badge component
- *
  * @example
  * // Basic usage
  * <Tag name="Frontend" />

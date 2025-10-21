@@ -12,7 +12,7 @@ import {
   Dialog,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import { CalendarEvent, DeleteUpdateEventOption } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';
 import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring-event';
@@ -52,7 +52,6 @@ const TEXT_LOW_EMPHASIS = 'text-low-emphasis';
  * - `onDelete`: `{Function}` – Callback triggered when the event is deleted. Receives the event ID as an argument.
  *
  * @param {EventDetailsProps} props - The props for configuring the event details dialog.
- * @returns {JSX.Element} The rendered JSX element for the event details dialog.
  */
 export const EventDetails = ({
   event,

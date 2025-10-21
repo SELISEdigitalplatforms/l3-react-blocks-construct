@@ -25,8 +25,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
-import CustomTextEditor from '@/components/blocks/custom-text-editor/custom-text-editor';
-import { ConfirmationModal } from '@/components/shared';
+import { CustomTextEditor, ConfirmationModal } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
@@ -335,7 +334,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
  * @param {(event: CalendarEvent) => void} onUpdate - Callback to update the event with new data
  * @param {(eventId: string, deleteOption?: DeleteOption) => void} onDelete - Callback to delete the event by ID
  *
- * @returns {JSX.Element} Edit event modal dialog with form fields and action buttons
  */
 export const EditEvent = ({
   event,

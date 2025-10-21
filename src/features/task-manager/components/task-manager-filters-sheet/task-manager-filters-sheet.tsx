@@ -44,8 +44,6 @@ import { ItemTag } from '../../types/task-manager.types';
  * @param {boolean} open - Whether the filter sheet is open
  * @param {(open: boolean) => void} onOpenChange - Callback triggered when the sheet's open state changes
  *
- * @returns {JSX.Element} The task manager filter sheet component
- *
  * @example
  * // Basic usage
  * <TaskManagerFilterSheet

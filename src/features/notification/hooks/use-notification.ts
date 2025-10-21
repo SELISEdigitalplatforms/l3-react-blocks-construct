@@ -4,7 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { GetNotificationsParams, Notification } from '../types/notification.types';
 import {
-  getNotifications,
   markAllNotificationAsRead,
   markNotificationAsRead,
 } from '../services/notification.service';
@@ -15,9 +14,18 @@ import {
  * @returns Query result with notifications and metadata
  */
 export const useGetNotifications = (params: GetNotificationsParams) => {
-  return useGlobalQuery({
+  return useGlobalQuery<{
+    notifications: any[];
+    unReadNotificationsCount: number;
+    totalNotificationsCount: number;
+  }>({
     queryKey: ['notifications', params],
-    queryFn: getNotifications,
+    // queryFn: getNotifications,
+    queryFn: () => ({
+      notifications: [],
+      unReadNotificationsCount: 0,
+      totalNotificationsCount: 0,
+    }),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

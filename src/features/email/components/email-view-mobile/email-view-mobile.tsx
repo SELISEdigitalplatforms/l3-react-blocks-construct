@@ -89,8 +89,6 @@ import { EmailViewResponseType } from '../email-view-response-type/email-view-re
  * @param {object} formData - Form data used for composing replies or forwards
  * @param {function} setFormData - Updates form data
  *
- * @returns {JSX.Element} Mobile-friendly email view with interactive controls
- *
  * @example
  * <EmailViewMobile
  *   selectedEmail={email}

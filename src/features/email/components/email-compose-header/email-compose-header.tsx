@@ -22,8 +22,6 @@ import { Button } from '@/components/ui/button';
  * @param {() => void} [onClose] - Callback triggered when the close button is clicked
  * @param {boolean} isMaximized - Whether the email compose window is currently maximized
  *
- * @returns {JSX.Element} The header UI of the email compose modal
- *
  * @example
  * // Basic usage
  * <EmailComposeHeader

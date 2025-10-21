@@ -28,8 +28,6 @@ import { useToast } from '@/hooks/use-toast';
  * Props:
  * @param {(label: string) => void} onAddTag - Callback triggered when the tag is added
  *
- * @returns {JSX.Element} The add tag dialog component
- *
  * @example
  * // Basic usage
  * <AddTag onAddTag={(label) => console.log('Tag added:', label)} />

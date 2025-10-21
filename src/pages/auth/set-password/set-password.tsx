@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { redirect, useSearchParams } from 'react-router-dom';
-import { SetpasswordForm } from '@/features/auth/components/set-password';
+import { SetpasswordForm } from '@/modules/auth/components/set-password';
 import { useAuthState } from '@/state/client-middleware';
 
 export function SetPasswordPage() {

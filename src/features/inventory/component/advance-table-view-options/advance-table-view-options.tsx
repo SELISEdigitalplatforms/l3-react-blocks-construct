@@ -27,7 +27,6 @@ import { Label } from '@/components/ui/label';
  * @param {Object} [props.columnVisibility={}] - An optional object where the keys are column IDs and the values are booleans
  * indicating whether the respective column should be visible or not. This will override the default visibility.
  *
- * @returns {JSX.Element} The rendered column visibility options dropdown, which includes:
  * - A "Select all" checkbox for toggling visibility of all columns at once.
  * - A list of individual checkboxes for each column (except `select`) to toggle visibility.
  * - Disabled columns are displayed with a different visual style to indicate that they cannot be toggled.

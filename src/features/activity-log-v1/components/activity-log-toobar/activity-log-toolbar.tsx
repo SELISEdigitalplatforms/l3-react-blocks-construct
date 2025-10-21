@@ -38,8 +38,6 @@ import { availableModulesData } from '../../services/activity-log-v1-services';
  * @param {(categories: string[]) => void} onCategoryChange - Callback triggered when the selected categories change
  * @param {string[]} selectedCategory - The currently selected module categories
  *
- * @returns {JSX.Element} The activity log toolbar component
- *
  * @example
  * // Basic usage
  * <ActivityLogToolbar

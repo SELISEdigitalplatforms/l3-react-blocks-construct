@@ -19,7 +19,6 @@ import { CaptchaProps } from './index.type';
  * - `...rest`: Additional props forwarded to the selected CAPTCHA component
  *
  * @param {CaptchaProps} props - The props for CAPTCHA selection and rendering
- * @returns {JSX.Element} The rendered CAPTCHA component based on the provided type
  *
  * @throws {Error} If no `type` is passed or an unsupported `type` is provided
  *

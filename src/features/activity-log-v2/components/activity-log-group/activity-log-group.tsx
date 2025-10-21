@@ -20,8 +20,6 @@ import { ActivityLogItem } from '../activity-log-item/activity-log-item';
  * @param {boolean} isLastIndex - Whether this is the final group in the timeline
  * @param {boolean} isFirstIndex - (Unused) Reserved for potential future logic
  *
- * @returns {JSX.Element} A section of the activity timeline grouped by date
- *
  * @example
  * <ActivityLogGroup
  *   date="2024-05-03"

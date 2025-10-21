@@ -5,8 +5,6 @@ import { activitiesData, ActivityLogTimeline } from '@/features/activity-log-v2'
  * Timeline Component
  *
  * Displays a timeline of filtered user activities using a shared filtering hook.
- *
- * @returns {JSX.Element}
  */
 export function Timeline() {
   const {

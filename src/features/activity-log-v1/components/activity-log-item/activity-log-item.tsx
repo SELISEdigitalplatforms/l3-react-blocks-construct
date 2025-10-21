@@ -20,8 +20,6 @@ import { ActivityItem } from '../../types/activity-log.types';
  * @param {string} category - The category of the activity
  * @param {string} description - The description of the activity
  *
- * @returns {JSX.Element} The activity log item component
- *
  * @example
  * // Basic usage
  * <ActivityLogItem

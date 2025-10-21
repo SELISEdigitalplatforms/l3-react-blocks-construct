@@ -56,8 +56,6 @@ const getFileType = (file: File): FileType => {
  * @param {Attachment[]} attachments - The list of current attachments
  * @param {React.Dispatch<React.SetStateAction<Attachment[]>>} setAttachments - Callback to update the attachments list
  *
- * @returns {JSX.Element} The attachments section component
- *
  * @example
  * // Basic usage
  * <AttachmentsSection

@@ -41,8 +41,6 @@ import { Dialog } from '@/components/ui/dialog';
  * @param {(isOpen: boolean) => void} setNewTaskModalOpen - Handler to toggle task modal state
  * @param {() => void} [onTaskAdded] - Optional callback triggered after task creation
  *
- * @returns {JSX.Element} A drag-and-drop-enabled Kanban board for tasks
- *
  * @example
  * <TaskCardView
  *   taskService={myTaskService}

@@ -6,9 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TEmail } from '../../types/email.types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import CustomPaginationEmail from '@/components/blocks/custom-pagination-email/custom-pagination-email';
 import { Button } from '@/components/ui/button';
 import { htmlToPlainText } from '../../utils/email-utils';
+import { CustomPaginationEmail } from '@/components/core';
 
 /**
  * EmailList Component
@@ -36,8 +36,6 @@ import { htmlToPlainText } from '../../utils/email-utils';
  * @param {string[]} checkedEmailIds - The list of selected email IDs
  * @param {() => void} handleComposeEmail - Callback triggered to open the compose email modal
  * @param {(email: TEmail) => void} handleEmailSelection - Callback triggered when an email is clicked
- *
- * @returns {JSX.Element} The email list component
  *
  * @example
  * // Basic usage

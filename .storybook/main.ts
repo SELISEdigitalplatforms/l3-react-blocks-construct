@@ -2,14 +2,11 @@ import type { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
   stories: [
-    '../src/stories/blocks/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/stories/core/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/stories/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/**/*.mdx',
   ],
-  addons: [
-    '@storybook/addon-docs',
-    '@storybook/addon-onboarding',
-  ],
+  addons: ['@storybook/addon-docs', '@storybook/addon-onboarding'],
   framework: {
     name: '@storybook/react-vite',
     options: {},
@@ -23,18 +20,18 @@ const config: StorybookConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
-      'assets': '/src/assets',
-      'components': '/src/components',
-      'features': '/src/features',
-      'hooks': '/src/hooks',
-      'lib': '/src/lib',
-      'constant': '/src/constant',
-      'pages': '/src/pages',
-      'providers': '/src/providers',
-      'styles': '/src/styles',
-      'utils': '/src/utils',
+      assets: '/src/assets',
+      components: '/src/components',
+      features: '/src/features',
+      hooks: '/src/hooks',
+      lib: '/src/lib',
+      constant: '/src/constant',
+      pages: '/src/pages',
+      providers: '/src/providers',
+      styles: '/src/styles',
+      utils: '/src/utils',
     };
-    
+
     return config;
   },
 };

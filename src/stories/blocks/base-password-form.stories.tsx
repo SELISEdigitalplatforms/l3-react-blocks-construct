@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { BasePasswordForm } from '../../components/blocks/base-password-form/base-password-form';
+import { BasePasswordForm } from '@/components/core';
 
 const passwordSchema = z
   .object({

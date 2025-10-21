@@ -1,8 +1,11 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
+import { DataTableColumnHeader } from '@/components/core';
 import { compareValues } from '@/features/iam/services/user-service';
 import { FileTableRowActions } from '../../file-manager-row-actions/file-manager-row-actions';
-import { getFileTypeOptions, IFileDataWithSharing } from '@/features/file-manager/utils/file-manager';
+import {
+  getFileTypeOptions,
+  IFileDataWithSharing,
+} from '@/features/file-manager/utils/file-manager';
 import { Info } from 'lucide-react';
 import { DateCell } from '@/features/file-manager/components/table-cells/date-cell';
 import { createDateRangeFilter } from '@/features/file-manager/utils/table-filters';
@@ -71,7 +74,9 @@ export const createFileTableColumns = ({
       <NameCell
         name={row.original.name}
         fileType={row.original.fileType}
-        isShared={Boolean(row.original.isShared || (row.original.sharedWith && row.original.sharedWith.length > 0))}
+        isShared={Boolean(
+          row.original.isShared || (row.original.sharedWith && row.original.sharedWith.length > 0)
+        )}
         t={t}
       />
     ),

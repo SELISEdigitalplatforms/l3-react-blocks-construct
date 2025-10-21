@@ -13,8 +13,6 @@
  * Props:
  * @param {boolean} isCompleted - Whether the task is completed
  *
- * @returns {JSX.Element} The status circle component
- *
  * @example
  * // Completed task
  * <StatusCircle isCompleted={true} />

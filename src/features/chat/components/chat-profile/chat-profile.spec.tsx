@@ -1,16 +1,9 @@
 // Test for ChatProfile component
 // Note: jest-dom matchers and browser polyfills are set up globally in vitest.setup.ts
 import { vi } from 'vitest';
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ChatProfile } from './chat-profile';
-
-// Mock translation
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../../../test-utils/shared-test-utils';
 
 // Mock useToast
 vi.mock('hooks/use-toast', () => ({
@@ -18,7 +11,7 @@ vi.mock('hooks/use-toast', () => ({
 }));
 
 // Mock ConfirmationModal and EditGroupName to avoid side effects
-vi.mock('components/shared/confirmation-modal/confirmation-modal', () => ({
+vi.mock('components/core/confirmation-modal/confirmation-modal', () => ({
   __esModule: true,
   default: ({ open, onOpenChange, onConfirm }: any) =>
     open ? (

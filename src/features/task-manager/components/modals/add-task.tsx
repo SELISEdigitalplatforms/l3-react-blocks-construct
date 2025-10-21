@@ -42,8 +42,6 @@ interface TaskSectionWithTasks extends TaskSection {
  * @param {ITaskManagerColumn[]} columns - The list of available columns
  * @param {(columnId: string, content: string) => void} onAddTask - Callback triggered when the task is added
  *
- * @returns {JSX.Element} The add task dialog component
- *
  * @example
  * // Basic usage
  * <AddTaskDialog

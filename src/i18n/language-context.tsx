@@ -10,11 +10,11 @@ import React, {
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { loadTranslations } from './i18n';
+import { routeModuleMap } from './route-module-map';
 import {
   useAvailableLanguages,
   useAvailableModules,
-} from '@/components/blocks/language-selector/hooks/use-language';
-import { routeModuleMap } from './route-module-map';
+} from '@/components/core/components/language-selector/hooks/use-language';
 
 /**
  * Type definition for the Language Context.

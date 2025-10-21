@@ -30,7 +30,6 @@ import { ChartTooltipWrapper } from '../chart-tooltip-wrapper/chart-tooltip-wrap
  *   <DashboardUserPlatform />
  * )
  *
- * @returns {JSX.Element} - The rendered JSX component with a pie chart and month selector.
  */
 
 export const DashboardUserPlatform = () => {

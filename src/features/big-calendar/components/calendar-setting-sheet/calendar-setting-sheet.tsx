@@ -48,8 +48,6 @@ interface CalendarSettingSheetProps {
  * - `onOpenChange`: `{Function}` – Callback triggered when the sheet's visibility changes.
  *
  * @param {CalendarSettingSheetProps} props - The props for configuring the settings sheet.
- * @returns {JSX.Element} The rendered JSX element for the calendar settings sheet.
- *
  * @example
  * <CalendarSettingSheet
  *   open={isSettingsSheetOpen}

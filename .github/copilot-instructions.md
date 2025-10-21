@@ -13,7 +13,7 @@ This is a React TypeScript application using the SELISE Blocks ecosystem - a com
 Always follow this order when building features:
 
 1. **Feature Components** (`src/features/*/components/`) - Complete business solutions
-2. **Block Components** (`src/components/blocks/`) - Reusable business patterns
+2. **Block Components** (`src/components/core/`) - Reusable business patterns
 3. **UI Components** (`src/components/ui/`) - Foundation design system
 
 ## Key Development Patterns
@@ -23,7 +23,7 @@ Always follow this order when building features:
 ```typescript
 // Always use AdvanceDataTable (feature-level solution)
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
+import { DataTableColumnHeader } from 'components/core/components/data-table/data-table-column-header'
 
 // Create custom business logic only
 export const createTableColumns = ({ onEdit, onDelete }) => [
@@ -60,7 +60,7 @@ import { Form, FormField, FormControl } from 'components/ui/form';
 
 ```typescript
 // Never create custom confirmations - always use this
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal';
 ```
 
 ## File Structure Pattern

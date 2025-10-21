@@ -51,7 +51,7 @@ import { AssigneeSelector } from './assignee-selector';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useToast } from '@/hooks/use-toast';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AddTag } from '../modals/add-tag';
@@ -81,8 +81,6 @@ import { AddTag } from '../modals/add-tag';
  * @param {() => void} [onTaskAddedList] - Callback triggered when a task is added to the list
  * @param {(columnId: string, taskTitle: string) => void} [onTaskAddedCard] - Callback for adding a task to a specific column
  * @param {(columnId: string) => void} [setActiveColumn] - Callback to set the active column
- *
- * @returns {JSX.Element} The task details view component
  *
  * @example
  * // Basic usage

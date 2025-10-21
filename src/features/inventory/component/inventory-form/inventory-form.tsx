@@ -39,7 +39,6 @@ import {
  * @param {number} props.currentStep - The current active step.
  * @param {function} props.onStepChange - Callback function to change the current step.
  *
- * @returns {JSX.Element} The rendered Stepper component.
  */
 
 interface StepperProps {
@@ -91,8 +90,6 @@ export function Stepper({ steps, currentStep, onStepChange }: Readonly<StepperPr
  * return (
  *   <InventoryForm />
  * );
- *
- * @returns {JSX.Element} The rendered InventoryForm component.
  */
 
 interface InventoryFormData {

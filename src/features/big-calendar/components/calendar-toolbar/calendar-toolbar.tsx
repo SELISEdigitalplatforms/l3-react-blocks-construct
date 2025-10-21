@@ -25,8 +25,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
  * - `views`: `{View[]}` – An array of available calendar views (e.g., ['day', 'week', 'month']).
  *
  * @param {ToolbarProps} props - The props for configuring the calendar toolbar.
- * @returns {JSX.Element} The rendered JSX element for the calendar toolbar.
- *
  * @example
  * <CalendarToolbar
  *   view="month"
