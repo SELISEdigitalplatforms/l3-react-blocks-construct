@@ -1,10 +1,10 @@
-import { SigninForm } from '@/features/auth/components/signin-form';
 import { Link } from 'react-router-dom';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { useTranslation } from 'react-i18next';
-import { useGetLoginOptions } from '@/features/auth/hooks/use-auth';
+import { useGetLoginOptions } from '@/modules/auth/hooks/use-auth';
+import { Signin } from '../../components/signin/signin';
 
 export function SigninPage() {
   const { theme } = useTheme();
@@ -37,14 +37,7 @@ export function SigninPage() {
           </p>
         </div>
       </div>
-
-      {loginOption && (
-        <SigninForm
-          loginOption={{
-            ...loginOption,
-          }}
-        />
-      )}
+      {loginOption && <Signin loginOption={loginOption} />}
     </div>
   );
 }
