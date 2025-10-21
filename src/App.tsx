@@ -1,5 +1,4 @@
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
-import { LoadingOverlay } from './components/core/loading-overlay';
 import './i18n/i18n';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,6 +26,7 @@ import { ActivityLog } from '@/pages/activity-log';
 import { Timeline } from '@/pages/timeline';
 import { AuthRoutes } from './routes/auth.route';
 import { FileManagerMyFiles, SharedWithMe, Trash } from '@/pages/file-manager';
+import { LoadingOverlay } from '@/components/shared';
 
 const queryClient = new QueryClient();
 

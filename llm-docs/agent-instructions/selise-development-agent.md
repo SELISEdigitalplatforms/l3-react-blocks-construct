@@ -69,7 +69,7 @@ A project uses Selise if you find:
 import { Button, Input, Card, Table, Dialog, Badge } from 'components/ui/*';
 
 // Proven block patterns
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
 import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
 
@@ -136,7 +136,7 @@ export const createYourTableColumns = ({ t, onEdit, onDelete }) => [
 **Always use ConfirmationModal - never create custom confirmation dialogs:**
 
 ```typescript
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 
 const [deleteModal, setDeleteModal] = useState({ open: false, item: null });
 
@@ -433,7 +433,7 @@ import { useForm } from 'react-hook-form';
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
 
 // 3. Block level imports
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
 
 // 4. UI level imports
 import { Button, Input, Card } from 'components/ui/*';

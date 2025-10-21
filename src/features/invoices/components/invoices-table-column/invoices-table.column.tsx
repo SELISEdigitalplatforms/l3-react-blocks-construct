@@ -6,7 +6,7 @@ import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table
 import { InvoiceItem, getStatusColors } from '../../types/invoices.types';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import { useDeleteInvoiceItem } from '../../hooks/use-invoices';
 
 interface ColumnFactoryProps {

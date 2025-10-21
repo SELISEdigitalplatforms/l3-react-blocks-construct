@@ -10,7 +10,7 @@
 - **Basic table**: `Table`, `TableHeader`, `TableBody` from `components/ui/table`
 
 #### Confirmation Dialog
-- **Always use**: `ConfirmationModal` from `components/blocks/confirmation-modal`
+- **Always use**: `ConfirmationModal` from `components/shared/confirmation-modal`
 - **Never create custom confirmation dialogs**
 
 #### Form
@@ -44,7 +44,7 @@ import { AdvanceDataTable } from 'features/inventory/component/advance-data-tabl
 import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar'
 
 // Block Components (Proven Patterns)
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
 import { DataTablePagination } from 'components/blocks/data-table/data-table-pagination'
 import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
@@ -69,7 +69,7 @@ import { Skeleton } from 'components/ui/skeleton'
 ```typescript
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { Button } from 'components/ui/button'
 
 // Usage: Complete table with delete confirmation
@@ -87,7 +87,7 @@ import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card'
 
 ### Modal Dialog
 ```typescript
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 // OR for custom modals:
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'components/ui/dialog'
 

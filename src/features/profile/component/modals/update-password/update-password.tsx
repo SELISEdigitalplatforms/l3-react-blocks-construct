@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -10,8 +11,15 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UPasswordInput } from '@/components/core/u-password-input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { PasswordInput, SharedPasswordStrengthChecker } from '@/components/shared';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   changePasswordFormDefaultValue,
   changePasswordFormType,
@@ -20,8 +28,6 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useChangePassword } from '@/features/profile/hooks/use-account';
 import { UpdatePasswordSuccess } from '../update-password-success/update-password-success';
-import { SharedPasswordStrengthChecker } from '@/components/core/shared-password-strength-checker';
-import { useTranslation } from 'react-i18next';
 
 type UpdatePasswordProps = {
   onClose: () => void;
@@ -110,7 +116,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                         {t('CURRENT_PASSWORD')}
                       </FormLabel>
                       <FormControl>
-                        <UPasswordInput placeholder={t('ENTER_YOUR_CURRENT_PASSWORD')} {...field} />
+                        <PasswordInput placeholder={t('ENTER_YOUR_CURRENT_PASSWORD')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -125,7 +131,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                         {t('NEW_PASSWORD')}
                       </FormLabel>
                       <FormControl>
-                        <UPasswordInput placeholder={t('ENTER_YOUR_NEW_PASSWORD')} {...field} />
+                        <PasswordInput placeholder={t('ENTER_YOUR_NEW_PASSWORD')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,7 +146,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
                         {t('CONFIRM_NEW_PASSWORD')}
                       </FormLabel>
                       <FormControl>
-                        <UPasswordInput placeholder={t('CONFIRM_YOUR_NEW_PASSWORD')} {...field} />
+                        <PasswordInput placeholder={t('CONFIRM_YOUR_NEW_PASSWORD')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

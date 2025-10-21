@@ -2,7 +2,7 @@ import React from 'react';
 import PhoneInput, { Country, Value } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './phone-input.css';
-import { cn } from '../../../lib/utils';
+import { cn } from '../../../../lib/utils';
 
 /**
  * UIPhoneInput Component
@@ -97,4 +97,4 @@ const UIPhoneInput = React.forwardRef<any, UIPhoneInputProps>(
 
 UIPhoneInput.displayName = 'UIPhoneInput';
 
-export default UIPhoneInput;
+export { UIPhoneInput };

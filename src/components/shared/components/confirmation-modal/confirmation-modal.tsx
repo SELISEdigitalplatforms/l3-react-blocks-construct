@@ -60,7 +60,7 @@ export interface ConfirmationModalProps {
   preventAutoClose?: boolean;
 }
 
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+export const ConfirmationModal = ({
   open,
   onOpenChange,
   title,
@@ -69,7 +69,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   confirmText = 'CONFIRM',
   cancelText = 'CANCEL',
   preventAutoClose = false,
-}) => {
+}: Readonly<ConfirmationModalProps>) => {
   const { t } = useTranslation();
 
   const handleConfirmClick = () => {
@@ -107,5 +107,3 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     </AlertDialog>
   );
 };
-
-export default ConfirmationModal;

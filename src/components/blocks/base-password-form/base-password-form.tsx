@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
   FormControl,
@@ -12,10 +13,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { UPasswordInput } from '@/components/core/u-password-input';
-import { SharedPasswordStrengthChecker } from '../../core/shared-password-strength-checker';
+import { SharedPasswordStrengthChecker, PasswordInput } from '@/components/shared';
 import { Captcha } from '@/features/captcha';
-import { useTranslation } from 'react-i18next';
 
 /**
  * BasePasswordForm Component
@@ -160,7 +159,7 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
             <FormItem>
               <FormLabel className="text-high-emphasis font-normal">{t('PASSWORD')}</FormLabel>
               <FormControl>
-                <UPasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
+                <PasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -176,7 +175,7 @@ export const BasePasswordForm: React.FC<BasePasswordFormProps> = ({
                 {t('CONFIRM_PASSWORD')}
               </FormLabel>
               <FormControl>
-                <UPasswordInput placeholder={t('CONFIRM_YOUR_PASSWORD')} {...field} />
+                <PasswordInput placeholder={t('CONFIRM_YOUR_PASSWORD')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -60,7 +60,7 @@ import { Form, FormField, FormControl } from 'components/ui/form';
 
 ```typescript
 // Never create custom confirmations - always use this
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal';
+import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
 ```
 
 ## File Structure Pattern

@@ -28,7 +28,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { ChatContact } from '../../types/chat.types';
-import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import { useToast } from '@/hooks/use-toast';
 import { attachments, getAttachmentBackgroundColor } from '../../services/chat.services';
 

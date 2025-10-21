@@ -2,13 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import UIOtpInput from '@/components/core/otp-input/otp-input';
-import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
+import { UIOtpInput } from '@/components/shared';
 import { useAuthStore } from '@/state/store/auth';
 import { MFASigninResponse } from '@/modules/auth/services/auth.service';
 import { UserMfaType } from '@/features/profile/enums/user-mfa-type-enum';
 import useResendOTPTime from '@/hooks/use-resend-otp';
 import { useResendOtp } from '@/features/profile/hooks/use-mfa';
+import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
 
 export function VerifyOtpKey() {
   const { login } = useAuthStore();

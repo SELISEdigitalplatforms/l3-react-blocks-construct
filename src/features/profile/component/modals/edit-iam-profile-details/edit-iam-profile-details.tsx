@@ -24,7 +24,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { IamData } from '@/features/iam/services/user-service';
-import UIPhoneInput from '@/components/core/phone-input/phone-input';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { useGetRolesQuery } from '@/features/iam/hooks/use-iam';
@@ -115,6 +114,7 @@ const useRolesData = () => {
 };
 
 import type { UseFormSetValue } from 'react-hook-form';
+import { UIPhoneInput } from '@/components/shared';
 
 const useFormInitialization = (userInfo: User | IamData, setValue: UseFormSetValue<FormData>) => {
   useEffect(() => {
