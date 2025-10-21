@@ -239,7 +239,7 @@ vi.mock('components/ui/scroll-area', () => ({
   ),
 }));
 
-vi.mock('components/blocks/data-table/data-table-pagination', () => ({
+vi.mock('components/core/data-table/data-table-pagination', () => ({
   DataTablePagination: ({
     showSelectedRowContent,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -32,7 +32,6 @@ import { cn } from '@/lib/utils';
  * @param {function} [props.onChange] - The callback function to handle changes to the slider value.
  * @param {string} [props.className] - Additional class names to apply to the slider wrapper.
  *
- * @returns {JSX.Element} The rendered StockSlider component.
  */
 
 type StockSliderProps = Readonly<{

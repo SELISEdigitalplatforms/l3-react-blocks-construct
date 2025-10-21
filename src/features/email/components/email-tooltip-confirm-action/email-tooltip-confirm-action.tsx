@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 
 /**
  * TooltipConfirmAction Component
@@ -23,8 +23,6 @@ import { ConfirmationModal } from '@/components/shared';
  * @param {() => void} onConfirm - Function called when the user confirms the action
  * @param {string} toastDescription - Text to show in the success toast after confirmation
  * @param {React.ReactElement} children - The trigger element (e.g., button/icon) to wrap
- *
- * @returns {JSX.Element} A component that includes a tooltip, confirmation modal, and optional toast
  *
  * @example
  * <TooltipConfirmAction

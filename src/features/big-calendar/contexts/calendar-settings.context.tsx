@@ -36,7 +36,6 @@ const CalendarSettingsContext = createContext<CalendarSettingsContextType | unde
  *
  * @param {Object} props - The props for the provider component.
  * @param {ReactNode} props.children - The child components wrapped by the provider.
- * @returns {JSX.Element} The rendered JSX element for the context provider.
  *
  * @example
  * <CalendarSettingsProvider>

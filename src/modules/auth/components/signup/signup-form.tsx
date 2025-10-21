@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CustomCheckbox } from '@/components/shared';
+import { CustomCheckbox } from '@/components/core';
 import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema } from './utils';
 
 /**

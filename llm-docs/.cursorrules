@@ -282,7 +282,7 @@ src/features/[feature-name]/
 
 ```
 1. Feature Components (src/features/*/components/)
-2. Block Components (src/components/blocks/)
+2. Block Components (src/components/core/)
 3. UI Components (src/components/ui/)
 ```
 

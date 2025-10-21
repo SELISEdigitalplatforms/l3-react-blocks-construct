@@ -32,8 +32,6 @@ import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
  * @param {React.Dispatch<React.SetStateAction<TFormData | TFormProps>>} [setFormData] - State updater for form data
  * @param {TFormData | TFormProps} [formData] - Current form data including attachments and images
  *
- * @returns {JSX.Element} A fully featured email composition editor
- *
  * @example
  * <EmailTextEditor
  *   value={emailBody}

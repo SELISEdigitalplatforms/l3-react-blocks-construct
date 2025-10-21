@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React, { useState } from 'react';
-import CustomPaginationEmail from '../../components/blocks/custom-pagination-email/custom-pagination-email';
+import { CustomPaginationEmail } from '@/components/core';
 
 const meta: Meta<typeof CustomPaginationEmail> = {
   title: 'CustomPaginationEmail',

@@ -29,7 +29,6 @@ import { Label } from '@/components/ui/label';
  * @param {function} props.setFilterValue - Callback function to set the selected filter value.
  * @param {React.Ref} ref - A reference that can be used to call the `clearFilter` method.
  *
- * @returns {JSX.Element} The rendered StockFilterDropdown component.
  */
 
 interface StockFilterDropdownProps {

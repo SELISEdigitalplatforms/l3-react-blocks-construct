@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { TActiveAction, TEmail, TReply } from '../../types/email.types';
 import { Button } from '@/components/ui/button';
-import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
+import { CustomAvatar } from '@/components/core';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -30,8 +30,6 @@ import { v4 as uuidv4 } from 'uuid';
  * @param {(action: TActiveAction) => void} setActiveActionReply - Function to set the current reply action state
  * @param {TActiveAction} activeActionReply - The current reply action state object (e.g., { reply: true, replyAll: false, ... })
  * @param {(action: 'reply' | 'replyAll' | 'forward') => void} handleSetActiveReply - Callback to change the active reply type
- *
- * @returns {JSX.Element} - A toolbar UI with reply actions and avatar-based buttons, or null if no action is active
  *
  * @example
  * <EmailActionsReplyPanel

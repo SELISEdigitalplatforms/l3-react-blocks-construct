@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import {
   useUpdateTaskSection,
   useDeleteTaskSection,
@@ -40,8 +40,6 @@ import {
  * @param {string} columnTitle - The current title of the column
  * @param {(columnId: string, newTitle: string) => void} onRename - Callback triggered when the column is renamed
  * @param {(columnId: string) => void} onDelete - Callback triggered when the column is deleted
- *
- * @returns {JSX.Element} The column menu component
  *
  * @example
  * // Basic usage

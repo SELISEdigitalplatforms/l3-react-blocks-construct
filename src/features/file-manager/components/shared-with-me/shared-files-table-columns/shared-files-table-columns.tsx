@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
+import { DataTableColumnHeader } from '@/components/core';
 import { compareValues } from '@/features/iam/services/user-service';
 import { Info } from 'lucide-react';
 import { FileTableRowActions } from '@/features/file-manager';

@@ -11,8 +11,6 @@ import { useTranslation } from 'react-i18next';
  * - Provides a structured layout for task list headers
  * - Ensures consistent alignment with task rows
  *
- * @returns {JSX.Element} The task list header component
- *
  * @example
  * // Basic usage
  * <TaskListHeader />

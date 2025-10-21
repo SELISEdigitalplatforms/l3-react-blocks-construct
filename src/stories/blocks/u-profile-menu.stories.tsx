@@ -9,8 +9,8 @@ import {
 } from '../../components/ui/dropdown-menu';
 import { ChevronDown, Moon, Sun, User } from 'lucide-react';
 
-// Simplified mock component that demonstrates the UProfileMenu functionality
-const MockUProfileMenu = ({
+// Simplified mock component that demonstrates the ProfileMenu functionality
+const MockProfileMenu = ({
   userName = 'John Doe',
   userEmail = 'john.doe@example.com',
   profileImage,
@@ -101,9 +101,9 @@ const MockUProfileMenu = ({
   );
 };
 
-const meta: Meta<typeof MockUProfileMenu> = {
-  title: 'UProfileMenu',
-  component: MockUProfileMenu,
+const meta: Meta<typeof MockProfileMenu> = {
+  title: 'ProfileMenu',
+  component: MockProfileMenu,
   tags: ['!dev'],
   parameters: {
     docs: {
@@ -123,7 +123,7 @@ const meta: Meta<typeof MockUProfileMenu> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof MockUProfileMenu>;
+type Story = StoryObj<typeof MockProfileMenu>;
 
 export const Default: Story = {
   args: {
@@ -176,7 +176,7 @@ export const InNavbar: Story = {
       </div>
       <div className="flex items-center space-x-4">
         <span className="text-sm text-gray-600">Welcome back!</span>
-        <MockUProfileMenu {...args} />
+        <MockProfileMenu {...args} />
       </div>
     </nav>
   ),

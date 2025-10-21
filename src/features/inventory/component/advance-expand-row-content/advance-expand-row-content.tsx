@@ -26,8 +26,6 @@ import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
  * @param {number} props.colSpan - The number of columns the expanded row will span.
  * @param {Array} props.data - The data associated with the inventory item.
  *
- * @returns {JSX.Element} - The expanded row UI with detailed product information.
- *
  * @example
  * const data = [
  *   { itemId: '123', ...otherData },

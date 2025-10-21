@@ -23,8 +23,6 @@ import { cn } from '@/lib/utils';
  * @param {string} [className] - Additional CSS classes for styling
  * @param {boolean} [asButton=false] - Whether the badge should be rendered as a button
  *
- * @returns {JSX.Element} The task manager badge component
- *
  * @example
  * // Basic usage
  * <TaskManagerBadge priority="High">High Priority</TaskManagerBadge>

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import React from 'react';
-import { PermissionGuard } from '../../components/blocks/gurads/permission-guard/permission-guard';
-import { Button } from '../../components/ui/button';
+import { PermissionGuard } from '@/components/core/components/gurads/permission-guard/permission-guard';
+import { Button } from '@/components/ui/button';
 
 const meta: Meta<typeof PermissionGuard> = {
   title: 'Block Components/Guards/PermissionGuard',

@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState } from 'react';
 import { EditGroupName } from '../modals/edit-group-name/edit-group-name';
 import { useTranslation } from 'react-i18next';
@@ -27,8 +26,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ChatContact } from '../../types/chat.types';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';
 import { attachments, getAttachmentBackgroundColor } from '../../services/chat.services';
 

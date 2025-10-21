@@ -25,8 +25,6 @@ import { useTranslation } from 'react-i18next';
  * @param {Object} props - The component props.
  * @param {Function} props.onClose - The function to call when the modal/dialog should be closed.
  *
- * @returns {JSX.Element} - The rendered component.
- *
  * @example
  * // Example usage
  * <UpdatePasswordSuccess onClose={() => setDialogOpen(false)} />

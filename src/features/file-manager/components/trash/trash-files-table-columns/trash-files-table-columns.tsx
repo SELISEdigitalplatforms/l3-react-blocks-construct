@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ColumnDef } from '@tanstack/react-table';
 import { Info } from 'lucide-react';
-import { DataTableColumnHeader } from '@/components/blocks/data-table/data-table-column-header';
+import { DataTableColumnHeader } from '@/components/core';
 import { IFileTrashData } from '../../../utils/file-manager';
 import { TrashTableRowActions } from '@/features/file-manager';
 import { NameCell } from '@/features/file-manager/components/table-cells/name-cell';

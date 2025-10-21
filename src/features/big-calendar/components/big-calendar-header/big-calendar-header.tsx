@@ -45,8 +45,6 @@ interface BigCalendarHeaderProps {
  * - `onSearchChange`: `{Function}` – Callback triggered when the search input value changes.
  *
  * @param {BigCalendarHeaderProps} props - The props for configuring the calendar header.
- * @returns {JSX.Element} The rendered JSX element for the calendar header.
- *
  * @example
  * <BigCalendarHeader
  *   title="My Calendar"

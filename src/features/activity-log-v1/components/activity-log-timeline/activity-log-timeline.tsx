@@ -22,8 +22,6 @@ import { ActivityLogGroup } from '../activity-log-group/activity-log-group';
  * Props:
  * @param {ActivityGroup[]} activities - The list of activity groups to display
  *
- * @returns {JSX.Element} The activity log timeline component
- *
  * @example
  * // Basic usage
  * <ActivityLogTimeline activities={activityGroups} />

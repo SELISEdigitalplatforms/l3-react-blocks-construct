@@ -62,8 +62,6 @@ const ShowMoreComponent = (count: number, remainingEvents: object[]) => (
  * - `onEventResize`: Function to handle event resize
  *
  * @param {BigCalendarProps} props - Calendar setup and handlers
- * @returns {JSX.Element} The rendered calendar component
- *
  * @example
  * <BigCalendar
  *   eventList={myEvents}

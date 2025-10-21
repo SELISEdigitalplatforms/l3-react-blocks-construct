@@ -8,7 +8,7 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { getUilmFile } from '@/components/blocks/language-selector/services/language.service';
+import { getUilmFile } from '@/components/core/components/language-selector/services/language.service';
 
 // declare custom type options so the return is always a string.
 declare module 'i18next' {

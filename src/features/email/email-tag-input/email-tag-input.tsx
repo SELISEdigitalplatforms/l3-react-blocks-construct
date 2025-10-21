@@ -20,8 +20,6 @@ import { X } from 'lucide-react';
  * @param {(tags: string[]) => void} [onChange] - Callback fired when the tags list changes
  * @param {string} type - Input type (e.g., 'email', 'text')
  *
- * @returns {JSX.Element} A tag input field component
- *
  * @example
  * // Basic usage
  * <EmailTagInput type="email" />

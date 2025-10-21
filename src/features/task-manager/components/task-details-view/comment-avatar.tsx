@@ -23,8 +23,6 @@ import { useState } from 'react';
  * @param {number} [height=50] - The height of the avatar (default: 50px)
  * @param {boolean} [showGrid=true] - Whether to display the grid background (default: true)
  *
- * @returns {JSX.Element} The comment avatar component
- *
  * @example
  * // Basic usage
  * <CommentAvatar src="https://example.com/avatar.jpg" alt="User Avatar" />

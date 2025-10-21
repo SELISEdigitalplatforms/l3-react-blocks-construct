@@ -299,8 +299,6 @@ const MainActionButtons: React.FC<{
  * @param {Object} formData - Form data for email compose
  * @param {Function} setFormData - Setter for form data
  *
- * @returns {JSX.Element} A dynamic email view layout with interaction controls
- *
  * @example
  * <EmailViewGrid
  *   selectedEmail={email}

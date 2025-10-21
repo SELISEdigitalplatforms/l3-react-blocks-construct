@@ -29,8 +29,6 @@ import { Input } from '@/components/ui/input';
  * @param {string[]} props.tags - The list of available tags.
  * @param {string[]} props.selectedTags - The list of currently selected tags.
  * @param {function} props.handleTagToggle - Callback function to handle tag selection or deselection.
- *
- * @returns {JSX.Element} The rendered TagsSelector component.
  */
 
 interface TagsSelectorProps {

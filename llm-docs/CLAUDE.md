@@ -68,13 +68,11 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 **When User Wants to Create Any Webapp/Website:**
 
 1. **FIRST: Read Documentation** (Before talking to user):
-
    - Read `workflows/user-interaction.md`
    - Read `workflows/feature-planning.md`
    - Read `agent-instructions/selise-development-agent.md`
 
 2. **User Interaction & Requirements Gathering:**
-
    - Follow patterns from `user-interaction.md`
    - Create tracking files: `FEATURELIST.md`, `TASKS.md`, `SCRATCHPAD.md`, `CLOUD.md`
    - Ask clarifying questions about features
@@ -82,7 +80,6 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
    - Get user confirmation before proceeding
 
 3. **Project Setup** (After user confirms features):
-
    - Get project name from user
    - Authentication Flow (Ask one by one if NOT IN user-info.txt):
      ```
@@ -290,7 +287,7 @@ src/features/[feature-name]/
 
 ```
 1. Feature Components (src/features/*/components/)
-2. Block Components (src/components/blocks/)
+2. Block Components (src/components/core/)
 3. UI Components (src/components/ui/)
 ```
 

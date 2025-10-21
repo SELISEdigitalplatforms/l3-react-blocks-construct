@@ -27,8 +27,6 @@ import TaskCardView from './task-card-view';
  * - Toolbar for user interaction and view toggling
  * - Context providers for shared task state and logic
  *
- * @returns {JSX.Element} The TaskManager UI with current tasks rendered in the selected view
- *
  * @example
  * // Usage in a route or page
  * <TaskManager />

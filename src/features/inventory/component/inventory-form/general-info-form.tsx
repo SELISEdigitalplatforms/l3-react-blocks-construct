@@ -58,7 +58,6 @@ import { InventoryStatus } from '../../types/inventory.types';
  * @param {string[]} props.categoryOptions - The available options for categories.
  * @param {string[]} props.locationOptions - The available options for locations.
  *
- * @returns {JSX.Element} The rendered GeneralInfoForm component.
  */
 
 interface GeneralInfoFormProps {

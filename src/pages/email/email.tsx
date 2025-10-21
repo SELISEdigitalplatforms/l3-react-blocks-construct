@@ -51,8 +51,6 @@ import {
  * - `checkedEmailIds`: Tracks the IDs of selected emails for bulk actions
  * - `searchTerm`: The current search term for filtering emails
  *
- * @returns {JSX.Element} The email management component
- *
  * @example
  * // Basic usage
  * <Email />

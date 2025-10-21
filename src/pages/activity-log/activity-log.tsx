@@ -10,7 +10,6 @@ import {
  *
  * Displays a timeline of filtered user activities using a shared filtering hook.
  *
- * @returns {JSX.Element}
  */
 export const ActivityLog = () => {
   const {

@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
-import DataTable from '@/components/blocks/data-table/data-table';
+import { DataTable } from '@/components/core';
 import { IFileTrashData, PaginationState } from '../../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../../hooks/use-mock-trash-files-query';
 import { FilePreview } from '../../file-preview/file-preview';
