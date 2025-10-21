@@ -8,8 +8,8 @@ import darkLogo from '@/assets/images/construct_logo_dark.svg';
 import lightLogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { useTranslation } from 'react-i18next';
-import { Divider } from '@/components/core/divider';
 import { Link } from 'react-router-dom';
+import { Divider } from '@/components/core';
 
 const socialButtons = [
   { icon: googleIcon, alt: 'Google Logo' },
