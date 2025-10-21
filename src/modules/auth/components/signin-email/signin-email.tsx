@@ -14,12 +14,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { UPasswordInput } from '@/components/core/u-password-input';
 import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useSigninEmail } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
+import { PasswordInput } from '@/components/shared';
 
 export const SigninEmail = () => {
   const navigate = useNavigate();
@@ -109,7 +109,7 @@ export const SigninEmail = () => {
               <FormItem>
                 <FormLabel>{t('PASSWORD')}</FormLabel>
                 <FormControl>
-                  <UPasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
+                  <PasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
