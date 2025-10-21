@@ -12,7 +12,7 @@ import {
   useCalendarUI,
   CalendarSettingsProvider,
 } from '@/features/big-calendar';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 
 /**
  * CalendarPage Component
@@ -21,7 +21,6 @@ import { ConfirmationModal } from '@/components/shared';
  * It provides features for adding, editing, deleting, and filtering events, as well as viewing event details.
  * The component uses the `react-big-calendar` library for the calendar view and supports modals for managing events.
  *
- * @returns {JSX.Element} The rendered JSX element for the calendar page.
  */
 export const CalendarPage = () => {
   const { t } = useTranslation();

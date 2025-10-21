@@ -36,8 +36,6 @@ import {
  * @param {Object} activeActionReply - An object containing flags for the active reply actions (reply, replyAll, forward)
  * @param {Function} handleSetActive - A function to handle the action for setting the reply type (reply, replyAll, forward)
  *
- * @returns {JSX.Element} - The EmailSingleActions component with available actions and timestamps.
- *
  * @example
  * return (
  *   <EmailSingleActions

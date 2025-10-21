@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MenuAction, TActiveAction, TEmail, TReply } from '../../types/email.types';
 import { Button } from '@/components/ui/button';
-import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
+import { CustomAvatar } from '@/components/core';
 import { createMenuActions, ReplyAllAvatars } from '../../services/email-data';
 /**
  * EmailActionsPanel Component
@@ -30,8 +30,6 @@ import { createMenuActions, ReplyAllAvatars } from '../../services/email-data';
  * @param {(action: 'reply' | 'replyAll' | 'forward') => void} handleSetActive - Callback to activate a specific reply action.
  * @param {(replyData?: TReply) => void} handleComposeEmailForward - Function to trigger forwarding or pop-out reply logic.
  * @param {(action: TActiveAction) => void} setActiveAction - Function to update the overall active action state.
- *
- * @returns {JSX.Element} The action panel UI for email replies and forwarding.
  *
  * @example
  * <EmailActionsPanel

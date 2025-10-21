@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { IamData } from '../../services/user-service';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import { Calendar, Clock, Mail, Phone, Shield, User } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useForgotPassword, useResendActivation } from '@/modules/auth/hooks/use-auth';
@@ -33,8 +33,6 @@ import { UserDetailItem } from './user-details-item';
  * @param {boolean} props.open - Boolean indicating whether the sheet modal is open or closed.
  * @param {function} props.onOpenChange - Callback function to toggle the sheet modal open/closed.
  * @param {IamData | null} props.selectedUser - The currently selected user whose details are displayed.
- *
- * @returns {JSX.Element} - The rendered user details sheet modal with options to edit, reset password, or resend activation.
  *
  * @example
  * <UserDetails

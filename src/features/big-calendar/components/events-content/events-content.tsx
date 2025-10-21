@@ -17,8 +17,6 @@ import { getTextColorClassFromBg } from '../../utils/date-utils';
  * - `event`: `{EventProps}` – The event object to display.
  *
  * @param {EventProps} props - The props for configuring the events content.
- * @returns {JSX.Element} The rendered JSX element for the events content.
- *
  * @example
  * <EventsContent event={event} />
  */

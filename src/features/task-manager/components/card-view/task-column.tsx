@@ -39,8 +39,6 @@ import { TaskSection } from '../../types/task-manager.types';
  * @param {TaskService} taskService - Service for managing task-related operations
  * @param {boolean} [isNewColumn] - Whether the column is newly created
  *
- * @returns {JSX.Element} The task column component
- *
  * @example
  * // Basic usage
  * <TaskColumn

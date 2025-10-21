@@ -39,8 +39,6 @@ interface ITaskCardProps {
  * @param {TaskSection[]} columns - The list of columns for moving tasks
  * @param {(id: string) => void} handleTaskClick - Callback triggered when the task title is clicked
  *
- * @returns {JSX.Element} The task card component
- *
  * @example
  * // Basic usage
  * <TaskCard task={task} index={0} columns={columns} handleTaskClick={(id) => console.log('Task clicked:', id)} />

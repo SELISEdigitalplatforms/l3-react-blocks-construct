@@ -18,8 +18,7 @@ import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useSigninEmail } from '../../hooks/use-auth';
-import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
-import { PasswordInput } from '@/components/shared';
+import { ErrorAlert, PasswordInput } from '@/components/core';
 
 export const SigninEmail = () => {
   const navigate = useNavigate();

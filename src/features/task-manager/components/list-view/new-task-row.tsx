@@ -31,8 +31,6 @@ import { useCardTasks } from '../../hooks/use-card-tasks';
  * @param {(title: string, status: string) => void} onAdd - Callback triggered when the task is added
  * @param {() => void} onCancel - Callback triggered when the task creation is canceled
  *
- * @returns {JSX.Element} The new task row component
- *
  * @example
  * // Basic usage
  * <NewTaskRow onAdd={(title, status) => console.log(title, status)} onCancel={() => console.log('Canceled')} />

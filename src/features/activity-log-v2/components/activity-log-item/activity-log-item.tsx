@@ -21,8 +21,6 @@ import type { ActivityItem } from '../../types/activity-log.types';
  * @param {boolean} [isFirst] - *(Optional)* Indicates if this item is the first in the group
  * @param {boolean} [isLast] - *(Optional)* Indicates if this item is the last in the group
  *
- * @returns {JSX.Element} A single styled activity entry in the timeline
- *
  * @example
  * <ActivityLogItem
  *   time="2024-05-03T09:15:00Z"

@@ -21,7 +21,6 @@ import { HCaptchaProps } from './index.type';
  * - `size` ('normal' | 'compact' | 'invisible'): Size of the widget (default: 'normal')
  *
  * @param {HCaptchaProps} props - Props required for rendering and interacting with hCaptcha
- * @returns {JSX.Element} The rendered hCaptcha widget
  *
  * @example
  * <HCaptcha

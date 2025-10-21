@@ -15,8 +15,6 @@ import { TaskItem } from '../../types/task-manager.types';
  * Props:
  * @param {TaskItem} task - The task object to display in the overlay
  *
- * @returns {JSX.Element} The drag overlay item component
- *
  * @example
  * // Basic usage
  * <DragOverlayItem task={task} />

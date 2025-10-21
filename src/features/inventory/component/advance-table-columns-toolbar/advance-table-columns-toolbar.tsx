@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button';
  * @param {Record<string, boolean>} [props.columnVisibility] - An object that represents the visibility state
  * of each column by column ID.
  *
- * @returns {JSX.Element} The rendered toolbar containing the following features:
  * - Display of the title of the table.
  * - Information about selected rows.
  * - A button to export selected rows as a CSV file.

@@ -29,7 +29,6 @@ const selectFilterColumns = new Set(['Category', 'ItemLoc', 'Status']);
  * @param {Table<TData>} props.table - The table instance, which contains the table state and methods for interacting
  * with the table, including column filters.
  *
- * @returns {JSX.Element} The rendered filter toolbar, which includes:
  * - Filters for individual columns based on their data type.
  * - A checkbox for selecting all rows.
  * - A reset button to clear all active column filters.

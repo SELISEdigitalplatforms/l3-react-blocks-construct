@@ -15,8 +15,6 @@ import * as React from 'react';
  * @param {string} [props.type='email'] - The type of input field, defaulting to 'email'.
  * @param {React.Ref<HTMLInputElement>} ref - The forwarded ref to the input element.
  *
- * @returns {JSX.Element} - The EmailInput component, styled and enhanced for email input.
- *
  * @example
  * return (
  *   <EmailInput

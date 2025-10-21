@@ -29,8 +29,6 @@ import { EmailTagInput } from '../../email-tag-input/email-tag-input';
  * @param {TEmail | null} selectedEmail - The currently selected email for forwarding or replying
  * @param {TIsComposing} isComposing - State indicating whether the email is being composed or forwarded
  *
- * @returns {JSX.Element} The email compose component
- *
  * @example
  * // Basic usage
  * <EmailCompose

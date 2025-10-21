@@ -5,33 +5,40 @@
 ### "I need a..."
 
 #### Data Table
+
 - **Complete table**: `AdvanceDataTable` from `features/inventory/component/advance-data-table`
-- **Custom table**: `DataTableColumnHeader` from `components/blocks/data-table`
+- **Custom table**: `DataTableColumnHeader` from `components/core/data-table`
 - **Basic table**: `Table`, `TableHeader`, `TableBody` from `components/ui/table`
 
 #### Confirmation Dialog
-- **Always use**: `ConfirmationModal` from `components/shared/confirmation-modal`
+
+- **Always use**: `ConfirmationModal` from `components/core/confirmation-modal`
 - **Never create custom confirmation dialogs**
 
 #### Form
+
 - **Form wrapper**: `Form` from `components/ui/form`
 - **Form fields**: `FormField`, `FormItem`, `FormLabel` from `components/ui/form`
 - **Inputs**: `Input`, `Textarea`, `Select`, `Checkbox` from `components/ui/*`
 
 #### Button
+
 - **All buttons**: `Button` from `components/ui/button`
 - **Variants**: `default`, `destructive`, `outline`, `secondary`, `ghost`, `link`
 - **Sizes**: `default`, `sm`, `lg`, `icon`
 
 #### User Avatar
-- **Avatar with fallbacks**: `CustomAvatar` from `components/blocks/custom-avatar`
+
+- **Avatar with fallbacks**: `CustomAvatar` from `components/core/custom-avatar`
 - **Basic avatar**: `Avatar` from `components/ui/avatar`
 
 #### Cards/Containers
+
 - **Content cards**: `Card`, `CardContent`, `CardHeader`, `CardTitle` from `components/ui/card`
 
 #### Navigation/Sidebar
-- **Complete sidebar**: Check `AppSidebar` in `components/blocks/`
+
+- **Complete sidebar**: Check `AppSidebar` in `components/core/`
 - **Menu items**: `SidebarMenuItem` from blocks if available
 
 ## Component Import Patterns
@@ -40,66 +47,82 @@
 
 ```typescript
 // Feature Components (Try First)
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
-import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar'
+import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
+import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
 
 // Block Components (Proven Patterns)
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import { DataTablePagination } from 'components/blocks/data-table/data-table-pagination'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal';
+import { DataTableColumnHeader } from 'components/core/data-table/data-table-column-header';
+import { DataTablePagination } from 'components/core/data-table/data-table-pagination';
+import CustomAvatar from 'components/core/custom-avatar/custom-avatar';
 
 // UI Components (Foundation)
-import { Button } from 'components/ui/button'
-import { Input } from 'components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/ui/select'
-import { Textarea } from 'components/ui/textarea'
-import { Checkbox } from 'components/ui/checkbox'
-import { Badge } from 'components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from 'components/ui/dialog'
-import { Skeleton } from 'components/ui/skeleton'
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'components/ui/select';
+import { Textarea } from 'components/ui/textarea';
+import { Checkbox } from 'components/ui/checkbox';
+import { Badge } from 'components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from 'components/ui/dialog';
+import { Skeleton } from 'components/ui/skeleton';
 ```
 
 ## Common Component Combinations
 
 ### Data Table with Actions
+
 ```typescript
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
-import { Button } from 'components/ui/button'
+import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
+import { DataTableColumnHeader } from 'components/core/data-table/data-table-column-header';
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal';
+import { Button } from 'components/ui/button';
 
 // Usage: Complete table with delete confirmation
 ```
 
 ### Form with Validation
+
 ```typescript
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form'
-import { Input } from 'components/ui/input'
-import { Button } from 'components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form';
+import { Input } from 'components/ui/input';
+import { Button } from 'components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from 'components/ui/card';
 
 // Usage: Complete form with React Hook Form + Zod
 ```
 
 ### Modal Dialog
+
 ```typescript
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal';
 // OR for custom modals:
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'components/ui/dialog';
 
 // Usage: Use ConfirmationModal for confirmations, Dialog for custom content
 ```
 
 ### User Interface Elements
+
 ```typescript
-import { Button } from 'components/ui/button'
-import { Badge } from 'components/ui/badge'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
-import { Card, CardContent } from 'components/ui/card'
+import { Button } from 'components/ui/button';
+import { Badge } from 'components/ui/badge';
+import CustomAvatar from 'components/core/custom-avatar/custom-avatar';
+import { Card, CardContent } from 'components/ui/card';
 
 // Usage: Standard UI patterns throughout the app
 ```
@@ -107,6 +130,7 @@ import { Card, CardContent } from 'components/ui/card'
 ## Props Quick Reference
 
 ### AdvanceDataTable
+
 ```typescript
 interface AdvanceDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -128,6 +152,7 @@ interface AdvanceDataTableProps<TData, TValue> {
 ```
 
 ### ConfirmationModal
+
 ```typescript
 interface ConfirmationModalProps {
   open: boolean;
@@ -135,13 +160,14 @@ interface ConfirmationModalProps {
   title: string | React.ReactNode;
   description: string | React.ReactNode;
   onConfirm: () => void;
-  confirmText?: string;          // Default: "CONFIRM"
-  cancelText?: string;           // Default: "CANCEL"
-  preventAutoClose?: boolean;    // Default: false
+  confirmText?: string; // Default: "CONFIRM"
+  cancelText?: string; // Default: "CANCEL"
+  preventAutoClose?: boolean; // Default: false
 }
 ```
 
 ### Button
+
 ```typescript
 interface ButtonProps {
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
@@ -153,6 +179,7 @@ interface ButtonProps {
 ```
 
 ### DataTableColumnHeader
+
 ```typescript
 interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>;
@@ -164,6 +191,7 @@ interface DataTableColumnHeaderProps<TData, TValue> {
 ## Component States & Variants
 
 ### Button States
+
 ```typescript
 // Variants
 <Button variant="default">Default</Button>
@@ -185,6 +213,7 @@ interface DataTableColumnHeaderProps<TData, TValue> {
 ```
 
 ### Badge Variants
+
 ```typescript
 <Badge variant="default">Default</Badge>
 <Badge variant="secondary">Secondary</Badge>
@@ -193,6 +222,7 @@ interface DataTableColumnHeaderProps<TData, TValue> {
 ```
 
 ### Form Field States
+
 ```typescript
 // With validation
 <FormField
@@ -213,11 +243,12 @@ interface DataTableColumnHeaderProps<TData, TValue> {
 ## Integration Hooks
 
 ### React Query Integration
+
 ```typescript
 // Always use these patterns with Selise components
-import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks'
-import { useToast } from 'hooks/use-toast'
-import { useTranslation } from 'react-i18next'
+import { useGlobalQuery, useGlobalMutation } from 'state/query-client/hooks';
+import { useToast } from 'hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 // Standard data fetching
 const { data, isLoading, error } = useGlobalQuery({
@@ -238,6 +269,7 @@ const { mutate, isPending } = useGlobalMutation({
 ## Common Patterns
 
 ### Table Column Definition
+
 ```typescript
 export const createYourTableColumns = ({ t, onEdit, onDelete }) => [
   {
@@ -268,6 +300,7 @@ export const createYourTableColumns = ({ t, onEdit, onDelete }) => [
 ```
 
 ### Modal State Management
+
 ```typescript
 const [modal, setModal] = useState({
   open: false,

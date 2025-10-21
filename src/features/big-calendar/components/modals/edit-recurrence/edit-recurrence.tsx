@@ -72,7 +72,6 @@ const FREQUENCY_MAP: Record<string, string> = {
  * - `setEvents`: `{React.Dispatch<React.SetStateAction<CalendarEvent[]>>}` – Function to update the state with the generated recurring events.
  *
  * @param {EditRecurrenceProps} props - The props for configuring the recurrence editor.
- * @returns {JSX.Element} The rendered JSX element for the recurrence editor dialog.
  *
  * @example
  * <EditRecurrence

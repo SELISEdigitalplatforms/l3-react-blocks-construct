@@ -43,8 +43,6 @@ interface DeleteRecurringEventProps {
  * - `onConfirm`: `{Function}` – Callback when the user confirms a deletion option
  *
  * @param {DeleteRecurringEventProps} props - Props for configuring the recurring event deletion dialog
- * @returns {JSX.Element} The rendered dialog component
- *
  * @example
  * <DeleteRecurringEvent
  *   open={showRecurringDeleteDialog}

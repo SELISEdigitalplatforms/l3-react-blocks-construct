@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { DataTableFacetedFilter } from '@/components/blocks/data-table/data-table-faceted-filter';
-import { DateRangeFilter } from '@/components/blocks/data-table/data-table-date-filter';
+import { DateRangeFilter, DataTableFacetedFilter } from '@/components/core';
 import { getMfaEnabledOptions, getStatusOptions } from './iam-table-filter-data';
 import { DateRange } from 'react-day-picker';
 
@@ -27,7 +26,6 @@ import { DateRange } from 'react-day-picker';
  * - `onDateRangeLastLoginChange` (function, optional): Callback that triggers when the last login date range changes
  *
  * @param {FilterControlsProps<TData>} props - The component props
- * @returns {JSX.Element} A filter controls section with date range pickers for creation and last login dates
  *
  * @example
  * <FilterControls
@@ -75,13 +73,21 @@ export function FilterControls<TData>({
     <div className={containerClass}>
       {activeColumn && (
         <div className={isMobile ? 'w-full' : undefined}>
-          <DataTableFacetedFilter column={activeColumn} title={t('STATUS')} options={getStatusOptions(t)} />
+          <DataTableFacetedFilter
+            column={activeColumn}
+            title={t('STATUS')}
+            options={getStatusOptions(t)}
+          />
         </div>
       )}
 
       {mfaEnabledColumn && (
         <div className={isMobile ? 'w-full' : undefined}>
-          <DataTableFacetedFilter column={mfaEnabledColumn} title={t('MFA')} options={getMfaEnabledOptions(t)} />
+          <DataTableFacetedFilter
+            column={mfaEnabledColumn}
+            title={t('MFA')}
+            options={getMfaEnabledOptions(t)}
+          />
         </div>
       )}
 

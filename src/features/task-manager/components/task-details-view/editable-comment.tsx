@@ -28,8 +28,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
  * @param {(newComment: string) => void} [onEdit] - Optional callback triggered when the comment is edited
  * @param {() => void} [onDelete] - Optional callback triggered when the comment is deleted
  *
- * @returns {JSX.Element} The editable comment component
- *
  * @example
  * // Basic usage
  * <EditableComment

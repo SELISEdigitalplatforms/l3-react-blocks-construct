@@ -26,8 +26,6 @@ import { EmailTextEditor } from '../email-text-editor/email-text-editor';
  * @param {boolean} [isCollapsedEmailSidebar] - Whether the sidebar is collapsed
  * @param {() => void} onClick - Callback triggered when the navigation item is clicked
  *
- * @returns {JSX.Element} The navigation item component
- *
  * @example
  * <NavItem
  *   icon={<Mail />}
@@ -108,8 +106,6 @@ function NavItem({
  * @param {(email: TEmail | null) => void} setSelectedEmail - Callback to set the currently selected email
  * @param {Partial<TEmailData>} emails - The email data categorized by type (e.g., Inbox, Sent)
  * @param {boolean} [isCollapsedEmailSidebar] - Whether the sidebar is in a collapsed state
- *
- * @returns {JSX.Element} The email sidebar component
  *
  * @example
  * // Basic usage

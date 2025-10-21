@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React, { useState } from 'react';
 import ConfirmationModal, {
   ConfirmationModalProps,
-} from '../../components/shared/components/confirmation-modal/confirmation-modal';
+} from '../../components/core/components/confirmation-modal/confirmation-modal';
 import { Button } from '../../components/ui/button';
 import DocsPage from './confirmation-modal.mdx';
 

@@ -40,7 +40,6 @@ import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
  * This component allows the user to view and edit general and additional information
  * about an inventory item, including image management, tags, warranty, replacement eligibility, and discounts.
  *
- * @returns {JSX.Element} The rendered inventory detail view with the following features:
  * - A button to navigate back to the previous page.
  * - Editable fields for general information (e.g., item name, category, price, stock, etc.).
  * - Image selection and management with a limit of 5 images.

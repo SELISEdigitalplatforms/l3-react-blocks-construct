@@ -40,8 +40,6 @@ interface CalendarFiltersSheetProps {
  * - `onApplyFilters`: `{Function}` – Callback to apply filters with data `{ dateRange: DateRange, color: string | null }`.
  *
  * @param {CalendarFiltersSheetProps} props - The props for configuring the filter sheet.
- * @returns {JSX.Element} The rendered JSX element for the calendar filter sheet.
- *
  * @example
  * <CalendarFilterSheet
  *   open={isFilterSheetOpen}

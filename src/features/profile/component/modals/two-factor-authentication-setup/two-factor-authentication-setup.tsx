@@ -30,7 +30,6 @@ import { useToast } from '@/hooks/use-toast';
  * @param {MfaDialogState} props.dialogState - The current state of the MFA dialog.
  * @param {Function} props.setMfaId - The function to call when the MFA ID should be set.
  *
- * @returns {JSX.Element} - The rendered component.
  */
 
 type TwoFactorAuthenticationSetupProps = {

@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { UIOtpInput } from '@/components/shared';
+import { UIOtpInput } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';
 import { User } from '@/types/user.type';
 import { useGetSetUpTotp, useVerifyOTP } from '../../../hooks/use-mfa';
@@ -28,7 +28,6 @@ import { useTranslation } from 'react-i18next';
  * @param {Function} props.onNext - The function to be called when the setup is successful and the next step should be triggered.
  * @param {string} props.mfaId - The ID of the MFA to be set up.
  *
- * @returns {JSX.Element} The rendered component.
  */
 type AuthenticatorAppSetupProps = {
   userInfo?: User;

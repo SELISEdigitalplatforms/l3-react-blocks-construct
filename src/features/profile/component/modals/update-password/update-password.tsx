@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { PasswordInput, SharedPasswordStrengthChecker } from '@/components/shared';
+import { PasswordInput, SharedPasswordStrengthChecker } from '@/components/core';
 import {
   Form,
   FormControl,

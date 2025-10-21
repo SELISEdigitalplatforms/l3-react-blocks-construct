@@ -27,7 +27,7 @@ import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
-import CustomTextEditor from '@/components/blocks/custom-text-editor/custom-text-editor';
+import { CustomTextEditor } from '@/components/core';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { generateTimePickerRange } from '../../../utils/date-utils';
 import { EventParticipant } from '../../event-participant/event-participant';
@@ -272,8 +272,6 @@ const createBaseEvent = (
  * - `onCancel`: `{Function}` – Callback triggered when the form is canceled.
  *
  * @param {AddEventProps} props - The props for configuring the event creation form.
- * @returns {JSX.Element} The rendered JSX element for the event creation dialog.
- *
  * @example
  * <AddEvent
  *   start={new Date()}

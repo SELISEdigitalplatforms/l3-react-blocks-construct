@@ -62,7 +62,7 @@ vi.mock('components/ui/button', () => ({
 }));
 
 // Mock ConfirmationModal
-vi.mock('components/shared/confirmation-modal/confirmation-modal', () => ({
+vi.mock('components/core/confirmation-modal/confirmation-modal', () => ({
   __esModule: true,
   default: ({ open, onOpenChange, onConfirm }: any) =>
     open ? (

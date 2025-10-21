@@ -32,8 +32,6 @@ import { Dialog } from '@/components/ui/dialog';
  * @param {function} props.onResetPassword - Callback function triggered when the "Reset Password" action is clicked
  * @param {function} [props.onResendActivation] - Optional callback function triggered when the "Resend Activation" action is clicked
  *
- * @returns {JSX.Element} - The rendered row actions dropdown and the edit modal if opened
- *
  * @example
  * <DataTableRowActions
  *   row={userRow}

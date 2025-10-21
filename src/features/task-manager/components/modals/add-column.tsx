@@ -27,8 +27,6 @@ import {
  * Props:
  * @param {(title: string) => void} onAddColumn - Callback triggered when the column is added
  *
- * @returns {JSX.Element} The add column dialog component
- *
  * @example
  * // Basic usage
  * <AddColumn onAddColumn={(title) => console.log('Column added:', title)} />

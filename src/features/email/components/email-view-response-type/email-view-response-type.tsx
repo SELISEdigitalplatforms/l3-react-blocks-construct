@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { parseISO, format } from 'date-fns';
-import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
+import { CustomAvatar } from '@/components/core';
 
 /**
  * EmailViewResponseType Component
@@ -26,8 +26,6 @@ import CustomAvatar from '@/components/blocks/custom-avatar/custom-avatar';
  *
  * Props:
  * @param {TEmail} selectedEmail - The selected email object containing details such as sender, subject, and metadata
- *
- * @returns {JSX.Element} The component displaying the email metadata, sender information, and the dropdown for more options
  *
  * @example
  * // Basic usage
