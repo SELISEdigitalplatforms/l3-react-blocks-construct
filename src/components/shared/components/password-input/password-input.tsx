@@ -3,7 +3,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Input, InputProps } from '@/components/ui/input';
 
 /**
- * UPasswordInput Component
+ * PasswordInput Component
  *
  * A password input field with toggle functionality to show/hide the password text,
  * designed for enhanced usability while maintaining security.
@@ -22,10 +22,10 @@ import { Input, InputProps } from '@/components/ui/input';
  *
  * @example
  * // Basic usage
- * <UPasswordInput placeholder="Enter your password" />
+ * <PasswordInput placeholder="Enter your password" />
  *
  * // With form control
- * <UPasswordInput
+ * <PasswordInput
  *   value={password}
  *   onChange={handleChange}
  *   placeholder="Create a password"
@@ -34,10 +34,10 @@ import { Input, InputProps } from '@/components/ui/input';
  *
  * // With forwarded ref
  * const inputRef = useRef<HTMLInputElement>(null);
- * <UPasswordInput ref={inputRef} />
+ * <PasswordInput ref={inputRef} />
  */
 
-export const UPasswordInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+export const PasswordInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const [open, setOpen] = useState(false);
   const EyeComponet = open ? EyeOffIcon : EyeIcon;
   return (
@@ -57,4 +57,4 @@ export const UPasswordInput = forwardRef<HTMLInputElement, InputProps>((props, r
     </div>
   );
 });
-UPasswordInput.displayName = 'UPasswordInput';
+PasswordInput.displayName = 'PasswordInput';

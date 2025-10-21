@@ -17,7 +17,7 @@ import { MfaDialogState } from '@/features/profile/enums/mfa-dialog-state.enum';
 import { User } from '@/types/user.type';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
 import { useDisableUserMfa } from '../../../hooks/use-mfa';
-import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 // import { ConfirmOtpVerification } from '../confirm-otp-verification/confirm-otp-verification';
 import { useTranslation } from 'react-i18next';
 

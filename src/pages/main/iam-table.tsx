@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
-import ConfirmationModal from '../../components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import { useForgotPassword, useResendActivation } from '@/features/auth/hooks/use-auth';
 import { useGetUsersQuery } from '@/features/iam/hooks/use-iam';
 import { createIamTableColumns } from '@/features/iam/components/iam-table/iam-table-columns';

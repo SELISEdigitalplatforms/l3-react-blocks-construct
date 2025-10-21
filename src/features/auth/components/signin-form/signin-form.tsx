@@ -4,10 +4,17 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { signinFormDefaultValue, signinFormType, getSigninFormValidationSchema } from './utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { UPasswordInput } from '@/components/core/u-password-input';
+import { LoadingOverlay, PasswordInput } from '@/components/shared';
 import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
@@ -17,7 +24,6 @@ import { SignInResponse } from '../../services/auth.service';
 import { SsoSignin } from '@/pages/auth/signin/signin-sso';
 import { GRANT_TYPES } from '@/constant/auth';
 import { LoginOption } from '@/constant/sso';
-import { LoadingOverlay } from '@/components/core/loading-overlay';
 
 /**
  * SigninForm Component
@@ -67,7 +73,8 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
-  const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '';
+  const googleSiteKey =
+    import.meta.env.VITE_CAPTCHA_SITE_KEY || import.meta.env.REACT_APP_CAPTCHA_SITE_KEY || '';
 
   const captchaEnabled = googleSiteKey !== '';
 
@@ -125,8 +132,8 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
   const signin = useCallback(
     async (code: string, state: string) => {
       try {
-        const res = await mutateAsync({ grantType: 'social', code, state }) as SignInResponse;
-        
+        const res = (await mutateAsync({ grantType: 'social', code, state })) as SignInResponse;
+
         // Check if MFA is enabled for this user (same logic as password signin)
         if (res?.enable_mfa) {
           // For SSO, we use the state parameter or a generic identifier since email is not in the response
@@ -200,7 +207,7 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
                 <FormItem>
                   <FormLabel>{t('PASSWORD')}</FormLabel>
                   <FormControl>
-                    <UPasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
+                    <PasswordInput placeholder={t('ENTER_YOUR_PASSWORD')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -220,7 +227,10 @@ export const SigninForm = ({ loginOption }: SigninProps) => {
               <div className="my-4">
                 <Captcha
                   type={
-                    (import.meta.env.VITE_CAPTCHA_TYPE || import.meta.env.REACT_APP_CAPTCHA_TYPE) === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'
+                    (import.meta.env.VITE_CAPTCHA_TYPE ||
+                      import.meta.env.REACT_APP_CAPTCHA_TYPE) === 'reCaptcha'
+                      ? 'reCaptcha'
+                      : 'hCaptcha'
                   }
                   siteKey={googleSiteKey}
                   theme="light"

@@ -18,7 +18,7 @@ import {
   EllipsisVertical,
   Check,
 } from 'lucide-react';
-import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import { TaskItem } from '@/features/task-manager/types/task-manager.types';
 
 /**

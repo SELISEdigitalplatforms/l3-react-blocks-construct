@@ -16,8 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmation-modal';
+import { ConfirmationModal } from '@/components/shared';
 import {
   useUpdateTaskSection,
   useDeleteTaskSection,

@@ -49,19 +49,35 @@ vi.mock('jspdf', () => ({
   })),
 }));
 
-vi.mock('@/components/blocks/confirmation-modal/confirmation-modal', () => ({
-  default: ({ open, title, onConfirm, onOpenChange }: any) =>
+vi.mock('@/components/shared', () => ({
+  ...vi.importActual('@/components/shared'),
+  ConfirmationModal: ({
+    open,
+    onConfirm,
+    title,
+    description,
+    confirmText = 'Confirm',
+    onOpenChange,
+  }: {
+    open: boolean;
+    onConfirm: () => void;
+    title: string;
+    description: string | React.ReactNode;
+    confirmText?: string;
+    onOpenChange?: (open: boolean) => void;
+  }) =>
     open ? (
-      <div data-testid="confirmation-modal">
+      <div role="alertdialog" data-testid="confirmation-modal">
         <h2>{title}</h2>
+        <div>{description}</div>
         <button
-          data-testid="confirm-button"
           onClick={() => {
             onConfirm?.();
             onOpenChange?.(false);
           }}
+          data-testid="confirm-button"
         >
-          Confirm
+          {confirmText}
         </button>
         <button onClick={() => onOpenChange?.(false)}>Cancel</button>
       </div>
@@ -72,30 +88,6 @@ vi.mock('hooks/use-toast', () => ({
   useToast: () => ({
     toast: vi.fn(),
   }),
-}));
-
-vi.mock('components/blocks/confirmation-modal/confirmation-modal', () => ({
-  __esModule: true,
-  default: ({
-    open,
-    onConfirm,
-    title,
-    description,
-  }: {
-    open: boolean;
-    onConfirm: () => void;
-    title: string;
-    description: string;
-  }) =>
-    open ? (
-      <div data-testid="confirmation-modal">
-        <h2>{title}</h2>
-        <p>{description}</p>
-        <button onClick={onConfirm} data-testid="confirm-button">
-          Confirm
-        </button>
-      </div>
-    ) : null,
 }));
 
 vi.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
