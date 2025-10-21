@@ -30,7 +30,11 @@ import ConfirmationModal from '@/components/blocks/confirmation-modal/confirmati
 import { useToast } from '@/hooks/use-toast';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
-import { CalendarEvent, Member } from '../../../types/calendar-event.types';
+import {
+  CalendarEvent,
+  DeleteUpdateEventOption,
+  Member,
+} from '../../../types/calendar-event.types';
 import { EventParticipant } from '../../event-participant/event-participant';
 import { members } from '../../../services/calendar-services';
 import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring-event';
@@ -39,15 +43,12 @@ import { useCalendarSettings } from '../../../contexts/calendar-settings.context
 import { WEEK_DAYS } from '../../../constants/calendar.constants';
 import { UpdateRecurringEvent } from '../update-recurring-event/update-recurring-event';
 
-type DeleteOption = 'this' | 'thisAndFollowing' | 'all';
-type CalendarUpdateOption = 'this' | 'thisAndFollowing' | 'all';
-
 interface EditEventProps {
   event: CalendarEvent;
   onClose: () => void;
   onNext: () => void;
-  onUpdate: (event: CalendarEvent, updateOption?: CalendarUpdateOption) => void;
-  onDelete: (eventId: string, deleteOption?: DeleteOption) => void;
+  onUpdate: (event: CalendarEvent, updateOption?: DeleteUpdateEventOption) => void;
+  onDelete: (eventId: string, deleteOption?: DeleteUpdateEventOption) => void;
   onRestore?: () => boolean;
 }
 
@@ -336,14 +337,14 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
  *
  * @returns {JSX.Element} Edit event modal dialog with form fields and action buttons
  */
-export function EditEvent({
+export const EditEvent = ({
   event,
   onClose,
   onNext,
   onUpdate,
   onDelete,
   onRestore,
-}: Readonly<EditEventProps>) {
+}: Readonly<EditEventProps>) => {
   const { toast, dismiss } = useToast();
   const { t } = useTranslation();
 
@@ -449,10 +450,7 @@ export function EditEvent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialEventData, form, parsedStart, parsedEnd]);
 
-  const onSubmit = (
-    data: AddEventFormValues,
-    updateOption?: 'this' | 'thisAndFollowing' | 'all'
-  ) => {
+  const onSubmit = (data: AddEventFormValues, updateOption?: DeleteUpdateEventOption) => {
     try {
       const memberIds: string[] = data.members ?? [];
 
@@ -527,7 +525,7 @@ export function EditEvent({
     });
   };
 
-  const handleRecurringDeleteConfirm = (deleteOption: DeleteOption) => {
+  const handleRecurringDeleteConfirm = (deleteOption: DeleteUpdateEventOption) => {
     onDelete(initialEventData.eventId ?? '', deleteOption);
     onClose();
     setShowRecurringDeleteDialog(false);
@@ -576,7 +574,7 @@ export function EditEvent({
     }
   };
 
-  const handleUpdateConfirm = (updateOption: 'this' | 'thisAndFollowing' | 'all') => {
+  const handleUpdateConfirm = (updateOption: DeleteUpdateEventOption) => {
     const tempData = window.localStorage.getItem('tempUpdateData');
     if (tempData) {
       const formData = JSON.parse(tempData) as AddEventFormValues;
@@ -820,4 +818,4 @@ export function EditEvent({
       )}
     </>
   );
-}
+};

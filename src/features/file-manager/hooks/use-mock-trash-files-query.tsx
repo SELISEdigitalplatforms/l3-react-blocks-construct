@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { folderContents, IFileTrashData, trashMockData } from '../utils/file-manager';
+import { IFileTrashData } from '../utils/file-manager';
+import { folderContents, trashMockData } from '../utils/mock-data';
 
 interface TrashQueryParams {
   filter: {

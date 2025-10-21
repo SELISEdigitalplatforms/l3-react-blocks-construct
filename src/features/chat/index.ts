@@ -8,3 +8,8 @@ export { ChatInput } from './components/chat-input/chat-input';
 export { ChatProfile } from './components/chat-profile/chat-profile';
 export { ForwardMessage } from './components/modals/forward-message/forward-message';
 export { EditGroupName } from './components/modals/edit-group-name/edit-group-name';
+export { ChatHeader } from './components/chat-header/chat-header';
+export { ChatAvatarContent } from './components/chat-avatar-content/chat-avatar-content';
+export { MessageMenu } from './components/message-menu/message-menu';
+export { MessageActions } from './components/message-actions/message-actions';
+export { MessageContent } from './components/message-content/message-content';

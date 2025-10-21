@@ -8,30 +8,25 @@ import { ClientMiddleware } from '@/state/client-middleware';
 import MainLayout from '@/pages/main/main-layout';
 import TaskPage from './pages/main/iam-table';
 import { Profile } from './pages/profile/profile';
-import { Storage } from './pages/services/storage/storage';
-import { Mail } from './pages/services/mail/mail';
-import { Help } from './pages/help/help';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { Inventory } from './pages/inventory/inventory';
 import { InventoryDetails } from './pages/inventory/inventory-details';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Email } from './pages/email/email';
+import { Email } from '@/pages/email';
 import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
 import TaskManager from './pages/task-manager/task-manager';
-import { CalendarPage } from './pages/calendar/calendar';
+import { CalendarPage } from '@/pages/calendar';
 import { Finance } from '@/pages/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice, EditInvoice } from './features/invoices';
-import SharedWithMe from '@/pages/file-manager/shared-files';
-import Trash from '@/pages/file-manager/trash';
-import { ChatPage } from './pages/chat/chat';
-import { FileManagerMyFiles } from './pages/file-manager/my-files';
+import { ChatPage } from '@/pages/chat';
 import { Dashboard } from '@/pages/dashboard';
 import { NotFound, ServiceUnavailable } from '@/pages/error';
 import { ActivityLog } from '@/pages/activity-log';
 import { Timeline } from '@/pages/timeline';
 import { AuthRoutes } from './routes/auth.route';
+import { FileManagerMyFiles, SharedWithMe, Trash } from '@/pages/file-manager';
 
 const queryClient = new QueryClient();
 
@@ -75,10 +70,7 @@ function AppContent() {
                 <Route path="/mail/:category" element={<Email />} />
                 <Route path="/mail/:category/:emailId" element={<Email />} />
                 <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
-                <Route path="/help" element={<Help />} />
                 <Route path="/identity-management" element={<TaskPage />} />
-                <Route path="/services/storage" element={<Storage />} />
-                <Route path="/services/mail" element={<Mail />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
                 {/* 

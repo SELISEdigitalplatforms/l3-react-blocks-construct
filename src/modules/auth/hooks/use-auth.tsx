@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import {
   accountActivation,
   forgotPassword,
@@ -12,6 +12,7 @@ import {
   SSoSigninPayload,
   SignInResponse,
   MFASigninResponse,
+  signinByEmail,
 } from '../services/auth.service';
 import { useGlobalMutation, useGlobalQuery } from '../../../state/query-client/hooks';
 import { ErrorResponse } from '../../../hooks/use-error-handler';
@@ -133,3 +134,38 @@ export const useGetLoginOptions = () => {
     queryFn: getLoginOption,
   });
 };
+
+export const useSigninEmail = () => {
+  return useMutation({
+    mutationKey: ['signin', 'email'],
+    mutationFn: signinByEmail,
+  });
+};
+
+// export const useSigninBySSO = () => {
+//   return useMutation({
+//     mutationKey: ["login", "sso"],
+//     mutationFn: oauthService.signinBySSO,
+//   });
+// };
+
+// export const useVerifyMfa = () => {
+//   return useMutation({
+//     mutationKey: ["verify", "mfa"],
+//     mutationFn: authService.verifyMfa,
+//   });
+// };
+
+// export const useLogout = () => {
+//   return useMutation({
+//     mutationKey: ["logout"],
+//     mutationFn: authService.logout,
+//   });
+// };
+
+// export const useSignupByEmail = () => {
+//   return useMutation({
+//     mutationKey: ["signup", "email"],
+//     mutationFn: authService.signupByEmail,
+//   });
+// };

@@ -1,9 +1,10 @@
 import { addMinutes, format, startOfDay } from 'date-fns';
-import { CalendarEventColor, EventContentTextColor } from '../enums/calendar.enum';
+import { CalendarEventColor } from '../enums/calendar.enum';
+import { EventContentTextColor } from '../constants/calendar.constants';
 
 /**
  * Generates an array of time strings at regular intervals throughout a 24-hour day.
- * 
+ *
  * This utility function creates a collection of formatted time strings (HH:mm) at specified
  * minute intervals starting from midnight (00:00) and continuing through a full 24-hour period.
  * Useful for creating time selection options in time pickers, scheduling interfaces, or
@@ -14,7 +15,7 @@ import { CalendarEventColor, EventContentTextColor } from '../enums/calendar.enu
  * @example
  * // Returns ['00:00', '00:30', '01:00', ... '23:30'] for 30-minute intervals
  * generateTimePickerRange(30)
- * 
+ *
  * // Returns ['00:00', '00:15', '00:30', ... '23:45'] for 15-minute intervals
  * generateTimePickerRange(15)
  */
@@ -28,8 +29,8 @@ export function generateTimePickerRange(intervalMinutes: number): string[] {
 
 /**
  * Determines the appropriate text color class based on a background color.
- * 
- * This utility function takes a background color (typically from a calendar event) 
+ *
+ * This utility function takes a background color (typically from a calendar event)
  * and returns the appropriate text color class to ensure optimal readability.
  * It maps background colors from CalendarEventColor enum to their corresponding
  * text colors defined in EventContentTextColor enum.
@@ -39,7 +40,7 @@ export function generateTimePickerRange(intervalMinutes: number): string[] {
  * @example
  * // Returns 'hsl(var(--white))' for a dark background
  * getTextColorClassFromBg('hsl(var(--primary-900))')
- * 
+ *
  * // Returns 'hsl(var(--high-emphasis))' for a light background or undefined input
  * getTextColorClassFromBg('hsl(var(--primary-100))')
  */

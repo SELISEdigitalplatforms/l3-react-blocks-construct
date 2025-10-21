@@ -141,8 +141,8 @@ export interface EmailSingleActionsProps {
   reply?: TReply;
   formatDateTime: (date: string) => string;
   onToggleStar?: (emailId: string, replyId?: string) => void;
-  onReplyClick?: () => void; // Keep this for the in-place reply
-  onPopOutReplyClick?: (email: TEmail | TReply | null) => void; // New prop for pop-out
+  onReplyClick?: () => void;
+  onPopOutReplyClick?: (email: TEmail | TReply | null) => void;
   onMoreOptionsClick?: () => void;
   handleSetActiveReply: (action: ActionType) => void;
   isReplySingleAction?: TIsReplySingleActionState;
@@ -153,3 +153,38 @@ export interface EmailSingleActionsProps {
   activeActionReply: { reply: boolean; replyAll: boolean; forward: boolean };
   handleSetActive: (action: ActionType) => void;
 }
+
+export type EmailActionType = 'reply' | 'replyAll' | 'forward' | 'popOutReply';
+
+export interface MenuAction {
+  type: EmailActionType;
+  icon: React.ComponentType<{ className?: string }>;
+  labelKey: string;
+  onClick: () => void;
+}
+
+export type NavItem = {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  count: number;
+  isActive?: boolean;
+  onClick?: () => void;
+};
+
+export type EmailCounts = {
+  inbox?: any[];
+  starred?: any[];
+  sent?: any[];
+  draft?: any[];
+  spam?: any[];
+  trash?: any[];
+};
+
+export type LabelItem = {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  isActive?: boolean;
+  onClick?: () => void;
+};

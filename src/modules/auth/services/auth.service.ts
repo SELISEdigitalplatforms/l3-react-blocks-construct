@@ -1,6 +1,7 @@
 import API_CONFIG, { getApiUrl } from '../../../config/api';
 import { clients, HttpError } from '@/lib/https';
 import { useAuthStore } from '@/state/store/auth';
+import { SigninEmailPayload, SigninEmailResponse } from '../types/auth.type';
 
 /**
  * Authentication API Utilities
@@ -264,4 +265,15 @@ export const resendActivation = async (data: { userId: string }) => {
 export const logoutAll = async () => {
   const url = '/authentication/v1/Authentication/LogoutAll';
   return clients.post(url, '');
+};
+
+export const signinByEmail = (payload: SigninEmailPayload): Promise<SigninEmailResponse> => {
+  const body = new URLSearchParams();
+  body.append('grant_type', 'password');
+  body.append('username', payload.username);
+  body.append('password', payload.password);
+  const url = '/authentication/v1/OAuth/Token';
+  return clients.post(url, body, {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  });
 };

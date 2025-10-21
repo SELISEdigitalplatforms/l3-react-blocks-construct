@@ -74,13 +74,13 @@ const ShowMoreComponent = (count: number, remainingEvents: object[]) => (
  * />
  */
 
-export function BigCalendar({
+export const BigCalendar = ({
   eventList,
   onSelectSlot,
   onSelectEvent,
   onEventDrop,
   onEventResize,
-}: Readonly<BigCalendarProps>) {
+}: Readonly<BigCalendarProps>) => {
   const [date, setDate] = useState<Date>(new Date());
   const [view, setView] = useState<View>(Views.MONTH);
   const { settings } = useCalendarSettings();
@@ -204,4 +204,4 @@ export function BigCalendar({
       />
     </div>
   );
-}
+};

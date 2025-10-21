@@ -18,14 +18,13 @@ import { UPasswordInput } from '@/components/core/u-password-input';
 import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
-import { useSigninMutation } from '../../hooks/use-auth';
+import { useSigninEmail } from '../../hooks/use-auth';
 import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
-import { SignInResponse } from '../../services/auth.service';
 
 export const SigninEmail = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { login } = useAuthStore();
+  const { login, setTokens } = useAuthStore();
   const { handleError } = useErrorHandler();
   const [captchaToken, setCaptchaToken] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
@@ -39,7 +38,7 @@ export const SigninEmail = () => {
     resolver: zodResolver(getSigninFormValidationSchema(t)),
   });
 
-  const { isPending, mutateAsync, isError } = useSigninMutation();
+  const { isPending, mutateAsync, isError } = useSigninEmail();
 
   const handleCaptchaVerify = (token: SetStateAction<string>) => {
     setCaptchaToken(token);
@@ -55,20 +54,19 @@ export const SigninEmail = () => {
     }
 
     try {
-      const res = (await mutateAsync({
-        grantType: 'password',
+      const res = await mutateAsync({
         username: values.username,
         password: values.password,
-      })) as SignInResponse;
+      });
 
-      if (res?.enable_mfa) {
-        navigate(
+      if (res.enable_mfa)
+        return navigate(
           `/verify-key?mfa_id=${res?.mfaId}&mfa_type=${res?.mfaType}&user_name=${values.username}`
         );
-      } else {
-        login(res.access_token, res.refresh_token);
-        navigate('/');
-      }
+
+      login(res.access_token || '', res.refresh_token || '');
+      setTokens({ accessToken: res.access_token || '', refreshToken: res.refresh_token || '' });
+      navigate('/');
     } catch (error) {
       if (captchaEnabled) {
         const newFailedAttempts = failedAttempts + 1;

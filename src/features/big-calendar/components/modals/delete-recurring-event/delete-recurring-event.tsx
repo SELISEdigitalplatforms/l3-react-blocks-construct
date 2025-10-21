@@ -12,22 +12,15 @@ import {
 } from '@/components/ui/alert-dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-
-type DeleteOption = 'this' | 'thisAndFollowing' | 'all';
+import { DeleteUpdateEventOption, DeleteUpdateRecurringEventOption } from '@/features/big-calendar';
+import { DELETE_UPDATE_RECURRING_EVENT_OPTIONS } from '@/features/big-calendar/constants/calendar.constants';
 
 interface DeleteRecurringEventProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   eventTitle: string;
-  onConfirm: (deleteOption: DeleteOption) => void;
+  onConfirm: (deleteOption: DeleteUpdateEventOption) => void;
 }
-
-// Moved to module level to avoid recreation on each render
-const DELETE_OPTIONS: Array<{ value: DeleteOption; labelKey: string }> = [
-  { value: 'this', labelKey: 'THIS_EVENT_ONLY' },
-  { value: 'thisAndFollowing', labelKey: 'THIS_AND_FOLLOWING_EVENTS' },
-  { value: 'all', labelKey: 'ALL_EVENTS_SERIES' },
-];
 
 /**
  * DeleteRecurringEvent Component
@@ -60,13 +53,13 @@ const DELETE_OPTIONS: Array<{ value: DeleteOption; labelKey: string }> = [
  *   onConfirm={(option) => handleRecurringDelete(eventId, option)}
  * />
  */
-export function DeleteRecurringEvent({
+export const DeleteRecurringEvent = ({
   open,
   onOpenChange,
   eventTitle,
   onConfirm,
-}: Readonly<DeleteRecurringEventProps>) {
-  const [deleteOption, setDeleteOption] = useState<DeleteOption>('this');
+}: Readonly<DeleteRecurringEventProps>) => {
+  const [deleteOption, setDeleteOption] = useState<DeleteUpdateEventOption>('this');
   const { t } = useTranslation();
 
   const handleConfirm = () => {
@@ -91,16 +84,18 @@ export function DeleteRecurringEvent({
             <RadioGroup
               className="flex flex-col gap-3"
               value={deleteOption}
-              onValueChange={(value) => setDeleteOption(value as DeleteOption)}
+              onValueChange={(value) => setDeleteOption(value as DeleteUpdateEventOption)}
             >
-              {DELETE_OPTIONS.map(({ value, labelKey }) => (
-                <div key={value} className="flex items-center gap-2">
-                  <RadioGroupItem value={value} id={`delete-option-${value}`} />
-                  <Label htmlFor={`delete-option-${value}`} className="cursor-pointer">
-                    {t(labelKey)}
-                  </Label>
-                </div>
-              ))}
+              {DELETE_UPDATE_RECURRING_EVENT_OPTIONS.map(
+                ({ value, labelKey }: DeleteUpdateRecurringEventOption) => (
+                  <div key={value} className="flex items-center gap-2">
+                    <RadioGroupItem value={value} id={`delete-option-${value}`} />
+                    <Label htmlFor={`delete-option-${value}`} className="cursor-pointer">
+                      {t(labelKey)}
+                    </Label>
+                  </div>
+                )
+              )}
             </RadioGroup>
           </div>
         </div>
@@ -113,4 +108,4 @@ export function DeleteRecurringEvent({
       </AlertDialogContent>
     </AlertDialog>
   );
-}
+};

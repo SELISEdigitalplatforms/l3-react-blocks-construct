@@ -32,7 +32,7 @@ interface AgendaContentProps {
  * <AgendaContent events={eventList} date={new Date()} />
  */
 
-export const AgendaContent = ({ events, date, onSelectEvent }: AgendaContentProps) => {
+export const AgendaContent = ({ events, date, onSelectEvent }: Readonly<AgendaContentProps>) => {
   const weekEvents = useMemo(() => {
     const startOfWeek = new Date(date);
     startOfWeek.setDate(date.getDate() - date.getDay());

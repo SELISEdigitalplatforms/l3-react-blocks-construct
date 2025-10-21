@@ -1,13 +1,6 @@
 import { Tag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-type LabelItem = {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  isActive?: boolean;
-  onClick?: () => void;
-};
+import { LabelItem } from '../types/email.types';
 
 export const useLabelItems = (
   location: { pathname: string },
