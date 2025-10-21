@@ -31,7 +31,7 @@ vi.mock('components/blocks/layout/app-sidebar', () => ({
 }));
 
 vi.mock('components/blocks/u-profile-menu', () => ({
-  UProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
+  ProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
 }));
 
 vi.mock('@/components/blocks/language-selector/language-selector', () => ({

@@ -17,7 +17,7 @@ import { useGetAccount } from '@/features/profile/hooks/use-account';
 import { useTheme } from '@/styles/theme/theme-provider';
 
 /**
- * UProfileMenu Component
+ * ProfileMenu Component
  *
  * A user profile dropdown menu component that displays user information and provides
  * navigation and account management options.
@@ -42,10 +42,10 @@ import { useTheme } from '@/styles/theme/theme-provider';
  *
  * @example
  * // Basic usage in a header or navigation component
- * <UProfileMenu />
+ * <ProfileMenu />
  */
 
-export const UProfileMenu = () => {
+export const ProfileMenu = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation();

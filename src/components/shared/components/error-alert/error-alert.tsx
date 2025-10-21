@@ -39,11 +39,11 @@ interface ErrorAlertProps {
   message?: string;
 }
 
-const ErrorAlert: React.FC<ErrorAlertProps> = ({
+export const ErrorAlert = ({
   isError,
   title = 'ERROR',
   message = 'AN_ERROR_OCCURRED.',
-}) => {
+}: Readonly<ErrorAlertProps>) => {
   const [isVisible, setIsVisible] = useState(false);
   const { t } = useTranslation();
 
@@ -70,5 +70,3 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({
     </div>
   );
 };
-
-export default ErrorAlert;

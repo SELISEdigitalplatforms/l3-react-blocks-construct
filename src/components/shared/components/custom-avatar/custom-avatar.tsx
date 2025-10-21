@@ -35,17 +35,16 @@ interface CustomAvatarProps {
   height?: number;
 }
 
-export default function CustomAvatar({
+export const CustomAvatar = ({
   src,
   alt,
   width = 50,
   height = 50,
   showGrid = true,
   name = '',
-}: Readonly<CustomAvatarProps>) {
+}: Readonly<CustomAvatarProps>) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const showImage = !!src;
-
   const firstChar = name.trim().charAt(0).toUpperCase();
 
   return (
@@ -74,4 +73,4 @@ export default function CustomAvatar({
       )}
     </div>
   );
-}
+};

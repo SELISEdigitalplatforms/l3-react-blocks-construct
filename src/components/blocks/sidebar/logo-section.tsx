@@ -1,4 +1,3 @@
-import React from 'react';
 import { X } from 'lucide-react';
 import darkLogo from '@/assets/images/construct_logo_dark.svg';
 import lightLogo from '@/assets/images/construct_logo_light.svg';

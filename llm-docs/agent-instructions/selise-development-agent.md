@@ -71,7 +71,7 @@ import { Button, Input, Card, Table, Dialog, Badge } from 'components/ui/*';
 // Proven block patterns
 import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar';
+import CustomAvatar from 'components/shared/custom-avatar/custom-avatar';
 
 // Complete feature solutions (when they fit exactly)
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';

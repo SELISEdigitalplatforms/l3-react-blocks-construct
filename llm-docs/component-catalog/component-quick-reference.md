@@ -47,7 +47,7 @@ import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advanc
 import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
 import { DataTablePagination } from 'components/blocks/data-table/data-table-pagination'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import CustomAvatar from 'components/shared/custom-avatar/custom-avatar'
 
 // UI Components (Foundation)
 import { Button } from 'components/ui/button'
@@ -98,7 +98,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'components/ui/
 ```typescript
 import { Button } from 'components/ui/button'
 import { Badge } from 'components/ui/badge'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import CustomAvatar from 'components/shared/custom-avatar/custom-avatar'
 import { Card, CardContent } from 'components/ui/card'
 
 // Usage: Standard UI patterns throughout the app

@@ -1,5 +1,5 @@
 import { render, screen, act } from '@testing-library/react';
-import ErrorAlert from './error-alert';
+import { ErrorAlert } from './error-alert';
 import { vi } from 'vitest';
 
 vi.mock('lucide-react', () => ({

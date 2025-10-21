@@ -107,7 +107,7 @@ import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-c
 **CustomAvatar** - User avatars
 ```typescript
 // Path: components/blocks/custom-avatar/custom-avatar.tsx
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import CustomAvatar from 'components/shared/custom-avatar/custom-avatar'
 
 // What you get:
 // - Image avatars with fallbacks
@@ -287,7 +287,7 @@ import { Button, Input, Card, Table, Dialog, Badge, Avatar } from 'components/ui
 // Proven block patterns - use when applicable
 import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
 import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import CustomAvatar from 'components/shared/custom-avatar/custom-avatar'
 
 // Feature components - use if they fit your use case exactly
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'

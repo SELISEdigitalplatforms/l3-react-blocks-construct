@@ -6,3 +6,6 @@ export { UIPhoneInput } from './components/phone-input/phone-input';
 export { UIOtpInput } from './components/otp-input/otp-input';
 export { CustomCheckbox } from './components/custom-checkbox/custom-checkbox';
 export { ConfirmationModal } from './components/confirmation-modal/confirmation-modal';
+export { ErrorAlert } from './components/error-alert/error-alert';
+export { ProfileMenu } from './components/profile-menu/profile-menu';
+export { CustomAvatar } from './components/custom-avatar/custom-avatar';

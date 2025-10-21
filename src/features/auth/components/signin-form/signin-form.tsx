@@ -14,12 +14,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { LoadingOverlay, PasswordInput } from '@/components/shared';
+import { ErrorAlert, LoadingOverlay, PasswordInput } from '@/components/shared';
 import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useSigninMutation } from '../../hooks/use-auth';
-import ErrorAlert from '../../../../components/blocks/error-alert/error-alert';
 import { SignInResponse } from '../../services/auth.service';
 import { SsoSignin } from '@/pages/auth/signin/signin-sso';
 import { GRANT_TYPES } from '@/constant/auth';
