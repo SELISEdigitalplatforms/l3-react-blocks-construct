@@ -78,16 +78,9 @@ export const useSignoutMutation = () => {
 };
 
 export const useAccountActivation = () => {
-  return useGlobalMutation<
-    unknown,
-    ErrorResponse,
-    { password: string; code: string; captchaCode: string }
-  >({
+  return useMutation({
     mutationKey: ['accountActivation'],
     mutationFn: accountActivation,
-    onError: (error) => {
-      throw error;
-    },
   });
 };
 

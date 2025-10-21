@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import emailSentIcon from '@/assets/images/email_sent.svg';
 
-export function EmailVerification() {
+export const EmailSentPage = () => {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-6">
@@ -39,4 +39,4 @@ export function EmailVerification() {
       </Link>
     </div>
   );
-}
+};

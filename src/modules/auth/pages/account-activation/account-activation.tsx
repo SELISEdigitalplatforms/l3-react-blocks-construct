@@ -4,7 +4,7 @@ import { redirect, useSearchParams } from 'react-router-dom';
 import { SetpasswordForm } from '@/modules/auth/components/set-password';
 import { useAuthState } from '@/state/client-middleware';
 
-export function SetPasswordPage() {
+export const AccountActivationPage = () => {
   const [searchParams] = useSearchParams();
   const code = searchParams.get('code') ?? '';
   const { isMounted, isAuthenticated } = useAuthState();
@@ -26,16 +26,7 @@ export function SetPasswordPage() {
           </div>
         </div>
       </div>
-
-      {/* <div className="w-full mx-auto">
-        <div className="rounded-lg bg-success-background border border-success p-4">
-          <p className="text-xs font-normal text-success-high-emphasis">
-            Your email has been verified successfully.
-          </p>
-        </div>
-      </div> */}
-
       <SetpasswordForm code={code} />
     </div>
   );
-}
+};
