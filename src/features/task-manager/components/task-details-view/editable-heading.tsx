@@ -29,8 +29,6 @@ import { useTaskDetails } from '../../hooks/use-task-details';
  * @param {boolean} [isNewTaskModalOpen] - Whether the component is rendered in a new task modal
  * @param {TaskService} [taskService] - Service for managing task-related operations
  *
- * @returns {JSX.Element} The editable heading component
- *
  * @example
  * // Basic usage
  * <EditableHeading

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { DashboardOverview } from './dashboard-overview';
 import { vi } from 'vitest';
+import '../../../../test-utils/shared-test-utils';
 
 // Mock the Card components
 vi.mock('components/ui/card', () => {
@@ -155,11 +156,6 @@ vi.mock('../../services/dashboard-service', () => ({
   ],
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
 
 describe('DashboardOverview Component', () => {
   beforeEach(() => {

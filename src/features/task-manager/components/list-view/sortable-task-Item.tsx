@@ -28,8 +28,6 @@ import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdow
  * @param {TaskItem} task - The task object to display
  * @param {(id: string) => void} handleTaskClick - Callback triggered when the task title is clicked
  *
- * @returns {JSX.Element} The sortable task item component
- *
  * @example
  * // Basic usage
  * <SortableTaskItem task={task} handleTaskClick={(id) => console.log('Task clicked:', id)} />

@@ -34,8 +34,6 @@ import { useTaskDetails } from '../../hooks/use-task-details';
  * @param {string} [initialContent] - The initial content of the description
  * @param {(content: string) => void} [onContentChange] - Callback triggered when the description is saved
  *
- * @returns {JSX.Element} The editable description component
- *
  * @example
  * // Basic usage
  * <EditableDescription

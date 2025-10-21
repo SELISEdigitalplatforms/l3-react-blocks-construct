@@ -28,7 +28,6 @@ import { Skeleton } from '@/components/ui/skeleton';
  * @param {function} props.onDeleteImage - Callback function that is called when an image is deleted. It receives the image URL to be deleted.
  * @param {number} [props.maxImages=5] - The maximum number of images that can be uploaded. Defaults to 5.
  *
- * @returns {JSX.Element} The rendered ImageUploader component.
  */
 
 interface ImageUploaderProps {

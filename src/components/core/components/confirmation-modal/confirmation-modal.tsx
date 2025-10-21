@@ -31,8 +31,6 @@ import { Button } from '@/components/ui/button';
  * @param {string} description - The descriptive text explaining the action to confirm
  * @param {() => void} onConfirm - Callback function executed when the user confirms the action
  *
- * @returns {JSX.Element} A confirmation modal dialog component
- *
  * @example
  * // Basic usage
  * <ConfirmationModal

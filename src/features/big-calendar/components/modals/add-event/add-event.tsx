@@ -272,8 +272,6 @@ const createBaseEvent = (
  * - `onCancel`: `{Function}` – Callback triggered when the form is canceled.
  *
  * @param {AddEventProps} props - The props for configuring the event creation form.
- * @returns {JSX.Element} The rendered JSX element for the event creation dialog.
- *
  * @example
  * <AddEvent
  *   start={new Date()}

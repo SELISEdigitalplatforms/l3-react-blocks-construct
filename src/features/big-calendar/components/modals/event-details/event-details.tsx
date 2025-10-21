@@ -52,7 +52,6 @@ const TEXT_LOW_EMPHASIS = 'text-low-emphasis';
  * - `onDelete`: `{Function}` – Callback triggered when the event is deleted. Receives the event ID as an argument.
  *
  * @param {EventDetailsProps} props - The props for configuring the event details dialog.
- * @returns {JSX.Element} The rendered JSX element for the event details dialog.
  */
 export const EventDetails = ({
   event,

@@ -18,8 +18,6 @@ import { Input, InputProps } from '@/components/ui/input';
  * @param {InputProps} props - All standard input props are supported and passed through
  * @param {React.Ref<HTMLInputElement>} ref - Ref forwarded to the underlying input element
  *
- * @returns {JSX.Element} A password input field with visibility toggle
- *
  * @example
  * // Basic usage
  * <PasswordInput placeholder="Enter your password" />

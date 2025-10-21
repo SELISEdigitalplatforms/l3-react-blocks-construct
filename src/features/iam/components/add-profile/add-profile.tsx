@@ -32,7 +32,6 @@ import { ACCOUNT_QUERY_KEY, useCreateAccount } from '@/features/profile/hooks/us
  * - `onClose` (function): Callback to close the dialog
  *
  * @param {AddUserProps} props - Component props
- * @returns {JSX.Element} A modal with a user invitation form
  *
  * @example
  * <AddUser onClose={() => setIsDialogOpen(false)} />

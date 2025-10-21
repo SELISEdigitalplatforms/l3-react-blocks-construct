@@ -37,8 +37,6 @@ import { CustomPaginationEmail } from '@/components/core';
  * @param {() => void} handleComposeEmail - Callback triggered to open the compose email modal
  * @param {(email: TEmail) => void} handleEmailSelection - Callback triggered when an email is clicked
  *
- * @returns {JSX.Element} The email list component
- *
  * @example
  * // Basic usage
  * <EmailList

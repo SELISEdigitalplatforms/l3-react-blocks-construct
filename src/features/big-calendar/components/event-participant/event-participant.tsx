@@ -36,8 +36,6 @@ interface EventParticipantProps {
  * - `editMembers`: `{Member[]}` (optional) – An array of additional members to include in the participant list.
  *
  * @param {EventParticipantProps} props - The props for configuring the event participant component.
- * @returns {JSX.Element} The rendered JSX element for managing event participants.
- *
  * @example
  * <EventParticipant
  *   selected={['1', '2']}

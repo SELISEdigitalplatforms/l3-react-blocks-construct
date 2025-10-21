@@ -42,8 +42,6 @@ import { TaskItem } from '@/features/task-manager/types/task-manager.types';
  * @param {() => void} onDelete - Callback triggered to delete the task
  * @param {(title: string) => void} onMoveToColumn - Callback triggered to move the task to a specific column
  *
- * @returns {JSX.Element} The task manager dropdown menu component
- *
  * @example
  * // Basic usage
  * <TaskManagerDropdownMenu

@@ -21,8 +21,6 @@ import { ActivityLogGroup } from '../activity-log-group/activity-log-group';
  * @param {Object} props - Component props
  * @param {ActivityGroup[]} props.activities - Array of activity groups to display in the timeline
  *
- * @returns {JSX.Element} The rendered timeline component with activity groups
- *
  * @example
  * // Basic usage
  * <ActivityLogTimeline activities={userActivities} />

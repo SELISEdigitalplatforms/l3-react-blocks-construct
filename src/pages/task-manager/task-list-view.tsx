@@ -42,8 +42,6 @@ import { useGetTaskSections } from '@/features/task-manager/hooks/use-task-manag
  * @param {TaskDetails[]} [task] - Optional array of task data (unused in this version, handled by context)
  * @param {TaskService} taskService - Service for interacting with task details and updates
  *
- * @returns {JSX.Element} A drag-and-drop-enabled list of tasks with task creation and modal support
- *
  * @example
  * // Basic usage inside a task manager
  * <TaskListView taskService={new TaskService()} />

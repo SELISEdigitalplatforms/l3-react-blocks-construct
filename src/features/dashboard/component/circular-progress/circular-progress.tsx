@@ -6,7 +6,6 @@
  *   <CircularProgress percentage={75} strokeColor="#4CAF50" />
  * )
  *
- * @returns {JSX.Element} - A circular progress bar with the specified percentage and stroke color.
  */
 
 interface CircularProgressBarProps {

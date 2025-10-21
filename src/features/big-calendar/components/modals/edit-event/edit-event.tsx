@@ -334,7 +334,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
  * @param {(event: CalendarEvent) => void} onUpdate - Callback to update the event with new data
  * @param {(eventId: string, deleteOption?: DeleteOption) => void} onDelete - Callback to delete the event by ID
  *
- * @returns {JSX.Element} Edit event modal dialog with form fields and action buttons
  */
 export const EditEvent = ({
   event,

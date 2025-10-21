@@ -27,8 +27,6 @@ import { Label } from '@/components/ui/label';
  * @param {string} [confirmPassword] - Optional confirmation password to verify matching
  * @param {(isValid: boolean) => void} [onRequirementsMet] - Optional callback that triggers when requirements status changes
  *
- * @returns {JSX.Element} A password strength indicator with visual feedback and requirement checklist
- *
  * @example
  * // Basic usage without confirmation
  * <PasswordStrengthIndicator

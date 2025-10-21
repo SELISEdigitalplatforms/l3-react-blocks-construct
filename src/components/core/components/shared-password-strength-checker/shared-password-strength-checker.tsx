@@ -24,8 +24,6 @@ import { usePasswordStrength } from '@/modules/auth/hooks/use-password-strength/
  * @param {string} [excludePassword] - Optional password that the new password should NOT match (e.g., current password)
  * @param {string} [excludePasswordLabel] - Optional label for the exclusion check (defaults to translation key)
  *
- * @returns {JSX.Element} A password strength indicator with requirement checklist
- *
  * @example
  * // Basic usage
  * <SharedPasswordStrengthChecker

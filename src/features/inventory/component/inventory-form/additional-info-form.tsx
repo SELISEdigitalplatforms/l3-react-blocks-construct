@@ -47,7 +47,6 @@ import { TagsSelector } from './tags-selector';
  * @param {function} props.handleTagToggle - Callback function to handle the toggling of tags.
  * @param {string[]} props.tags - The available tags that can be selected.
  *
- * @returns {JSX.Element} The rendered AdditionalInfoForm component.
  */
 
 interface AdditionalInfoFormProps {

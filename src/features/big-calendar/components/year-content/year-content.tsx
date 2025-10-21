@@ -36,7 +36,6 @@ interface YearContentProps {
  * - `onSelectEvent`: `{Function}` – Callback triggered when a date or event is selected. Receives either a `CalendarEvent` or a `Date`.
  *
  * @param {YearContentProps} props - The props for configuring the year content view.
- * @returns {JSX.Element} The rendered JSX element for the year calendar view.
  *
  * Static Methods:
  * - `title(date: Date): string` – Returns the formatted title for the year view (e.g., "January 2023").

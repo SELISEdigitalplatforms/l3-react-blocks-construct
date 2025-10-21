@@ -12,8 +12,6 @@ import { useState } from 'react';
  * @param {number} [height=50] - The height of the avatar, default is 50px.
  * @param {boolean} [showGrid=true] - Whether to display a grid background inside the avatar frame.
  *
- * @returns {JSX.Element} - The EmailAvatar component, styled with an image and optional grid effect.
- *
  * @example
  * return (
  *   <CustomAvatar

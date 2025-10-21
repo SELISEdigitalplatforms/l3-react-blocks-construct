@@ -31,7 +31,6 @@ interface ShowMorePopupProps {
  * - `onClose`: `{Function}` (optional) – Callback triggered when the popover is closed.
  *
  * @param {ShowMorePopupProps} props - The props for configuring the "Show More" popup.
- * @returns {JSX.Element} The rendered JSX element for the "Show More" popup.
  *
  * @example
  * <ShowMorePopup

@@ -24,8 +24,6 @@ import { ConfirmationModal } from '@/components/core';
  * @param {string} toastDescription - Text to show in the success toast after confirmation
  * @param {React.ReactElement} children - The trigger element (e.g., button/icon) to wrap
  *
- * @returns {JSX.Element} A component that includes a tooltip, confirmation modal, and optional toast
- *
  * @example
  * <TooltipConfirmAction
  *   tooltipLabel="Delete item"

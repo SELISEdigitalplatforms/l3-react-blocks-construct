@@ -20,8 +20,6 @@ import { EditIamProfileDetails } from '@/features/profile/component/modals/edit-
  * @param {(user: IamData) => void} props.onResetPassword - A callback function to handle the reset password action.
  * @param {(user: IamData) => void} props.onResendActivation - A callback function to handle the resend activation link action.
  *
- * @returns {JSX.Element} - The rendered expanded user details component.
- *
  * @example
  * <ExpandedUserDetails
  *   user={selectedUser}

@@ -27,8 +27,6 @@ import { CustomAvatar } from '@/components/core';
  * Props:
  * @param {TEmail} selectedEmail - The selected email object containing details such as sender, subject, and metadata
  *
- * @returns {JSX.Element} The component displaying the email metadata, sender information, and the dropdown for more options
- *
  * @example
  * // Basic usage
  * <EmailViewResponseType selectedEmail={selectedEmail} />

@@ -38,8 +38,6 @@ import { useTheme } from '@/styles/theme/theme-provider';
  * - Uses DropdownMenu components for the menu interface
  * - Uses React Router's useNavigate for navigation
  *
- * @returns {JSX.Element} A dropdown menu component for user profile management
- *
  * @example
  * // Basic usage in a header or navigation component
  * <ProfileMenu />

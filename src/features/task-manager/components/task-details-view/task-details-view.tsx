@@ -82,8 +82,6 @@ import { AddTag } from '../modals/add-tag';
  * @param {(columnId: string, taskTitle: string) => void} [onTaskAddedCard] - Callback for adding a task to a specific column
  * @param {(columnId: string) => void} [setActiveColumn] - Callback to set the active column
  *
- * @returns {JSX.Element} The task details view component
- *
  * @example
  * // Basic usage
  * <TaskDetailsView

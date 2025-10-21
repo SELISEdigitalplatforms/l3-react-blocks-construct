@@ -26,8 +26,6 @@ interface AgendaContentProps {
  * - `date`: `Date` – the reference date for the current week
  *
  * @param {AgendaContentProps} props - Props including the date and list of events
- * @returns {JSX.Element} The rendered weekly agenda view
- *
  * @example
  * <AgendaContent events={eventList} date={new Date()} />
  */

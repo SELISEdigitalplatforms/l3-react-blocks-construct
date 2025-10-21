@@ -29,8 +29,6 @@ import { DYNAMIC_BREADCRUMB_TITLES } from '@/constant/dynamic-breadcrumb-title';
  * @param {number} [breadcrumbIndex] - Optional index to start displaying breadcrumbs from
  *   (e.g., breadcrumbIndex=2 will skip the first breadcrumb segment)
  *
- * @returns {JSX.Element} A breadcrumb navigation component
- *
  * @example
  * // Basic usage showing all path segments
  * <DynamicBreadcrumb />

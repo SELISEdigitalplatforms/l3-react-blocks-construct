@@ -3,13 +3,7 @@
 import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ChatProfile } from './chat-profile';
-
-// Mock translation
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+import '../../../../test-utils/shared-test-utils';
 
 // Mock useToast
 vi.mock('hooks/use-toast', () => ({

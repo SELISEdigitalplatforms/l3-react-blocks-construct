@@ -29,8 +29,6 @@ import FilterControls from './filter-controls';
  * @param {function} [props.onSearch] - Optional callback function triggered when filters are applied
  * @param {Array} props.columns - The columns used for rendering the table
  *
- * @returns {JSX.Element} - The rendered toolbar with search, filter, and reset options
- *
  * @example
  * <IamTableToolbar
  *   table={tableInstance}

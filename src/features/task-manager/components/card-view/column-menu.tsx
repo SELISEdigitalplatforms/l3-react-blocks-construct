@@ -41,8 +41,6 @@ import {
  * @param {(columnId: string, newTitle: string) => void} onRename - Callback triggered when the column is renamed
  * @param {(columnId: string) => void} onDelete - Callback triggered when the column is deleted
  *
- * @returns {JSX.Element} The column menu component
- *
  * @example
  * // Basic usage
  * <ColumnMenu

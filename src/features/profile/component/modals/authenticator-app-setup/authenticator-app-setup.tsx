@@ -28,7 +28,6 @@ import { useTranslation } from 'react-i18next';
  * @param {Function} props.onNext - The function to be called when the setup is successful and the next step should be triggered.
  * @param {string} props.mfaId - The ID of the MFA to be set up.
  *
- * @returns {JSX.Element} The rendered component.
  */
 type AuthenticatorAppSetupProps = {
   userInfo?: User;

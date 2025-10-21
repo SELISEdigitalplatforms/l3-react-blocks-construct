@@ -18,8 +18,6 @@ import { useTranslation } from 'react-i18next';
  * @component
  * @example
  * return <DevicesTable />;
- *
- * @returns {JSX.Element} The rendered DevicesTable component.
  */
 
 export const DevicesTable = () => {

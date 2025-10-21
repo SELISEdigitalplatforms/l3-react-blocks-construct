@@ -24,8 +24,6 @@ import { Button } from '@/components/ui/button';
  * @param {string} [submitName='Comment'] - Optional label for the submit button (default: "Comment")
  * @param {string} [cancelButton='Cancel'] - Optional label for the cancel button (default: "Cancel")
  *
- * @returns {JSX.Element} The editable comment input component
- *
  * @example
  * // Basic usage
  * <EditableCommentInput
@@ -73,8 +71,8 @@ export function EditableCommentInput({
     setIsMounted(true);
 
     import('../../../../components/core/components/custom-text-editor/custom-text-editor')
-      .then((module) => {
-        setEditorComponent(() => module.default);
+      .then(({ CustomTextEditor }) => {
+        setEditorComponent(() => CustomTextEditor);
       })
       .catch((error) => {
         console.error('Error loading editor:', error);

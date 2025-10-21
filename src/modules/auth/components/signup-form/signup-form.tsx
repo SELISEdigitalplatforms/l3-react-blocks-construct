@@ -27,8 +27,6 @@ import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema }
  * - Terms of Service and Privacy Policy acknowledgement checkbox
  * - Loading state handling during async submission
  *
- * @returns {JSX.Element} The rendered signup form with validation
- *
  * @example
  * // Basic usage
  * <SignupForm />

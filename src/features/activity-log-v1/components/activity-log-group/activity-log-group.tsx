@@ -22,8 +22,6 @@ import { getFormattedDateLabel } from '../../utils/activity-log-utils';
  * @param {Array} items - The list of activity log items for the group
  * @param {boolean} isLastIndex - Whether this is the last group in the list
  *
- * @returns {JSX.Element} The activity log group component
- *
  * @example
  * // Basic usage
  * <ActivityLogGroup

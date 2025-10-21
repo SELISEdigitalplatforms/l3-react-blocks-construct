@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useLanguageContext } from '../../../../i18n/language-context';
+import { useLanguageContext } from '@/i18n/language-context';
 
 /**
  * LanguageSelector Component

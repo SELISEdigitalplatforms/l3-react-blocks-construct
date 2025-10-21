@@ -40,8 +40,6 @@ import { Captcha } from '@/features/captcha';
  * @param {boolean} [isCaptchaValid] - Optional flag indicating if CAPTCHA is valid
  * @param {(isValid: boolean) => void} [onCaptchaValidation] - Optional callback when CAPTCHA validation state changes
  *
- * @returns {JSX.Element} A password form with validation and optional CAPTCHA
- *
  * @example
  * // Basic usage
  * <BasePasswordForm

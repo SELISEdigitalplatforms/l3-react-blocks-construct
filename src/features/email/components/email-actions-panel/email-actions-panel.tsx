@@ -31,8 +31,6 @@ import { createMenuActions, ReplyAllAvatars } from '../../services/email-data';
  * @param {(replyData?: TReply) => void} handleComposeEmailForward - Function to trigger forwarding or pop-out reply logic.
  * @param {(action: TActiveAction) => void} setActiveAction - Function to update the overall active action state.
  *
- * @returns {JSX.Element} The action panel UI for email replies and forwarding.
- *
  * @example
  * <EmailActionsPanel
  *   selectedEmail={email}

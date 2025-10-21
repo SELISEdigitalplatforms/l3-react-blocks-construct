@@ -31,8 +31,6 @@ import { cn } from '@/lib/utils';
  * @param {AllowedInputTypes} [inputType] - Type of input (text, number, etc.)
  * @param {boolean} [skipDefaultStyles] - Whether to skip default styling
  *
- * @returns {JSX.Element} A series of input fields for OTP entry
- *
  * @example
  * // Basic usage
  * <UIOtpInput

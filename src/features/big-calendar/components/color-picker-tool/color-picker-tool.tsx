@@ -28,8 +28,6 @@ interface ColorPickerProps {
  * - `colors`: Array of available colors (defaults to `CalendarEventColor` enum values)
  *
  * @param {ColorPickerProps} props - Configuration and event handlers
- * @returns {JSX.Element} A group of color buttons with visual selection indicator
- *
  * @example
  * <ColorPickerTool
  *   selectedColor={currentColor}

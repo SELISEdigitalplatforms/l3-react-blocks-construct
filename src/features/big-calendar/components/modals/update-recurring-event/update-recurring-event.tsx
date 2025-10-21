@@ -46,7 +46,6 @@ const DEFAULT_UPDATE_OPTION: DeleteUpdateEventOption = 'this';
  * - `onConfirm`: `{Function}` – Callback when the user confirms an update option
  *
  * @param {UpdateRecurringEventProps} props - Props for configuring the recurring event update dialog
- * @returns {JSX.Element} The rendered dialog component
  *
  * @example
  * <UpdateRecurringEvent

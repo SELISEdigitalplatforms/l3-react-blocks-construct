@@ -11,7 +11,6 @@ import { UserMfaType } from '../../enums/user-mfa-type-enum';
  * edit the profile, manage two-factor authentication (MFA), and change the password.
  * It also handles various dialogs for MFA setup, authentication app setup, and email verification.
  *
- * @returns {JSX.Element} The rendered user profile and account security sections.
  */
 
 export const GeneralInfo = () => {

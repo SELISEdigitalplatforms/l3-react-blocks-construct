@@ -24,7 +24,6 @@ import { ReCaptchaProps } from './index.type';
  * - `size` ('normal' | 'compact'): Widget size (default: 'normal')
  *
  * @param {ReCaptchaProps} props - Properties for the reCAPTCHA component
- * @returns {JSX.Element} The rendered Google reCAPTCHA widget container
  *
  * @example
  * <ReCaptcha

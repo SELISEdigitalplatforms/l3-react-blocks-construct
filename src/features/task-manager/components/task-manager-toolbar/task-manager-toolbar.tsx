@@ -32,8 +32,6 @@ import {
  * @param {string} [viewMode='board'] - The current view mode ('board' or 'list')
  * @param {(view: string) => void} handleViewMode - Callback to change the view mode
  *
- * @returns {JSX.Element} The task manager toolbar component
- *
  * @example
  * // Basic usage
  * <TaskManagerToolbar

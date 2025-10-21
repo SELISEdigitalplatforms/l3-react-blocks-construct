@@ -26,7 +26,6 @@ import { DateRange } from 'react-day-picker';
  * - `onDateRangeLastLoginChange` (function, optional): Callback that triggers when the last login date range changes
  *
  * @param {FilterControlsProps<TData>} props - The component props
- * @returns {JSX.Element} A filter controls section with date range pickers for creation and last login dates
  *
  * @example
  * <FilterControls

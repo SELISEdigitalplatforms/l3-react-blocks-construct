@@ -40,8 +40,6 @@ import { Assignee } from '../../types/task-manager.types';
  * @param {Assignee[]} selectedAssignees - The list of currently selected assignees
  * @param {(selected: Assignee[]) => void} onChange - Callback triggered when the selected assignees change
  *
- * @returns {JSX.Element} The assignee selector component
- *
  * @example
  * // Basic usage
  * <AssigneeSelector

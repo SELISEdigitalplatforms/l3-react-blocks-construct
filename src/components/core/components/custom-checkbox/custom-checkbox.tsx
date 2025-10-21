@@ -18,8 +18,6 @@ import { UCheckboxProps } from './index.type';
  * @param {string} [label] - Optional text label displayed next to the checkbox
  * @param {string} [labelClassName] - Optional CSS classes to apply to the label element
  *
- * @returns {JSX.Element} A styled checkbox with optional label
- *
  * @example
  * // Basic usage with label
  * <CustomCheckbox label="I agree to the terms and conditions" />

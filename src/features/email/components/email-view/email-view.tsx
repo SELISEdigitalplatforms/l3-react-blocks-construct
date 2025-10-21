@@ -53,8 +53,6 @@ import { EmailViewMobile } from '../email-view-mobile/email-view-mobile';
  * @param {Function} setIsReplySingleAction - A function to update the reply action state
  * @param {Function} setIsComposing - A function to set whether the user is composing a new email
  *
- * @returns {JSX.Element} The EmailView component displaying the selected email, its content, and options for replying or composing
- *
  * @example
  * // Basic usage
  * <EmailView

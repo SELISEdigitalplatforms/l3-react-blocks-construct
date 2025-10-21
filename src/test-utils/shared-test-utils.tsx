@@ -58,6 +58,13 @@ const mockRouter = {
   BrowserRouter: MockRouter,
   MemoryRouter: MockRouter,
   HashRouter: MockRouter,
+  Outlet: ({ children }: { children?: React.ReactNode }) => (
+    <div data-testid="outlet">{children}</div>
+  ),
+  Routes: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  Route: ({ element, children }: { element?: React.ReactNode; children?: React.ReactNode }) => (
+    <>{element ?? children}</>
+  ),
   Link: ({ children, to, ...props }: { children: React.ReactNode; to: string }) => (
     <a href={to} {...props} data-testid="link">
       {children}

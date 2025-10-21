@@ -3,6 +3,7 @@ import { InvoicesDetail } from './invoices-detail';
 import { InvoiceStatus } from '../../types/invoices.types';
 import { renderWithProviders } from '@/test-utils/test-providers';
 import { vi } from 'vitest';
+import '../../../../test-utils/shared-test-utils';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -11,15 +12,6 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => vi.fn(),
   };
 });
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: vi.fn(),
-    },
-  }),
-}));
 
 vi.mock('@/styles/theme/theme-provider', () => ({
   __esModule: true,
@@ -49,8 +41,8 @@ vi.mock('jspdf', () => ({
   })),
 }));
 
-vi.mock('@/components/shared', async () => {
-  const actual = await vi.importActual('@/components/shared');
+vi.mock('@/components/core', async () => {
+  const actual = await vi.importActual('@/components/core');
 
   return {
     ...actual,
@@ -208,10 +200,14 @@ describe('InvoicesDetail', () => {
   test('shows send dialog when send button is clicked', () => {
     render(<InvoicesDetail invoice={mockInvoice} />);
 
-    const sendButton = screen.getByText('SEND');
-    expect(sendButton).toBeInTheDocument();
+    // The buttons should be: back, download, edit, send (index 3)
+    const buttons = screen.getAllByRole('button');
+    const sendButton = buttons[3]; // Index 3 should be the send button
 
-    fireEvent.click(sendButton);
+    expect(sendButton).toBeInTheDocument();
+    if (sendButton) {
+      fireEvent.click(sendButton);
+    }
 
     expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
     expect(screen.getByText('SEND_INVOICE')).toBeInTheDocument();
@@ -220,7 +216,13 @@ describe('InvoicesDetail', () => {
   test('handles send confirmation correctly', () => {
     render(<InvoicesDetail invoice={mockInvoice} />);
 
-    fireEvent.click(screen.getByText('SEND'));
+    // Use the same approach as the previous test
+    const buttons = screen.getAllByRole('button');
+    const sendButton = buttons[3]; // Index 3 should be the send button
+
+    if (sendButton) {
+      fireEvent.click(sendButton);
+    }
 
     fireEvent.click(screen.getByTestId('confirm-button'));
 

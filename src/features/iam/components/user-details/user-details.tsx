@@ -34,8 +34,6 @@ import { UserDetailItem } from './user-details-item';
  * @param {function} props.onOpenChange - Callback function to toggle the sheet modal open/closed.
  * @param {IamData | null} props.selectedUser - The currently selected user whose details are displayed.
  *
- * @returns {JSX.Element} - The rendered user details sheet modal with options to edit, reset password, or resend activation.
- *
  * @example
  * <UserDetails
  *   open={isSheetOpen}
