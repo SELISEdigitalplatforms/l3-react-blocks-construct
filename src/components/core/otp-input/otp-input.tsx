@@ -77,13 +77,13 @@ export interface UIOtpInputProps {
   skipDefaultStyles?: boolean;
 }
 
-const UIOtpInput: React.FC<UIOtpInputProps> = ({
+export const UIOtpInput = ({
   numInputs = 6,
   value,
   inputStyle,
   onChange,
   renderInput = (props) => <Input {...props} />,
-}) => {
+}: Readonly<UIOtpInputProps>) => {
   return (
     <OtpInput
       containerStyle="flex w-full justify-between"
@@ -95,5 +95,3 @@ const UIOtpInput: React.FC<UIOtpInputProps> = ({
     />
   );
 };
-
-export default UIOtpInput;

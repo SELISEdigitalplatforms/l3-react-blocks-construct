@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import UIOtpInput from '@/components/core/otp-input/otp-input';
+import { UIOtpInput } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';
 import { User } from '@/types/user.type';
 import { useGetSetUpTotp, useVerifyOTP } from '../../../hooks/use-mfa';

@@ -52,7 +52,7 @@ type DynamicBreadcrumbProps = {
   breadcrumbIndex?: number;
 };
 
-const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }) => {
+export const DynamicBreadcrumb = ({ breadcrumbIndex }: Readonly<DynamicBreadcrumbProps>) => {
   const location = useLocation();
   const { t } = useTranslation();
   const pathSegments = location.pathname.split('/').filter((segment) => segment);
@@ -139,5 +139,3 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
     </Breadcrumb>
   );
 };
-
-export default DynamicBreadcrumb;

@@ -97,4 +97,4 @@ const UIPhoneInput = React.forwardRef<any, UIPhoneInputProps>(
 
 UIPhoneInput.displayName = 'UIPhoneInput';
 
-export default UIPhoneInput;
+export { UIPhoneInput };

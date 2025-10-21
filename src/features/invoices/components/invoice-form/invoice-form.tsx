@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import UIPhoneInput from '@/components/core/phone-input/phone-input';
+import { UIPhoneInput } from '@/components/core';
 import { format } from 'date-fns';
 import { InvoiceFormValues } from '../../schemas/invoice-form-schema';
 

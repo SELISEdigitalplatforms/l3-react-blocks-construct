@@ -51,13 +51,13 @@ interface SharedPasswordStrengthCheckerProps {
   excludePasswordLabel?: string;
 }
 
-export const SharedPasswordStrengthChecker: React.FC<SharedPasswordStrengthCheckerProps> = ({
+export const SharedPasswordStrengthChecker = ({
   password,
   confirmPassword,
   onRequirementsMet,
   excludePassword,
   excludePasswordLabel,
-}) => {
+}: Readonly<SharedPasswordStrengthCheckerProps>) => {
   const { t } = useTranslation();
   const { checks, requirements } = usePasswordStrength(password);
   const [passwordsMatch, setPasswordsMatch] = useState(false);

@@ -34,7 +34,7 @@ import { UCheckboxProps } from './index.type';
  * if multiple checkboxes are used on the same page
  */
 
-export function UCheckbox({ label, labelClassName }: Readonly<UCheckboxProps>) {
+export const UCheckbox = ({ label, labelClassName }: Readonly<UCheckboxProps>) => {
   return (
     <div className="flex items-center space-x-2">
       <Checkbox
@@ -51,4 +51,4 @@ export function UCheckbox({ label, labelClassName }: Readonly<UCheckboxProps>) {
       )}
     </div>
   );
-}
+};

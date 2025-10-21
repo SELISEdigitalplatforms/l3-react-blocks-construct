@@ -22,7 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
-import UIPhoneInput from '@/components/core/phone-input/phone-input';
+import { UIPhoneInput } from '@/components/core';
 import DummyProfile from '@/assets/images/dummy_profile.png';
 
 /**

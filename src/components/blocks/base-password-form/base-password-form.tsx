@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
   FormControl,
@@ -12,10 +13,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { UPasswordInput } from '@/components/core/u-password-input';
-import { SharedPasswordStrengthChecker } from '../../core/shared-password-strength-checker';
+import { SharedPasswordStrengthChecker, UPasswordInput } from '@/components/core';
 import { Captcha } from '@/features/captcha';
-import { useTranslation } from 'react-i18next';
 
 /**
  * BasePasswordForm Component
