@@ -26,7 +26,7 @@ type ColumnDefWithFilter = ColumnDef<InvoiceItem> & {
 };
 
 // Mock the DataTableColumnHeader component
-vi.mock('components/blocks/data-table/data-table-column-header', () => ({
+vi.mock('components/core', () => ({
   // eslint-disable-next-line react/prop-types
   DataTableColumnHeader: ({ title }: { title: string }) => (
     <div data-testid="column-header">{title}</div>

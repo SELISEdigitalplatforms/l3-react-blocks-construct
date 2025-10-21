@@ -87,7 +87,7 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
       setIsMounted(true);
 
       if (isEditing) {
-        import('../../../../components/blocks/custom-text-editor/custom-text-editor')
+        import('../../../../components/core/components/custom-text-editor/custom-text-editor')
           .then((module) => {
             setEditorComponent(() => module.default);
           })
@@ -235,7 +235,7 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
       }
 
       if (!editorComponent) {
-        import('../../../../components/blocks/custom-text-editor/custom-text-editor')
+        import('../../../../components/core/components/custom-text-editor/custom-text-editor')
           .then((module) => {
             setEditorComponent(() => module.default);
           })

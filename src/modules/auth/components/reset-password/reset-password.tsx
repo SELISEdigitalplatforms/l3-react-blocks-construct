@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { BasePasswordForm } from '../../../../components/blocks/base-password-form/base-password-form';
+import { BasePasswordForm } from '@/components/core';
 import { useResetPassword } from '../../hooks/use-auth';
 import { resetPasswordFormDefaultValue, getResetPasswordFormValidationSchema } from './utils';
 
@@ -17,8 +17,6 @@ import { resetPasswordFormDefaultValue, getResetPasswordFormValidationSchema } f
  *
  * @param {Object} props - Component props
  * @param {string} props.code - Verification code from the reset password link
- *
- * @returns {JSX.Element} The rendered password reset form
  *
  * @example
  * // Basic usage with reset code from URL params

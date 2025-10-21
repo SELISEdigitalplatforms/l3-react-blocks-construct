@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BasePasswordForm } from '@/components/blocks/base-password-form/base-password-form';
+import { BasePasswordForm } from '@/components/core';
 import { useAccountActivation } from '../../hooks/use-auth';
 import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from './utils';
 
@@ -19,8 +19,6 @@ import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from 
  *
  * @param {Object} props - Component props
  * @param {string} props.code - Verification code for account activation
- *
- * @returns {JSX.Element} The rendered password setting form with CAPTCHA
  *
  * @example
  * // Basic usage with activation code from URL params

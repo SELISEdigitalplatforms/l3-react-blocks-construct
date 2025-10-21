@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React, { useState } from 'react';
-import LanguageSelector from '../../components/blocks/language-selector/language-selector';
+import { LanguageSelector } from '@/components/core';
 
 // Mock language context for stories
 const MockLanguageProvider = ({ children, mockData }: any) => {

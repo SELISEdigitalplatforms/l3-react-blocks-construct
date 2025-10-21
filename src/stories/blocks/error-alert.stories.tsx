@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import React from 'react';
-import { ErrorAlert } from '../../components/shared';
+import { ErrorAlert } from '../../components/core';
 
 const meta: Meta<typeof ErrorAlert> = {
   title: 'ErrorAlert',

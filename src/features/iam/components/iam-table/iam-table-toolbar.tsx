@@ -6,7 +6,7 @@ import { X, Mail, User, Filter } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { DataTableViewOptions } from '@/components/blocks/data-table/data-table-view-options';
+import { DataTableViewOptions } from '@/components/core';
 import { useEffect, useState, useCallback } from 'react';
 import { debounce } from 'lodash';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';

@@ -18,7 +18,7 @@ vi.mock('hooks/use-toast', () => ({
 }));
 
 // Mock ConfirmationModal and EditGroupName to avoid side effects
-vi.mock('components/shared/confirmation-modal/confirmation-modal', () => ({
+vi.mock('components/core/confirmation-modal/confirmation-modal', () => ({
   __esModule: true,
   default: ({ open, onOpenChange, onConfirm }: any) =>
     open ? (

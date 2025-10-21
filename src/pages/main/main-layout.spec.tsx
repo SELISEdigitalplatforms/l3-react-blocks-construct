@@ -26,20 +26,20 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('components/blocks/layout/app-sidebar', () => ({
+vi.mock('components/core/app-sidebar', () => ({
   AppSidebar: () => <div data-testid="app-sidebar">App Sidebar</div>,
 }));
 
-vi.mock('components/blocks/u-profile-menu', () => ({
+vi.mock('components/core/profile-menu', () => ({
   ProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
 }));
 
-vi.mock('@/components/blocks/language-selector/language-selector', () => ({
+vi.mock('components/core/language-selector', () => ({
   __esModule: true,
   default: () => <div data-testid="language-selector">Language Selector</div>,
 }));
 
-vi.mock('@/i18n/language-context', () => ({
+vi.mock('i18n/language-context', () => ({
   useLanguageContext: vi.fn(() => ({
     currentLanguage: 'en',
     setLanguage: vi.fn(),
@@ -50,7 +50,7 @@ vi.mock('@/i18n/language-context', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/sidebar', () => {
+vi.mock('components/ui/sidebar', () => {
   const mockUseSidebar = vi.fn(() => ({
     open: true,
     isMobile: false,

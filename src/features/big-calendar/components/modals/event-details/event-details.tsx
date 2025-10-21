@@ -12,7 +12,7 @@ import {
   Dialog,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import { CalendarEvent, DeleteUpdateEventOption } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';
 import { DeleteRecurringEvent } from '../delete-recurring-event/delete-recurring-event';

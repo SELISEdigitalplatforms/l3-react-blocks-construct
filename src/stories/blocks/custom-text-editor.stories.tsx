@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import React, { useState } from 'react';
-import CustomTextEditor from '../../components/blocks/custom-text-editor/custom-text-editor';
+import { useState } from 'react';
+import { CustomTextEditor } from '@/components/core';
 
 const meta: Meta<typeof CustomTextEditor> = {
   title: 'CustomTextEditor',

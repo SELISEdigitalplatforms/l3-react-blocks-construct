@@ -114,7 +114,7 @@ const useRolesData = () => {
 };
 
 import type { UseFormSetValue } from 'react-hook-form';
-import { UIPhoneInput } from '@/components/shared';
+import { UIPhoneInput } from '@/components/core';
 
 const useFormInitialization = (userInfo: User | IamData, setValue: UseFormSetValue<FormData>) => {
   useEffect(() => {

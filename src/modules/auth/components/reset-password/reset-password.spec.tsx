@@ -16,7 +16,7 @@ type BasePasswordFormProps = {
   code: string;
 };
 
-vi.mock('../../../../components/blocks/base-password-form/base-password-form', () => ({
+vi.mock('@/components/core', () => ({
   BasePasswordForm: ({ onSubmit, isPending, code }: BasePasswordFormProps) => (
     <form
       data-testid="base-password-form"

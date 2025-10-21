@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { Icon, type IconName } from '../../components/blocks/menu-icon/menu-icon';
+import { MenuIcon, type IconName } from '../../components/core/components/menu-icon/menu-icon';
 
-const meta: Meta<typeof Icon> = {
+const meta: Meta<typeof MenuIcon> = {
   title: 'MenuIcon',
-  component: Icon,
+  component: MenuIcon,
   tags: ['autodocs'],
   parameters: {
     docs: {
@@ -44,7 +44,7 @@ const meta: Meta<typeof Icon> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Icon>;
+type Story = StoryObj<typeof MenuIcon>;
 
 export const Default: Story = {
   args: {
@@ -78,12 +78,12 @@ export const WarningIcon: Story = {
 export const NavigationIcons: Story = {
   render: () => (
     <div className="flex gap-4 items-center">
-      <Icon name="LayoutDashboard" size={20} />
-      <Icon name="Users" size={20} />
-      <Icon name="Store" size={20} />
-      <Icon name="ReceiptText" size={20} />
-      <Icon name="Calendar" size={20} />
-      <Icon name="Inbox" size={20} />
+      <MenuIcon name="LayoutDashboard" size={20} />
+      <MenuIcon name="Users" size={20} />
+      <MenuIcon name="Store" size={20} />
+      <MenuIcon name="ReceiptText" size={20} />
+      <MenuIcon name="Calendar" size={20} />
+      <MenuIcon name="Inbox" size={20} />
     </div>
   ),
 };
@@ -116,7 +116,7 @@ export const AllIcons: Story = {
       <div className="grid grid-cols-6 gap-4 p-4">
         {iconNames.map((iconName) => (
           <div key={iconName} className="flex flex-col items-center gap-2">
-            <Icon name={iconName} size={24} />
+            <MenuIcon name={iconName} size={24} />
             <span className="text-xs text-center">{iconName}</span>
           </div>
         ))}

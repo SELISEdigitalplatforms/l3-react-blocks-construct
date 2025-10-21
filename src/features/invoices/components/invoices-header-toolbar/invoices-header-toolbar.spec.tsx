@@ -14,7 +14,7 @@ vi.mock('react-i18next', () => ({
   },
 }));
 
-vi.mock('components/blocks/gurads/permission-guard/permission-guard', () => ({
+vi.mock('components/core/components/gurads/permission-guard/permission-guard', () => ({
   PermissionGuard: ({
     children,
     showFallback,

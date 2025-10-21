@@ -51,7 +51,7 @@ import { AssigneeSelector } from './assignee-selector';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useToast } from '@/hooks/use-toast';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AddTag } from '../modals/add-tag';

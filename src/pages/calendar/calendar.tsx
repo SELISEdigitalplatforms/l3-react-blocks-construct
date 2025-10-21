@@ -12,7 +12,7 @@ import {
   useCalendarUI,
   CalendarSettingsProvider,
 } from '@/features/big-calendar';
-import { ConfirmationModal } from '@/components/shared';
+import { ConfirmationModal } from '@/components/core';
 
 /**
  * CalendarPage Component

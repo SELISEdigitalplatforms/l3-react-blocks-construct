@@ -1,15 +1,19 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { Bell } from 'lucide-react';
-import { AppSidebar } from '../../components/blocks/layout/app-sidebar';
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import LanguageSelector from '../../components/blocks/language-selector/language-selector';
 import { Button } from '@/components/ui/button';
 import { Menubar, MenubarMenu, MenubarTrigger } from '@/components/ui/menubar';
 import { Notification } from '@/features/notification/component/notification/notification';
 import { useGetNotifications } from '@/features/notification/hooks/use-notification';
 import { useGetAccount } from '@/features/profile/hooks/use-account';
 import { PermissionsProvider } from '@/providers/permission-provider';
-import { ProfileMenu } from '@/components/shared';
+import { LanguageSelector, ProfileMenu, AppSidebar } from '@/components/core';
+
+type NotificationsData = {
+  notifications: any[];
+  unReadNotificationsCount: number;
+  totalNotificationsCount: number;
+};
 
 export default function MainLayout() {
   const { open, isMobile } = useSidebar();
@@ -25,7 +29,7 @@ export default function MainLayout() {
     PageSize: 10,
   });
 
-  const notifications = notificationsData ?? {
+  const notifications: NotificationsData = notificationsData ?? {
     notifications: [],
     unReadNotificationsCount: 0,
     totalNotificationsCount: 0,

@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { parseISO, format } from 'date-fns';
-import { CustomAvatar } from '@/components/shared';
+import { CustomAvatar } from '@/components/core';
 
 /**
  * EmailViewResponseType Component

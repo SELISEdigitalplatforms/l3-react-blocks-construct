@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { CustomAvatar } from '../../components/shared';
+import { CustomAvatar } from '../../components/core';
 
 const meta: Meta<typeof CustomAvatar> = {
   title: 'CustomAvatar',

@@ -3,7 +3,7 @@ import { InvoicesFilterControls } from './invoices-filter-controls';
 import { vi } from 'vitest';
 
 // Mock the DateRangeFilter component
-vi.mock('components/blocks/data-table/data-table-date-filter', () => ({
+vi.mock('components/core/data-table/data-table-date-filter', () => ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   DateRangeFilter: ({ title, ..._props }: { title: string; [key: string]: any }) => (
     <div data-testid={`date-filter-${title}`}>{title} Filter</div>
@@ -11,7 +11,7 @@ vi.mock('components/blocks/data-table/data-table-date-filter', () => ({
 }));
 
 // Mock the DataTableFacetedFilter component
-vi.mock('components/blocks/data-table/data-table-faceted-filter', () => ({
+vi.mock('components/core/data-table/data-table-faceted-filter', () => ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   DataTableFacetedFilter: ({
     title,

@@ -46,7 +46,7 @@ The MCP-created project automatically includes the Selise Blocks component libra
 A project uses Selise if you find:
 
 - Imports from `features/*/component/`
-- Imports from `components/blocks/` or `components/ui/`
+- Imports from `components/core/` or `components/ui/`
 - `AdvanceDataTable` or `ConfirmationModal` in the codebase
 - Selise-style folder structure: `src/features/[feature-name]/components/`
 
@@ -57,7 +57,7 @@ A project uses Selise if you find:
 **Always follow this order when building components:**
 
 1. **Feature Level First** - Check `features/*/components/` for existing solutions
-2. **Block Level Second** - Use `components/blocks/` for business patterns
+2. **Block Level Second** - Use `components/core/` for business patterns
 3. **UI Level Last** - Use `components/ui/` as the foundation
 
 ### Import Decision Matrix
@@ -69,9 +69,9 @@ A project uses Selise if you find:
 import { Button, Input, Card, Table, Dialog, Badge } from 'components/ui/*';
 
 // Proven block patterns
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header';
-import CustomAvatar from 'components/shared/custom-avatar/custom-avatar';
+import ConfirmationModal from 'components/core/components/confirmation-modal/confirmation-modal';
+import { DataTableColumnHeader } from 'components/core/components/data-table/data-table-column-header';
+import CustomAvatar from 'components/core/components/custom-avatar/custom-avatar';
 
 // Complete feature solutions (when they fit exactly)
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
@@ -104,7 +104,7 @@ When building data tables, follow this exact pattern:
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
 
 // 2. Use Block Patterns
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
+import { DataTableColumnHeader } from 'components/core/components/data-table/data-table-column-header'
 
 // 3. Create Custom Business Logic
 export const createYourTableColumns = ({ t, onEdit, onDelete }) => [
@@ -136,7 +136,7 @@ export const createYourTableColumns = ({ t, onEdit, onDelete }) => [
 **Always use ConfirmationModal - never create custom confirmation dialogs:**
 
 ```typescript
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal'
+import ConfirmationModal from 'components/core/components/confirmation-modal/confirmation-modal'
 
 const [deleteModal, setDeleteModal] = useState({ open: false, item: null });
 
@@ -433,7 +433,7 @@ import { useForm } from 'react-hook-form';
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
 
 // 3. Block level imports
-import ConfirmationModal from 'components/shared/confirmation-modal/confirmation-modal';
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal';
 
 // 4. UI level imports
 import { Button, Input, Card } from 'components/ui/*';
