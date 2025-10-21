@@ -1,7 +1,12 @@
 import API_CONFIG, { getApiUrl } from '../../../config/api';
 import { clients, HttpError } from '@/lib/https';
 import { useAuthStore } from '@/state/store/auth';
-import { SigninEmailPayload, SigninEmailResponse } from '../types/auth.type';
+import {
+  ForgotPasswordPayload,
+  ForgotPasswordResponse,
+  SigninEmailPayload,
+  SigninEmailResponse,
+} from '../types/auth.type';
 
 /**
  * Authentication API Utilities
@@ -230,15 +235,15 @@ export const accountActivation = async (data: {
   return clients.post(url, JSON.stringify(payload));
 };
 
-export const forgotPassword = async (data: { email: string; captchaCode?: string }) => {
-  const payload = {
-    ...data,
+export const forgotPassword = async (
+  payload: ForgotPasswordPayload
+): Promise<ForgotPasswordResponse> => {
+  const modified = {
+    ...payload,
     mailPurpose: 'RecoverAccount',
-    ProjectKey: API_CONFIG.blocksKey,
   };
-
   const url = '/iam/v1/Account/Recover';
-  return clients.post(url, JSON.stringify(payload));
+  return clients.post(url, JSON.stringify(modified));
 };
 
 export const resetPassword = async (data: { code: string; password: string }) => {

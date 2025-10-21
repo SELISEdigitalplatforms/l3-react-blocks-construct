@@ -3,8 +3,10 @@ import { ForgotpasswordForm } from '@/modules/auth/components/forgot-password';
 import { useTheme } from '@/styles/theme/theme-provider';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
-export function ForgotPasswordPage() {
+export const ForgotPasswordPage = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -22,6 +24,11 @@ export function ForgotPasswordPage() {
         </div>
       </div>
       <ForgotpasswordForm />
+      <Link to={'/login'}>
+        <Button className="font-extrabold text-primary w-full" size="lg" variant="ghost">
+          {t('GO_TO_LOGIN')}
+        </Button>
+      </Link>
     </div>
   );
-}
+};

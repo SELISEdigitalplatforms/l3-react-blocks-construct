@@ -2,7 +2,7 @@ import { SigninPage } from '@/modules/auth/pages/signin/signin-page';
 import { ActivationSuccess } from '@/pages/auth/activation-success/activation-success';
 import { AuthLayout } from '@/pages/auth/auth-layout';
 import { EmailVerification } from '@/pages/auth/email-verification/email-verification';
-import { ForgotPasswordPage } from '@/pages/auth/forgot-password/forgot-password';
+import { ForgotPasswordPage } from '@/modules/auth/pages/forgot-password';
 import { ResetPasswordPage } from '@/pages/auth/reset-password/reset-password';
 import { SetPasswordPage } from '@/pages/auth/set-password/set-password';
 import { SignupPage } from '@/pages/auth/signup/signup-page';

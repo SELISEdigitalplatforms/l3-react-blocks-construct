@@ -92,12 +92,9 @@ export const useAccountActivation = () => {
 };
 
 export const useForgotPassword = () => {
-  return useGlobalMutation<unknown, ErrorResponse, { email: string; captchaCode?: string }>({
+  return useMutation({
     mutationKey: ['forgotPassword'],
     mutationFn: forgotPassword,
-    onError: (error) => {
-      throw error;
-    },
   });
 };
 
