@@ -4,7 +4,7 @@ import githubIcon from '@/assets/images/social_media_github.svg';
 import linkedinIcon from '@/assets/images/social_media_in.svg';
 import microsoftIcon from '@/assets/images/social_media_ms.svg';
 import googleIcon from '@/assets/images/social_media_google.svg';
-import { SignupForm } from '@/features/auth/components/signup-form';
+import { SignupForm } from '@/modules/auth/components/signup-form';
 import darkLogo from '@/assets/images/construct_logo_dark.svg';
 import lightLogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
@@ -71,10 +71,10 @@ type SocialLoginOptionsProps = Readonly<{
   socialButtons: ReadonlyArray<Readonly<{ icon: string; alt: string }>>;
 }>;
 
-function SocialLoginOptions({ t, socialButtons }: SocialLoginOptionsProps) {
+function SocialLoginOptions({ socialButtons }: SocialLoginOptionsProps) {
   return (
     <div>
-      <Divider text={t('OR_CONTINUE_WITH')} />
+      {/* <Divider text={t('OR_CONTINUE_WITH')} /> */}
       <div className="flex items-center gap-8">
         <div className="flex w-full items-center gap-4">
           {socialButtons.map((button) => (
@@ -96,23 +96,5 @@ function SocialButton({ icon, alt }: SocialButtonProps) {
     <Button variant="outline" className="w-[25%] h-12" disabled>
       <img src={icon} width={20} height={20} alt={alt} />
     </Button>
-  );
-}
-
-type DividerProps = Readonly<{
-  text: string;
-}>;
-
-export function Divider({ text }: DividerProps) {
-  return (
-    <div className="flex items-center gap-4 mb-6 mt-23">
-      <div className="flex-1">
-        <hr className="h-[2px] bg-gray-200 border-0 rounded" />
-      </div>
-      <div className="text-base font-normal text-low-emphasis">{text}</div>
-      <div className="flex-1">
-        <hr className="h-[2px] bg-gray-200 border-0 rounded" />
-      </div>
-    </div>
   );
 }

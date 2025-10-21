@@ -1,15 +1,14 @@
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { LoginOption, SOCIAL_AUTH_PROVIDERS } from '@/constant/sso';
 import { GRANT_TYPES } from '@/constant/auth';
-import SSOSigninCard from '@/features/auth/components/sso-signin-card/sso-signin-card';
-import { Divider } from '../signup/signup-page';
+import SSOSigninCard from '@/modules/auth/components/sso-signin-card/sso-signin-card';
 
 type SsoSigninProps = {
   loginOption: LoginOption;
 };
 
 export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
-  const { t } = useTranslation();
+  // const {  } = useTranslation();
   const socialGrantAllowed = loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);
 
   if (!socialGrantAllowed) {
@@ -35,25 +34,17 @@ export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
   const isSingleProvider = availableProviders.length === 1;
 
   return (
-    <>
-      <div className="mt-6">
-        <Divider text={t('AUTH_OR')} />
+    <div className="flex items-center gap-8">
+      <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
+        {availableProviders.map((item) => (
+          <SSOSigninCard
+            key={item?.value}
+            providerConfig={item}
+            showText={isSingleProvider}
+            totalProviders={availableProviders.length}
+          />
+        ))}
       </div>
-
-      <div className="flex items-center gap-8">
-        <div
-          className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}
-        >
-          {availableProviders.map((item) => (
-            <SSOSigninCard
-              key={item?.value}
-              providerConfig={item}
-              showText={isSingleProvider}
-              totalProviders={availableProviders.length}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+    </div>
   );
 };

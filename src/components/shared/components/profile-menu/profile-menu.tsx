@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useSignoutMutation } from '@/features/auth/hooks/use-auth';
+import { useSignoutMutation } from '@/modules/auth/hooks/use-auth';
 import { useAuthStore } from '@/state/store/auth';
 import DummyProfile from '@/assets/images/dummy_profile.png';
 import { Skeleton } from '@/components/ui/skeleton';
