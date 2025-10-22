@@ -142,9 +142,9 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
 
     if (responseData && typeof responseData === 'object') {
       if ('getTaskManagerItems' in responseData) {
-        taskManagerItems = (responseData as any).getTaskManagerItems;
+        taskManagerItems = responseData.getTaskManagerItems;
       } else if ('TaskManagerItems' in responseData) {
-        taskManagerItems = (responseData as any).TaskManagerItems;
+        taskManagerItems = responseData.TaskManagerItems;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerItems = responseData as GetTasksResponse['TaskManagerItems'];
       }
@@ -252,9 +252,9 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
 
     if (responseData && typeof responseData === 'object') {
       if ('getTaskManagerSections' in responseData) {
-        taskManagerSections = (responseData as any).getTaskManagerSections;
+        taskManagerSections = responseData.getTaskManagerSections;
       } else if ('TaskManagerSections' in responseData) {
-        taskManagerSections = (responseData as any).TaskManagerSections;
+        taskManagerSections = responseData.TaskManagerSections;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerSections = responseData as GetSectionsResponse['TaskManagerSections'];
       }
@@ -335,9 +335,9 @@ export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResp
 
     if (responseData && typeof responseData === 'object') {
       if ('getTaskManagerTags' in responseData) {
-        taskManagerTags = (responseData as any).getTaskManagerTags;
+        taskManagerTags = responseData.getTaskManagerTags;
       } else if ('TaskManagerTags' in responseData) {
-        taskManagerTags = (responseData as any).TaskManagerTags;
+        taskManagerTags = responseData.TaskManagerTags;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerTags = responseData as GetTagsResponse['TaskManagerTags'];
       }
@@ -415,9 +415,9 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
 
     const responseData = (response as any)?.data || (response as any);
     const taskComments =
-      (responseData as any)?.getTaskComments ||
-      (responseData as any)?.TaskManagerComments ||
-      (responseData as any)?.TaskComments;
+      responseData?.getTaskComments ||
+      responseData?.TaskManagerComments ||
+      responseData?.TaskComments;
 
     if (taskComments) {
       const processedComments = (taskComments.items || []).map((comment: any) => ({

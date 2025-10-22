@@ -29,7 +29,7 @@ vi.mock('react-i18next', async () => {
       type: '3rdParty',
       init: vi.fn(),
     },
-  } as any;
+  };
 });
 
 // react-router-dom mock - used by components with routing
@@ -91,7 +91,7 @@ vi.mock('react-router-dom', async () => {
       </a>
     ),
     Navigate: ({ to }: { to: string }) => <div data-tegstid="navigate" data-to={to} />,
-  } as any;
+  };
 });
 
 // Export mocks for use in tests

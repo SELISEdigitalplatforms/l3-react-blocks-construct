@@ -70,11 +70,11 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
     let invoiceItems: InvoiceItemsData | null = null;
     if (responseData && typeof responseData === 'object') {
       if ('getInvoiceItems' in responseData) {
-        invoiceItems = (responseData as any).getInvoiceItems as InvoiceItemsData;
+        invoiceItems = responseData.getInvoiceItems as InvoiceItemsData;
       } else if ('InvoiceItems' in responseData) {
-        invoiceItems = (responseData as any).InvoiceItems as InvoiceItemsData;
+        invoiceItems = responseData.InvoiceItems as InvoiceItemsData;
       } else if ('invoiceItems' in responseData) {
-        invoiceItems = (responseData as any).invoiceItems as InvoiceItemsData;
+        invoiceItems = responseData.invoiceItems as InvoiceItemsData;
       }
     }
 
