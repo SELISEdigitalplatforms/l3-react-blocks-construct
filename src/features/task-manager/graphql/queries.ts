@@ -9,7 +9,7 @@
 // First, let's try to get the task items without the complex fields
 export const GET_TASK_MANAGER_QUERY = `
   query TaskManagerItems($input: DynamicQueryInput) {
-    TaskManagerItems(input: $input) {
+    getTaskManagerItems(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
@@ -62,7 +62,7 @@ export const GET_TASK_MANAGER_QUERY = `
 
 export const GET_TASK_MANAGER_SECTIONS_QUERY = `
   query TaskManagerSections($input: DynamicQueryInput) {
-    TaskManagerSections(input: $input) {
+    getTaskManagerSections(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
@@ -94,7 +94,7 @@ export const GET_TASK_MANAGER_SECTIONS_QUERY = `
 
 export const GET_TASK_MANAGER_TAGS_QUERY = `
   query TaskManagerTags($input: DynamicQueryInput) {
-    TaskManagerTags(input: $input) {
+    getTaskManagerTags(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
@@ -126,7 +126,7 @@ export const GET_TASK_MANAGER_TAGS_QUERY = `
 
 export const GET_TASK_COMMENTS_QUERY = `
   query TaskManagerComments($input: DynamicQueryInput) {
-    TaskComments(input: $input) {
+    getTaskComments(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
@@ -157,7 +157,7 @@ export const GET_TASK_COMMENTS_QUERY = `
 
 export const GET_TASK_ATTACHMENTS_QUERY = `
   query TaskAttachments($input: DynamicQueryInput) {
-    TaskAttachments(input: $input) {
+    getTaskAttachments(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
