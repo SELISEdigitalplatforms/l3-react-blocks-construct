@@ -35,11 +35,11 @@ export function Inventory() {
     pageNo: paginationState.pageIndex + 1,
     pageSize: paginationState.pageSize,
   });
-  const data = inventoryData as { InventoryItems: any };
+  const data = inventoryData as { getInventoryItems: any };
 
   useEffect(() => {
-    if (data?.InventoryItems?.items) {
-      const inventoryDataMap = data.InventoryItems.items.map((item: InventoryItem) => ({
+    if (data?.getInventoryItems?.items) {
+      const inventoryDataMap = data.getInventoryItems.items.map((item: InventoryItem) => ({
         ItemId: item.ItemId,
         Category: item.Category,
         CreatedBy: item.CreatedBy,
@@ -65,7 +65,7 @@ export function Inventory() {
       setInventoryTableData(inventoryDataMap);
       setPaginationState((prev) => ({
         ...prev,
-        totalCount: data.InventoryItems.totalCount ?? 0,
+        totalCount: data.getInventoryItems.totalCount ?? 0,
       }));
     }
   }, [data]);

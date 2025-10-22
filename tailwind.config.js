@@ -1,10 +1,10 @@
 import tailwindcssAnimate from 'tailwindcss-animate';
+/** @typedef {import('tailwindcss').Config} Config */
 
-/** @type {import('tailwindcss').Config} */
+/** @type {Config} */
 export default {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
-    './public/index.html',
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/features/**/*.{js,ts,jsx,tsx,mdx}',
@@ -219,4 +219,4 @@ export default {
     },
   },
   plugins: [tailwindcssAnimate],
-}
+};

@@ -148,6 +148,13 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         }
       });
 
+      const sectionsById = new Map<string, TaskSection>();
+      filteredSections.forEach((section: TaskSection) => {
+        if (section.ItemId) {
+          sectionsById.set(section.ItemId, section);
+        }
+      });
+
       const tasksBySectionId: Record<string, TaskItem[]> = {};
       filteredSections.forEach((section: TaskSection) => {
         tasksBySectionId[section.ItemId] = [];
@@ -213,11 +220,12 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return true;
       };
 
-      const findSectionByTitle = (title: string): TaskSection | undefined => {
-        if (!title) return undefined;
+      const findSectionByReference = (ref: string): TaskSection | undefined => {
+        if (!ref) return undefined;
+        const byTitle = sectionsByTitle.get(ref);
+        if (byTitle) return byTitle;
 
-        const sections = Array.from(sectionsByTitle.values());
-        return sections.find((section) => section.Title === title);
+        return sectionsById.get(ref);
       };
 
       const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
@@ -230,7 +238,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       const addTaskToSection = (task: TaskItem): void => {
         if (!task.Section) return;
 
-        const section = findSectionByTitle(task.Section);
+        const section = findSectionByReference(task.Section);
         if (!section) return;
 
         const sectionTasks = ensureSectionTasksArray(section.ItemId);

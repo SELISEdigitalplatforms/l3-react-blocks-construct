@@ -124,24 +124,27 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
   const { pageNo, pageSize, filter = {}, sort = {} } = params;
 
   try {
+    const input: any = { pageNo, pageSize };
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_MANAGER_QUERY,
-      variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
-      },
+      variables: { input },
     });
 
-    const responseData = (response as any)?.data || response;
+    const responseData = (response as any)?.data || (response as any);
     let taskManagerItems: GetTasksResponse['TaskManagerItems'] | null = null;
 
     if (responseData && typeof responseData === 'object') {
-      if ('TaskManagerItems' in responseData) {
-        taskManagerItems = responseData.TaskManagerItems;
+      if ('getTaskManagerItems' in responseData) {
+        taskManagerItems = (responseData as any).getTaskManagerItems;
+      } else if ('TaskManagerItems' in responseData) {
+        taskManagerItems = (responseData as any).TaskManagerItems;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerItems = responseData as GetTasksResponse['TaskManagerItems'];
       }
@@ -221,27 +224,37 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
  * @returns Promise with task sections data
  */
 export const getTaskSections = async (params: PaginationParams): Promise<GetSectionsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+  const { pageNo, pageSize, filter, sort } = params;
 
   try {
+    const input: any = {
+      pageNo,
+      pageSize,
+    };
+
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_MANAGER_SECTIONS_QUERY,
       variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
+        input,
       },
     });
 
-    const responseData = (response as any)?.data || response;
+    const responseData = (response as any)?.data || (response as any);
     let taskManagerSections: GetSectionsResponse['TaskManagerSections'] | null = null;
 
     if (responseData && typeof responseData === 'object') {
-      if ('TaskManagerSections' in responseData) {
-        taskManagerSections = responseData.TaskManagerSections;
+      if ('getTaskManagerSections' in responseData) {
+        taskManagerSections = (responseData as any).getTaskManagerSections;
+      } else if ('TaskManagerSections' in responseData) {
+        taskManagerSections = (responseData as any).TaskManagerSections;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerSections = responseData as GetSectionsResponse['TaskManagerSections'];
       }
@@ -294,27 +307,37 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
  * @returns Promise with task sections data
  */
 export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+  const { pageNo, pageSize, filter, sort } = params;
 
   try {
+    const input: any = {
+      pageNo,
+      pageSize,
+    };
+
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_MANAGER_TAGS_QUERY,
       variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
+        input,
       },
     });
 
-    const responseData = (response as any)?.data || response;
+    const responseData = (response as any)?.data || (response as any);
     let taskManagerTags: GetTagsResponse['TaskManagerTags'] | null = null;
 
     if (responseData && typeof responseData === 'object') {
-      if ('TaskManagerTags' in responseData) {
-        taskManagerTags = responseData.TaskManagerTags;
+      if ('getTaskManagerTags' in responseData) {
+        taskManagerTags = (responseData as any).getTaskManagerTags;
+      } else if ('TaskManagerTags' in responseData) {
+        taskManagerTags = (responseData as any).TaskManagerTags;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerTags = responseData as GetTagsResponse['TaskManagerTags'];
       }
@@ -367,23 +390,34 @@ export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResp
  * @returns Promise with task comments data
  */
 export const getTaskComments = async (params: PaginationParams): Promise<GetCommentsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+  const { pageNo, pageSize, filter, sort } = params;
 
   try {
+    const input: any = {
+      pageNo,
+      pageSize,
+    };
+
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_COMMENTS_QUERY,
       variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
+        input,
       },
     });
 
-    const responseData = (response as any)?.data || response;
-    const taskComments = responseData?.TaskComments;
+    const responseData = (response as any)?.data || (response as any);
+    const taskComments =
+      (responseData as any)?.getTaskComments ||
+      (responseData as any)?.TaskManagerComments ||
+      (responseData as any)?.TaskComments;
 
     if (taskComments) {
       const processedComments = (taskComments.items || []).map((comment: any) => ({
