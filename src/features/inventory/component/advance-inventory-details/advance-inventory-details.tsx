@@ -69,8 +69,8 @@ export function AdvanceInventoryDetails() {
   const { t } = useTranslation();
   const { itemId } = useParams();
   const { data, isLoading } = useGetInventories({ pageNo: 1, pageSize: 1000 });
-  const inventoryData = data as { InventoryItems?: { items: any[] } };
-  const items = inventoryData?.InventoryItems?.items ?? [];
+  const inventoryData = data as { getInventoryItems?: { items: any[] } };
+  const items = inventoryData?.getInventoryItems?.items ?? [];
   const selectedInventory = items.find(
     (item: any) => String(item.ItemId).trim() === String(itemId).trim()
   );

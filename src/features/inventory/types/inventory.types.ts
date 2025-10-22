@@ -31,6 +31,7 @@ export interface InventoryItem {
   Category: string;
   CreatedBy: string;
   CreatedDate: string;
+  DeletedDate: string;
   IsDeleted: boolean;
   ItemId: string;
   ItemImageFileId: string;
@@ -95,6 +96,7 @@ export interface AddInventoryItemInput {
   Status: InventoryStatus;
   Stock: number;
   Tags: string[];
+  DeletedDate?: string;
   EligibleWarranty: boolean;
   EligibleReplacement: boolean;
   Discount: boolean;
@@ -123,6 +125,7 @@ export interface UpdateInventoryItemInput {
   Status?: InventoryStatus;
   Stock?: number;
   Tags?: string[];
+  DeletedDate?: string;
   EligibleWarranty?: boolean;
   EligibleReplacement?: boolean;
   Discount?: boolean;
