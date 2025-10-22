@@ -85,9 +85,9 @@ export const useGetTasks = (params: TaskQueryParams) => {
       const data = await getTasks(params);
       return data;
     },
-    staleTime: 0, // CHANGED: Disable caching temporarily for debugging
-    gcTime: 0, // CHANGED: Disable garbage collection caching
-    refetchOnWindowFocus: true, // CHANGED: Refetch when window gains focus
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
     onError: (error) => {
       console.error('[useGetTasks] Error:', error);
       throw error;

@@ -227,18 +227,15 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
   const { pageNo, pageSize, filter, sort } = params;
 
   try {
-    // Build input object conditionally - only include filter/sort if they have values
     const input: any = {
       pageNo,
       pageSize,
     };
 
-    // Only add filter if it exists and has properties
     if (filter && Object.keys(filter).length > 0) {
       input.filter = JSON.stringify(filter);
     }
 
-    // Only add sort if it exists and has properties
     if (sort && Object.keys(sort).length > 0) {
       input.sort = JSON.stringify(sort);
     }
@@ -313,18 +310,15 @@ export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResp
   const { pageNo, pageSize, filter, sort } = params;
 
   try {
-    // Build input object conditionally - only include filter/sort if they have values
     const input: any = {
       pageNo,
       pageSize,
     };
 
-    // Only add filter if it exists and has properties
     if (filter && Object.keys(filter).length > 0) {
       input.filter = JSON.stringify(filter);
     }
 
-    // Only add sort if it exists and has properties
     if (sort && Object.keys(sort).length > 0) {
       input.sort = JSON.stringify(sort);
     }
@@ -399,18 +393,15 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
   const { pageNo, pageSize, filter, sort } = params;
 
   try {
-    // Build input object conditionally - only include filter/sort if they have values
     const input: any = {
       pageNo,
       pageSize,
     };
 
-    // Only add filter if it exists and has properties
     if (filter && Object.keys(filter).length > 0) {
       input.filter = JSON.stringify(filter);
     }
 
-    // Only add sort if it exists and has properties
     if (sort && Object.keys(sort).length > 0) {
       input.sort = JSON.stringify(sort);
     }

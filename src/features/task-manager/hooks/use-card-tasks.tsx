@@ -121,7 +121,6 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
     pageSize: 100,
   });
 
-
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
   useEffect(() => {
@@ -223,12 +222,9 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
 
       const findSectionByReference = (ref: string): TaskSection | undefined => {
         if (!ref) return undefined;
-
-        // Try direct Title match first
         const byTitle = sectionsByTitle.get(ref);
         if (byTitle) return byTitle;
 
-        // Fallback: treat ref as Section ItemId
         return sectionsById.get(ref);
       };
 
