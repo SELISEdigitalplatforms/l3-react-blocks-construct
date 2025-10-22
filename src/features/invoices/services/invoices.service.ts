@@ -49,7 +49,11 @@ type GetInvoiceItemsContext = {
 export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
   try {
     const [, { pageNo, pageSize }] = context.queryKey;
-    const response = await graphqlClient.query<{ InvoiceItems: InvoiceItemsData }>({
+    const response = await graphqlClient.query<{
+      getInvoiceItems?: InvoiceItemsData;
+      InvoiceItems?: InvoiceItemsData;
+      invoiceItems?: InvoiceItemsData;
+    }>({
       query: GET_INVOICE_ITEMS_QUERY,
       variables: {
         input: {
@@ -61,17 +65,23 @@ export const getInvoiceItems = async (context: GetInvoiceItemsContext) => {
       },
     });
 
-    if (!response || typeof response !== 'object' || !response.InvoiceItems) {
-      const errorMessage = 'Invalid response structure: Missing InvoiceItems';
-      console.error('Invalid response structure:', { response });
-      throw new Error(`Failed to fetch invoice items: ${errorMessage}`);
+    const responseData = (response as any)?.data || response;
+
+    let invoiceItems: InvoiceItemsData | null = null;
+    if (responseData && typeof responseData === 'object') {
+      if ('getInvoiceItems' in responseData) {
+        invoiceItems = (responseData as any).getInvoiceItems as InvoiceItemsData;
+      } else if ('InvoiceItems' in responseData) {
+        invoiceItems = (responseData as any).InvoiceItems as InvoiceItemsData;
+      } else if ('invoiceItems' in responseData) {
+        invoiceItems = (responseData as any).invoiceItems as InvoiceItemsData;
+      }
     }
 
-    const invoiceItems = response.InvoiceItems;
-
     if (!invoiceItems || typeof invoiceItems !== 'object') {
-      console.error('Invalid invoice items data:', { invoiceItems });
-      throw new Error('Invalid invoice items data received from server');
+      const errorMessage = 'Invalid response structure: Missing getInvoiceItems';
+      console.error('Invalid response structure:', { response: responseData });
+      throw new Error(`Failed to fetch invoice items: ${errorMessage}`);
     }
 
     const result = {

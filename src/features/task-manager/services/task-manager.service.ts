@@ -136,12 +136,14 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
       },
     });
 
-    const responseData = (response as any)?.data || response;
+    const responseData = (response as any)?.data || (response as any);
     let taskManagerItems: GetTasksResponse['TaskManagerItems'] | null = null;
 
     if (responseData && typeof responseData === 'object') {
-      if ('TaskManagerItems' in responseData) {
-        taskManagerItems = responseData.TaskManagerItems;
+      if ('getTaskManagerItems' in responseData) {
+        taskManagerItems = (responseData as any).getTaskManagerItems;
+      } else if ('TaskManagerItems' in responseData) {
+        taskManagerItems = (responseData as any).TaskManagerItems;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerItems = responseData as GetTasksResponse['TaskManagerItems'];
       }
@@ -236,12 +238,14 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
       },
     });
 
-    const responseData = (response as any)?.data || response;
+    const responseData = (response as any)?.data || (response as any);
     let taskManagerSections: GetSectionsResponse['TaskManagerSections'] | null = null;
 
     if (responseData && typeof responseData === 'object') {
-      if ('TaskManagerSections' in responseData) {
-        taskManagerSections = responseData.TaskManagerSections;
+      if ('getTaskManagerSections' in responseData) {
+        taskManagerSections = (responseData as any).getTaskManagerSections;
+      } else if ('TaskManagerSections' in responseData) {
+        taskManagerSections = (responseData as any).TaskManagerSections;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerSections = responseData as GetSectionsResponse['TaskManagerSections'];
       }
@@ -309,12 +313,14 @@ export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResp
       },
     });
 
-    const responseData = (response as any)?.data || response;
+    const responseData = (response as any)?.data || (response as any);
     let taskManagerTags: GetTagsResponse['TaskManagerTags'] | null = null;
 
     if (responseData && typeof responseData === 'object') {
-      if ('TaskManagerTags' in responseData) {
-        taskManagerTags = responseData.TaskManagerTags;
+      if ('getTaskManagerTags' in responseData) {
+        taskManagerTags = (responseData as any).getTaskManagerTags;
+      } else if ('TaskManagerTags' in responseData) {
+        taskManagerTags = (responseData as any).TaskManagerTags;
       } else if ('items' in responseData || 'totalCount' in responseData) {
         taskManagerTags = responseData as GetTagsResponse['TaskManagerTags'];
       }
@@ -382,8 +388,11 @@ export const getTaskComments = async (params: PaginationParams): Promise<GetComm
       },
     });
 
-    const responseData = (response as any)?.data || response;
-    const taskComments = responseData?.TaskComments;
+    const responseData = (response as any)?.data || (response as any);
+    const taskComments =
+      (responseData as any)?.getTaskComments ||
+      (responseData as any)?.TaskManagerComments ||
+      (responseData as any)?.TaskComments;
 
     if (taskComments) {
       const processedComments = (taskComments.items || []).map((comment: any) => ({
