@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ClientMiddleware } from '@/state/client-middleware';
 import MainLayout from '@/pages/main/main-layout';
 import TaskPage from './pages/main/iam-table';
-import { Profile } from './pages/profile/profile';
+import { Profile } from './modules/iam/pages/profile/profile';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { Inventory } from './pages/inventory/inventory';
 import { InventoryDetails } from './pages/inventory/inventory-details';

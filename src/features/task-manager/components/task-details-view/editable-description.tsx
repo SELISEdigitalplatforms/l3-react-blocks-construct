@@ -86,8 +86,8 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
 
       if (isEditing) {
         import('../../../../components/core/components/custom-text-editor/custom-text-editor')
-          .then((module) => {
-            setEditorComponent(() => module.default);
+          .then(({ CustomTextEditor }) => {
+            setEditorComponent(() => CustomTextEditor as React.ComponentType<any>);
           })
           .catch((error) => {
             console.error('Error loading editor:', error);
@@ -234,8 +234,8 @@ const EditableDescription = forwardRef<EditableDescriptionRef, EditableDescripti
 
       if (!editorComponent) {
         import('../../../../components/core/components/custom-text-editor/custom-text-editor')
-          .then((module) => {
-            setEditorComponent(() => module.default);
+          .then(({ CustomTextEditor }) => {
+            setEditorComponent(() => CustomTextEditor as React.ComponentType<any>);
           })
           .catch(console.error);
         return <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>;

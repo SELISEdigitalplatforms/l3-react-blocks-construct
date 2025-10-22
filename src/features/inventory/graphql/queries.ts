@@ -20,6 +20,8 @@ export const GET_INVENTORY_QUERY = `
         CreatedBy
         CreatedDate
         IsDeleted
+        Tags
+        DeletedDate
         ItemImageFileId
         ItemImageFileIds
         ItemLoc
@@ -32,7 +34,6 @@ export const GET_INVENTORY_QUERY = `
         Status
         Stock
         Supplier
-        Tags
         EligibleWarranty
         EligibleReplacement
         Discount

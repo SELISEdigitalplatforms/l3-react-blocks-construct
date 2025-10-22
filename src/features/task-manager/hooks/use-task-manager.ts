@@ -79,16 +79,22 @@ interface TaskQueryParams {
  * });
  */
 export const useGetTasks = (params: TaskQueryParams) => {
-  return useGlobalQuery<GetTasksResponse>({
+  const result = useGlobalQuery<GetTasksResponse>({
     queryKey: ['tasks', params],
-    queryFn: () => getTasks(params),
+    queryFn: async () => {
+      const data = await getTasks(params);
+      return data;
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
     onError: (error) => {
+      console.error('[useGetTasks] Error:', error);
       throw error;
     },
   });
+
+  return result;
 };
 
 /**

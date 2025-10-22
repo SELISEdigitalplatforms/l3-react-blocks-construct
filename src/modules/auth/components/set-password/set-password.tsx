@@ -17,16 +17,6 @@ import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from 
  * - Handles form submission with password, verification code, and CAPTCHA token
  * - Delegates validation and UI rendering to the BasePasswordForm
  *
- * @param {Object} props - Component props
- * @param {string} props.code - Verification code for account activation
- *
- * @example
- * // Basic usage with activation code from URL params
- * const { code } = useParams();
- * <SetPasswordForm code={code || ''} />
- *
- * // With explicit activation code
- * <SetPasswordForm code="abc123def456" />
  */
 
 export const SetpasswordForm = ({ code }: { code: string }) => {
@@ -46,6 +36,7 @@ export const SetpasswordForm = ({ code }: { code: string }) => {
       password,
       code,
       captchaCode: captchaToken ?? '',
+      projectKey: import.meta.env.VITE_X_BLOCKS_KEY || '',
     });
   };
 

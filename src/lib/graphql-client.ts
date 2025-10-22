@@ -73,7 +73,7 @@ export const graphqlClient: GraphQLClient = {
       throw new Error(response.errors[0].message);
     }
 
-    return response.data as T;
+    return (response.data as T) ?? ({} as T);
   },
 
   async mutate<T>(request: GraphQLRequest): Promise<T> {

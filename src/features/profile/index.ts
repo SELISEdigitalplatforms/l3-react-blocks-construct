@@ -1,4 +1,4 @@
-export { GeneralInfo } from './component/general-info/general-info';
+export { GeneralInfo } from '../../modules/iam/components/general-info/general-info';
 export { DevicesTable } from './component/devices/devices-table/devices-table';
 export { useDeviceTableColumns } from './component/devices/devices-table-columns/devices-table-columns';
 export { EditProfile } from './component/modals/edit-profile/edit-profile';

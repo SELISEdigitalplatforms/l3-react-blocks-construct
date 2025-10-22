@@ -2,6 +2,7 @@ import API_CONFIG, { getApiUrl } from '../../../config/api';
 import { clients, HttpError } from '@/lib/https';
 import { useAuthStore } from '@/state/store/auth';
 import {
+  AccountActivationPayload,
   ForgotPasswordPayload,
   ForgotPasswordResponse,
   SigninEmailPayload,
@@ -59,16 +60,6 @@ export interface SignInResponse {
   enable_mfa: boolean;
   mfaId: string;
   mfaType: number;
-}
-
-interface AccountActivationData {
-  password: string;
-  code: string;
-}
-
-interface AccountActivationPayload extends AccountActivationData {
-  ProjectKey: string;
-  preventPostEvent: boolean;
 }
 
 export type PasswordSigninPayload = {
@@ -220,17 +211,11 @@ export const getRefreshToken = async () => {
   return response.json();
 };
 
-export const accountActivation = async (data: {
-  password: string;
-  code: string;
-  captchaCode: string;
-}) => {
-  const payload: AccountActivationPayload = {
+export const accountActivation = async (data: AccountActivationPayload) => {
+  const payload = {
     ...data,
-    ProjectKey: API_CONFIG.blocksKey,
     preventPostEvent: true,
   };
-
   const url = '/iam/v1/Account/Activate';
   return clients.post(url, JSON.stringify(payload));
 };

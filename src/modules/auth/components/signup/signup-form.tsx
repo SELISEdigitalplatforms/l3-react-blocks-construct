@@ -27,18 +27,6 @@ import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema }
  * - Terms of Service and Privacy Policy acknowledgement checkbox
  * - Loading state handling during async submission
  *
- * @example
- * // Basic usage
- * <SignupForm />
- *
- * // Within a registration page
- * <div className="auth-container">
- *   <h1>Create Your Account</h1>
- *   <SignupForm />
- *   <div className="auth-footer">
- *     <p>Already have an account? <Link to="/signin">Sign in</Link></p>
- *   </div>
- * </div>
  */
 
 export const SignupForm = () => {

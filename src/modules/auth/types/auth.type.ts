@@ -38,3 +38,10 @@ export interface ForgotPasswordResponse {
   errors: unknown;
   isSuccess: boolean;
 }
+
+export interface AccountActivationPayload {
+  password: string;
+  code: string;
+  captchaCode: string;
+  projectKey: string;
+}
