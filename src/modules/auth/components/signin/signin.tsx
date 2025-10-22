@@ -11,10 +11,8 @@ type SigninProps = {
 
 export const Signin = ({ loginOption }: SigninProps) => {
   const { t } = useTranslation();
-  const passwordGrantAllowed =
-    loginOption && loginOption.allowedGrantTypes?.includes(GRANT_TYPES.password);
-  const socialGrantAllowed =
-    loginOption && loginOption.allowedGrantTypes?.includes(GRANT_TYPES.social);
+  const passwordGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.password);
+  const socialGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);
 
   return (
     <div className="w-full">
@@ -24,7 +22,7 @@ export const Signin = ({ loginOption }: SigninProps) => {
           <Divider text={t('AUTH_OR')} />
         </div>
       )}
-      {socialGrantAllowed && <SsoSignin loginOption={loginOption} />}
+      {socialGrantAllowed && loginOption && <SsoSignin loginOption={loginOption} />}
     </div>
   );
 };

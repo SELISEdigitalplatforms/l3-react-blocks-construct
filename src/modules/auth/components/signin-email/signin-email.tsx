@@ -63,8 +63,8 @@ export const SigninEmail = () => {
           `/verify-key?mfa_id=${res?.mfaId}&mfa_type=${res?.mfaType}&user_name=${values.username}`
         );
 
-      login(res.access_token || '', res.refresh_token || '');
-      setTokens({ accessToken: res.access_token || '', refreshToken: res.refresh_token || '' });
+      login(res.access_token ?? '', res.refresh_token ?? '');
+      setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
       navigate('/');
     } catch (error) {
       if (captchaEnabled) {

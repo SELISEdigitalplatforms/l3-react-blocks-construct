@@ -19,17 +19,18 @@ const mockUseTranslation = () => ({
   i18n: mockI18n,
 });
 
-const mockI18next = {
-  ...vi.importActual('react-i18next'),
-  useTranslation: mockUseTranslation,
-  I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  initReactI18next: {
-    type: '3rdParty',
-    init: vi.fn(),
-  },
-};
-
-vi.mock('react-i18next', () => mockI18next);
+vi.mock('react-i18next', async () => {
+  const actual: any = await vi.importActual('react-i18next');
+  return {
+    ...actual,
+    useTranslation: mockUseTranslation,
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    initReactI18next: {
+      type: '3rdParty',
+      init: vi.fn(),
+    },
+  } as any;
+});
 
 // react-router-dom mock - used by components with routing
 const mockNavigate = vi.fn();
@@ -49,48 +50,49 @@ const MockRouter = ({ children }: { children: React.ReactNode }) => (
   <div data-testid="mock-router">{children}</div>
 );
 
-const mockRouter = {
-  ...vi.importActual('react-router-dom'),
-  useNavigate: mockUseNavigate,
-  useLocation: mockUseLocation,
-  useParams: mockUseParams,
-  useSearchParams: mockUseSearchParams,
-  BrowserRouter: MockRouter,
-  MemoryRouter: MockRouter,
-  HashRouter: MockRouter,
-  Outlet: ({ children }: { children?: React.ReactNode }) => (
-    <div data-testid="outlet">{children}</div>
-  ),
-  Routes: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  Route: ({ element, children }: { element?: React.ReactNode; children?: React.ReactNode }) => (
-    <>{element ?? children}</>
-  ),
-  Link: ({ children, to, ...props }: { children: React.ReactNode; to: string }) => (
-    <a href={to} {...props} data-testid="link">
-      {children}
-    </a>
-  ),
-  NavLink: ({
-    children,
-    to,
-    className,
-    style,
-    ...props
-  }: {
-    children: React.ReactNode;
-    to: string;
-    className?: string;
-    style?: React.CSSProperties;
-    [key: string]: any;
-  }) => (
-    <a href={to} className={className} style={style} {...props} data-testid="nav-link">
-      {children}
-    </a>
-  ),
-  Navigate: ({ to }: { to: string }) => <div data-testid="navigate" data-to={to} />,
-};
-
-vi.mock('react-router-dom', () => mockRouter);
+vi.mock('react-router-dom', async () => {
+  const actual: any = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: mockUseNavigate,
+    useLocation: mockUseLocation,
+    useParams: mockUseParams,
+    useSearchParams: mockUseSearchParams,
+    BrowserRouter: MockRouter,
+    MemoryRouter: MockRouter,
+    HashRouter: MockRouter,
+    Outlet: ({ children }: { children?: React.ReactNode }) => (
+      <div data-testid="outlet">{children}</div>
+    ),
+    Routes: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    Route: ({ element, children }: { element?: React.ReactNode; children?: React.ReactNode }) => (
+      <>{element ?? children}</>
+    ),
+    Link: ({ children, to, ...props }: { children: React.ReactNode; to: string }) => (
+      <a href={to} {...props} data-testid="link">
+        {children}
+      </a>
+    ),
+    NavLink: ({
+      children,
+      to,
+      className,
+      style,
+      ...props
+    }: {
+      children: React.ReactNode;
+      to: string;
+      className?: string;
+      style?: React.CSSProperties;
+      [key: string]: any;
+    }) => (
+      <a href={to} className={className} style={style} {...props} data-testid="nav-link">
+        {children}
+      </a>
+    ),
+    Navigate: ({ to }: { to: string }) => <div data-tegstid="navigate" data-to={to} />,
+  } as any;
+});
 
 // Export mocks for use in tests
 export {

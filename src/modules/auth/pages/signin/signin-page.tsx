@@ -1,15 +1,51 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { useTranslation } from 'react-i18next';
 import { useGetLoginOptions } from '@/modules/auth/hooks/use-auth';
 import { Signin } from '../../components/signin/signin';
+import { useEffect, useRef } from 'react';
+import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
+import { useAuthStore } from '@/state/store/auth';
+import { SignInResponse } from '@/modules/auth/services/auth.service';
 
 export function SigninPage() {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { data: loginOption } = useGetLoginOptions();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { mutateAsync: signinMutate } = useSigninMutation<'social'>();
+  const { login, setTokens } = useAuthStore();
+  const isExchangingRef = useRef(false);
+
+  useEffect(() => {
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    if (code && state && !isExchangingRef.current) {
+      isExchangingRef.current = true;
+      (async () => {
+        try {
+          const res = (await signinMutate({ grantType: 'social', code, state })) as SignInResponse;
+          if (res.enable_mfa) {
+            navigate(`/verify-key?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
+              replace: true,
+            });
+            return;
+          }
+          login(res.access_token ?? '', res.refresh_token ?? '');
+          setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
+          navigate('/', { replace: true });
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('SSO code exchange failed:', error);
+        } finally {
+          isExchangingRef.current = false;
+        }
+      })();
+    }
+  }, [searchParams, signinMutate, login, setTokens, navigate]);
 
   return (
     <div className="flex flex-col gap-6">

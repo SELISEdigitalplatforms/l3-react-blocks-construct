@@ -3,14 +3,20 @@ import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Profile } from './profile';
-import { GeneralInfo, DevicesTable } from '@/features/profile';
 import '../../../../test-utils/shared-test-utils';
 
-vi.mock('@/features/profile', () => ({
+// Mock the actual modules used by Profile component
+vi.mock('../../components/general-info/general-info', () => ({
   GeneralInfo: vi.fn(() => <div data-testid="general-info">General Info Content</div>),
-  DevicesTable: vi.fn(() => <div data-testid="devices-table">Devices Table Content</div>),
 }));
+
+vi.mock('../../components/devices', () => ({
+  Devices: vi.fn(() => <div data-testid="devices-table">Devices Table Content</div>),
+}));
+
+import { Profile } from './profile';
+import { GeneralInfo as GeneralInfoMock } from '../../components/general-info/general-info';
+import { Devices as DevicesMock } from '../../components/devices';
 
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = new QueryClient({
@@ -46,8 +52,8 @@ describe('Profile Component', () => {
 
   test('shows GeneralInfo tab by default', () => {
     renderWithProviders(<Profile />);
-    expect(GeneralInfo).toHaveBeenCalled();
-    expect(DevicesTable).not.toHaveBeenCalled();
+    expect(GeneralInfoMock).toHaveBeenCalled();
+    expect(DevicesMock).not.toHaveBeenCalled();
     expect(screen.getByTestId('general-info')).toBeInTheDocument();
     expect(screen.queryByTestId('devices-table')).not.toBeInTheDocument();
   });
@@ -58,7 +64,7 @@ describe('Profile Component', () => {
 
     fireEvent.click(devicesTab);
 
-    expect(DevicesTable).toHaveBeenCalled();
+    expect(DevicesMock).toHaveBeenCalled();
     expect(screen.getByTestId('devices-table')).toBeInTheDocument();
     expect(screen.queryByTestId('general-info')).not.toBeInTheDocument();
   });
