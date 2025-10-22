@@ -6,7 +6,6 @@
  * including their details, assignments, and status information.
  */
 
-// First, let's try to get the task items without the complex fields
 export const GET_TASK_MANAGER_QUERY = `
   query TaskManagerItems($input: DynamicQueryInput) {
     getTaskManagerItems(input: $input) {

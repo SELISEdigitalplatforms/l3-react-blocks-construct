@@ -124,16 +124,17 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
   const { pageNo, pageSize, filter = {}, sort = {} } = params;
 
   try {
+    const input: any = { pageNo, pageSize };
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_MANAGER_QUERY,
-      variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
-      },
+      variables: { input },
     });
 
     const responseData = (response as any)?.data || (response as any);
@@ -223,18 +224,29 @@ export const getTasks = async (params: PaginationParams): Promise<GetTasksRespon
  * @returns Promise with task sections data
  */
 export const getTaskSections = async (params: PaginationParams): Promise<GetSectionsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+  const { pageNo, pageSize, filter, sort } = params;
 
   try {
+    // Build input object conditionally - only include filter/sort if they have values
+    const input: any = {
+      pageNo,
+      pageSize,
+    };
+
+    // Only add filter if it exists and has properties
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+
+    // Only add sort if it exists and has properties
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_MANAGER_SECTIONS_QUERY,
       variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
+        input,
       },
     });
 
@@ -298,18 +310,29 @@ export const getTaskSections = async (params: PaginationParams): Promise<GetSect
  * @returns Promise with task sections data
  */
 export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+  const { pageNo, pageSize, filter, sort } = params;
 
   try {
+    // Build input object conditionally - only include filter/sort if they have values
+    const input: any = {
+      pageNo,
+      pageSize,
+    };
+
+    // Only add filter if it exists and has properties
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+
+    // Only add sort if it exists and has properties
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_MANAGER_TAGS_QUERY,
       variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
+        input,
       },
     });
 
@@ -373,18 +396,29 @@ export const getTaskTags = async (params: PaginationParams): Promise<GetTagsResp
  * @returns Promise with task comments data
  */
 export const getTaskComments = async (params: PaginationParams): Promise<GetCommentsResponse> => {
-  const { pageNo, pageSize, filter = {}, sort = {} } = params;
+  const { pageNo, pageSize, filter, sort } = params;
 
   try {
+    // Build input object conditionally - only include filter/sort if they have values
+    const input: any = {
+      pageNo,
+      pageSize,
+    };
+
+    // Only add filter if it exists and has properties
+    if (filter && Object.keys(filter).length > 0) {
+      input.filter = JSON.stringify(filter);
+    }
+
+    // Only add sort if it exists and has properties
+    if (sort && Object.keys(sort).length > 0) {
+      input.sort = JSON.stringify(sort);
+    }
+
     const response = await graphqlClient.query({
       query: GET_TASK_COMMENTS_QUERY,
       variables: {
-        input: {
-          filter: JSON.stringify(filter),
-          sort: JSON.stringify(sort),
-          pageNo,
-          pageSize,
-        },
+        input,
       },
     });
 

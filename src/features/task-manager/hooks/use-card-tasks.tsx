@@ -121,6 +121,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
     pageSize: 100,
   });
 
+
   const { touchEnabled, screenSize } = useDeviceCapabilities();
 
   useEffect(() => {
@@ -145,6 +146,13 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       filteredSections.forEach((section: TaskSection) => {
         if (section.Title) {
           sectionsByTitle.set(section.Title, section);
+        }
+      });
+
+      const sectionsById = new Map<string, TaskSection>();
+      filteredSections.forEach((section: TaskSection) => {
+        if (section.ItemId) {
+          sectionsById.set(section.ItemId, section);
         }
       });
 
@@ -213,11 +221,15 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
         return true;
       };
 
-      const findSectionByTitle = (title: string): TaskSection | undefined => {
-        if (!title) return undefined;
+      const findSectionByReference = (ref: string): TaskSection | undefined => {
+        if (!ref) return undefined;
 
-        const sections = Array.from(sectionsByTitle.values());
-        return sections.find((section) => section.Title === title);
+        // Try direct Title match first
+        const byTitle = sectionsByTitle.get(ref);
+        if (byTitle) return byTitle;
+
+        // Fallback: treat ref as Section ItemId
+        return sectionsById.get(ref);
       };
 
       const ensureSectionTasksArray = (sectionId: string): TaskItem[] => {
@@ -230,7 +242,7 @@ export function useCardTasks({ searchQuery = '', filters = {} }: UseCardTasksPro
       const addTaskToSection = (task: TaskItem): void => {
         if (!task.Section) return;
 
-        const section = findSectionByTitle(task.Section);
+        const section = findSectionByReference(task.Section);
         if (!section) return;
 
         const sectionTasks = ensureSectionTasksArray(section.ItemId);
