@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { Finance } from './finance';
 import '../../test-utils/shared-test-utils';
 
 // Mock all finance feature components
-vi.mock('@/features/finance', () => ({
+vi.mock('@/modules/finance', () => ({
   FinanceInvoices: () => <div data-testid="finance-invoices">FinanceInvoices Component</div>,
   FinanceOverview: () => <div data-testid="finance-overview">FinanceOverview Component</div>,
   FinanceProfitOverviewGraph: () => (
@@ -17,6 +16,8 @@ vi.mock('@/features/finance', () => ({
     <div data-testid="finance-dashboard-header">FinanceDashboardHeader Component</div>
   ),
 }));
+
+import { Finance } from './finance';
 
 describe('Finance Component', () => {
   it('should render without crashing', () => {

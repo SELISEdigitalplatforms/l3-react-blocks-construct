@@ -44,7 +44,6 @@ import { vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Dashboard } from './dashboard';
 
 // 5. Mock other components
 // Mock components/ui/button module
@@ -56,8 +55,8 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
-// Mock features/dashboard module - using correct import path with @/ alias
-vi.mock('@/features/dashboard', () => ({
+// Mock modules/dashboard module - using correct import path with @/ alias
+vi.mock('@/modules/dashboard', () => ({
   DashboardHeader: () => (
     <div data-testid="dashboard-header">
       <h3>DASHBOARD</h3>
@@ -85,6 +84,8 @@ vi.mock('@/features/profile/hooks/use-account', () => ({
     error: null,
   })),
 }));
+
+import { Dashboard } from './dashboard';
 
 describe('Dashboard Component', () => {
   let queryClient: QueryClient;

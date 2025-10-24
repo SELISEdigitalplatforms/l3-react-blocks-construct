@@ -3,7 +3,7 @@ import {
   ActivityLogTimeline,
   ActivityLogToolbar,
   useActivityLogFilters,
-} from '@/features/activity-log-v1';
+} from '@/modules/activity-log-v1';
 
 /**
  * ActivityLogPage1 Component

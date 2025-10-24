@@ -11,7 +11,7 @@ import {
   useCalendarEvents,
   useCalendarUI,
   CalendarSettingsProvider,
-} from '@/features/big-calendar';
+} from '@/modules/big-calendar';
 import { ConfirmationModal } from '@/components/core';
 
 /**
