@@ -9,8 +9,8 @@ export const getProjectKey = (): string => {
   if (typeof window === 'undefined') return '';
 
   return (
-    window.localStorage.getItem(LOCAL_STORAGE_PROJECT_KEY) ||
-    import.meta.env.VITE_X_BLOCKS_KEY ||
+    window.localStorage.getItem(LOCAL_STORAGE_PROJECT_KEY) ??
+    import.meta.env.VITE_X_BLOCKS_KEY ??
     ''
   );
 };
