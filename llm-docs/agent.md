@@ -42,7 +42,7 @@ This project uses a FastMCP (Model Context Protocol) server for automating Selis
 
 **CRITICAL: Always get the project key from environment variables before using MCP tools.**
 
-- **Default**: Read `REACT_APP_PUBLIC_X_BLOCKS_KEY` from `.env` file
+- **Default**: Read `VITE_X_BLOCKS_KEY` from `.env` file
 - **Environment-specific**: If an environment is specified (dev, prod, test, etc.), read from `.env.{environment}` instead
 - **Usage**: Pass this value as `project_key` parameter to MCP tools that require it
 
@@ -50,10 +50,10 @@ Example:
 
 ```bash
 # For default environment
-PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env | cut -d '=' -f2)
+PROJECT_KEY=$(grep VITE_X_BLOCKS_KEY .env | cut -d '=' -f2)
 
 # For specific environment (e.g., dev)
-PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
+PROJECT_KEY=$(grep VITE_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 ```
 
 ## 📋 Project Setup Workflow (MCP-First)

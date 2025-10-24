@@ -61,9 +61,8 @@ type ColorPalette = {
 const initialState: ThemeProviderState = {
   theme: 'light',
   colors: {
-    primary: import.meta.env.VITE_PRIMARY_COLOR || import.meta.env.REACT_APP_PRIMARY_COLOR || '',
-    secondary:
-      import.meta.env.VITE_SECONDARY_COLOR || import.meta.env.REACT_APP_SECONDARY_COLOR || '',
+    primary: import.meta.env.VITE_PRIMARY_COLOR || '',
+    secondary: import.meta.env.VITE_SECONDARY_COLOR || '',
   },
   setTheme: () => null,
 };
@@ -82,12 +81,8 @@ export function ThemeProvider({
   const [colors, setColors] = useState(() => {
     const themeColors = getThemeColors();
     const currentTheme = theme === 'dark' ? themeColors.dark : themeColors.light;
-    const defaultPrimary =
-      import.meta.env.VITE_PRIMARY_COLOR || import.meta.env.REACT_APP_PRIMARY_COLOR || '#15969B';
-    const defaultSecondary =
-      import.meta.env.VITE_SECONDARY_COLOR ||
-      import.meta.env.REACT_APP_SECONDARY_COLOR ||
-      '#5194B8';
+    const defaultPrimary = import.meta.env.VITE_PRIMARY_COLOR || '#15969B';
+    const defaultSecondary = import.meta.env.VITE_SECONDARY_COLOR || '#5194B8';
 
     // Helper function to resolve color value
     const resolveColor = (
@@ -153,12 +148,8 @@ export function ThemeProvider({
     }
 
     setColors({
-      primary:
-        import.meta.env.VITE_PRIMARY_COLOR || import.meta.env.REACT_APP_PRIMARY_COLOR || '#15969B',
-      secondary:
-        import.meta.env.VITE_SECONDARY_COLOR ||
-        import.meta.env.REACT_APP_SECONDARY_COLOR ||
-        '#5194B8',
+      primary: import.meta.env.VITE_PRIMARY_COLOR || '#15969B',
+      secondary: import.meta.env.VITE_SECONDARY_COLOR || '#5194B8',
     });
   }, [theme]);
 

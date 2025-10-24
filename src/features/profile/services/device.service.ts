@@ -42,7 +42,7 @@ class SessionsService {
    * @param {FetchSessionsParams} params - The parameters to fetch the sessions.
    * @param {number} [params.page=0] - The page number for pagination.
    * @param {number} [params.pageSize=10] - The number of sessions to fetch per page.
-   * @param {string} [params.projectkey=process.env.REACT_APP_PUBLIC_X_BLOCKS_KEY] - The project key for the request.
+   * @param {string} [params.projectkey=API_CONFIG.blocksKey] - The project key for the request.
    * @param {object} params.filter - The filter object to apply when fetching sessions.
    * @param {string} params.filter.userId - The ID of the user whose sessions need to be fetched.
    *

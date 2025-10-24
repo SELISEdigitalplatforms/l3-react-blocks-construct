@@ -48,8 +48,8 @@ import API_CONFIG, { isLocalhost } from '@/config/api';
  * }
  *
  * @note Requires environment variables:
- * - REACT_APP_PUBLIC_BLOCKS_API_URL: Base URL for API requests
- * - REACT_APP_PUBLIC_X_BLOCKS_KEY: API key for authentication
+ * - VITE_PUBLIC_BLOCKS_API_URL: Base URL for API requests
+ * - VITE_X_BLOCKS_KEY: API key for authentication
  *
  */
 

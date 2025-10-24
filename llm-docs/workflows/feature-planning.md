@@ -123,7 +123,7 @@ This guide explains how to break down user requirements into actionable tasks an
 ## API Keys
 
 - GraphQL Endpoint: https://api.selise.cloud/data
-- API Key: Stored in .env as REACT_APP_API_KEY
+- API Key: Stored in .env as VITE_API_KEY
 ```
 
 ## Feature Breakdown Process
@@ -227,13 +227,11 @@ See: `docs/llm-docs/cloud-setup.md` for complete CLOUD.md workflow
 ## Implementation Order
 
 1. **Foundation** (Do First)
-
    - GraphQL setup
    - Basic list view
    - Route configuration
 
 2. **Core Features** (Do Second)
-
    - Create functionality
    - Edit functionality
    - Delete functionality

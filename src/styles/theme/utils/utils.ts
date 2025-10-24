@@ -37,7 +37,7 @@ export const generateColorPalette = (baseColor: string, isDark = false): ColorPa
 
   const { h, s: baseS } = base;
   const s = Math.min(100, baseS); // Ensure saturation doesn't exceed 100
-  const isPrimary = baseColor === (import.meta.env.VITE_PRIMARY_COLOR || import.meta.env.REACT_APP_PRIMARY_COLOR);
+  const isPrimary = baseColor === (import.meta.env.VITE_PRIMARY_COLOR || '');
 
   if (isDark) {
     if (isPrimary) {
@@ -154,8 +154,8 @@ const defaultColors = {
 } as const;
 
 export const getThemeColors = (): { light: ThemeColors; dark: ThemeColors } => {
-  const primaryColor = import.meta.env.VITE_PRIMARY_COLOR || import.meta.env.REACT_APP_PRIMARY_COLOR;
-  const secondaryColor = import.meta.env.VITE_SECONDARY_COLOR || import.meta.env.REACT_APP_SECONDARY_COLOR;
+  const primaryColor = import.meta.env.VITE_PRIMARY_COLOR || '';
+  const secondaryColor = import.meta.env.VITE_SECONDARY_COLOR || '';
 
   // Only generate palettes if colors are provided in env
   const lightPrimary = primaryColor ? generateColorPalette(primaryColor, false) : null;

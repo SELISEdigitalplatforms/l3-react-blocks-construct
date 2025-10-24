@@ -10,7 +10,7 @@ export const getProjectKey = (): string => {
 
   return (
     window.localStorage.getItem(LOCAL_STORAGE_PROJECT_KEY) ||
-    import.meta.env.REACT_APP_PUBLIC_X_BLOCKS_KEY ||
+    import.meta.env.VITE_X_BLOCKS_KEY ||
     ''
   );
 };
@@ -32,7 +32,7 @@ export const setProjectKey = (key: string): void => {
 export const initializeProjectKey = (): void => {
   if (typeof window === 'undefined') return;
 
-  const envKey = import.meta.env.REACT_APP_PUBLIC_X_BLOCKS_KEY;
+  const envKey = import.meta.env.VITE_X_BLOCKS_KEY;
   if (envKey) {
     setProjectKey(envKey);
   }
