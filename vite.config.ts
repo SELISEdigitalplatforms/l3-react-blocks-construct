@@ -17,13 +17,11 @@ export default defineConfig({
     },
   },
 
-  // Development server configuration
   server: {
     port: 3000,
-    host: true, // Allow external connections
-    open: false, // Don't auto-open browser (matches BROWSER=none from CRA)
-    // Allow SSO callbacks and requests from this external host
-    allowedHosts: ['dev-construct.seliseblocks.com'],
+    host: true,
+    open: false,
+    allowedHosts: true, // ✅ works for all tenants/domains
   },
 
   // Build configuration
