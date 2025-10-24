@@ -147,7 +147,7 @@ export function AuthLayout() {
   const isBannerAllowedToVisible = [
     'https://construct.seliseblocks.com/',
     'https://stg-construct.seliseblocks.com',
-    'http://dev-construct.seliseblocks.com',
+    'https://dev-construct.seliseblocks.com',
   ].some((path) => window.location.href.startsWith(path));
 
   return (
