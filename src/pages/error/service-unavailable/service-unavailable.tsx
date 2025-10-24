@@ -1,7 +1,7 @@
 import { RefreshCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import temporaryUnavailable from '@/assets/images/unavailable.svg';
-import { ErrorState } from '@/features/error-state';
+import { ErrorState } from '@/modules/error-state';
 
 export const ServiceUnavailable = () => {
   const { t } = useTranslation();

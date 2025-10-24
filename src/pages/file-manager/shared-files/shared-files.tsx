@@ -1,20 +1,20 @@
 import { useCallback, useState } from 'react';
-import { useFileManager } from '@/features/file-manager/hooks/use-file-manager';
-import { useFileFilters } from '@/features/file-manager/hooks/use-file-filters';
-import { FileManagerLayout } from '@/features/file-manager/components/layout/file-manager-layout';
-import { FileViewRenderer } from '@/features/file-manager/components/file-view-renderer/file-view-renderer';
-import { SharedFilters } from '@/features/file-manager/types/header-toolbar.type';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FilePreview } from '@/features/file-manager/components/file-preview/file-preview';
 import { useViewMode } from '@/hooks/use-view-mode';
+import { useFileManager } from '@/modules/file-manager/hooks/use-file-manager';
+import { useFileFilters } from '@/modules/file-manager/hooks/use-file-filters';
 import {
   DynamicFileModal,
+  FileManagerLayout,
+  FilePreview,
+  FileViewRenderer,
   RenameFile,
   SharedFilesGridView,
   SharedFilesListView,
   SharedWithMeHeaderToolbar,
   ShareWithMeModal,
-} from '@/features/file-manager';
+} from '@/modules/file-manager';
+import { SharedFilters } from '@/modules/file-manager/types/header-toolbar.type';
 
 interface SharedWithMeProps {
   onCreateFile?: () => void;

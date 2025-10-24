@@ -1,5 +1,5 @@
-import { ActivityLogToolbar, useActivityLogFilters } from '@/features/activity-log-v1';
-import { activitiesData, ActivityLogTimeline } from '@/features/activity-log-v2';
+import { ActivityLogToolbar, useActivityLogFilters } from '@/modules/activity-log-v1';
+import { activitiesData, ActivityLogTimeline } from '@/modules/activity-log-v2';
 
 /**
  * Timeline Component

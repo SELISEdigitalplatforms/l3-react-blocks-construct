@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import notFound from '@/assets/images/not_found.svg';
-import { ErrorState } from '@/features/error-state';
+import { ErrorState } from '@/modules/error-state';
 
 export const NotFound = () => {
   const { t } = useTranslation();
