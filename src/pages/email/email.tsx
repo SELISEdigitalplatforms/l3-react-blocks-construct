@@ -25,7 +25,7 @@ import {
   useEmailSelection,
   useEmailCompose,
   useEmailUI,
-} from '@/features/email';
+} from '@/modules/email';
 
 /**
  * Email Component

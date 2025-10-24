@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IFileTrashData } from '@/features/file-manager/utils/file-manager';
-import { TrashFilters } from '@/features/file-manager/types/header-toolbar.type';
-import { useMockTrashFilesQuery } from '@/features/file-manager/hooks/use-mock-trash-files-query';
 import { useViewMode } from '@/hooks/use-view-mode';
-import { TrashFilesListView, TrashGridView, TrashHeaderToolbar } from '@/features/file-manager';
+import { IFileTrashData } from '@/modules/file-manager/utils/file-manager';
+import { TrashFilters } from '@/modules/file-manager/types/header-toolbar.type';
+import { useMockTrashFilesQuery } from '@/modules/file-manager/hooks/use-mock-trash-files-query';
+import { TrashFilesListView, TrashGridView, TrashHeaderToolbar } from '@/modules/file-manager';
 
 interface TrashProps {
   onRestoreFile?: (file: IFileTrashData) => void;

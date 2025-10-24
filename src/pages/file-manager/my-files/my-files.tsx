@@ -1,20 +1,20 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FileManagerLayout } from '@/features/file-manager/components/layout/file-manager-layout';
-import { FileViewRenderer } from '@/features/file-manager/components/file-view-renderer/file-view-renderer';
-import { useFileManager } from '@/features/file-manager/hooks/use-file-manager';
-import { useFileFilters } from '@/features/file-manager/hooks/use-file-filters';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FilePreview } from '@/features/file-manager/components/file-preview/file-preview';
 import { useViewMode } from '@/hooks/use-view-mode';
+import { useFileManager } from '@/modules/file-manager/hooks/use-file-manager';
+import { useFileFilters } from '@/modules/file-manager/hooks/use-file-filters';
 import {
   DynamicFileModal,
   FileFilters,
   FileManagerHeaderToolbar,
+  FileManagerLayout,
+  FilePreview,
+  FileViewRenderer,
   MyFileGridView,
   MyFilesListView,
   RenameFile,
   ShareWithMeModal,
-} from '@/features/file-manager';
+} from '@/modules/file-manager';
 
 interface FileManagerMyFilesProps {
   onCreateFile?: () => void;

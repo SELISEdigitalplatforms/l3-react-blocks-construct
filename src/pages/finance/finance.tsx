@@ -4,7 +4,7 @@ import {
   FinanceProfitOverviewGraph,
   FinanceRevenueExpenseGraph,
   FinanceDashboardHeader,
-} from '@/features/finance';
+} from '@/modules/finance';
 
 export const Finance = () => {
   return (

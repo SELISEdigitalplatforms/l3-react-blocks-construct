@@ -36,7 +36,7 @@ const mockUseActivityLogFilters = vi.fn(() => ({
 }));
 
 // Mock the activity log v1 feature
-vi.mock('@/features/activity-log-v1', () => {
+vi.mock('@/modules/activity-log-v1', () => {
   // Mock data - defined inside the factory to avoid hoisting issues
   const mockActivitiesData = [
     {
