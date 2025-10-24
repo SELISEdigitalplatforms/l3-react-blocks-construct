@@ -1,9 +1,6 @@
-# CLAUDE.md
+# AI Agent Instructions for Selise Blocks Projects
 
-**MUST DO: READ LLM DOCS: llm-docs/ as per the usage guidelines in this file. Don't implement or do anything without following this step. if you fail to find it, do a full directory search first. dont just start path guidance: ~/Desktop/selise-demo via ❯ ls CLAUDE.md llm-docs selise_mcp_server.py user-info.txt**
-**MUST DO: READ LLM DOCS: llm-docs/ as per the usage guidelines in this file. Don't implement or do anything without following this step. if you fail to find it, do a full directory search first. dont just start path guidance: ~/Desktop/selise-demo via ❯ ls CLAUDE.md llm-docs selise_mcp_server.py user-info.txt**
-
-This file provides guidance to Claude Code (claude.ai/code) when working with Selise Blocks applications.
+This file provides guidance for AI agents and IDEs (such as VSCode with Copilot, Kilo Code, Trae AI, and similar tools) when working with Selise Blocks applications.
 
 ## 🚨 CRITICAL: MCP Server Integration
 
@@ -13,30 +10,19 @@ This project uses a FastMCP (Model Context Protocol) server for automating Selis
 
 **Authentication (Required First):**
 
-- `login`: Authenticate with Selise Blocks API (ask for username, password, GitHub username, repo name)
 - `get_auth_status`: Check authentication status
 
 **Project Management:**
 
-- `create_project`: Create new Selise Cloud project (ALWAYS use for new projects)
 - `get_projects`: List existing projects
 
 **Schema Management:**
-
 
 - `create_schema`: Create new schemas in Selise Cloud
 - `list_schemas`: List all schemas
 - `get_schema_details`: Get schema field information
 - `update_schema_fields`: Update existing schema fields
 - `finalize_schema`: Finalize schema changes
-
-**Translation Management:**
-
-- `get_translation_languages`: Get available languages for translation
-- `get_translation_modules`: List all translation modules
-- `create_module`: Create a new translation module
-- `get_module_keys`: Get all translation keys in a module
-- `save_module_keys_with_translations`: Save translation keys with their translations
 
 **Translation Management:**
 
@@ -72,11 +58,12 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 
 ## 📋 Project Setup Workflow (MCP-First)
 
-### Vibecoding Experience Flow (MUST FOLLOW IN ORDER):
+### Development Experience Flow (MUST FOLLOW IN ORDER):
 
 **When User Wants to Create Any Webapp/Website:**
 
 1. **FIRST: Read Documentation** (Before talking to user):
+
    - Read `workflows/user-interaction.md`
    - Read `workflows/feature-planning.md`
    - Read `agent-instructions/selise-development-agent.md`
@@ -89,38 +76,16 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
    - Document everything in FEATURELIST.md
    - Get user confirmation before proceeding
 
-3. **Project Setup** (After user confirms features):
-   - Get project name from user
-   - Authentication Flow (Ask one by one if NOT IN user-info.txt):
-     ```
-     - Username/email for Selise Blocks
-     - Password for Selise Blocks
-     - GitHub username
-     - GitHub repository name to connect
-     ```
-   - Project Creation Flow:
-
-     ```python
-     # ALWAYS create new project - don't look for existing domains
-     create_project(
-         project_name="UserProvidedName",
-         github_username="from_step_1",
-         repository_name="from_step_1"
-     )
-
-     # If user wants local setup:
-     create_local_repository(project_name="UserProvidedName")
-     ```
-
-4. **Feature Planning & Schema Design** (AFTER user confirmation):
+3. **Feature Planning & Schema Design** (AFTER user confirmation):
    - Break down confirmed features into technical requirements
    - Analyze what schemas are needed based on FEATURELIST.md
    - Document schema plan in CLOUD.md
    - Create schemas using MCP:
      ```python
      # For each entity the app needs:
+     # Use prefix format: <projectName><schemaName> (e.g., "MyAppTasks")
      create_schema(
-         schema_name="Tasks",
+         schema_name="<projectName>Tasks",
          fields=[
              {"name": "Title", "type": "String"},
              {"name": "Status", "type": "String"},
@@ -178,9 +143,9 @@ llm-docs/
 
 ## 🔄 Development Workflow
 
-**FOLLOW THE VIBECODING EXPERIENCE FLOW ABOVE FIRST!**
+**FOLLOW THE DEVELOPMENT EXPERIENCE FLOW ABOVE FIRST!**
 
-After completing steps 1-4 of the Vibecoding Experience Flow, continue with implementation:
+After completing steps 1-4 of the Development Experience Flow, continue with implementation:
 
 ### 5. Implementation Process (Using Your Tracking Files)
 
@@ -299,7 +264,7 @@ src/features/[feature-name]/
 
 ```
 1. Feature Components (src/features/*/components/)
-2. Block Components (src/components/core/)
+2. Block Components (src/components/blocks/)
 3. UI Components (src/components/ui/)
 ```
 
@@ -350,7 +315,6 @@ src/features/[feature-name]/
 
 Before ANY implementation:
 
-- [ ] Authenticated with MCP login tool
 - [ ] Created project with MCP create_project
 - [ ] Read ALL recipes in llm-docs/recipes/
 - [ ] Understood 3-layer component hierarchy

@@ -6,6 +6,7 @@ You are a specialized AI agent for building applications using the Selise Blocks
 
 ### 1. MCP Automated Project Creation (Agent Handles)
 
+
 **CRITICAL**: Project creation is now automated via MCP tools - follow CLAUDE.md workflow:
 
 ```python
