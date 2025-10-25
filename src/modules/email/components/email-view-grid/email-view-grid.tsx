@@ -33,13 +33,11 @@ import { EmailTextEditor } from '../email-text-editor/email-text-editor';
 import { EmailCompose } from '../email-compose/email-compose';
 import { sanitizeHTML } from '@/utils/sanitizer';
 import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tooltip-confirm-action';
-import {
-  EmailActionsPanel,
-  EmailActionsReplyPanel,
-  EmailSingleActions,
-  EmailViewResponseType,
-  htmlToPlainText,
-} from '@/modules/email';
+import { EmailActionsReplyPanel } from '../email-actions-reply-panel/email-actions-reply-panel';
+import { EmailViewResponseType } from '../email-view-response-type/email-view-response-type';
+import { EmailSingleActions } from '../email-single-action/email-single-action';
+import { htmlToPlainText } from '../../utils/email-utils';
+import { EmailActionsPanel } from '../email-actions-panel/email-actions-panel';
 
 interface AttachmentDisplayProps {
   attachments?: string[];

@@ -11,22 +11,22 @@ import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { Inventory } from './pages/inventory/inventory';
 import { InventoryDetails } from './pages/inventory/inventory-details';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { Email } from '@/pages/email';
 import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
 import TaskManager from './pages/task-manager/task-manager';
-import { CalendarPage } from '@/pages/calendar';
-import { Finance } from '@/pages/finance';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice, EditInvoice } from './features/invoices';
-import { ChatPage } from '@/pages/chat';
-import { Dashboard } from '@/pages/dashboard';
-import { NotFound, ServiceUnavailable } from '@/pages/error';
 import { ActivityLog } from '@/pages/activity-log';
 import { Timeline } from '@/pages/timeline';
 import { AuthRoutes } from './routes/auth.route';
-import { FileManagerMyFiles, SharedWithMe, Trash } from '@/pages/file-manager';
 import { LoadingOverlay } from '@/components/core';
+import { DashboardPage } from '@/modules/dashboard';
+import { FinancePage } from '@/modules/finance';
+import { CalendarPage } from '@/modules/big-calendar';
+import { EmailPage } from '@/modules/email';
+import { ChatPage } from '@/modules/chat';
+import { NotFoundPage, ServiceUnavailablePage } from '@/modules/error-view';
+import { FileManagerMyFilesPage, SharedWithMePage, TrashPage } from '@/modules/file-manager';
 
 const queryClient = new QueryClient();
 
@@ -57,8 +57,8 @@ function AppContent() {
               </Route> */}
 
               <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/finance" element={<Finance />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/finance" element={<FinancePage />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/inventory/add" element={<InventoryForm />} />
@@ -66,10 +66,10 @@ function AppContent() {
 
                 <Route path="/activity-log" element={<ActivityLog />} />
                 <Route path="/timeline" element={<Timeline />} />
-                <Route path="/mail" element={<Email />} />
-                <Route path="/mail/:category" element={<Email />} />
-                <Route path="/mail/:category/:emailId" element={<Email />} />
-                <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
+                <Route path="/mail" element={<EmailPage />} />
+                <Route path="/mail/:category" element={<EmailPage />} />
+                <Route path="/mail/:category/:emailId" element={<EmailPage />} />
+                <Route path="/mail/:category/:labels/:emailId" element={<EmailPage />} />
                 <Route path="/identity-management" element={<TaskPage />} />
                 <Route path="/task-manager" element={<TaskManager />} />
                 <Route path="/chat" element={<ChatPage />} />
@@ -118,16 +118,19 @@ function AppContent() {
                 <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
 
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
-                <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash" element={<Trash />} />
-                <Route path="/file-manager/my-files/:folderId" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash/:folderId" element={<Trash />} />
+                <Route path="/file-manager/my-files" element={<FileManagerMyFilesPage />} />
+                <Route path="/file-manager/shared-files" element={<SharedWithMePage />} />
+                <Route path="/file-manager/trash" element={<TrashPage />} />
+                <Route
+                  path="/file-manager/my-files/:folderId"
+                  element={<FileManagerMyFilesPage />}
+                />
+                <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMePage />} />
+                <Route path="/file-manager/trash/:folderId" element={<TrashPage />} />
 
                 <Route path="/calendar" element={<CalendarPage />} />
-                <Route path="/503" element={<ServiceUnavailable />} />
-                <Route path="/404" element={<NotFound />} />
+                <Route path="/503" element={<ServiceUnavailablePage />} />
+                <Route path="/404" element={<NotFoundPage />} />
               </Route>
 
               {/* redirecting */}

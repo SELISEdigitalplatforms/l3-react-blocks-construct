@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { SlotInfo, Event } from 'react-big-calendar';
 import { EventInteractionArgs } from 'react-big-calendar/lib/addons/dragAndDrop';
-import { CalendarEvent, CalendarModalState } from '@/modules/big-calendar';
+import { CalendarModalState } from '../enums/calendar.enum';
+import { CalendarEvent } from '../types/calendar-event.types';
 
 /**
  * Hook for managing calendar UI state

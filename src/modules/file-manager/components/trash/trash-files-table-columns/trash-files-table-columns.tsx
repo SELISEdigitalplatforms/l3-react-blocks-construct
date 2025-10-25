@@ -2,10 +2,10 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Info } from 'lucide-react';
 import { DataTableColumnHeader } from '@/components/core';
-import { IFileTrashData } from '@/modules/file-manager/utils/file-manager';
-import { TrashTableRowActions } from '@/modules/file-manager';
-import { NameCell } from '@/modules/file-manager/components/table-cells/name-cell';
-import { DateCell } from '@/modules/file-manager/components/table-cells/date-cell';
+import { IFileTrashData } from '../../../utils/file-manager';
+import { NameCell } from '../../table-cells/name-cell';
+import { DateCell } from '../../table-cells/date-cell';
+import { TrashTableRowActions } from '../trash-files-row-actions/trash-files-row-actions';
 
 interface ColumnFactoryProps {
   onViewDetails?: (file: IFileTrashData) => void;

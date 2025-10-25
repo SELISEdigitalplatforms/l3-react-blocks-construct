@@ -6,7 +6,8 @@ import { DataTable } from '@/components/core';
 import { IFileTrashData, PaginationState } from '../../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../../hooks/use-mock-trash-files-query';
 import { FilePreview } from '../../file-preview/file-preview';
-import { TrashDetailsSheet, TrashTableColumns } from '@/modules/file-manager';
+import { TrashTableColumns } from '../trash-files-table-columns/trash-files-table-columns';
+import { TrashDetailsSheet } from '../trash-files-details/trash-files-details';
 
 interface TrashFilesListViewProps {
   onRestore: (file: IFileTrashData) => void;

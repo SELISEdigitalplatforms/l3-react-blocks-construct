@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FilterConfig, FilterType } from '@/modules/file-manager/types/header-toolbar.type';
+import { FilterConfig, FilterType } from '../../../types/header-toolbar.type';
 import {
   ActiveFilterBadge,
   ActiveFiltersContainer,
   getDateRangeLabel,
-} from '@/modules/file-manager';
+} from '../../common-filters/common-filters';
 
 interface ActiveFiltersProps<T extends FilterType> {
   filters: T;

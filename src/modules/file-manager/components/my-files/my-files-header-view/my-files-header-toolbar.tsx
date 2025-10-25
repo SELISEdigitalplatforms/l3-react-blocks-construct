@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { BaseHeaderToolbar } from '../../header-toolbar/base-header-toolbar/base-header-toolbar';
 import {
+  FilterConfig,
   FileManagerFilters,
   fileTypeFilterConfig,
-  FilterConfig,
-} from '@/modules/file-manager/types/header-toolbar.type';
-import { BaseHeaderToolbar } from '@/modules/file-manager';
+} from '../../../types/header-toolbar.type';
 
 export interface FileManagerHeaderToolbarProps {
   viewMode?: string;
