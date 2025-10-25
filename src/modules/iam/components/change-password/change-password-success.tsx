@@ -27,14 +27,14 @@ import { useTranslation } from 'react-i18next';
  *
  * @example
  * // Example usage
- * <UpdatePasswordSuccess onClose={() => setDialogOpen(false)} />
+ * <ChangePasswordSuccess onClose={() => setDialogOpen(false)} />
  */
 
-type UpdatePasswordSuccessProps = {
+type ChangePasswordSuccessProps = {
   onClose: () => void;
 };
 
-export const UpdatePasswordSuccess: React.FC<UpdatePasswordSuccessProps> = ({ onClose }) => {
+export const ChangePasswordSuccess: React.FC<ChangePasswordSuccessProps> = ({ onClose }) => {
   const [logoutAllDevices, setLogoutAllDevices] = useState(false);
   const { mutateAsync: signoutMutateAsync } = useSignoutMutation();
   const { mutateAsync: logoutAllMutateAsync } = useLogoutAllMutation();
