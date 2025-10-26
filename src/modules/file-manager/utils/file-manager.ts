@@ -23,6 +23,16 @@ export interface IFileDataWithSharing extends IFileData {
   sharePermissions?: { [key: string]: string };
 }
 
+export function compareValues(a: number, b: number) {
+  if (a < b) {
+    return -1;
+  } else if (a > b) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 export const sharedUsers = [
   { id: '1', name: 'Luca Meier' },
   { id: '2', name: 'Aaron Green' },

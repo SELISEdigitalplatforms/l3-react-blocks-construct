@@ -14,7 +14,7 @@ import { CommonGridView } from '../../common-grid-view/common-grid-view';
 import { useMockTrashFilesQuery } from '../../../hooks/use-mock-trash-files-query';
 import { FilePreview } from '../../file-preview/file-preview';
 import { TrashDetailsSheet } from '../trash-files-details/trash-files-details';
-import { TrashTableRowActions } from '@/modules/file-manager';
+import { TrashTableRowActions } from '../trash-files-row-actions/trash-files-row-actions';
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;

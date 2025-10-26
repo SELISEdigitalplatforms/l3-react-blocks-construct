@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FilterConfig, FilterType } from '@/modules/file-manager/types/header-toolbar.type';
-import { DateRangeFilter, SelectFilter, UserFilter } from '@/modules/file-manager';
+import { DateRangeFilter, SelectFilter, UserFilter } from '../../common-filters/common-filters';
 
 interface FilterControlsProps<T extends FilterType> {
   filters: T;

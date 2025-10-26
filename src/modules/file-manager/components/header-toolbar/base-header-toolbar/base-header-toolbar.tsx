@@ -1,19 +1,16 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ListFilter, X } from 'lucide-react';
-import { FilterType, HeaderToolbarConfig } from '@/modules/file-manager/types/header-toolbar.type';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import {
-  ActiveFilters,
-  AddDropdownMenu,
-  countActiveFilters,
-  FilterControls,
-  HeaderActions,
-  SearchInput,
-  ViewToggle,
-} from '@/modules/file-manager';
+import { countActiveFilters, SearchInput } from '../../common-filters/common-filters';
+import { HeaderActions } from '../header-actions/header-actions';
+import { AddDropdownMenu } from '../../file-manager-add-new-dropdown/file-manager-add-new-dropdown';
+import { FilterControls } from '../filter-controls/filter-controls';
+import { ViewToggle } from '../view-toggle/view-toggle';
+import { ActiveFilters } from '../active-filters/active-filters';
+import { FilterType, HeaderToolbarConfig } from '../../../types/header-toolbar.type';
 
 export const BaseHeaderToolbar = <T extends FilterType>({
   title,

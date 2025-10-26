@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Table } from '@tanstack/react-table';
+import { DateRange } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
 import { DateRangeFilter, DataTableFacetedFilter } from '@/components/core';
 import { getMfaEnabledOptions, getStatusOptions } from './iam-table-filter-data';
-import { DateRange } from 'react-day-picker';
 
 /**
  * FilterControls Component

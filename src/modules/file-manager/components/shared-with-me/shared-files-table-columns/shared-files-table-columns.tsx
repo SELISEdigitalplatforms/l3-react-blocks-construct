@@ -1,14 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { DataTableColumnHeader } from '@/components/core';
-import { compareValues } from '@/features/iam/services/user-service';
 import { Info } from 'lucide-react';
-import { FileTableRowActions } from '@/modules/file-manager';
-import { IFileData } from '@/modules/file-manager/types/file-manager.type';
+import { DataTableColumnHeader } from '@/components/core';
 import { DateCell } from '../../table-cells/date-cell';
 import { createDateRangeFilter } from '@/modules/file-manager/utils/table-filters';
 import { parseFileSize } from '@/modules/file-manager/utils/file-size';
-import { NameCell } from '@/modules/file-manager/components/table-cells/name-cell';
-import { SharedByCell } from '@/modules/file-manager/components/table-cells/shared-by-cell';
+import { NameCell } from '../../table-cells/name-cell';
+import { SharedByCell } from '../../table-cells/shared-by-cell';
+import { IFileData } from '../../../types/file-manager.type';
+import { FileTableRowActions } from '../../file-manager-row-actions/file-manager-row-actions';
+import { compareValues } from '../../../utils/file-manager';
 
 interface ColumnFactoryProps {
   onViewDetails: (file: IFileData) => void;
