@@ -51,7 +51,11 @@ interface GraphQLClient {
 const cleanBaseUrl = API_CONFIG.baseUrl.endsWith('/')
   ? API_CONFIG.baseUrl.slice(0, -1)
   : API_CONFIG.baseUrl;
-const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1/gateway`;
+const PROJECT_SHORT_KEY =
+  process.env.REACT_APP_PROJECT_SHORT_KEY || process.env.REACT_APP_PUBLIC_PROJECT_SHORT_KEY || '';
+const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${
+  PROJECT_SHORT_KEY ? `/${PROJECT_SHORT_KEY}` : ''
+}/gateway`;
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {
@@ -73,7 +77,7 @@ export const graphqlClient: GraphQLClient = {
       throw new Error(response.errors[0].message);
     }
 
-    return response.data as T;
+    return (response.data as T) ?? ({} as T);
   },
 
   async mutate<T>(request: GraphQLRequest): Promise<T> {

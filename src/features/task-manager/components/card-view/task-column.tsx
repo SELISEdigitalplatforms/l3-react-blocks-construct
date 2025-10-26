@@ -99,7 +99,10 @@ export function TaskColumn({
 
   const MIN_COLUMN_HEIGHT = '150px';
 
-  const taskIds = useMemo(() => tasks.map((task) => `task-${task.id}`), [tasks]);
+  const taskIds = useMemo(
+    () => tasks.map((task) => `task-${(task && (task.ItemId || task.id)) || ''}`),
+    [tasks]
+  );
 
   const handleAddTaskClick = () => {
     if (showAddInput) return;

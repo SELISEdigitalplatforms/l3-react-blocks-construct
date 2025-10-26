@@ -7,7 +7,7 @@
 
 export const GET_INVOICE_ITEMS_QUERY = `
   query InvoiceItems($input: DynamicQueryInput) {
-    InvoiceItems(input: $input) {
+    getInvoiceItems(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount

@@ -7,7 +7,7 @@
 
 export const GET_INVENTORY_QUERY = `
   query InventoryItems($input: DynamicQueryInput) {
-    InventoryItems(input: $input) {
+    getInventoryItems(input: $input) {
       hasNextPage
       hasPreviousPage
       totalCount
@@ -20,6 +20,8 @@ export const GET_INVENTORY_QUERY = `
         CreatedBy
         CreatedDate
         IsDeleted
+        Tags
+        DeletedDate
         ItemImageFileId
         ItemImageFileIds
         ItemLoc
@@ -32,7 +34,6 @@ export const GET_INVENTORY_QUERY = `
         Status
         Stock
         Supplier
-        Tags
         EligibleWarranty
         EligibleReplacement
         Discount
