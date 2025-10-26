@@ -20,70 +20,53 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  changePasswordFormDefaultValue,
-  changePasswordFormType,
-  getValidationSchemas,
-} from '@/features/profile/utils/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useChangePassword } from '@/features/profile/hooks/use-account';
-import { UpdatePasswordSuccess } from '../update-password-success/update-password-success';
+import { ChangePasswordSuccess } from './change-password-success';
+import {
+  changePasswordFormType,
+  getChangePasswordValidationSchemas,
+  changePasswordFormDefaultValue,
+} from './utils';
+import { useErrorHandler } from '@/hooks/use-error-handler';
+import { useToast } from '@/hooks/use-toast';
+import { useChangePassword } from '../../hooks/use-account';
 
-type UpdatePasswordProps = {
+type ChangePasswordProps = {
   onClose: () => void;
   open?: boolean;
   onOpenChange?(open: boolean): void;
 };
 
-export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, onOpenChange }) => {
+export const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose, open, onOpenChange }) => {
   const [passwordRequirementsMet, setPasswordRequirementsMet] = useState(false);
-  const [updatePasswordSuccessModalOpen, setUpdatePasswordSuccessModalOpen] = useState(false);
+  const [changePasswordSuccessModalOpen, setChangePasswordSuccessModalOpen] = useState(false);
   const { t } = useTranslation();
-
+  const { handleError } = useErrorHandler();
+  const { toast } = useToast();
   const form = useForm<changePasswordFormType>({
     defaultValues: changePasswordFormDefaultValue,
-    resolver: zodResolver(getValidationSchemas(t).changePasswordFormValidationSchema),
+    resolver: zodResolver(getChangePasswordValidationSchemas(t)),
   });
 
-  const { mutate: changePassword, isPending } = useChangePassword();
+  const { mutateAsync, isPending } = useChangePassword();
 
   const onSubmitHandler = async (values: changePasswordFormType) => {
-    if (values.newPassword !== values.confirmNewPassword) {
-      form.setError('confirmNewPassword', {
-        type: 'manual',
-        message: t('PASSWORDS_DO_NOT_MATCH'),
+    try {
+      await mutateAsync(values);
+      toast({
+        variant: 'success',
+        title: t('PASSWORD_UPDATED'),
+        description: t('PASSWORD_HAS_UPDATED_SUCCESSFULLY'),
       });
-      return;
-    }
-
-    if (values.oldPassword === values.newPassword) {
-      form.setError('newPassword', {
-        type: 'manual',
-        message: "New password shouldn't match current password",
+      form.reset();
+      onOpenChange?.(false);
+      setChangePasswordSuccessModalOpen(true);
+    } catch (error) {
+      handleError(error, {
+        title: t('UPDATE_FAILED'),
+        defaultMessage: t('PLEASE_CHECK_PASSWORD_TRY_AGAIN'),
       });
-      return;
     }
-
-    changePassword(
-      {
-        newPassword: values.newPassword,
-        oldPassword: values.oldPassword,
-      },
-      {
-        onSuccess: () => {
-          form.reset();
-          onOpenChange?.(false);
-          setUpdatePasswordSuccessModalOpen(true);
-        },
-        onError: (error) => {
-          console.error('Error:', error);
-          form.setError('oldPassword', {
-            type: 'manual',
-            message: error?.error?.message ?? t('FAILED_TO_CHANGE_PASSWORD'),
-          });
-        },
-      }
-    );
   };
 
   const password = form.watch('newPassword');
@@ -91,7 +74,7 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
   const oldPassword = form.watch('oldPassword');
 
   const onModalClose = () => {
-    setUpdatePasswordSuccessModalOpen(false);
+    setChangePasswordSuccessModalOpen(false);
     onClose();
     form.reset();
   };
@@ -175,12 +158,12 @@ export const UpdatePassword: React.FC<UpdatePasswordProps> = ({ onClose, open, o
         </DialogContent>
       </Dialog>
       <Dialog
-        open={updatePasswordSuccessModalOpen}
-        onOpenChange={() => setUpdatePasswordSuccessModalOpen(false)}
+        open={changePasswordSuccessModalOpen}
+        onOpenChange={() => setChangePasswordSuccessModalOpen(false)}
       >
-        <UpdatePasswordSuccess
+        <ChangePasswordSuccess
           onClose={() => {
-            setUpdatePasswordSuccessModalOpen(false);
+            setChangePasswordSuccessModalOpen(false);
             onClose();
           }}
         />

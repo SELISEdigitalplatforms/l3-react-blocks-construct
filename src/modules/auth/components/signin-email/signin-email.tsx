@@ -1,4 +1,3 @@
-import { SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +13,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Captcha } from '@/features/captcha';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useSigninEmail } from '../../hooks/use-auth';
@@ -25,12 +23,6 @@ export const SigninEmail = () => {
   const { t } = useTranslation();
   const { login, setTokens } = useAuthStore();
   const { handleError } = useErrorHandler();
-  const [captchaToken, setCaptchaToken] = useState('');
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || '';
-  const captchaType = import.meta.env.VITE_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha';
-  const captchaEnabled = googleSiteKey !== '';
 
   const form = useForm({
     defaultValues: signinFormDefaultValue,
@@ -39,19 +31,7 @@ export const SigninEmail = () => {
 
   const { isPending, mutateAsync, isError } = useSigninEmail();
 
-  const handleCaptchaVerify = (token: SetStateAction<string>) => {
-    setCaptchaToken(token);
-  };
-
-  const handleCaptchaExpired = () => {
-    setCaptchaToken('');
-  };
-
   const onSubmitHandler = async (values: signinFormType) => {
-    if (captchaEnabled && showCaptcha && !captchaToken) {
-      return;
-    }
-
     try {
       const res = await mutateAsync({
         username: values.username,
@@ -67,14 +47,6 @@ export const SigninEmail = () => {
       setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
       navigate('/');
     } catch (error) {
-      if (captchaEnabled) {
-        const newFailedAttempts = failedAttempts + 1;
-        setFailedAttempts(newFailedAttempts);
-
-        if (newFailedAttempts >= 3 && !showCaptcha) {
-          setShowCaptcha(true);
-        }
-      }
       handleError(error);
     }
   };
@@ -123,25 +95,7 @@ export const SigninEmail = () => {
               {t('FORGOT_PASSWORD')}
             </Link>
           </div>
-
-          {captchaEnabled && showCaptcha && (
-            <div className="my-4">
-              <Captcha
-                type={captchaType}
-                siteKey={googleSiteKey}
-                theme="light"
-                onVerify={handleCaptchaVerify}
-                onExpired={handleCaptchaExpired}
-                size="normal"
-              />
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isPending || (captchaEnabled && showCaptcha && !captchaToken)}
-          >
+          <Button type="submit" className="w-full" disabled={isPending}>
             {t('LOG_IN')}
           </Button>
         </form>
