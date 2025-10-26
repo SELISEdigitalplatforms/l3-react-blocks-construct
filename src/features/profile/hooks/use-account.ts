@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useGlobalMutation, useGlobalQuery } from '@/state/query-client/hooks';
@@ -136,26 +136,9 @@ export const useUpdateAccount = (options?: { onSuccess?: () => void }) => {
  * const { mutate } = useChangePassword();
  */
 export const useChangePassword = () => {
-  const { toast } = useToast();
-  const { t } = useTranslation();
-  const { handleError } = useErrorHandler();
-
-  return useGlobalMutation({
+  return useMutation({
     mutationKey: ['changePassword'],
     mutationFn: changePassword,
-    onSuccess: () => {
-      toast({
-        variant: 'success',
-        title: t('PASSWORD_UPDATED'),
-        description: t('PASSWORD_HAS_UPDATED_SUCCESSFULLY'),
-      });
-    },
-    onError: (error) => {
-      handleError(error, {
-        title: t('UPDATE_FAILED'),
-        defaultMessage: t('PLEASE_CHECK_PASSWORD_TRY_AGAIN'),
-      });
-    },
   });
 };
 

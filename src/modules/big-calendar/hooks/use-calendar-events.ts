@@ -1,12 +1,8 @@
 import { useState, useRef } from 'react';
 import { generateUuid } from '@/utils/uuid';
-import {
-  CalendarEvent,
-  myEventsList,
-  Member,
-  DeleteUpdateEventOption,
-} from '@/modules/big-calendar';
-import { MEMBER_STATUS } from '@/modules/big-calendar/enums/calendar.enum';
+import { myEventsList } from '../services/calendar-services';
+import { CalendarEvent, DeleteUpdateEventOption, Member } from '../types/calendar-event.types';
+import { MEMBER_STATUS } from '../enums/calendar.enum';
 
 /**
  * Hook for managing calendar events

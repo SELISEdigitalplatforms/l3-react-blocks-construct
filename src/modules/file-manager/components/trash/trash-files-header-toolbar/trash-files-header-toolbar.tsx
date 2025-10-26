@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Recycle, RotateCcw } from 'lucide-react';
-import { BaseHeaderToolbar } from '@/modules/file-manager';
 import {
   ActionConfig,
   fileTypeFilterConfig,
   FilterConfig,
   TrashFilters,
-} from '@/modules/file-manager/types/header-toolbar.type';
+} from '../../../types/header-toolbar.type';
+import { BaseHeaderToolbar } from '../../header-toolbar/base-header-toolbar/base-header-toolbar';
 
 export interface TrashHeaderToolbarProps {
   viewMode?: string;

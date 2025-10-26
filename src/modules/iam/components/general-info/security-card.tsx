@@ -10,8 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { UpdatePassword } from '../../../../features/profile/component/modals/update-password/update-password';
 import { useGetMfaTemplate } from '../../../../features/profile/hooks/use-mfa';
+import { ChangePassword } from '@/modules/iam/components/change-password';
 
 export const SecurityCard: React.FC<{
   userInfo: any;
@@ -155,7 +155,7 @@ export const SecurityCard: React.FC<{
               <Lock className="w-4 h-4" />
               {t('UPDATE_PASSWORD')}
             </Button>
-            <UpdatePassword
+            <ChangePassword
               onClose={() => setIsChangePasswordModalOpen(false)}
               open={isChangePasswordModalOpen}
               onOpenChange={setIsChangePasswordModalOpen}

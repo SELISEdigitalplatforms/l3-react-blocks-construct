@@ -35,8 +35,9 @@ import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tool
 import { EmailSingleActions } from '../email-single-action/email-single-action';
 import { EmailActionsReplyPanel } from '../email-actions-reply-panel/email-actions-reply-panel';
 import { sanitizeHTML } from '@/utils/sanitizer';
-import { EmailTextEditor, htmlToPlainText } from '@/modules/email';
 import { EmailViewResponseType } from '../email-view-response-type/email-view-response-type';
+import { EmailTextEditor } from '../email-text-editor/email-text-editor';
+import { htmlToPlainText } from '../../utils/email-utils';
 
 /**
  * EmailViewMobile Component
