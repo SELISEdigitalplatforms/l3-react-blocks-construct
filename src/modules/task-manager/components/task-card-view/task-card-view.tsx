@@ -1,24 +1,24 @@
 import { useEffect, useMemo, useCallback } from 'react';
 import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
-import { useCardTasks } from '@/features/task-manager/hooks/use-card-tasks';
-import { useGetTaskSections } from '@/features/task-manager/hooks/use-task-manager';
 import { useToast } from '@/hooks/use-toast';
 import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog } from '@/components/ui/dialog';
 import {
+  GetSectionsResponse,
+  ItemTag,
+  TaskItem,
   TaskSection,
   TaskSectionWithTasks,
-  TaskItem,
-  ItemTag,
-  GetSectionsResponse,
-} from '@/features/task-manager/types/task-manager.types';
-import { TaskColumn } from '@/features/task-manager/components/card-view/task-column';
-import { AddColumn } from '../../features/task-manager/components/modals/add-column';
-import { TaskDragOverlay } from '@/features/task-manager/components/card-view/task-drag-overlay';
-import { AddTask } from '../../features/task-manager/components/modals/add-task';
-import TaskDetailsView from '@/features/task-manager/components/task-details-view/task-details-view';
-import { Dialog } from '@/components/ui/dialog';
+} from '../../types/task-manager.types';
+import { useGetTaskSections } from '../../hooks/use-task-manager';
+import { useCardTasks } from '../../hooks/use-card-tasks';
+import { TaskColumn } from '../card-view/task-column';
+import { AddColumn } from '../modals/add-column';
+import { TaskDragOverlay } from '../card-view/task-drag-overlay';
+import { AddTask } from '../modals/add-task';
+import TaskDetailsView from '../task-details-view/task-details-view';
 
 /**
  * TaskCardView Component
@@ -66,12 +66,12 @@ interface TaskCardViewProps {
   };
 }
 
-export function TaskCardView({
+export const TaskCardView = ({
   isNewTaskModalOpen,
   setNewTaskModalOpen,
   searchQuery = '',
   filters,
-}: Readonly<TaskCardViewProps>) {
+}: Readonly<TaskCardViewProps>) => {
   const { touchEnabled } = useDeviceCapabilities();
   const { t } = useTranslation();
 
@@ -342,6 +342,4 @@ export function TaskCardView({
       </Dialog>
     </div>
   );
-}
-
-export default TaskCardView;
+};

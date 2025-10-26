@@ -1,8 +1,8 @@
 import React from 'react';
+import '../../../../test-utils/shared-test-utils';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
-import { useInvoiceDetails } from '@/modules/invoices/hooks/use-invoice-details';
 import { InvoiceItem } from '@/modules/invoices/types/invoices.types';
 import { vi } from 'vitest';
 
@@ -12,19 +12,21 @@ vi.mock('uuid', () => ({
   v1: () => 'mock-uuid-v1',
 }));
 
-// Mock the useGetInvoiceItems hook
-vi.mock('@/features/invoices/hooks/use-invoices', () => ({
-  useGetInvoiceItems: vi.fn(),
+// Mock the useInvoiceDetails hook for both alias and relative paths
+const { mockUseInvoiceDetails } = vi.hoisted(() => ({
+  mockUseInvoiceDetails: vi.fn(),
+}));
+vi.mock('../../hooks/use-invoice-details', () => ({
+  useInvoiceDetails: mockUseInvoiceDetails,
+}));
+vi.mock('@/modules/invoices/hooks/use-invoice-details', () => ({
+  useInvoiceDetails: mockUseInvoiceDetails,
 }));
 
-// Mock the useInvoiceDetails hook
-vi.mock('@/features/invoices/hooks/use-invoice-details', () => ({
-  useInvoiceDetails: vi.fn(),
-}));
-
-// Mock the InvoicesDetail component
-vi.mock('@/features/invoices', () => ({
-  InvoicesDetail: ({ invoice }: { invoice: InvoiceItem }) => (
+// Mock the InvoicesDetail component using the exact module path used by the page
+vi.mock('../../components/invoices-detail/invoices-detail', () => ({
+  __esModule: true,
+  default: ({ invoice }: { invoice: InvoiceItem }) => (
     <div data-testid="invoice-detail">
       <div data-testid="customer-name">{invoice.Customer[0].CustomerName}</div>
       <div data-testid="invoice-id">{invoice.ItemId}</div>
@@ -32,13 +34,10 @@ vi.mock('@/features/invoices', () => ({
   ),
 }));
 
-// Mock the translation hook
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
+// i18n is mocked via shared-test-utils
 
 // Mock the useToast hook
-vi.mock('hooks/use-toast', () => ({
+vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({
     toast: vi.fn(),
   }),
@@ -76,7 +75,6 @@ const mockInvoice: InvoiceItem = {
 };
 
 describe('InvoiceDetailsPage', () => {
-  const mockUseInvoiceDetails = useInvoiceDetails as any;
 
   beforeEach(() => {
     // Reset all mocks before each test

@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
  * <TaskListHeader />
  */
 
-export function TableHeader() {
+export function TaskListHeader() {
   const { t } = useTranslation();
 
   return (

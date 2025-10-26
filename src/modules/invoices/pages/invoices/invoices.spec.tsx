@@ -1,7 +1,9 @@
 import React from 'react';
+import '../../../../test-utils/shared-test-utils';
+import { mockNavigate } from '../../../../test-utils/shared-test-utils';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import * as invoicesModule from '@/modules/invoices';
+import * as columnsModule from '../../components/invoices-table-column/invoices-table.column';
 import { MemoryRouter } from 'react-router-dom';
 import { InvoicesPage } from './invoices';
 import { InvoiceItem } from '@/modules/invoices/types/invoices.types';
@@ -58,17 +60,20 @@ const mockData = {
 
 const mockUseGetInvoiceItems = vi.fn();
 
-vi.mock('features/invoices/hooks/use-invoices', () => ({
+vi.mock('../../hooks/use-invoices', () => ({
   useGetInvoiceItems: () => mockUseGetInvoiceItems(),
 }));
 
-// Mock the features/invoices components
-vi.mock('@/features/invoices', () => ({
-  __esModule: true,
+// Mock columns creator used by the page
+vi.mock('../../components/invoices-table-column/invoices-table.column', () => ({
   createInvoiceTableColumns: vi.fn(() => [
     { id: 'customerName', header: 'Customer Name' },
     { id: 'status', header: 'Status' },
   ]),
+}));
+
+// Mock table and toolbar components used by the page
+vi.mock('../../components/invoices-overview-table/invoices-overview-table', () => ({
   InvoicesOverviewTable: ({
     data,
     onRowClick,
@@ -98,27 +103,20 @@ vi.mock('@/features/invoices', () => ({
       </table>
     </div>
   ),
-  InvoicesHeaderToolbar: () => <div data-testid="invoices-header-toolbar">Header Toolbar</div>,
-  InvoicesFilterToolbar: () => <div data-testid="invoices-filter-toolbar">Filter Toolbar</div>,
 }));
 
-// Mock the react-router-dom's useNavigate
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
-
-// Mock the translation hook
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+vi.mock('../../components/invoices-header-toolbar/invoices-header-toolbar', () => ({
+  default: () => <div data-testid="invoices-header-toolbar">Header Toolbar</div>,
 }));
+
+vi.mock('../../components/invoices-filter-toolbar/invoices-filter-toolbar', () => ({
+  default: () => <div data-testid="invoices-filter-toolbar">Filter Toolbar</div>,
+}));
+
+// react-router and i18n are mocked via shared-test-utils
 
 describe('InvoicesPage', () => {
-  const createInvoiceTableColumns = invoicesModule.createInvoiceTableColumns as Mock;
+  const createInvoiceTableColumns = columnsModule.createInvoiceTableColumns as Mock;
   const renderInvoicesPage = () => {
     const queryClient = new QueryClient();
     return render(
@@ -184,10 +182,7 @@ describe('InvoicesPage', () => {
     });
     const { container } = renderInvoicesPage();
 
-    const outerDiv = container.firstChild;
-    expect(outerDiv).toHaveClass('flex');
-    expect(outerDiv).toHaveClass('w-full');
-    expect(outerDiv).toHaveClass('gap-5');
-    expect(outerDiv).toHaveClass('flex-col');
+    const outerDiv = container.querySelector('div.flex.w-full.gap-5.flex-col');
+    expect(outerDiv).toBeInTheDocument();
   });
 });

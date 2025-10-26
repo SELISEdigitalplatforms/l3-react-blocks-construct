@@ -15,7 +15,7 @@ import { NotificationSkeletonList } from '../notification-skeleton/notification-
 
 const PAGE_SIZE = 10;
 
-export function Notification() {
+export const Notification = () => {
   const { t } = useTranslation();
   const [tabId, setTabId] = useState('all');
   const [page, setPage] = useState(0);
@@ -261,4 +261,4 @@ export function Notification() {
       </div>
     </MenubarContent>
   );
-}
+};

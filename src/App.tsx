@@ -9,7 +9,6 @@ import TaskPage from './pages/main/iam-table';
 import { Profile } from './modules/iam/pages/profile/profile';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import TaskManager from './pages/task-manager/task-manager';
 import { AuthRoutes } from './routes/auth.route';
 import { LoadingOverlay } from '@/components/core';
 import { DashboardPage } from '@/modules/dashboard';
@@ -27,6 +26,7 @@ import {
   CreateInvoicePage,
   EditInvoicePage,
 } from '@/modules/invoices';
+import { TaskManagerPage } from '@/modules/task-manager';
 
 const queryClient = new QueryClient();
 
@@ -71,7 +71,7 @@ function AppContent() {
                 <Route path="/mail/:category/:emailId" element={<EmailPage />} />
                 <Route path="/mail/:category/:labels/:emailId" element={<EmailPage />} />
                 <Route path="/identity-management" element={<TaskPage />} />
-                <Route path="/task-manager" element={<TaskManager />} />
+                <Route path="/task-manager" element={<TaskManagerPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 {/* 
                 To implement permissions for feature Invoices

@@ -12,17 +12,12 @@ import {
   DragEndEvent,
   DragOverlay,
 } from '@dnd-kit/core';
-import { TaskItem } from '../../features/task-manager/types/task-manager.types';
-import {
-  NewTaskRow,
-  SortableTaskItem,
-  StatusCircle,
-  TableHeader,
-} from '@/features/task-manager/components/list-view';
+import { ItemTag, TaskItem } from '../../types/task-manager.types';
+import { useListTasks } from '../../hooks/use-list-tasks';
+import { useGetTaskSections } from '../../hooks/use-task-manager';
+import { NewTaskRow, SortableTaskItem, StatusCircle, TaskListHeader } from '../list-view';
 import { Dialog } from '@/components/ui/dialog';
-import TaskDetailsView from '@/features/task-manager/components/task-details-view/task-details-view';
-import { useListTasks } from '@/features/task-manager/hooks/use-list-tasks';
-import { useGetTaskSections } from '@/features/task-manager/hooks/use-task-manager';
+import TaskDetailsView from '../task-details-view/task-details-view';
 
 /**
  * TaskListView Component
@@ -46,8 +41,6 @@ import { useGetTaskSections } from '@/features/task-manager/hooks/use-task-manag
  * // Basic usage inside a task manager
  * <TaskListView taskService={new TaskService()} />
  */
-
-import { ItemTag } from '@/features/task-manager/types/task-manager.types';
 
 interface TaskListViewProps {
   searchQuery?: string;
@@ -210,7 +203,7 @@ export function TaskListView({ searchQuery = '', filters }: Readonly<TaskListVie
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto" ref={scrollContainerRef}>
           <div className="min-w-max">
-            <TableHeader />
+            <TaskListHeader />
             <DndContext
               sensors={sensors}
               collisionDetection={closestCorners}

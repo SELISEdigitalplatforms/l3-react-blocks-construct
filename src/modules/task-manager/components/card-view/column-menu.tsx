@@ -17,10 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ConfirmationModal } from '@/components/core';
-import {
-  useUpdateTaskSection,
-  useDeleteTaskSection,
-} from '@/features/task-manager/hooks/use-task-manager';
+import { useDeleteTaskSection, useUpdateTaskSection } from '../../hooks/use-task-manager';
 
 /**
  * ColumnMenu Component

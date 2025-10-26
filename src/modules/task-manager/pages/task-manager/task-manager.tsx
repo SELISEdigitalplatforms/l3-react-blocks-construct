@@ -1,18 +1,13 @@
 import { useState, useMemo } from 'react';
-
+import TaskListView from '../../components/task-list-view/task-list-view';
 import TaskManagerToolbar, {
   ViewMode,
-} from '@/features/task-manager/components/task-manager-toolbar/task-manager-toolbar';
-import TaskListView from './task-list-view';
-import { useListTasks } from '@/features/task-manager/hooks/use-list-tasks';
-import {
-  useGetTaskSections,
-  useGetTaskTags,
-  useGetUsers,
-} from '@/features/task-manager/hooks/use-task-manager';
-import { ItemTag } from '@/features/task-manager/types/task-manager.types';
-import { TaskFilters } from '@/features/task-manager/components/task-manager-filters-sheet/task-manager-filters-sheet';
-import TaskCardView from './task-card-view';
+} from '../../components/task-manager-toolbar/task-manager-toolbar';
+import { TaskFilters } from '../../components/task-manager-filters-sheet/task-manager-filters-sheet';
+import { useListTasks } from '../../hooks/use-list-tasks';
+import { useGetTaskSections, useGetTaskTags, useGetUsers } from '../../hooks/use-task-manager';
+import { ItemTag } from '../../types/task-manager.types';
+import { TaskCardView } from '../../components/task-card-view/task-card-view';
 
 /**
  * TaskManager Component
@@ -32,7 +27,7 @@ import TaskCardView from './task-card-view';
  * <TaskManager />
  */
 
-export default function TaskManager() {
+export const TaskManagerPage = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('board');
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<TaskFilters>({
@@ -149,4 +144,4 @@ export default function TaskManager() {
       {viewMode === 'list' && <TaskListView searchQuery={searchQuery} filters={filters} />}
     </div>
   );
-}
+};
