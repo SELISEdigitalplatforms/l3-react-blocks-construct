@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 import { useEffect, useRef, useCallback } from 'react';
-import { ReCaptchaProps } from './index.type';
+import { ReCaptchaProps } from '../../types/index.type';
 
 /**
  * ReCaptcha Component

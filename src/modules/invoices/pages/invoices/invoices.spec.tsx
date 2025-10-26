@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../../../test-utils/shared-test-utils';
 import { mockNavigate } from '../../../../test-utils/shared-test-utils';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -11,7 +10,7 @@ import { vi, Mock } from 'vitest';
 
 // Mock UUID module
 vi.mock('uuid', () => ({
-  v4: () => 'mock-uuid-v4',
+  v4: () => 'cmock-uuid-v4',
   v1: () => 'mock-uuid-v1',
 }));
 

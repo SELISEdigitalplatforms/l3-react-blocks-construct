@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { SharedPasswordStrengthChecker, PasswordInput } from '@/components/core';
-import { Captcha } from '@/features/captcha';
+import { Captcha } from '@/modules/captcha';
 
 /**
  * BasePasswordForm Component

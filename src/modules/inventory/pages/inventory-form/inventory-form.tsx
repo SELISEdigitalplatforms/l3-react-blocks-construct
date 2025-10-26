@@ -172,17 +172,19 @@ export const InventoryFormPage = () => {
           tags: '',
         },
         {
-          onSuccess: async (data) => {
+          onSuccess: (data) => {
             if (!data.isSuccess || !data.uploadUrl) {
-              return resolve(null);
-            }
-            try {
-              const { uploadUrl } = await uploadFile(data.uploadUrl, file);
-              resolve({ fileId: data.fileId ?? '', uploadUrl });
-            } catch (error) {
-              console.error('Error uploading file:', error);
               resolve(null);
+              return;
             }
+            uploadFile(data.uploadUrl, file)
+              .then(({ uploadUrl }) => {
+                resolve({ fileId: data.fileId ?? '', uploadUrl });
+              })
+              .catch((error) => {
+                console.error('Error uploading file:', error);
+                resolve(null);
+              });
           },
           onError: () => resolve(null),
         }
