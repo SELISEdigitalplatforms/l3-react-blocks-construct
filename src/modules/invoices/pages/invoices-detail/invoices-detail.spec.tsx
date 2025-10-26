@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
-import { useInvoiceDetails } from '@/features/invoices/hooks/use-invoice-details';
-import { InvoiceItem } from '@/features/invoices/types/invoices.types';
+import { useInvoiceDetails } from '@/modules/invoices/hooks/use-invoice-details';
+import { InvoiceItem } from '@/modules/invoices/types/invoices.types';
 import { vi } from 'vitest';
 
 // Mock UUID module

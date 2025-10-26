@@ -10,9 +10,6 @@ import { Profile } from './modules/iam/pages/profile/profile';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import TaskManager from './pages/task-manager/task-manager';
-import { InvoicesPage } from './pages/invoices/invoices';
-import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
-import { CreateInvoice, EditInvoice } from './features/invoices';
 import { AuthRoutes } from './routes/auth.route';
 import { LoadingOverlay } from '@/components/core';
 import { DashboardPage } from '@/modules/dashboard';
@@ -24,6 +21,12 @@ import { NotFoundPage, ServiceUnavailablePage } from '@/modules/error-view';
 import { FileManagerMyFilesPage, SharedWithMePage, TrashPage } from '@/modules/file-manager';
 import { ActivityLogPage, TimelinePage } from '@/modules/activity-log';
 import { InventoryPage, InventoryDetailsPage, InventoryFormPage } from '@/modules/inventory';
+import {
+  InvoicesPage,
+  InvoiceDetailsPage,
+  CreateInvoicePage,
+  EditInvoicePage,
+} from '@/modules/invoices';
 
 const queryClient = new QueryClient();
 
@@ -111,8 +114,8 @@ function AppContent() {
                 */}
 
                 <Route path="/invoices" element={<InvoicesPage />} />
-                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
+                <Route path="/invoices/create-invoice" element={<CreateInvoicePage />} />
+                <Route path="/invoices/:invoiceId/edit" element={<EditInvoicePage />} />
 
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
                 <Route path="/file-manager/my-files" element={<FileManagerMyFilesPage />} />

@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import * as invoicesModule from '@/features/invoices';
+import * as invoicesModule from '@/modules/invoices';
 import { MemoryRouter } from 'react-router-dom';
 import { InvoicesPage } from './invoices';
-import { InvoiceItem } from '@/features/invoices/types/invoices.types';
+import { InvoiceItem } from '@/modules/invoices/types/invoices.types';
 import { vi, Mock } from 'vitest';
 
 // Mock UUID module

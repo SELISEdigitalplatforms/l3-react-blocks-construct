@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { generateInvoiceId } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
-import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
+import { BaseInvoiceForm } from '../../components/base-invoice-form/base-invoice-form';
 import { useAddInvoiceItem } from '../../hooks/use-invoices';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,7 +21,7 @@ const getCurrentUser = () => {
   return profile ? JSON.parse(profile) : null;
 };
 
-export function CreateInvoice() {
+export const CreateInvoicePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -118,6 +118,4 @@ export function CreateInvoice() {
   };
 
   return <BaseInvoiceForm title={t('CREATE_NEW_INVOICE')} onSubmit={handleSubmit} />;
-}
-
-export default CreateInvoice;
+};

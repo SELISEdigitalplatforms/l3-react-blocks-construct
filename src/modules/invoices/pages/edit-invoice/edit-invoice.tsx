@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { createInvoiceFromForm } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { formatPhoneToE164, normalizeCategoryValue } from '../../utils/invoice-helpers';
-import { BaseInvoiceForm } from '../base-invoice-form/base-invoice-form';
+import { BaseInvoiceForm } from '../../components/base-invoice-form/base-invoice-form';
 import { CustomerDetails, InvoiceItemDetails, InvoiceStatus } from '../../types/invoices.types';
 import { useUpdateInvoiceItem } from '../../hooks/use-invoices';
 import { useInvoiceDetails } from '../../hooks/use-invoice-details';
 
-export function EditInvoice() {
+export const EditInvoicePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { mutate: updateInvoiceItem } = useUpdateInvoiceItem();
@@ -123,6 +123,4 @@ export function EditInvoice() {
       }}
     />
   );
-}
-
-export default EditInvoice;
+};

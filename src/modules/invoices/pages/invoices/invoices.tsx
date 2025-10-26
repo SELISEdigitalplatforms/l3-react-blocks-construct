@@ -2,14 +2,12 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@tanstack/react-table';
-import {
-  InvoicesOverviewTable,
-  InvoicesHeaderToolbar,
-  createInvoiceTableColumns,
-  InvoicesFilterToolbar,
-} from '@/features/invoices';
-import { InvoiceItem } from '@/features/invoices/types/invoices.types';
-import { useGetInvoiceItems } from '@/features/invoices/hooks/use-invoices';
+import { InvoiceItem } from '../../types/invoices.types';
+import InvoicesFilterToolbar from '../../components/invoices-filter-toolbar/invoices-filter-toolbar';
+import { createInvoiceTableColumns } from '../../components/invoices-table-column/invoices-table.column';
+import { useGetInvoiceItems } from '../../hooks/use-invoices';
+import InvoicesHeaderToolbar from '../../components/invoices-header-toolbar/invoices-header-toolbar';
+import { InvoicesOverviewTable } from '../../components/invoices-overview-table/invoices-overview-table';
 
 interface PaginationState {
   pageIndex: number;
