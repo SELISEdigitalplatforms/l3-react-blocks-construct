@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
-import { TagsSelector } from './tags-selector';
+import { TagsSelector } from '../tags-selector/tags-selector';
 
 /**
  * AdditionalInfoForm component that allows users to configure settings related to warranty, replacement, and discount.

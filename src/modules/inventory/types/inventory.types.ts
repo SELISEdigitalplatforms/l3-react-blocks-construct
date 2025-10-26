@@ -96,7 +96,7 @@ export interface AddInventoryItemInput {
   Status: InventoryStatus;
   Stock: number;
   Tags: string[];
-  DeletedDate: string;
+  DeletedDate?: string;
   EligibleWarranty: boolean;
   EligibleReplacement: boolean;
   Discount: boolean;

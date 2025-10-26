@@ -24,16 +24,12 @@ import {
   statusColors,
   tags,
 } from '../../types/inventory.types';
-import {
-  useGetInventories,
-  useUpdateInventoryItem,
-  useDeleteInventoryItem,
-} from '@/features/inventory/hooks/use-inventory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import API_CONFIG from '@/config/api';
 import { GetPreSignedUrlForUploadResponse } from '@/lib/api/types/storage.types';
 import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
+import { useDeleteInventoryItem, useGetInventories, useUpdateInventoryItem } from '../../hooks/use-inventory';
 
 /**
  * A detailed view and editing interface for an individual inventory item.

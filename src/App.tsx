@@ -8,10 +8,7 @@ import MainLayout from '@/pages/main/main-layout';
 import TaskPage from './pages/main/iam-table';
 import { Profile } from './modules/iam/pages/profile/profile';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
-import { Inventory } from './pages/inventory/inventory';
-import { InventoryDetails } from './pages/inventory/inventory-details';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
 import TaskManager from './pages/task-manager/task-manager';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
@@ -26,6 +23,7 @@ import { ChatPage } from '@/modules/chat';
 import { NotFoundPage, ServiceUnavailablePage } from '@/modules/error-view';
 import { FileManagerMyFilesPage, SharedWithMePage, TrashPage } from '@/modules/file-manager';
 import { ActivityLogPage, TimelinePage } from '@/modules/activity-log';
+import { InventoryPage, InventoryDetailsPage, InventoryFormPage } from '@/modules/inventory';
 
 const queryClient = new QueryClient();
 
@@ -59,9 +57,9 @@ function AppContent() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/finance" element={<FinancePage />} />
                 <Route path="/profile" element={<Profile />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/inventory/add" element={<InventoryForm />} />
-                <Route path="/inventory/:itemId" element={<InventoryDetails />} />
+                <Route path="/inventory" element={<InventoryPage />} />
+                <Route path="/inventory/add" element={<InventoryFormPage />} />
+                <Route path="/inventory/:itemId" element={<InventoryDetailsPage />} />
 
                 <Route path="/activity-log" element={<ActivityLogPage />} />
                 <Route path="/timeline" element={<TimelinePage />} />

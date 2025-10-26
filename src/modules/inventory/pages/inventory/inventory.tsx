@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Table } from '@tanstack/react-table';
-import { AdvancedTableColumnsToolbar } from '@/features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar';
-import AdvanceDataTable from '@/features/inventory/component/advance-data-table/advance-data-table';
-import { createAdvanceTableColumns } from '@/features/inventory/component/advance-table-columns/advance-table-columns';
-import { AdvanceTableFilterToolbar } from '@/features/inventory/component/advance-table-filter-toolbar/advance-table-filter-toolbar';
-import { AdvanceExpandRowContent } from '@/features/inventory/component/advance-expand-row-content/advance-expand-row-content';
-import { useGetInventories } from '@/features/inventory/hooks/use-inventory';
-import { InventoryItem } from '@/features/inventory/types/inventory.types';
+import { createAdvanceTableColumns } from '../../component/advance-table-columns/advance-table-columns';
+import { useGetInventories } from '../../hooks/use-inventory';
+import { InventoryItem } from '../../types/inventory.types';
+import { AdvancedTableColumnsToolbar } from '../../component/advance-table-columns-toolbar/advance-table-columns-toolbar';
+import { AdvanceExpandRowContent } from '../../component/advance-expand-row-content/advance-expand-row-content';
+import { AdvanceTableFilterToolbar } from '../../component/advance-table-filter-toolbar/advance-table-filter-toolbar';
+import AdvanceDataTable from '../../component/advance-data-table/advance-data-table';
 
 interface PaginationState {
   pageIndex: number;
@@ -16,7 +16,7 @@ interface PaginationState {
   totalCount: number;
 }
 
-export function Inventory() {
+export const InventoryPage = () => {
   const { t } = useTranslation();
   const columns = createAdvanceTableColumns({ t });
   const navigate = useNavigate();
@@ -123,4 +123,4 @@ export function Inventory() {
       />
     </div>
   );
-}
+};

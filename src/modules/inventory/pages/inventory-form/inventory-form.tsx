@@ -6,16 +6,16 @@ import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import API_CONFIG from '@/config/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { GeneralInfoForm } from './general-info-form';
-import { AdditionalInfoForm } from './additional-info-form';
-import { ImageUploader } from '../image-uploader/image-uploader';
-import { useAddInventoryItem } from '@/features/inventory/hooks/use-inventory';
+import { GeneralInfoForm } from '../../component/general-info-form/general-info-form';
+import { ImageUploader } from '../../component/image-uploader/image-uploader';
 import {
   categoryOptions,
   InventoryStatus,
   itemLocOptions,
   tags,
 } from '../../types/inventory.types';
+import { useAddInventoryItem } from '../../hooks/use-inventory';
+import { AdditionalInfoForm } from '../../component/additional-info-form/additional-info-form';
 
 /**
  * Stepper component provides a multi-step navigation interface, displaying the steps and allowing the user to
@@ -109,7 +109,7 @@ interface InventoryFormData {
   itemImageUrls: string[];
 }
 
-export function InventoryForm() {
+export const InventoryFormPage = () => {
   const { t } = useTranslation();
   const steps = [t('GENERAL_INFO'), t('ADDITIONAL_INFO')];
   const [currentStep, setCurrentStep] = useState(0);
@@ -399,4 +399,4 @@ export function InventoryForm() {
       </div>
     </div>
   );
-}
+};
