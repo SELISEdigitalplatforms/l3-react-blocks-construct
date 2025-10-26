@@ -16,8 +16,6 @@ import TaskManager from './pages/task-manager/task-manager';
 import { InvoicesPage } from './pages/invoices/invoices';
 import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
 import { CreateInvoice, EditInvoice } from './features/invoices';
-import { ActivityLog } from '@/pages/activity-log';
-import { Timeline } from '@/pages/timeline';
 import { AuthRoutes } from './routes/auth.route';
 import { LoadingOverlay } from '@/components/core';
 import { DashboardPage } from '@/modules/dashboard';
@@ -27,6 +25,7 @@ import { EmailPage } from '@/modules/email';
 import { ChatPage } from '@/modules/chat';
 import { NotFoundPage, ServiceUnavailablePage } from '@/modules/error-view';
 import { FileManagerMyFilesPage, SharedWithMePage, TrashPage } from '@/modules/file-manager';
+import { ActivityLogPage, TimelinePage } from '@/modules/activity-log';
 
 const queryClient = new QueryClient();
 
@@ -64,8 +63,8 @@ function AppContent() {
                 <Route path="/inventory/add" element={<InventoryForm />} />
                 <Route path="/inventory/:itemId" element={<InventoryDetails />} />
 
-                <Route path="/activity-log" element={<ActivityLog />} />
-                <Route path="/timeline" element={<Timeline />} />
+                <Route path="/activity-log" element={<ActivityLogPage />} />
+                <Route path="/timeline" element={<TimelinePage />} />
                 <Route path="/mail" element={<EmailPage />} />
                 <Route path="/mail/:category" element={<EmailPage />} />
                 <Route path="/mail/:category/:emailId" element={<EmailPage />} />
