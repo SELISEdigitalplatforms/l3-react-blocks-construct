@@ -1,5 +1,5 @@
 import CoreHCaptcha from '@hcaptcha/react-hcaptcha';
-import { HCaptchaProps } from './index.type';
+import { HCaptchaProps } from '../../types/index.type';
 
 /**
  * HCaptcha Component

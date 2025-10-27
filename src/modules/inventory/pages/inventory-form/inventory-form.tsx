@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Check, ChevronLeft } from 'lucide-react';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import API_CONFIG from '@/config/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui-kit/button';
+import { Card, CardContent } from '@/components/ui-kit/card';
 import { GeneralInfoForm } from '../../component/general-info-form/general-info-form';
 import { ImageUploader } from '../../component/image-uploader/image-uploader';
 import {
@@ -172,17 +172,19 @@ export const InventoryFormPage = () => {
           tags: '',
         },
         {
-          onSuccess: async (data) => {
+          onSuccess: (data) => {
             if (!data.isSuccess || !data.uploadUrl) {
-              return resolve(null);
-            }
-            try {
-              const { uploadUrl } = await uploadFile(data.uploadUrl, file);
-              resolve({ fileId: data.fileId ?? '', uploadUrl });
-            } catch (error) {
-              console.error('Error uploading file:', error);
               resolve(null);
+              return;
             }
+            uploadFile(data.uploadUrl, file)
+              .then(({ uploadUrl }) => {
+                resolve({ fileId: data.fileId ?? '', uploadUrl });
+              })
+              .catch((error) => {
+                console.error('Error uploading file:', error);
+                resolve(null);
+              });
           },
           onError: () => resolve(null),
         }

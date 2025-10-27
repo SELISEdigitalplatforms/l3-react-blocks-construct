@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
 import { statsData, daysOfWeek } from '../../services/dashboard-service';
 import { useTranslation } from 'react-i18next';
 import { DashboardSystemOverviewStatisticItem } from '../dashboard-system-overview-statistic-item/dashboard-system-overview-statistic-item';
@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui-kit/select';
 
 /**
  * DashboardSystemOverview component displays an overview of system usage with key statistics.

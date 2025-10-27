@@ -5,7 +5,7 @@ import { ActivityItem } from '../../types/activity-log.types';
 import '../../../../../test-utils/shared-test-utils';
 
 // Mock dependencies
-vi.mock('@/components/ui/separator', () => ({
+vi.mock('@/components/ui-kit/separator', () => ({
   Separator: () => <div data-testid="separator" />,
 }));
 

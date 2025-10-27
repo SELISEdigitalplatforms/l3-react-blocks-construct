@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
 import { PasswordInput, SharedPasswordStrengthChecker } from '@/components/core';
 import {
   Form,
@@ -19,7 +19,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/ui-kit/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangePasswordSuccess } from './change-password-success';
 import {

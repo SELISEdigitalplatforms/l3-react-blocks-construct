@@ -106,7 +106,7 @@ export {
 };
 
 // UI Card components mock - used by many components
-vi.mock('@/components/ui/card', () => ({
+vi.mock('@/components/ui-kit/card', () => ({
   Card: ({ children, className }: any) => (
     <div data-testid="card" className={className}>
       {children}
@@ -123,7 +123,7 @@ vi.mock('@/components/ui/card', () => ({
 }));
 
 // UI Select components mock - used by many components
-vi.mock('@/components/ui/select', () => ({
+vi.mock('@/components/ui-kit/select', () => ({
   Select: ({ children }: any) => <div data-testid="select">{children}</div>,
   SelectTrigger: ({ children, className }: any) => (
     <button data-testid="select-trigger" className={className}>

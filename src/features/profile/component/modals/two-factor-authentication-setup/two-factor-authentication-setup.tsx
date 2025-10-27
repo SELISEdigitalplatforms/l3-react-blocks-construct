@@ -8,11 +8,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Separator } from '@/components/ui-kit/separator';
 import { MfaDialogState } from '@/features/profile/enums/mfa-dialog-state.enum';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui-kit/skeleton';
 import { User } from '@/types/user.type';
 import { useGetMfaTemplate, useGenerateOTP } from '../../../hooks/use-mfa';
 import { useToast } from '@/hooks/use-toast';

@@ -24,11 +24,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/dropdown-menu';
+import { Checkbox } from '@/components/ui-kit/checkbox';
+import { Label } from '@/components/ui-kit/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
+import { Button } from '@/components/ui-kit/button';
 import { EmailTextEditor } from '../email-text-editor/email-text-editor';
 import { EmailCompose } from '../email-compose/email-compose';
 import { sanitizeHTML } from '@/utils/sanitizer';

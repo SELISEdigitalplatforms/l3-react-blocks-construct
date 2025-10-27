@@ -3,7 +3,7 @@ import { DateRange } from 'react-day-picker';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, startOfDay, isAfter, isBefore, isSameDay, parseISO } from 'date-fns';
 import { InvoiceItem, getStatusColors } from '../../types/invoices.types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { useState } from 'react';
 import { ConfirmationModal, DataTableColumnHeader } from '@/components/core';
 import { useDeleteInvoiceItem } from '../../hooks/use-invoices';

@@ -14,13 +14,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui-kit/form';
+import { Input } from '@/components/ui-kit/input';
 import { useForgotPassword } from '../../hooks/use-auth';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { SetStateAction, useRef, useState, useEffect } from 'react';
-import { CaptchaRef } from '@/features/captcha/index.type';
-import { Captcha } from '@/features/captcha';
+import { Captcha, CaptchaRef } from '@/modules/captcha';
 
 /**
  * ForgotPasswordForm Component

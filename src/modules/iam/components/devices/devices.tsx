@@ -1,6 +1,6 @@
 import { Loader2, Trash } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui-kit/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
 import {
   Table,
   TableBody,
@@ -8,10 +8,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui-kit/table';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { useState, useEffect, useRef } from 'react';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui-kit/scroll-area';
 import { useTranslation } from 'react-i18next';
 import { useDeviceTableColumns } from './devices-table-columns';
 import { useGetSessions } from '../../hooks/use-sessions';

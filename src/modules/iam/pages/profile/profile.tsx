@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
 import { useTranslation } from 'react-i18next';
 import { GeneralInfo } from '../../components/general-info/general-info';
 import { Devices } from '../../components/devices';

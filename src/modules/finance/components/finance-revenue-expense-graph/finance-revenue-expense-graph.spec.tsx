@@ -20,7 +20,7 @@ import { FinanceRevenueExpenseGraph } from './finance-revenue-expense-graph';
 vi.mock('recharts', () => createRechartsBarChartMock());
 
 // Mock UI Chart components using shared factory
-vi.mock('@/components/ui/chart', () => createUIChartMock());
+vi.mock('@/components/ui-kit/chart', () => createUIChartMock());
 
 // Mock tooltip component
 vi.mock('../finance-revenue-expense-graph-tooltip/finance-revenue-expense-graph-tooltip', () => ({

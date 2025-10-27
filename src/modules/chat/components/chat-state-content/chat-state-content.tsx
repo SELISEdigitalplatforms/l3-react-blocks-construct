@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import chatSvg from '@/assets/images/chat.svg';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 interface ChatStateContentProps {
   isSearchActive?: boolean;

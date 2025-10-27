@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { SquarePen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { TEmail, TEmailData } from '../../types/email.types';
 import { useNavItems } from '../../constants/nav-items';
 import { useLabelItems } from '../../constants/label-items';

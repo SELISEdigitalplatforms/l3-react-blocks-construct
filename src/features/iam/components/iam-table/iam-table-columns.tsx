@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui-kit/badge';
 import { DataTableColumnHeader } from '@/components/core';
 import { compareValues, IamData } from '../../services/user-service';
 import { DataTableRowActions } from './iam-table-row-actions';

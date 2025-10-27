@@ -9,10 +9,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { usePermissions } from '@/hooks/use-permissions';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 export const CombinedGuard: React.FC<
   CombinedGuardProps & {

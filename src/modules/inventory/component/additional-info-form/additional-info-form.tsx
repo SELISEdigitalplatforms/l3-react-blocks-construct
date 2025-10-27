@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@/components/ui-kit/switch';
 import { TagsSelector } from '../tags-selector/tags-selector';
 
 /**

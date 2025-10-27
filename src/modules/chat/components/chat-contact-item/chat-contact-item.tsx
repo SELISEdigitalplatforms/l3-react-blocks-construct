@@ -7,7 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { ChatContact } from '../../types/chat.types';
 import { cn } from '@/lib/utils';
 import { ChatAvatarContent } from '../chat-avatar-content/chat-avatar-content';

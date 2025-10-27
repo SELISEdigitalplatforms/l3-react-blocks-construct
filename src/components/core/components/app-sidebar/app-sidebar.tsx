@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '@/components/ui-kit/sidebar';
 import { menuItems } from '../../../../constant/sidebar-menu';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { getSidebarStyle } from '@/utils/sidebar-utils';

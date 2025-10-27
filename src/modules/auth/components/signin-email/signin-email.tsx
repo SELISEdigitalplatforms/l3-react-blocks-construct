@@ -10,9 +10,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/form';
+import { Input } from '@/components/ui-kit/input';
+import { Button } from '@/components/ui-kit/button';
 import { useAuthStore } from '@/state/store/auth';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useSigninEmail } from '../../hooks/use-auth';

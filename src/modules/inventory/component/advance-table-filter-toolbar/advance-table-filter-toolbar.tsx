@@ -3,16 +3,16 @@ import { Column, Header, Table } from '@tanstack/react-table';
 import { RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { TableRow, TableHead } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
+import { TableRow, TableHead } from '@/components/ui-kit/table';
+import { Input } from '@/components/ui-kit/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@/components/ui-kit/select';
+import { Checkbox } from '@/components/ui-kit/checkbox';
 import StockFilterDropdown from '../stock-filter-dropdown/stock-filter-dropdown';
 import LastUpdatedFilterDropdown from '../last-updated-filter-dropdown/last-updated-filter-dropdown';
 import { InventoryStatus } from '../../types/inventory.types';

@@ -3,20 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Pen, Plus, Search, Trash } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui-kit/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import { Separator } from '@/components/ui-kit/separator';
+import { Label } from '@/components/ui-kit/label';
+import { Input } from '@/components/ui-kit/input';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@/components/ui-kit/select';
+import { Switch } from '@/components/ui-kit/switch';
+import { Checkbox } from '@/components/ui-kit/checkbox';
 import {
   categoryOptions,
   InventoryStatus,
@@ -24,7 +24,7 @@ import {
   statusColors,
   tags,
 } from '../../types/inventory.types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import API_CONFIG from '@/config/api';
 import { GetPreSignedUrlForUploadResponse } from '@/lib/api/types/storage.types';

@@ -2,25 +2,25 @@ import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control } from 'react-hook-form';
 import { MoreVertical, NotebookPen, Plus, Trash } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui-kit/table';
+import { Input } from '@/components/ui-kit/input';
+import { Button } from '@/components/ui-kit/button';
+import { Label } from '@/components/ui-kit/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui-kit/select';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Textarea } from '@/components/ui/textarea';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+} from '@/components/ui-kit/dropdown-menu';
+import { Textarea } from '@/components/ui-kit/textarea';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui-kit/form';
 import { Categories, InvoiceItemDetails } from '../../types/invoices.types';
 
 interface InvoiceItemsTableProps {

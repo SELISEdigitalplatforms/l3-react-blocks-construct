@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { Bell } from 'lucide-react';
-import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
-import { Menubar, MenubarMenu, MenubarTrigger } from '@/components/ui/menubar';
+import { SidebarTrigger, useSidebar } from '@/components/ui-kit/sidebar';
+import { Button } from '@/components/ui-kit/button';
+import { Menubar, MenubarMenu, MenubarTrigger } from '@/components/ui-kit/menubar';
 import { Notification, useGetNotifications } from '@/modules/notification';
 import { useGetAccount } from '@/features/profile/hooks/use-account';
 import { PermissionsProvider } from '@/providers/permission-provider';

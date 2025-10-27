@@ -8,8 +8,8 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/sheet';
+import { Button } from '@/components/ui-kit/button';
 import {
   Command,
   CommandEmpty,
@@ -17,12 +17,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/ui-kit/command';
+import { Checkbox } from '@/components/ui-kit/checkbox';
+import { Label } from '@/components/ui-kit/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
+import { Calendar } from '@/components/ui-kit/calendar';
+import { Badge } from '@/components/ui-kit/badge';
 import { ItemTag } from '../../types/task-manager.types';
 
 /**

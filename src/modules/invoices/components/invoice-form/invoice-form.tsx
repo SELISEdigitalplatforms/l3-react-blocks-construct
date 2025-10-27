@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Control } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui-kit/button';
+import { Card, CardContent } from '@/components/ui-kit/card';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui-kit/form';
+import { Input } from '@/components/ui-kit/input';
+import { Separator } from '@/components/ui-kit/separator';
 import {
   Dialog,
   DialogContent,
@@ -13,17 +13,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import { CalendarIcon } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui-kit/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui-kit/select';
 import { UIPhoneInput } from '@/components/core';
 import { format } from 'date-fns';
 import { InvoiceFormValues } from '../../schemas/invoice-form-schema';

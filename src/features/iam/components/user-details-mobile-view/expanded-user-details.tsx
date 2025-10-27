@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dialog } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog } from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
 import { IamData } from '../../services/user-service';
 import { EditIamProfileDetails } from '@/features/profile/component/modals/edit-iam-profile-details/edit-iam-profile-details';
 

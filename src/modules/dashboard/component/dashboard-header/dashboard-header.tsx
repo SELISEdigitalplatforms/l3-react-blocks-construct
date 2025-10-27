@@ -1,5 +1,5 @@
 import { Download, RefreshCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { useTranslation } from 'react-i18next';
 
 export const DashboardHeader = () => {

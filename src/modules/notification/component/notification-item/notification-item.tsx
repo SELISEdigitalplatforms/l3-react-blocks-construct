@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { EllipsisVertical, Loader2 } from 'lucide-react';
 import { parseISO, format, isToday, isYesterday } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { useMarkNotificationAsRead } from '../../hooks/use-notification';
 import type { Notification } from '../../types/notification.types';
 import {
@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 
 interface NotificationItemProps {
   notification: Notification;

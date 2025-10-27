@@ -1,5 +1,5 @@
 import { Monitor, Smartphone, Trash } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { IDeviceSession } from '../../../services/device.service';
 import { CustomtDateFormat } from '@/lib/custom-date-formatter';

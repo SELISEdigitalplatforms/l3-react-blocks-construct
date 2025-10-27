@@ -1,6 +1,6 @@
-import { ReCaptcha } from './reCaptcha';
-import { HCaptcha } from './hCaptcha';
-import { CaptchaProps } from './index.type';
+import { CaptchaProps } from '../../types/index.type';
+import { ReCaptcha } from '../reCaptcha/reCaptcha';
+import { HCaptcha } from '../hCaptcha/hCaptcha';
 
 /**
  * Captcha Component

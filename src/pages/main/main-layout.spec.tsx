@@ -55,7 +55,7 @@ vi.mock('@/i18n/language-context', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/sidebar', () => {
+vi.mock('@/components/ui-kit/sidebar', () => {
   const mockUseSidebar = vi.fn(() => ({
     open: true,
     isMobile: false,
@@ -235,7 +235,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui-kit/sidebar';
 import MainLayout from './main-layout';
 
 const renderWithProviders = (component: React.ReactElement) => {

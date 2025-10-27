@@ -22,13 +22,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { EmailViewProps, TReply } from '@/modules/email/types/email.types';
 import empty_email from '@/assets/images/empty_email.svg';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui-kit/checkbox';
+import { Label } from '@/components/ui-kit/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
+import { Button } from '@/components/ui-kit/button';
 import { EmailActionsPanel } from '../email-actions-panel/email-actions-panel';
 import { EmailCompose } from '../email-compose/email-compose';
 import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tooltip-confirm-action';

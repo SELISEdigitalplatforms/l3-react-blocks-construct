@@ -3,8 +3,8 @@ import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
 import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui-kit/skeleton';
+import { Dialog } from '@/components/ui-kit/dialog';
 import {
   GetSectionsResponse,
   ItemTag,

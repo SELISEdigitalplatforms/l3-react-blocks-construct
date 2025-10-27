@@ -4,10 +4,10 @@ import { DateRange } from 'react-day-picker';
 import { Check, PlusCircle, Search } from 'lucide-react';
 import { debounce } from 'lodash';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
+import { Calendar } from '@/components/ui-kit/calendar';
 import {
   Command,
   CommandEmpty,
@@ -15,7 +15,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from '@/components/ui-kit/command';
 import { availableModulesData } from '@/modules/activity-log/activity-log-v1/services/activity-log-v1-services';
 
 /**

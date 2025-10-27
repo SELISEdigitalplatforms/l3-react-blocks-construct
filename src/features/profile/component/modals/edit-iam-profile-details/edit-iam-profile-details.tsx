@@ -11,20 +11,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Label } from '@/components/ui-kit/label';
+import { Input } from '@/components/ui-kit/input';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui-kit/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui-kit/select';
 import { IamData } from '@/features/iam/services/user-service';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui-kit/badge';
 import { X } from 'lucide-react';
 import { useGetRolesQuery } from '@/features/iam/hooks/use-iam';
 import { useTranslation } from 'react-i18next';
