@@ -116,7 +116,7 @@ export const InventoryFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { mutate: addInventoryItem } = useAddInventoryItem();
-  const { mutate: getPreSignedUrl } = useGetPreSignedUrlForUpload();
+  const { mutateAsync: getPreSignedUrlAsync } = useGetPreSignedUrlForUpload();
 
   const [formData, setFormData] = useState<InventoryFormData>({
     itemName: '',
@@ -156,40 +156,36 @@ export const InventoryFormPage = () => {
     return { uploadUrl: url.split('?')[0] };
   };
 
-  const getPresignedUrlAndUpload = (
+  const getPresignedUrlAndUpload = async (
     file: File
-  ): Promise<{ fileId: string; uploadUrl: string } | null> =>
-    new Promise((resolve) => {
-      getPreSignedUrl(
-        {
-          name: file.name,
-          projectKey: API_CONFIG.blocksKey,
-          itemId: '',
-          metaData: '',
-          accessModifier: 'Public',
-          configurationName: 'Default',
-          parentDirectoryId: '',
-          tags: '',
-        },
-        {
-          onSuccess: (data) => {
-            if (!data.isSuccess || !data.uploadUrl) {
-              resolve(null);
-              return;
-            }
-            uploadFile(data.uploadUrl, file)
-              .then(({ uploadUrl }) => {
-                resolve({ fileId: data.fileId ?? '', uploadUrl });
-              })
-              .catch((error) => {
-                console.error('Error uploading file:', error);
-                resolve(null);
-              });
-          },
-          onError: () => resolve(null),
-        }
-      );
-    });
+  ): Promise<{ fileId: string; uploadUrl: string } | null> => {
+    try {
+      const data = await getPreSignedUrlAsync({
+        name: file.name,
+        projectKey: API_CONFIG.blocksKey,
+        itemId: '',
+        metaData: '',
+        accessModifier: 'Public',
+        configurationName: 'Default',
+        parentDirectoryId: '',
+        tags: '',
+      });
+
+      if (!data.isSuccess || !data.uploadUrl) {
+        return null;
+      }
+
+      try {
+        const { uploadUrl } = await uploadFile(data.uploadUrl, file);
+        return { fileId: data.fileId ?? '', uploadUrl };
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        return null;
+      }
+    } catch {
+      return null;
+    }
+  };
 
   const handleAddImages = async (files: (File | string)[]) => {
     const fileObjects = files.filter((file): file is File => file instanceof File);
