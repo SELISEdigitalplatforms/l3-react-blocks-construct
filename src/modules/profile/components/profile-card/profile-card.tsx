@@ -1,3 +1,4 @@
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,8 +14,7 @@ import { Button } from '@/components/ui-kit/button';
 import { Dialog } from '@/components/ui-kit/dialog';
 import { Separator } from '@/components/ui-kit/separator';
 import { Skeleton } from '@/components/ui-kit/skeleton';
-import { EditProfile } from '../../../../features/profile/component/modals/edit-profile/edit-profile';
-import React, { useMemo, useState } from 'react';
+import { EditProfile } from '../modals/edit-profile/edit-profile';
 
 interface ProfileCardProps {
   userInfo: any;

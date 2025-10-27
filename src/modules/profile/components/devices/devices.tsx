@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, Trash } from 'lucide-react';
 import { Button } from '@/components/ui-kit/button';
@@ -17,12 +18,11 @@ import {
   TableRow,
 } from '@/components/ui-kit/table';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { useState, useEffect, useRef } from 'react';
 import { ScrollArea, ScrollBar } from '@/components/ui-kit/scroll-area';
 import { useDeviceTableColumns } from '../devices-table-columns/devices-table-columns';
 import { useGetSessions } from '../../hooks/use-sessions';
-import { IDeviceSession } from '@/features/profile/services/device.service';
-import { useGetAccount } from '@/features/profile/hooks/use-account';
+import { DeviceSession } from '../../types/device.type';
+import { useGetAccount } from '../../hooks/use-account';
 
 /**
  * DevicesTable is a component that displays a paginated list of device sessions.
@@ -33,7 +33,7 @@ import { useGetAccount } from '@/features/profile/hooks/use-account';
 
 export const Devices = () => {
   const { data: userInfo } = useGetAccount();
-  const [deviceSessions, setDeviceSessions] = useState<IDeviceSession[]>([]);
+  const [deviceSessions, setDeviceSessions] = useState<DeviceSession[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
   const loadingRef = useRef<HTMLDivElement>(null);
@@ -57,9 +57,9 @@ export const Devices = () => {
             ExpiresUtc: new Date(session.ExpiresUtc),
             CreateDate: new Date(session.CreateDate),
             UpdateDate: new Date(session.UpdateDate),
-          } as IDeviceSession;
+          } as DeviceSession;
         })
-        .filter((session): session is IDeviceSession => session !== null);
+        .filter((session): session is DeviceSession => session !== null);
 
       setDeviceSessions((prev) => {
         const newSessions = page === 0 ? processedSessions : [...prev, ...processedSessions];

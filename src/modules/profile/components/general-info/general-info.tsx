@@ -2,10 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProfileCard } from '../profile-card/profile-card';
 import { SecurityCard } from '../security-card/security-card';
-import { useGetAccount } from '../../../../features/profile/hooks/use-account';
-import { MfaDialogState } from '../../../../features/profile/enums/mfa-dialog-state.enum';
-import { UserMfaType } from '../../../../features/profile/enums/user-mfa-type-enum';
-
+import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
+import { UserMfaType } from '../../enums/user-mfa-type-enum';
+import { useGetAccount } from '../../hooks/use-account';
 /**
  * `GeneralInfo` component renders a user profile and account security section with options to
  * edit the profile, manage two-factor authentication (MFA), and change the password.

@@ -26,7 +26,7 @@ import {
   changePasswordFormType,
   getChangePasswordValidationSchemas,
   changePasswordFormDefaultValue,
-} from './utils';
+} from '../utils/index.utils';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useToast } from '@/hooks/use-toast';
 import { useChangePassword } from '../../hooks/use-account';

@@ -1,10 +1,5 @@
 import { useState } from 'react';
 import { ShieldCheck, Lock } from 'lucide-react';
-import { MfaDialogState } from '../../../../features/profile/enums/mfa-dialog-state.enum';
-import { TwoFactorAuthenticationSetup } from '../../../../features/profile/component/modals/two-factor-authentication-setup/two-factor-authentication-setup';
-import { AuthenticatorAppSetup } from '../../../../features/profile/component/modals/authenticator-app-setup/authenticator-app-setup';
-import { EmailVerification } from '../../../../features/profile/component/modals/email-verification/email-verification';
-import { ManageTwoFactorAuthentication } from '../../../../features/profile/component/modals/manage-two-factor-authentication/manage-two-factor-authentication';
 import {
   Card,
   CardContent,
@@ -16,8 +11,13 @@ import { Separator } from '@/components/ui-kit/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { Button } from '@/components/ui-kit/button';
-import { useGetMfaTemplate } from '../../../../features/profile/hooks/use-mfa';
 import { ChangePassword } from '../change-password/change-password';
+import { MfaDialogState } from '../../enums/mfa-dialog-state.enum';
+import { useGetMfaTemplate } from '../../hooks/use-mfa';
+import { TwoFactorAuthenticationSetup } from '../modals/two-factor-authentication-setup/two-factor-authentication-setup';
+import { AuthenticatorAppSetup } from '../modals/authenticator-app-setup/authenticator-app-setup';
+import { EmailVerification } from '../modals/email-verification/email-verification';
+import { ManageTwoFactorAuthentication } from '../modals/manage-two-factor-authentication/manage-two-factor-authentication';
 
 interface SecurityCardProps {
   userInfo: any;

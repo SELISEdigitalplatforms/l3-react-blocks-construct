@@ -1,8 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { Monitor, Smartphone, Trash } from 'lucide-react';
 import { Button } from '@/components/ui-kit/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { CustomtDateFormat } from '@/lib/custom-date-formatter';
-import { useTranslation } from 'react-i18next';
 import { DeviceSession } from '../../types/device.type';
 
 /**
