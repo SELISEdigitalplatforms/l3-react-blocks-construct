@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
 import { useTranslation } from 'react-i18next';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
 import { GeneralInfo } from '../../components/general-info/general-info';
-import { Devices } from '../../components/devices';
+import { Devices } from '../../components/devices/devices';
 
-export function Profile() {
+export const ProfilePage = () => {
   const [tabId, setTabId] = useState('generalInfo');
   const { t } = useTranslation();
 
@@ -36,4 +36,4 @@ export function Profile() {
       </Tabs>
     </div>
   );
-}
+};

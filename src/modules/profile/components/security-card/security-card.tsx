@@ -5,15 +5,21 @@ import { TwoFactorAuthenticationSetup } from '../../../../features/profile/compo
 import { AuthenticatorAppSetup } from '../../../../features/profile/component/modals/authenticator-app-setup/authenticator-app-setup';
 import { EmailVerification } from '../../../../features/profile/component/modals/email-verification/email-verification';
 import { ManageTwoFactorAuthentication } from '../../../../features/profile/component/modals/manage-two-factor-authentication/manage-two-factor-authentication';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui-kit/card';
 import { Separator } from '@/components/ui-kit/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { Button } from '@/components/ui-kit/button';
 import { useGetMfaTemplate } from '../../../../features/profile/hooks/use-mfa';
-import { ChangePassword } from '@/modules/iam/components/change-password';
+import { ChangePassword } from '../change-password/change-password';
 
-export const SecurityCard: React.FC<{
+interface SecurityCardProps {
   userInfo: any;
   isLoading: boolean;
   isDemoAccount: boolean;
@@ -24,7 +30,9 @@ export const SecurityCard: React.FC<{
   dialogState: MfaDialogState;
   isChangePasswordModalOpen: boolean;
   setIsChangePasswordModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({
+}
+
+export const SecurityCard = ({
   userInfo,
   isLoading,
   isDemoAccount,
@@ -35,7 +43,7 @@ export const SecurityCard: React.FC<{
   dialogState,
   isChangePasswordModalOpen,
   setIsChangePasswordModalOpen,
-}) => {
+}: Readonly<SecurityCardProps>) => {
   const { data } = useGetMfaTemplate();
   const [mfaId, setMfaId] = useState<string>('');
   const mfaButtonText =

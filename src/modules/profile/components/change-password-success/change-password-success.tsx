@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DialogContent,
   DialogDescription,
@@ -14,7 +15,6 @@ import { useLogoutAllMutation, useSignoutMutation } from '@/modules/auth/hooks/u
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/state/store/auth';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from 'react-i18next';
 
 /**
  * Component to display a success message after a password has been updated.
@@ -30,11 +30,11 @@ import { useTranslation } from 'react-i18next';
  * <ChangePasswordSuccess onClose={() => setDialogOpen(false)} />
  */
 
-type ChangePasswordSuccessProps = {
+interface ChangePasswordSuccessProps {
   onClose: () => void;
-};
+}
 
-export const ChangePasswordSuccess: React.FC<ChangePasswordSuccessProps> = ({ onClose }) => {
+export const ChangePasswordSuccess = ({ onClose }: Readonly<ChangePasswordSuccessProps>) => {
   const [logoutAllDevices, setLogoutAllDevices] = useState(false);
   const { mutateAsync: signoutMutateAsync } = useSignoutMutation();
   const { mutateAsync: logoutAllMutateAsync } = useLogoutAllMutation();

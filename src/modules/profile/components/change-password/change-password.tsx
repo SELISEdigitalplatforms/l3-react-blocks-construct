@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui-kit/form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChangePasswordSuccess } from './change-password-success';
+import { ChangePasswordSuccess } from '../change-password-success/change-password-success';
 import {
   changePasswordFormType,
   getChangePasswordValidationSchemas,
@@ -31,13 +31,13 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useToast } from '@/hooks/use-toast';
 import { useChangePassword } from '../../hooks/use-account';
 
-type ChangePasswordProps = {
+interface ChangePasswordProps {
   onClose: () => void;
   open?: boolean;
   onOpenChange?(open: boolean): void;
-};
+}
 
-export const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose, open, onOpenChange }) => {
+export const ChangePassword = ({ onClose, open, onOpenChange }: Readonly<ChangePasswordProps>) => {
   const [passwordRequirementsMet, setPasswordRequirementsMet] = useState(false);
   const [changePasswordSuccessModalOpen, setChangePasswordSuccessModalOpen] = useState(false);
   const { t } = useTranslation();

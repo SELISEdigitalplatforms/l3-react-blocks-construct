@@ -14,9 +14,9 @@ vi.mock('../../components/devices', () => ({
   Devices: vi.fn(() => <div data-testid="devices-table">Devices Table Content</div>),
 }));
 
-import { Profile } from './profile';
+import { ProfilePage } from './profile';
 import { GeneralInfo as GeneralInfoMock } from '../../components/general-info/general-info';
-import { Devices as DevicesMock } from '../../components/devices';
+import { Devices as DevicesMock } from '../../components/devices/devices';
 
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = new QueryClient({
@@ -40,18 +40,18 @@ describe('Profile Component', () => {
   });
 
   test('renders profile header', () => {
-    renderWithProviders(<Profile />);
+    renderWithProviders(<ProfilePage />);
     expect(screen.getByText('MY_PROFILE')).toBeInTheDocument();
   });
 
   test('renders tabs', () => {
-    renderWithProviders(<Profile />);
+    renderWithProviders(<ProfilePage />);
     expect(screen.getByText('GENERAL_INFO')).toBeInTheDocument();
     expect(screen.getByText('DEVICES')).toBeInTheDocument();
   });
 
   test('shows GeneralInfo tab by default', () => {
-    renderWithProviders(<Profile />);
+    renderWithProviders(<ProfilePage />);
     expect(GeneralInfoMock).toHaveBeenCalled();
     expect(DevicesMock).not.toHaveBeenCalled();
     expect(screen.getByTestId('general-info')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('Profile Component', () => {
   });
 
   test('switches to Devices tab when clicked', () => {
-    renderWithProviders(<Profile />);
+    renderWithProviders(<ProfilePage />);
     const devicesTab = screen.getByText('DEVICES');
 
     fireEvent.click(devicesTab);
@@ -70,7 +70,7 @@ describe('Profile Component', () => {
   });
 
   test('switches back to GeneralInfo tab when clicked', () => {
-    renderWithProviders(<Profile />);
+    renderWithProviders(<ProfilePage />);
 
     const devicesTab = screen.getByText('DEVICES');
     fireEvent.click(devicesTab);

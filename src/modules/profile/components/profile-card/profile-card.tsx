@@ -2,7 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import DummyProfile from '@/assets/images/dummy_profile.png';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui-kit/card';
 import { Button } from '@/components/ui-kit/button';
 import { Dialog } from '@/components/ui-kit/dialog';
 import { Separator } from '@/components/ui-kit/separator';
@@ -10,7 +16,7 @@ import { Skeleton } from '@/components/ui-kit/skeleton';
 import { EditProfile } from '../../../../features/profile/component/modals/edit-profile/edit-profile';
 import React, { useMemo, useState } from 'react';
 
-export const ProfileCard: React.FC<{
+interface ProfileCardProps {
   userInfo: any;
   isLoading: boolean;
   formatDate: (dateString: string | undefined) => string;
@@ -18,7 +24,9 @@ export const ProfileCard: React.FC<{
   isEditProfileModalOpen: boolean;
   setIsEditProfileModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleEditProfileClose: () => void;
-}> = ({
+}
+
+export const ProfileCard = ({
   userInfo,
   isLoading,
   formatDate,
@@ -26,7 +34,7 @@ export const ProfileCard: React.FC<{
   isEditProfileModalOpen,
   setIsEditProfileModalOpen,
   handleEditProfileClose,
-}) => {
+}: Readonly<ProfileCardProps>) => {
   const { t } = useTranslation();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);

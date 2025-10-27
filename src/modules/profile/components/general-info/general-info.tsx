@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ProfileCard } from './profile-card';
-import { SecurityCard } from './security-card';
+import { ProfileCard } from '../profile-card/profile-card';
+import { SecurityCard } from '../security-card/security-card';
 import { useGetAccount } from '../../../../features/profile/hooks/use-account';
 import { MfaDialogState } from '../../../../features/profile/enums/mfa-dialog-state.enum';
 import { UserMfaType } from '../../../../features/profile/enums/user-mfa-type-enum';
