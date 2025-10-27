@@ -9,9 +9,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/form';
+import { Input } from '@/components/ui-kit/input';
+import { Button } from '@/components/ui-kit/button';
 import { CustomCheckbox } from '@/components/core';
 import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema } from './utils';
 

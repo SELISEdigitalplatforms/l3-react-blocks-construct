@@ -6,7 +6,7 @@ import bgAuthDark from '@/assets/images/bg_auth_dark.svg';
 import { useGetLoginOptions } from '@/modules/auth/hooks/use-auth';
 import { useAuthState } from '@/state/client-middleware';
 import { useTheme } from '@/styles/theme/theme-provider';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { LanguageSelector } from '@/components/core';
 
 export function AuthLayout() {

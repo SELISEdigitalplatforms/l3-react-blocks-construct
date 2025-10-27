@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ActionConfig } from '@/modules/file-manager/types/header-toolbar.type';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 interface HeaderActionsProps {
   actions: ActionConfig[];

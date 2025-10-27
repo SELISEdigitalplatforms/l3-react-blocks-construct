@@ -8,12 +8,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
+import { Textarea } from '@/components/ui-kit/textarea';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui-kit/avatar';
+import { Label } from '@/components/ui-kit/label';
 
 interface ForwardMessageProps {
   open: boolean;

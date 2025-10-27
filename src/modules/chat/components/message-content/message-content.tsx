@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { FileText, Download } from 'lucide-react';
 import type { Message } from '../../types/chat.types';
 

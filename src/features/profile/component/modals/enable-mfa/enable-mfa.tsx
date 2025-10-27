@@ -5,8 +5,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
 import { useAuthStore } from '@/state/store/auth';
 import { useSignoutMutation } from '@/modules/auth/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';

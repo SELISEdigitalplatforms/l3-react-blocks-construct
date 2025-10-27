@@ -5,9 +5,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { TActiveAction, TEmail, TReply } from '../../types/email.types';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { CustomAvatar } from '@/components/core';
 import { v4 as uuidv4 } from 'uuid';
 

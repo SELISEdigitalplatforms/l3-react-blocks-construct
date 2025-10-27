@@ -10,7 +10,7 @@ import {
 import { NotFoundPage } from './not-found';
 
 // Mock UI Button component
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, className, ...props }: any) => (
     <button data-testid="button" className={className} {...props}>
       {children}

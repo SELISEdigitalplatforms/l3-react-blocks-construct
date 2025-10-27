@@ -5,12 +5,17 @@ import { Menu } from 'lucide-react';
 
 import { useIsMobile } from '../../hooks/use-mobile';
 import { cn } from '../../lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
+import { Separator } from '@/components/ui-kit/separator';
+import { Sheet, SheetContent } from '@/components/ui-kit/sheet';
+import { Skeleton } from '@/components/ui-kit/skeleton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui-kit/tooltip';
 import { DynamicBreadcrumb } from '../core/components/dynamic-breadcrumb/dynamic-breadcrumb';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';

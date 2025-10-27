@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlignJustify, Columns3, ListFilter, Plus, Search } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ItemTag } from '@/features/task-manager/types/task-manager.types';
+import { Input } from '@/components/ui-kit/input';
+import { Button } from '@/components/ui-kit/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
 import {
   TaskManagerFilterSheet,
   TaskFilters,
 } from '../task-manager-filters-sheet/task-manager-filters-sheet';
+import { ItemTag } from '../../types/task-manager.types';
 
 /**
  * TaskManagerToolbar Component

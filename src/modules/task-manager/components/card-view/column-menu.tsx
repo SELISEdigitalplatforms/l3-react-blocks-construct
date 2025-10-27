@@ -1,21 +1,21 @@
 import { useState, useCallback, useEffect } from 'react';
 import { EllipsisVertical, SquarePen, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui-kit/dialog';
+import { Input } from '@/components/ui-kit/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { ConfirmationModal } from '@/components/core';
 import { useDeleteTaskSection, useUpdateTaskSection } from '../../hooks/use-task-manager';
 

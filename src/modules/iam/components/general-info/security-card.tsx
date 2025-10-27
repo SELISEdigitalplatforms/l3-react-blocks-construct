@@ -5,11 +5,11 @@ import { TwoFactorAuthenticationSetup } from '../../../../features/profile/compo
 import { AuthenticatorAppSetup } from '../../../../features/profile/component/modals/authenticator-app-setup/authenticator-app-setup';
 import { EmailVerification } from '../../../../features/profile/component/modals/email-verification/email-verification';
 import { ManageTwoFactorAuthentication } from '../../../../features/profile/component/modals/manage-two-factor-authentication/manage-two-factor-authentication';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import { Separator } from '@/components/ui-kit/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
+import { Skeleton } from '@/components/ui-kit/skeleton';
+import { Button } from '@/components/ui-kit/button';
 import { useGetMfaTemplate } from '../../../../features/profile/hooks/use-mfa';
 import { ChangePassword } from '@/modules/iam/components/change-password';
 

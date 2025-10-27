@@ -17,8 +17,8 @@ import {
   useReactTable,
   Table as TableInstance,
 } from '@tanstack/react-table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import { Separator } from '@/components/ui-kit/separator';
 import {
   TableRow,
   TableCell,
@@ -26,9 +26,9 @@ import {
   TableHead,
   Table,
   TableBody,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+} from '@/components/ui-kit/table';
+import { Skeleton } from '@/components/ui-kit/skeleton';
+import { ScrollArea, ScrollBar } from '@/components/ui-kit/scroll-area';
 import { DataTablePagination } from '@/components/core';
 import { InvoiceItem, InvoiceStatus } from '../../types/invoices.types';
 

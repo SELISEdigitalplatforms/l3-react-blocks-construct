@@ -3,7 +3,7 @@ import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react
 import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker';
 
 import { cn } from '@/lib/utils';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui-kit/button';
 
 function Calendar({
   className,
@@ -34,7 +34,10 @@ function Calendar({
         ...formatters,
       }}
       classNames={{
-        root: cn('w-fit [&_tr]:border-0 [&_.rdp-month]:border-0 [&_td]:border-0 [&_th]:border-0', defaultClassNames.root),
+        root: cn(
+          'w-fit [&_tr]:border-0 [&_.rdp-month]:border-0 [&_td]:border-0 [&_th]:border-0',
+          defaultClassNames.root
+        ),
         months: cn('relative flex flex-col gap-4 md:flex-row', defaultClassNames.months),
         month: cn('flex w-full flex-col gap-4 md:border-0', defaultClassNames.month),
         nav: cn(

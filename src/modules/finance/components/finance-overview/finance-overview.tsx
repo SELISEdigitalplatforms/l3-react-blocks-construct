@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
 import {
   Select,
   SelectContent,
@@ -7,7 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui-kit/select';
 import { metricsData, monthsOfYear } from '../../services/finance-services';
 import { FinanceOverviewMetricCard } from '../finance-overview-metric-card/finance-overview-metric-card';
 

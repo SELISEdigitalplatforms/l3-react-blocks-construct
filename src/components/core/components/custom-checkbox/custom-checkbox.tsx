@@ -1,4 +1,4 @@
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui-kit/checkbox';
 import { UCheckboxProps } from './index.type';
 
 /**

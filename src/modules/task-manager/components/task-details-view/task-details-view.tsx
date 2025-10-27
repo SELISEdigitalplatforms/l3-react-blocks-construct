@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -24,17 +24,17 @@ import {
   TaskAttachments,
   priorityStyle,
 } from '../../types/task-manager.types';
-import { Calendar } from '@/components/ui/calendar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Calendar } from '@/components/ui-kit/calendar';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/select';
+import { Label } from '@/components/ui-kit/label';
 import { EditableHeading } from './editable-heading';
 import { EditableComment } from './editable-comment';
 import {
@@ -42,10 +42,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import { EditableDescription, EditableDescriptionRef } from './editable-description';
 import { AttachmentsSection } from './attachment-section';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/ui-kit/separator';
 import { Tags } from './tag-selector';
 import { AssigneeSelector } from './assignee-selector';
 import { useTaskDetails } from '../../hooks/use-task-details';
@@ -53,7 +53,7 @@ import { useCardTasks } from '../../hooks/use-card-tasks';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmationModal } from '@/components/core';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
 import { AddTag } from '../modals/add-tag';
 
 /**

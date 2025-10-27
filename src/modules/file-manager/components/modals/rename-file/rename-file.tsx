@@ -5,12 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
+import { Label } from '@/components/ui-kit/label';
 import { useTranslation } from 'react-i18next';
-import { IFileData } from '../../../hooks/use-mock-files-query';
+import { IFileData } from '@/modules/file-manager/types/file-manager.type';
 
 interface RenameFileProps {
   isOpen: boolean;

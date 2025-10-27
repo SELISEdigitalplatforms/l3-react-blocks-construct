@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { ChevronLeft, Download, Pencil, Send } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui-kit/card';
+import { Button } from '@/components/ui-kit/button';
 import {
   Table,
   TableBody,
@@ -13,11 +13,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Separator } from '@/components/ui/separator';
+} from '@/components/ui-kit/table';
+import { Separator } from '@/components/ui-kit/separator';
 import darkLogo from '@/assets/images/construct_logo_dark.svg';
 import lightLogo from '@/assets/images/construct_logo_light.svg';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui-kit/badge';
 import { useToast } from '@/hooks/use-toast';
 import { ConfirmationModal } from '@/components/core';
 import { InvoiceItem, InvoiceStatus, getStatusColors } from '../../types/invoices.types';

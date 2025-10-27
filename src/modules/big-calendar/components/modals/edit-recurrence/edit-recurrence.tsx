@@ -4,7 +4,7 @@ import { CalendarIcon } from 'lucide-react';
 import { format, addMonths } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { RRule } from 'rrule';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import {
   DialogContent,
   DialogHeader,
@@ -12,19 +12,19 @@ import {
   DialogDescription,
   DialogFooter,
   Dialog,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui-kit/dialog';
+import { Input } from '@/components/ui-kit/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+} from '@/components/ui-kit/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui-kit/radio-group';
+import { Label } from '@/components/ui-kit/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
+import { Calendar } from '@/components/ui-kit/calendar';
 import { CalendarEvent } from '../../../types/calendar-event.types';
 import { CALENDER_PERIOD, WEEK_DAYS_RRULE } from '../../../constants/calendar.constants';
 

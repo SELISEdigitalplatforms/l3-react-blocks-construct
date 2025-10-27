@@ -1,5 +1,5 @@
 import { AlignJustify, LayoutGrid } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
 
 interface ViewToggleProps {
   viewMode: string;

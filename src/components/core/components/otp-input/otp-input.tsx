@@ -1,6 +1,6 @@
 import React from 'react';
 import OtpInput, { AllowedInputTypes, InputProps } from 'react-otp-input';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui-kit/input';
 import { cn } from '@/lib/utils';
 
 /**

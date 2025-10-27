@@ -5,11 +5,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
 import SecurityOn from '@/assets/images/security_on.svg';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui-kit/checkbox';
+import { Label } from '@/components/ui-kit/label';
 import { useLogoutAllMutation, useSignoutMutation } from '@/modules/auth/hooks/use-auth';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/state/store/auth';

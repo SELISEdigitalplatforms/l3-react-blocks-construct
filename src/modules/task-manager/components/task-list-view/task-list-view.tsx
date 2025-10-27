@@ -16,7 +16,7 @@ import { ItemTag, TaskItem } from '../../types/task-manager.types';
 import { useListTasks } from '../../hooks/use-list-tasks';
 import { useGetTaskSections } from '../../hooks/use-task-manager';
 import { NewTaskRow, SortableTaskItem, StatusCircle, TaskListHeader } from '../list-view';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui-kit/dialog';
 import TaskDetailsView from '../task-details-view/task-details-view';
 
 /**

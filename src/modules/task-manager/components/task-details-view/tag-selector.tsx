@@ -2,8 +2,8 @@ import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui-kit/button';
+import { Badge } from '@/components/ui-kit/badge';
 import {
   Command,
   CommandEmpty,
@@ -11,13 +11,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
+} from '@/components/ui-kit/command';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/dropdown-menu';
+import { Label } from '@/components/ui-kit/label';
 import { ItemTag } from '../../types/task-manager.types';
 
 interface TagsSelectorProps {

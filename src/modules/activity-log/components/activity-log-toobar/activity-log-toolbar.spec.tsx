@@ -12,7 +12,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 // Mock dependencies
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, onClick, className, variant, size, ...props }: any) => (
     <button
       onClick={onClick}
@@ -26,7 +26,7 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/input', () => ({
+vi.mock('@/components/ui-kit/input', () => ({
   Input: ({ onChange, value, placeholder, className, ...props }: any) => (
     <input
       onChange={onChange}
@@ -39,7 +39,7 @@ vi.mock('@/components/ui/input', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/popover', () => ({
+vi.mock('@/components/ui-kit/popover', () => ({
   Popover: ({ children, open, onOpenChange }: any) => {
     const handleKeyDown = (e: any) => {
       if (e.key === 'Escape' && open) {
@@ -77,7 +77,7 @@ vi.mock('@/components/ui/popover', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/calendar', () => ({
+vi.mock('@/components/ui-kit/calendar', () => ({
   Calendar: ({ mode, onSelect, numberOfMonths, className }: any) => {
     const handleDateSelect = () => {
       onSelect?.({ from: new Date('2024-01-01'), to: new Date('2024-01-31') });
@@ -121,7 +121,7 @@ vi.mock('@/components/ui/calendar', () => ({
   },
 }));
 
-vi.mock('@/components/ui/command', () => ({
+vi.mock('@/components/ui-kit/command', () => ({
   Command: ({ children }: any) => <div data-testid="command">{children}</div>,
   CommandInput: ({ placeholder }: any) => (
     <input data-testid="command-input" placeholder={placeholder} />

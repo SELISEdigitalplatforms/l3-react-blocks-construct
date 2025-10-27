@@ -10,9 +10,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import { UserX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 export const RoleGuard: React.FC<
   RoleGuardProps & {

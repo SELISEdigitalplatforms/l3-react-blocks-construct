@@ -1,4 +1,4 @@
-import { ChartConfig } from '@/components/ui/chart';
+import { ChartConfig } from '@/components/ui-kit/chart';
 import { UserCog, UserPlus, Users } from 'lucide-react';
 import type { 
   MetricConfig, 

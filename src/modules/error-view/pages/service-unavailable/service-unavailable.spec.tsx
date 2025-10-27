@@ -10,7 +10,7 @@ import {
 import { ServiceUnavailablePage } from './service-unavailable';
 
 // Mock UI Button component
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, className, ...props }: any) => (
     <button data-testid="button" className={className} {...props}>
       {children}

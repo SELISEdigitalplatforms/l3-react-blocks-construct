@@ -9,8 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@/components/ui-kit/dropdown-menu';
+import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useLanguageContext } from '@/i18n/language-context';
 
 /**

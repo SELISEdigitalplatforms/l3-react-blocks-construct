@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Minus, X, Expand, Minimize2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 /**
  * EmailComposeHeader Component

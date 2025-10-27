@@ -6,17 +6,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
+import { Label } from '@/components/ui-kit/label';
 import { useTranslation } from 'react-i18next';
 
 export const AddDropdownMenu = ({

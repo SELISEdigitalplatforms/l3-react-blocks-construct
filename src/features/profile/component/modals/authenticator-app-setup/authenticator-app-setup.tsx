@@ -7,8 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
 import { UIOtpInput } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';
 import { User } from '@/types/user.type';

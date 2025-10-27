@@ -1,17 +1,17 @@
 import { Search, Edit, User, EllipsisVertical, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
+import { Input } from '@/components/ui-kit/input';
 import { ChatContactItem } from '../chat-contact-item/chat-contact-item';
 import { mockUserProfile } from '../../services/chat.services';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { ChatContact } from '../../types/chat.types';
 
 interface ChatSidebarProps {

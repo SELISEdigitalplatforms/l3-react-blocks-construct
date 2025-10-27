@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, CartesianGrid, Bar, XAxis, YAxis } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
 import {
   Select,
   SelectContent,
@@ -9,8 +9,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+} from '@/components/ui-kit/select';
+import { ChartContainer, ChartTooltip } from '@/components/ui-kit/chart';
 import { FinanceRevenueExpenseTooltipContent } from '../finance-revenue-expense-graph-tooltip/finance-revenue-expense-graph-tooltip';
 import { chartConfig, expenseChartData, timePeriods } from '../../services/finance-services';
 

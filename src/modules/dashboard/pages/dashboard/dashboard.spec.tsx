@@ -47,7 +47,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // 5. Mock other components
 // Mock components/ui/button module
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, ...props }: any) => (
     <button data-testid="button" {...props}>
       {children}

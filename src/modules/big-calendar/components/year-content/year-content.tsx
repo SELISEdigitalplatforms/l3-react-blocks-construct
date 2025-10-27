@@ -7,7 +7,7 @@ import {
   addDays,
   subDays,
 } from 'date-fns';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui-kit/tooltip';
 import { CalendarEvent } from '../../types/calendar-event.types';
 import { WEEK_DAYS } from '../../constants/calendar.constants';
 

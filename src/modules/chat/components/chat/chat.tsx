@@ -5,9 +5,9 @@ import { ChatSearch } from '../chat-search/chat-search';
 import { ChatUsers } from '../chat-users/chat-users';
 import { ChatContact } from '../../types/chat.types';
 import { mockChatContacts } from '../../services/chat.services';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent } from '@/components/ui-kit/sheet';
 import { ChatProfile } from '../chat-profile/chat-profile';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui-kit/dialog';
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 import { ChatHeader } from '../chat-header/chat-header';
 

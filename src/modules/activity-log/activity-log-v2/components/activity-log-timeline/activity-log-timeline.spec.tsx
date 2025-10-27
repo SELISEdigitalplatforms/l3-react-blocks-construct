@@ -10,7 +10,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 // Mock dependencies
-vi.mock('@/components/ui/card', () => ({
+vi.mock('@/components/ui-kit/card', () => ({
   Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <div data-testid="card" className={className}>
       {children}

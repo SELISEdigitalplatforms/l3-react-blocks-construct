@@ -7,8 +7,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/alert-dialog';
+import { Button } from '@/components/ui-kit/button';
 
 /**
  * ConfirmationModal Component

@@ -2,15 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BellOff, EllipsisVertical, Info, Phone, Trash, Users, Video, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui-kit/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
+import { Button } from '@/components/ui-kit/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { ForwardMessage } from '../modals/forward-message/forward-message';
 import { ChatProfile } from '../chat-profile/chat-profile';
 import { ChatInput } from '../chat-input/chat-input';

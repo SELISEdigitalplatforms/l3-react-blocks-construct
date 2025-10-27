@@ -7,9 +7,9 @@ import React, {
   useImperativeHandle,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { ChevronDown, PenLine } from 'lucide-react';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/components/ui-kit/label';
 import { useTaskDetails } from '../../hooks/use-task-details';
 
 /**

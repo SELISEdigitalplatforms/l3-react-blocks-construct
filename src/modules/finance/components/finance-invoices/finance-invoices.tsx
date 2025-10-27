@@ -7,9 +7,9 @@ import {
   TableHead,
   TableRow,
   TableCell,
-} from '@/components/ui/table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import { Button } from '@/components/ui-kit/button';
 import { Invoice, STATUS_COLORS, TABLE_HEADERS } from '../../types/finance.type';
 import { invoices } from '../../services/finance-services';
 
