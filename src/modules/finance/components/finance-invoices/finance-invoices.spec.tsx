@@ -4,7 +4,7 @@ import { expectElementWithClasses } from '../../../../test-utils/shared-test-uti
 import { FinanceInvoices } from './finance-invoices';
 
 // Local mocks (must come before shared test utils import)
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, className, ...props }: any) => (
     <button data-testid="view-all-button" className={className} {...props}>
       {children}
@@ -12,7 +12,7 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/table', () => ({
+vi.mock('@/components/ui-kit/table', () => ({
   Table: ({ children }: any) => <table data-testid="table">{children}</table>,
   TableHeader: ({ children }: any) => <thead data-testid="table-header">{children}</thead>,
   TableBody: ({ children }: any) => <tbody data-testid="table-body">{children}</tbody>,

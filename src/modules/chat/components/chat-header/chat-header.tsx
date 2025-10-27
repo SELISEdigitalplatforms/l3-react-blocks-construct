@@ -1,5 +1,5 @@
 import { Menu, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import type { ChatContact } from '../../types/chat.types';
 
 export interface ChatHeaderProps {

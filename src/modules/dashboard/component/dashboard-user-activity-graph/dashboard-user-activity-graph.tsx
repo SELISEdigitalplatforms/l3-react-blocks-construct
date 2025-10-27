@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { BarChart, CartesianGrid, Bar, XAxis, YAxis, TooltipProps } from 'recharts';
 import { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
 import {
   Select,
   SelectContent,
@@ -9,8 +9,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ChartContainer, ChartTooltip } from '@/components/ui/chart';
+} from '@/components/ui-kit/select';
+import { ChartContainer, ChartTooltip } from '@/components/ui-kit/chart';
 import { chartConfig, chartData, daysOfWeek } from '../../services/dashboard-service';
 import { DashboardUserActivityGraphTooltip } from '../dashboard-user-activity-graph-tooltip/dashboard-user-activity-graph-tooltip';
 

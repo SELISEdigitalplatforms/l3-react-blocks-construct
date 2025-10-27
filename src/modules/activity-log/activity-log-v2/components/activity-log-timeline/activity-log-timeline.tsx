@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui-kit/card';
 import type { ActivityGroup } from '../../types/activity-log.types';
 import no_activity from '@/assets/images/Illustration.svg';
 import { ActivityLogGroup } from '../activity-log-group/activity-log-group';

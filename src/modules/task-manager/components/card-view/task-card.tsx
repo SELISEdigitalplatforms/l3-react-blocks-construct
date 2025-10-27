@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui-kit/card';
 import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.types';
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';

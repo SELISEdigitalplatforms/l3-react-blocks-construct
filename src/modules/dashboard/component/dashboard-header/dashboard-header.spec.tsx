@@ -5,7 +5,7 @@ import { DashboardHeader } from './dashboard-header';
 import '../../../../test-utils/shared-test-utils';
 
 // Mock UI components
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, variant, className, ...props }: any) => (
     <button data-variant={variant} className={className} {...props}>
       {children}

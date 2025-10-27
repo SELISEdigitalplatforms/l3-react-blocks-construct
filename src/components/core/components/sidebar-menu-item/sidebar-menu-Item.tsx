@@ -8,8 +8,12 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
-} from '@/components/ui/sidebar';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+} from '@/components/ui-kit/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui-kit/collapsible';
 import { SidebarMenuItemProps } from '@/models/sidebar';
 import { MenuIcon, MenuIconName } from '@/components/core';
 

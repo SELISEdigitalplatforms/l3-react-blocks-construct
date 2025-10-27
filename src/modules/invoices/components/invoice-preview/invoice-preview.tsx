@@ -6,8 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { InvoicesDetail } from '../invoices-detail/invoices-detail';
 import { InvoiceItem } from '../../types/invoices.types';

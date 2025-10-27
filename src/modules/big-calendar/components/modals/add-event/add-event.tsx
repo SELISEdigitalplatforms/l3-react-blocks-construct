@@ -6,26 +6,26 @@ import { format } from 'date-fns';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui-kit/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui-kit/form';
+import { Input } from '@/components/ui-kit/input';
 import {
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
   PopoverAnchor,
   Close as PopoverClose,
-} from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { Calendar } from '@/components/ui/calendar';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/popover';
+import { Separator } from '@/components/ui-kit/separator';
+import { Switch } from '@/components/ui-kit/switch';
+import { Calendar } from '@/components/ui-kit/calendar';
+import { Label } from '@/components/ui-kit/label';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
 import { CustomTextEditor } from '@/components/core';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';

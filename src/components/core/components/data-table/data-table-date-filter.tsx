@@ -3,11 +3,11 @@ import { Column } from '@tanstack/react-table';
 import { CalendarIcon } from 'lucide-react';
 import { formatDate } from '@/utils/custom-date';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
+import { Button } from '@/components/ui-kit/button';
+import { Separator } from '@/components/ui-kit/separator';
 import usePopoverWidth from '@/hooks/use-popover-width';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '@/components/ui-kit/calendar';
 import { DateRange } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
 

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import githubIcon from '@/assets/images/social_media_github.svg';
 import linkedinIcon from '@/assets/images/social_media_in.svg';
 import microsoftIcon from '@/assets/images/social_media_ms.svg';

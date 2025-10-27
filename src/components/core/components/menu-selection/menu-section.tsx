@@ -1,4 +1,4 @@
-import { SidebarMenu } from '@/components/ui/sidebar';
+import { SidebarMenu } from '@/components/ui-kit/sidebar';
 import { MenuItem } from '@/models/sidebar';
 import { SidebarMenuItemComponent } from '../sidebar-menu-item/sidebar-menu-Item';
 

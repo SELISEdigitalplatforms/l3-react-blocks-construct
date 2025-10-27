@@ -4,7 +4,7 @@ import { useTheme } from '@/styles/theme/theme-provider';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 export const ForgotPasswordPage = () => {
   const { t } = useTranslation();

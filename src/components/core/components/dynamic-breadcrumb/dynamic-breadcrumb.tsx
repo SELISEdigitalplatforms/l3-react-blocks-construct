@@ -8,7 +8,7 @@ import {
   BreadcrumbItem,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from '@/components/ui-kit/breadcrumb';
 import { DYNAMIC_BREADCRUMB_TITLES } from '@/constant/dynamic-breadcrumb-title';
 
 /**

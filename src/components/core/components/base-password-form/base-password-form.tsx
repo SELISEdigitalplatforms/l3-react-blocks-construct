@@ -11,8 +11,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/form';
+import { Button } from '@/components/ui-kit/button';
 import { SharedPasswordStrengthChecker, PasswordInput } from '@/components/core';
 import { Captcha } from '@/modules/captcha';
 

@@ -16,12 +16,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Separator } from '@/components/ui-kit/separator';
+import { Label } from '@/components/ui-kit/label';
+import { Input } from '@/components/ui-kit/input';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui-kit/form';
 import { UIPhoneInput } from '@/components/core';
 import DummyProfile from '@/assets/images/dummy_profile.png';
 

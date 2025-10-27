@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { History, Mail, MailOpen, Menu, Search, Trash2, TriangleAlert, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui-kit/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
 import { makeFirstLetterUpperCase } from '../../utils/email-utils';
 import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tooltip-confirm-action';
 

@@ -4,7 +4,7 @@ import { FinanceDashboardHeader } from './finance-dashboard-header';
 import '../../../../test-utils/shared-test-utils';
 
 // Mock UI components
-vi.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui-kit/button', () => ({
   Button: ({ children, variant, className, ...props }: any) => (
     <button 
       data-testid={variant === 'outline' ? 'sync-button' : 'export-button'}

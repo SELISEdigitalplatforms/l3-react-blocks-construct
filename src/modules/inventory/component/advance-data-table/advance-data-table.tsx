@@ -31,13 +31,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@/components/ui-kit/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import { Skeleton } from '@/components/ui-kit/skeleton';
 import { DataTablePagination } from '@/components/core';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { useSidebar } from '@/components/ui/sidebar';
+import { Checkbox } from '@/components/ui-kit/checkbox';
+import { Button } from '@/components/ui-kit/button';
+import { useSidebar } from '@/components/ui-kit/sidebar';
 
 export interface AdvanceDataTableProps<TData, TValue> {
   /**

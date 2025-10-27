@@ -18,15 +18,15 @@ import {
   Trash,
   UserRoundX,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui-kit/button';
+import { ScrollArea } from '@/components/ui-kit/scroll-area';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from '@/components/ui-kit/accordion';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
 import { ChatContact } from '../../types/chat.types';
 import { ConfirmationModal } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';

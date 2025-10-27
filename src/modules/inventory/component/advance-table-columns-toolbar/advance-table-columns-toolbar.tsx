@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import { Download, Plus } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 import { AdvanceTableViewOptions } from '../advance-table-view-options/advance-table-view-options';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 
 /**
  * A toolbar component for managing table columns, displaying selected row information,

@@ -1,15 +1,15 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui-kit/input';
 import { Updater } from '@tanstack/react-table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui-kit/dropdown-menu';
+import { RadioGroup, RadioGroupItem } from '@/components/ui-kit/radio-group';
+import { Button } from '@/components/ui-kit/button';
+import { Label } from '@/components/ui-kit/label';
 
 /**
  * StockFilterDropdown is a dropdown component that allows users to filter stock items based on the stock amount.

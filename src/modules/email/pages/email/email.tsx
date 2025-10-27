@@ -11,8 +11,8 @@ import {
   TriangleAlert,
   X,
 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui-kit/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/tooltip';
 import { useEmailUI } from '../../hooks/use-email-ui';
 import { useEmailState } from '../../hooks/use-email-state';
 import { useEmailSelection } from '../../hooks/use-email-selection';

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import { UIOtpInput } from '@/components/core';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
 import { useToast } from '@/hooks/use-toast';

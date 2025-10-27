@@ -7,15 +7,15 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui-kit/sheet';
+import { Button } from '@/components/ui-kit/button';
 import { IamData } from '../../services/user-service';
 import { ConfirmationModal } from '@/components/core';
 import { Calendar, Clock, Mail, Phone, Shield, User } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/ui-kit/separator';
 import { useForgotPassword, useResendActivation } from '@/modules/auth/hooks/use-auth';
 import DummyProfile from '@/assets/images/dummy_profile.png';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui-kit/dialog';
 import { EditIamProfileDetails } from '@/features/profile/component/modals/edit-iam-profile-details/edit-iam-profile-details';
 import { UserDetailItem } from './user-details-item';
 

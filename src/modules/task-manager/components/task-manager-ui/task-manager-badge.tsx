@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui-kit/badge';
 import { cn } from '@/lib/utils';
 
 /**

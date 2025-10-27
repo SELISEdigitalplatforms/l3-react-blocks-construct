@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import { SkeletonGrid } from '../file-manager-grid-view-skeleton/file-manager-grid-view-skeleton';
 import { GridViewCard } from '../grid-view-card/grid-view-card';
 

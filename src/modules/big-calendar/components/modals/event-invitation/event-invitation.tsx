@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar, Check, ChevronDown, ChevronUp, Link, Users, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import {
   DialogContent,
   DialogHeader,
@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogFooter,
   Dialog,
-} from '@/components/ui/dialog';
+} from '@/components/ui-kit/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarEvent } from '../../../types/calendar-event.types';
 import { MEMBER_STATUS } from '../../../enums/calendar.enum';

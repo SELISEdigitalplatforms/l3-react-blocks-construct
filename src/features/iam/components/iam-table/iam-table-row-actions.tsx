@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { Row } from '@tanstack/react-table';
 import { MoreVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui-kit/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import { IamData } from '../../services/user-service';
 import { EditIamProfileDetails } from '@/features/profile/component/modals/edit-iam-profile-details/edit-iam-profile-details';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog } from '@/components/ui-kit/dialog';
 
 /**
  * Renders the actions for a row in the IAM (Identity and Access Management) table.

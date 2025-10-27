@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Check, ChevronLeft } from 'lucide-react';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import API_CONFIG from '@/config/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui-kit/button';
+import { Card, CardContent } from '@/components/ui-kit/card';
 import { GeneralInfoForm } from '../../component/general-info-form/general-info-form';
 import { ImageUploader } from '../../component/image-uploader/image-uploader';
 import {

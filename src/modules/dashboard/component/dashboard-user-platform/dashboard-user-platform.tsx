@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Pie, Label, PieChart } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { ViewBox } from 'recharts/types/util/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
 import {
   Select,
   SelectContent,
@@ -10,13 +10,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui-kit/select';
 import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
-} from '@/components/ui/chart';
+} from '@/components/ui-kit/chart';
 import { monthsOfYear, pieChartConfig, pieChartData } from '../../services/dashboard-service';
 import { ChartTooltipWrapper } from '../chart-tooltip-wrapper/chart-tooltip-wrapper';
 

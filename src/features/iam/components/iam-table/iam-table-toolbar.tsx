@@ -4,12 +4,18 @@
 import { Table } from '@tanstack/react-table';
 import { X, Mail, User, Filter } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui-kit/button';
+import { Input } from '@/components/ui-kit/input';
 import { DataTableViewOptions } from '@/components/core';
 import { useEffect, useState, useCallback } from 'react';
 import { debounce } from 'lodash';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui-kit/sheet';
 import { DateRange } from 'react-day-picker';
 import FilterControls from './filter-controls';
 

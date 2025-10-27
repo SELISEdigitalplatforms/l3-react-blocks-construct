@@ -2,13 +2,13 @@ import { memo, useCallback, useState, useMemo, useEffect } from 'react';
 import { Plus, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui-kit/button';
+import { Label } from '@/components/ui-kit/label';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui-kit/dropdown-menu';
 import {
   Command,
   CommandEmpty,
@@ -16,8 +16,8 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from '@/components/ui-kit/command';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
 import { Assignee } from '../../types/task-manager.types';
 
 /**

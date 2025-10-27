@@ -8,11 +8,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
+} from '@/components/ui-kit/dialog';
+import { Button } from '@/components/ui-kit/button';
+import { Label } from '@/components/ui-kit/label';
+import { Input } from '@/components/ui-kit/input';
+import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui-kit/form';
 import { ACCOUNT_QUERY_KEY, useCreateAccount } from '@/features/profile/hooks/use-account';
 
 /**
