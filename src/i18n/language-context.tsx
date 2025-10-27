@@ -14,7 +14,7 @@ import { routeModuleMap } from './route-module-map';
 import {
   useAvailableLanguages,
   useAvailableModules,
-} from '@/components/core/components/language-selector/hooks/use-language';
+} from '@/components/core/language-selector/hooks/use-language';
 
 /**
  * Type definition for the Language Context.
