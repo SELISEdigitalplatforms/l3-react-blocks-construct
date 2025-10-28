@@ -18,7 +18,8 @@ export function AuthLayout() {
 
   useLayoutEffect(() => {
     // Don't redirect if we're on the MFA verification page
-    if (isAuthenticated && !window.location.pathname.includes('/verify-key')) {
+    if (isAuthenticated && !window.location.pathname.includes('/verify-mfa')) {
+      console.log('User is authenticated, redirecting to home page.');
       navigate('/');
     }
   }, [isAuthenticated, navigate]);

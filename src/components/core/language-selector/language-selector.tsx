@@ -60,7 +60,7 @@ export const LanguageSelector = () => {
     '/success',
     '/activate-failed',
     '/forgot-password',
-    '/verify-key',
+    '/verify-mfa',
   ];
 
   const isAuthLayout = authPaths.some((path) => location.pathname.startsWith(path));

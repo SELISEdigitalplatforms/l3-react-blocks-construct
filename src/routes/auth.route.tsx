@@ -7,8 +7,8 @@ import { ResetPasswordPage } from '@/pages/auth/reset-password/reset-password';
 import { AccountActivationPage } from '@/modules/auth/pages/account-activation';
 import { SignupPage } from '@/modules/auth/pages/signup';
 import { VerificationFailed } from '@/modules/auth/pages/verification-failed/verification-failed';
-import { VerifyOtpKey } from '@/pages/auth/verify-otp-key/verify-otp-key';
 import { Route } from 'react-router-dom';
+import { VerifyMfaPage } from '@/modules/auth/pages/verify-mfa';
 
 export const AuthRoutes = (
   <Route element={<AuthLayout />}>
@@ -20,6 +20,6 @@ export const AuthRoutes = (
     <Route path="/success" element={<ActivationSuccessPage />} />
     <Route path="/activate-failed" element={<VerificationFailed />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-    <Route path="/verify-key" element={<VerifyOtpKey />} />
+    <Route path="/verify-mfa" element={<VerifyMfaPage />} />
   </Route>
 );

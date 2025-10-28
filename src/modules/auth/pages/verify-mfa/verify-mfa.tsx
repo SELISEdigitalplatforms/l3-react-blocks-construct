@@ -10,7 +10,7 @@ import useResendOTPTime from '@/hooks/use-resend-otp';
 import { useResendOtp } from '@/features/profile/hooks/use-mfa';
 import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
 
-export function VerifyOtpKey() {
+export function VerifyMfaPage() {
   const { login } = useAuthStore();
   const { t } = useTranslation();
   const navigate = useNavigate();

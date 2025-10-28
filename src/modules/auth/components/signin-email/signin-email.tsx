@@ -40,7 +40,7 @@ export const SigninEmail = () => {
 
       if (res.enable_mfa)
         return navigate(
-          `/verify-key?mfa_id=${res?.mfaId}&mfa_type=${res?.mfaType}&user_name=${values.username}`
+          `/verify-mfa?mfa_id=${res?.mfaId}&mfa_type=${res?.mfaType}&user_name=${values.username}`
         );
 
       login(res.access_token ?? '', res.refresh_token ?? '');
