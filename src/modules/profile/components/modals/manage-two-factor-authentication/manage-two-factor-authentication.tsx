@@ -14,22 +14,24 @@ import { Button } from '@/components/ui-kit/button';
 import { useAuthStore } from '@/state/store/auth';
 import { useSignoutMutation } from '@/modules/auth/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { MfaDialogState } from '@/features/profile/enums/mfa-dialog-state.enum';
 import { User } from '@/types/user.type';
 import { UserMfaType } from '../../../enums/user-mfa-type-enum';
 import { useDisableUserMfa } from '../../../hooks/use-mfa';
 import { ConfirmationModal } from '@/components/core';
 // import { ConfirmOtpVerification } from '../confirm-otp-verification/confirm-otp-verification';
+import { MfaDialogState } from '@/modules/profile/enums/mfa-dialog-state.enum';
 
-type ManageTwoFactorAuthenticationProps = {
+interface ManageTwoFactorAuthenticationProps {
   userInfo?: User;
   onClose: () => void;
   dialogState: MfaDialogState;
-};
+}
 
-export const ManageTwoFactorAuthentication: React.FC<
-  Readonly<ManageTwoFactorAuthenticationProps>
-> = ({ userInfo, onClose, dialogState }) => {
+export const ManageTwoFactorAuthentication = ({
+  userInfo,
+  onClose,
+  dialogState,
+}: Readonly<ManageTwoFactorAuthenticationProps>) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { logout } = useAuthStore();
@@ -154,11 +156,11 @@ export const ManageTwoFactorAuthentication: React.FC<
         });
         onClose();
       },
-      onError: (error: { error?: { message?: string } }) => {
+      onError: (error: Error) => {
         toast({
           variant: 'destructive',
           title: t('FAILED_TO_DISABLE_MFA'),
-          description: error?.error?.message ?? t('ERROR_OCCURED_DISABLING_MULTI_FACTOR'),
+          description: error?.message ?? t('ERROR_OCCURED_DISABLING_MULTI_FACTOR'),
         });
         setIsDisabling(false);
       },

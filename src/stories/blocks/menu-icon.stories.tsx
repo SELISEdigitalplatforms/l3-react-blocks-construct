@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
-import { MenuIcon, type IconName } from '../../components/core/components/menu-icon/menu-icon';
+import { MenuIcon, type IconName } from '../../components/core/menu-icon/menu-icon';
 
 const meta: Meta<typeof MenuIcon> = {
   title: 'MenuIcon',

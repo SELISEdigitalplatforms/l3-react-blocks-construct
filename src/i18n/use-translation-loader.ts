@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { loadTranslations } from './i18n';
-import { useAvailableModules } from '@/components/core/components/language-selector/hooks/use-language';
+import { useAvailableModules } from '@/components/core/language-selector/hooks/use-language';
 
 /**
  * Custom hook to load translations for the current language and module

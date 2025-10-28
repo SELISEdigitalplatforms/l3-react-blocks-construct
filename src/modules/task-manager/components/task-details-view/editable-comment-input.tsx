@@ -70,7 +70,7 @@ export function EditableCommentInput({
   useEffect(() => {
     setIsMounted(true);
 
-    import('../../../../components/core/components/custom-text-editor/custom-text-editor')
+    import('../../../../components/core/custom-text-editor/custom-text-editor')
       .then(({ CustomTextEditor }) => {
         setEditorComponent(() => CustomTextEditor);
       })
