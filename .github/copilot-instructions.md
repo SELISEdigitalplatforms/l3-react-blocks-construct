@@ -106,8 +106,8 @@ npm run lint           # ESLint + TypeScript checking
 npm test               # Jest test suite
 
 # Storybook (Vite-powered)
-npm run storybook      # Storybook dev server
-npm run build-storybook # Build Storybook
+# npm run storybook      # Storybook dev server
+# npm run build-storybook # Build Storybook
 ```
 
 ## Vite-Specific Patterns
