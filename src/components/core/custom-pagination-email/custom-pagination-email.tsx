@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui-kit/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui-kit/button';
 
 /**
  * Pagination Component
@@ -67,7 +67,7 @@ export const CustomPaginationEmail = ({
   };
 
   return (
-    <div className="w-full flex justify-between md:justify-center items-center  space-x-4 text-sm text-medium-emphasis">
+    <div className="w-full flex justify-between md:justify-center items-center space-x-4 text-sm text-medium-emphasis">
       <p>{`${start}-${end} of ${totalItems}`}</p>
       <div className="flex  space-x-1">
         <Button
