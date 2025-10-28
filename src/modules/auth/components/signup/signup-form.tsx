@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,7 +29,6 @@ import { signupFormDefaultValue, signupFormType, getSignupFormValidationSchema }
  */
 
 export const SignupForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { t } = useTranslation();
 
   const form = useForm<signupFormType>({
@@ -38,22 +36,9 @@ export const SignupForm = () => {
     resolver: zodResolver(getSignupFormValidationSchema(t)),
   });
 
-  const onSubmitHandler = async () => {
-    setIsSubmitting(true);
-    try {
-      // Handle sign-up request
-      // await signupMutation(values);
-      // Handle successful signup
-    } catch (error) {
-      // Handle error
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <Form {...form}>
-      <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmitHandler)}>
+      <form className="flex flex-col gap-4">
         <FormField
           control={form.control}
           name="username"
@@ -89,7 +74,7 @@ export const SignupForm = () => {
         </div>
 
         <div className="flex gap-10 mt-2">
-          <Button className="flex-1 font-extrabold" size="lg" type="submit" disabled={isSubmitting}>
+          <Button className="flex-1 font-extrabold" size="lg" type="submit" disabled>
             {t('SIGN_UP')}
           </Button>
         </div>

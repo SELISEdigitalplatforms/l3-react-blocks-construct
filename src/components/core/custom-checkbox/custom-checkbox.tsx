@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/ui-kit/checkbox';
-import { UCheckboxProps } from './index.type';
+import { CustomCheckboxProps } from './index.type';
 
 /**
  * CustomCheckbox Component
@@ -32,7 +32,7 @@ import { UCheckboxProps } from './index.type';
  * if multiple checkboxes are used on the same page
  */
 
-export const CustomCheckbox = ({ label, labelClassName }: Readonly<UCheckboxProps>) => {
+export const CustomCheckbox = ({ label, labelClassName }: Readonly<CustomCheckboxProps>) => {
   return (
     <div className="flex items-center space-x-2">
       <Checkbox

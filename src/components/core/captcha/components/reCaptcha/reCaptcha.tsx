@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
-import { CaptchaRef, ReCaptchaProps } from "./index.type";
+import { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { CaptchaRef, ReCaptchaProps } from '../../types/captcha.type';
 
 declare global {
   interface Window {
@@ -8,10 +8,10 @@ declare global {
         container: HTMLElement,
         params: {
           sitekey: string;
-          size: "compact" | "normal";
-          theme: "light" | "dark";
+          size: 'compact' | 'normal';
+          theme: 'light' | 'dark';
           callback: (token: string) => void;
-        },
+        }
       ) => number;
       ready: (cb: () => void) => void;
       reset: (widgetId?: number) => void;
@@ -19,13 +19,13 @@ declare global {
   }
 }
 
-const isReady = () => typeof window !== "undefined" && !!window.grecaptcha;
+const isReady = () => typeof window !== 'undefined' && !!window.grecaptcha;
 
-const SCRIPT_ID = "blocks-recaptcha-script";
-const SCRIPT_SRC = "https://www.google.com/recaptcha/api.js?render=explicit";
+const SCRIPT_ID = 'blocks-recaptcha-script';
+const SCRIPT_SRC = 'https://www.google.com/recaptcha/api.js?render=explicit';
 
 export const ReCaptcha = forwardRef<CaptchaRef, ReCaptchaProps>(
-  ({ siteKey, theme = "light", onVerify, onExpired, onError, size = "normal" }, ref) => {
+  ({ siteKey, theme = 'light', onVerify, onExpired, onError, size = 'normal' }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<number | null>(null);
 
@@ -46,8 +46,8 @@ export const ReCaptcha = forwardRef<CaptchaRef, ReCaptchaProps>(
           theme,
           size,
           callback: onVerify,
-          ...(onExpired && { "expired-callback": onExpired }),
-          ...(onError && { "error-callback": onError }),
+          ...(onExpired && { 'expired-callback': onExpired }),
+          ...(onError && { 'error-callback': onError }),
         });
       });
     }, [siteKey, theme, size, onVerify, onExpired, onError]);
@@ -55,7 +55,7 @@ export const ReCaptcha = forwardRef<CaptchaRef, ReCaptchaProps>(
     const loadScript = () => {
       if (document.getElementById(SCRIPT_ID)) return;
 
-      const script = document.createElement("script");
+      const script = document.createElement('script');
       script.id = SCRIPT_ID;
       script.src = SCRIPT_SRC;
       script.async = true;
@@ -71,15 +71,15 @@ export const ReCaptcha = forwardRef<CaptchaRef, ReCaptchaProps>(
 
       loadScript();
       const scriptNode = document.getElementById(SCRIPT_ID);
-      scriptNode?.addEventListener("load", renderReCaptcha);
+      scriptNode?.addEventListener('load', renderReCaptcha);
 
       return () => {
-        scriptNode?.removeEventListener("load", renderReCaptcha);
+        scriptNode?.removeEventListener('load', renderReCaptcha);
       };
     }, [renderReCaptcha]);
 
     return <div ref={containerRef} />;
-  },
+  }
 );
 
-ReCaptcha.displayName = "ReCaptcha";
+ReCaptcha.displayName = 'ReCaptcha';

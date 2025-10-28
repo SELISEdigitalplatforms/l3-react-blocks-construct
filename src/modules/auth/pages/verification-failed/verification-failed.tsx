@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui-kit/button';
 import emailSentIcon from '@/assets/images/verification-failed.svg';
 
-export function VerificationFailed() {
+export const VerificationFailed = () => {
   const { t } = useTranslation();
 
   return (
@@ -34,4 +34,4 @@ export function VerificationFailed() {
       </Button>
     </div>
   );
-}
+};

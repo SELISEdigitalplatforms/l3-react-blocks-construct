@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import uuidv4 from '@/utils/uuid';
+import { useTranslation } from 'react-i18next';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -16,7 +16,7 @@ import {
   useReactTable,
   Table as TableInstance,
 } from '@tanstack/react-table';
-
+import uuidv4 from '@/utils/uuid';
 import {
   Table,
   TableBody,
@@ -29,7 +29,6 @@ import { Card } from '@/components/ui-kit/card';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { ScrollArea, ScrollBar } from '@/components/ui-kit/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useTranslation } from 'react-i18next';
 import { DataTablePagination } from './data-table-pagination';
 
 /**

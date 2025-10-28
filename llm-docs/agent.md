@@ -63,13 +63,11 @@ PROJECT_KEY=$(grep VITE_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 **When User Wants to Create Any Webapp/Website:**
 
 1. **FIRST: Read Documentation** (Before talking to user):
-
    - Read `workflows/user-interaction.md`
    - Read `workflows/feature-planning.md`
    - Read `agent-instructions/selise-development-agent.md`
 
 2. **User Interaction & Requirements Gathering:**
-
    - Follow patterns from `user-interaction.md`
    - Create tracking files: `FEATURELIST.md`, `TASKS.md`, `SCRATCHPAD.md`, `CLOUD.md`
    - Ask clarifying questions about features
@@ -263,9 +261,9 @@ src/modules/[modules-name]/
 ### Component Hierarchy (3-Layer Rule)
 
 ```
-1. Feature Components (src/modules/*/components/)
-2. Block Components (src/components/blocks/)
-3. UI Components (src/components/ui/)
+1. Module Components (src/modules/*/components/)
+2. Core Components (src/components/core/)
+3. UI-Kit Components (src/components/ui-kit/)
 ```
 
 ### Critical Patterns from Recipes

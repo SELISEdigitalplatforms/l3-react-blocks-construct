@@ -9,7 +9,7 @@ import { useTheme } from '@/styles/theme/theme-provider';
 import { Button } from '@/components/ui-kit/button';
 import { LanguageSelector } from '@/components/core';
 
-export function AuthLayout() {
+export const AuthLayout = () => {
   const { isLoading, error: loginOptionsError } = useGetLoginOptions();
   const navigate = useNavigate();
   const { isMounted, isAuthenticated } = useAuthState();
@@ -207,4 +207,4 @@ export function AuthLayout() {
       </div>
     </div>
   );
-}
+};

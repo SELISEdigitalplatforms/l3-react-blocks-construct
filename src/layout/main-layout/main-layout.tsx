@@ -3,9 +3,14 @@ import { Bell } from 'lucide-react';
 import { SidebarTrigger, useSidebar } from '@/components/ui-kit/sidebar';
 import { Button } from '@/components/ui-kit/button';
 import { Menubar, MenubarMenu, MenubarTrigger } from '@/components/ui-kit/menubar';
-import { Notification, useGetNotifications } from '@/modules/notification';
 import { PermissionsProvider } from '@/providers/permission-provider';
-import { LanguageSelector, ProfileMenu, AppSidebar } from '@/components/core';
+import {
+  LanguageSelector,
+  ProfileMenu,
+  AppSidebar,
+  Notification,
+  useGetNotifications,
+} from '@/components/core';
 import { useGetAccount } from '@/modules/profile/hooks/use-account';
 
 type NotificationsData = {
@@ -14,7 +19,7 @@ type NotificationsData = {
   totalNotificationsCount: number;
 };
 
-export default function MainLayout() {
+export const MainLayout = () => {
   const { open, isMobile } = useSidebar();
   const { pathname } = useLocation();
   const segments = pathname?.split('/').filter(Boolean);
@@ -93,4 +98,4 @@ export default function MainLayout() {
       </div>
     </PermissionsProvider>
   );
-}
+};

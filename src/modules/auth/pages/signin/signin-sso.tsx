@@ -1,4 +1,3 @@
-// import { useTranslation } from 'react-i18next';
 import { LoginOption, SOCIAL_AUTH_PROVIDERS } from '@/constant/sso';
 import { GRANT_TYPES } from '@/constant/auth';
 import SSOSigninCard from '@/modules/auth/components/sso-signin-card/sso-signin-card';
@@ -8,7 +7,6 @@ type SsoSigninProps = {
 };
 
 export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
-  // const {  } = useTranslation();
   const socialGrantAllowed = loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);
 
   if (!socialGrantAllowed) {

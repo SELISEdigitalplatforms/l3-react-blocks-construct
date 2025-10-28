@@ -1,5 +1,5 @@
-import { CaptchaProps, CaptchaRef } from './index.type';
 import { useCallback, useRef, useState } from 'react';
+import { CaptchaProps, CaptchaRef } from '../types/captcha.type';
 
 type UseCaptchaProps = {
   siteKey: string;

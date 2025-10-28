@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +19,7 @@ import {
 import { Input } from '@/components/ui-kit/input';
 import { useForgotPassword } from '../../hooks/use-auth';
 import { Button } from '@/components/ui-kit/button';
-import { SetStateAction, useRef, useState, useEffect } from 'react';
-import { Captcha, CaptchaRef } from '@/modules/captcha';
+import { Captcha, useCaptcha } from '@/components/core';
 
 /**
  * ForgotPasswordForm Component
@@ -49,18 +49,22 @@ export const ForgotpasswordForm = () => {
 
   const { isPending, mutateAsync } = useForgotPassword();
 
-  const captchaRef = useRef<CaptchaRef>(null);
-
-  const resetCaptcha = () => {
-    captchaRef.current?.reset();
-  };
-
-  const [captchaToken, setCaptchaToken] = useState('');
   const [showCaptcha, setShowCaptcha] = useState(false);
 
   const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || '';
-
   const captchaEnabled = googleSiteKey !== '';
+
+  const captchaType =
+    import.meta.env.VITE_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha-v2-checkbox' : 'hCaptcha';
+
+  const {
+    code: captchaToken,
+    reset: resetCaptcha,
+    captcha,
+  } = useCaptcha({
+    siteKey: googleSiteKey,
+    type: captchaType,
+  });
 
   const emailValue = form.watch('email');
 
@@ -71,14 +75,6 @@ export const ForgotpasswordForm = () => {
       setShowCaptcha(false);
     }
   }, [emailValue]);
-
-  const handleCaptchaVerify = (token: SetStateAction<string>) => {
-    setCaptchaToken(token);
-  };
-
-  const handleCaptchaExpired = () => {
-    setCaptchaToken('');
-  };
 
   const onSubmitHandler = async (values: forgotPasswordFormType) => {
     if (captchaEnabled && showCaptcha && !captchaToken) return;
@@ -115,14 +111,7 @@ export const ForgotpasswordForm = () => {
 
         {captchaEnabled && showCaptcha && (
           <div className="my-4">
-            <Captcha
-              type={import.meta.env.VITE_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'}
-              siteKey={googleSiteKey}
-              theme="light"
-              onVerify={handleCaptchaVerify}
-              onExpired={handleCaptchaExpired}
-              size="normal"
-            />
+            <Captcha {...captcha} theme="light" size="normal" />
           </div>
         )}
 

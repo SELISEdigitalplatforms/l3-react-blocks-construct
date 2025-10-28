@@ -1,9 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { GRANT_TYPES } from '@/constant/auth';
 import { LoginOption } from '@/constant/sso';
+import { Divider } from '@/components/core';
 import { SsoSignin } from '../../pages/signin/signin-sso';
 import { SigninEmail } from '../signin-email';
-import { Divider } from '@/components/core';
-import { useTranslation } from 'react-i18next';
 
 type SigninProps = {
   loginOption?: LoginOption;
