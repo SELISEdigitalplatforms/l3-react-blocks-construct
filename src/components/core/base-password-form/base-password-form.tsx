@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -13,8 +13,12 @@ import {
   FormMessage,
 } from '@/components/ui-kit/form';
 import { Button } from '@/components/ui-kit/button';
-import { SharedPasswordStrengthChecker, PasswordInput } from '@/components/core';
-import { Captcha } from '@/modules/captcha';
+import {
+  SharedPasswordStrengthChecker,
+  PasswordInput,
+  Captcha,
+  useCaptcha,
+} from '@/components/core';
 
 /**
  * BasePasswordForm Component
@@ -75,13 +79,19 @@ export const BasePasswordForm = ({
 }: Readonly<BasePasswordFormProps>) => {
   const navigate = useNavigate();
   const [requirementsMet, setRequirementsMet] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState('');
   const [showCaptcha, setShowCaptcha] = useState(false);
   const { t } = useTranslation();
 
   const googleSiteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY || '';
-  // Check if captcha is enabled (site key is not empty)
   const captchaEnabled = googleSiteKey !== '';
+
+  const captchaType =
+    import.meta.env.VITE_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha-v2-checkbox' : 'hCaptcha';
+
+  const { code: captchaToken, captcha } = useCaptcha({
+    siteKey: googleSiteKey,
+    type: captchaType,
+  });
 
   const form = useForm({
     defaultValues,
@@ -102,11 +112,8 @@ export const BasePasswordForm = ({
       setShowCaptcha(true);
     } else {
       setShowCaptcha(false);
-      if (captchaToken) {
-        setCaptchaToken('');
-        if (onCaptchaValidation) {
-          onCaptchaValidation(false);
-        }
+      if (captchaToken && onCaptchaValidation) {
+        onCaptchaValidation(false);
       }
     }
   }, [
@@ -118,19 +125,12 @@ export const BasePasswordForm = ({
     captchaEnabled,
   ]);
 
-  const handleCaptchaVerify = (token: React.SetStateAction<string>) => {
-    setCaptchaToken(token);
+  // Sync captcha token with onCaptchaValidation callback
+  useEffect(() => {
     if (onCaptchaValidation) {
-      onCaptchaValidation(!!token);
+      onCaptchaValidation(!!captchaToken);
     }
-  };
-
-  const handleCaptchaExpired = () => {
-    setCaptchaToken('');
-    if (onCaptchaValidation) {
-      onCaptchaValidation(false);
-    }
-  };
+  }, [captchaToken, onCaptchaValidation]);
 
   const onSubmitHandler = async (values: { password: string; confirmPassword: string }) => {
     if (captchaEnabled && !captchaToken) {
@@ -188,14 +188,7 @@ export const BasePasswordForm = ({
 
         {captchaEnabled && showCaptcha && (
           <div className="my-4">
-            <Captcha
-              type={import.meta.env.VITE_CAPTCHA_TYPE === 'reCaptcha' ? 'reCaptcha' : 'hCaptcha'}
-              siteKey={googleSiteKey}
-              theme="light"
-              onVerify={handleCaptchaVerify}
-              onExpired={handleCaptchaExpired}
-              size="normal"
-            />
+            <Captcha {...captcha} theme="light" size="normal" />
           </div>
         )}
 

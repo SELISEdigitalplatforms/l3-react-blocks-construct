@@ -1,12 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useLanguageContext, LanguageProvider } from './i18n/language-context';
-import './i18n/i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from '@/components/ui-kit/toaster';
-import { ClientMiddleware } from '@/state/client-middleware';
-import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { SidebarProvider } from '@/components/ui-kit/sidebar';
-import { AuthRoutes } from './routes/auth.route';
 import { LoadingOverlay } from '@/components/core';
 import { DashboardPage } from '@/modules/dashboard';
 import { FinancePage } from '@/modules/finance';
@@ -27,6 +21,12 @@ import { TaskManagerPage } from '@/modules/task-manager';
 import { ProfilePage } from '@/modules/profile';
 import { UsersTablePage } from '@/modules/iam';
 import { MainLayout } from '@/layout/main-layout/main-layout';
+import { Toaster } from '@/components/ui-kit/toaster';
+import { ClientMiddleware } from '@/state/client-middleware';
+import { ThemeProvider } from '@/styles/theme/theme-provider';
+import './i18n/i18n';
+import { AuthRoutes } from './routes/auth.route';
+import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 
 const queryClient = new QueryClient();
 
