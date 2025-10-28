@@ -1,7 +1,7 @@
-import Quill from 'quill';
 import { useEffect, useRef } from 'react';
-import { Button } from '@/components/ui-kit/button';
+import Quill from 'quill';
 import { Paperclip, Smile, Image } from 'lucide-react';
+import { Button } from '@/components/ui-kit/button';
 import 'quill/dist/quill.snow.css';
 
 /**

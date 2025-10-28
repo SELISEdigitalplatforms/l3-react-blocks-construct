@@ -1,7 +1,7 @@
 import { clients } from '@/lib/https';
 import { ChangePasswordPayload } from '../types/account.type';
 import { User } from '@/types/user.type';
-import { ProfileFormType } from '../components/utils/index.utils';
+import { CreateUserFormType, ProfileFormType } from '../components/utils/index.utils';
 
 export const changePassword = async (payload: ChangePasswordPayload) => {
   payload.projectKey = payload.projectKey ?? import.meta.env.VITE_X_BLOCKS_KEY;
@@ -19,4 +19,12 @@ export const updateAccount = (data: ProfileFormType) => {
     errors: unknown;
     isSuccess: boolean;
   }>('/iam/v1/user/UpdateAccount', JSON.stringify(data));
+};
+
+export const createAccount = (data: CreateUserFormType) => {
+  return clients.post<{
+    itemId: string;
+    errors: unknown;
+    isSuccess: boolean;
+  }>('/iam/v1/User/Create', JSON.stringify(data));
 };

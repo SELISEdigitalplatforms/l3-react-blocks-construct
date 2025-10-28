@@ -10,13 +10,17 @@ vi.mock('../../components/general-info/general-info', () => ({
   GeneralInfo: vi.fn(() => <div data-testid="general-info">General Info Content</div>),
 }));
 
-vi.mock('../../components/devices', () => ({
+vi.mock('../../components/devices/devices', () => ({
   Devices: vi.fn(() => <div data-testid="devices-table">Devices Table Content</div>),
 }));
 
 import { ProfilePage } from './profile';
-import { GeneralInfo as GeneralInfoMock } from '../../components/general-info/general-info';
-import { Devices as DevicesMock } from '../../components/devices/devices';
+import { GeneralInfo } from '../../components/general-info/general-info';
+import { Devices } from '../../components/devices/devices';
+
+// Get the mocked functions using vi.mocked
+const GeneralInfoMock = vi.mocked(GeneralInfo);
+const DevicesMock = vi.mocked(Devices);
 
 const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = new QueryClient({

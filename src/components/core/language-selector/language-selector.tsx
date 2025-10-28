@@ -12,6 +12,7 @@ import {
 } from '@/components/ui-kit/dropdown-menu';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useLanguageContext } from '@/i18n/language-context';
+import { publicRoutes } from '@/constant/auth-public-routes';
 
 /**
  * LanguageSelector Component
@@ -51,19 +52,7 @@ export const LanguageSelector = () => {
     }
   }, [availableLanguages, currentLanguage, isLoading, setLanguage]);
 
-  const authPaths = [
-    '/login',
-    '/signup',
-    '/sent-email',
-    '/activate',
-    '/resetpassword',
-    '/success',
-    '/activate-failed',
-    '/forgot-password',
-    '/verify-mfa',
-  ];
-
-  const isAuthLayout = authPaths.some((path) => location.pathname.startsWith(path));
+  const isAuthLayout = publicRoutes.some((path) => location.pathname.startsWith(path));
 
   const changeLanguage = async (newLanguageCode: string) => {
     await setLanguage(newLanguageCode);

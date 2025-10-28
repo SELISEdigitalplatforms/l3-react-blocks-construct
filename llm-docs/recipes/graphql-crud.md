@@ -573,7 +573,7 @@ This will show:
 ## File Structure Pattern
 
 ```
-src/features/[feature]/
+src/modules/[module]/
 ├── components/         # UI components
 ├── graphql/           # Queries and mutations
 │   ├── queries.ts

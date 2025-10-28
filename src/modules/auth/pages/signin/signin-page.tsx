@@ -9,7 +9,7 @@ import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/state/store/auth';
 import { SignInResponse } from '@/modules/auth/services/auth.service';
 
-export function SigninPage() {
+export const SigninPage = () => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const { data: loginOption } = useGetLoginOptions();
@@ -75,4 +75,4 @@ export function SigninPage() {
       {loginOption && <Signin loginOption={loginOption} />}
     </div>
   );
-}
+};

@@ -63,13 +63,11 @@ PROJECT_KEY=$(grep VITE_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 **When User Wants to Create Any Webapp/Website:**
 
 1. **FIRST: Read Documentation** (Before talking to user):
-
    - Read `workflows/user-interaction.md`
    - Read `workflows/feature-planning.md`
    - Read `agent-instructions/selise-development-agent.md`
 
 2. **User Interaction & Requirements Gathering:**
-
    - Follow patterns from `user-interaction.md`
    - Create tracking files: `FEATURELIST.md`, `TASKS.md`, `SCRATCHPAD.md`, `CLOUD.md`
    - Ask clarifying questions about features
@@ -245,7 +243,7 @@ git merge feature/[task-name]
 **Directory Structure - Follow inventory pattern:**
 
 ```
-src/features/[feature-name]/
+src/modules/[modules-name]/
 ├── components/         # Feature-specific components
 ├── graphql/           # Queries and mutations (if using GraphQL)
 ├── hooks/             # Feature-specific hooks
@@ -256,16 +254,16 @@ src/features/[feature-name]/
 
 **⚠️ CRITICAL: Inventory is for STRUCTURE ONLY, not data operations!**
 
-- Use `src/features/inventory/` as template for folder structure
+- Use `src/modules/inventory/` as template for folder structure
 - NEVER copy inventory's GraphQL patterns - they're different
 - For data operations, ONLY follow `recipes/graphql-crud.md`
 
 ### Component Hierarchy (3-Layer Rule)
 
 ```
-1. Feature Components (src/features/*/components/)
-2. Block Components (src/components/blocks/)
-3. UI Components (src/components/ui/)
+1. Module Components (src/modules/*/components/)
+2. Core Components (src/components/core/)
+3. UI-Kit Components (src/components/ui-kit/)
 ```
 
 ### Critical Patterns from Recipes
