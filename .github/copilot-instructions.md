@@ -12,7 +12,7 @@ This is a React TypeScript application using the SELISE Blocks ecosystem - a com
 
 Always follow this order when building features:
 
-1. **Feature Components** (`src/features/*/components/`) - Complete business solutions
+1. **Feature Components** (`src/modules/*/components/`) - Complete business solutions
 2. **Block Components** (`src/components/core/`) - Reusable business patterns
 3. **UI Components** (`src/components/ui/`) - Foundation design system
 
@@ -66,7 +66,7 @@ import ConfirmationModal from 'components/core/confirmation-modal/confirmation-m
 ## File Structure Pattern
 
 ```
-src/features/[feature-name]/
+src/modules/[modules-name]/
 ├── components/         # Feature-specific UI
 ├── graphql/           # Queries/mutations (follow recipes/graphql-crud.md)
 ├── hooks/             # React Query hooks

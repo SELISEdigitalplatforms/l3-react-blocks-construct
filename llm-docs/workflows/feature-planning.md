@@ -189,7 +189,7 @@ See: `docs/llm-docs/cloud-setup.md` for complete CLOUD.md workflow
 
 ### Feature Structure (MANDATORY)
 
-- [ ] Create feature folder following src/features/inventory/ pattern exactly
+- [ ] Create feature folder following src/modules/inventory/ pattern exactly
 - [ ] Setup folder structure: components/, hooks/, services/, types/, index.ts
 - [ ] Study inventory feature implementation before starting
 
@@ -392,10 +392,10 @@ Before marking a task complete:
 
 ```bash
 # ALWAYS study inventory structure first
-ls -la src/features/inventory/
+ls -la src/modules/inventory/
 
 # Required folder structure to replicate:
-src/features/[your-feature]/
+src/modules/[your-module]/
 ├── components/           # Feature-specific components
 ├── hooks/               # Feature-specific hooks
 ├── services/            # API calls and business logic
@@ -424,7 +424,7 @@ src/features/[your-feature]/
 2. **One task at a time** - Focus prevents context switching
 3. **Document blockers** immediately in SCRATCHPAD.md
 4. **Update status** as you work, not after
-5. **Reference existing code** - Check src/features/ for patterns
+5. **Reference existing code** - Check src/modules/ for patterns
 6. **Test incrementally** - Don't wait until end
 7. **Commit frequently** - Small, logical commits
 8. **Screenshot Selise Cloud** configs for CLOUD.md

@@ -247,7 +247,7 @@ git merge feature/[task-name]
 **Directory Structure - Follow inventory pattern:**
 
 ```
-src/features/[feature-name]/
+src/modules/[modules-name]/
 ├── components/         # Feature-specific components
 ├── graphql/           # Queries and mutations (if using GraphQL)
 ├── hooks/             # Feature-specific hooks
@@ -258,14 +258,14 @@ src/features/[feature-name]/
 
 **⚠️ CRITICAL: Inventory is for STRUCTURE ONLY, not data operations!**
 
-- Use `src/features/inventory/` as template for folder structure
+- Use `src/modules/inventory/` as template for folder structure
 - NEVER copy inventory's GraphQL patterns - they're different
 - For data operations, ONLY follow `recipes/graphql-crud.md`
 
 ### Component Hierarchy (3-Layer Rule)
 
 ```
-1. Feature Components (src/features/*/components/)
+1. Feature Components (src/modules/*/components/)
 2. Block Components (src/components/core/)
 3. UI Components (src/components/ui/)
 ```
