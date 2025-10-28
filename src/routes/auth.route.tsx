@@ -6,9 +6,9 @@ import { EmailSentPage } from '@/modules/auth/pages/email-sent';
 import { ForgotPasswordPage } from '@/modules/auth/pages/forgot-password';
 import { AccountActivationPage } from '@/modules/auth/pages/account-activation';
 import { SignupPage } from '@/modules/auth/pages/signup';
-import { VerificationFailed } from '@/modules/auth/pages/verification-failed/verification-failed';
-import { ResetPasswordPage } from '@/modules/auth/pages/reset-password/reset-password';
-import { VerifyOtpKeyPage } from '@/modules/auth/pages/verify-otp-key/verify-otp-key';
+import { ResetPasswordPage } from '@/modules/auth/pages/reset-password';
+import { VerifyOtpKeyPage } from '@/modules/auth/pages/verify-otp-key';
+import { VerificationFailed } from '@/modules/auth/pages/verification-failed';
 
 export const AuthRoutes = (
   <Route element={<AuthLayout />}>

@@ -21,24 +21,19 @@ Object.defineProperty(window, 'location', {
 import { vi } from 'vitest';
 import '../../test-utils/shared-test-utils';
 
-vi.mock('components/core/app-sidebar', () => ({
-  AppSidebar: () => <div data-testid="app-sidebar">App Sidebar</div>,
-}));
-
-vi.mock('components/core/profile-menu', () => ({
-  ProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
-}));
-
-vi.mock('components/core/language-selector', () => ({
-  __esModule: true,
-  default: () => <div data-testid="language-selector">Language Selector</div>,
-}));
-
 // Mock the core barrel so named imports in MainLayout resolve to test doubles
 vi.mock('@/components/core', () => ({
   LanguageSelector: () => <div data-testid="language-selector">Language Selector</div>,
   ProfileMenu: () => <div data-testid="profile-menu">Profile Menu</div>,
   AppSidebar: () => <div data-testid="app-sidebar">App Sidebar</div>,
+  Notification: () => <div data-testid="notification">Notification</div>,
+  useGetNotifications: vi.fn().mockReturnValue({
+    data: {
+      notifications: [],
+      unReadNotificationsCount: 0,
+      totalNotificationsCount: 0,
+    },
+  }),
 }));
 
 vi.mock('@/i18n/language-context', () => ({
@@ -206,21 +201,7 @@ vi.mock('components/ui/menubar', () => ({
   ),
 }));
 
-vi.mock('features/notification/component/notification/notification', () => ({
-  Notification: () => <div data-testid="notification">Notification</div>,
-}));
-
-vi.mock('features/notification/hooks/use-notification', () => ({
-  useGetNotifications: vi.fn().mockReturnValue({
-    data: {
-      notifications: [],
-      unReadNotificationsCount: 0,
-      totalNotificationsCount: 0,
-    },
-  }),
-}));
-
-vi.mock('features/profile/hooks/use-account', () => ({
+vi.mock('@/modules/profile/hooks/use-account', () => ({
   useGetAccount: vi.fn().mockReturnValue({
     data: {
       id: 'test-user-id',
