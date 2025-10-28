@@ -58,7 +58,7 @@ export default defineConfig({
   test: {
     globals: true, // so you can use 'describe', 'it', 'expect' without importing
     environment: 'jsdom', // simulates browser for React components
-    setupFiles: ['./vitest.setup.ts'], // path to setup file
+    setupFiles: ['./vitest.polyfills.ts', './vitest.setup.ts'], // polyfills must load first
     coverage: {
       provider: 'v8',
       reporter: ['lcov', 'text', 'html'],
