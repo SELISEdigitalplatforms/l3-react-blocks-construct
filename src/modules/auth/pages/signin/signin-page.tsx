@@ -28,7 +28,7 @@ export const SigninPage = () => {
         try {
           const res = (await signinMutate({ grantType: 'social', code, state })) as SignInResponse;
           if (res.enable_mfa) {
-            navigate(`/verify-key?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
+            navigate(`/verify-mfa?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
               replace: true,
             });
             return;
