@@ -1,12 +1,10 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 import './i18n/i18n';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui-kit/toaster';
 import { ClientMiddleware } from '@/state/client-middleware';
 import MainLayout from '@/pages/main/main-layout';
-import TaskPage from './pages/main/iam-table';
-import { Profile } from './modules/iam/pages/profile/profile';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { SidebarProvider } from '@/components/ui-kit/sidebar';
 import { AuthRoutes } from './routes/auth.route';
@@ -27,6 +25,8 @@ import {
   EditInvoicePage,
 } from '@/modules/invoices';
 import { TaskManagerPage } from '@/modules/task-manager';
+import { ProfilePage } from '@/modules/profile';
+import { UsersTablePage } from '@/modules/iam';
 
 const queryClient = new QueryClient();
 
@@ -59,7 +59,7 @@ function AppContent() {
               <Route element={<MainLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/finance" element={<FinancePage />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/inventory" element={<InventoryPage />} />
                 <Route path="/inventory/add" element={<InventoryFormPage />} />
                 <Route path="/inventory/:itemId" element={<InventoryDetailsPage />} />
@@ -70,7 +70,7 @@ function AppContent() {
                 <Route path="/mail/:category" element={<EmailPage />} />
                 <Route path="/mail/:category/:emailId" element={<EmailPage />} />
                 <Route path="/mail/:category/:labels/:emailId" element={<EmailPage />} />
-                <Route path="/identity-management" element={<TaskPage />} />
+                <Route path="/identity-management" element={<UsersTablePage />} />
                 <Route path="/task-manager" element={<TaskManagerPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 {/* 

@@ -20,6 +20,16 @@ if (!global.ResizeObserver) {
   }));
 }
 
+// Polyfill IntersectionObserver if not present
+if (!global.IntersectionObserver) {
+  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+    takeRecords: vi.fn(),
+  }));
+}
+
 // Polyfill matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

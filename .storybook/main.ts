@@ -22,7 +22,7 @@ const config: StorybookConfig = {
       ...config.resolve.alias,
       assets: '/src/assets',
       components: '/src/components',
-      features: '/src/features',
+      modules: '/src/modules',
       hooks: '/src/hooks',
       lib: '/src/lib',
       constant: '/src/constant',

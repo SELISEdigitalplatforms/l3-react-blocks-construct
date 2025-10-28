@@ -91,7 +91,7 @@ Update progressively as you gather requirements:
 ## Implementation Notes (Internal)
 - Remove/hide irrelevant sidebar items (inventory, invoices, etc.)
 - Show only navigation relevant to this app
-- Follow src/features/inventory/ structure pattern
+- Follow src/modules/inventory/ structure pattern
 - Backend setup via cloud-setup.md → Data operations via graphql-crud recipe
 
 ## Out of Scope (Confirmed)

@@ -4,7 +4,7 @@
 
 Selise follows a strict 3-layer hierarchy for components. **Always start at the top and work your way down.**
 
-### Layer 1: Feature Components (src/features/\*/components/)
+### Layer 1: Feature Components (src/modules/\*/components/)
 
 **Most Specific → Least Work**
 
@@ -15,8 +15,8 @@ These are complete, business-ready components that solve entire use cases.
 **AdvanceDataTable** - Complete table system
 
 ```typescript
-// Path: features/inventory/component/advance-data-table/advance-data-table.tsx
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
+// Path: modules/inventory/component/advance-data-table/advance-data-table.tsx
+import { AdvanceDataTable } from 'modules/inventory/component/advance-data-table/advance-data-table'
 
 // What you get:
 // - Full TanStack Table integration
@@ -42,8 +42,8 @@ import { AdvanceDataTable } from 'features/inventory/component/advance-data-tabl
 **AdvancedTableColumnsToolbar** - Column management
 
 ```typescript
-// Path: features/inventory/component/advance-table-columns-toolbar/
-import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar'
+// Path: modules/inventory/component/advance-table-columns-toolbar/
+import { AdvancedTableColumnsToolbar } from 'modules/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar'
 
 // What you get:
 // - Column visibility toggles

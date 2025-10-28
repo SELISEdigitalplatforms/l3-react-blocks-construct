@@ -37,7 +37,7 @@ The MCP-created project automatically includes the Selise Blocks component libra
 
 1. Agent uses MCP to create project (user provides names only)
 2. Agent creates schemas via MCP (`create_schema`, `list_schemas`)
-3. Agent builds features using auto-included Selise components
+3. Agent builds modules using auto-included Selise components
 4. Components imported from established paths
 
 **Important**: Agent works in MCP-created Selise React project with component library ready to use.
@@ -46,10 +46,10 @@ The MCP-created project automatically includes the Selise Blocks component libra
 
 A project uses Selise if you find:
 
-- Imports from `features/*/component/`
+- Imports from `modules/*/component/`
 - Imports from `components/core/` or `components/ui/`
 - `AdvanceDataTable` or `ConfirmationModal` in the codebase
-- Selise-style folder structure: `src/features/[feature-name]/components/`
+- Selise-style folder structure: `src/modules/[modules-name]/components/`
 
 ## Core Development Principles
 
@@ -57,7 +57,7 @@ A project uses Selise if you find:
 
 **Always follow this order when building components:**
 
-1. **Feature Level First** - Check `features/*/components/` for existing solutions
+1. **Module Level First** - Check `modules/*/components/` for existing solutions
 2. **Block Level Second** - Use `components/core/` for business patterns
 3. **UI Level Last** - Use `components/ui/` as the foundation
 

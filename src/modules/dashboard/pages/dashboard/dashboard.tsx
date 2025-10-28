@@ -6,7 +6,7 @@ import {
   DashboardUserActivityGraph,
   DashboardSystemOverview,
 } from '@/modules/dashboard';
-import { useGetAccount } from '@/features/profile/hooks/use-account';
+import { useGetAccount } from '@/modules/profile/hooks/use-account';
 
 const DashboardLoader = () => {
   return (
