@@ -10,7 +10,7 @@ import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
 import { UserMfaType } from '@/modules/profile/enums/user-mfa-type-enum';
 import { useResendOtp } from '@/modules/profile/hooks/use-mfa';
 
-export function VerifyOtpKey() {
+export const VerifyOtpKeyPage = () => {
   const { login } = useAuthStore();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -138,4 +138,4 @@ export function VerifyOtpKey() {
       </div>
     </div>
   );
-}
+};

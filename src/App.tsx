@@ -4,7 +4,6 @@ import './i18n/i18n';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui-kit/toaster';
 import { ClientMiddleware } from '@/state/client-middleware';
-import MainLayout from '@/pages/main/main-layout';
 import { ThemeProvider } from '@/styles/theme/theme-provider';
 import { SidebarProvider } from '@/components/ui-kit/sidebar';
 import { AuthRoutes } from './routes/auth.route';
@@ -27,6 +26,7 @@ import {
 import { TaskManagerPage } from '@/modules/task-manager';
 import { ProfilePage } from '@/modules/profile';
 import { UsersTablePage } from '@/modules/iam';
+import { MainLayout } from '@/layout/main-layout/main-layout';
 
 const queryClient = new QueryClient();
 

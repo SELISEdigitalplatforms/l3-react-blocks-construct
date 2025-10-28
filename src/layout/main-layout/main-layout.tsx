@@ -14,7 +14,7 @@ type NotificationsData = {
   totalNotificationsCount: number;
 };
 
-export default function MainLayout() {
+export const MainLayout = () => {
   const { open, isMobile } = useSidebar();
   const { pathname } = useLocation();
   const segments = pathname?.split('/').filter(Boolean);
@@ -93,4 +93,4 @@ export default function MainLayout() {
       </div>
     </PermissionsProvider>
   );
-}
+};

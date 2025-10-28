@@ -59,7 +59,7 @@ jobs:
         uses: ./.github/actions/setvars
         with:
           varFilePath: ./.github/variables/vars.env
-      
+
       # Logs in with your Azure credentials
       - name: Azure login
         uses: azure/login@v2
@@ -68,7 +68,7 @@ jobs:
 
       - name: Remove invisible CSS classes
         run: |
-          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/pages/auth/signin/signin-page.tsx
+          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
 
       - name: Build and push image to ACR
         run: |
@@ -117,12 +117,10 @@ jobs:
           resource-group: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.CLUSTER_NAME }}
 
-
-
       - name: Add kubelogin
         uses: azure/use-kubelogin@v1
         with:
-          kubelogin-version: "v0.0.24"
+          kubelogin-version: 'v0.0.24'
 
       - name: Convert kubeconfig to use AAD
         run: |
