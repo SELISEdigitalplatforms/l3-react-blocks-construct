@@ -77,7 +77,7 @@ vi.mock('@/modules/dashboard', () => ({
 }));
 
 // Mock features/profile/hooks/use-account
-vi.mock('@/features/profile/hooks/use-account', () => ({
+vi.mock('@/modules/profile/hooks/use-account', () => ({
   useGetAccount: vi.fn(() => ({
     isLoading: false,
     data: {},

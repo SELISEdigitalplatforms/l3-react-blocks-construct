@@ -5,10 +5,10 @@ import { Button } from '@/components/ui-kit/button';
 import { UIOtpInput } from '@/components/core';
 import { useAuthStore } from '@/state/store/auth';
 import { MFASigninResponse } from '@/modules/auth/services/auth.service';
-import { UserMfaType } from '@/features/profile/enums/user-mfa-type-enum';
 import useResendOTPTime from '@/hooks/use-resend-otp';
-import { useResendOtp } from '@/features/profile/hooks/use-mfa';
 import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
+import { UserMfaType } from '@/modules/profile/enums/user-mfa-type-enum';
+import { useResendOtp } from '@/modules/profile/hooks/use-mfa';
 
 export function VerifyOtpKey() {
   const { login } = useAuthStore();

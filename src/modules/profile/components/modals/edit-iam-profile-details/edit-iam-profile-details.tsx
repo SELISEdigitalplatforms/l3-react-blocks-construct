@@ -26,8 +26,8 @@ import {
 import { Badge } from '@/components/ui-kit/badge';
 import { UIPhoneInput } from '@/components/core';
 import { ACCOUNT_QUERY_KEY, useUpdateAccount } from '@/modules/profile/hooks/use-account';
-import { IamData } from '@/features/iam/services/user-service';
-import { useGetRolesQuery } from '@/features/iam/hooks/use-iam';
+import { useGetRolesQuery } from '@/modules/iam/hooks/use-iam';
+import { IamData } from '@/modules/iam/types/user.types';
 
 // Constants
 const MAX_ROLES = 5;

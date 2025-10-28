@@ -13,8 +13,8 @@ import { useSignoutMutation } from '@/modules/auth/hooks/use-auth';
 import { useAuthStore } from '@/state/store/auth';
 import DummyProfile from '@/assets/images/dummy_profile.png';
 import { Skeleton } from '@/components/ui-kit/skeleton';
-import { useGetAccount } from '@/features/profile/hooks/use-account';
 import { useTheme } from '@/styles/theme/theme-provider';
+import { useGetAccount } from '@/modules/profile/hooks/use-account';
 
 /**
  * ProfileMenu Component

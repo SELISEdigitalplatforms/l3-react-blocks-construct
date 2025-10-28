@@ -38,3 +38,7 @@ export const changePasswordFormDefaultValue: changePasswordFormType = {
 export type ProfileFormType = z.infer<
   ReturnType<typeof getValidationSchemas>['profileFormValidationSchema']
 >;
+
+export type CreateUserFormType = z.infer<
+  ReturnType<typeof getValidationSchemas>['createUserFormValidationSchema']
+>;

@@ -103,18 +103,18 @@ export interface AdvanceDataTableProps<TData, TValue> {
   };
   /**
    * Callback function for pagination changes.
-   * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination)
+   * @link [API Docs](https://tanstack.com/table/v8/docs/api/modules/pagination)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/pagination)
    */
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
   /**
    * Enables manual pagination when `true`.
-   * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#manualpagination)
+   * @link [API Docs](https://tanstack.com/table/v8/docs/api/modules/pagination#manualpagination)
    */
   manualPagination?: boolean;
   /**
    * Used to configure which columns should be pinned to either the left or right side of the table.
-   * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning)
+   * @link [API Docs](https://tanstack.com/table/v8/docs/api/modules/column-pinning)
    */
   columnPinningConfig?: ColumnPinningState;
 }
