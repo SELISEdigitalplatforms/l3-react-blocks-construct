@@ -34,7 +34,7 @@ on:
         required: true
 
 env:
-  SERVICE_TYPE: 'webclient'
+  SERVICE_TYPE: "webclient"
 
 jobs:
   integrateWeb:
@@ -46,7 +46,7 @@ jobs:
       #Checks out the repository this file is in
       - uses: actions/checkout@v4
         with:
-          submodules: 'true'
+          submodules: "true"
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
       - name: Update submodule
@@ -60,7 +60,7 @@ jobs:
       - name: Remove invisible CSS classes
         run: |
           sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
-
+      
       # Logs in with your Azure credentials
       - name: Azure login
         uses: azure/login@v2
@@ -85,7 +85,7 @@ jobs:
       #Checks out the repository this file is in
       - uses: actions/checkout@v4
         with:
-          submodules: 'true'
+          submodules: "true"
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
       - name: Update submodule
@@ -96,9 +96,9 @@ jobs:
         with:
           varFilePath: ./.github/variables/vars.env
 
-      - name: Remove invisible CSS classes
-        run: |
-          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
+      # - name: Remove invisible CSS classes
+      #   run: |
+      #     sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
 
       # Logs in with your Azure credentials
       - name: Azure login
