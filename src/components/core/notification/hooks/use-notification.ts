@@ -1,12 +1,12 @@
-import { useGlobalQuery } from '@/state/query-client/hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { GetNotificationsParams, Notification } from '../types/notification.types';
 import {
+  getNotifications,
   markAllNotificationAsRead,
   markNotificationAsRead,
 } from '../services/notification.service';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Hook to fetch notifications with pagination and filtering
@@ -14,18 +14,9 @@ import {
  * @returns Query result with notifications and metadata
  */
 export const useGetNotifications = (params: GetNotificationsParams) => {
-  return useGlobalQuery<{
-    notifications: any[];
-    unReadNotificationsCount: number;
-    totalNotificationsCount: number;
-  }>({
+  return useQuery({
     queryKey: ['notifications', params],
-    // queryFn: getNotifications,
-    queryFn: () => ({
-      notifications: [],
-      unReadNotificationsCount: 0,
-      totalNotificationsCount: 0,
-    }),
+    queryFn: getNotifications,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

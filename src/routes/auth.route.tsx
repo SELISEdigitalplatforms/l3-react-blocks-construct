@@ -20,6 +20,6 @@ export const AuthRoutes = (
     <Route path="/success" element={<ActivationSuccessPage />} />
     <Route path="/activate-failed" element={<VerificationFailed />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-    <Route path="/verify-key" element={<VerifyOtpKeyPage />} />
+    <Route path="/verify-mfa" element={<VerifyOtpKeyPage />} />
   </Route>
 );

@@ -5,10 +5,10 @@ import { Button } from '@/components/ui-kit/button';
 import { UIOtpInput } from '@/components/core';
 import { useAuthStore } from '@/state/store/auth';
 import { MFASigninResponse } from '@/modules/auth/services/auth.service';
-import useResendOTPTime from '@/hooks/use-resend-otp';
+// import useResendOTPTime from '@/hooks/use-resend-otp';
 import { useSigninMutation } from '@/modules/auth/hooks/use-auth';
 import { UserMfaType } from '@/modules/profile/enums/user-mfa-type-enum';
-import { useResendOtp } from '@/modules/profile/hooks/use-mfa';
+// import { useResendOtp } from '@/modules/profile/hooks/use-mfa';
 
 export const VerifyOtpKeyPage = () => {
   const { login } = useAuthStore();
@@ -17,15 +17,14 @@ export const VerifyOtpKeyPage = () => {
   const [otpError, setOtpError] = useState('');
   const [otpValue, setOtpValue] = useState('');
   const { mutateAsync, isPending } = useSigninMutation();
-  const { mutate: resendOtp } = useResendOtp();
+  // const { mutate: resendOtp } = useResendOtp();
   const [searchParams] = useSearchParams();
   const lastVerifiedOtpRef = useRef<string>('');
-  const [newMfaId, setNewMfaId] = useState<string | null>(null);
+  // const [newMfaId, setNewMfaId] = useState<string | null>(null);
 
   const mfaId = searchParams.get('mfa_id');
   const mfaType = Number(searchParams.get('mfa_type'));
   const userEmail = searchParams.get('user_name');
-  const isSsoFlow = searchParams.get('sso') === 'true';
 
   const maskEmail = (email: string | undefined) => {
     if (!email) return '';
@@ -33,34 +32,32 @@ export const VerifyOtpKeyPage = () => {
     return `${name[0]}****@${domain}`;
   };
 
-  const {
-    formattedTime,
-    isResendDisabled,
-    handleResend: handleResendOTP,
-  } = useResendOTPTime({
-    initialTime: 120,
-    onResend: () => {
-      if (!mfaId) return;
+  // TODO FE: Revert the code after the backend make resend api public api
+  // const {
+  //   formattedTime,
+  //   isResendDisabled,
+  //   handleResend: handleResendOTP,
+  // } = useResendOTPTime({
+  //   initialTime: 120,
+  //   onResend: () => {
+  //     if (!mfaId) return;
 
-      if (isSsoFlow) {
-        // For SSO flow, we can't resend OTP directly, just reset the timer
-        handleResendOTP();
-      } else {
-        // For regular MFA flow, use the existing resend logic
-        resendOtp(mfaId, {
-          onSuccess: (data: { mfaId?: string }) => {
-            if (data?.mfaId) {
-              setNewMfaId(data.mfaId);
-            }
-          },
-        });
-      }
-    },
-  });
+  //     // Both SSO and regular MFA flow use the same resend logic
+  //     resendOtp(mfaId, {
+  //       onSuccess: (data: { mfaId?: string }) => {
+  //         if (data?.mfaId) {
+  //           setNewMfaId(data.mfaId);
+  //         }
+  //       },
+  //     });
+  //   },
+  // });
 
   const onVerify = useCallback(async () => {
     try {
-      const currentMfaId = newMfaId ?? mfaId ?? '';
+      // const currentMfaId = newMfaId ?? mfaId ?? '';
+      const currentMfaId = mfaId ?? '';
+
       const res = (await mutateAsync({
         grantType: 'mfa_code',
         code: otpValue,
@@ -74,7 +71,7 @@ export const VerifyOtpKeyPage = () => {
       console.error('MFA verification failed:', error);
       setOtpError(t('MFA_CODE_IS_NOT_VALID'));
     }
-  }, [mutateAsync, otpValue, newMfaId, mfaId, mfaType, login, navigate, t]);
+  }, [mutateAsync, otpValue, mfaId, mfaType, login, navigate, t]);
 
   useEffect(() => {
     const requiredLength = mfaType === UserMfaType.AUTHENTICATOR_APP ? 6 : 5;
@@ -124,7 +121,7 @@ export const VerifyOtpKeyPage = () => {
         >
           {isPending ? `${t('VERIFYING')}...` : t('VERIFY')}
         </Button>
-        {mfaType === UserMfaType.EMAIL_VERIFICATION && (
+        {/* {mfaType === UserMfaType.EMAIL_VERIFICATION && (
           <Button
             className={`${isResendDisabled && 'font-extrabold'}`}
             size="lg"
@@ -134,7 +131,7 @@ export const VerifyOtpKeyPage = () => {
           >
             {isResendDisabled ? `${t('RESEND_KEY_IN')} ${formattedTime}` : `${t('RESEND_KEY')}`}
           </Button>
-        )}
+        )} */}
       </div>
     </div>
   );
