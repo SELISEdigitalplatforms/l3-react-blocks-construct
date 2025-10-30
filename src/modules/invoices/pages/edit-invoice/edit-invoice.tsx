@@ -79,7 +79,6 @@ export const EditInvoicePage = () => {
     updateInvoiceItem({
       filter: `{"_id": "${invoiceId}"}`,
       input: {
-        ItemId: invoiceId,
         DateIssued: new Date().toISOString(),
         DueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
         Amount: updatedInvoice.Amount,

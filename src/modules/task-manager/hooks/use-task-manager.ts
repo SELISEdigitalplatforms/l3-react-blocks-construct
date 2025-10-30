@@ -467,7 +467,6 @@ export const useCreateTaskComment = () => {
         ...input,
         TaskId: taskId,
         Timestamp: new Date().toISOString(),
-        IsDeleted: false,
       });
 
       return result;

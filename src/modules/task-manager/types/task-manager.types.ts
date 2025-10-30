@@ -165,7 +165,6 @@ export interface TaskItemInsertInput {
   Tags?: string[];
   ItemTag?: ItemTag[];
   IsCompleted?: boolean;
-  Language?: string;
   OrganizationIds?: string[];
 }
 
@@ -179,24 +178,12 @@ export interface TaskItemUpdateInput {
   Priority?: TaskPriority;
   Section?: string;
   IsCompleted?: boolean;
-  IsDeleted?: boolean;
-  Language?: string;
   OrganizationIds?: string[];
   Tags?: string[];
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
 }
 
 export interface TaskTagInsertInput {
-  CreatedBy?: string;
-  CreatedDate?: string;
-  DeleteDate?: string;
-  IsDeleted?: boolean;
-  ItemId?: string;
   Label: string;
-  Language?: string;
-  LastUpdatedBy?: string;
-  LastUpdatedDate?: string;
   OrganizationIds?: string[];
   Tags?: string[];
 }
@@ -266,22 +253,16 @@ export interface GetUsersPayload {
 }
 
 export interface TaskCommentInsertInput {
-  ItemId: string;
   TaskId: string;
   Content: string;
   Timestamp?: string;
   Author?: string;
-  IsDeleted?: boolean;
   Tags?: string[];
-  Language?: string;
   OrganizationIds?: string[];
 }
 
 export interface TaskCommentUpdateInput {
-  ItemId: string;
-  TaskId?: string;
   Content?: string;
   Timestamp?: string;
   Author?: string;
-  IsDeleted?: boolean;
 }

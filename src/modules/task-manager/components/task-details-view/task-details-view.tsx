@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui-kit/avatar';
 import { CalendarIcon, CheckCircle, CircleDashed, Trash } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
 import {
   useCreateTags,
   useGetTaskTags,
@@ -292,7 +291,6 @@ export default function TaskDetailsView({
       await updateComment({
         itemId: id,
         input: {
-          ItemId: id,
           Content: newText,
         },
       });
@@ -461,12 +459,9 @@ export default function TaskDetailsView({
 
     try {
       const commentInput: TaskCommentInsertInput = {
-        ItemId: uuidv4(),
         TaskId: currentTaskId,
         Content: content,
         Author: userProfile.fullName ?? '',
-        IsDeleted: false,
-        Language: '',
       };
 
       setNewCommentContent('');
@@ -536,7 +531,6 @@ export default function TaskDetailsView({
   };
 
   const createNewTask = useCallback((): NewTaskInput => {
-    const now = new Date().toISOString();
     return {
       Section: section,
       IsCompleted: isMarkComplete,
@@ -547,11 +541,6 @@ export default function TaskDetailsView({
       Description: description ?? '',
       ItemTag: selectedTags,
       AttachmentField: attachments.length > 0 ? attachments : undefined,
-      CreatedDate: now,
-      LastUpdatedDate: now,
-      CreatedBy: userProfile?.fullName ?? '',
-      LastUpdatedBy: userProfile?.fullName ?? '',
-      Language: '',
       OrganizationIds: [],
     };
   }, [
@@ -564,14 +553,12 @@ export default function TaskDetailsView({
     description,
     selectedTags,
     attachments,
-    userProfile,
   ]);
 
   const createNewTags = useCallback(
     async (tagsToCreate: Array<string | ItemTag>) => {
       if (tagsToCreate.length === 0) return;
 
-      const now = new Date().toISOString();
       const existingTagLabels = tags.map((tag) => tag.TagLabel.toLowerCase());
 
       const tagPromises = tagsToCreate
@@ -582,12 +569,8 @@ export default function TaskDetailsView({
         .map((tag) => {
           const tagLabel = typeof tag === 'string' ? tag : tag.TagLabel;
           return createTag({
-            ItemId: uuidv4(),
             Label: tagLabel,
-            CreatedDate: now,
-            IsDeleted: false,
-            LastUpdatedDate: now,
-          } as TaskTagInsertInput);
+          });
         });
 
       await Promise.all(tagPromises);
@@ -804,16 +787,12 @@ export default function TaskDetailsView({
       if (existingTag) {
         tagToAdd = existingTag;
       } else {
-        const newTagId = uuidv4();
         const tagCreateInput: TaskTagInsertInput = {
-          ItemId: newTagId,
           Label: trimmedLabel,
-          CreatedBy: 'current-user',
-          CreatedDate: new Date().toISOString(),
-          IsDeleted: false,
         };
 
-        await createTagMutation.mutateAsync(tagCreateInput);
+        const response = await createTagMutation.mutateAsync(tagCreateInput);
+        const newTagId = response.insertTaskManagerTag.itemId;
         tagToAdd = { ItemId: newTagId, TagLabel: trimmedLabel };
       }
 

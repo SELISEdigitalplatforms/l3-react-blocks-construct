@@ -111,7 +111,7 @@ export interface GetInvoiceItemResponse {
 }
 
 export interface AddInvoiceItemInput {
-  ItemId: string;
+  ItemId?: string;
   CreatedBy?: string;
   CreatedDate?: string;
   DateIssued: string;
@@ -141,7 +141,6 @@ export interface AddInvoiceItemResponse {
 }
 
 export interface UpdateInvoiceItemInput {
-  ItemId: string;
   CreatedBy?: string;
   CreatedDate?: string;
   IsDeleted?: boolean;

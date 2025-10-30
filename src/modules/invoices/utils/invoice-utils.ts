@@ -1,9 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
 import { InvoiceItem, InvoiceItemDetails, InvoiceStatus } from '../types/invoices.types';
-
-export const generateInvoiceId = (): string => {
-  return `inv-${uuidv4().substring(0, 9).replace(/-/g, '')}`;
-};
 
 interface InvoiceTotals {
   Subtotal: number;
@@ -35,11 +30,7 @@ export function createInvoiceFromForm(
 ): InvoiceItem {
   const taxes = Number(formValues.taxes) || 0;
   const discount = Number(formValues.discount) || 0;
-  const { TotalAmount, Subtotal, Taxes } = calculateInvoiceTotals(
-    items,
-    taxes,
-    discount
-  );
+  const { TotalAmount, Subtotal, Taxes } = calculateInvoiceTotals(items, taxes, discount);
   const status = action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT;
 
   return {

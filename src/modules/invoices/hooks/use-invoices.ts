@@ -127,12 +127,10 @@ export const useGetInvoiceItems = (params: InvoiceItemQueryParams) => {
  */
 export const useAddInvoiceItem = () => {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { t } = useTranslation();
 
   return useGlobalMutation({
     mutationFn: (params: AddInvoiceItemParams) => addInvoiceItem(params),
-    onSuccess: (data: any) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         predicate: (query) => query.queryKey[0] === 'invoice-items',
       });
@@ -141,14 +139,6 @@ export const useAddInvoiceItem = () => {
         predicate: (query) => query.queryKey[0] === 'invoice-items',
         type: 'active',
       });
-
-      if (data.insertInvoice?.acknowledged) {
-        toast({
-          variant: 'success',
-          title: t('INVOICE_ADDED'),
-          description: t('INVOICES_HAS_SUCCESSFULLY_ADDED'),
-        });
-      }
     },
     onError: (error) => {
       throw error;

@@ -13,6 +13,7 @@ export const useInvoiceDetails = () => {
   const {
     data: invoicesData,
     isLoading,
+    isFetching,
     error,
   } = useGetInvoiceItems({
     pageNo: 1,
@@ -27,7 +28,7 @@ export const useInvoiceDetails = () => {
   return {
     invoice,
     invoiceId,
-    isLoading,
+    isLoading: isLoading || isFetching,
     error,
     toast,
     t,
