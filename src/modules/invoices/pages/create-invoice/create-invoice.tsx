@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
-import { generateInvoiceId } from '../../utils/invoice-utils';
 import { type InvoiceFormValues } from '../../schemas/invoice-form-schema';
 import { BaseInvoiceForm } from '../../components/base-invoice-form/base-invoice-form';
 import { useAddInvoiceItem } from '../../hooks/use-invoices';
@@ -14,24 +12,11 @@ import {
   InvoiceStatus,
 } from '../../types/invoices.types';
 
-// Get current user profile from localStorage
-const getCurrentUser = () => {
-  if (typeof window === 'undefined') return null;
-  const profile = localStorage.getItem('userProfile');
-  return profile ? JSON.parse(profile) : null;
-};
-
 export const CreateInvoicePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [userProfile, setUserProfile] = useState(getCurrentUser());
   const { mutate: addInvoiceItem } = useAddInvoiceItem();
-  const invoiceId = generateInvoiceId();
-
-  useEffect(() => {
-    setUserProfile(getCurrentUser());
-  }, []);
 
   const handleSubmit = async (
     values: InvoiceFormValues,
@@ -68,9 +53,6 @@ export const CreateInvoicePage = () => {
 
       const apiPayload: AddInvoiceItemParams = {
         input: {
-          ItemId: invoiceId,
-          CreatedBy: userProfile?.fullName ?? '',
-          CreatedDate: new Date().toISOString(),
           DateIssued: new Date().toISOString(),
           DueDate: values.dueDate?.toISOString() ?? new Date().toISOString(),
           Amount: totalAmount,
@@ -79,15 +61,13 @@ export const CreateInvoicePage = () => {
           Status: action === 'send' ? InvoiceStatus.PENDING : InvoiceStatus.DRAFT,
           ItemDetails: itemDetails,
           GeneralNote: values.generalNote ?? '',
-          LastUpdatedBy: userProfile?.fullName ?? '',
-          LastUpdatedDate: new Date().toISOString(),
           Taxes: values.taxes,
           Discount: values.discount,
         },
       };
 
       addInvoiceItem(apiPayload, {
-        onSuccess: () => {
+        onSuccess: (data) => {
           toast({
             variant: 'success',
             title: t(action === 'send' ? 'INVOICE_SENT' : 'DRAFT_SAVED'),
@@ -96,7 +76,14 @@ export const CreateInvoicePage = () => {
             ),
           });
 
-          navigate(`/invoices/${invoiceId}`);
+          // Use the ItemId from the response instead of locally generated ID
+          const createdInvoiceId = data?.insertInvoiceItem?.itemId;
+          if (createdInvoiceId) {
+            navigate(`/invoices/${createdInvoiceId}`);
+          } else {
+            // Fallback to invoices list if no ID is returned
+            navigate('/invoices');
+          }
         },
         onError: (error) => {
           console.error('Error creating invoice:', error);

@@ -845,10 +845,8 @@ export const updateTaskComment = async (
   const now = new Date().toISOString();
   const mutationInput: TaskCommentUpdateInput = {
     ...input,
-    ItemId: itemId,
     Content: input.Content ?? '',
     Timestamp: input.Timestamp ?? now,
-    IsDeleted: input.IsDeleted ?? false,
   };
 
   const cleanInput = Object.fromEntries(
@@ -877,21 +875,6 @@ export const deleteTaskComment = async (
   isHardDelete = false
 ): Promise<DeleteTaskCommentResponse> => {
   try {
-    if (!isHardDelete) {
-      const updateResponse = await updateTaskComment(itemId, {
-        ItemId: itemId,
-        IsDeleted: true,
-        Timestamp: new Date().toISOString(),
-      });
-
-      return {
-        deleteTaskComment: {
-          itemId: updateResponse.updateTaskComment.itemId,
-          totalImpactedData: 1,
-          acknowledged: true,
-        },
-      };
-    }
     const response = await graphqlClient.mutate<{
       deleteTaskComment: { itemId: string; totalImpactedData: number; acknowledged: boolean };
     }>({
