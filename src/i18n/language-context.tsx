@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useMemo,
   useCallback,
+  useRef,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -66,6 +67,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   const { i18n } = useTranslation();
   const { data: languages = [], isLoading: isLanguagesLoading } = useAvailableLanguages();
   const { data: modules = [], isLoading: isModulesLoading } = useAvailableModules();
+  const isInitialized = useRef(false);
 
   useEffect(() => {
     setIsLoading(isLanguagesLoading || isModulesLoading);
@@ -152,6 +154,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
         await loadLanguageModules(language, location.pathname);
         i18n.changeLanguage(language);
         setCurrentLanguage(language);
+        isInitialized.current = true; // Mark as initialized after language change
       } catch (error) {
         console.error('Failed to change language:', error);
       } finally {
@@ -164,13 +167,17 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   /**
    * Effect hook to initialize translations when the component mounts.
    * Loads initial translation modules and sets up the language.
+   * This only runs once on mount to prevent unnecessary reloads.
    */
   useEffect(() => {
+    if (isInitialized.current) return;
+
     const initializeTranslations = async () => {
       setIsLoading(true);
       try {
         await loadLanguageModules(currentLanguage, location.pathname);
         i18n.changeLanguage(currentLanguage);
+        isInitialized.current = true;
       } catch (error) {
         console.error('Failed to initialize translations:', error);
       } finally {
@@ -179,7 +186,8 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     };
 
     initializeTranslations();
-  }, [currentLanguage, location.pathname, loadLanguageModules, i18n]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Effect hook to handle route changes.
