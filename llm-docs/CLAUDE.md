@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 **MUST DO: READ LLM DOCS: llm-docs/ as per the usage guidelines in this file. Don't implement or do anything without following this step. if you fail to find it, do a full directory search first. dont just start path guidance: ~/Desktop/selise-demo via ❯ ls CLAUDE.md llm-docs selise_mcp_server.py user-info.txt**
+**MUST DO: READ LLM DOCS: llm-docs/ as per the usage guidelines in this file. Don't implement or do anything without following this step. if you fail to find it, do a full directory search first. dont just start path guidance: ~/Desktop/selise-demo via ❯ ls CLAUDE.md llm-docs selise_mcp_server.py user-info.txt**
 
 This file provides guidance to Claude Code (claude.ai/code) when working with Selise Blocks applications.
 
@@ -12,19 +13,30 @@ This project uses a FastMCP (Model Context Protocol) server for automating Selis
 
 **Authentication (Required First):**
 
+- `login`: Authenticate with Selise Blocks API (ask for username, password, GitHub username, repo name)
 - `get_auth_status`: Check authentication status
 
 **Project Management:**
 
+- `create_project`: Create new Selise Cloud project (ALWAYS use for new projects)
 - `get_projects`: List existing projects
 
 **Schema Management:**
+
 
 - `create_schema`: Create new schemas in Selise Cloud
 - `list_schemas`: List all schemas
 - `get_schema_details`: Get schema field information
 - `update_schema_fields`: Update existing schema fields
 - `finalize_schema`: Finalize schema changes
+
+**Translation Management:**
+
+- `get_translation_languages`: Get available languages for translation
+- `get_translation_modules`: List all translation modules
+- `create_module`: Create a new translation module
+- `get_module_keys`: Get all translation keys in a module
+- `save_module_keys_with_translations`: Save translation keys with their translations
 
 **Translation Management:**
 
@@ -44,7 +56,7 @@ This project uses a FastMCP (Model Context Protocol) server for automating Selis
 
 **CRITICAL: Always get the project key from environment variables before using MCP tools.**
 
-- **Default**: Read `REACT_APP_PUBLIC_X_BLOCKS_KEY` from `.env` file
+- **Default**: Read `VITE_X_BLOCKS_KEY` from `.env` file
 - **Environment-specific**: If an environment is specified (dev, prod, test, etc.), read from `.env.{environment}` instead
 - **Usage**: Pass this value as `project_key` parameter to MCP tools that require it
 
@@ -52,10 +64,10 @@ Example:
 
 ```bash
 # For default environment
-PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env | cut -d '=' -f2)
+PROJECT_KEY=$(grep VITE_X_BLOCKS_KEY .env | cut -d '=' -f2)
 
 # For specific environment (e.g., dev)
-PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
+PROJECT_KEY=$(grep VITE_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 ```
 
 ## 📋 Project Setup Workflow (MCP-First)
@@ -65,7 +77,6 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
 **When User Wants to Create Any Webapp/Website:**
 
 1. **FIRST: Read Documentation** (Before talking to user):
-
    - Read `workflows/user-interaction.md`
    - Read `workflows/feature-planning.md`
    - Read `agent-instructions/selise-development-agent.md`
@@ -78,7 +89,30 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
    - Document everything in FEATURELIST.md
    - Get user confirmation before proceeding
 
-3. **Feature Planning & Schema Design** (AFTER user confirmation):
+3. **Project Setup** (After user confirms features):
+   - Get project name from user
+   - Authentication Flow (Ask one by one if NOT IN user-info.txt):
+     ```
+     - Username/email for Selise Blocks
+     - Password for Selise Blocks
+     - GitHub username
+     - GitHub repository name to connect
+     ```
+   - Project Creation Flow:
+
+     ```python
+     # ALWAYS create new project - don't look for existing domains
+     create_project(
+         project_name="UserProvidedName",
+         github_username="from_step_1",
+         repository_name="from_step_1"
+     )
+
+     # If user wants local setup:
+     create_local_repository(project_name="UserProvidedName")
+     ```
+
+4. **Feature Planning & Schema Design** (AFTER user confirmation):
    - Break down confirmed features into technical requirements
    - Analyze what schemas are needed based on FEATURELIST.md
    - Document schema plan in CLOUD.md
@@ -86,7 +120,7 @@ PROJECT_KEY=$(grep REACT_APP_PUBLIC_X_BLOCKS_KEY .env.dev | cut -d '=' -f2)
      ```python
      # For each entity the app needs:
      create_schema(
-         schema_name="<projectName>Tasks",
+         schema_name="Tasks",
          fields=[
              {"name": "Title", "type": "String"},
              {"name": "Status", "type": "String"},
@@ -246,7 +280,7 @@ git merge feature/[task-name]
 **Directory Structure - Follow inventory pattern:**
 
 ```
-src/features/[feature-name]/
+src/modules/[modules-name]/
 ├── components/         # Feature-specific components
 ├── graphql/           # Queries and mutations (if using GraphQL)
 ├── hooks/             # Feature-specific hooks
@@ -257,15 +291,15 @@ src/features/[feature-name]/
 
 **⚠️ CRITICAL: Inventory is for STRUCTURE ONLY, not data operations!**
 
-- Use `src/features/inventory/` as template for folder structure
+- Use `src/modules/inventory/` as template for folder structure
 - NEVER copy inventory's GraphQL patterns - they're different
 - For data operations, ONLY follow `recipes/graphql-crud.md`
 
 ### Component Hierarchy (3-Layer Rule)
 
 ```
-1. Feature Components (src/features/*/components/)
-2. Block Components (src/components/blocks/)
+1. Feature Components (src/modules/*/components/)
+2. Block Components (src/components/core/)
 3. UI Components (src/components/ui/)
 ```
 

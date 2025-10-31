@@ -16,8 +16,8 @@ env:
 jobs:
   initialization:
     permissions:
-        contents: read
-        id-token: write
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     outputs:
       envvalue1: ${{ steps.setvar.outputs.envvar1 }}
@@ -38,8 +38,8 @@ jobs:
   cd-job:
     if: ${{ github.event_name == 'push' }}
     permissions:
-        contents: read
-        id-token: write
+      contents: read
+      id-token: write
     uses: ./.github/workflows/3_web.yml
     with:
       CONTAINER_NAME: 'prod-$SERVICE_NAME-webclient'
@@ -53,7 +53,7 @@ jobs:
       ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_PROD_RESOURCE_GROUP }}
       CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_PROD_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_PROD_RESOURCE_GROUP }}
-    # needs: [sonarqube-job] 
+    # needs: [sonarqube-job]
   # storybook-job:
   #   if: ${{ github.event_name == 'push' }}
   #   permissions:

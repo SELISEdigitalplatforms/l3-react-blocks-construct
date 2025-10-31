@@ -1,8 +1,8 @@
 import { GRANT_TYPES } from './auth';
-import microsoftIcon from 'assets/images/social_media_ms.svg';
-import googleIcon from 'assets/images/social_media_google.svg';
-import githubIcon from 'assets/images/social_media_github.svg';
-import linkedinIcon from 'assets/images/social_media_in.svg';
+import microsoftIcon from '@/assets/images/social_media_ms.svg';
+import googleIcon from '@/assets/images/social_media_google.svg';
+import githubIcon from '@/assets/images/social_media_github.svg';
+import linkedinIcon from '@/assets/images/social_media_in.svg';
 
 export enum SSO_PROVIDERS {
   google = 'google',

@@ -196,8 +196,8 @@ To simulate production locally:
    - In your local project, open the `.env` file and add:
 
   ```env
-  REACT_APP_CAPTCHA_SITE_KEY=YourSiteKey
-  REACT_APP_CAPTCHA_TYPE=YourCaptchaType // reCaptcha or hCaptcha
+  VITE_CAPTCHA_SITE_KEY=YourSiteKey
+  VITE_CAPTCHA_TYPE=YourCaptchaType // reCaptcha or hCaptcha
   ```
 Replace <code>YourSiteKey</code> with the Site Key you received from Google reCAPTCHA's or hCAPTCHA's frontend configuration.</small>
 

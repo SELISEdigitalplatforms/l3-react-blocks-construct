@@ -27,8 +27,6 @@ import { cn } from '../../../lib/utils';
  * @param {string} [className] - Additional CSS classes to apply to the component
  * @param {...PhoneInputProps} props - All other props from the underlying PhoneInput component
  *
- * @returns {JSX.Element} A styled phone input field with country selection
- *
  * @example
  * // Basic usage
  * <UIPhoneInput
@@ -97,4 +95,4 @@ const UIPhoneInput = React.forwardRef<any, UIPhoneInputProps>(
 
 UIPhoneInput.displayName = 'UIPhoneInput';
 
-export default UIPhoneInput;
+export { UIPhoneInput };

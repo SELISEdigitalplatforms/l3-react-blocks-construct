@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useLayoutEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth';
-import { publicRoutes } from 'constant/auth-public-routes';
+import { publicRoutes } from '@/constant/auth-public-routes';
 
 /**
  * useAuthState Hook

@@ -19,8 +19,6 @@ import { getThemeColors, type HSLColor } from './utils/utils';
  * @param {Theme} [defaultTheme='light'] - The default theme to use if none is stored
  * @param {string} [storageKey='theme'] - The localStorage key used to persist theme preference
  *
- * @returns {JSX.Element} A context provider that supplies theme values to children
- *
  * @example
  * // Basic usage at the root of your app
  * <ThemeProvider defaultTheme="system">
@@ -63,8 +61,8 @@ type ColorPalette = {
 const initialState: ThemeProviderState = {
   theme: 'light',
   colors: {
-    primary: process.env.REACT_APP_PRIMARY_COLOR ?? '',
-    secondary: process.env.REACT_APP_SECONDARY_COLOR ?? '',
+    primary: import.meta.env.VITE_PRIMARY_COLOR || '',
+    secondary: import.meta.env.VITE_SECONDARY_COLOR || '',
   },
   setTheme: () => null,
 };
@@ -83,8 +81,8 @@ export function ThemeProvider({
   const [colors, setColors] = useState(() => {
     const themeColors = getThemeColors();
     const currentTheme = theme === 'dark' ? themeColors.dark : themeColors.light;
-    const defaultPrimary = process.env.REACT_APP_PRIMARY_COLOR ?? '#15969B';
-    const defaultSecondary = process.env.REACT_APP_SECONDARY_COLOR ?? '#5194B8';
+    const defaultPrimary = import.meta.env.VITE_PRIMARY_COLOR || '#15969B';
+    const defaultSecondary = import.meta.env.VITE_SECONDARY_COLOR || '#5194B8';
 
     // Helper function to resolve color value
     const resolveColor = (
@@ -150,8 +148,8 @@ export function ThemeProvider({
     }
 
     setColors({
-      primary: process.env.REACT_APP_PRIMARY_COLOR ?? '#15969B',
-      secondary: process.env.REACT_APP_SECONDARY_COLOR ?? '#5194B8',
+      primary: import.meta.env.VITE_PRIMARY_COLOR || '#15969B',
+      secondary: import.meta.env.VITE_SECONDARY_COLOR || '#5194B8',
     });
   }, [theme]);
 

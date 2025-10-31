@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, RefObject } from 'react';
  * This hook returns a reference to a button element (`buttonRef`) and its width (`popoverWidth`).
  * It listens for changes in the window size and updates the width of the button whenever a resize event occurs.
  *
- * @returns {[RefObject<HTMLButtonElement>, number | undefined]} A tuple containing:
+ * @returns {[RefObject<HTMLButtonElement | null>, number | undefined]} A tuple containing:
  * - `buttonRef`: A reference to the button element.
  * - `popoverWidth`: The width of the button element (undefined if the width can't be determined).
  *
@@ -15,7 +15,7 @@ import { useState, useEffect, useRef, RefObject } from 'react';
  * console.log(popoverWidth); // The current width of the button element.
  */
 
-function usePopoverWidth(): [RefObject<HTMLButtonElement>, number | undefined] {
+function usePopoverWidth(): [RefObject<HTMLButtonElement | null>, number | undefined] {
   const [popoverWidth, setPopoverWidth] = useState<number | undefined>(undefined);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
