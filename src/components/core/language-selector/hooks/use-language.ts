@@ -67,6 +67,8 @@ export const useAvailableLanguages = () => {
     gcTime: 30 * 60 * 1000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    refetchInterval: 30000, // Refetch every 30 seconds to detect API changes
+    refetchIntervalInBackground: false, // Only refetch when tab is active
     retry: 2,
     retryDelay: 1000,
   });
