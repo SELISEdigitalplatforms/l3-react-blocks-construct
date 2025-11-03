@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -25,7 +25,7 @@ import {
  */
 interface LanguageContextType {
   currentLanguage: string;
-  setLanguage: (language: string) => Promise<void>;
+  setLanguage: (language: string, isUserAction?: boolean) => Promise<void>;
   isLoading: boolean;
   availableLanguages: any[];
   availableModules: any[];
@@ -56,18 +56,16 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   defaultModules = ['common', 'auth'],
 }) => {
   const location = useLocation();
-  const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('language') ?? defaultLanguage;
-    }
-    return defaultLanguage;
-  });
+  // Start with a temporary language - will be updated once API default is loaded
+  const [currentLanguage, setCurrentLanguage] = useState<string>(defaultLanguage);
 
   const [isLoading, setIsLoading] = useState(true);
   const { i18n } = useTranslation();
   const { data: languages = [], isLoading: isLanguagesLoading } = useAvailableLanguages();
   const { data: modules = [], isLoading: isModulesLoading } = useAvailableModules();
   const isInitialized = useRef(false);
+  const hasCheckedDefaultLanguage = useRef(false);
+  const lastApiDefaultLanguage = useRef<string | null>(null);
 
   useEffect(() => {
     setIsLoading(isLanguagesLoading || isModulesLoading);
@@ -141,14 +139,19 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
    * - Updates i18n instance and context state
    *
    * @param {string} language - The language code to switch to
+   * @param {boolean} isUserAction - Whether this is triggered by user action (default: true)
    * @returns {Promise<void>} Resolves when language change is complete
    */
   const setLanguage = useCallback(
-    async (language: string): Promise<void> => {
+    async (language: string, isUserAction = true): Promise<void> => {
       setIsLoading(true);
       try {
         if (typeof window !== 'undefined') {
           localStorage.setItem('language', language);
+          // Mark if this was an explicit user selection
+          if (isUserAction) {
+            localStorage.setItem('language_user_selected', 'true');
+          }
         }
 
         await loadLanguageModules(language, location.pathname);
@@ -165,12 +168,68 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   );
 
   /**
-   * Effect hook to initialize translations when the component mounts.
-   * Loads initial translation modules and sets up the language.
-   * This only runs once on mount to prevent unnecessary reloads.
+   * Effect to check and apply the default language from the API.
+   * This runs when languages are loaded and automatically detects when the
+   * API's default language changes, applying it unless user has explicitly chosen a language.
    */
   useEffect(() => {
-    if (isInitialized.current) return;
+    if (isLanguagesLoading || languages.length === 0) {
+      return;
+    }
+
+    const storedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+    const userExplicitChoice =
+      typeof window !== 'undefined' ? localStorage.getItem('language_user_selected') : null;
+    const apiDefaultLanguage = languages.find((lang) => lang.isDefault);
+
+    if (!apiDefaultLanguage) {
+      return;
+    }
+
+    const apiDefaultCode = apiDefaultLanguage.languageCode;
+
+    // Detect if the API default language has changed
+    const apiDefaultChanged =
+      lastApiDefaultLanguage.current !== null && lastApiDefaultLanguage.current !== apiDefaultCode;
+
+    // Update the last known API default
+    lastApiDefaultLanguage.current = apiDefaultCode;
+
+    // If user has explicitly selected a language, only override if API default changed
+    if (userExplicitChoice === 'true' && storedLanguage && !apiDefaultChanged) {
+      const storedLanguageExists = languages.some((lang) => lang.languageCode === storedLanguage);
+      if (
+        storedLanguageExists &&
+        storedLanguage !== currentLanguage &&
+        hasCheckedDefaultLanguage.current
+      ) {
+        setLanguage(storedLanguage, false);
+        return;
+      }
+    }
+
+    // Apply the API's default language if:
+    // 1. First time checking (initial load)
+    // 2. API default has changed
+    // 3. No user explicit choice exists
+    if (!hasCheckedDefaultLanguage.current || apiDefaultChanged || userExplicitChoice !== 'true') {
+      if (apiDefaultCode !== currentLanguage) {
+        setLanguage(apiDefaultCode, false);
+      }
+      hasCheckedDefaultLanguage.current = true;
+    }
+  }, [languages, isLanguagesLoading, currentLanguage, setLanguage]);
+
+  /**
+   * Effect hook to initialize translations when the component mounts.
+   * Loads initial translation modules and sets up the language.
+   * Waits for languages to be loaded to ensure we use the correct default language.
+   */
+  useEffect(() => {
+    // Don't initialize until languages are loaded and default language check is complete
+    if (isInitialized.current || isLanguagesLoading || !hasCheckedDefaultLanguage.current) {
+      return;
+    }
 
     const initializeTranslations = async () => {
       setIsLoading(true);
@@ -186,8 +245,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     };
 
     initializeTranslations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentLanguage, location.pathname, loadLanguageModules, i18n, isLanguagesLoading]);
 
   /**
    * Effect hook to handle route changes.
