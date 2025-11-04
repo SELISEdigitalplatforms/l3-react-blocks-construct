@@ -10,6 +10,7 @@ import { ThemeProvider } from '@/styles/theme/theme-provider';
 import './i18n/i18n';
 import { AuthRoutes } from './routes/auth.route';
 import { useLanguageContext, LanguageProvider } from './i18n/language-context';
+import { Guard } from './state/store/auth/guard';
 
 const DashboardPage = lazy(() =>
   import('@/modules/dashboard').then((m) => ({ default: m.DashboardPage }))
@@ -103,7 +104,13 @@ const AppContent = () => {
                 <Route path="/verify-key" element={<VerifyOtpKey />} />
               </Route> */}
 
-                <Route element={<MainLayout />}>
+                <Route
+                  element={
+                    <Guard>
+                      <MainLayout />
+                    </Guard>
+                  }
+                >
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/finance" element={<FinancePage />} />
                   <Route path="/profile" element={<ProfilePage />} />
