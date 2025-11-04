@@ -38,10 +38,10 @@ export const ReCaptcha = forwardRef<CaptchaRef, ReCaptchaProps>(
     }));
 
     const renderReCaptcha = useCallback(() => {
-      if (!containerRef.current) return;
-      window.grecaptcha?.ready(() => {
-        if (widgetIdRef.current !== null) return null;
-        widgetIdRef.current = window.grecaptcha!.render(containerRef.current!, {
+      if (!containerRef.current || !window.grecaptcha) return;
+      window.grecaptcha.ready(() => {
+        if (widgetIdRef.current !== null || !containerRef.current || !window.grecaptcha) return;
+        widgetIdRef.current = window.grecaptcha.render(containerRef.current, {
           sitekey: siteKey,
           theme,
           size,
