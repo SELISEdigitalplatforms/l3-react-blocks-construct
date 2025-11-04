@@ -28,18 +28,93 @@ export default defineConfig({
   build: {
     outDir: 'build', // Keep same output directory as CRA
     sourcemap: true,
+    chunkSizeWarningLimit: 700, // Increase limit since gzipped sizes are acceptable
     // Optimize chunk splitting for better caching
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          query: ['@tanstack/react-query'],
-          ui: [
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-avatar',
-          ],
+        manualChunks: (id) => {
+          // Core React libraries
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'vendor';
+          }
+
+          // Router
+          if (id.includes('node_modules/react-router-dom/')) {
+            return 'router';
+          }
+
+          // React Query
+          if (id.includes('node_modules/@tanstack/react-query')) {
+            return 'query';
+          }
+
+          // All Radix UI components in one chunk
+          if (id.includes('node_modules/@radix-ui/')) {
+            return 'ui';
+          }
+
+          // Form libraries
+          if (
+            id.includes('node_modules/react-hook-form') ||
+            id.includes('node_modules/@hookform/') ||
+            id.includes('node_modules/zod/')
+          ) {
+            return 'forms';
+          }
+
+          // Date/Time libraries
+          if (
+            id.includes('node_modules/date-fns') ||
+            id.includes('node_modules/react-day-picker') ||
+            id.includes('node_modules/react-big-calendar')
+          ) {
+            return 'datetime';
+          }
+
+          // Rich text editor
+          if (id.includes('node_modules/quill')) {
+            return 'editor';
+          }
+
+          // Charts
+          if (id.includes('node_modules/recharts')) {
+            return 'charts';
+          }
+
+          // Icons
+          if (id.includes('node_modules/lucide-react')) {
+            return 'icons';
+          }
+
+          // i18n
+          if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+            return 'i18n';
+          }
+
+          // DnD libraries
+          if (id.includes('node_modules/@dnd-kit/') || id.includes('node_modules/react-dnd')) {
+            return 'dnd';
+          }
+
+          // File handling
+          if (
+            id.includes('node_modules/react-dropzone') ||
+            id.includes('node_modules/papaparse') ||
+            id.includes('node_modules/html2canvas') ||
+            id.includes('node_modules/jspdf')
+          ) {
+            return 'file-utils';
+          }
+
+          // Other utilities
+          if (
+            id.includes('node_modules/') &&
+            (id.includes('clsx') ||
+              id.includes('class-variance-authority') ||
+              id.includes('tailwind-merge'))
+          ) {
+            return 'utils';
+          }
         },
       },
     },
@@ -70,7 +145,6 @@ export default defineConfig({
         'src/**/*.model.ts',
         'src/**/*.module.ts',
         'src/**/*.d.ts',
-        'src/stories/**',
         'src/assets/**',
         'node_modules/**',
       ],

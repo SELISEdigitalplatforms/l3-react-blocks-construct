@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,7 +25,7 @@ import { Separator } from '@/components/ui-kit/separator';
 import { Switch } from '@/components/ui-kit/switch';
 import { Calendar } from '@/components/ui-kit/calendar';
 import { Label } from '@/components/ui-kit/label';
-import { CustomTextEditor, ConfirmationModal } from '@/components/core';
+import { ConfirmationModal } from '@/components/core';
 import { useToast } from '@/hooks/use-toast';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
@@ -335,6 +335,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
  * @param {(eventId: string, deleteOption?: DeleteOption) => void} onDelete - Callback to delete the event by ID
  *
  */
+type EditorComponentType = React.ComponentType<any> | null;
+
 export const EditEvent = ({
   event,
   onClose,
@@ -372,6 +374,8 @@ export const EditEvent = ({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showRecurringDeleteDialog, setShowRecurringDeleteDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const form = useForm<AddEventFormValues>({
     resolver: zodResolver(formSchema),
@@ -393,6 +397,17 @@ export const EditEvent = ({
   useEffect(() => {
     setEditorContent(initialEventData.resource?.description ?? '');
   }, [initialEventData.resource?.description]);
+
+  useEffect(() => {
+    setIsMounted(true);
+    import('@/components/core/custom-text-editor/custom-text-editor')
+      .then(({ CustomTextEditor }) => {
+        setEditorComponent(() => CustomTextEditor as React.ComponentType<any>);
+      })
+      .catch((error) => {
+        console.error('Error loading editor:', error);
+      });
+  }, []);
 
   const isAllDay = form.watch('allDay');
 
@@ -755,11 +770,15 @@ export const EditEvent = ({
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-base text-high-emphasis">{t('DESCRIPTION')}</p>
                 <div className="flex flex-col flex-1">
-                  <CustomTextEditor
-                    value={editorContent}
-                    onChange={setEditorContent}
-                    showIcons={false}
-                  />
+                  {isMounted && editorComponent ? (
+                    React.createElement(editorComponent, {
+                      value: editorContent,
+                      onChange: setEditorContent,
+                      showIcons: false,
+                    })
+                  ) : (
+                    <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>
+                  )}
                 </div>
               </div>
               <FormField
