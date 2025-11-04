@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
+import React, { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
 import { generateUuid } from '@/utils/uuid';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,7 +27,6 @@ import { Switch } from '@/components/ui-kit/switch';
 import { Calendar } from '@/components/ui-kit/calendar';
 import { Label } from '@/components/ui-kit/label';
 import { ColorPickerTool } from '../../color-picker-tool/color-picker-tool';
-import { CustomTextEditor } from '@/components/core';
 import { AddEventFormValues, formSchema } from '../../../utils/form-schema';
 import { generateTimePickerRange } from '../../../utils/date-utils';
 import { EventParticipant } from '../../event-participant/event-participant';
@@ -280,6 +279,8 @@ const createBaseEvent = (
  *   onCancel={() => handleCloseForm()}
  * />
  */
+type EditorComponentType = React.ComponentType<any> | null;
+
 export const AddEvent = ({ start, end, onCancel, onSubmit }: Readonly<AddEventProps>) => {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -297,6 +298,8 @@ export const AddEvent = ({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
   const [endWidth, setEndWidth] = useState(0);
   const [isStartTimeOpen, setIsStartTimeOpen] = useState(false);
   const [isEndTimeOpen, setIsEndTimeOpen] = useState(false);
+  const [editorComponent, setEditorComponent] = useState<EditorComponentType>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { settings } = useCalendarSettings();
   const timePickerRange = useMemo(
@@ -330,6 +333,17 @@ export const AddEvent = ({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
+    import('@/components/core/custom-text-editor/custom-text-editor')
+      .then(({ CustomTextEditor }) => {
+        setEditorComponent(() => CustomTextEditor as React.ComponentType<any>);
+      })
+      .catch((error) => {
+        console.error('Error loading editor:', error);
+      });
   }, []);
 
   const form = useForm<AddEventFormValues>({
@@ -646,11 +660,15 @@ export const AddEvent = ({ start, end, onCancel, onSubmit }: Readonly<AddEventPr
                 <div className="flex flex-col gap-1">
                   <p className="font-semibold text-base text-high-emphasis">{t('DESCRIPTION')}</p>
                   <div className="flex flex-col flex-1">
-                    <CustomTextEditor
-                      value={field.value}
-                      onChange={field.onChange}
-                      showIcons={false}
-                    />
+                    {isMounted && editorComponent ? (
+                      React.createElement(editorComponent, {
+                        value: field.value,
+                        onChange: field.onChange,
+                        showIcons: false,
+                      })
+                    ) : (
+                      <div className="border rounded-md p-4">{t('LOADING_EDITOR')}</div>
+                    )}
                   </div>
                   {fieldState.error && (
                     <span className="text-xs text-destructive">{fieldState.error.message}</span>
