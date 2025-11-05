@@ -54,7 +54,8 @@ const cleanBaseUrl = API_CONFIG.baseUrl.endsWith('/')
 
 const PROJECT_SLUG = import.meta.env.VITE_PROJECT_SLUG || '';
 
-const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${PROJECT_SLUG ? `/${PROJECT_SLUG}` : ''}/gateway`;
+const projectSlug = PROJECT_SLUG ? `/${PROJECT_SLUG}` : '';
+const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${projectSlug}/gateway`;
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {
