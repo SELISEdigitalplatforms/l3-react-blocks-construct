@@ -1,9 +1,8 @@
 import { vi, Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, InitialEntry } from 'react-router-dom';
 import { ClientMiddleware } from './client-middleware';
 import { useAuthStore } from './store/auth';
-import { InitialEntry } from '@remix-run/router';
 
 vi.mock('./store/auth', async () => {
   const originalModule = await vi.importActual('./store/auth');

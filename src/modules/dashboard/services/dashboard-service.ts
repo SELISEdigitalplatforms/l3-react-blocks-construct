@@ -1,11 +1,11 @@
 import { ChartConfig } from '@/components/ui-kit/chart';
 import { UserCog, UserPlus, Users } from 'lucide-react';
-import type { 
-  MetricConfig, 
-  SelectOption, 
-  ChartDataPoint, 
-  PieChartDataPoint, 
-  StatisticData 
+import type {
+  MetricConfig,
+  SelectOption,
+  ChartDataPoint,
+  PieChartDataPoint,
+  StatisticData,
 } from '../types/dashboard.types';
 
 export const daysOfWeek: SelectOption[] = [
