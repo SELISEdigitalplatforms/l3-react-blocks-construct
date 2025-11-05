@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { AlertTriangle, SquareArrowOutUpRight, X } from 'lucide-react';
 import bgAuthLight from '@/assets/images/bg_auth_light.svg';
@@ -16,7 +16,7 @@ export const AuthLayout = () => {
   const { theme } = useTheme();
   const [showBanner, setShowBanner] = useState(true);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Don't redirect if we're on the MFA verification page
     if (isAuthenticated && !window.location.pathname.includes('/verify-mfa')) {
       navigate('/');

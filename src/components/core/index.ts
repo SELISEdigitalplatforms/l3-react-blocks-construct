@@ -13,6 +13,7 @@ export { CustomAvatar } from './custom-avatar/custom-avatar';
 export { Divider } from './divider/divider';
 export { BasePasswordForm } from './base-password-form/base-password-form';
 export { CustomPaginationEmail } from './custom-pagination-email/custom-pagination-email';
+export { CustomTextEditor } from './custom-text-editor/custom-text-editor';
 export { DataTableColumnHeader } from './data-table/data-table-column-header';
 export { DateRangeFilter } from './data-table/data-table-date-filter';
 export { DataTableFacetedFilter } from './data-table/data-table-faceted-filter';
