@@ -4,7 +4,8 @@
 
 Selise follows a strict 3-layer hierarchy for components. **Always start at the top and work your way down.**
 
-### Layer 1: Feature Components (src/features/*/components/)
+### Layer 1: Feature Components (src/modules/\*/components/)
+
 **Most Specific → Least Work**
 
 These are complete, business-ready components that solve entire use cases.
@@ -12,9 +13,10 @@ These are complete, business-ready components that solve entire use cases.
 #### Key Feature Components
 
 **AdvanceDataTable** - Complete table system
+
 ```typescript
-// Path: features/inventory/component/advance-data-table/advance-data-table.tsx
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
+// Path: modules/inventory/component/advance-data-table/advance-data-table.tsx
+import { AdvanceDataTable } from 'modules/inventory/component/advance-data-table/advance-data-table'
 
 // What you get:
 // - Full TanStack Table integration
@@ -38,9 +40,10 @@ import { AdvanceDataTable } from 'features/inventory/component/advance-data-tabl
 ```
 
 **AdvancedTableColumnsToolbar** - Column management
+
 ```typescript
-// Path: features/inventory/component/advance-table-columns-toolbar/
-import { AdvancedTableColumnsToolbar } from 'features/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar'
+// Path: modules/inventory/component/advance-table-columns-toolbar/
+import { AdvancedTableColumnsToolbar } from 'modules/inventory/component/advance-table-columns-toolbar/advance-table-columns-toolbar'
 
 // What you get:
 // - Column visibility toggles
@@ -53,7 +56,8 @@ const renderColumnsToolbar = (table) => (
 );
 ```
 
-### Layer 2: Block Components (src/components/blocks/)
+### Layer 2: Block Components (src/components/core/)
+
 **Medium Specificity → Medium Work**
 
 These are business patterns and reusable compound components.
@@ -61,9 +65,10 @@ These are business patterns and reusable compound components.
 #### Key Block Components
 
 **ConfirmationModal** - All confirmation dialogs
+
 ```typescript
-// Path: components/blocks/confirmation-modal/confirmation-modal.tsx
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+// Path: components/core/confirmation-modal/confirmation-modal.tsx
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal'
 
 // What you get:
 // - Accessible dialog with ARIA attributes
@@ -85,9 +90,10 @@ import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation
 ```
 
 **DataTableColumnHeader** - Sortable column headers
+
 ```typescript
-// Path: components/blocks/data-table/data-table-column-header.tsx
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
+// Path: components/core/data-table/data-table-column-header.tsx
+import { DataTableColumnHeader } from 'components/core/data-table/data-table-column-header'
 
 // What you get:
 // - Sortable column headers
@@ -105,9 +111,10 @@ import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-c
 ```
 
 **CustomAvatar** - User avatars
+
 ```typescript
-// Path: components/blocks/custom-avatar/custom-avatar.tsx
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+// Path: components/core/custom-avatar/custom-avatar.tsx
+import CustomAvatar from 'components/core/custom-avatar/custom-avatar'
 
 // What you get:
 // - Image avatars with fallbacks
@@ -116,17 +123,18 @@ import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
 // - Loading states
 
 // Usage:
-<CustomAvatar 
-  src={user.avatar} 
+<CustomAvatar
+  src={user.avatar}
   alt={user.name}
   fallback={user.initials}
 />
 ```
 
 **DataTablePagination** - Table pagination
+
 ```typescript
-// Path: components/blocks/data-table/data-table-pagination.tsx
-import { DataTablePagination } from 'components/blocks/data-table/data-table-pagination'
+// Path: components/core/data-table/data-table-pagination.tsx
+import { DataTablePagination } from 'components/core/data-table/data-table-pagination'
 
 // What you get:
 // - Page navigation controls
@@ -143,6 +151,7 @@ import { DataTablePagination } from 'components/blocks/data-table/data-table-pag
 ```
 
 ### Layer 3: UI Components (src/components/ui/)
+
 **Most Generic → Most Work**
 
 These are the foundational design system components.
@@ -150,6 +159,7 @@ These are the foundational design system components.
 #### Essential UI Components
 
 **Button** - All button variations
+
 ```typescript
 // Path: components/ui/button.tsx
 import { Button } from 'components/ui/button'
@@ -165,20 +175,22 @@ import { Button } from 'components/ui/button'
 ```
 
 **Input** - Text inputs
+
 ```typescript
 // Path: components/ui/input.tsx
 import { Input } from 'components/ui/input'
 
 // Usage:
-<Input 
-  type="email" 
-  placeholder="Enter email" 
+<Input
+  type="email"
+  placeholder="Enter email"
   value={value}
   onChange={onChange}
 />
 ```
 
 **Card** - Container component
+
 ```typescript
 // Path: components/ui/card.tsx
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'components/ui/card'
@@ -196,6 +208,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'compo
 ```
 
 **Table** - Basic table elements
+
 ```typescript
 // Path: components/ui/table.tsx
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'components/ui/table'
@@ -218,6 +231,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'c
 ```
 
 **Form Components** - Form building blocks
+
 ```typescript
 // Path: components/ui/form.tsx
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from 'components/ui/form'
@@ -239,6 +253,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 ```
 
 **Select** - Dropdown selections
+
 ```typescript
 // Path: components/ui/select.tsx
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'components/ui/select'
@@ -260,19 +275,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'c
 ### "What component should I use?"
 
 #### For Data Tables:
+
 1. **Try First**: `AdvanceDataTable` (Feature) - Complete table solution
-2. **Try Second**: `DataTable` + `DataTableColumnHeader` (Block) - Custom table with Selise patterns  
+2. **Try Second**: `DataTable` + `DataTableColumnHeader` (Block) - Custom table with Selise patterns
 3. **Last Resort**: `Table` + `TableHeader` + `TableBody` (UI) - Build from scratch
 
 #### For Confirmations:
+
 1. **Always Use**: `ConfirmationModal` (Block) - Never create custom confirmation dialogs
 
 #### For Forms:
+
 1. **Try First**: Look for feature form patterns in existing features
 2. **Try Second**: Use `Form` + `FormField` + UI inputs (UI + patterns)
 3. **Build Custom**: Create feature-specific forms following established patterns
 
 #### For Navigation/Layout:
+
 1. **Check Features**: See if AppSidebar or similar exists
 2. **Use Blocks**: Look for layout block components
 3. **Build with UI**: Use Card, Button, etc.
@@ -280,20 +299,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'c
 ## Import Patterns
 
 ### ✅ Always Import These
+
 ```typescript
 // All UI components - never recreate these
-import { Button, Input, Card, Table, Dialog, Badge, Avatar } from 'components/ui/*'
+import { Button, Input, Card, Table, Dialog, Badge, Avatar } from 'components/ui/*';
 
 // Proven block patterns - use when applicable
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import CustomAvatar from 'components/blocks/custom-avatar/custom-avatar'
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal';
+import { DataTableColumnHeader } from 'components/core/data-table/data-table-column-header';
+import CustomAvatar from 'components/core/custom-avatar/custom-avatar';
 
 // Feature components - use if they fit your use case exactly
-import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
+import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table';
 ```
 
 ### ❌ Never Import These (Create Custom)
+
 ```typescript
 // Don't import business logic across features
 // ❌ import { createAdvanceTableColumns } from 'features/inventory/...'
@@ -313,20 +334,21 @@ import { AdvanceDataTable } from 'features/inventory/component/advance-data-tabl
 Before building any component, ask:
 
 - [ ] **Feature Level**: Does `AdvanceDataTable` or another feature component solve this?
-- [ ] **Block Level**: Is there a pattern in `components/blocks/` for this?
+- [ ] **Block Level**: Is there a pattern in `components/core/` for this?
 - [ ] **UI Level**: Can I build this with existing UI components?
 - [ ] **Custom**: Do I need to create feature-specific business logic?
 
 ## Real-World Examples
 
 ### Building a User Management Table
+
 ```typescript
 // 1. Try Feature Level First
 import { AdvanceDataTable } from 'features/inventory/component/advance-data-table/advance-data-table'
 
 // 2. Use Block Patterns
-import { DataTableColumnHeader } from 'components/blocks/data-table/data-table-column-header'
-import ConfirmationModal from 'components/blocks/confirmation-modal/confirmation-modal'
+import { DataTableColumnHeader } from 'components/core/data-table/data-table-column-header'
+import ConfirmationModal from 'components/core/confirmation-modal/confirmation-modal'
 
 // 3. Use UI Foundation
 import { Button, Badge } from 'components/ui/button'

@@ -1,4 +1,4 @@
-import { clients } from 'lib/https';
+import { clients } from '@/lib/https';
 import { GetPreSignedUrlForUploadPayload, GetPreSignedUrlForUploadResponse } from '../types/storage.types';
 
 export const getPreSignedUrlForUpload = async (

@@ -1,11 +1,13 @@
 name: Analyze Code Quality
 
-on: 
+on:
   workflow_call:
     secrets:
       SONAR_TOKEN:
         required: true
       SELISE_GITHUB_PAT:
+        required: true
+      DEPENDENCY_TRACK_API_KEY:
         required: true
 
 jobs:
@@ -13,8 +15,8 @@ jobs:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
     permissions:
-        contents: read
-        id-token: write
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,26 +29,50 @@ jobs:
         with:
           varFilePath: ./.github/variables/vars.env
 
-      - name: Setup Node version 18
+      - name: Setup Node version v22.20.0
         uses: actions/setup-node@v3
         with:
-          node-version: 18.13
+          node-version: 22.20.0
 
       - name: Install dependencies
         run: npm i
+
+      - name: Generate CycloneDX SBOM
+        uses: CycloneDX/gh-node-module-generatebom@v1
+        with:
+          path: '.'
+          output: 'bom.xml'
+
+      - name: Upload SBOM as a workflow artifact
+        uses: actions/upload-artifact@v4 
+        with:
+          name: sbom-cyclonedx-xml 
+          path: bom.xml         
+          retention-days: 7     
+          if-no-files-found: error 
+
+      - name: Upload to Dependency-Track
+        uses: DependencyTrack/gh-upload-sbom@v3.1.0
+        with:
+          serverHostname: 'api-dt.seliseblocks.com'
+          apiKey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+          projectName: ${{ github.event.repository.name }}
+          projectVersion: ${{ github.ref_name }}
+          bomFilename: 'bom.xml'
+          autoCreate: true
 
       - name: Test and coverage
         run: npm run test -- --coverage
 
       - name: Change abs paths to rel paths
         working-directory: ./coverage
-        run: | 
-          sed -i "s|/home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/||g" lcov.info 
+        run: |
+          sed -i "s|/home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/||g" lcov.info
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: "17"
+          java-version: '17'
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4

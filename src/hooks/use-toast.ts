@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { ToastActionElement, ToastProps } from '../components/ui/toast';
+import { ToastActionElement, ToastProps } from '@/components/ui-kit/toast';
 
 /**
  * A custom Toast management system that handles displaying, updating, and dismissing toasts in the UI.

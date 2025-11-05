@@ -12,8 +12,8 @@ interface IAPIConfig {
 
 const getBaseUrl = (): string => {
   return isLocalhost()
-    ? (process.env.REACT_APP_PUBLIC_BLOCKS_API_URL ?? '')
-    : (process.env.REACT_APP_PUBLIC_API_URL ?? '');
+    ? import.meta.env.VITE_BLOCKS_API_URL || ''
+    : import.meta.env.VITE_API_BASE_URL || '';
 };
 
 export const isLocalhost = (): boolean => {
@@ -25,7 +25,7 @@ export const isLocalhost = (): boolean => {
   );
 };
 
-if (!getBaseUrl() || !getProjectKey()) {
+if (!getBaseUrl() || !projectKey) {
   throw new Error('Required environment variables are not defined');
 }
 
