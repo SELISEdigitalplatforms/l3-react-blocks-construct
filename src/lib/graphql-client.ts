@@ -52,11 +52,9 @@ const cleanBaseUrl = API_CONFIG.baseUrl.endsWith('/')
   ? API_CONFIG.baseUrl.slice(0, -1)
   : API_CONFIG.baseUrl;
 
-const PROJECT_SHORT_KEY = import.meta.env.VITE_PROJECT_SHORT_KEY || '';
+const PROJECT_SLUG = import.meta.env.VITE_PROJECT_SLUG || '';
 
-const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${
-  PROJECT_SHORT_KEY ? `/${PROJECT_SHORT_KEY}` : ''
-}/gateway`;
+const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${PROJECT_SLUG ? `/${PROJECT_SLUG}` : ''}/gateway`;
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {
