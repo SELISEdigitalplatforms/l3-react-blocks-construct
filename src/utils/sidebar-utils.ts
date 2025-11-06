@@ -31,6 +31,5 @@ export function getSidebarStyle(
     minWidth: open ? 'var(--sidebar-width)' : '64px',
     transition: 'width 0.3s ease, min-width 0.3s ease',
     height: '100%',
-    borderRight: '1px solid var(--border-color, #e2e8f0)',
   };
 }
