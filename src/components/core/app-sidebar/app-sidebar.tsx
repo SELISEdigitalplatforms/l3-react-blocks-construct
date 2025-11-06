@@ -73,7 +73,7 @@ export const AppSidebar = () => {
       collapsible={isMobile ? 'none' : 'icon'}
       style={sidebarStyle}
     >
-      <SidebarHeader className="p-2">
+      <SidebarHeader className={`${!open && !isMobile ? 'border-b' : ''} p-2`}>
         <LogoSection
           theme={theme}
           open={open}
@@ -82,14 +82,12 @@ export const AppSidebar = () => {
         />
       </SidebarHeader>
 
-      <SidebarContent className="text-base ml-4 mr-2 my-3 text-high-emphasis font-normal">
+      <SidebarContent className="text-base ml-4 mr-2 my-3 text-high-emphasis font-normal overflow-x-hidden">
         <MenuSection
           title={t('CLOUD_INTEGRATED')}
           items={integratedMenuItems}
           showText={open || isMobile}
           pathname={pathname}
-          isMobile={isMobile}
-          open={open}
           onItemClick={isMobile ? () => setOpenMobile(false) : undefined}
         />
 
@@ -98,8 +96,6 @@ export const AppSidebar = () => {
           items={designOnlyMenuItems}
           showText={open || isMobile}
           pathname={pathname}
-          isMobile={isMobile}
-          open={open}
           onItemClick={isMobile ? () => setOpenMobile(false) : undefined}
         />
       </SidebarContent>

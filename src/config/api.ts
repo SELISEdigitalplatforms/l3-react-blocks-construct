@@ -11,9 +11,7 @@ interface IAPIConfig {
 }
 
 const getBaseUrl = (): string => {
-  return isLocalhost()
-    ? import.meta.env.VITE_BLOCKS_API_URL || ''
-    : import.meta.env.VITE_API_BASE_URL || '';
+  return import.meta.env.VITE_API_BASE_URL || '';
 };
 
 export const isLocalhost = (): boolean => {

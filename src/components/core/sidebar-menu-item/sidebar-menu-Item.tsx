@@ -66,7 +66,7 @@ export const SidebarMenuItemComponent = ({
       <Collapsible className="group/collapsible" open={isOpen} onOpenChange={setIsOpen}>
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
-            <SidebarMenuButton onClick={handleClick}>
+            <SidebarMenuButton>
               <div className="flex items-center justify-start w-full">
                 {renderIcon(item.icon as MenuIconName)}
                 <span
