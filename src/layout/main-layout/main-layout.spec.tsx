@@ -1,6 +1,5 @@
 // Set environment variables
 process.env.VITE_X_BLOCKS_KEY = 'test-key';
-process.env.VITE_BLOCKS_API_URL = 'https://test-api.com';
 process.env.VITE_API_BASE_URL = 'https://test-api.com';
 
 // Mock window.location

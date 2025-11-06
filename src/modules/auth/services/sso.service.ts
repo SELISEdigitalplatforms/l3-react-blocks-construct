@@ -54,6 +54,7 @@ export class SSOservice {
           Accept: 'application/json',
           'x-blocks-key': API_CONFIG.blocksKey,
         },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -90,6 +91,7 @@ export class SSOservice {
           'Content-Type': 'application/json',
           'x-blocks-key': API_CONFIG.blocksKey,
         },
+        credentials: 'include',
         body: JSON.stringify({
           mfaToken,
           code,
@@ -118,9 +120,15 @@ export class SSOservice {
 
 export const getLoginOption = async (): Promise<LoginOption | null> => {
   try {
-    const response = await fetch(`${API_CONFIG.baseUrl}/authentication/v1/Social/GetLoginOptions`, {
+    const url = `${API_CONFIG.baseUrl}/authentication/v1/Social/GetLoginOptions`;
+
+    const response = await fetch(url, {
       method: 'GET',
-      headers: { 'X-Blocks-Key': API_CONFIG.blocksKey },
+      headers: {
+        'X-Blocks-Key': API_CONFIG.blocksKey,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
       referrerPolicy: 'no-referrer',
     });
 
@@ -130,7 +138,7 @@ export const getLoginOption = async (): Promise<LoginOption | null> => {
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching login options:', error);
+    console.error('[SSO] Error fetching login options:', error);
     throw error;
   }
 };
