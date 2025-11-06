@@ -48,7 +48,7 @@ export const EditInvoicePage = () => {
     invoice.ItemDetails?.map(
       (item) =>
         ({
-          ItemId: item.ItemId,
+          ItemId: item.ItemId || uuidv4(),
           ItemName: item.ItemName,
           Category: normalizeCategoryValue(item.Category) ?? '',
           Quantity: item.Quantity,

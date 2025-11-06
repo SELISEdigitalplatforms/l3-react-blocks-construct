@@ -195,10 +195,10 @@ export function TaskCard({
 
           {task.ItemTag &&
             task.ItemTag.length > 0 &&
-            task.ItemTag.map((tag) => (
+            task.ItemTag.map((tag, tagIndex) => (
               <TaskManagerBadge
                 className="px-2 py-0.5"
-                key={tag.ItemId}
+                key={tag.ItemId || `tag-${tag.TagLabel}-${tagIndex}`}
                 asButton={false}
                 onClick={handleInteractiveElementClick}
               >

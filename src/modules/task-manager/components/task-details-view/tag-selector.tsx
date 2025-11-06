@@ -100,7 +100,7 @@ function TagsComponent({ availableTags, selectedTags, onChange }: Readonly<TagsS
                     return (
                       <CommandItem
                         key={tag.ItemId}
-                        value={tag.ItemId}
+                        value={tag.TagLabel}
                         onSelect={() => handleSelect(tag)}
                         className="flex items-center px-2 py-1.5 cursor-pointer"
                       >
