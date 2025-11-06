@@ -98,7 +98,8 @@ export function TaskColumn({
   const MIN_COLUMN_HEIGHT = '150px';
 
   const taskIds = useMemo(
-    () => tasks.map((task) => `task-${(task && (task.ItemId || task.id)) || ''}`),
+    () =>
+      tasks.map((task, index) => `task-${(task && (task.ItemId || task.id)) || `temp-${index}`}`),
     [tasks]
   );
 
@@ -209,7 +210,7 @@ export function TaskColumn({
             <div className="space-y-3">
               {tasks.map((task, index) => (
                 <div
-                  key={`task-${task.ItemId || task.id || 'temp-' + index}`}
+                  key={task.ItemId || task.id || `task-temp-${column.ItemId}-${index}`}
                   className="task-card-container"
                 >
                   <TaskCard

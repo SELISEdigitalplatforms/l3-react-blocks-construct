@@ -4,7 +4,6 @@
  */
 
 // 1. Set up environment variables first
-process.env.VITE_BLOCKS_API_URL = 'http://localhost:3000';
 process.env.VITE_API_BASE_URL = 'http://localhost:3000';
 process.env.VITE_X_BLOCKS_KEY = 'test-key';
 

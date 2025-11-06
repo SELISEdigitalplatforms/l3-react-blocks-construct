@@ -110,7 +110,7 @@ export const UserDetails = ({
               <div className="flex items-center space-x-4">
                 <div className="relative overflow-hidden rounded-full border shadow-sm border-white h-16 w-16">
                   <img
-                    src={selectedUser?.profileImageUrl ?? DummyProfile}
+                    src={selectedUser?.profileImageUrl || DummyProfile}
                     alt="profile"
                     loading="lazy"
                     className="w-full h-full object-cover"
