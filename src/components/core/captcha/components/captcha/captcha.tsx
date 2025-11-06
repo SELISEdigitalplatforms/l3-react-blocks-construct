@@ -1,9 +1,9 @@
 'use client';
 
+import { forwardRef } from 'react';
 import { ReCaptcha } from '../reCaptcha/reCaptcha';
 import { HCaptcha } from '../hCaptcha/hCaptcha';
 import { CaptchaProps, CaptchaRef } from '../../types/captcha.type';
-import { forwardRef } from 'react';
 
 export const Captcha = forwardRef<CaptchaRef, CaptchaProps>((props: CaptchaProps, ref) => {
   const { type, ...rest } = props;

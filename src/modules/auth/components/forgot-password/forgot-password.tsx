@@ -109,11 +109,7 @@ export const ForgotpasswordForm = () => {
           )}
         />
 
-        {captchaEnabled && showCaptcha && (
-          <div className="my-4">
-            <Captcha {...captcha} theme="light" size="normal" />
-          </div>
-        )}
+        {captchaEnabled && showCaptcha && <Captcha {...captcha} theme="light" size="normal" />}
 
         <Button
           className="font-extrabold mt-4"
