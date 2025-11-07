@@ -34,3 +34,4 @@ export type { CaptchaRef, CaptchaProps } from './captcha/types/captcha.type';
 export { Notification } from './notification/component/notification/notification';
 export { NotificationItem } from './notification/component/notification-item/notification-item';
 export * from './notification/hooks/use-notification';
+export { ExtensionBanner } from './extension-banner/extension-banner';
