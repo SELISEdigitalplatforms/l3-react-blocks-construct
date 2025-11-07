@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   X,
   Download,
@@ -12,10 +12,13 @@ import {
   Image as ImageIcon,
   Video as VideoIcon,
   Music,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { IFileTrashData } from '../../utils/file-manager';
 import { v4 as uuidv4 } from 'uuid';
-import { IFileData } from '../../hooks/use-mock-files-query';
+import { IFileData } from '../../types/file-manager.type';
+import { Button } from '@/components/ui-kit/button';
 
 interface PreviewProps {
   file: IFileTrashData | IFileData;
@@ -23,7 +26,7 @@ interface PreviewProps {
 }
 
 // Image Preview Component
-const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
+const ImagePreview = ({ file, onClose }: Readonly<PreviewProps>) => {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [imageError, setImageError] = useState(false);
@@ -73,7 +76,6 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
       <div className="relative w-full h-full flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 bg-transparent bg-opacity-50 text-gray-50">
           <div className="flex items-center space-x-3">
             <ImageIcon className="w-5 h-5" />
@@ -145,7 +147,7 @@ const ImagePreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 };
 
 // Video Preview Component
-const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
+const VideoPreview = ({ file, onClose }: Readonly<PreviewProps>) => {
   const getPlaceholderVideo = () => {
     return `https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4`;
   };
@@ -170,7 +172,6 @@ const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           </button>
         </div>
 
-        {/* Video Container */}
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
             <video
@@ -202,7 +203,7 @@ const VideoPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 };
 
 // Audio Preview Component
-const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
+const AudioPreview = ({ file, onClose }: Readonly<PreviewProps>) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime] = useState(0);
@@ -235,7 +236,6 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
           </button>
         </div>
 
-        {/* Audio Visualization */}
         <div className="flex items-center justify-center h-32 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg mb-6">
           <div className="flex items-end space-x-1">
             {Array.from({ length: 20 }).map((_, i) => (
@@ -290,7 +290,7 @@ const AudioPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
 };
 
 // Document Preview Component
-const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
+const DocumentPreview = ({ file, onClose }: Readonly<PreviewProps>) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 5;
 
@@ -326,33 +326,38 @@ const DocumentPreview: React.FC<PreviewProps> = ({ file, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
       <div className="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">{getFileIcon(file.name)}</span>
-            <div>
-              <h3 className="font-medium text-high-emphasis">{file.name}</h3>
+            <div className="flex flex-col w-[50%] md:w-full">
+              <h3 className="font-medium text-high-emphasis truncate">{file.name}</h3>
               <p className="text-sm text-medium-emphasis">{file.size}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-medium-emphasis">
+            <span className="hidden md:flex text-sm text-medium-emphasis">
               Page {currentPage} of {totalPages}
             </span>
-            <button
+            <Button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="outline"
+              size="sm"
+              className="px-3 py-1 text-sm"
             >
-              Previous
-            </button>
-            <button
+              <ChevronLeft className="md:hidden h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Previous</span>
+            </Button>
+            <Button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="outline"
+              size="sm"
+              className="px-3 py-1 text-sm"
             >
-              Next
-            </button>
+              <span className="hidden md:inline">Next</span>
+              <ChevronRight className="md:hidden h-4 w-4 md:ml-2" />
+            </Button>
             <button onClick={onClose} className="p-2 rounded-lg transition-colors">
               <X className="w-4 h-4" />
             </button>

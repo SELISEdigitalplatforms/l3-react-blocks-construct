@@ -85,17 +85,19 @@ export const CalendarFilterSheet = ({
                 </div>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  numberOfMonths={2}
-                  onSelect={(range) => {
-                    if (range?.from && range?.to) {
-                      setDateRange(range);
-                      setOpenPopover(false);
-                    }
-                  }}
-                />
+                <div className="max-h-[80vh] overflow-y-auto">
+                  <Calendar
+                    mode="range"
+                    selected={dateRange}
+                    numberOfMonths={1}
+                    onSelect={(range) => {
+                      if (range?.from && range?.to) {
+                        setDateRange(range);
+                        setOpenPopover(false);
+                      }
+                    }}
+                  />
+                </div>
               </PopoverContent>
             </Popover>
             <div className="flex flex-col gap-1">

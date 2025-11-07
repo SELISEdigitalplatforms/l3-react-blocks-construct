@@ -177,21 +177,23 @@ export const TaskManagerFilterSheet = ({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="range"
-                  selected={selectedDueDate ?? undefined}
-                  numberOfMonths={2}
-                  onSelect={setSelectedDueDate}
-                />
-                <div className="p-2 border-t">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setSelectedDueDate(undefined)}
-                    className="w-full"
-                    size="sm"
-                  >
-                    {t('CLEAR_FILTER')}
-                  </Button>
+                <div className="max-h-[80vh] overflow-y-auto">
+                  <Calendar
+                    mode="range"
+                    selected={selectedDueDate ?? undefined}
+                    numberOfMonths={1}
+                    onSelect={setSelectedDueDate}
+                  />
+                  <div className="p-2 border-t">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setSelectedDueDate(undefined)}
+                      className="w-full"
+                      size="sm"
+                    >
+                      {t('CLEAR_FILTER')}
+                    </Button>
+                  </div>
                 </div>
               </PopoverContent>
             </Popover>
