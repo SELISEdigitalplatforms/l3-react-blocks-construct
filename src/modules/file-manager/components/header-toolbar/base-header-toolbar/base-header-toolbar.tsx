@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { ListFilter, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui-kit/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui-kit/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui-kit/sheet';
 import { countActiveFilters, SearchInput } from '../../common-filters/common-filters';
 import { HeaderActions } from '../header-actions/header-actions';
 import { AddDropdownMenu } from '../../file-manager-add-new-dropdown/file-manager-add-new-dropdown';

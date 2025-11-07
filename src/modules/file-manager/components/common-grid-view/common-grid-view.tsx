@@ -164,7 +164,7 @@ export const CommonGridView = <T extends BaseFile>({
                 <h2 className="text-sm font-medium text-high-emphasis mb-4 py-2 rounded">
                   {sectionLabels.folder} ({folders.length})
                 </h2>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+                <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {folders.map((file) => {
                     const IconComponent = getFileTypeIcon(file.fileType);
                     const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);
@@ -191,7 +191,7 @@ export const CommonGridView = <T extends BaseFile>({
                 <h2 className="text-sm font-medium text-high-emphasis mb-4 py-2 rounded">
                   {sectionLabels.file} ({regularFiles.length})
                 </h2>
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+                <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                   {regularFiles.map((file) => {
                     const IconComponent = getFileTypeIcon(file.fileType);
                     const { iconColor, backgroundColor } = getFileTypeInfo(file.fileType);

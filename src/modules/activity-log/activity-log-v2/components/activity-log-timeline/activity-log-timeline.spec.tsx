@@ -211,9 +211,10 @@ describe('ActivityLogTimeline V2', () => {
       const { container } = renderActivityLogTimelineV2();
 
       const scrollContainer = container.querySelector(
-        '.px-12.py-8.h-\\[800px\\].overflow-y-auto.scrollbar-hide'
+        '.h-\\[800px\\].overflow-y-auto.scrollbar-hide'
       );
       expect(scrollContainer).toBeInTheDocument();
+      expect(scrollContainer).toHaveClass('px-2', 'py-6', 'md:px-12', 'md:py-8');
     });
 
     it('should render V2 timeline visual indicator', () => {

@@ -157,16 +157,18 @@ const LastUpdatedFilterDropdown = forwardRef<
                 </PopoverTrigger>
                 {selectedOption !== 'today' && (
                   <PopoverContent className="w-auto p-0">
-                    {selectedOption === 'date_range' ? (
-                      <Calendar
-                        mode="range"
-                        selected={dateRange}
-                        onSelect={handleDateRangeSelect}
-                        numberOfMonths={2}
-                      />
-                    ) : (
-                      <Calendar mode="single" selected={date} onSelect={handleDateSelect} />
-                    )}
+                    <div className="max-h-[80vh] overflow-y-auto">
+                      {selectedOption === 'date_range' ? (
+                        <Calendar
+                          mode="range"
+                          selected={dateRange}
+                          onSelect={handleDateRangeSelect}
+                          numberOfMonths={1}
+                        />
+                      ) : (
+                        <Calendar mode="single" selected={date} onSelect={handleDateSelect} />
+                      )}
+                    </div>
                   </PopoverContent>
                 )}
               </Popover>
