@@ -1,47 +1,32 @@
-import { useLanguageContext, LanguageProvider } from './i18n/language-context';
-import { LoadingOverlay } from './components/core/loading-overlay';
-import './i18n/i18n';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'components/ui/toaster';
-import { ClientMiddleware } from 'state/client-middleware';
-import MainLayout from 'pages/main/main-layout';
-import { AuthLayout } from './pages/auth/auth-layout';
-import { SigninPage } from 'pages/auth/signin/signin-page';
-import { SignupPage } from 'pages/auth/signup/signup-page';
-import { EmailVerification } from 'pages/auth/email-verification/email-verification';
-import { Dashboard } from 'pages/main/dashboard/dashboard';
-import { SetPasswordPage } from './pages/auth/set-password/set-password';
-import { ActivationSuccess } from './pages/auth/activation-success/activation-success';
-import { VerificationFailed } from './pages/auth/verification-failed/verification-failed';
-import { ResetPasswordPage } from './pages/auth/reset-password/reset-password';
-import { ForgotPasswordPage } from './pages/auth/forgot-password/forgot-password';
-import TaskPage from './pages/main/iam-table';
-import { Profile } from './pages/profile/profile';
-import { Storage } from './pages/services/storage/storage';
-import { Mail } from './pages/services/mail/mail';
-import { Help } from './pages/help/help';
-import { ThemeProvider } from 'styles/theme/theme-provider';
-import { Inventory } from './pages/inventory/inventory';
-import { InventoryDetails } from './pages/inventory/inventory-details';
-import { SidebarProvider } from 'components/ui/sidebar';
-import { Email } from './pages/email/email';
-import { VerifyOtpKey } from './pages/auth/verify-otp-key/verify-otp-key';
-import { InventoryForm } from './features/inventory/component/inventory-form/inventory-form';
-import TaskManager from './pages/task-manager/task-manager';
-import ActivityLogPage2 from './pages/activity-log-v2/activity-log';
-import ActivityLogPage1 from './pages/activity-log-v1/activity-log';
-import { CalendarPage } from './pages/calendar/calendar';
-import ServiceUnavailable from './pages/error/service-unavailable/service-unavailable';
-import NotFound from './pages/error/not-found/not-found';
-import Finance from './pages/finance/finance';
-import { InvoicesPage } from './pages/invoices/invoices';
-import { InvoiceDetailsPage } from './pages/invoices/invoices-detail';
-import { CreateInvoice, EditInvoice } from './features/invoices';
-import SharedWithMe from 'pages/file-manager/shared-files';
-import Trash from 'pages/file-manager/trash';
-import { ChatPage } from './pages/chat/chat';
-import { FileManagerMyFiles } from './pages/file-manager/my-files';
+import { SidebarProvider } from '@/components/ui-kit/sidebar';
+import { LoadingOverlay } from '@/components/core';
+import { DashboardPage } from '@/modules/dashboard';
+import { FinancePage } from '@/modules/finance';
+import { CalendarPage } from '@/modules/big-calendar';
+import { EmailPage } from '@/modules/email';
+import { ChatPage } from '@/modules/chat';
+import { NotFoundPage, ServiceUnavailablePage } from '@/modules/error-view';
+import { FileManagerMyFilesPage, SharedWithMePage, TrashPage } from '@/modules/file-manager';
+import { ActivityLogPage, TimelinePage } from '@/modules/activity-log';
+import { InventoryPage, InventoryDetailsPage, InventoryFormPage } from '@/modules/inventory';
+import {
+  InvoicesPage,
+  InvoiceDetailsPage,
+  CreateInvoicePage,
+  EditInvoicePage,
+} from '@/modules/invoices';
+import { TaskManagerPage } from '@/modules/task-manager';
+import { ProfilePage } from '@/modules/profile';
+import { UsersTablePage } from '@/modules/iam';
+import { MainLayout } from '@/layout/main-layout/main-layout';
+import { Toaster } from '@/components/ui-kit/toaster';
+import { ClientMiddleware } from '@/state/client-middleware';
+import { ThemeProvider } from '@/styles/theme/theme-provider';
+import './i18n/i18n';
+import { AuthRoutes } from './routes/auth.route';
+import { useLanguageContext, LanguageProvider } from './i18n/language-context';
 
 const queryClient = new QueryClient();
 
@@ -58,37 +43,23 @@ function AppContent() {
         <ThemeProvider>
           <SidebarProvider>
             <Routes>
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<SigninPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/sent-email" element={<EmailVerification />} />
-                <Route path="/activate" element={<SetPasswordPage />} />
-                <Route path="/resetpassword" element={<ResetPasswordPage />} />
-                <Route path="/success" element={<ActivationSuccess />} />
-                <Route path="/activate-failed" element={<VerificationFailed />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/verify-key" element={<VerifyOtpKey />} />
-              </Route>
-
+              {AuthRoutes}
               <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/finance" element={<Finance />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/inventory/add" element={<InventoryForm />} />
-                <Route path="/inventory/:itemId" element={<InventoryDetails />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/finance" element={<FinancePage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/inventory" element={<InventoryPage />} />
+                <Route path="/inventory/add" element={<InventoryFormPage />} />
+                <Route path="/inventory/:itemId" element={<InventoryDetailsPage />} />
 
-                <Route path="/activity-log" element={<ActivityLogPage1 />} />
-                <Route path="/timeline" element={<ActivityLogPage2 />} />
-                <Route path="/mail" element={<Email />} />
-                <Route path="/mail/:category" element={<Email />} />
-                <Route path="/mail/:category/:emailId" element={<Email />} />
-                <Route path="/mail/:category/:labels/:emailId" element={<Email />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/identity-management" element={<TaskPage />} />
-                <Route path="/services/storage" element={<Storage />} />
-                <Route path="/services/mail" element={<Mail />} />
-                <Route path="/task-manager" element={<TaskManager />} />
+                <Route path="/activity-log" element={<ActivityLogPage />} />
+                <Route path="/timeline" element={<TimelinePage />} />
+                <Route path="/mail" element={<EmailPage />} />
+                <Route path="/mail/:category" element={<EmailPage />} />
+                <Route path="/mail/:category/:emailId" element={<EmailPage />} />
+                <Route path="/mail/:category/:labels/:emailId" element={<EmailPage />} />
+                <Route path="/identity-management" element={<UsersTablePage />} />
+                <Route path="/task-manager" element={<TaskManagerPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 {/* 
                 To implement permissions for feature Invoices
@@ -131,20 +102,23 @@ function AppContent() {
                 */}
 
                 <Route path="/invoices" element={<InvoicesPage />} />
-                <Route path="/invoices/create-invoice" element={<CreateInvoice />} />
-                <Route path="/invoices/:invoiceId/edit" element={<EditInvoice />} />
+                <Route path="/invoices/create-invoice" element={<CreateInvoicePage />} />
+                <Route path="/invoices/:invoiceId/edit" element={<EditInvoicePage />} />
 
                 <Route path="/invoices/:invoiceId" element={<InvoiceDetailsPage />} />
-                <Route path="/file-manager/my-files" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash" element={<Trash />} />
-                <Route path="/file-manager/my-files/:folderId" element={<FileManagerMyFiles />} />
-                <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMe />} />
-                <Route path="/file-manager/trash/:folderId" element={<Trash />} />
+                <Route path="/file-manager/my-files" element={<FileManagerMyFilesPage />} />
+                <Route path="/file-manager/shared-files" element={<SharedWithMePage />} />
+                <Route path="/file-manager/trash" element={<TrashPage />} />
+                <Route
+                  path="/file-manager/my-files/:folderId"
+                  element={<FileManagerMyFilesPage />}
+                />
+                <Route path="/file-manager/shared-files/:folderId" element={<SharedWithMePage />} />
+                <Route path="/file-manager/trash/:folderId" element={<TrashPage />} />
 
                 <Route path="/calendar" element={<CalendarPage />} />
-                <Route path="/503" element={<ServiceUnavailable />} />
-                <Route path="/404" element={<NotFound />} />
+                <Route path="/503" element={<ServiceUnavailablePage />} />
+                <Route path="/404" element={<NotFoundPage />} />
               </Route>
 
               {/* redirecting */}

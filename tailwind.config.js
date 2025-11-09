@@ -1,13 +1,13 @@
-/** @type {Config} */
+import tailwindcssAnimate from 'tailwindcss-animate';
 /** @typedef {import('tailwindcss').Config} Config */
 
-module.exports = {
+/** @type {Config} */
+export default {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
-    './public/index.html',
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/features/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/modules/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
@@ -218,5 +218,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [tailwindcssAnimate],
 };
