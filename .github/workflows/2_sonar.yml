@@ -37,6 +37,11 @@ jobs:
       - name: Install dependencies
         run: npm i
 
+      # # - name: Generate CycloneDX SBOM
+      # #   uses: CycloneDX/gh-node-module-generatebom@v1
+      # #   with:
+      # #     path: '.'
+      # #     output: 'bom.xml'
       # - name: Generate CycloneDX SBOM
       #   run: npx @cyclonedx/cyclonedx-npm --output-file bom.xml --output-format xml
 
@@ -59,7 +64,7 @@ jobs:
       #     autocreate: true
 
       - name: Test and coverage
-        run: npm run test --coverage
+        run: npm run test -- --coverage
 
       - name: Change abs paths to rel paths
         working-directory: ./coverage
