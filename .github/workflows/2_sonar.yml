@@ -56,12 +56,12 @@ jobs:
       - name: Upload to Dependency-Track
         uses: DependencyTrack/gh-upload-sbom@v3.1.0
         with:
-          serverHostname: "api-dt.seliseblocks.com"
-          apiKey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
-          projectName: ${{ github.event.repository.name }}
-          projectVersion: ${{ github.ref_name }}
-          bomFilename: "bom.xml"
-          autoCreate: true
+          serverhostname: "api-dt.seliseblocks.com"
+          apikey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+          projectname: ${{ github.event.repository.name }}
+          projectversion: ${{ github.ref_name }}
+          bomfilename: "bom.xml"
+          autocreate: true
 
       # - name: Test and coverage
       #   run: npm run test -- --coverage
