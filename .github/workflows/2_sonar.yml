@@ -37,28 +37,30 @@ jobs:
       - name: Install dependencies
         run: npm i
 
+      # - name: Generate CycloneDX SBOM
+      #   uses: CycloneDX/gh-node-module-generatebom@v1
+      #   with:
+      #     path: '.'
+      #     output: 'bom.xml'
       - name: Generate CycloneDX SBOM
-        uses: CycloneDX/gh-node-module-generatebom@v1
-        with:
-          path: '.'
-          output: 'bom.xml'
+        run: npx @cyclonedx/cyclonedx-npm --output bom.xml --type xml
 
       - name: Upload SBOM as a workflow artifact
-        uses: actions/upload-artifact@v4 
+        uses: actions/upload-artifact@v4
         with:
-          name: sbom-cyclonedx-xml 
-          path: bom.xml         
-          retention-days: 7     
-          if-no-files-found: error 
+          name: sbom-cyclonedx-xml
+          path: bom.xml
+          retention-days: 7
+          if-no-files-found: error
 
       - name: Upload to Dependency-Track
         uses: DependencyTrack/gh-upload-sbom@v3.1.0
         with:
-          serverHostname: 'api-dt.seliseblocks.com'
+          serverHostname: "api-dt.seliseblocks.com"
           apiKey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
           projectName: ${{ github.event.repository.name }}
           projectVersion: ${{ github.ref_name }}
-          bomFilename: 'bom.xml'
+          bomFilename: "bom.xml"
           autoCreate: true
 
       - name: Test and coverage
@@ -72,7 +74,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: '17'
+          java-version: "17"
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4

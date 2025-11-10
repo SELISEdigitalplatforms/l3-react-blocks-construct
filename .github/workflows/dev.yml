@@ -3,10 +3,10 @@ name: Build (dev)
 on:
   push:
     branches:
-      - dev
+      - cicd-test
 
 env:
-  RUN_UNIT_TEST: 'false'
+  RUN_UNIT_TEST: "false"
 
 jobs:
   initialization:
@@ -29,26 +29,26 @@ jobs:
       DEPENDENCY_TRACK_API_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
     needs: [initialization]
 
-  cd-job:
-    permissions:
-      contents: read
-      id-token: write
-    if: ${{ github.event_name == 'push' }}
-    uses: ./.github/workflows/3_web.yml
-    with:
-      CONTAINER_NAME: 'dev-$SERVICE_NAME-webclient'
-      NAMESPACE: 'dev-$REPO_NAME'
-      SERVICE_NAME: $SERVICE_NAME
-      # CI_BUILD: 'build-dev'
-      CI_BUILD: 'dev'
-    secrets:
-      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
-      ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
-      CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
-      ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
-    needs: [sonarqube-job]
+  # cd-job:
+  #   permissions:
+  #     contents: read
+  #     id-token: write
+  #   if: ${{ github.event_name == 'push' }}
+  #   uses: ./.github/workflows/3_web.yml
+  #   with:
+  #     CONTAINER_NAME: 'dev-$SERVICE_NAME-webclient'
+  #     NAMESPACE: 'dev-$REPO_NAME'
+  #     SERVICE_NAME: $SERVICE_NAME
+  #     # CI_BUILD: 'build-dev'
+  #     CI_BUILD: 'dev'
+  #   secrets:
+  #     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+  #     AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
+  #     ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+  #     CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
+  #     ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+  #   needs: [sonarqube-job]
 
   # storybook-job:
   #   permissions:
