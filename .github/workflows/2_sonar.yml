@@ -38,61 +38,56 @@ jobs:
         run: npm i
 
       # - name: Generate CycloneDX SBOM
-      #   uses: CycloneDX/gh-node-module-generatebom@v1
-      #   with:
-      #     path: '.'
-      #     output: 'bom.xml'
-      - name: Generate CycloneDX SBOM
-        run: npx @cyclonedx/cyclonedx-npm --output-file bom.xml --output-format xml
+      #   run: npx @cyclonedx/cyclonedx-npm --output-file bom.xml --output-format xml
 
-      - name: Upload SBOM as a workflow artifact
-        uses: actions/upload-artifact@v4
+      # - name: Upload SBOM as a workflow artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: sbom-cyclonedx-xml
+      #     path: bom.xml
+      #     retention-days: 7
+      #     if-no-files-found: error
+
+      # - name: Upload to Dependency-Track
+      #   uses: DependencyTrack/gh-upload-sbom@v3.1.0
+      #   with:
+      #     serverhostname: "api-dt.seliseblocks.com"
+      #     apikey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+      #     projectname: ${{ github.event.repository.name }}
+      #     projectversion: ${{ github.ref_name }}
+      #     bomfilename: "bom.xml"
+      #     autocreate: true
+
+      - name: Test and coverage
+        run: npm run test --coverage
+
+      - name: Change abs paths to rel paths
+        working-directory: ./coverage
+        run: |
+          sed -i "s|/home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/||g" lcov.info
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
         with:
-          name: sbom-cyclonedx-xml
-          path: bom.xml
-          retention-days: 7
-          if-no-files-found: error
+          java-version: "17"
 
-      - name: Upload to Dependency-Track
-        uses: DependencyTrack/gh-upload-sbom@v3.1.0
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
         with:
-          serverhostname: "api-dt.seliseblocks.com"
-          apikey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
-          projectname: ${{ github.event.repository.name }}
-          projectversion: ${{ github.ref_name }}
-          bomfilename: "bom.xml"
-          autocreate: true
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: |
+            ${{ runner.os }}-sonar
 
-      # - name: Test and coverage
-      #   run: npm run test -- --coverage
+      - uses: sonarsource/sonarqube-scan-action@v5.3.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
 
-      # - name: Change abs paths to rel paths
-      #   working-directory: ./coverage
-      #   run: |
-      #     sed -i "s|/home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/||g" lcov.info
-
-      # - name: Set up JDK 17
-      #   uses: actions/setup-java@v1
-      #   with:
-      #     java-version: "17"
-
-      # - name: Cache SonarQube packages
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.sonar/cache
-      #     key: ${{ runner.os }}-sonar
-      #     restore-keys: |
-      #       ${{ runner.os }}-sonar
-
-      # - uses: sonarsource/sonarqube-scan-action@v5.3.1
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
-
-      # - name: SonarQube Quality Gate check
-      #   uses: sonarsource/sonarqube-quality-gate-action@v1.2.0
-      #   # Force to fail step after specific time.
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@v1.2.0
+        # Force to fail step after specific time.
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
