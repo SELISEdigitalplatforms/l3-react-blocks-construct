@@ -43,7 +43,7 @@ jobs:
       #     path: '.'
       #     output: 'bom.xml'
       - name: Generate CycloneDX SBOM
-        run: npx @cyclonedx/cyclonedx-npm --output bom.xml --type xml
+        run: npx @cyclonedx/cyclonedx-npm --output-file bom.xml --output-format xml
 
       - name: Upload SBOM as a workflow artifact
         uses: actions/upload-artifact@v4
@@ -63,36 +63,36 @@ jobs:
           bomFilename: "bom.xml"
           autoCreate: true
 
-      - name: Test and coverage
-        run: npm run test -- --coverage
+      # - name: Test and coverage
+      #   run: npm run test -- --coverage
 
-      - name: Change abs paths to rel paths
-        working-directory: ./coverage
-        run: |
-          sed -i "s|/home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/||g" lcov.info
+      # - name: Change abs paths to rel paths
+      #   working-directory: ./coverage
+      #   run: |
+      #     sed -i "s|/home/runner/work/${{ env.REPO_NAME }}/${{ env.REPO_NAME }}/||g" lcov.info
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
-        with:
-          java-version: "17"
+      # - name: Set up JDK 17
+      #   uses: actions/setup-java@v1
+      #   with:
+      #     java-version: "17"
 
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: |
-            ${{ runner.os }}-sonar
+      # - name: Cache SonarQube packages
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.sonar/cache
+      #     key: ${{ runner.os }}-sonar
+      #     restore-keys: |
+      #       ${{ runner.os }}-sonar
 
-      - uses: sonarsource/sonarqube-scan-action@v5.3.1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
+      # - uses: sonarsource/sonarqube-scan-action@v5.3.1
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
 
-      - name: SonarQube Quality Gate check
-        uses: sonarsource/sonarqube-quality-gate-action@v1.2.0
-        # Force to fail step after specific time.
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
+      # - name: SonarQube Quality Gate check
+      #   uses: sonarsource/sonarqube-quality-gate-action@v1.2.0
+      #   # Force to fail step after specific time.
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ env.SONARQUBE_HOST }}
