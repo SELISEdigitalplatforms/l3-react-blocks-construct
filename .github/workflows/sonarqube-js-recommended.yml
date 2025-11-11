@@ -224,12 +224,32 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
 
+      - name: Debug - Find report file location
+        if: always()
+        run: |
+          echo "=== Searching for report-task.txt ==="
+          find . -name "report-task.txt" -type f 2>/dev/null || echo "Not found anywhere"
+
+          echo ""
+          echo "=== Checking expected location ==="
+          ls -la .sonarqube/out/.sonar/ 2>/dev/null || echo "Directory doesn't exist"
+
+          echo ""
+          echo "=== Checking alternative locations ==="
+          ls -la .scannerwork/ 2>/dev/null || echo "No .scannerwork"
+          ls -la .sonar/ 2>/dev/null || echo "No .sonar"
+
+          echo ""
+          echo "=== All hidden directories ==="
+          find . -type d -name ".*" -maxdepth 2 2>/dev/null
+
       - name: Upload SonarQube report
         uses: actions/upload-artifact@v4
         with:
           name: sonar-report
           path: .sonarqube/out/.sonar/report-task.txt
           retention-days: 1
+          if-no-files-found: warn
 
       - name: Analysis summary
         if: always()
