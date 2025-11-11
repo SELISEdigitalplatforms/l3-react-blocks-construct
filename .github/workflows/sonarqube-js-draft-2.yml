@@ -1,0 +1,133 @@
+# .github/workflows/reusable-sonarqube-analysis.yml
+name: Reusable - SonarQube Analysis
+
+on:
+  workflow_call:
+    inputs:
+      # --- General Configuration ---
+      NODE_VERSION:
+        description: "Node.js version to use"
+        required: false
+        type: string
+        default: "18"
+      JAVA_VERSION:
+        description: "Java version for SonarQube scanner"
+        required: false
+        type: string
+        default: "17"
+      PACKAGE_MANAGER:
+        description: "Package manager to use (npm, yarn, pnpm)"
+        required: false
+        type: string
+        default: "npm"
+      INSTALL_COMMAND:
+        description: "Command to install dependencies"
+        required: false
+        type: string
+        default: "ci" # 'npm ci', 'yarn install --frozen-lockfile', 'pnpm i --frozen-lockfile'
+      TEST_COMMAND:
+        description: "Command to run tests and generate coverage"
+        required: false
+        type: string
+        default: "test:coverage" # Convention: projects should have a 'test:coverage' script
+
+      # --- SonarQube Configuration ---
+      SONAR_PROJECT_KEY:
+        description: "A custom SonarQube project key. If not set, it's generated from the repository name."
+        required: false
+        type: string
+      SONAR_SOURCES:
+        description: "Comma-separated list of directories containing source code."
+        required: false
+        type: string
+        default: "src, app, pages" # Covers Angular, Next.js (app/pages router), and common React setups
+      SONAR_TESTS:
+        description: "Comma-separated list of directories containing test files."
+        required: false
+        type: string
+        default: "src, app, pages"
+      SONAR_COVERAGE_EXCLUSIONS:
+        description: "Comma-separated list of file patterns to exclude from code coverage."
+        required: false
+        type: string
+        default: "" # Default to none, let SonarQube handle test files automatically
+
+    secrets:
+      SONAR_TOKEN:
+        required: true
+      SONAR_HOST_URL:
+        required: true
+
+jobs:
+  sonarqube-analysis:
+    name: SonarQube Code Quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # Required for checkout
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Required for SonarQube to analyze PRs and branches accurately
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+          # Cache dependencies based on the package manager and lock file
+          cache: ${{ inputs.PACKAGE_MANAGER }}
+
+      - name: Install Dependencies
+        run: ${{ inputs.PACKAGE_MANAGER }} ${{ inputs.INSTALL_COMMAND }}
+
+      - name: Run Tests with Coverage
+        run: ${{ inputs.PACKAGE_MANAGER }} run ${{ inputs.TEST_COMMAND }}
+
+      - name: Correct coverage paths
+        # This step is crucial if your coverage tool generates absolute paths
+        run: |
+          if [ -f "coverage/lcov.info" ]; then
+            sed -i "s|$(pwd)/||g" coverage/lcov.info
+            echo "✅ Coverage paths corrected."
+          else
+            echo "⚠️ coverage/lcov.info not found. Skipping path correction."
+          fi
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.JAVA_VERSION }}
+          distribution: "temurin"
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          # Generate a project key if not provided. Replaces '/' with '_' for compatibility.
+          projectKey: ${{ inputs.SONAR_PROJECT_KEY || github.repository_owner }}_${{ github.event.repository.name }}
+          args: >
+            -Dsonar.sources=${{ inputs.SONAR_SOURCES }}
+            -Dsonar.tests=${{ inputs.SONAR_TESTS }}
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.coverage.exclusions=${{ inputs.SONAR_COVERAGE_EXCLUSIONS }}
+            -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js,**/*.test.jsx,**/*.spec.jsx,**/*.test.ts,**/*.spec.ts,**/*.test.tsx,**/*.spec.tsx
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
+
+      - name: SonarQube Quality Gate Check
+        # This action waits for the analysis to be processed on the server and then checks the Quality Gate status.
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

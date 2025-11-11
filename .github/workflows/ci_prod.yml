@@ -168,21 +168,6 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
 
   # Build and push image
-  # build:
-  #     uses: ./.github/workflows/build-push.yml
-  #     with:
-  #         SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
-  #         SERVICE_TYPE: ${{ needs.initialization.outputs.service_type }}
-  #         ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
-  #         VERSION: "1.0.0" # Optional: Adds -v1.0.0 suffix to container name
-  #         BUILD_ARGS: |
-  #             CI_BUILD: "prod"
-  #             NODE_VERSION=18
-  #             NPM_VERSION=9
-  #             PYTHON_VERSION=3.11
-  #             BUILD_DATE=${{ github.event.head_commit.timestamp }}
-
-  # Build and push image
   build:
     needs: [initialization, sonarqube]
     if: ${{ github.event_name == 'push' && (success() || needs.sonarqube.result == 'skipped' ) }}
@@ -196,7 +181,7 @@ jobs:
       DOCKERFILE_PATH: ${{ needs.initialization.outputs.dockerfile_path }}
       VERSION: ${{ needs.initialization.outputs.version }} # Optional: Comment out to skip version suffix
       BUILD_ARGS: |
-        CI_BUILD=prod
+        ci_build=prod
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_PROD_CREDENTIALS }}
       AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_PROD_CONTAINER_REGISTRY }}
@@ -220,48 +205,6 @@ jobs:
       IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
       COMMIT_TAG: ${{ needs.build.outputs.commit_tag }}
       SEMANTIC_TAG: ${{ needs.build.outputs.semantic_tag }}
-      TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "commit" (default), "semantic", or "primary"
-      CLUSTER_NAME: ${{ needs.initialization.outputs.cluster_name }}
-      # GITOPS_BRANCH: "main"
-    secrets:
-      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_PROD_CONTAINER_REGISTRY }}
-
-  build-worker:
-    needs: [initialization, sonarqube]
-    if: ${{ github.event_name == 'push' && (success() || needs.sonarqube.result == 'skipped' ) }}
-    uses: ./.github/workflows/build-push.yml
-    with:
-      SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
-      # SERVICE_TYPE: ${{ needs.initialization.outputs.service_type }}
-      SERVICE_TYPE: "worker" # e.g., webclient, webservice, winservice
-      ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
-      TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "both" (default), "semantic", "commit"
-      DOCKERFILE_PATH: ${{ needs.initialization.outputs.win_dockerfile_path }}
-      BUILD_ARGS: |
-        CI_BUILD=prod
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_PROD_CREDENTIALS }}
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_PROD_CONTAINER_REGISTRY }}
-      ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_PROD_RESOURCE_GROUP }}
-      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-
-  # Update GitOps repository
-  update-gitops-worker:
-    needs: [initialization, build-worker]
-    if: |
-      github.event_name == 'push' && 
-      always() &&
-      needs.initialization.result == 'success' &&
-      needs.build-worker.result == 'success'
-    uses: ./.github/workflows/update-gitops.yml
-    with:
-      SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
-      SERVICE_TYPE: "worker" # Match the service type from build job
-      ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
-      IMAGE_TAG: ${{ needs.build-worker.outputs.image_tag }}
-      COMMIT_TAG: ${{ needs.build-worker.outputs.commit_tag }}
-      SEMANTIC_TAG: ${{ needs.build-worker.outputs.semantic_tag }}
       TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "commit" (default), "semantic", or "primary"
       CLUSTER_NAME: ${{ needs.initialization.outputs.cluster_name }}
       # GITOPS_BRANCH: "main"
