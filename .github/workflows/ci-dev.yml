@@ -171,7 +171,7 @@ jobs:
       # Optional - Package Manager
       PACKAGE_MANAGER: ${{ needs.initialization.outputs.package_manager }}
       INSTALL_COMMAND: "ci"
-      TEST_COMMAND: "test -- --coverage --watchAll=false"
+      TEST_COMMAND: "test -- --coverage"
 
       # Optional - SonarQube Configuration
       SONAR_PROJECT_KEY: ${{ needs.initialization.outputs.sonar_project_key }}

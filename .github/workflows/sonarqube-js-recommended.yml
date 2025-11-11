@@ -49,7 +49,7 @@ on:
         description: "Command to run tests and generate coverage"
         required: false
         type: string
-        default: "test -- --coverage --watchAll=false"
+        default: "test -- --coverage"
 
       # ========================================
       # SonarQube Configuration
