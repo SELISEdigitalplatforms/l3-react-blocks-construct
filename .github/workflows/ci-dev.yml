@@ -158,7 +158,7 @@ jobs:
   sonarqube:
     if: needs.initialization.outputs.run_sonarqube == 'true'
     needs: [initialization]
-    uses: ./.github/workflows/sonarqube-js-recommended.yml
+    uses: ./.github/workflows/sonarqube-js.yml
     with:
       # Required
       SONARQUBE_HOST: ${{ needs.initialization.outputs.sonarqube_host }}
