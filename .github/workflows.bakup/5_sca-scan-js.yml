@@ -6,7 +6,7 @@ on:
       NODE_VERSION:
         required: false
         type: string
-        default: "22.20.0"
+        default: "21"
     secrets:
       SELISE_GITHUB_PAT:
         required: true
@@ -14,8 +14,8 @@ on:
         required: true
 
 jobs:
-  build:
-    name: SonarQube Analysis
+  sca-scan:
+    name: SCA Scan JS and Upload SBOM
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,11 +26,6 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           token: ${{ secrets.SELISE_GITHUB_PAT }}
-
-      # - name: Set Environment Variables
-      #   uses: ./.github/actions/setvars
-      #   with:
-      #     varFilePath: ./.github/variables/vars.env
 
       - name: Setup Node version v22.20.0
         uses: actions/setup-node@v3
