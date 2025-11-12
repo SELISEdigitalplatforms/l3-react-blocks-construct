@@ -1,13 +1,69 @@
 name: 'Set environment variables'
-description: 'Configures environment variables for a workflow'
+description: 'Configures environment variables for a workflow from a file or directory'
+author: 'Platform Team'
+
 inputs:
   varFilePath:
     description: 'File path to variable file or directory. Defaults to ./.github/variables/* if none specified and runs against each file in that directory.'
     required: false
-    default: ./.github/variables/*
+    default: './.github/variables/*'
+
 runs:
   using: "composite"
   steps:
-    - run: |
-        sed "" ${{ inputs.varFilePath }} >> $GITHUB_ENV
+    - name: Set environment variables from file(s)
       shell: bash
+      run: |
+        # Check if the path exists
+        if [ ! -e "${{ inputs.varFilePath }}" ]; then
+          # Check for wildcard patterns
+          if [[ "${{ inputs.varFilePath }}" == *"*"* ]]; then
+            # Expand wildcard
+            files=$(ls ${{ inputs.varFilePath }} 2>/dev/null || echo "")
+            if [ -z "$files" ]; then
+              echo "⚠️ No files found matching pattern: ${{ inputs.varFilePath }}"
+              echo "Continuing without setting environment variables..."
+              exit 0
+            fi
+            
+            # Process each file
+            for file in $files; do
+              if [ -f "$file" ]; then
+                echo "📄 Loading environment variables from: $file"
+                # Use sed to ensure proper newlines
+                sed -e '$a\' "$file" >> $GITHUB_ENV
+                echo "✅ Loaded variables from $file"
+              fi
+            done
+          else
+            echo "⚠️ Variable file not found: ${{ inputs.varFilePath }}"
+            echo "Continuing without setting environment variables..."
+            exit 0
+          fi
+        elif [ -f "${{ inputs.varFilePath }}" ]; then
+          # Single file
+          echo "📄 Loading environment variables from: ${{ inputs.varFilePath }}"
+          sed -e '$a\' "${{ inputs.varFilePath }}" >> $GITHUB_ENV
+          echo "✅ Loaded variables from ${{ inputs.varFilePath }}"
+        elif [ -d "${{ inputs.varFilePath }}" ]; then
+          # Directory - load all files
+          echo "📁 Loading environment variables from directory: ${{ inputs.varFilePath }}"
+          for file in "${{ inputs.varFilePath }}"/*; do
+            if [ -f "$file" ]; then
+              echo "📄 Loading: $file"
+              # Use sed to ensure proper newlines
+              sed -e '$a\' "$file" >> $GITHUB_ENV
+              echo "✅ Loaded variables from $file"
+            fi
+          done
+        else
+          echo "⚠️ Invalid path: ${{ inputs.varFilePath }}"
+          echo "Continuing without setting environment variables..."
+          exit 0
+        fi
+        
+        echo "✅ Environment variables configured successfully"
+
+branding:
+  icon: 'settings'
+  color: 'blue'
