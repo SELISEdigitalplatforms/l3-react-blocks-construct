@@ -1,0 +1,213 @@
+name: CI/CD - Dev Environment
+
+on:
+  push:
+    branches:
+      - stg
+  pull_request:
+    branches:
+      - stg
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+env:
+  # ========================================
+  # Environment-Specific Configuration
+  # (Different for each environment)
+  # ========================================
+  ENVIRONMENT: "stg" # dev, stg, uat, prod
+  CLUSTER_NAME: "aks-blocks-stg" # TODO: Set your dev cluster name
+
+  # ========================================
+  # Quality Checks
+  # ========================================
+  RUN_TESTS: "false" # Usually disabled in dev for speed
+  RUN_SONARQUBE: "false" # Enable for testing the new dotnet-coverage integration
+
+  # ========================================
+  # Tag Stategy for Build and GitOps
+  # ========================================
+  TAG_STRATEGY: "commit" # Options: "both" (default), "semantic", "commit"
+
+  # ========================================
+  # Shared Configuration Loading
+  # ========================================
+  LOAD_CUSTOM_VARS:
+    "true" # Load shared config from .github/variables/vars.env
+    # Set to 'false' only if you don't have vars.env
+
+concurrency:
+  group: ${{ github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  # Initialize configuration
+  initialization:
+    runs-on: ubuntu-latest
+    outputs:
+      cluster_name: ${{ steps.config.outputs.cluster_name }}
+      environment: ${{ steps.config.outputs.environment }}
+      load_custom_vars: ${{ steps.config.outputs.load_custom_vars }}
+      run_tests: ${{ steps.config.outputs.run_tests }}
+      run_sonarqube: ${{ steps.config.outputs.run_sonarqube }}
+      service_name: ${{ steps.config.outputs.service_name }} # e.g., your service name
+      service_type: ${{ steps.config.outputs.service_type }} # e.g., webclient, webservice, winservice
+      sonarqube_host: ${{ steps.config.outputs.sonarqube_host }} # e.g., https://code.selise.biz
+      sonar_project_key: ${{ steps.config.outputs.sonar_project_key }} # e.g., your SonarQube project key
+      sonar_organization: ${{ steps.config.outputs.sonar_organization }} # e.g., your SonarQube org
+      solution_name: ${{ steps.config.outputs.solution_name }} # e.g., YourSolution.sln for .NET
+      tag_strategy: ${{ steps.config.outputs.tag_strategy }} # e.g., commit, semantic
+      working_directory: ${{ steps.config.outputs.working_directory }} # e.g., ./src. Used for SonarQube
+      version: ${{ steps.config.outputs.version }} # Version suffix based on environment
+      dockerfile_path: ${{ steps.config.outputs.dockerfile_path }} # Path to Dockerfile
+      win_dockerfile_path: ${{ steps.config.outputs.win_dockerfile_path }} # Path to Window/Console service Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      # Load shared variables first (if enabled)
+      - name: Load Shared Configuration
+        if: env.LOAD_CUSTOM_VARS == 'true'
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/
+
+      - name: Set Configuration Outputs
+        id: config
+        run: |
+          # From workflow env (environment-specific)
+          echo "run_tests=${{ env.RUN_TESTS }}" >> $GITHUB_OUTPUT
+          echo "run_sonarqube=${{ env.RUN_SONARQUBE }}" >> $GITHUB_OUTPUT
+          echo "environment=${{ env.ENVIRONMENT }}" >> $GITHUB_OUTPUT
+          echo "cluster_name=${{ env.CLUSTER_NAME }}" >> $GITHUB_OUTPUT
+          echo "load_custom_vars=${{ env.LOAD_CUSTOM_VARS }}" >> $GITHUB_OUTPUT
+          echo "tag_strategy=${{ env.TAG_STRATEGY }}" >> $GITHUB_OUTPUT
+
+          # From vars.env (if loaded) or fallback to defaults
+          echo "dockerfile_path=${DOCKERFILE:-./Dockerfile}" >> $GITHUB_OUTPUT
+          echo "win_dockerfile_path=${WIN_DOCKERFILE:-./win.Dockerfile}" >> $GITHUB_OUTPUT
+
+          # From vars.env (if loaded) or fallback to defaults
+          echo "service_name=${SERVICE_NAME:-github.event.repository.name}" >> $GITHUB_OUTPUT
+          echo "service_type=${SERVICE_TYPE:-}" >> $GITHUB_OUTPUT
+          echo "sonarqube_host=${SONARQUBE_HOST:-}" >> $GITHUB_OUTPUT
+
+          # SonarQube specific configurations (map from vars.env names)
+          echo "sonar_project_key=${SONAR_KEY:-}" >> $GITHUB_OUTPUT
+          echo "sonar_organization=${AUTHOR:-}" >> $GITHUB_OUTPUT
+          echo "solution_name=${SOLUTION_NAME:-YourSolution.sln}" >> $GITHUB_OUTPUT
+          echo "working_directory=${WORKING_DIRECTORY:-./src}" >> $GITHUB_OUTPUT
+
+          # Version based on environment (from versions.env)
+          ENVIRONMENT="${{ env.ENVIRONMENT }}"
+          case "$ENVIRONMENT" in
+            "dev")
+              VERSION="${DEV_VERSION:-}"
+              ;;
+            "stg")
+              VERSION="${STAGE_VERSION:-}"
+              ;;
+            "prod")
+              VERSION="${PROD_VERSION:-}"
+              ;;
+            "uat")
+              VERSION="${UAT_VERSION:-}"
+              ;;
+            *)
+              VERSION=""
+              ;;
+          esac
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+          echo "### 🔧 Pipeline Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service**: ${SERVICE_NAME:-'Not set'}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version Suffix**: ${VERSION:-'None'}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type**: ${SERVICE_TYPE:-'Not set'}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Tag Strategy**: ${{ env.TAG_STRATEGY }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cluster**: ${{ env.CLUSTER_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tests Enabled**: ${{ env.RUN_TESTS }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SonarQube Enabled**: ${{ env.RUN_SONARQUBE }}" >> $GITHUB_STEP_SUMMARY
+
+  # # Run tests and checks on PRs only (optional)
+  # pr-checks:
+  #     if: github.event_name == 'pull_request' && needs.initialization.outputs.run_tests == 'true'
+  #     needs: [initialization]
+  #     uses: SELISEdigitalplatforms/l0-yml-devops-workflow/.github/workflows/test.yml@main
+  #     with:
+  #         SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
+  #         LOAD_CUSTOM_VARS: ${{ needs.initialization.outputs.load_custom_vars == 'true' }}
+  #     secrets:
+  #         SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+
+  # Run SonarQube analysis on both push and pull_request
+  sonarqube:
+    # if: github.event_name == 'pull_request' && needs.initialization.outputs.run_sonarqube == 'true'
+    if: needs.initialization.outputs.run_sonarqube == 'true'
+    needs: [initialization]
+    uses: ./.github/workflows/sonarqube-js.yml
+    with:
+      SOLUTION_NAME: ${{ needs.initialization.outputs.solution_name }}
+      SONARQUBE_HOST: ${{ needs.initialization.outputs.sonarqube_host }}
+      SONAR_PROJECT_KEY: ${{ needs.initialization.outputs.sonar_project_key }}
+      SONAR_ORGANIZATION: ${{ needs.initialization.outputs.sonar_organization }}
+      WORKING_DIRECTORY: ${{ needs.initialization.outputs.working_directory }}
+
+      # Optional: Specify tool versions (defaults shown)
+      DOTNET_VERSION: "9.0.x" # .NET SDK version
+      # DOTNET_COVERAGE_VERSION: "17.13.1" # Use 17.13.1 for .NET 6 or older
+      DOTNET_SONARSCANNER_VERSION: "5.15.0" # SonarScanner version
+      JAVA_VERSION: "17" # Java for SonarScanner
+      # Optional: Skip quality gate check (default: false)
+      SKIP_QUALITY_GATE: true
+
+      # Optional: Custom NuGet sources (defaults to NuGet.org + nuget.selise.biz)
+      # Only specify if you need additional sources (comma-separated)
+      # NUGET_SOURCES: "https://api.nuget.org/v3/index.json,https://nuget.selise.biz/nuget,https://custom-feed.com"
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
+
+  # Build and push image
+  build:
+    needs: [initialization, sonarqube]
+    if: ${{ github.event_name == 'push' && (success() || needs.sonarqube.result == 'skipped' ) }}
+    uses: ./.github/workflows/build-push.yml
+    with:
+      SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
+      # SERVICE_TYPE: ${{ needs.initialization.outputs.service_type }}
+      SERVICE_TYPE: "webservice" # e.g., webclient, webservice, winservice
+      ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
+      TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "both" (default), "semantic", "commit"
+      DOCKERFILE_PATH: ${{ needs.initialization.outputs.dockerfile_path }}
+      VERSION: ${{ needs.initialization.outputs.version }} # Optional: Comment out to skip version suffix
+      BUILD_ARGS: |
+        ci_build=stg
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
+      ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+
+  # Update GitOps repository
+  update-gitops:
+    needs: [initialization, build]
+    if: |
+      github.event_name == 'push' && 
+      always() &&
+      needs.initialization.result == 'success' &&
+      needs.build.result == 'success'
+    uses: ./.github/workflows/update-gitops.yml
+    with:
+      SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
+      SERVICE_TYPE: "webservice" # Match the service type from build job
+      ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
+      VERSION: ${{ needs.initialization.outputs.version }} # Pass version for proper file naming
+      IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+      COMMIT_TAG: ${{ needs.build.outputs.commit_tag }}
+      SEMANTIC_TAG: ${{ needs.build.outputs.semantic_tag }}
+      TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "commit" (default), "semantic", or "primary"
+      CLUSTER_NAME: ${{ needs.initialization.outputs.cluster_name }}
+      # GITOPS_BRANCH: "main"
+    secrets:
+      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}

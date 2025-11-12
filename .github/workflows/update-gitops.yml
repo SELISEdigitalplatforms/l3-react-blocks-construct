@@ -1,0 +1,339 @@
+name: Reusable - Update GitOps Repository
+
+on:
+  workflow_call:
+    inputs:
+      SERVICE_NAME:
+        required: true
+        type: string
+      SERVICE_TYPE:
+        required: true
+        type: string
+      ENVIRONMENT:
+        required: true
+        type: string
+      VERSION:
+        required: false
+        type: string
+        default: ""
+        description: "Optional version suffix (must match build-push VERSION)"
+      IMAGE_TAG:
+        required: true
+        type: string
+        description: "Primary image tag (from build output)"
+      COMMIT_TAG:
+        required: false
+        type: string
+        default: ""
+        description: "Commit SHA tag (for tag strategy selection)"
+      SEMANTIC_TAG:
+        required: false
+        type: string
+        default: ""
+        description: "Semantic tag (for tag strategy selection)"
+      TAG_STRATEGY:
+        required: false
+        type: string
+        default: "commit"
+        description: 'Which tag to use in GitOps: "commit" (default), "semantic", or "primary"'
+      CLUSTER_NAME:
+        required: true
+        type: string
+        description: "Target cluster name (e.g., dev-cluster, prod-cluster)"
+      GITOPS_REPO:
+        required: false
+        type: string
+        default: "SELISEdigitalplatforms/l0-yml-argo-helm"
+        description: "GitOps repository"
+      GITOPS_BRANCH:
+        required: false
+        type: string
+        default: "main"
+        description: "GitOps repository branch"
+
+    secrets:
+      SELISE_GITHUB_PAT:
+        required: true
+      AZURE_CONTAINER_REGISTRY:
+        required: true
+
+jobs:
+  update-gitops:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.GITOPS_REPO }}
+          token: ${{ secrets.SELISE_GITHUB_PAT }}
+          ref: ${{ inputs.GITOPS_BRANCH }}
+
+      - name: Setup Git Config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "github-actions-bot@selisegroup.com"
+
+      - name: Determine Tag and File Path
+        id: determine-config
+        run: |
+          # Determine which tag to use based on TAG_STRATEGY
+          TAG_STRATEGY="${{ inputs.TAG_STRATEGY }}"
+
+          case "$TAG_STRATEGY" in
+            "semantic")
+              if [ -n "${{ inputs.SEMANTIC_TAG }}" ]; then
+                FINAL_TAG="${{ inputs.SEMANTIC_TAG }}"
+              else
+                echo "âš ï¸ Semantic tag requested but not provided, falling back to primary tag"
+                FINAL_TAG="${{ inputs.IMAGE_TAG }}"
+              fi
+              ;;
+            "commit")
+              if [ -n "${{ inputs.COMMIT_TAG }}" ]; then
+                FINAL_TAG="${{ inputs.COMMIT_TAG }}"
+              else
+                echo "âš ï¸ Commit tag requested but not provided, falling back to primary tag"
+                FINAL_TAG="${{ inputs.IMAGE_TAG }}"
+              fi
+              ;;
+            "primary"|*)
+              FINAL_TAG="${{ inputs.IMAGE_TAG }}"
+              ;;
+          esac
+
+          echo "final_tag=${FINAL_TAG}" >> $GITHUB_OUTPUT
+
+          # Build base name with service type logic (matches build-push.yml)
+          SERVICE_TYPE="${{ inputs.SERVICE_TYPE }}"
+          ENVIRONMENT="${{ inputs.ENVIRONMENT }}"
+          SERVICE_NAME="${{ inputs.SERVICE_NAME }}"
+          VERSION="${{ inputs.VERSION }}"
+
+          # Apply service type naming convention
+          case "$SERVICE_TYPE" in
+            "webservice")
+              BASE_NAME="${ENVIRONMENT}-${SERVICE_NAME}"
+              ;;
+            "webclient")
+              BASE_NAME="${ENVIRONMENT}-${SERVICE_NAME}-webclient"
+              ;;
+            "winservice")
+              BASE_NAME="${ENVIRONMENT}-${SERVICE_NAME}-win"
+              ;;
+            *)
+              # For any other service type, keep the full naming
+              BASE_NAME="${ENVIRONMENT}-${SERVICE_NAME}-${SERVICE_TYPE}"
+              ;;
+          esac
+
+          # Add version suffix if provided
+          if [ -n "$VERSION" ]; then
+            CONTAINER_NAME="${BASE_NAME}-v${VERSION}"
+          else
+            CONTAINER_NAME="${BASE_NAME}"
+          fi
+
+          echo "container_name=${CONTAINER_NAME}" >> $GITHUB_OUTPUT
+
+          # Determine values file name based on SERVICE_TYPE
+          SERVICE_TYPE="${{ inputs.SERVICE_TYPE }}"
+          SERVICE_NAME="${{ inputs.SERVICE_NAME }}"
+
+          if [ -n "$VERSION" ]; then
+            VERSION_SUFFIX="-v${VERSION}"
+          else
+            VERSION_SUFFIX=""
+          fi
+
+          case "$SERVICE_TYPE" in
+            "webclient")
+              VALUES_FILENAME="${SERVICE_NAME}${VERSION_SUFFIX}-webclient.values.yaml"
+              ;;
+            "winservice")
+              VALUES_FILENAME="${SERVICE_NAME}${VERSION_SUFFIX}-win.values.yaml"
+              ;;
+            "webservice")
+              VALUES_FILENAME="${SERVICE_NAME}${VERSION_SUFFIX}.values.yaml"
+              ;;
+            *)
+              # Default fallback
+              VALUES_FILENAME="${SERVICE_NAME}${VERSION_SUFFIX}-${SERVICE_TYPE}.values.yaml"
+              ;;
+          esac
+
+          VALUES_FILE="${{ inputs.CLUSTER_NAME }}/${VALUES_FILENAME}"
+          echo "values_file=${VALUES_FILE}" >> $GITHUB_OUTPUT
+
+          # Summary
+          echo "### 🔧 GitOps Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag Strategy:** \`${TAG_STRATEGY}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Final Tag:** \`${FINAL_TAG}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Container:** \`${CONTAINER_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Values File:** \`${VALUES_FILE}\`" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$VERSION" ]; then
+            echo "- **Version:** \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Update Helm Values
+        id: update-values
+        run: |
+          VALUES_FILE="${{ steps.determine-config.outputs.values_file }}"
+
+          if [ ! -f "$VALUES_FILE" ]; then
+            echo "âŒ Values file not found: $VALUES_FILE"
+            exit 1
+          fi
+
+          # Backup original file
+          cp "$VALUES_FILE" "${VALUES_FILE}.backup"
+
+          # Update image repository and tag using yq (proper YAML handling)
+          REGISTRY="${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io"
+          CONTAINER_NAME="${{ steps.determine-config.outputs.container_name }}"
+          IMAGE_TAG="${{ steps.determine-config.outputs.final_tag }}"
+
+          # Use yq to update YAML fields (preserves formatting and indentation)
+          yq eval ".image.repository = \"${REGISTRY}/${CONTAINER_NAME}\"" -i "$VALUES_FILE"
+          yq eval ".image.tag = \"${IMAGE_TAG}\"" -i "$VALUES_FILE"
+
+          # Check if file was modified
+          if diff "$VALUES_FILE" "${VALUES_FILE}.backup" > /dev/null; then
+            echo "No changes detected in values file"
+            echo "modified=false" >> $GITHUB_OUTPUT
+          else
+            echo "Values file updated successfully"
+            echo "modified=true" >> $GITHUB_OUTPUT
+            
+            # Show diff
+            echo "### 📝 Changes Made" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            diff "${VALUES_FILE}.backup" "$VALUES_FILE" >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+          rm "${VALUES_FILE}.backup"
+
+      - name: Commit and Push Changes
+        if: steps.update-values.outputs.modified == 'true'
+        run: |
+          VALUES_FILE="${{ steps.determine-config.outputs.values_file }}"
+          git add "$VALUES_FILE"
+
+          # Create detailed commit message
+          cat << EOF > commit_msg.txt
+          🚀 Update ${{ inputs.SERVICE_NAME }}-${{ inputs.SERVICE_TYPE }} image for ${{ inputs.ENVIRONMENT }}
+
+          - Service: ${{ inputs.SERVICE_NAME }}
+          - Type: ${{ inputs.SERVICE_TYPE }}
+          - Environment: ${{ inputs.ENVIRONMENT }}
+          - Cluster: ${{ inputs.CLUSTER_NAME }}
+          - Image Tag: ${{ steps.determine-config.outputs.final_tag }}
+          - Container: ${{ steps.determine-config.outputs.container_name }}
+          - Triggered by: ${{ github.repository }}@${{ github.sha }}
+          - Workflow: ${{ github.workflow }}
+          EOF
+
+          git commit -F commit_msg.txt
+
+          # Retry logic to handle concurrent GitOps updates
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          BASE_DELAY=3
+
+          echo "### 🔄 Push Strategy" >> $GITHUB_STEP_SUMMARY
+          echo "Attempting to push with automatic retry on conflicts..." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            ATTEMPT=$((RETRY_COUNT + 1))
+            echo "📤 Attempt $ATTEMPT of $MAX_RETRIES: Pushing changes..."
+            
+            if git push origin ${{ inputs.GITOPS_BRANCH }}; then
+              echo "✅ Successfully pushed changes on attempt $ATTEMPT" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              SUCCESS=true
+              break
+            else
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⚠️ Push failed (likely due to concurrent update)"
+                echo "⚠️ Attempt $ATTEMPT failed - concurrent update detected" >> $GITHUB_STEP_SUMMARY
+                
+                # Pull latest changes and rebase our commit
+                echo "🔄 Pulling latest changes and rebasing..."
+                if git pull --rebase origin ${{ inputs.GITOPS_BRANCH }}; then
+                  echo "✅ Rebase successful, will retry push"
+                else
+                  # Check if our specific file has conflicts
+                  if git diff --name-only --diff-filter=U | grep -q "$VALUES_FILE"; then
+                    echo "❌ CONFLICT: Our values file has conflicts!" | tee -a $GITHUB_STEP_SUMMARY
+                    echo "" >> $GITHUB_STEP_SUMMARY
+                    echo "**Conflicting files:**" >> $GITHUB_STEP_SUMMARY
+                    git diff --name-only --diff-filter=U >> $GITHUB_STEP_SUMMARY
+                    echo "" >> $GITHUB_STEP_SUMMARY
+                    echo "This should not happen - each service should update its own file." >> $GITHUB_STEP_SUMMARY
+                    exit 1
+                  else
+                    # Conflicts in other files, continue rebase
+                    echo "Conflicts in other services' files (expected), continuing..."
+                    git add -A
+                    git rebase --continue || echo "Rebase completed with resolution"
+                  fi
+                fi
+                
+                # Exponential backoff with jitter
+                WAIT_TIME=$((BASE_DELAY * RETRY_COUNT + RANDOM % 3))
+                echo "⏳ Waiting ${WAIT_TIME} seconds before retry $((RETRY_COUNT + 1))..."
+                sleep $WAIT_TIME
+              else
+                echo "❌ Failed to push after $MAX_RETRIES attempts" | tee -a $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "**Possible causes:**" >> $GITHUB_STEP_SUMMARY
+                echo "- High concurrent deployment activity" >> $GITHUB_STEP_SUMMARY
+                echo "- Network issues" >> $GITHUB_STEP_SUMMARY
+                echo "- GitOps repository protected branch rules" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "💡 **Recommendation:** Add concurrency groups to your workflow" >> $GITHUB_STEP_SUMMARY
+                exit 1
+              fi
+            fi
+          done
+
+          echo "### ✅ GitOps Update Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **File Updated:** \`${{ steps.determine-config.outputs.values_file }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **New Image Tag:** \`${{ steps.determine-config.outputs.final_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Container:** \`${{ steps.determine-config.outputs.container_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Push Attempts:** $ATTEMPT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**ArgoCD will sync this change automatically**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create Deployment Tracking Issue (Optional)
+        if: steps.update-values.outputs.modified == 'true' && inputs.ENVIRONMENT == 'prod'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.SELISE_GITHUB_PAT }}
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Deployment] ${{ inputs.SERVICE_NAME }} to ${{ inputs.ENVIRONMENT }}`,
+              body: `## Deployment Information
+              
+              - **Service:** ${{ inputs.SERVICE_NAME }}
+              - **Environment:** ${{ inputs.ENVIRONMENT }}
+              - **Image Tag:** ${{ steps.determine-config.outputs.final_tag }}
+              - **Container:** ${{ steps.determine-config.outputs.container_name }}
+              - **Commit:** ${{ github.sha }}
+              - **Triggered by:** @${{ github.actor }}
+              
+              ArgoCD will automatically sync this deployment.
+              
+              [View GitOps Commit](https://github.com/${{ inputs.GITOPS_REPO }}/commits/${{ inputs.GITOPS_BRANCH }})`,
+              labels: ['deployment', '${{ inputs.ENVIRONMENT }}']
+            });
+            console.log(`Created issue #${issue.data.number}`);

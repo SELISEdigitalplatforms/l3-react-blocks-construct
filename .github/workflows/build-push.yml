@@ -1,0 +1,252 @@
+name: Reusable - Build and Push Image
+
+on:
+  workflow_call:
+    inputs:
+      SERVICE_NAME:
+        required: true
+        type: string
+        description: "Name of the service"
+      SERVICE_TYPE:
+        required: true
+        type: string
+        description: "Type of service: webclient, webservice, winservice"
+      ENVIRONMENT:
+        required: true
+        type: string
+        description: "Target environment: dev, staging, prod"
+      VERSION:
+        required: false
+        type: string
+        default: ""
+        description: "Optional version suffix (e.g., '1.0.0' will create container-v1.0.0)"
+      DOCKERFILE_PATH:
+        required: true
+        type: string
+        default: "./Dockerfile"
+        description: "Path to Dockerfile"
+      BUILD_ARGS:
+        required: false
+        type: string
+        default: ""
+        description: 'Additional build arguments (format: "KEY1=value1 KEY2=value2" or multiline)'
+      TAG_STRATEGY:
+        required: false
+        type: string
+        default: "both"
+        description: 'Tagging strategy: "both" (semantic + commit), "semantic", or "commit"'
+
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+      AZURE_CONTAINER_REGISTRY:
+        required: true
+      ACR_RESOURCE_GROUP:
+        required: true
+      SELISE_GITHUB_PAT:
+        required: true
+
+    outputs:
+      image_tag:
+        description: "Built image tag (primary)"
+        value: ${{ jobs.build-and-push.outputs.image_tag }}
+      container_name:
+        description: "Container name (without registry)"
+        value: ${{ jobs.build-and-push.outputs.container_name }}
+      commit_tag:
+        description: "Commit SHA tag"
+        value: ${{ jobs.build-and-push.outputs.commit_tag }}
+      semantic_tag:
+        description: "Semantic tag"
+        value: ${{ jobs.build-and-push.outputs.semantic_tag }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    outputs:
+      image_tag: ${{ steps.generate-tag.outputs.tag }}
+      container_name: ${{ steps.generate-tag.outputs.container_name }}
+      commit_tag: ${{ steps.generate-tag.outputs.commit_tag }}
+      semantic_tag: ${{ steps.generate-tag.outputs.semantic_tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          token: ${{ secrets.SELISE_GITHUB_PAT }}
+
+      - name: Update submodules
+        run: |
+          git submodule update --init --recursive
+
+      - name: Generate Image Tags
+        id: generate-tag
+        run: |
+          # Generate tags based on strategy
+          FULL_SHA="${{ github.sha }}"
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+          # Determine service type suffix for container naming
+          SERVICE_TYPE="${{ inputs.SERVICE_TYPE }}"
+          case "$SERVICE_TYPE" in
+            "webservice")
+              TYPE_SUFFIX=""
+              ;;
+            "winservice")
+              TYPE_SUFFIX="-win"
+              ;;
+            "webclient")
+              TYPE_SUFFIX="-webclient"
+              ;;
+            *)
+              # For any other service type, include full type name
+              TYPE_SUFFIX="-${SERVICE_TYPE}"
+              ;;
+          esac
+
+          # Build container name with optional version
+          BASE_NAME="${{ inputs.ENVIRONMENT }}-${{ inputs.SERVICE_NAME }}${TYPE_SUFFIX}"
+          VERSION="${{ inputs.VERSION }}"
+
+          if [ -n "$VERSION" ]; then
+            CONTAINER_NAME="${BASE_NAME}-v${VERSION}"
+          else
+            CONTAINER_NAME="${BASE_NAME}"
+          fi
+
+          # Semantic tag: {env}-{timestamp}-{sha}
+          SEMANTIC_TAG="${{ inputs.ENVIRONMENT }}-${TIMESTAMP}-${SHORT_SHA}"
+
+          # Commit tag: full SHA
+          COMMIT_TAG="${FULL_SHA}"
+
+          # Determine primary tag based on strategy
+          TAG_STRATEGY="${{ inputs.TAG_STRATEGY }}"
+
+          case "$TAG_STRATEGY" in
+            "semantic")
+              PRIMARY_TAG="$SEMANTIC_TAG"
+              USE_SEMANTIC_TAG="false"
+              ;;
+            "commit")
+              PRIMARY_TAG="$COMMIT_TAG"
+              USE_SEMANTIC_TAG="false"
+              ;;
+            "both"|*)
+              PRIMARY_TAG="$COMMIT_TAG"
+              USE_SEMANTIC_TAG="true"
+              ;;
+          esac
+
+          REGISTRY="${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io"
+          FULL_PATH="${REGISTRY}/${CONTAINER_NAME}:${PRIMARY_TAG}"
+          SEMANTIC_FULL_PATH="${REGISTRY}/${CONTAINER_NAME}:${SEMANTIC_TAG}"
+
+          # Set outputs
+          echo "tag=${PRIMARY_TAG}" >> $GITHUB_OUTPUT
+          echo "semantic_tag=${SEMANTIC_TAG}" >> $GITHUB_OUTPUT
+          echo "commit_tag=${COMMIT_TAG}" >> $GITHUB_OUTPUT
+          echo "container_name=${CONTAINER_NAME}" >> $GITHUB_OUTPUT
+          echo "full_path=${FULL_PATH}" >> $GITHUB_OUTPUT
+          echo "semantic_full_path=${SEMANTIC_FULL_PATH}" >> $GITHUB_OUTPUT
+          echo "use_semantic_tag=${USE_SEMANTIC_TAG}" >> $GITHUB_OUTPUT
+
+          # Summary
+          echo "### 🏗️ Image Build Info" >> $GITHUB_STEP_SUMMARY
+          echo "- **Strategy:** \`${TAG_STRATEGY}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Container:** \`${CONTAINER_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$VERSION" ]; then
+            echo "- **Version:** \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags Created in This Pipeline:**" >> $GITHUB_STEP_SUMMARY
+          echo "- **Strategy:** \`${TAG_STRATEGY}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Container:** \`${CONTAINER_NAME}\`" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$VERSION" ]; then
+            echo "- **Version:** \`${VERSION}\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tags Created in This Pipeline:**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Prepare Build Arguments
+        id: build-args
+        run: |
+          # Process BUILD_ARGS input
+          BUILD_ARGS_INPUT="${{ inputs.BUILD_ARGS }}"
+
+          if [ -z "$BUILD_ARGS_INPUT" ]; then
+            echo "formatted_args=" >> $GITHUB_OUTPUT
+            echo "No additional build arguments"
+          else
+            # Convert space-separated key=value pairs to --build-arg format
+            # Supports: "KEY1=value1 KEY2=value2" or multiline format
+            FORMATTED_ARGS=""
+            
+            # Replace newlines with spaces
+            BUILD_ARGS_INPUT=$(echo "$BUILD_ARGS_INPUT" | tr '\n' ' ')
+            
+            # Process each KEY=value pair
+            for arg in $BUILD_ARGS_INPUT; do
+              if [[ $arg == *"="* ]]; then
+                FORMATTED_ARGS="$FORMATTED_ARGS --build-arg $arg"
+              fi
+            done
+            
+            echo "formatted_args=$FORMATTED_ARGS" >> $GITHUB_OUTPUT
+            echo "Build arguments: $FORMATTED_ARGS"
+          fi
+
+      - name: Build and Push to ACR
+        run: |
+          az acr build \
+            --image ${{ steps.generate-tag.outputs.full_path }} \
+            --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} \
+            -g ${{ secrets.ACR_RESOURCE_GROUP }} \
+            --file ${{ inputs.DOCKERFILE_PATH }} \
+            ${{ steps.build-args.outputs.formatted_args }} \
+            .
+
+      - name: Add Semantic Tag
+        if: steps.generate-tag.outputs.use_semantic_tag == 'true'
+        run: |
+          # Import the image with an additional tag (this creates an alias, no extra storage)
+          az acr import \
+            --name ${{ secrets.AZURE_CONTAINER_REGISTRY }} \
+            --source ${{ steps.generate-tag.outputs.full_path }} \
+            --image ${{ steps.generate-tag.outputs.semantic_full_path }} \
+            --resource-group ${{ secrets.ACR_RESOURCE_GROUP }}
+
+          echo "✅ Added semantic tag: ${{ steps.generate-tag.outputs.semantic_tag }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify Image
+        run: |
+          # Verify primary tag exists
+          az acr repository show \
+            --name ${{ secrets.AZURE_CONTAINER_REGISTRY }} \
+            --image ${{ steps.generate-tag.outputs.container_name }}:${{ steps.generate-tag.outputs.tag }}
+
+          echo "✅ Image successfully pushed and verified" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Show tags created in this pipeline
+          REGISTRY="${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io"
+          CONTAINER="${{ steps.generate-tag.outputs.container_name }}"
+
+          # Primary tag (commit SHA)
+          echo "1. **Commit SHA (Primary):** \`${REGISTRY}/${CONTAINER}:${{ steps.generate-tag.outputs.commit_tag }}\`" >> $GITHUB_STEP_SUMMARY
+
+          # Semantic tag (if strategy is "both")
+          if [ "${{ steps.generate-tag.outputs.use_semantic_tag }}" = "true" ]; then
+            echo "2. **Semantic Tag:** \`${REGISTRY}/${CONTAINER}:${{ steps.generate-tag.outputs.semantic_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          fi
