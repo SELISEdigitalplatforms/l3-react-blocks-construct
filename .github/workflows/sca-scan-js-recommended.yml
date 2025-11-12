@@ -11,13 +11,13 @@ on:
         required: false
         type: string
         default: ""
-      
+
       PROJECT_VERSION:
         description: "Project version for Dependency-Track (defaults to branch/tag name)"
         required: false
         type: string
         default: ""
-      
+
       NODE_VERSION:
         description: "Node.js version to use"
         required: false
@@ -32,7 +32,7 @@ on:
         required: false
         type: string
         default: "npm"
-      
+
       INSTALL_COMMAND:
         description: "Command to install dependencies (e.g., 'ci', 'install --frozen-lockfile')"
         required: false
@@ -43,23 +43,29 @@ on:
       # Dependency-Track Configuration
       # ========================================
       DEPENDENCY_TRACK_HOST:
-        description: "Dependency-Track server hostname"
+        description: "Dependency-Track API server hostname (backend)"
         required: false
         type: string
         default: "api-dt.seliseblocks.com"
-      
+
+      DEPENDENCY_TRACK_FRONTEND_URL:
+        description: "Dependency-Track frontend URL (for dashboard links)"
+        required: false
+        type: string
+        default: "sca.seliseblocks.com"
+
       SBOM_FILENAME:
         description: "SBOM filename to generate"
         required: false
         type: string
         default: "bom.xml"
-      
+
       AUTO_CREATE_PROJECT:
         description: "Auto-create project in Dependency-Track if it doesn't exist"
         required: false
         type: boolean
         default: true
-      
+
       ARTIFACT_RETENTION_DAYS:
         description: "Number of days to retain SBOM artifact"
         required: false
@@ -79,7 +85,7 @@ on:
       DEPENDENCY_TRACK_API_KEY:
         required: true
         description: "Dependency-Track API key"
-      
+
       SELISE_GITHUB_PAT:
         required: false
         description: "GitHub PAT for private repositories and submodules"
@@ -127,7 +133,7 @@ jobs:
             PROJECT_NAME="${{ github.event.repository.name }}"
           fi
           echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
-          
+
           # Determine project version
           if [ -n "${{ inputs.PROJECT_VERSION }}" ]; then
             PROJECT_VERSION="${{ inputs.PROJECT_VERSION }}"
@@ -135,7 +141,7 @@ jobs:
             PROJECT_VERSION="${{ github.ref_name }}"
           fi
           echo "project_version=$PROJECT_VERSION" >> $GITHUB_OUTPUT
-          
+
           # Summary
           echo "### 🔍 SCA Scan Configuration" >> $GITHUB_STEP_SUMMARY
           echo "- **Project**: \`$PROJECT_NAME\`" >> $GITHUB_STEP_SUMMARY
@@ -149,9 +155,9 @@ jobs:
           npx @cyclonedx/cyclonedx-npm \
             --output-file ${{ inputs.SBOM_FILENAME }} \
             --output-format xml
-          
+
           echo "✅ SBOM generated: ${{ inputs.SBOM_FILENAME }}" >> $GITHUB_STEP_SUMMARY
-          
+
           # Show SBOM stats
           if [ -f "${{ inputs.SBOM_FILENAME }}" ]; then
             COMPONENT_COUNT=$(grep -c "<component" ${{ inputs.SBOM_FILENAME }} || echo "0")
@@ -188,6 +194,6 @@ jobs:
           echo "- **SBOM Format**: CycloneDX XML" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Dependency-Track**: https://${{ inputs.DEPENDENCY_TRACK_HOST }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project URL**: https://${{ inputs.DEPENDENCY_TRACK_HOST }}/projects" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dashboard**: [https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}](https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }})" >> $GITHUB_STEP_SUMMARY
+          echo "- **Projects**: [https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}/projects](https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}/projects)" >> $GITHUB_STEP_SUMMARY
           echo "- **SBOM Artifact**: Available in workflow artifacts for ${{ inputs.ARTIFACT_RETENTION_DAYS }} days" >> $GITHUB_STEP_SUMMARY

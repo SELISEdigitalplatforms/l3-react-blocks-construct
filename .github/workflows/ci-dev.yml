@@ -72,6 +72,7 @@ jobs:
       dockerfile_path: ${{ steps.config.outputs.dockerfile_path }} # Path to Dockerfile
       win_dockerfile_path: ${{ steps.config.outputs.win_dockerfile_path }} # Path to Window/Console service Dockerfile
       dependency_track_host: ${{ steps.config.outputs.dependency_track_host }} # e.g., api-dt.seliseblocks.com
+      dependency_track_frontend_url: ${{ steps.config.outputs.dependency_track_frontend_url }} # e.g., sca.seliseblocks.com
       has_submodules: ${{ steps.config.outputs.has_submodules }}
       package_manager: ${{ steps.config.outputs.package_manager }}
       node_version: ${{ steps.config.outputs.node_version }}
@@ -114,6 +115,7 @@ jobs:
           echo "project_name=${PROJECT_NAME:-${{ github.event.repository.name }}}" >> $GITHUB_OUTPUT
           echo "project_version=${PROJECT_VERSION:-${{ github.ref_name }}}" >> $GITHUB_OUTPUT
           echo "dependency_track_host=${DEPENDENCY_TRACK_HOST:-api-dt.seliseblocks.com}" >> $GITHUB_OUTPUT
+          echo "dependency_track_frontend_url=${DEPENDENCY_TRACK_FRONTEND_URL:-sca.seliseblocks.com}" >> $GITHUB_OUTPUT
 
           # SonarQube specific configurations (map from vars.env names)
           echo "sonar_project_key=${SONAR_KEY:-}" >> $GITHUB_OUTPUT
@@ -231,8 +233,9 @@ jobs:
       PACKAGE_MANAGER: ${{ needs.initialization.outputs.package_manager }}
       INSTALL_COMMAND: "ci"
 
-      # Dependency-Track Configuration
+      # Dependency-Track Configuration (optional)
       DEPENDENCY_TRACK_HOST: ${{ needs.initialization.outputs.dependency_track_host }}
+      DEPENDENCY_TRACK_FRONTEND_URL: "${{ needs.initialization.outputs.dependency_track_frontend_url }}"
       AUTO_CREATE_PROJECT: true
       ARTIFACT_RETENTION_DAYS: 7
 
