@@ -1,0 +1,193 @@
+name: Reusable - SCA Scan JS/TS
+
+on:
+  workflow_call:
+    inputs:
+      # ========================================
+      # General Configuration
+      # ========================================
+      PROJECT_NAME:
+        description: "Project name for Dependency-Track (defaults to repository name)"
+        required: false
+        type: string
+        default: ""
+      
+      PROJECT_VERSION:
+        description: "Project version for Dependency-Track (defaults to branch/tag name)"
+        required: false
+        type: string
+        default: ""
+      
+      NODE_VERSION:
+        description: "Node.js version to use"
+        required: false
+        type: string
+        default: "18"
+
+      # ========================================
+      # Package Manager Configuration
+      # ========================================
+      PACKAGE_MANAGER:
+        description: "Package manager to use (npm, yarn, pnpm)"
+        required: false
+        type: string
+        default: "npm"
+      
+      INSTALL_COMMAND:
+        description: "Command to install dependencies (e.g., 'ci', 'install --frozen-lockfile')"
+        required: false
+        type: string
+        default: "ci"
+
+      # ========================================
+      # Dependency-Track Configuration
+      # ========================================
+      DEPENDENCY_TRACK_HOST:
+        description: "Dependency-Track server hostname"
+        required: false
+        type: string
+        default: "api-dt.seliseblocks.com"
+      
+      SBOM_FILENAME:
+        description: "SBOM filename to generate"
+        required: false
+        type: string
+        default: "bom.xml"
+      
+      AUTO_CREATE_PROJECT:
+        description: "Auto-create project in Dependency-Track if it doesn't exist"
+        required: false
+        type: boolean
+        default: true
+      
+      ARTIFACT_RETENTION_DAYS:
+        description: "Number of days to retain SBOM artifact"
+        required: false
+        type: number
+        default: 7
+
+      # ========================================
+      # Optional Features
+      # ========================================
+      HAS_SUBMODULES:
+        description: "Set to true if repository uses Git submodules"
+        required: false
+        type: boolean
+        default: false
+
+    secrets:
+      DEPENDENCY_TRACK_API_KEY:
+        required: true
+        description: "Dependency-Track API key"
+      
+      SELISE_GITHUB_PAT:
+        required: false
+        description: "GitHub PAT for private repositories and submodules"
+
+jobs:
+  sca-scan:
+    name: SCA Scan & SBOM Upload
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: ${{ inputs.HAS_SUBMODULES && 'recursive' || 'false' }}
+          token: ${{ secrets.SELISE_GITHUB_PAT || github.token }}
+
+      - name: Update submodules
+        if: inputs.HAS_SUBMODULES
+        run: |
+          git submodule update --init --recursive
+          echo "✅ Submodules updated" >> $GITHUB_STEP_SUMMARY
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+          cache: ${{ inputs.PACKAGE_MANAGER }}
+
+      - name: Install dependencies
+        run: |
+          echo "📦 Installing dependencies with ${{ inputs.PACKAGE_MANAGER }}..."
+          ${{ inputs.PACKAGE_MANAGER }} ${{ inputs.INSTALL_COMMAND }}
+
+      - name: Determine project configuration
+        id: config
+        run: |
+          # Determine project name
+          if [ -n "${{ inputs.PROJECT_NAME }}" ]; then
+            PROJECT_NAME="${{ inputs.PROJECT_NAME }}"
+          else
+            PROJECT_NAME="${{ github.event.repository.name }}"
+          fi
+          echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+          
+          # Determine project version
+          if [ -n "${{ inputs.PROJECT_VERSION }}" ]; then
+            PROJECT_VERSION="${{ inputs.PROJECT_VERSION }}"
+          else
+            PROJECT_VERSION="${{ github.ref_name }}"
+          fi
+          echo "project_version=$PROJECT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Summary
+          echo "### 🔍 SCA Scan Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project**: \`$PROJECT_NAME\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: \`$PROJECT_VERSION\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package Manager**: ${{ inputs.PACKAGE_MANAGER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node Version**: ${{ inputs.NODE_VERSION }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          echo "📋 Generating SBOM..."
+          npx @cyclonedx/cyclonedx-npm \
+            --output-file ${{ inputs.SBOM_FILENAME }} \
+            --output-format xml
+          
+          echo "✅ SBOM generated: ${{ inputs.SBOM_FILENAME }}" >> $GITHUB_STEP_SUMMARY
+          
+          # Show SBOM stats
+          if [ -f "${{ inputs.SBOM_FILENAME }}" ]; then
+            COMPONENT_COUNT=$(grep -c "<component" ${{ inputs.SBOM_FILENAME }} || echo "0")
+            echo "- **Components found**: $COMPONENT_COUNT" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload SBOM as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx-xml
+          path: ${{ inputs.SBOM_FILENAME }}
+          retention-days: ${{ inputs.ARTIFACT_RETENTION_DAYS }}
+          if-no-files-found: error
+
+      - name: Upload to Dependency-Track
+        id: dt-upload
+        uses: DependencyTrack/gh-upload-sbom@v3.1.0
+        with:
+          serverhostname: ${{ inputs.DEPENDENCY_TRACK_HOST }}
+          apikey: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+          projectname: ${{ steps.config.outputs.project_name }}
+          projectversion: ${{ steps.config.outputs.project_version }}
+          bomfilename: ${{ inputs.SBOM_FILENAME }}
+          autocreate: ${{ inputs.AUTO_CREATE_PROJECT }}
+
+      - name: SCA Scan Summary
+        if: always()
+        run: |
+          echo "## 📊 SCA Scan Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project**: ${{ steps.config.outputs.project_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.config.outputs.project_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SBOM Format**: CycloneDX XML" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dependency-Track**: https://${{ inputs.DEPENDENCY_TRACK_HOST }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project URL**: https://${{ inputs.DEPENDENCY_TRACK_HOST }}/projects" >> $GITHUB_STEP_SUMMARY
+          echo "- **SBOM Artifact**: Available in workflow artifacts for ${{ inputs.ARTIFACT_RETENTION_DAYS }} days" >> $GITHUB_STEP_SUMMARY
