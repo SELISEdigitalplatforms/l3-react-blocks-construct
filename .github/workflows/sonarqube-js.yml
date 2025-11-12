@@ -81,7 +81,8 @@ on:
         description: "Paths to exclude from coverage"
         required: false
         type: string
-        default: "**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/*.model.ts,**/*.module.ts,**/node_modules/**,**/dist/**,**/build/**"
+        default: "**/node_modules/**,**/dist/**,**/build/**,**/*.model.ts,**/*.module.ts"
+        # For Angular projects, consider adding: **/*.model.ts,**/*.module.ts
 
       # ========================================
       # Optional Features
@@ -219,7 +220,7 @@ jobs:
             -Dsonar.sources=${{ inputs.SONAR_SOURCES }}
             -Dsonar.tests=${{ inputs.SONAR_TESTS }}
             -Dsonar.test.inclusions=**/*.test.js,**/*.spec.js,**/*.test.jsx,**/*.spec.jsx,**/*.test.ts,**/*.spec.ts,**/*.test.tsx,**/*.spec.tsx
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
             -Dsonar.coverage.exclusions=${{ inputs.COVERAGE_EXCLUSIONS }}
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
