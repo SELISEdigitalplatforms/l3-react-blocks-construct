@@ -36,7 +36,6 @@ jobs:
     uses: ./.github/workflows/5_sca-scan-js.yml
     secrets:
       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-      # SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
       DEPENDENCY_TRACK_API_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
     needs: [initialization]
   # cd-job:

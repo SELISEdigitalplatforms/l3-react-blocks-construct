@@ -8,8 +8,6 @@ on:
         type: string
         default: "22.20.0"
     secrets:
-      SONAR_TOKEN:
-        required: true
       SELISE_GITHUB_PAT:
         required: true
       DEPENDENCY_TRACK_API_KEY:
