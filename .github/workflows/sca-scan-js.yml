@@ -194,6 +194,6 @@ jobs:
           echo "- **SBOM Format**: CycloneDX XML" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Dashboard**: [https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}](https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }})" >> $GITHUB_STEP_SUMMARY
-          echo "- **Projects**: [https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}/projects](https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}/projects)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dashboard**: https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Projects**: https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}/projects" >> $GITHUB_STEP_SUMMARY
           echo "- **SBOM Artifact**: Available in workflow artifacts for ${{ inputs.ARTIFACT_RETENTION_DAYS }} days" >> $GITHUB_STEP_SUMMARY

@@ -27,7 +27,7 @@ env:
   # Quality Checks
   # ========================================
   RUN_TESTS: "false" # Usually disabled in dev for speed
-  RUN_SONARQUBE: "true" # Enable for testing the new dotnet-coverage integration
+  RUN_SONARQUBE: "false" # Enable for testing the new dotnet-coverage integration
   RUN_SCA_SCAN: "true" # Enable SCA Scan
 
   # ========================================
@@ -222,7 +222,7 @@ jobs:
   sca-scan:
     if: needs.initialization.outputs.run_sca_scan == 'true'
     needs: [initialization]
-    uses: ./.github/workflows/sca-scan-js-recommended.yml
+    uses: ./.github/workflows/sca-scan-js.yml
     with:
       # Project Configuration
       PROJECT_NAME: ${{ needs.initialization.outputs.project_name }}
@@ -245,61 +245,62 @@ jobs:
     secrets:
       DEPENDENCY_TRACK_API_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-# ==============================================
-# ALTERNATIVE: Simple Direct Passing (No Init Job)
-# ==============================================
-# If you don't need vars.env, you can pass values directly:
-#
-# jobs:
-#   sca-scan:
-#     uses: ./.github/workflows/sca-scan-js-recommended.yml
-#     with:
-#       PROJECT_NAME: "my-project"
-#       DEPENDENCY_TRACK_HOST: "api-dt.seliseblocks.com"
-#     secrets:
-#       DEPENDENCY_TRACK_API_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+  # ==============================================
+  # ALTERNATIVE: Simple Direct Passing (No Init Job)
+  # ==============================================
+  # If you don't need vars.env, you can pass values directly:
+  #
+  # jobs:
+  #   sca-scan:
+  #     uses: ./.github/workflows/sca-scan-js-recommended.yml
+  #     with:
+  #       PROJECT_NAME: "my-project"
+  #       DEPENDENCY_TRACK_HOST: "api-dt.seliseblocks.com"
+  #     secrets:
+  #       DEPENDENCY_TRACK_API_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
 
-# # Build and push image
-# build:
-#   needs: [initialization, sonarqube]
-#   if: ${{ github.event_name == 'push' && (success() || needs.sonarqube.result == 'skipped' ) }}
-#   uses: ./.github/workflows/build-push.yml
-#   with:
-#     SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
-#     # SERVICE_TYPE: ${{ needs.initialization.outputs.service_type }}
-#     SERVICE_TYPE: "webservice" # e.g., webclient, webservice, winservice
-#     ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
-#     TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "both" (default), "semantic", "commit"
-#     DOCKERFILE_PATH: ${{ needs.initialization.outputs.dockerfile_path }}
-#     VERSION: ${{ needs.initialization.outputs.version }} # Optional: Comment out to skip version suffix
-#     BUILD_ARGS: |
-#       ci_build=dev
-#   secrets:
-#     AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
-#     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
-#     ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
-#     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+  # Build and push image
+  build:
+    needs: [initialization, sonarqube]
+    if: ${{ github.event_name == 'push' && (success() || needs.sonarqube.result == 'skipped' ) }}
+    uses: ./.github/workflows/build-push.yml
+    with:
+      SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
+      # SERVICE_TYPE: ${{ needs.initialization.outputs.service_type }}
+      SERVICE_TYPE: "webclient" # e.g., webclient, webservice, winservice
+      ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
+      TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "both" (default), "semantic", "commit"
+      DOCKERFILE_PATH: ${{ needs.initialization.outputs.dockerfile_path }}
+      VERSION: ${{ needs.initialization.outputs.version }} # Optional: Comment out to skip version suffix
+      BUILD_ARGS: |
+        ci_build=dev
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
+      ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
 
-# # Update GitOps repository
-# update-gitops:
-#   needs: [initialization, build]
-#   if: |
-#     github.event_name == 'push' &&
-#     always() &&
-#     needs.initialization.result == 'success' &&
-#     needs.build.result == 'success'
-#   uses: ./.github/workflows/update-gitops.yml
-#   with:
-#     SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
-#     SERVICE_TYPE: "webservice" # Match the service type from build job
-#     ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
-#     VERSION: ${{ needs.initialization.outputs.version }} # Pass version for proper file naming
-#     IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
-#     COMMIT_TAG: ${{ needs.build.outputs.commit_tag }}
-#     SEMANTIC_TAG: ${{ needs.build.outputs.semantic_tag }}
-#     TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "commit" (default), "semantic", or "primary"
-#     CLUSTER_NAME: ${{ needs.initialization.outputs.cluster_name }}
-#     # GITOPS_BRANCH: "main"
-#   secrets:
-#     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
-#     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
+  # Update GitOps repository
+  update-gitops:
+    needs: [initialization, build]
+    if: |
+      github.event_name == 'push' &&
+      always() &&
+      needs.initialization.result == 'success' &&
+      needs.build.result == 'success'
+    uses: ./.github/workflows/update-gitops.yml
+    with:
+      SERVICE_NAME: ${{ needs.initialization.outputs.service_name }}
+      # SERVICE_TYPE: ${{ needs.initialization.outputs.service_type }}
+      SERVICE_TYPE: "webclient" # Match the service type from build job
+      ENVIRONMENT: ${{ needs.initialization.outputs.environment }}
+      VERSION: ${{ needs.initialization.outputs.version }} # Pass version for proper file naming
+      IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+      COMMIT_TAG: ${{ needs.build.outputs.commit_tag }}
+      SEMANTIC_TAG: ${{ needs.build.outputs.semantic_tag }}
+      TAG_STRATEGY: ${{ needs.initialization.outputs.tag_strategy }} # Options: "commit" (default), "semantic", or "primary"
+      CLUSTER_NAME: ${{ needs.initialization.outputs.cluster_name }}
+      # GITOPS_BRANCH: "main"
+    secrets:
+      SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
