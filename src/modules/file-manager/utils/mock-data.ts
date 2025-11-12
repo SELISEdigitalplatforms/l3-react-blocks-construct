@@ -20,6 +20,7 @@ const USER_POOL: Record<string, SharedUser> = {
   '2': { id: '2', name: 'Aaron Green', avatar: '/avatars/aaron-green.jpg' },
   '3': { id: '3', name: 'Sarah Pavan', avatar: '/avatars/sarah-pavan.jpg' },
   '4': { id: '4', name: 'Adrian Müller', avatar: '/avatars/adrian-muller.jpg' },
+  '5': { id: '5', name: 'Sami Müller', avatar: '/avatars/adrian-muller.jpg' },
 };
 
 // ============================================================================
