@@ -71,6 +71,7 @@ jobs:
       version: ${{ steps.config.outputs.version }} # Version suffix based on environment
       dockerfile_path: ${{ steps.config.outputs.dockerfile_path }} # Path to Dockerfile
       win_dockerfile_path: ${{ steps.config.outputs.win_dockerfile_path }} # Path to Window/Console service Dockerfile
+      dependency_track_host: ${{ steps.config.outputs.dependency_track_host }} # e.g., api-dt.seliseblocks.com
       has_submodules: ${{ steps.config.outputs.has_submodules }}
       package_manager: ${{ steps.config.outputs.package_manager }}
       node_version: ${{ steps.config.outputs.node_version }}
