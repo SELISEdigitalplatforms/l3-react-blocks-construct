@@ -6,10 +6,10 @@ name: CI/CD - Dev Environment
 on:
   push:
     branches:
-      - cicd-test
+      - bugfix/dev
   pull_request:
     branches:
-      - cicd-test
+      - bugfix/dev
     types:
       - opened
       - reopened
