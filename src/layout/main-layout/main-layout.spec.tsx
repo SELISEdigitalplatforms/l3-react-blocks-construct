@@ -250,7 +250,7 @@ describe('MainLayout', () => {
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });
 
-  it.skip('renders all navigation and utility elements', () => {
+  it('renders all navigation and utility elements', () => {
     renderWithProviders(<MainLayout />);
     expect(screen.getByTestId('bell-icon')).toBeInTheDocument();
     // expect(screen.getByTestId('library-icon')).toBeInTheDocument();

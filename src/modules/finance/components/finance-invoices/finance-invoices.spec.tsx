@@ -156,6 +156,7 @@ describe('FinanceInvoices Component', () => {
 
     it('should render the card with correct structure', () => {
       renderComponent();
+      expect(screen.getByTestId('card')).toBeInTheDocument();
       expectElementWithClasses('card', ['w-full', 'border-none', 'rounded-[8px]', 'shadow-sm']);
       expectTableStructure(['card-header', 'card-content']);
     });
@@ -191,16 +192,20 @@ describe('FinanceInvoices Component', () => {
   describe('Table Structure', () => {
     it('should render table with correct structure', () => {
       renderComponent();
+      expect(screen.getByTestId('table')).toBeInTheDocument();
       expectTableStructure(['table', 'table-header', 'table-body']);
     });
 
     it('should render all table headers', () => {
       renderComponent();
+      expect(screen.getByText(TABLE_HEADERS[0])).toBeInTheDocument();
       expectTextElements(TABLE_HEADERS);
     });
 
     it('should render table headers with correct styling', () => {
       renderComponent();
+      const tableHeads = screen.getAllByTestId('table-head');
+      expect(tableHeads.length).toBeGreaterThan(0);
       expectElementsWithClasses('table-head', ['text-high-emphasis', 'font-semibold']);
     });
 
@@ -221,21 +226,25 @@ describe('FinanceInvoices Component', () => {
   describe('Data Rendering', () => {
     it('should render invoice data rows', () => {
       renderComponent();
+      expect(screen.getByText(MOCK_INVOICE_DATA.ids[0])).toBeInTheDocument();
       expectTextElements([...MOCK_INVOICE_DATA.ids, ...MOCK_INVOICE_DATA.customers]);
     });
 
     it('should render invoice amounts and dates', () => {
       renderComponent();
+      expect(screen.getByText(MOCK_INVOICE_DATA.amounts[0])).toBeInTheDocument();
       expectTextElements([...MOCK_INVOICE_DATA.amounts, ...MOCK_INVOICE_DATA.dates]);
     });
 
     it('should render payment methods', () => {
       renderComponent();
+      expect(screen.getByText(MOCK_INVOICE_DATA.paymentMethods[0])).toBeInTheDocument();
       expectTextElements(MOCK_INVOICE_DATA.paymentMethods);
     });
 
     it('should render status with correct styling', () => {
       renderComponent();
+      expect(screen.getByText(MOCK_INVOICE_DATA.statuses[0])).toBeInTheDocument();
       expectTextElements(MOCK_INVOICE_DATA.statuses);
     });
 

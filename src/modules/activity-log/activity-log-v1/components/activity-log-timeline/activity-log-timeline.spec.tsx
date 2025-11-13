@@ -159,6 +159,8 @@ describe('ActivityLogTimeline V1', () => {
   describe('Empty State', () => {
     it('should render empty state when no activities provided', () => {
       renderActivityLogTimeline([]);
+      const illustration = screen.getByRole('presentation');
+      expect(illustration).toBeInTheDocument();
       expectEmptyStateToBeRendered();
     });
 
@@ -178,6 +180,8 @@ describe('ActivityLogTimeline V1', () => {
   describe('Timeline with Activities', () => {
     it('should render Card component when activities are provided', () => {
       renderActivityLogTimeline();
+      const card = screen.getByTestId('card');
+      expect(card).toBeInTheDocument();
       expectCardToBeRendered();
     });
 
@@ -212,16 +216,21 @@ describe('ActivityLogTimeline V1', () => {
   describe('Activity Groups Rendering', () => {
     it('should render all activity groups', () => {
       renderActivityLogTimeline();
+      const activityGroups = screen.queryAllByTestId('activity-log-group');
+      expect(activityGroups).toHaveLength(mockActivityGroups.length);
       expectActivityGroupsToBeRendered(mockActivityGroups);
     });
 
     it('should pass correct isLastIndex prop to groups', () => {
       renderActivityLogTimeline();
+      const activityGroups = screen.queryAllByTestId('activity-log-group');
+      expect(activityGroups).toHaveLength(mockActivityGroups.length);
       expectActivityGroupsToBeRendered(mockActivityGroups);
     });
 
     it('should render group dates and item counts correctly', () => {
       renderActivityLogTimeline();
+      expect(screen.getByText(mockActivityGroups[0].date)).toBeInTheDocument();
       expectGroupDatesAndItemCounts(mockActivityGroups);
     });
   });
@@ -229,6 +238,7 @@ describe('ActivityLogTimeline V1', () => {
   describe('Infinite Scroll Integration', () => {
     it('should call useInfiniteScroll hook with correct parameters', () => {
       renderActivityLogTimeline();
+      expect(mockUseInfiniteScroll).toHaveBeenCalled();
       expectInfiniteScrollToBeCalledWith(mockUseInfiniteScroll, mockActivityGroups.length);
     });
 
@@ -269,6 +279,8 @@ describe('ActivityLogTimeline V1', () => {
     it('should handle single activity group', () => {
       const singleGroup = [mockActivityGroups[0]];
       renderActivityLogTimeline(singleGroup);
+      const activityGroups = screen.queryAllByTestId('activity-log-group');
+      expect(activityGroups).toHaveLength(1);
       expectActivityGroupsToBeRendered(singleGroup);
     });
 
@@ -287,6 +299,7 @@ describe('ActivityLogTimeline V1', () => {
 
     it('should use translation for empty state message', () => {
       renderActivityLogTimeline([]);
+      expect(screen.getByText('COULDNT_FIND_ANYTHING_MATCHING')).toBeInTheDocument();
       expectEmptyStateToBeRendered();
     });
   });

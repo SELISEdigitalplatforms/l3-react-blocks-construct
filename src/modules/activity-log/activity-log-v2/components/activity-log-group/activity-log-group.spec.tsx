@@ -138,26 +138,36 @@ describe('ActivityLogGroup V2', () => {
   describe('Component Rendering', () => {
     it('should render the main container with correct V2 structure', () => {
       const { container } = renderActivityLogGroupV2();
+      const mainContainer = container.firstChild as HTMLElement;
+      expect(mainContainer).toBeInTheDocument();
       expectV2ContainerStructure(container);
     });
 
     it('should render the date badge with correct V2 styling', () => {
       renderActivityLogGroupV2();
+      const dateLabel = screen.getByText(getExpectedDateLabel(mockProps.date));
+      expect(dateLabel).toBeInTheDocument();
       expectV2DateBadgeStyling();
     });
 
     it('should render the date badge container with centered layout', () => {
       const { container } = renderActivityLogGroupV2();
+      const dateBadgeContainer = container.querySelector('.flex.justify-center.mb-4.relative.z-10');
+      expect(dateBadgeContainer).toBeInTheDocument();
       expectV2ContainerStructure(container);
     });
 
     it('should render the items container with correct styling', () => {
       const { container } = renderActivityLogGroupV2();
+      const itemsContainer = container.querySelector('.relative:last-child');
+      expect(itemsContainer).toBeInTheDocument();
       expectV2ContainerStructure(container);
     });
 
     it('should render all activity items with V2-specific props', () => {
       renderActivityLogGroupV2();
+      const activityItems = screen.queryAllByTestId('activity-log-item');
+      expect(activityItems).toHaveLength(mockActivityItems.length);
       expectActivityItemsToBeRenderedV2(mockActivityItems, false);
     });
   });
@@ -173,6 +183,8 @@ describe('ActivityLogGroup V2', () => {
 
     it('should display the formatted date label', () => {
       renderActivityLogGroupV2();
+      const expectedLabel = getExpectedDateLabel(mockProps.date);
+      expect(screen.getByText(expectedLabel)).toBeInTheDocument();
       expectDateLabelToBeDisplayedV2(mockProps.date);
     });
 

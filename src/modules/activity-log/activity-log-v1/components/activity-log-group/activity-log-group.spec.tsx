@@ -122,6 +122,8 @@ describe('ActivityLogGroup', () => {
 
     it('should render all activity items', () => {
       renderActivityLogGroup();
+      const activityItems = screen.queryAllByTestId('activity-log-item');
+      expect(activityItems).toHaveLength(mockActivityItems.length);
       expectActivityItemsToBeRendered(mockActivityItems);
     });
   });
