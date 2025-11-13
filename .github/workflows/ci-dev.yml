@@ -112,7 +112,7 @@ jobs:
           echo "node_version=${NODE_VERSION:-21}" >> $GITHUB_OUTPUT
 
           # Project configuration for SCA Scan
-          echo "project_name=${PROJECT_NAME:-${{ github.event.repository }}}" >> $GITHUB_OUTPUT
+          echo "project_name=${PROJECT_NAME:-${{ github.repository }}}" >> $GITHUB_OUTPUT
           echo "project_version=${PROJECT_VERSION:-${{ github.ref_name }}}" >> $GITHUB_OUTPUT
           echo "dependency_track_host=${DEPENDENCY_TRACK_HOST:-api-dt.seliseblocks.com}" >> $GITHUB_OUTPUT
           echo "dependency_track_frontend_url=${DEPENDENCY_TRACK_FRONTEND_URL:-sca.seliseblocks.com}" >> $GITHUB_OUTPUT
