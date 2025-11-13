@@ -4,7 +4,6 @@ import type {
   GetSectionsResponse,
   GetTagsResponse,
   GetTasksResponse,
-  GetUsersPayload,
   TaskCommentInsertInput,
   TaskCommentUpdateInput,
   TaskTagInsertInput,
@@ -51,6 +50,7 @@ import {
   updateTaskComment,
   createTaskComment,
 } from '../services/task-manager.service';
+import { GetUsersPayload } from '@/modules/iam/types/user.types';
 
 interface TaskQueryParams {
   pageNo: number;
