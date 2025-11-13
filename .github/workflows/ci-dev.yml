@@ -233,7 +233,7 @@ jobs:
       NODE_VERSION: ${{ needs.initialization.outputs.node_version }}
       PACKAGE_MANAGER: ${{ needs.initialization.outputs.package_manager }}
       INSTALL_COMMAND: "ci"
-      SBOM_TOOL: "cyclonedx-npm"
+      SBOM_TOOL: "cyclonedx-npm" # e.g. cdxgen(default), cyclonedx-npm. Better use cdxgen if unsure.
       # USE_DOCKER: true
 
       # Dependency-Track Configuration (optional)
