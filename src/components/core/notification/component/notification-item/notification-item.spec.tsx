@@ -64,7 +64,6 @@ describe('NotificationItem', () => {
     expect(screen.getByText(/^TODAY, \d{1,2}:\d{2} [AP]M$/)).toBeInTheDocument();
   });
 
-  // TODO: Implement test for markAsRead functionality
   // Skipped due to complex dropdown menu interaction that needs proper mocking
   // The functionality is covered by integration tests
   it.todo('calls markAsRead with notification id and onError callback when menu item is clicked');
