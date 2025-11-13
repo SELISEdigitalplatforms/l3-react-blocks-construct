@@ -22,7 +22,7 @@ on:
         description: "Node.js version to use"
         required: false
         type: string
-        default: "18"
+        default: "20"
 
       # ========================================
       # Package Manager Configuration
@@ -42,6 +42,42 @@ on:
       # ========================================
       # Dependency-Track Configuration
       # ========================================
+      SKIP_DEPENDENCY_INSTALL:
+        description: "Skip dependency installation (useful for cdxgen)"
+        required: false
+        type: boolean
+        default: false
+
+      SBOM_TOOL:
+        description: "SBOM generation tool (cdxgen, cyclonedx-npm)"
+        required: false
+        type: string
+        default: "cdxgen"
+
+      CYCLONEDX_NPM_VERSION:
+        description: "CycloneDX NPM version (auto-detected if empty)"
+        required: false
+        type: string
+        default: ""
+
+      CDXGEN_VERSION:
+        description: "cdxgen version (auto-detected if empty)"
+        required: false
+        type: string
+        default: ""
+
+      USE_DOCKER:
+        description: "Use Docker version of cdxgen (requires cdxgen as SBOM_TOOL)"
+        required: false
+        type: boolean
+        default: false
+
+      INCLUDE_FORMULATION:
+        description: "Include build/CI info in SBOM (cdxgen only)"
+        required: false
+        type: boolean
+        default: true
+
       DEPENDENCY_TRACK_HOST:
         description: "Dependency-Track API server hostname (backend)"
         required: false
@@ -55,11 +91,10 @@ on:
         default: "sca.seliseblocks.com"
 
       SBOM_FILENAME:
-        description: "SBOM filename to generate"
+        description: "SBOM filename to generate (JSON format only)"
         required: false
         type: string
-        default: "bom.xml"
-
+        default: "bom.json"
       AUTO_CREATE_PROJECT:
         description: "Auto-create project in Dependency-Track if it doesn't exist"
         required: false
@@ -70,7 +105,7 @@ on:
         description: "Number of days to retain SBOM artifact"
         required: false
         type: number
-        default: 7
+        default: 2
 
       # ========================================
       # Optional Features
@@ -112,16 +147,48 @@ jobs:
           git submodule update --init --recursive
           echo "✅ Submodules updated" >> $GITHUB_STEP_SUMMARY
 
+      - name: Set up Docker Buildx
+        if: inputs.SBOM_TOOL == 'cdxgen' && inputs.USE_DOCKER
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        if: inputs.SBOM_TOOL == 'cdxgen' && inputs.USE_DOCKER
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-cdxgen-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-cdxgen-
+
+      - name: Pull cdxgen Docker image
+        if: inputs.SBOM_TOOL == 'cdxgen' && inputs.USE_DOCKER
+        run: |
+          echo "📥 Pulling cdxgen Docker image..."
+          docker pull ghcr.io/cyclonedx/cdxgen:master
+          echo "✅ Docker image cached" >> $GITHUB_STEP_SUMMARY
+
       - name: Setup Node.js
+        if: ${{ !inputs.USE_DOCKER }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: ${{ inputs.PACKAGE_MANAGER }}
 
       - name: Install dependencies
+        # if: ${{ !inputs.SKIP_DEPENDENCY_INSTALL }}
+        if: ${{ !inputs.SKIP_DEPENDENCY_INSTALL && !inputs.USE_DOCKER }}
         run: |
           echo "📦 Installing dependencies with ${{ inputs.PACKAGE_MANAGER }}..."
-          ${{ inputs.PACKAGE_MANAGER }} ${{ inputs.INSTALL_COMMAND }}
+          if [ "${{ inputs.PACKAGE_MANAGER }}" = "npm" ]; then
+            if [ "${{ inputs.INSTALL_COMMAND }}" = "ci" ]; then
+              npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+            else
+              npm ${{ inputs.INSTALL_COMMAND }} --legacy-peer-deps
+            fi
+          else
+            ${{ inputs.PACKAGE_MANAGER }} ${{ inputs.INSTALL_COMMAND }}
+          fi
+          echo "✅ Dependencies installed" >> $GITHUB_STEP_SUMMARY
 
       - name: Determine project configuration
         id: config
@@ -147,33 +214,160 @@ jobs:
           echo "- **Project**: \`$PROJECT_NAME\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: \`$PROJECT_VERSION\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Package Manager**: ${{ inputs.PACKAGE_MANAGER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SBOM Tool**: ${{ inputs.SBOM_TOOL }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Node Version**: ${{ inputs.NODE_VERSION }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: Generate CycloneDX SBOM
+      - name: Determine tool version
+        if: ${{ !inputs.USE_DOCKER }}
+        id: tool-version
         run: |
-          echo "📋 Generating SBOM..."
-          npx @cyclonedx/cyclonedx-npm \
-            --output-file ${{ inputs.SBOM_FILENAME }} \
-            --output-format xml
+          NODE_MAJOR=$(node -v | cut -d'.' -f1 | sed 's/v//')
 
-          echo "✅ SBOM generated: ${{ inputs.SBOM_FILENAME }}" >> $GITHUB_STEP_SUMMARY
-
-          # Show SBOM stats
-          if [ -f "${{ inputs.SBOM_FILENAME }}" ]; then
-            COMPONENT_COUNT=$(grep -c "<component" ${{ inputs.SBOM_FILENAME }} || echo "0")
-            echo "- **Components found**: $COMPONENT_COUNT" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ inputs.SBOM_TOOL }}" = "cdxgen" ]; then
+            if [ -n "${{ inputs.CDXGEN_VERSION }}" ]; then
+              # User specified version
+              VERSION="${{ inputs.CDXGEN_VERSION }}"
+              echo "✅ Using specified cdxgen version: $VERSION" >> $GITHUB_STEP_SUMMARY
+              
+            elif [ "$NODE_MAJOR" -ge 20 ]; then
+              # Node 20+: Latest cdxgen
+              VERSION="latest"
+              echo "✅ Node $NODE_MAJOR: using latest cdxgen" >> $GITHUB_STEP_SUMMARY
+              
+            elif [ "$NODE_MAJOR" -ge 18 ]; then
+              # Node 18-19: Compatibility gap - must use Docker
+              echo "❌ Node $NODE_MAJOR: cdxgen cannot be installed via npm" >> $GITHUB_STEP_SUMMARY
+              echo "💡 Solution 1: Set USE_DOCKER: true" >> $GITHUB_STEP_SUMMARY
+              echo "💡 Solution 2: Upgrade to NODE_VERSION: \"20\"" >> $GITHUB_STEP_SUMMARY
+              echo "💡 Solution 3: Downgrade to NODE_VERSION: \"16\"" >> $GITHUB_STEP_SUMMARY
+              exit 1
+              
+            else
+              # Node 17 and below: cdxgen 9.x
+              VERSION="8.6.3"
+              echo "✅ Node $NODE_MAJOR: using cdxgen@8.6.3" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+          else
+            # cyclonedx-npm
+            if [ -n "${{ inputs.CYCLONEDX_NPM_VERSION }}" ]; then
+              VERSION="${{ inputs.CYCLONEDX_NPM_VERSION }}"
+            elif [ "$NODE_MAJOR" -lt 16 ]; then
+              VERSION="1.9.2"
+            elif [ "$NODE_MAJOR" -lt 19 ]; then
+              VERSION="1.17.0"
+            else
+              VERSION="latest"
+            fi
           fi
 
-      - name: Upload SBOM as workflow artifact
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate SBOM with cdxgen (Docker)
+        if: inputs.SBOM_TOOL == 'cdxgen' && inputs.USE_DOCKER
+        run: |
+          echo "📋 Generating SBOM with cdxgen (Docker)..."
+
+          FORMULATION_FLAG=""
+          [ "${{ inputs.INCLUDE_FORMULATION }}" = "true" ] && FORMULATION_FLAG="--include-formulation"
+
+          # Create a temporary output directory with proper permissions
+          mkdir -p /tmp/cdxgen-output
+          chmod 777 /tmp/cdxgen-output
+
+          # # Run Docker - output to /tmp (accessible by container)
+          # docker run --rm \
+          #   -v $(pwd):/app:ro \
+          #   -v /tmp/cdxgen-output:/output:rw \
+          #   ghcr.io/cyclonedx/cdxgen:master \
+          #   -r /app \
+          #   -o /output/${{ inputs.SBOM_FILENAME }} \
+          #   -t js \
+          #   --spec-version 1.5 \
+          #   --include-crypto \
+          #   --deep \
+          #   $FORMULATION_FLAG
+          # Run Docker - output to /tmp (accessible by container)
+
+          docker run --rm \
+            -v $(pwd):/app:ro \
+            -v /tmp/cdxgen-output:/output:rw \
+            -t ghcr.io/cyclonedx/cdxgen:master \
+            -r /app \
+            -o /output/${{ inputs.SBOM_FILENAME }} \
+            --include-crypto \
+            --deep \
+            $FORMULATION_FLAG
+
+          # Move SBOM to workspace
+          mv /tmp/cdxgen-output/${{ inputs.SBOM_FILENAME }} ${{ inputs.SBOM_FILENAME }}
+
+          # Cleanup
+          rm -rf /tmp/cdxgen-output
+
+          echo "✅ SBOM generated" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate SBOM with cdxgen (NPM)
+        if: inputs.SBOM_TOOL == 'cdxgen' && !inputs.USE_DOCKER
+        run: |
+          echo "📋 Generating SBOM with cdxgen..."
+          npm install -g @cyclonedx/cdxgen@${{ steps.tool-version.outputs.version }}
+
+          FORMULATION_FLAG=""
+          [ "${{ inputs.INCLUDE_FORMULATION }}" = "true" ] && FORMULATION_FLAG="--include-formulation"
+
+          cdxgen \
+            -o ${{ inputs.SBOM_FILENAME }} \
+            -t js \
+            --spec-version 1.5 \
+            --include-crypto \
+            --deep \
+            $FORMULATION_FLAG \
+            .
+
+          echo "✅ SBOM generated" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate SBOM with CycloneDX NPM
+        if: inputs.SBOM_TOOL == 'cyclonedx-npm'
+        run: |
+          echo "📋 Generating SBOM with CycloneDX NPM..."
+
+          npx @cyclonedx/cyclonedx-npm@${{ steps.tool-version.outputs.version }} \
+            --output-file ${{ inputs.SBOM_FILENAME }} \
+            --output-format json
+
+          echo "✅ SBOM generated" >> $GITHUB_STEP_SUMMARY
+
+      - name: Validate and show SBOM stats
+        run: |
+          [ ! -f "${{ inputs.SBOM_FILENAME }}" ] && echo "❌ SBOM not found" && exit 1
+          [ ! -s "${{ inputs.SBOM_FILENAME }}" ] && echo "❌ SBOM is empty" && exit 1
+
+          FILE_SIZE=$(ls -lh ${{ inputs.SBOM_FILENAME }} | awk '{print $5}')
+          echo "- **File Size**: $FILE_SIZE" >> $GITHUB_STEP_SUMMARY
+
+          if command -v jq &> /dev/null; then
+            if jq empty ${{ inputs.SBOM_FILENAME }} 2>/dev/null; then
+              COMPONENTS=$(jq -r '.components | length' ${{ inputs.SBOM_FILENAME }} 2>/dev/null || echo "N/A")
+              DEPENDENCIES=$(jq -r '.dependencies | length' ${{ inputs.SBOM_FILENAME }} 2>/dev/null || echo "N/A")
+              echo "- **Components**: $COMPONENTS" >> $GITHUB_STEP_SUMMARY
+              echo "- **Dependencies**: $DEPENDENCIES" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ Invalid JSON format" && exit 1
+            fi
+          fi
+
+          echo "✅ SBOM validation passed" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-cyclonedx-xml
+          name: sbom-cyclonedx
           path: ${{ inputs.SBOM_FILENAME }}
           retention-days: ${{ inputs.ARTIFACT_RETENTION_DAYS }}
           if-no-files-found: error
 
       - name: Upload to Dependency-Track
-        id: dt-upload
         uses: DependencyTrack/gh-upload-sbom@v3.1.0
         with:
           serverhostname: ${{ inputs.DEPENDENCY_TRACK_HOST }}
@@ -191,7 +385,8 @@ jobs:
           echo "### Configuration" >> $GITHUB_STEP_SUMMARY
           echo "- **Project**: ${{ steps.config.outputs.project_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Version**: ${{ steps.config.outputs.project_version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **SBOM Format**: CycloneDX XML" >> $GITHUB_STEP_SUMMARY
+          echo "- **SBOM Tool**: ${{ inputs.SBOM_TOOL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SBOM Format**: CycloneDX json" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Results" >> $GITHUB_STEP_SUMMARY
           echo "- **Dashboard**: https://${{ inputs.DEPENDENCY_TRACK_FRONTEND_URL }}" >> $GITHUB_STEP_SUMMARY
