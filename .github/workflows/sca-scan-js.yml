@@ -319,7 +319,6 @@ jobs:
           cdxgen \
             -o ${{ inputs.SBOM_FILENAME }} \
             -t js \
-            --spec-version 1.5 \
             --include-crypto \
             --deep \
             $FORMULATION_FLAG \
