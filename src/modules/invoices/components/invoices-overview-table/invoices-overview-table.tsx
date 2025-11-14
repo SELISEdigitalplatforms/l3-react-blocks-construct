@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import uuidv4 from '@/utils/uuid';
+import uuidv4 from '@/lib/utils/uuid';
 import { FileText, Clock, CheckCircle, AlertCircle, FileEdit } from 'lucide-react';
 import {
   ColumnDef,
@@ -17,7 +17,13 @@ import {
   useReactTable,
   Table as TableInstance,
 } from '@tanstack/react-table';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui-kit/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui-kit/card';
 import { Separator } from '@/components/ui-kit/separator';
 import {
   TableRow,

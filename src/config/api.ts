@@ -1,4 +1,4 @@
-import { getProjectKey } from '../utils/project-key';
+import { getProjectKey } from '../lib/utils/project-key';
 
 const projectKey = getProjectKey();
 

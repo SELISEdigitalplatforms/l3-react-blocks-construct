@@ -2,7 +2,7 @@ import {
   createPasswordValidationSchema,
   PasswordFormType,
   passwordFormDefaultValues,
-} from '../../../../utils/validation/password-validation';
+} from '../../../../lib/utils/validation/password-validation';
 
 /**
  * Set Password Form Schema
@@ -19,6 +19,7 @@ import {
  * @module setPasswordForm
  */
 
-export const getSetPasswordFormValidationSchema = (t: (key: string) => string) => createPasswordValidationSchema(t);
+export const getSetPasswordFormValidationSchema = (t: (key: string) => string) =>
+  createPasswordValidationSchema(t);
 export type setPasswordFormType = PasswordFormType;
 export const setPasswordFormDefaultValue = passwordFormDefaultValues;

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { vi, describe, test, beforeEach, expect } from 'vitest';
 import { DashboardCard } from './dashboard-card';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 vi.mock('@/components/ui-kit/card', () => {
   return {

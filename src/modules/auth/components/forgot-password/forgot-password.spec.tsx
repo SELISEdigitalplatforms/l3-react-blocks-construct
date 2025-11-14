@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 import { ForgotpasswordForm } from './forgot-password';
 import { BrowserRouter } from 'react-router-dom';
 

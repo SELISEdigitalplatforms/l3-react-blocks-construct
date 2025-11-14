@@ -797,3 +797,110 @@ export const createErrorPageTestSuite = (
     });
   };
 };
+
+// ============================================================================
+// ADDITIONAL COMMON TEST MOCKS & HELPERS
+// ============================================================================
+// NOTE: These factory functions are useful for test files that DON'T import
+// shared-test-utils.tsx. If your test file imports shared-test-utils.tsx,
+// react-i18next is already mocked globally, so you should define mocks inline
+// to avoid Vitest hoisting conflicts.
+
+/**
+ * Creates a PermissionGuard mock that respects global permission state
+ *
+ * IMPORTANT: Define this mock INLINE in your test file to avoid hoisting issues:
+ *
+ * vi.mock('components/core/components/gurads/permission-guard/permission-guard', () => ({
+ *   PermissionGuard: ({ children, showFallback }) => {
+ *     const hasPermission = (global as any).mockHasPermission ?? true;
+ *     if (hasPermission) return <>{children}</>;
+ *     if (showFallback) return <div data-testid="permission-denied">No Permission</div>;
+ *     return null;
+ *   },
+ * }));
+ *
+ * Then use setMockPermission() and resetMockPermission() helpers from this file.
+ */
+export const createPermissionGuardMock = () => ({
+  PermissionGuard: ({
+    children,
+    showFallback,
+  }: {
+    children: React.ReactNode;
+    showFallback?: boolean;
+  }) => {
+    const hasPermission = (global as any).mockHasPermission ?? true;
+    if (hasPermission) {
+      return <>{children}</>;
+    }
+
+    if (showFallback) {
+      return <div data-testid="permission-denied">No Permission</div>;
+    }
+
+    return null;
+  },
+});
+
+/**
+ * Creates a basic react-i18next mock with translation function
+ * Usage: vi.mock('react-i18next', createReactI18nextMock);
+ */
+export const createReactI18nextMock = () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: vi.fn(),
+    },
+  }),
+});
+
+/**
+ * Creates a roles-permissions config mock
+ * Usage: vi.mock('config/roles-permissions', () => createRolesPermissionsMock({ INVOICE_WRITE: 'invoice:write' }));
+ */
+export const createRolesPermissionsMock = (permissions: Record<string, string>) => ({
+  MENU_PERMISSIONS: permissions,
+});
+
+/**
+ * Helper to set global permission state for tests
+ */
+export const setMockPermission = (hasPermission: boolean) => {
+  (global as any).mockHasPermission = hasPermission;
+};
+
+/**
+ * Helper to reset global permission state
+ */
+export const resetMockPermission = () => {
+  (global as any).mockHasPermission = true;
+};
+
+/**
+ * Helper to verify element has specific classes
+ */
+export const expectElementToHaveClasses = (element: HTMLElement, ...classes: string[]) => {
+  classes.forEach((className) => {
+    expect(element).toHaveClass(className);
+  });
+};
+
+/**
+ * Helper to verify multiple text elements are in document
+ */
+export const expectTextsToBeInDocument = (...texts: string[]) => {
+  texts.forEach((text) => {
+    expect(screen.getByText(text)).toBeInTheDocument();
+  });
+};
+
+/**
+ * Helper to verify element with role and text
+ */
+export const expectRoleWithText = (role: string, text: string) => {
+  const element = screen.getByRole(role);
+  expect(element).toBeInTheDocument();
+  expect(element).toHaveTextContent(text);
+};

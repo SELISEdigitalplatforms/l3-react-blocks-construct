@@ -34,7 +34,7 @@ import { EmailCompose } from '../email-compose/email-compose';
 import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tooltip-confirm-action';
 import { EmailSingleActions } from '../email-single-action/email-single-action';
 import { EmailActionsReplyPanel } from '../email-actions-reply-panel/email-actions-reply-panel';
-import { sanitizeHTML } from '@/utils/sanitizer';
+import { sanitizeHTML } from '@/lib/utils/sanitizer';
 import { EmailViewResponseType } from '../email-view-response-type/email-view-response-type';
 import { EmailTextEditor } from '../email-text-editor/email-text-editor';
 import { htmlToPlainText } from '../../utils/email-utils';

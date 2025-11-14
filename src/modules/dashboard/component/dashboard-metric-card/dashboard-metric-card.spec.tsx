@@ -5,7 +5,7 @@ import { Users } from 'lucide-react';
 import { DashboardMetricCard } from './dashboard-metric-card';
 
 // Import shared test utilities (provides react-i18next, card, select mocks)
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // Mock lucide-react icons
 vi.mock('lucide-react', () => ({
@@ -29,13 +29,13 @@ describe('DashboardMetricCard', () => {
 
     // Test title is displayed
     expect(screen.getByText('Total Users')).toBeInTheDocument();
-    
+
     // Test value is displayed
     expect(screen.getByText('1,234')).toBeInTheDocument();
-    
+
     // Test trend is displayed
     expect(screen.getByText('+12%')).toBeInTheDocument();
-    
+
     // Test trend label is displayed
     expect(screen.getByText('from last month')).toBeInTheDocument();
   });
@@ -151,7 +151,7 @@ describe('DashboardMetricCard', () => {
     };
 
     render(<DashboardMetricCard {...negativeTrendProps} />);
-    
+
     expect(screen.getByText('-5%')).toBeInTheDocument();
     expect(screen.getByText('from last week')).toBeInTheDocument();
   });
@@ -164,7 +164,7 @@ describe('DashboardMetricCard', () => {
     };
 
     render(<DashboardMetricCard {...longContentProps} />);
-    
+
     expect(screen.getByText('Total Active Users This Month')).toBeInTheDocument();
     expect(screen.getByText('1,234,567')).toBeInTheDocument();
   });

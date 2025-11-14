@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { expectElementWithClasses } from '../../../../test-utils/shared-test-utils';
+import { expectElementWithClasses } from '../../../../lib/utils/test-utils/shared-test-utils';
 import { FinanceInvoices } from './finance-invoices';
 
 // Local mocks (must come before shared test utils import)

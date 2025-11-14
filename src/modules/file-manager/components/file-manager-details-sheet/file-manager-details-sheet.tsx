@@ -9,7 +9,7 @@ import {
   SharedUser,
 } from '@/modules/file-manager/utils/file-manager';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/utils/custom-date/custom-date';
 import { FileType } from '@/modules/file-manager/types/file-manager.type';
 
 export interface IFileDataWithSharing {

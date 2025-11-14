@@ -18,7 +18,7 @@ Object.defineProperty(window, 'location', {
 });
 
 import { vi } from 'vitest';
-import '../../test-utils/shared-test-utils';
+import '../../lib/utils/test-utils/shared-test-utils';
 
 // Mock the core barrel so named imports in MainLayout resolve to test doubles
 vi.mock('@/components/core', () => ({

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { NotificationItem } from './notification-item';
-import { QueryWrapper } from '@/test-utils/test-providers';
+import { QueryWrapper } from '@/lib/utils/test-utils/test-providers';
 import { vi, expect, it, describe, beforeEach } from 'vitest';
 
 // Mock translation
