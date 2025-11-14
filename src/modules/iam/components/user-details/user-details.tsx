@@ -14,7 +14,6 @@ import { Calendar, Clock, Mail, Phone, Shield, User } from 'lucide-react';
 import { Separator } from '@/components/ui-kit/separator';
 import { useForgotPassword, useResendActivation } from '@/modules/auth/hooks/use-auth';
 import DummyProfile from '@/assets/images/dummy_profile.png';
-import API_CONFIG from '@/config/api';
 import { Dialog } from '@/components/ui-kit/dialog';
 import { UserDetailItem } from './user-details-item';
 import { IamData } from '../../types/user.types';
@@ -50,6 +49,8 @@ interface UserDetailsSheetProps {
 
 type ModalType = 'resetPassword' | 'resendActivation' | 'edit' | null;
 
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+
 export const UserDetails = ({
   open,
   onOpenChange,
@@ -80,7 +81,7 @@ export const UserDetails = ({
     handleApiOperation(() =>
       resetPassword({
         email: selectedUser.email,
-        projectKey: API_CONFIG.blocksKey,
+        projectKey: projectKey,
       })
     );
   };

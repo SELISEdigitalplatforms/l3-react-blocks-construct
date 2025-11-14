@@ -1,59 +1,71 @@
 import { render, screen } from '@testing-library/react';
 import { vi, describe, test, beforeEach, expect } from 'vitest';
 import { DashboardCard } from './dashboard-card';
-import '../../../../lib/utils/test-utils/shared-test-utils';
 
-vi.mock('@/components/ui-kit/card', () => {
-  return {
-    Card: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card" {...props}>
-        {children}
-      </div>
-    ),
-    CardHeader: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-header" {...props}>
-        {children}
-      </div>
-    ),
-    CardContent: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-content" {...props}>
-        {children}
-      </div>
-    ),
-    CardTitle: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-title" {...props}>
-        {children}
-      </div>
-    ),
-    CardDescription: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-description" {...props}>
-        {children}
-      </div>
-    ),
-  };
-});
-
-vi.mock('@/components/ui-kit/select', () => {
-  return {
-    Select: ({ children }: any) => <div data-testid="select">{children}</div>,
-    SelectTrigger: ({ children }: any) => <button data-testid="select-trigger">{children}</button>,
-    SelectValue: ({ placeholder }: any) => <span data-testid="select-value">{placeholder}</span>,
-    SelectContent: ({ children }: any) => <div data-testid="select-content">{children}</div>,
-    SelectGroup: ({ children }: any) => <div data-testid="select-group">{children}</div>,
-    SelectItem: ({ children, value }: any) => (
-      <div data-testid={`select-item-${value}`}>{children}</div>
-    ),
-  };
-});
-
-// -----------------------------------------------------------------------------
-// 🔹 Mock react-i18next
-// -----------------------------------------------------------------------------
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
+// Mock Card and Select components - Must be defined before imports to avoid hoisting issues
+vi.mock('@/components/ui-kit/card', () => ({
+  Card: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
+  CardHeader: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-header" {...props}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
+  CardTitle: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-title" {...props}>
+      {children}
+    </div>
+  ),
+  CardDescription: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-description" {...props}>
+      {children}
+    </div>
+  ),
 }));
+
+vi.mock('@/components/ui-kit/select', () => ({
+  Select: ({ children, ...props }: any) => (
+    <div data-testid="select" {...props}>
+      {children}
+    </div>
+  ),
+  SelectTrigger: ({ children, className, ...props }: any) => (
+    <button className={className} data-testid="select-trigger" {...props}>
+      {children}
+    </button>
+  ),
+  SelectValue: ({ placeholder, ...props }: any) => (
+    <span data-testid="select-value" {...props}>
+      {placeholder}
+    </span>
+  ),
+  SelectContent: ({ children, ...props }: any) => (
+    <div data-testid="select-content" {...props}>
+      {children}
+    </div>
+  ),
+  SelectGroup: ({ children, ...props }: any) => (
+    <div data-testid="select-group" {...props}>
+      {children}
+    </div>
+  ),
+  SelectItem: ({ children, value, ...props }: any) => (
+    <div data-testid={`select-item-${value}`} data-value={value} {...props}>
+      {children}
+    </div>
+  ),
+}));
+
+// Import shared test utils for react-i18next mock AFTER mocks
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // -----------------------------------------------------------------------------
 // 🔹 Test Data

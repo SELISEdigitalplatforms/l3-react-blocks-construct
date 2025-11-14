@@ -4,7 +4,7 @@ import { ActivityLogGroup } from './activity-log-group';
 import { ActivityItem } from '../../types/activity-log.types';
 import '../../../../../lib/utils/test-utils/shared-test-utils';
 
-// Mock dependencies - V2 specific
+// Mock dependencies - V2 specific - Must be defined before imports to avoid hoisting issues
 vi.mock('../activity-log-item/activity-log-item', () => ({
   ActivityLogItem: ({
     time,
@@ -33,7 +33,6 @@ vi.mock('../activity-log-item/activity-log-item', () => ({
 
 vi.mock('../../utils/activity-log-utils', () => ({
   getFormattedDateLabel: vi.fn((date: string) => {
-    // Mock implementation for predictable testing
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
@@ -48,25 +47,21 @@ vi.mock('../../utils/activity-log-utils', () => ({
   }),
 }));
 
-// Test data
-const mockActivityItems: ActivityItem[] = [
-  {
-    time: '10:30',
-    category: 'system',
-    description: 'User logged in successfully',
-  },
-  {
-    time: '11:45',
-    category: 'task',
-    description: 'Task completed: Review documents',
-  },
-  {
-    time: '14:20',
-    category: 'notification',
-    description: 'New message received',
-  },
-];
+// Import shared utilities AFTER mocks to avoid hoisting issues
+import {
+  mockActivityItems,
+  getExpectedDateLabel,
+  expectDateLabelToBeDisplayed,
+  expectBasicActivityItemAttributes,
+  expectItemsInCorrectOrder,
+  createLongDescriptionItem,
+  createSpecialCharsItem,
+  createDifferentTimeItems,
+  createSingleItem,
+  createEmptyItems,
+} from '../../../test-utils/activity-log-group-test-utils';
 
+// Test data
 const mockProps = {
   date: '2024-01-15',
   items: mockActivityItems,
@@ -79,18 +74,15 @@ const renderActivityLogGroupV2 = (props = mockProps) => {
   return render(<ActivityLogGroup {...props} />);
 };
 
-const getExpectedDateLabel = (date: string) => `MOCK_WEEKDAY - ${date}`;
-
 const expectActivityItemsToBeRenderedV2 = (items: ActivityItem[], isLastIndex = false) => {
   const activityItems = screen.queryAllByTestId('activity-log-item');
   expect(activityItems).toHaveLength(items.length);
 
-  items.forEach((item, index) => {
-    expect(activityItems[index]).toHaveAttribute('data-time', item.time);
-    expect(activityItems[index]).toHaveAttribute('data-category', item.category);
-    expect(activityItems[index]).toHaveTextContent(item.description);
+  // Use shared helper for basic attributes
+  expectBasicActivityItemAttributes(Array.from(activityItems), items);
 
-    // V2-specific props
+  // V2-specific props
+  items.forEach((item, index) => {
     expect(activityItems[index]).toHaveAttribute('data-is-even', String(index % 2 === 0));
     expect(activityItems[index]).toHaveAttribute('data-is-first', String(index === 0));
     expect(activityItems[index]).toHaveAttribute(
@@ -101,8 +93,7 @@ const expectActivityItemsToBeRenderedV2 = (items: ActivityItem[], isLastIndex = 
 };
 
 const expectDateLabelToBeDisplayedV2 = (date: string) => {
-  const expectedLabel = getExpectedDateLabel(date);
-  expect(screen.getByText(expectedLabel)).toBeInTheDocument();
+  expectDateLabelToBeDisplayed(date);
 };
 
 const expectV2DateBadgeStyling = () => {
@@ -199,19 +190,14 @@ describe('ActivityLogGroup V2', () => {
 
   describe('Activity Items Rendering', () => {
     it('should render items with unique keys', () => {
-      const { container } = renderActivityLogGroupV2();
-
-      const activityItems = container.querySelectorAll('[data-testid="activity-log-item"]');
+      renderActivityLogGroupV2();
+      const activityItems = screen.queryAllByTestId('activity-log-item');
       expect(activityItems).toHaveLength(mockActivityItems.length);
-
-      // Verify items are rendered in correct order
-      mockActivityItems.forEach((item, index) => {
-        expect(activityItems[index]).toHaveTextContent(item.description);
-      });
+      expectItemsInCorrectOrder(mockActivityItems);
     });
 
     it('should handle empty items array', () => {
-      const emptyItems: ActivityItem[] = [];
+      const emptyItems = createEmptyItems();
       const propsWithEmptyItems = { ...mockProps, items: emptyItems };
 
       renderActivityLogGroupV2(propsWithEmptyItems);
@@ -221,7 +207,7 @@ describe('ActivityLogGroup V2', () => {
     });
 
     it('should handle single item', () => {
-      const singleItem = [mockActivityItems[0]];
+      const singleItem = createSingleItem();
       const propsWithSingleItem = { ...mockProps, items: singleItem };
 
       renderActivityLogGroupV2(propsWithSingleItem);
@@ -311,12 +297,7 @@ describe('ActivityLogGroup V2', () => {
 
   describe('Edge Cases', () => {
     it('should handle very long descriptions', () => {
-      const longDescriptionItem = {
-        time: '10:30',
-        category: 'system',
-        description:
-          'This is a very long description that might wrap to multiple lines and should be handled gracefully by the component without breaking the layout or functionality',
-      };
+      const longDescriptionItem = createLongDescriptionItem();
       const propsWithLongDescription = { ...mockProps, items: [longDescriptionItem] };
 
       renderActivityLogGroupV2(propsWithLongDescription);
@@ -324,11 +305,7 @@ describe('ActivityLogGroup V2', () => {
     });
 
     it('should handle special characters in descriptions', () => {
-      const specialCharsItem = {
-        time: '10:30',
-        category: 'system',
-        description: 'Special chars: @#$%^&*()_+-=[]{}|;:,.<>?',
-      };
+      const specialCharsItem = createSpecialCharsItem();
       const propsWithSpecialChars = { ...mockProps, items: [specialCharsItem] };
 
       renderActivityLogGroupV2(propsWithSpecialChars);
@@ -336,11 +313,7 @@ describe('ActivityLogGroup V2', () => {
     });
 
     it('should handle different time formats', () => {
-      const differentTimeItems = [
-        { time: '9:05', category: 'system', description: 'Morning activity' },
-        { time: '13:30', category: 'task', description: 'Afternoon activity' },
-        { time: '23:59', category: 'notification', description: 'Late night activity' },
-      ];
+      const differentTimeItems = createDifferentTimeItems();
       const propsWithDifferentTimes = { ...mockProps, items: differentTimeItems };
 
       renderActivityLogGroupV2(propsWithDifferentTimes);

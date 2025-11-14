@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { DashboardUserPlatform } from './dashboard-user-platform';
 import { vi } from 'vitest';
 
+// Mock all UI components - Must be defined before imports to avoid hoisting issues
 vi.mock('components/ui/chart', () => ({
   ChartContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="chart-container">{children}</div>
@@ -28,7 +29,6 @@ vi.mock('components/ui/chart', () => ({
   ChartLegendContent: () => <div data-testid="chart-legend-content">Legend Content</div>,
 }));
 
-// Valid PieChart mock with proper data handling
 vi.mock('recharts', () => ({
   PieChart: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
@@ -71,36 +71,34 @@ vi.mock('recharts', () => ({
   ),
 }));
 
-// Mock the Card components
-vi.mock('components/ui/card', () => {
-  return {
-    Card: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card" {...props}>
-        {children}
-      </div>
-    ),
-    CardHeader: ({ children, className, ...props }: any) => (
-      <div className={className} {...props}>
-        {children}
-      </div>
-    ),
-    CardContent: ({ children, className, ...props }: any) => (
-      <div className={className} {...props}>
-        {children}
-      </div>
-    ),
-    CardTitle: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-title" {...props}>
-        {children}
-      </div>
-    ),
-    CardDescription: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-description" {...props}>
-        {children}
-      </div>
-    ),
-  };
-});
+vi.mock('components/ui/card', () => ({
+  Card: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
+  CardHeader: ({ children, className, ...props }: any) => (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children, className, ...props }: any) => (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  ),
+  CardTitle: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-title" {...props}>
+      {children}
+    </div>
+  ),
+  CardDescription: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-description" {...props}>
+      {children}
+    </div>
+  ),
+}));
+
 vi.mock('components/ui/select', () => {
   const mockMonths = [
     'january',
@@ -121,7 +119,6 @@ vi.mock('components/ui/select', () => {
     Select: ({ children }: { children: React.ReactNode }) => (
       <div data-testid="select">
         {children}
-        {/* Render month items when Select is rendered */}
         {mockMonths.map((month) => (
           <div key={month} data-testid={`select-item-${month}`} data-value={month}>
             {month}
@@ -149,11 +146,8 @@ vi.mock('components/ui/select', () => {
   };
 });
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+// Import shared test utils for react-i18next mock AFTER mocks
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 describe('DashboardUserPlatform', () => {
   it('renders the component structure correctly', () => {

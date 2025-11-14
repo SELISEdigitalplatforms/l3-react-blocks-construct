@@ -1,8 +1,5 @@
 import { clients } from '@/lib/https';
-import API_CONFIG from '../../../config/api';
-import { GetUsersPayload } from '../hooks/use-iam';
-import { IamData } from '../types/user.types';
-
+import { GetUsersPayload, IamData } from '../types/user.types';
 
 export const getUsers = (payload: GetUsersPayload) => {
   const requestBody = {
@@ -48,6 +45,8 @@ export interface GetRolesPayload {
   projectKey?: string;
 }
 
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+
 /**
  * Function to fetch a list of roles from the API with pagination, sorting, and filtering.
  *
@@ -67,7 +66,7 @@ export const getRoles = (payload: GetRolesPayload) => {
     filter: {
       search: payload.filter?.search ?? '',
     },
-    projectKey: API_CONFIG.blocksKey,
+    projectKey: projectKey,
   };
 
   return clients.post<{
