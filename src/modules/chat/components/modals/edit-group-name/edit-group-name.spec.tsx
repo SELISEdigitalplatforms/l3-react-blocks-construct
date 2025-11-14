@@ -2,14 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 
-// Mock translation
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
-// Mock Dialog and related UI components
+// Mock Dialog and related UI components - Must be defined before imports to avoid hoisting issues
 vi.mock('components/ui/dialog', () => ({
   Dialog: ({ open, children }: any) => (open ? <div>{children}</div> : null),
   DialogContent: ({ children }: any) => <div>{children}</div>,
@@ -29,6 +22,9 @@ vi.mock('components/ui/button', () => ({
 vi.mock('components/ui/input', () => ({
   Input: (props: any) => <input {...props} />,
 }));
+
+// Import shared test utils for react-i18next mock AFTER mocks
+import '../../../../../lib/utils/test-utils/shared-test-utils';
 
 import { EditGroupName } from './edit-group-name';
 

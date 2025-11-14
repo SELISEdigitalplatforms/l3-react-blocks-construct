@@ -9,7 +9,6 @@ import { Dialog, DialogTrigger } from '@/components/ui-kit/dialog';
 import { useForgotPassword, useResendActivation } from '@/modules/auth/hooks/use-auth';
 import { AddUser } from '../../components/add-profile/add-profile';
 import { UserDetails } from '../../components/user-details/user-details';
-import API_CONFIG from '@/config/api';
 import { IamData } from '../../types/user.types';
 import IamTableToolbar from '../../components/iam-table/iam-table-toolbar';
 import { useGetUsersQuery } from '../../hooks/use-iam';
@@ -21,6 +20,8 @@ interface PaginationState {
   pageSize: number;
   totalCount: number;
 }
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
 /**
  * Table toolbar component for handling filters and search.
@@ -117,7 +118,7 @@ export const UsersTablePage = () => {
     try {
       await resetPassword({
         email: selectedUser.email,
-        projectKey: API_CONFIG.blocksKey,
+        projectKey: projectKey,
       });
       setIsResetPasswordModalOpen(false);
     } catch (error) {

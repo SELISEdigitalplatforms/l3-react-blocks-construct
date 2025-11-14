@@ -1,38 +1,36 @@
 import { render, screen } from '@testing-library/react';
 import { DashboardOverview } from './dashboard-overview';
 import { vi } from 'vitest';
-import '../../../../lib/utils/test-utils/shared-test-utils';
 
-// Mock the Card components
-vi.mock('components/ui/card', () => {
-  return {
-    Card: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card" {...props}>
-        {children}
-      </div>
-    ),
-    CardHeader: ({ children, className, ...props }: any) => (
-      <div className={className} {...props}>
-        {children}
-      </div>
-    ),
-    CardContent: ({ children, className, ...props }: any) => (
-      <div className={className} {...props}>
-        {children}
-      </div>
-    ),
-    CardTitle: ({ children, className, ...props }: any) => (
-      <div className={className} data-testid="card-title" {...props}>
-        {children}
-      </div>
-    ),
-    CardDescription: ({ children, className, ...props }: any) => (
-      <div className={className} {...props}>
-        {children}
-      </div>
-    ),
-  };
-}); // Mock the Select components
+// Mock all UI components - Must be defined before imports to avoid hoisting issues
+vi.mock('components/ui/card', () => ({
+  Card: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
+  CardHeader: ({ children, className, ...props }: any) => (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children, className, ...props }: any) => (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  ),
+  CardTitle: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-title" {...props}>
+      {children}
+    </div>
+  ),
+  CardDescription: ({ children, className, ...props }: any) => (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  ),
+}));
+
 vi.mock('components/ui/select', () => {
   const mockMonths = [
     'January',
@@ -82,27 +80,30 @@ vi.mock('components/ui/select', () => {
 
 vi.mock('lucide-react', () => ({
   TrendingUp: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-trending-up" className={`lucide-trending-up ${className}`} />
+    <svg data-testid="icon-trending-up" className={`lucide-trending-up ${className || ''}`} />
   ),
   Users: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-users" className={`lucide-users ${className}`} />
+    <svg data-testid="icon-users" className={`lucide-users ${className || ''}`} />
   ),
   UserCog: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-user-cog" className={`lucide-user-cog ${className}`} />
+    <svg data-testid="icon-user-cog" className={`lucide-user-cog ${className || ''}`} />
   ),
   UserPlus: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-user-plus" className={`lucide-user-plus ${className}`} />
+    <svg data-testid="icon-user-plus" className={`lucide-user-plus ${className || ''}`} />
   ),
   ChevronDown: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-chevron-down" className={`lucide-chevron-down ${className}`} />
+    <svg data-testid="icon-chevron-down" className={`lucide-chevron-down ${className || ''}`} />
   ),
   ChevronUp: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-chevron-up" className={`lucide-chevron-up ${className}`} />
+    <svg data-testid="icon-chevron-up" className={`lucide-chevron-up ${className || ''}`} />
   ),
   Check: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-check" className={`lucide-check ${className}`} />
+    <svg data-testid="icon-check" className={`lucide-check ${className || ''}`} />
   ),
 }));
+
+// Import shared test utils for react-i18next mock AFTER mocks
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 vi.mock('../../services/dashboard-service', () => ({
   monthsOfYear: [

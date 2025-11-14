@@ -26,7 +26,6 @@ import {
 } from '../../types/inventory.types';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
-import API_CONFIG from '@/config/api';
 import { GetPreSignedUrlForUploadResponse } from '@/lib/api/types/storage.types';
 import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
 import { useDeleteInventoryItem, useGetInventories, useUpdateInventoryItem } from '../../hooks/use-inventory';
@@ -47,6 +46,8 @@ import { useDeleteInventoryItem, useGetInventories, useUpdateInventoryItem } fro
  * // Example usage:
  * <AdvanceInventoryDetails />
  */
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
 export function AdvanceInventoryDetails() {
   const [selectedImage, setSelectedImage] = useState('');
@@ -108,7 +109,7 @@ export function AdvanceInventoryDetails() {
         getPreSignedUrl(
           {
             name: file.name,
-            projectKey: API_CONFIG.blocksKey,
+            projectKey: projectKey,
             itemId: '',
             metaData: '',
             accessModifier: 'Public',

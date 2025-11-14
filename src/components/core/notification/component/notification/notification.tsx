@@ -8,12 +8,14 @@ import { useGetNotifications, useMarkAllNotificationAsRead } from '../../hooks/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
 import { NotificationItem } from '../notification-item/notification-item';
 import { subscribeNotifications } from '@seliseblocks/notifications';
-import API_CONFIG from '@/config/api';
 import { useAuthStore } from '@/state/store/auth';
 import type { Notification as NotificationType } from '../../types/notification.types';
 import { NotificationSkeletonList } from '../notification-skeleton/notification-skeleton';
 
 const PAGE_SIZE = 10;
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
 export const Notification = () => {
   const { t } = useTranslation();
@@ -170,9 +172,9 @@ export const Notification = () => {
 
       try {
         subscription = subscribeNotifications(
-          `${API_CONFIG.baseUrl}/notification/v1/`,
+          `${baseUrl}/notification/v1/`,
           {
-            projectKey: API_CONFIG.blocksKey,
+            projectKey: projectKey,
             accessTokenFactory: () => accessToken,
           },
           (channel: string, message: unknown) => {

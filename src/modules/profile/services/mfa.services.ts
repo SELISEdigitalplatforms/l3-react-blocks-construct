@@ -1,5 +1,4 @@
 import { clients } from '@/lib/https';
-import API_CONFIG from '../../../config/api';
 import {
   DisableUserMfaRequest,
   DisableUserMfaResponse,
@@ -28,10 +27,12 @@ import {
  * const otpResponse = await generateOTP({ userId: '12345', mfaType: 1 });
  */
 
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+
 export const generateOTP = async (payload: GenerateOTPPayload): Promise<GenerateOTPResponse> => {
   const requestPayload = {
     ...payload,
-    projectKey: API_CONFIG.blocksKey,
+    projectKey: projectKey,
   };
   const res = await clients.post<GenerateOTPResponse>(
     '/mfa/v1/Management/GenerateOTP',
@@ -60,7 +61,7 @@ export const generateOTP = async (payload: GenerateOTPPayload): Promise<Generate
 export const verifyOTP = async (payload: VerifyOTP): Promise<VerifyOTPResponse> => {
   const verifyOTPPayload = {
     ...payload,
-    projectKey: API_CONFIG.blocksKey,
+    projectKey: projectKey,
   };
   const res = await clients.post<VerifyOTPResponse>(
     '/mfa/v1/Management/VerifyOTP',
@@ -111,7 +112,7 @@ export const getSetUpTotp = async (context: {
 export const resendOtp = async (mfaId: string): Promise<ResendOtpResponse> => {
   const requestPayload = {
     mfaId,
-    projectKey: API_CONFIG.blocksKey,
+    projectKey: projectKey,
   };
   const res = await clients.post<ResendOtpResponse>(
     '/mfa/v1/Management/ResendOtp',
@@ -135,7 +136,7 @@ export const resendOtp = async (mfaId: string): Promise<ResendOtpResponse> => {
  */
 export const getMfaTemplate = async (): Promise<GetMfaTemplateResponse> => {
   const params = new URLSearchParams({
-    projectKey: API_CONFIG.blocksKey,
+    projectKey: projectKey,
   });
   const url = `/mfa/v1/Configuration/Get?${params.toString()}`;
   const res = await clients.get<GetMfaTemplateResponse>(url);
@@ -160,7 +161,7 @@ export const getMfaTemplate = async (): Promise<GetMfaTemplateResponse> => {
 export const disableUserMfa = async (userId: string): Promise<DisableUserMfaResponse> => {
   const payload: DisableUserMfaRequest = {
     userId,
-    projectKey: API_CONFIG.blocksKey,
+    projectKey: projectKey,
   };
   const res = await clients.post<DisableUserMfaResponse>(
     '/mfa/v1/Management/DisableUserMfa',
