@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { DashboardOverview } from './dashboard-overview';
 import { vi } from 'vitest';
 
-// Mock all UI components - Must be defined before imports to avoid hoisting issues
+// Card component mocks - matches createCardComponentMocks() from shared-test-utils
 vi.mock('components/ui/card', () => ({
   Card: ({ children, className, ...props }: any) => (
     <div className={className} data-testid="card" {...props}>
@@ -31,6 +31,7 @@ vi.mock('components/ui/card', () => ({
   ),
 }));
 
+// Select component mocks - matches createSelectComponentMocks() from shared-test-utils
 vi.mock('components/ui/select', () => {
   const mockMonths = [
     'January',
@@ -56,7 +57,7 @@ vi.mock('components/ui/select', () => {
     ),
     SelectValue: ({ placeholder, ...props }: any) => (
       <span data-testid="select-value" {...props}>
-        {placeholder || 'THIS_MONTH'}
+        {placeholder ?? 'THIS_MONTH'}
       </span>
     ),
     SelectContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -78,27 +79,28 @@ vi.mock('components/ui/select', () => {
   };
 });
 
+// Lucide icon mocks - matches createLucideIconMocks() from shared-test-utils
 vi.mock('lucide-react', () => ({
   TrendingUp: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-trending-up" className={`lucide-trending-up ${className || ''}`} />
+    <svg data-testid="icon-trending-up" className={`lucide-trending-up ${className ?? ''}`} />
   ),
   Users: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-users" className={`lucide-users ${className || ''}`} />
+    <svg data-testid="icon-users" className={`lucide-users ${className ?? ''}`} />
   ),
   UserCog: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-user-cog" className={`lucide-user-cog ${className || ''}`} />
+    <svg data-testid="icon-user-cog" className={`lucide-user-cog ${className ?? ''}`} />
   ),
   UserPlus: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-user-plus" className={`lucide-user-plus ${className || ''}`} />
+    <svg data-testid="icon-user-plus" className={`lucide-user-plus ${className ?? ''}`} />
   ),
   ChevronDown: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-chevron-down" className={`lucide-chevron-down ${className || ''}`} />
+    <svg data-testid="icon-chevron-down" className={`lucide-chevron-down ${className ?? ''}`} />
   ),
   ChevronUp: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-chevron-up" className={`lucide-chevron-up ${className || ''}`} />
+    <svg data-testid="icon-chevron-up" className={`lucide-chevron-up ${className ?? ''}`} />
   ),
   Check: ({ className }: { className?: string }) => (
-    <svg data-testid="icon-check" className={`lucide-check ${className || ''}`} />
+    <svg data-testid="icon-check" className={`lucide-check ${className ?? ''}`} />
   ),
 }));
 

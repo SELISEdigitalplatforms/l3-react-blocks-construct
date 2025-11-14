@@ -217,34 +217,11 @@ export const createMockTranslation = () => (key: string) => key;
 
 // ------------------ UI Component Mock Factories ------------------
 // Reusable UI component mocks to eliminate duplication across test files
-//
-// ⚠️ IMPORTANT: These factories CANNOT be used directly in vi.mock() calls due to Vitest hoisting.
-// Vitest hoists all vi.mock() calls to the top of the file before any imports are processed.
-// Using imported functions inside vi.mock() causes "Cannot access before initialization" errors.
-//
-// ✅ CORRECT Usage - For reference/documentation only:
-//    These factories document the standard mock structure to use.
-//    Copy the mock implementation inline in your test file.
-//
-// ❌ INCORRECT Usage - Will cause hoisting errors:
-//    import { createCardComponentMocks } from 'shared-test-utils';
-//    vi.mock('components/ui/card', () => createCardComponentMocks()); // ❌ Error!
-//
-// ✅ CORRECT Usage - Inline the mock:
-//    vi.mock('components/ui/card', () => ({
-//      Card: ({ children, className, ...props }: any) => ( /* ... */ ),
-//      // ... rest of mock
-//    }));
-//
-// These factories serve as:
-// 1. Documentation of standard mock patterns
-// 2. Reference for consistent mock structure
-// 3. Copy-paste templates for test files
 
 /**
  * Creates mock Card component family (Card, CardHeader, CardContent, CardTitle, CardDescription)
  * Used by: dashboard, invoices, and other components using card UI
- * 
+ *
  * NOTE: Copy this implementation inline in vi.mock() - do not import and call this function
  */
 export const createCardComponentMocks = () => ({
@@ -302,12 +279,11 @@ export const createSelectComponentMocks = (mockItems?: string[]) => ({
   ),
   SelectGroup: ({ children, ...props }: any) => (
     <div data-testid="select-group" {...props}>
-      {mockItems &&
-        mockItems.map((item) => (
-          <div key={item} data-testid={`select-item-${item}`} data-value={item}>
-            {item}
-          </div>
-        ))}
+      {mockItems?.map((item) => (
+        <div key={item} data-testid={`select-item-${item}`} data-value={item}>
+          {item}
+        </div>
+      ))}
       {children}
     </div>
   ),
@@ -453,7 +429,13 @@ export const createLucideIconMocks = (icons: string[]) => {
   const mocks: Record<string, any> = {};
   icons.forEach((icon) => {
     mocks[icon] = ({ className }: { className?: string }) => (
-      <svg data-testid={`icon-${icon.toLowerCase().replace(/([A-Z])/g, '-$1').slice(1)}`} className={`lucide-${icon.toLowerCase()} ${className || ''}`} />
+      <svg
+        data-testid={`icon-${icon
+          .toLowerCase()
+          .replace(/([A-Z])/g, '-$1')
+          .slice(1)}`}
+        className={`lucide-${icon.toLowerCase()} ${className ?? ''}`}
+      />
     );
   });
   return mocks;

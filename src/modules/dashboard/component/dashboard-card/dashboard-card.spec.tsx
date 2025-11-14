@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { vi, describe, test, beforeEach, expect } from 'vitest';
 import { DashboardCard } from './dashboard-card';
 
-// Mock Card and Select components - Must be defined before imports to avoid hoisting issues
+// Card component mocks - matches createCardComponentMocks() from shared-test-utils
 vi.mock('@/components/ui-kit/card', () => ({
   Card: ({ children, className, ...props }: any) => (
     <div className={className} data-testid="card" {...props}>
@@ -31,6 +31,7 @@ vi.mock('@/components/ui-kit/card', () => ({
   ),
 }));
 
+// Select component mocks - matches createSelectComponentMocks() from shared-test-utils
 vi.mock('@/components/ui-kit/select', () => ({
   Select: ({ children, ...props }: any) => (
     <div data-testid="select" {...props}>

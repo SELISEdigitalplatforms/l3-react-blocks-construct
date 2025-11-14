@@ -3,12 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { DashboardUserActivityGraph } from './dashboard-user-activity-graph';
 import { vi } from 'vitest';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
 vi.mock('components/ui/chart', async () => {
   const actual = await vi.importActual('components/ui/chart');
   return {
@@ -56,13 +50,16 @@ vi.mock('../../services/dashboard-service', () => ({
   ],
 }));
 
+// Import shared test utils for react-i18next mock AFTER mocks
+import '../../../../lib/utils/test-utils/shared-test-utils';
+
 // Mock ResizeObserver if it doesn't exist
 if (!global.ResizeObserver) {
   global.ResizeObserver = vi.fn(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
-  }));
+  })) as any;
 }
 
 describe('DashboardUserActivityGraph Component', () => {

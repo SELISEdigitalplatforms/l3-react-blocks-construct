@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { DashboardUserPlatform } from './dashboard-user-platform';
 import { vi } from 'vitest';
 
-// Mock all UI components - Must be defined before imports to avoid hoisting issues
+// Chart UI component mocks - matches createChartUIComponentMocks() from shared-test-utils
 vi.mock('components/ui/chart', () => ({
   ChartContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="chart-container">{children}</div>
@@ -22,13 +22,14 @@ vi.mock('components/ui/chart', () => ({
   },
   ChartLegend: ({ content }: { content: React.ReactNode }) => (
     <div data-testid="chart-legend">
-      {content || <div data-testid="chart-legend-content">Legend Content</div>}
+      {content ?? <div data-testid="chart-legend-content">Legend Content</div>}
     </div>
   ),
   ChartTooltipContent: () => <div data-testid="chart-tooltip-content">Tooltip Content</div>,
   ChartLegendContent: () => <div data-testid="chart-legend-content">Legend Content</div>,
 }));
 
+// Recharts component mocks - matches createRechartsComponentMocks() from shared-test-utils
 vi.mock('recharts', () => ({
   PieChart: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
@@ -71,6 +72,7 @@ vi.mock('recharts', () => ({
   ),
 }));
 
+// Card component mocks - matches createCardComponentMocks() from shared-test-utils
 vi.mock('components/ui/card', () => ({
   Card: ({ children, className, ...props }: any) => (
     <div className={className} data-testid="card" {...props}>
@@ -99,6 +101,7 @@ vi.mock('components/ui/card', () => ({
   ),
 }));
 
+// Select component mocks - matches createSelectComponentMocks() from shared-test-utils
 vi.mock('components/ui/select', () => {
   const mockMonths = [
     'january',
