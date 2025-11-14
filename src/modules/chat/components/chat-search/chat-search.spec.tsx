@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@/test-utils/shared-test-utils';
+import '@/lib/utils/test-utils/shared-test-utils';
 
 import { ChatSearch } from './chat-search';
 

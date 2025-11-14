@@ -16,7 +16,7 @@ import {
   useReactTable,
   Table as TableInstance,
 } from '@tanstack/react-table';
-import uuidv4 from '@/utils/uuid';
+import uuidv4 from '@/lib/utils/uuid';
 import {
   Table,
   TableBody,

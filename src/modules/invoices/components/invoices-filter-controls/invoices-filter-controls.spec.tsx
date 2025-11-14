@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { InvoicesFilterControls } from './invoices-filter-controls';
 import { vi } from 'vitest';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // Mock the DateRangeFilter component
 vi.mock('components/core/data-table/data-table-date-filter', () => ({

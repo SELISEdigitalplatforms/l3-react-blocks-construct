@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { InvoicesDetail } from './invoices-detail';
 import { InvoiceStatus } from '../../types/invoices.types';
-import { renderWithProviders } from '@/test-utils/test-providers';
+import { renderWithProviders } from '@/lib/utils/test-utils/test-providers';
 import { vi } from 'vitest';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');

@@ -31,7 +31,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui-kit/too
 import { Button } from '@/components/ui-kit/button';
 import { EmailTextEditor } from '../email-text-editor/email-text-editor';
 import { EmailCompose } from '../email-compose/email-compose';
-import { sanitizeHTML } from '@/utils/sanitizer';
+import { sanitizeHTML } from '@/lib/utils/sanitizer';
 import { TooltipConfirmAction } from '../email-tooltip-confirm-action/email-tooltip-confirm-action';
 import { EmailActionsReplyPanel } from '../email-actions-reply-panel/email-actions-reply-panel';
 import { EmailViewResponseType } from '../email-view-response-type/email-view-response-type';

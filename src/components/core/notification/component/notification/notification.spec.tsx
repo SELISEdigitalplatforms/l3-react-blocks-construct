@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import { Notification } from './notification';
 import { vi } from 'vitest';
-import { renderWithProviders } from '@/test-utils/test-providers';
+import { renderWithProviders } from '@/lib/utils/test-utils/test-providers';
 
 // Mock translation
 vi.mock('react-i18next', () => ({

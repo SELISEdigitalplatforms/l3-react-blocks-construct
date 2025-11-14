@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { InvoiceDetailsPage } from './invoices-detail';
@@ -75,7 +75,6 @@ const mockInvoice: InvoiceItem = {
 };
 
 describe('InvoiceDetailsPage', () => {
-
   beforeEach(() => {
     // Reset all mocks before each test
     vi.clearAllMocks();

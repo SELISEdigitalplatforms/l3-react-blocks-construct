@@ -164,192 +164,185 @@ const convertDefinitions = <T>(
   parentId?: string
 ): T[] => definitions.map((def) => converter(def, parentId));
 
+/**
+ * Helper to create a file item with common defaults
+ */
+const createFileItem = (
+  idSuffix: string,
+  name: string,
+  fileType: FileType,
+  overrides: Partial<FolderItemInput> = {}
+): FolderItemInput => ({
+  idSuffix,
+  name,
+  fileType,
+  ...overrides,
+});
+
+/**
+ * Helper to create a trash item with common defaults
+ */
+const createTrashItem = (
+  idSuffix: string,
+  name: string,
+  fileType: FileType,
+  trashedDate: string,
+  overrides: Partial<TrashItemInput> = {}
+): TrashItemInput => ({
+  idSuffix,
+  name,
+  fileType,
+  trashedDate,
+  ...overrides,
+});
+
+/**
+ * Helper to reduce Record<string, T[]> with converter
+ */
+const convertRecordDefinitions = <T>(
+  data: Record<string, BaseFileDefinition[]>,
+  converter: (def: BaseFileDefinition, parentId?: string) => T
+): Record<string, T[]> =>
+  Object.entries(data).reduce(
+    (acc, [folderId, definitions]) => {
+      acc[folderId] = convertDefinitions(definitions, converter, folderId);
+      return acc;
+    },
+    {} as Record<string, T[]>
+  );
+
 // ============================================================================
 // DATA DEFINITIONS
 // ============================================================================
 
 const FOLDER_CONTENTS_DATA: Record<string, BaseFileDefinition[]> = {
   '1': createFolderContents('1', [
-    {
-      idSuffix: '1',
-      name: 'Weekly_Standup_Notes.doc',
-      fileType: 'File',
+    createFileItem('1', 'Weekly_Standup_Notes.doc', 'File', {
       size: '2.3 MB',
       isShared: true,
       sharedById: '1',
       sharedWithIds: ['2', '3'],
-    },
-    {
-      idSuffix: '2',
-      name: 'Sprint_Planning.pdf',
-      fileType: 'File',
+    }),
+    createFileItem('2', 'Sprint_Planning.pdf', 'File', {
       lastModified: '2025-01-28',
       size: '1.8 MB',
       isShared: true,
       sharedById: '2',
       sharedWithIds: ['2'],
-    },
-    {
-      idSuffix: '3',
-      name: 'Action_Items.xlsx',
-      fileType: 'File',
+    }),
+    createFileItem('3', 'Action_Items.xlsx', 'File', {
       lastModified: '2025-01-25',
       size: '0.9 MB',
       isShared: false,
       sharedById: '3',
-    },
+    }),
   ]),
   '2': createFolderContents('2', [
-    {
-      idSuffix: '1',
-      name: 'Survey_Results.csv',
-      fileType: 'File',
+    createFileItem('1', 'Survey_Results.csv', 'File', {
       lastModified: '2025-02-02',
       size: '5.4 MB',
       isShared: true,
       sharedById: '2',
       sharedWithIds: ['1', '4'],
-    },
-    {
-      idSuffix: '2',
-      name: 'Analysis_Report.pdf',
-      fileType: 'File',
+    }),
+    createFileItem('2', 'Analysis_Report.pdf', 'File', {
       lastModified: '2025-01-30',
       size: '3.2 MB',
       isShared: true,
       sharedWithIds: ['2', '3', '4'],
-    },
-    {
-      idSuffix: '3',
-      name: 'Raw_Data.json',
-      fileType: 'File',
+    }),
+    createFileItem('3', 'Raw_Data.json', 'File', {
       lastModified: '2025-01-27',
       size: '12.1 MB',
       isShared: false,
       sharedById: '4',
-    },
+    }),
   ]),
   '3': createFolderContents('3', [
-    {
-      idSuffix: '1',
-      name: 'Contract_Agreement.pdf',
-      fileType: 'File',
+    createFileItem('1', 'Contract_Agreement.pdf', 'File', {
       size: '2.7 MB',
       isShared: true,
       sharedById: '3',
       sharedWithIds: ['1', '2'],
-    },
-    {
-      idSuffix: '2',
-      name: 'Client_Proposal.docx',
-      fileType: 'File',
+    }),
+    createFileItem('2', 'Client_Proposal.docx', 'File', {
       lastModified: '2025-01-29',
       size: '4.1 MB',
       isShared: true,
       sharedWithIds: ['3', '4'],
-    },
-    {
-      idSuffix: '3',
-      name: 'Requirements_Spec.pdf',
-      fileType: 'File',
+    }),
+    createFileItem('3', 'Requirements_Spec.pdf', 'File', {
       lastModified: '2025-01-26',
       size: '6.3 MB',
       isShared: true,
       sharedById: '2',
       sharedWithIds: ['1', '3'],
-    },
+    }),
   ]),
   '4': createFolderContents('4', [
-    {
-      idSuffix: '1',
-      name: 'Architecture_Diagram.png',
-      fileType: 'Image',
+    createFileItem('1', 'Architecture_Diagram.png', 'Image', {
       size: '3.8 MB',
       isShared: true,
       sharedWithIds: ['2', '4'],
-    },
-    {
-      idSuffix: '2',
-      name: 'Technical_Specs.md',
-      fileType: 'File',
+    }),
+    createFileItem('2', 'Technical_Specs.md', 'File', {
       lastModified: '2025-01-31',
       size: '1.2 MB',
       isShared: true,
       sharedById: '4',
       sharedWithIds: ['1', '2', '3'],
-    },
-    {
-      idSuffix: '3',
-      name: 'Code_Review.pdf',
-      fileType: 'File',
+    }),
+    createFileItem('3', 'Code_Review.pdf', 'File', {
       lastModified: '2025-01-28',
       size: '2.9 MB',
       isShared: false,
       sharedById: '3',
-    },
+    }),
   ]),
   '5': createFolderContents('5', [
-    {
-      idSuffix: '1',
-      name: 'Logo_Variations.ai',
-      fileType: 'File',
+    createFileItem('1', 'Logo_Variations.ai', 'File', {
       lastModified: '2025-02-02',
       size: '8.4 MB',
       isShared: true,
       sharedById: '4',
       sharedWithIds: ['1', '3'],
-    },
-    {
-      idSuffix: '2',
-      name: 'UI_Components.sketch',
-      fileType: 'File',
+    }),
+    createFileItem('2', 'UI_Components.sketch', 'File', {
       lastModified: '2025-01-30',
       size: '15.7 MB',
       isShared: true,
       sharedById: '3',
       sharedWithIds: ['1', '2', '4'],
-    },
-    {
-      idSuffix: '3',
-      name: 'Color_Palette.png',
-      fileType: 'Image',
+    }),
+    createFileItem('3', 'Color_Palette.png', 'Image', {
       lastModified: '2025-01-27',
       size: '1.1 MB',
       isShared: true,
       sharedWithIds: ['2', '3'],
-    },
+    }),
   ]),
   '11': createFolderContents('11', [
-    {
-      idSuffix: '1',
-      name: 'Campaign_Banner.jpg',
-      fileType: 'Image',
+    createFileItem('1', 'Campaign_Banner.jpg', 'Image', {
       lastModified: '2025-01-31',
       size: '7.2 MB',
       isShared: true,
       sharedById: '4',
       sharedWithIds: ['1', '2'],
-    },
-    {
-      idSuffix: '2',
-      name: 'Social_Media_Kit.zip',
-      fileType: 'File',
+    }),
+    createFileItem('2', 'Social_Media_Kit.zip', 'File', {
       lastModified: '2025-01-29',
       size: '23.5 MB',
       isShared: true,
       sharedById: '2',
       sharedWithIds: ['1', '3', '4'],
-    },
-    {
-      idSuffix: '3',
-      name: 'Brand_Guidelines.pdf',
-      fileType: 'File',
+    }),
+    createFileItem('3', 'Brand_Guidelines.pdf', 'File', {
       lastModified: '2025-01-26',
       size: '9.8 MB',
       isShared: true,
       sharedById: '3',
       sharedWithIds: ['1', '2', '4'],
-    },
+    }),
   ]),
 };
 
@@ -538,50 +531,14 @@ const TRASH_DEFINITIONS: BaseFileDefinition[] = [
 
 const TRASH_FOLDER_CONTENTS: Record<string, BaseFileDefinition[]> = {
   '3': createTrashFolderContents('3', [
-    {
-      idSuffix: '1',
-      name: 'Logo_Design.png',
-      fileType: 'Image',
-      trashedDate: '2025-01-03',
-      size: '2.1 MB',
-    },
-    {
-      idSuffix: '2',
-      name: 'Brand_Guidelines.pdf',
-      fileType: 'File',
-      trashedDate: '2025-06-03',
-      size: '5.3 MB',
-    },
-    {
-      idSuffix: '3',
-      name: 'Icon_Set.svg',
-      fileType: 'Image',
-      trashedDate: '2025-03-03',
-      size: '1.8 MB',
-    },
+    createTrashItem('1', 'Logo_Design.png', 'Image', '2025-01-03', { size: '2.1 MB' }),
+    createTrashItem('2', 'Brand_Guidelines.pdf', 'File', '2025-06-03', { size: '5.3 MB' }),
+    createTrashItem('3', 'Icon_Set.svg', 'Image', '2025-03-03', { size: '1.8 MB' }),
   ]),
   '4': createTrashFolderContents('4', [
-    {
-      idSuffix: '1',
-      name: 'Mockup_Design.jpg',
-      fileType: 'Image',
-      trashedDate: '2025-01-10',
-      size: '4.2 MB',
-    },
-    {
-      idSuffix: '2',
-      name: 'Style_Guide.docx',
-      fileType: 'File',
-      trashedDate: '2025-04-03',
-      size: '3.1 MB',
-    },
-    {
-      idSuffix: '3',
-      name: 'Color_Palette.png',
-      fileType: 'Image',
-      trashedDate: '2025-04-03',
-      size: '0.9 MB',
-    },
+    createTrashItem('1', 'Mockup_Design.jpg', 'Image', '2025-01-10', { size: '4.2 MB' }),
+    createTrashItem('2', 'Style_Guide.docx', 'File', '2025-04-03', { size: '3.1 MB' }),
+    createTrashItem('3', 'Color_Palette.png', 'Image', '2025-04-03', { size: '0.9 MB' }),
   ]),
 };
 
@@ -589,14 +546,9 @@ const TRASH_FOLDER_CONTENTS: Record<string, BaseFileDefinition[]> = {
 // GENERATED EXPORTS
 // ============================================================================
 
-export const filesFolderContents: Record<string, IFileDataWithSharing[]> = Object.entries(
-  FOLDER_CONTENTS_DATA
-).reduce(
-  (acc, [folderId, definitions]) => {
-    acc[folderId] = convertDefinitions(definitions, definitionToFile, folderId);
-    return acc;
-  },
-  {} as Record<string, IFileDataWithSharing[]>
+export const filesFolderContents: Record<string, IFileDataWithSharing[]> = convertRecordDefinitions(
+  FOLDER_CONTENTS_DATA,
+  definitionToFile
 );
 
 export const mockFileData: IFileDataWithSharing[] = convertDefinitions(
@@ -609,14 +561,9 @@ export const trashMockData: IFileTrashData[] = convertDefinitions(
   definitionToTrash
 );
 
-export const folderContents: Record<string, IFileTrashData[]> = Object.entries(
-  TRASH_FOLDER_CONTENTS
-).reduce(
-  (acc, [folderId, definitions]) => {
-    acc[folderId] = convertDefinitions(definitions, definitionToTrash, folderId);
-    return acc;
-  },
-  {} as Record<string, IFileTrashData[]>
+export const folderContents: Record<string, IFileTrashData[]> = convertRecordDefinitions(
+  TRASH_FOLDER_CONTENTS,
+  definitionToTrash
 );
 
 // ============================================================================

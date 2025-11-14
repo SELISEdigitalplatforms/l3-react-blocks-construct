@@ -1,7 +1,7 @@
 import { vi, Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ActivityLogTimeline } from './activity-log-timeline';
-import '../../../../../test-utils/shared-test-utils';
+import '../../../../../lib/utils/test-utils/shared-test-utils';
 import {
   createMockActivityGroups,
   createLargeActivityList,

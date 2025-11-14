@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
-import { createMockIcon } from '@/test-utils/shared-test-utils';
+import { createMockIcon } from '@/lib/utils/test-utils/shared-test-utils';
 
 // Mock lucide-react icons using shared utility
 vi.mock('lucide-react', () => ({

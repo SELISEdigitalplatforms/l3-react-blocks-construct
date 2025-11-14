@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ActivityLogGroup } from './activity-log-group';
 import { ActivityItem } from '../../types/activity-log.types';
-import '../../../../../test-utils/shared-test-utils';
+import '../../../../../lib/utils/test-utils/shared-test-utils';
 
 // Mock dependencies - V2 specific
 vi.mock('../activity-log-item/activity-log-item', () => ({

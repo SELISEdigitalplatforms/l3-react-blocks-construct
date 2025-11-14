@@ -1,7 +1,7 @@
 import { vi, Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ActivityLogTimeline } from './activity-log-timeline';
-import '../../../../../test-utils/shared-test-utils';
+import '../../../../../lib/utils/test-utils/shared-test-utils';
 import {
   createMockActivityGroups,
   createLargeActivityList,
@@ -153,7 +153,7 @@ describe('ActivityLogTimeline V2', () => {
     it('should use visibleActivities logic for rendering', () => {
       mockInfiniteScrollWithVisibleCount(mockUseInfiniteScroll, 2);
       renderActivityLogTimelineV2();
-      
+
       // V2 uses visibleActivities which is sliced, so isFirstIndex and isLastIndex
       // are based on the visible array, not the original
       const activityGroups = screen.queryAllByTestId('activity-log-group');
@@ -161,7 +161,7 @@ describe('ActivityLogTimeline V2', () => {
       expect(activityGroups[0]).toHaveAttribute('data-date', '2024-01-15');
       expect(activityGroups[0]).toHaveAttribute('data-is-first', 'true');
       expect(activityGroups[0]).toHaveAttribute('data-is-last', 'false');
-      
+
       expect(activityGroups[1]).toHaveAttribute('data-date', '2024-01-14');
       expect(activityGroups[1]).toHaveAttribute('data-is-first', 'false');
       expect(activityGroups[1]).toHaveAttribute('data-is-last', 'true');

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
-import '@/test-utils/shared-test-utils';
+import '@/lib/utils/test-utils/shared-test-utils';
 
 // Mock DropdownMenu and related components to always render children
 vi.mock('components/ui/dropdown-menu', () => ({
