@@ -1,85 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { DashboardOverview } from './dashboard-overview';
 import { vi } from 'vitest';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
-// Card component mocks - matches createCardComponentMocks() from shared-test-utils
-vi.mock('components/ui/card', () => ({
-  Card: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card" {...props}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-  CardContent: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-  CardTitle: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card-title" {...props}>
-      {children}
-    </div>
-  ),
-  CardDescription: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-}));
-
-// Select component mocks - matches createSelectComponentMocks() from shared-test-utils
-vi.mock('components/ui/select', () => {
-  const mockMonths = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  return {
-    Select: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    SelectTrigger: ({ children, className, ...props }: any) => (
-      <button className={className} {...props}>
-        {children}
-      </button>
-    ),
-    SelectValue: ({ placeholder, ...props }: any) => (
-      <span data-testid="select-value" {...props}>
-        {placeholder ?? 'THIS_MONTH'}
-      </span>
-    ),
-    SelectContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    SelectGroup: ({ children, ...props }: any) => (
-      <div data-testid="select-group" {...props}>
-        {mockMonths.map((month) => (
-          <div key={month} data-testid="select-item">
-            {month}
-          </div>
-        ))}
-        {children}
-      </div>
-    ),
-    SelectItem: ({ children, ...props }: any) => (
-      <div data-testid="select-item" {...props}>
-        {children}
-      </div>
-    ),
-  };
-});
-
-// Lucide icon mocks - matches createLucideIconMocks() from shared-test-utils
 vi.mock('lucide-react', () => ({
   TrendingUp: ({ className }: { className?: string }) => (
     <svg data-testid="icon-trending-up" className={`lucide-trending-up ${className ?? ''}`} />
@@ -104,24 +27,11 @@ vi.mock('lucide-react', () => ({
   ),
 }));
 
-// Import shared test utils for react-i18next mock AFTER mocks
-import '../../../../lib/utils/test-utils/shared-test-utils';
-
 vi.mock('../../services/dashboard-service', () => ({
-  monthsOfYear: [
-    { value: 'january', label: 'January' },
-    { value: 'february', label: 'February' },
-    { value: 'march', label: 'March' },
-    { value: 'april', label: 'April' },
-    { value: 'may', label: 'May' },
-    { value: 'june', label: 'June' },
-    { value: 'july', label: 'July' },
-    { value: 'august', label: 'August' },
-    { value: 'september', label: 'September' },
-    { value: 'october', label: 'October' },
-    { value: 'november', label: 'November' },
-    { value: 'december', label: 'December' },
-  ],
+  monthsOfYear: Array.from({ length: 12 }, (_, i) => ({
+    value: new Date(0, i).toLocaleString('en', { month: 'long' }).toLowerCase(),
+    label: new Date(0, i).toLocaleString('en', { month: 'long' }),
+  })),
   metricsConfigData: [
     {
       id: 'total-users',
@@ -159,48 +69,34 @@ vi.mock('../../services/dashboard-service', () => ({
   ],
 }));
 
+const expectMetricToBeRendered = (
+  title: string,
+  value: string,
+  trend: string,
+  iconTestId: string
+) => {
+  expect(screen.getByText(title)).toBeInTheDocument();
+  expect(screen.getByText(value)).toBeInTheDocument();
+  expect(screen.getByText(trend)).toBeInTheDocument();
+  expect(screen.getByTestId(iconTestId)).toBeInTheDocument();
+};
+
 describe('DashboardOverview Component', () => {
   beforeEach(() => {
     render(<DashboardOverview />);
   });
 
-  test('renders the card with the Overview title', () => {
-    render(<DashboardOverview />);
-    expect(screen.getAllByText('OVERVIEW')[0]).toBeInTheDocument();
-  });
-
-  test('renders the select with default placeholder "This month"', () => {
-    render(<DashboardOverview />);
-    expect(screen.getAllByText('THIS_MONTH')[0]).toBeInTheDocument();
-  });
-
-  test('renders months in the select dropdown', () => {
-    render(<DashboardOverview />);
-    // Simply check that the component renders without errors
+  test('renders the card with overview title and month selector', () => {
     expect(screen.getAllByText('OVERVIEW')[0]).toBeInTheDocument();
     expect(screen.getAllByText('THIS_MONTH')[0]).toBeInTheDocument();
   });
 
-  test('renders the "Total users" section with correct details', () => {
-    expect(screen.getByText('TOTAL_USERS')).toBeInTheDocument();
-    expect(screen.getByText('10,000')).toBeInTheDocument();
-    expect(screen.getByText('+2.5%')).toBeInTheDocument();
+  test('renders all metrics with correct details', () => {
+    expectMetricToBeRendered('TOTAL_USERS', '10,000', '+2.5%', 'icon-users');
+    expectMetricToBeRendered('TOTAL_ACTIVE_USERS', '7,000', '+5%', 'icon-user-cog');
+    expectMetricToBeRendered('NEW_SIGN_UPS', '1,200', '+8%', 'icon-user-plus');
+
     expect(screen.getAllByText('FROM_LAST_MONTH')).toHaveLength(3);
     expect(screen.getAllByTestId('icon-trending-up')).toHaveLength(3);
-    expect(screen.getByTestId('icon-users')).toBeInTheDocument();
-  });
-
-  test('renders the "Total active users" section with correct details', () => {
-    expect(screen.getByText('TOTAL_ACTIVE_USERS')).toBeInTheDocument();
-    expect(screen.getByText('7,000')).toBeInTheDocument();
-    expect(screen.getByText('+5%')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-user-cog')).toBeInTheDocument();
-  });
-
-  test('renders the "New sign-ups" section with correct details', () => {
-    expect(screen.getByText('NEW_SIGN_UPS')).toBeInTheDocument();
-    expect(screen.getByText('1,200')).toBeInTheDocument();
-    expect(screen.getByText('+8%')).toBeInTheDocument();
-    expect(screen.getByTestId('icon-user-plus')).toBeInTheDocument();
   });
 });

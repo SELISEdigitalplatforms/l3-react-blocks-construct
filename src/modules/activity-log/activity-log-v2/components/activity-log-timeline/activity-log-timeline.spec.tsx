@@ -61,10 +61,7 @@ vi.mock('@/modules/activity-log/hooks/use-infinite-scroll', () => ({
   useInfiniteScroll: hoisted.mockUseInfiniteScroll,
 }));
 
-// Mock the illustration asset
-vi.mock('@/assets/images/Illustration.svg', () => ({
-  default: 'mocked-illustration.svg',
-}));
+vi.mock('@/assets/images/Illustration.svg', () => ({ default: 'mocked-illustration.svg' }));
 
 // Test data
 const mockActivityGroups = createMockActivityGroups();
@@ -122,24 +119,9 @@ describe('ActivityLogTimeline V2', () => {
   });
 
   describe('Activity Groups Rendering', () => {
-    it('should render all activity groups', () => {
+    it('should render all activity groups with V2-specific props', () => {
       renderActivityLogTimelineV2();
       expectActivityGroupsToBeRenderedV2(mockActivityGroups);
-    });
-
-    it('should pass correct V2-specific props to groups', () => {
-      renderActivityLogTimelineV2();
-      expectActivityGroupsToBeRenderedV2(mockActivityGroups);
-    });
-
-    it('should generate unique keys for activity groups', () => {
-      // This tests the key generation logic: `${group.date}-${index}`
-      renderActivityLogTimelineV2();
-      expectActivityGroupsToBeRenderedV2(mockActivityGroups);
-    });
-
-    it('should render group dates and item counts correctly', () => {
-      renderActivityLogTimelineV2();
       expectGroupDatesAndItemCounts(mockActivityGroups);
     });
   });
@@ -183,9 +165,8 @@ describe('ActivityLogTimeline V2', () => {
 
   describe('V2 Edge Cases', () => {
     it('should handle single activity group with V2 props', () => {
-      const singleGroup = [mockActivityGroups[0]];
-      renderActivityLogTimelineV2(singleGroup);
-      expectActivityGroupsToBeRenderedV2(singleGroup);
+      renderActivityLogTimelineV2([mockActivityGroups[0]]);
+      expectActivityGroupsToBeRenderedV2([mockActivityGroups[0]]);
     });
 
     it('should handle activities with no items', () => {
@@ -199,20 +180,10 @@ describe('ActivityLogTimeline V2', () => {
       expectV2TimelineVisualIndicator(container);
     });
 
-    it('should use translation for empty state message', () => {
-      renderActivityLogTimelineV2([]);
-      expectEmptyStateToBeRendered();
-    });
-
-    it('should handle visibleActivities vs total activities correctly', () => {
+    it('should handle empty visibleActivities correctly', () => {
       mockInfiniteScrollWithVisibleCount(mockUseInfiniteScroll, 0);
       renderActivityLogTimelineV2();
       expectEmptyStateToBeRendered();
-    });
-
-    it('should import useInfiniteScroll from v1 features', () => {
-      renderActivityLogTimelineV2();
-      expectInfiniteScrollToBeCalledWith(mockUseInfiniteScroll, mockActivityGroups.length);
     });
   });
 });

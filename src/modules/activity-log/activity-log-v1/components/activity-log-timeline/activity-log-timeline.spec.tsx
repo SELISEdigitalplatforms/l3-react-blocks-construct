@@ -53,10 +53,7 @@ vi.mock('@/modules/activity-log/hooks/use-infinite-scroll', () => ({
   useInfiniteScroll: hoisted.mockUseInfiniteScroll,
 }));
 
-// Mock the illustration asset
-vi.mock('@/assets/images/Illustration.svg', () => ({
-  default: 'mocked-illustration.svg',
-}));
+vi.mock('@/assets/images/Illustration.svg', () => ({ default: 'mocked-illustration.svg' }));
 
 // Test data
 const mockActivityGroups = createMockActivityGroups();
@@ -108,18 +105,9 @@ describe('ActivityLogTimeline V1', () => {
   });
 
   describe('Activity Groups Rendering', () => {
-    it('should render all activity groups', () => {
+    it('should render all activity groups with correct props', () => {
       renderActivityLogTimeline();
       expectActivityGroupsToBeRenderedV1(mockActivityGroups);
-    });
-
-    it('should pass correct isLastIndex prop to groups', () => {
-      renderActivityLogTimeline();
-      expectActivityGroupsToBeRenderedV1(mockActivityGroups);
-    });
-
-    it('should render group dates and item counts correctly', () => {
-      renderActivityLogTimeline();
       expectGroupDatesAndItemCounts(mockActivityGroups);
     });
   });
@@ -156,9 +144,8 @@ describe('ActivityLogTimeline V1', () => {
 
   describe('Edge Cases', () => {
     it('should handle single activity group', () => {
-      const singleGroup = [mockActivityGroups[0]];
-      renderActivityLogTimeline(singleGroup);
-      expectActivityGroupsToBeRenderedV1(singleGroup);
+      renderActivityLogTimeline([mockActivityGroups[0]]);
+      expectActivityGroupsToBeRenderedV1([mockActivityGroups[0]]);
     });
 
     it('should handle activities with no items', () => {
@@ -166,11 +153,6 @@ describe('ActivityLogTimeline V1', () => {
       renderActivityLogTimeline(emptyItemsGroup);
       expectActivityGroupsToBeRenderedV1(emptyItemsGroup);
       expectGroupDatesAndItemCounts(emptyItemsGroup);
-    });
-
-    it('should use translation for empty state message', () => {
-      renderActivityLogTimeline([]);
-      expectEmptyStateToBeRendered();
     });
   });
 });

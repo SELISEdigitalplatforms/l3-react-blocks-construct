@@ -113,12 +113,14 @@ vi.mock('config/roles-permissions', () => ({
   },
 }));
 
-vi.mock('assets/images/construct_logo_dark.svg', () => ({
-  default: 'mock-logo-path',
-}));
-vi.mock('assets/images/construct_logo_light.svg', () => ({
-  default: 'mock-logo-path',
-}));
+vi.mock('assets/images/construct_logo_dark.svg', () => ({ default: 'mock-logo-path' }));
+vi.mock('assets/images/construct_logo_light.svg', () => ({ default: 'mock-logo-path' }));
+
+const getSendButton = () => screen.getAllByRole('button')[3];
+
+const expectTextElements = (texts: string[]) => {
+  texts.forEach((text) => expect(screen.getByText(text)).toBeInTheDocument());
+};
 
 describe('InvoicesDetail', () => {
   const mockInvoice = {
@@ -163,51 +165,36 @@ describe('InvoicesDetail', () => {
     renderWithProviders(<InvoicesDetail invoice={mockInvoice} />);
 
     expect(screen.getAllByText('INV-001').length).toBeGreaterThan(0);
-
-    expect(screen.getByText('Test Customer')).toBeInTheDocument();
-
-    expect(screen.getByText('Test Address')).toBeInTheDocument();
-    expect(screen.getByText('test@example.com')).toBeInTheDocument();
-    expect(screen.getByText('+41123456789')).toBeInTheDocument();
-
-    expect(screen.getByText('Test Item')).toBeInTheDocument();
-    expect(screen.getByText('Test Description')).toBeInTheDocument();
-    expect(screen.getByText('Test Category')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
-
-    const currencySpans = screen.getAllByText('CHF');
-
-    const amount500 = screen.getByText('500');
-    const amount1000 = screen.getByText('1000');
-
-    expect(currencySpans.length).toBeGreaterThan(0);
-    expect(amount500).toBeInTheDocument();
-    expect(amount1000).toBeInTheDocument();
-
-    expect(screen.getByText('Test Note')).toBeInTheDocument();
+    expectTextElements([
+      'Test Customer',
+      'Test Address',
+      'test@example.com',
+      '+41123456789',
+      'Test Item',
+      'Test Description',
+      'Test Category',
+      '2',
+      '500',
+      '1000',
+      'Test Note',
+    ]);
+    expect(screen.getAllByText('CHF').length).toBeGreaterThan(0);
   });
 
   test('renders in preview mode correctly', () => {
     render(<InvoicesDetail invoice={mockInvoice} isPreview={true} />);
 
-    expect(screen.queryByText('DOWNLOAD')).not.toBeInTheDocument();
-    expect(screen.queryByText('EDIT')).not.toBeInTheDocument();
-    expect(screen.queryByText('SEND')).not.toBeInTheDocument();
-
+    ['DOWNLOAD', 'EDIT', 'SEND'].forEach((text) => {
+      expect(screen.queryByText(text)).not.toBeInTheDocument();
+    });
     expect(screen.getAllByText('INV-001').length).toBeGreaterThan(0);
   });
 
   test('shows send dialog when send button is clicked', () => {
     render(<InvoicesDetail invoice={mockInvoice} />);
 
-    // The buttons should be: back, download, edit, send (index 3)
-    const buttons = screen.getAllByRole('button');
-    const sendButton = buttons[3]; // Index 3 should be the send button
-
-    expect(sendButton).toBeInTheDocument();
-    if (sendButton) {
-      fireEvent.click(sendButton);
-    }
+    const sendButton = getSendButton();
+    fireEvent.click(sendButton);
 
     expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
     expect(screen.getByText('SEND_INVOICE')).toBeInTheDocument();
@@ -216,14 +203,7 @@ describe('InvoicesDetail', () => {
   test('handles send confirmation correctly', () => {
     render(<InvoicesDetail invoice={mockInvoice} />);
 
-    // Use the same approach as the previous test
-    const buttons = screen.getAllByRole('button');
-    const sendButton = buttons[3]; // Index 3 should be the send button
-
-    if (sendButton) {
-      fireEvent.click(sendButton);
-    }
-
+    fireEvent.click(getSendButton());
     fireEvent.click(screen.getByTestId('confirm-button'));
 
     expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
@@ -237,19 +217,10 @@ describe('InvoicesDetail', () => {
     expect(badges.some((badge) => badge.className.includes('text-success'))).toBe(true);
   });
 
-  test('shows edit button when user has invoice write permission', () => {
-    (global as any).mockHasPermission = true;
-    render(<InvoicesDetail invoice={mockInvoice} />);
-
-    expect(screen.getByText('EDIT')).toBeInTheDocument();
-  });
-
   test('shows all action buttons when user has permissions', () => {
     (global as any).mockHasPermission = true;
     render(<InvoicesDetail invoice={mockInvoice} />);
 
-    expect(screen.getByText('DOWNLOAD')).toBeInTheDocument();
-    expect(screen.getByText('EDIT')).toBeInTheDocument();
-    expect(screen.getByText('SEND')).toBeInTheDocument();
+    expectTextElements(['DOWNLOAD', 'EDIT', 'SEND']);
   });
 });

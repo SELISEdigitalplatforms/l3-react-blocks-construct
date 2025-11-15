@@ -1,9 +1,11 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DashboardUserPlatform } from './dashboard-user-platform';
 import { vi } from 'vitest';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
-// Chart UI component mocks - matches createChartUIComponentMocks() from shared-test-utils
-vi.mock('components/ui/chart', () => ({
+// Chart UI component mocks - aligned with createChartUIComponentMocks() from shared-test-utils
+vi.mock('@/components/ui-kit/chart', () => ({
   ChartContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="chart-container">{children}</div>
   ),
@@ -22,14 +24,14 @@ vi.mock('components/ui/chart', () => ({
   },
   ChartLegend: ({ content }: { content: React.ReactNode }) => (
     <div data-testid="chart-legend">
-      {content ?? <div data-testid="chart-legend-content">Legend Content</div>}
+      {content || <div data-testid="chart-legend-content">Legend Content</div>}
     </div>
   ),
   ChartTooltipContent: () => <div data-testid="chart-tooltip-content">Tooltip Content</div>,
   ChartLegendContent: () => <div data-testid="chart-legend-content">Legend Content</div>,
 }));
 
-// Recharts component mocks - matches createRechartsComponentMocks() from shared-test-utils
+// Recharts component mocks - aligned with createRechartsComponentMocks() from shared-test-utils
 vi.mock('recharts', () => ({
   PieChart: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="pie-chart">{children}</div>
@@ -72,86 +74,6 @@ vi.mock('recharts', () => ({
   ),
 }));
 
-// Card component mocks - matches createCardComponentMocks() from shared-test-utils
-vi.mock('components/ui/card', () => ({
-  Card: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card" {...props}>
-      {children}
-    </div>
-  ),
-  CardHeader: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-  CardContent: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-  CardTitle: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card-title" {...props}>
-      {children}
-    </div>
-  ),
-  CardDescription: ({ children, className, ...props }: any) => (
-    <div className={className} data-testid="card-description" {...props}>
-      {children}
-    </div>
-  ),
-}));
-
-// Select component mocks - matches createSelectComponentMocks() from shared-test-utils
-vi.mock('components/ui/select', () => {
-  const mockMonths = [
-    'january',
-    'february',
-    'march',
-    'april',
-    'may',
-    'june',
-    'july',
-    'august',
-    'september',
-    'october',
-    'november',
-    'december',
-  ];
-
-  return {
-    Select: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="select">
-        {children}
-        {mockMonths.map((month) => (
-          <div key={month} data-testid={`select-item-${month}`} data-value={month}>
-            {month}
-          </div>
-        ))}
-      </div>
-    ),
-    SelectTrigger: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="select-trigger">{children}</div>
-    ),
-    SelectValue: ({ placeholder }: { placeholder: string }) => (
-      <span data-testid="select-value">{placeholder}</span>
-    ),
-    SelectContent: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="select-content">{children}</div>
-    ),
-    SelectGroup: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="select-group">{children}</div>
-    ),
-    SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) => (
-      <div data-testid={`select-item-${value}`} data-value={value}>
-        {children}
-      </div>
-    ),
-  };
-});
-
-// Import shared test utils for react-i18next mock AFTER mocks
-import '../../../../lib/utils/test-utils/shared-test-utils';
-
 describe('DashboardUserPlatform', () => {
   it('renders the component structure correctly', () => {
     render(<DashboardUserPlatform />);
@@ -182,9 +104,11 @@ describe('DashboardUserPlatform', () => {
     render(<DashboardUserPlatform />);
 
     // Check that chart elements are present using data-testid from our mocks
+    expect(screen.getByTestId('chart-container')).toBeInTheDocument();
     expect(screen.getByTestId('pie-chart')).toBeInTheDocument();
     expect(screen.getByTestId('pie')).toBeInTheDocument();
-    expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
+    expect(screen.getByTestId('chart-legend')).toBeInTheDocument();
+    expect(screen.getByTestId('chart-tooltip')).toBeInTheDocument();
   });
 
   it('renders label inside the pie chart', () => {
