@@ -17,11 +17,16 @@ vi.mock('components/core/components/gurads/permission-guard/permission-guard', (
     showFallback?: boolean;
   }) => {
     const hasPermission = (global as any).mockHasPermission ?? true;
-    return hasPermission ? (
-      <>{children}</>
-    ) : showFallback ? (
-      <div data-testid="permission-denied">No Permission</div>
-    ) : null;
+
+    if (hasPermission) {
+      return <>{children}</>;
+    }
+
+    if (showFallback) {
+      return <div data-testid="permission-denied">No Permission</div>;
+    }
+
+    return null;
   },
 }));
 
