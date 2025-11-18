@@ -8,13 +8,13 @@ import {
   IFileTrashData,
   PaginationState,
 } from '../../../utils/file-manager';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useCallback, useEffect, useState } from 'react';
 import { CommonGridView } from '../../common-grid-view/common-grid-view';
 import { useMockTrashFilesQuery } from '../../../hooks/use-mock-trash-files-query';
 import { FilePreview } from '../../file-preview/file-preview';
 import { TrashDetailsSheet } from '../trash-files-details/trash-files-details';
 import { TrashTableRowActions } from '../trash-files-row-actions/trash-files-row-actions';
+import { ResponsiveMainPane } from '@/modules/file-manager/components/layout/responsive-main-pane';
 
 interface TrashGridViewProps {
   onRestore?: (file: IFileTrashData) => void;
@@ -36,15 +36,13 @@ interface TrashGridViewProps {
 
 export const TrashGridView = (props: Readonly<TrashGridViewProps>) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
-
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
 
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: isMobile ? 20 : 50,
+    pageSize: 50,
     totalCount: 0,
   });
 
@@ -237,50 +235,40 @@ export const TrashGridView = (props: Readonly<TrashGridViewProps>) => {
     return t('NO_DELETED_FILES');
   };
 
-  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
-
   return (
-    <div className="flex h-full w-full rounded-xl relative">
-      {!shouldHideMainContent && (
-        <div
-          className={`flex flex-col h-full transition-all duration-300 ${
-            isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
-          }`}
-        >
-          <CommonGridView
-            onViewDetails={handleViewDetails}
-            filters={props.filters}
-            data={data ?? undefined}
-            isLoading={isLoading}
-            error={error}
-            onLoadMore={handleLoadMore}
-            renderDetailsSheet={() => null}
-            getFileTypeIcon={getFileTypeIcon}
-            getFileTypeInfo={getFileTypeInfo}
-            renderActions={renderActions}
-            emptyStateConfig={{
-              icon: Trash2,
-              title: t('TRASH_EMPTY'),
-              description:
-                props.filters.name ??
-                props.filters.fileType ??
-                props.filters.deletedBy ??
-                getEmptyStateMessage(),
-            }}
-            sectionLabels={{
-              folder: t('FOLDER'),
-              file: t('FILE'),
-            }}
-            errorMessage={t('ERROR_LOADING_FILES')}
-            loadingMessage={t('LOADING')}
-            loadMoreLabel={t('LOAD_MORE')}
-            processFiles={processFiles}
-            filterFiles={filterFiles}
-            currentFolderId={props.currentFolderId}
-            onNavigateToFolder={props.onNavigateToFolder}
-          />
-        </div>
-      )}
+    <ResponsiveMainPane isDetailsOpen={isDetailsOpen} isPreviewOpen={isPreviewOpen}>
+      <CommonGridView
+        onViewDetails={handleViewDetails}
+        filters={props.filters}
+        data={data ?? undefined}
+        isLoading={isLoading}
+        error={error}
+        onLoadMore={handleLoadMore}
+        renderDetailsSheet={() => null}
+        getFileTypeIcon={getFileTypeIcon}
+        getFileTypeInfo={getFileTypeInfo}
+        renderActions={renderActions}
+        emptyStateConfig={{
+          icon: Trash2,
+          title: t('TRASH_EMPTY'),
+          description:
+            props.filters.name ??
+            props.filters.fileType ??
+            props.filters.deletedBy ??
+            getEmptyStateMessage(),
+        }}
+        sectionLabels={{
+          folder: t('FOLDER'),
+          file: t('FILE'),
+        }}
+        errorMessage={t('ERROR_LOADING_FILES')}
+        loadingMessage={t('LOADING')}
+        loadMoreLabel={t('LOAD_MORE')}
+        processFiles={processFiles}
+        filterFiles={filterFiles}
+        currentFolderId={props.currentFolderId}
+        onNavigateToFolder={props.onNavigateToFolder}
+      />
 
       <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
@@ -299,6 +287,6 @@ export const TrashGridView = (props: Readonly<TrashGridViewProps>) => {
         }
         t={t}
       />
-    </div>
+    </ResponsiveMainPane>
   );
 };

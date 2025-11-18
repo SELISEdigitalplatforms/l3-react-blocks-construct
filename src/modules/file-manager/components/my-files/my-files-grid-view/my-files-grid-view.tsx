@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-
 import { useCallback } from 'react';
 import { BaseGridView } from '../../base-grid-view/base-grid-view';
 import { RegularFileDetailsSheet } from '../../regular-file-details-sheet/regular-file-details-sheet';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '@/hooks/use-mobile';
 import {
   createGridFilter,
   createGridQueryBuilder,
@@ -35,13 +33,12 @@ interface MyFileGridViewProps {
 
 export const MyFileGridView = (props: Readonly<MyFileGridViewProps>) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
   const {
     isDetailsOpen,
     selectedItem: selectedFileForDetails,
     handleOpenDetails: handleViewDetails,
     handleCloseDetails,
-  } = useDetailsPane<IFileData>(isMobile, props.onViewDetails);
+  } = useDetailsPane<IFileData>(props.onViewDetails);
 
   const queryBuilder = useCallback(createGridQueryBuilder(props.currentFolderId), [
     props.currentFolderId,
@@ -49,7 +46,7 @@ export const MyFileGridView = (props: Readonly<MyFileGridViewProps>) => {
   const filterFiles = useCallback(createGridFilter(), []);
 
   return (
-    <ResponsiveMainPane isMobile={isMobile} isDetailsOpen={isDetailsOpen}>
+    <ResponsiveMainPane isDetailsOpen={isDetailsOpen}>
       <BaseGridView
         onNavigateToFolder={props.onNavigateToFolder}
         onFilePreview={props.onFilePreview}
