@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Table } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import { ConfirmationModal, DataTable } from '@/components/core';
-import { useIsMobile } from '../../../../hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-media-query';
 import { Button } from '@/components/ui-kit/button';
 import { Dialog, DialogTrigger } from '@/components/ui-kit/dialog';
 import { useForgotPassword, useResendActivation } from '@/modules/auth/hooks/use-auth';

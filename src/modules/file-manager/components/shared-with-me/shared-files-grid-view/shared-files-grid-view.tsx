@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { IFileDataWithSharing, SharedUser } from '@/modules/file-manager/utils/file-manager';
 import {
   matchesFileType,
@@ -35,13 +34,12 @@ export interface SharedFilesGridViewProps {
 
 export const SharedFilesGridView = (props: Readonly<SharedFilesGridViewProps>) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
   const {
     isDetailsOpen,
     selectedItem: selectedFileForDetails,
     handleOpenDetails: handleViewDetails,
     handleCloseDetails,
-  } = useDetailsPane<IFileDataWithSharing>(isMobile, props.onViewDetails);
+  } = useDetailsPane<IFileDataWithSharing>(props.onViewDetails);
 
   const queryBuilder = useCallback(
     (params: any) => ({
@@ -76,7 +74,7 @@ export const SharedFilesGridView = (props: Readonly<SharedFilesGridViewProps>) =
   );
 
   return (
-    <ResponsiveMainPane isMobile={isMobile} isDetailsOpen={isDetailsOpen}>
+    <ResponsiveMainPane isDetailsOpen={isDetailsOpen}>
       <BaseGridView
         onNavigateToFolder={props.onNavigateToFolder}
         onFilePreview={props.onFilePreview}

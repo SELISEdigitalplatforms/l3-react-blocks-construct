@@ -4,7 +4,7 @@ import { formatDate } from '@/lib/utils/custom-date/custom-date';
 import { useTranslation } from 'react-i18next';
 import { Column } from '@tanstack/react-table';
 import { DateRange } from 'react-day-picker';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-media-query';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui-kit/popover';
 import { Button } from '@/components/ui-kit/button';
 import { Separator } from '@/components/ui-kit/separator';

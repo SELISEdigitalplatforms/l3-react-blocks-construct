@@ -28,7 +28,7 @@ import {
 import { Card } from '@/components/ui-kit/card';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { ScrollArea, ScrollBar } from '@/components/ui-kit/scroll-area';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-media-query';
 import { DataTablePagination } from './data-table-pagination';
 
 /**

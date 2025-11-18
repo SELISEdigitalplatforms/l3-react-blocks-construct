@@ -9,9 +9,9 @@ import { TaskCard } from './task-card';
 import { Dialog } from '@/components/ui-kit/dialog';
 import TaskDetailsView from '../task-details-view/task-details-view';
 import { ColumnMenu } from './column-menu';
-import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import { getResponsiveContainerHeight } from '@/lib/mobile-responsiveness';
 import { TaskSection } from '../../types/task-manager.types';
+import { useDeviceCapabilities } from '@/modules/file-manager/hooks/use-device-capabilities';
 
 /**
  * TaskColumn Component

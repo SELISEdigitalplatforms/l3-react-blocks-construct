@@ -32,7 +32,7 @@ export const HeaderActions = ({
             key={action.key}
             size={isMobile ? 'sm' : (action.size ?? 'sm')}
             variant={action.variant ?? 'outline'}
-            className={isMobile ? 'h-8' : 'h-10 text-sm font-bold'}
+            className="h-8 md:h-10 text-sm font-bold"
             onClick={action.onClick}
           >
             <Icon className="h-4 w-4 mr-1" />
