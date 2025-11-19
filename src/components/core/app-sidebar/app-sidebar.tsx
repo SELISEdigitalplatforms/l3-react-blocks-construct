@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from '@/components/ui-kit/sidebar';
 import { useTheme } from '@/styles/theme/theme-provider';
-import { getSidebarStyle } from '@/utils/sidebar-utils';
+import { getSidebarStyle } from '@/lib/utils/sidebar-utils';
 import { useFilteredMenu } from '@/hooks/use-filtered-menu';
 import { LogoSection, MenuSection } from '@/components/core';
 import { menuItems } from '@/constant/sidebar-menu';

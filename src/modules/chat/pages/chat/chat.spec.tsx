@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { ChatPage } from './chat';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 vi.mock('features/chat', () => ({
   Chat: vi.fn(() => <div data-testid="mock-chat" />),

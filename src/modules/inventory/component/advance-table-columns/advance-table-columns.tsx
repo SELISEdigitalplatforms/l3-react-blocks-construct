@@ -1,7 +1,7 @@
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { DataTableColumnHeader } from '@/components/core';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/utils/custom-date/custom-date';
 import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
 import { InventoryStatus, InventoryItem } from '../../types/inventory.types';
 

@@ -10,7 +10,6 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import {
   ItemTag,
   TaskItem,
@@ -28,6 +27,7 @@ import {
   useDeleteTaskSection,
 } from './use-task-manager';
 import { useToast } from '@/hooks/use-toast';
+import { useDeviceCapabilities } from '@/modules/file-manager/hooks/use-device-capabilities';
 
 /**
  * useCardTasks Hook

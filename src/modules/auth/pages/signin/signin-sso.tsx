@@ -13,6 +13,7 @@ export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
     return null;
   }
 
+  // Map all providers and check if they have API configuration
   const allProviders = Object.values(SOCIAL_AUTH_PROVIDERS).map((provider) => {
     const ssoInfo = loginOption.ssoInfo?.find((s) => s.provider === provider.value);
     return {
@@ -23,23 +24,27 @@ export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
     };
   });
 
-  const availableProviders = allProviders.filter((provider) => provider.isAvailable);
+  // Providers without API configuration will be disabled
+  const providersToShow = allProviders;
 
-  if (availableProviders.length === 0) {
+  // Check if we have at least one configured provider
+  const hasAnyConfiguredProvider = allProviders.some((provider) => provider.isAvailable);
+
+  if (!hasAnyConfiguredProvider) {
     return null;
   }
 
-  const isSingleProvider = availableProviders.length === 1;
+  const isSingleProvider = providersToShow.length === 1;
 
   return (
     <div className="flex items-center gap-8">
       <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
-        {availableProviders.map((item) => (
+        {providersToShow.map((item) => (
           <SSOSigninCard
             key={item?.value}
             providerConfig={item}
             showText={isSingleProvider}
-            totalProviders={availableProviders.length}
+            totalProviders={providersToShow.length}
           />
         ))}
       </div>

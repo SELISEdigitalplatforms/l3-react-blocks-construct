@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMockFilesQuery } from '@/modules/file-manager/hooks/use-mock-files-query';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { DataTable } from '@/components/core';
 import {
   IFileDataWithSharing,
@@ -20,6 +19,7 @@ import {
   enhanceFileWithSharing,
   mergeUniqueById,
 } from '@/modules/file-manager/utils/list-view-utils';
+import { ResponsiveMainPane } from '@/modules/file-manager/components/layout/responsive-main-pane';
 
 export interface SharedFilesListViewProps {
   onDownload: ((file: IFileData) => void) | undefined;
@@ -56,7 +56,6 @@ export const SharedFilesListView = ({
   onNavigateToFolder,
 }: Readonly<SharedFilesListViewProps>) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
@@ -274,35 +273,25 @@ export const SharedFilesListView = ({
     return <div className="p-4 text-error">{t('ERROR_LOADING_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
-
   return (
-    <div className="flex h-full w-full rounded-xl relative">
-      {!shouldHideMainContent && (
-        <div
-          className={`flex flex-col h-full transition-all duration-150 ${
-            isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
-          }`}
-        >
-          <div className="h-full flex-col flex w-full gap-6 md:gap-8">
-            <DataTable
-              data={combinedData}
-              columns={columns}
-              onRowClick={handleRowClick}
-              isLoading={isLoading}
-              pagination={{
-                pageIndex: paginationProps.pageIndex,
-                pageSize: paginationProps.pageSize,
-                totalCount: paginationProps.totalCount,
-              }}
-              onPaginationChange={handlePaginationChange}
-              manualPagination={paginationProps.manualPagination}
-              mobileColumns={['name']}
-              expandable={false}
-            />
-          </div>
-        </div>
-      )}
+    <ResponsiveMainPane isDetailsOpen={isDetailsOpen} isPreviewOpen={isPreviewOpen}>
+      <div className="h-full flex-col flex w-full gap-6 md:gap-8">
+        <DataTable
+          data={combinedData}
+          columns={columns}
+          onRowClick={handleRowClick}
+          isLoading={isLoading}
+          pagination={{
+            pageIndex: paginationProps.pageIndex,
+            pageSize: paginationProps.pageSize,
+            totalCount: paginationProps.totalCount,
+          }}
+          onPaginationChange={handlePaginationChange}
+          manualPagination={paginationProps.manualPagination}
+          mobileColumns={['name']}
+          expandable={false}
+        />
+      </div>
 
       <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
@@ -323,6 +312,6 @@ export const SharedFilesListView = ({
         }
         t={t}
       />
-    </div>
+    </ResponsiveMainPane>
   );
 };

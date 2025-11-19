@@ -3,7 +3,7 @@
 import { vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ChatProfile } from './chat-profile';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // Mock useToast
 vi.mock('hooks/use-toast', () => ({

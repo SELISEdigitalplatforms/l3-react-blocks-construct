@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlignJustify, Columns3, ListFilter, Plus, Search } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui-kit/input';
 import { Button } from '@/components/ui-kit/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui-kit/tabs';
@@ -70,7 +69,6 @@ export default function TaskManagerToolbar({
   onApplyFilters,
   onResetFilters,
 }: Readonly<TaskManagerToolbarProps>) {
-  const isMobile = useIsMobile();
   const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -113,92 +111,16 @@ export default function TaskManagerToolbar({
     setSearchQuery('');
   };
 
-  // mobile view
-  if (isMobile) {
-    return (
-      <div className="flex flex-col gap-3 w-full">
-        <div className="flex justify-between w-full">
-          <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
-            {t('TASK_MANAGER')}
-          </h3>
-
-          <Button onClick={handleTaskModalOpen} size="sm" className="h-8">
-            <Plus className="h-4 w-4" />
-            {t('ADD_ITEM')}
-          </Button>
-        </div>
-
-        <div className="flex items-center w-full mt-2">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 bg-background" />
-            <Input
-              placeholder={t('SEARCH')}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="h-8 w-full rounded-lg bg-background pl-8"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          <div className="flex ml-2 gap-1">
-            <Button
-              onClick={() => setOpenSheet(true)}
-              variant="outline"
-              size="sm"
-              className="h-8 px-2"
-            >
-              <ListFilter className="h-4 w-4" />
-            </Button>
-
-            <Tabs
-              value={viewMode}
-              onValueChange={(value) => {
-                if (value === 'board' || value === 'list') {
-                  handleViewMode(value);
-                }
-              }}
-            >
-              <TabsList className="border rounded-lg flex h-8">
-                <TabsTrigger value="board">
-                  <Columns3 className="h-3 w-4" />
-                </TabsTrigger>
-                <TabsTrigger value="list">
-                  <AlignJustify className="h-3 w-4" />
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </div>
-        <TaskManagerFilterSheet
-          open={openSheet}
-          onOpenChange={setOpenSheet}
-          priorities={priorities}
-          statuses={statuses}
-          assignees={assignees}
-          tags={tags}
-          value={filters}
-          onApply={applyFiltersHandler}
-          onReset={resetFiltersHandler}
-        />
-      </div>
-    );
-  }
-
-  // desktop view
   return (
-    <div className="flex justify-between items-center">
-      <div>
+    <div className="flex md:justify-between md:items-center md:flex-row md:gap-0 flex-col gap-3 w-full">
+      <div className="flex justify-between w-full">
         <h3 className="text-2xl font-bold tracking-tight text-high-emphasis">
           {t('TASK_MANAGER')}
         </h3>
+        <Button onClick={handleTaskModalOpen} size="sm" className="h-8 flex md:hidden">
+          <Plus className="h-4 w-4" />
+          {t('ADD_ITEM')}
+        </Button>
       </div>
       <div className="flex gap-2">
         <div className="relative w-64">
@@ -239,7 +161,11 @@ export default function TaskManagerToolbar({
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <Button onClick={handleTaskModalOpen} size="sm" className="h-8 text-sm font-bold">
+        <Button
+          onClick={handleTaskModalOpen}
+          size="sm"
+          className="h-8 hidden md:flex text-sm font-bold"
+        >
           <Plus />
           {t('ADD_ITEM')}
         </Button>

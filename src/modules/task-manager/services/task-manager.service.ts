@@ -19,8 +19,6 @@ import type {
   GetTasksResponse,
   GetSectionsResponse,
   UpdateTaskManagerSectionResponse,
-  IamData,
-  GetUsersPayload,
   GetTagsResponse,
   TaskTagInsertInput,
   TaskTagUpdateInput,
@@ -40,6 +38,7 @@ import {
   DELETE_TASK_COMMENTS_MUTATION,
 } from '../graphql/mutations';
 import { clients } from '@/lib/https';
+import { GetUsersPayload, IamData } from '@/modules/iam/types/user.types';
 
 export interface BaseMutationResponse {
   itemId: string;

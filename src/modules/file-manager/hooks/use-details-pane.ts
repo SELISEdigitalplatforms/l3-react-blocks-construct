@@ -8,10 +8,7 @@ export interface UseDetailsPaneResult<T> {
   shouldHideMainContent: boolean;
 }
 
-export const useDetailsPane = <T>(
-  isMobile: boolean,
-  onViewDetails?: (item: T) => void
-): UseDetailsPaneResult<T> => {
+export const useDetailsPane = <T>(onViewDetails?: (item: T) => void): UseDetailsPaneResult<T> => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
 
@@ -29,13 +26,11 @@ export const useDetailsPane = <T>(
     setSelectedItem(null);
   }, []);
 
-  const shouldHideMainContent = isMobile && isDetailsOpen;
-
   return {
     isDetailsOpen,
     selectedItem,
     handleOpenDetails,
     handleCloseDetails,
-    shouldHideMainContent,
+    shouldHideMainContent: isDetailsOpen,
   };
 };

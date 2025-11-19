@@ -1,5 +1,4 @@
 import { clients } from './https';
-import API_CONFIG from '@/config/api';
 
 /**
  * GraphQL Client Module
@@ -48,9 +47,10 @@ interface GraphQLClient {
   mutate<T>(request: GraphQLRequest): Promise<T>;
 }
 
-const cleanBaseUrl = API_CONFIG.baseUrl.endsWith('/')
-  ? API_CONFIG.baseUrl.slice(0, -1)
-  : API_CONFIG.baseUrl;
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 
 const PROJECT_SLUG = import.meta.env.VITE_PROJECT_SLUG || '';
 
@@ -69,7 +69,7 @@ export const graphqlClient: GraphQLClient = {
       JSON.stringify(payload),
       {
         'Content-Type': 'application/json',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       }
     );
 
@@ -91,7 +91,7 @@ export const graphqlClient: GraphQLClient = {
       JSON.stringify(payload),
       {
         'Content-Type': 'application/json',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       }
     );
 

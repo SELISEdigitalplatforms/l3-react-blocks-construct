@@ -18,7 +18,7 @@ Object.defineProperty(window, 'location', {
 });
 
 import { vi } from 'vitest';
-import '../../test-utils/shared-test-utils';
+import '../../lib/utils/test-utils/shared-test-utils';
 
 // Mock the core barrel so named imports in MainLayout resolve to test doubles
 vi.mock('@/components/core', () => ({
@@ -250,7 +250,7 @@ describe('MainLayout', () => {
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });
 
-  it.skip('renders all navigation and utility elements', () => {
+  it('renders all navigation and utility elements', () => {
     renderWithProviders(<MainLayout />);
     expect(screen.getByTestId('bell-icon')).toBeInTheDocument();
     // expect(screen.getByTestId('library-icon')).toBeInTheDocument();

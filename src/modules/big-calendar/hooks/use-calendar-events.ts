@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { generateUuid } from '@/utils/uuid';
+import { generateUuid } from '@/lib/utils/uuid';
 import { myEventsList } from '../services/calendar-services';
 import { CalendarEvent, DeleteUpdateEventOption, Member } from '../types/calendar-event.types';
 import { MEMBER_STATUS } from '../enums/calendar.enum';

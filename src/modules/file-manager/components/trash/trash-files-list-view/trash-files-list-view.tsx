@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { DataTable } from '@/components/core';
 import { IFileTrashData, PaginationState } from '../../../utils/file-manager';
 import { useMockTrashFilesQuery } from '../../../hooks/use-mock-trash-files-query';
 import { FilePreview } from '../../file-preview/file-preview';
+import { ResponsiveMainPane } from '@/modules/file-manager/components/layout/responsive-main-pane';
 import { TrashTableColumns } from '../trash-files-table-columns/trash-files-table-columns';
 import { TrashDetailsSheet } from '../trash-files-details/trash-files-details';
 
@@ -36,8 +36,6 @@ export const TrashFilesListView = ({
   onNavigateToFolder,
 }: Readonly<TrashFilesListViewProps>) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
-
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileTrashData | null>(null);
@@ -187,35 +185,25 @@ export const TrashFilesListView = ({
     return <div className="p-4 text-error">{t('ERROR_LOADING_TRASH_FILES')}</div>;
   }
 
-  const shouldHideMainContent = isMobile && (isDetailsOpen || isPreviewOpen);
-
   return (
-    <div className="flex h-full w-full rounded-xl relative">
-      {!shouldHideMainContent && (
-        <div
-          className={`flex flex-col h-full transition-all duration-300 ${
-            isDetailsOpen && !isMobile ? 'flex-1' : 'w-full'
-          }`}
-        >
-          <div className="h-full flex-col flex w-full gap-6 md:gap-8">
-            <DataTable
-              data={displayData}
-              columns={columns}
-              onRowClick={handleRowClick}
-              isLoading={isLoading}
-              pagination={{
-                pageIndex: paginationProps.pageIndex,
-                pageSize: paginationProps.pageSize,
-                totalCount: paginationProps.totalCount,
-              }}
-              onPaginationChange={handlePaginationChange}
-              manualPagination={paginationProps.manualPagination}
-              mobileColumns={['name']}
-              expandable={false}
-            />
-          </div>
-        </div>
-      )}
+    <ResponsiveMainPane isDetailsOpen={isDetailsOpen} isPreviewOpen={isPreviewOpen}>
+      <div className="h-full flex-col flex w-full gap-6 md:gap-8">
+        <DataTable
+          data={displayData}
+          columns={columns}
+          onRowClick={handleRowClick}
+          isLoading={isLoading}
+          pagination={{
+            pageIndex: paginationProps.pageIndex,
+            pageSize: paginationProps.pageSize,
+            totalCount: paginationProps.totalCount,
+          }}
+          onPaginationChange={handlePaginationChange}
+          manualPagination={paginationProps.manualPagination}
+          mobileColumns={['name']}
+          expandable={false}
+        />
+      </div>
 
       <FilePreview file={selectedFile} isOpen={isPreviewOpen} onClose={handleClosePreview} />
 
@@ -234,6 +222,6 @@ export const TrashFilesListView = ({
         }
         t={t}
       />
-    </div>
+    </ResponsiveMainPane>
   );
 };

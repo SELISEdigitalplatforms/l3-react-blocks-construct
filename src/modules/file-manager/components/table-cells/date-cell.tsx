@@ -1,4 +1,4 @@
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/utils/custom-date/custom-date';
 
 export const DateCell = ({ date }: { date: Date | null | undefined }) => {
   if (!date) return <span className="text-muted-foreground">-</span>;
