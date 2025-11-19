@@ -24,13 +24,10 @@ export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
     };
   });
 
-  // Providers without API configuration will be disabled
-  const providersToShow = allProviders;
+  // Only show providers that are configured in the backend
+  const providersToShow = allProviders.filter((provider) => provider.isAvailable);
 
-  // Check if we have at least one configured provider
-  const hasAnyConfiguredProvider = allProviders.some((provider) => provider.isAvailable);
-
-  if (!hasAnyConfiguredProvider) {
+  if (providersToShow.length === 0) {
     return null;
   }
 

@@ -3,14 +3,14 @@ import microsoftIcon from '@/assets/images/social_media_ms.svg';
 import googleIcon from '@/assets/images/social_media_google.svg';
 import githubIcon from '@/assets/images/social_media_github.svg';
 import linkedinIcon from '@/assets/images/social_media_in.svg';
-import twitterXIcon from '@/assets/images/social_media_x.svg';
+import xIcon from '@/assets/images/social_media_x.svg';
 
 export enum SSO_PROVIDERS {
   google = 'google',
   microsoft = 'microsoft',
   github = 'github',
   linkedin = 'linkedin',
-  twitterX = 'twitterX',
+  x = 'x',
 }
 
 export const SOCIAL_AUTH_PROVIDERS: Record<SSO_PROVIDERS, SocialAuthProvider> = {
@@ -55,12 +55,12 @@ export const SOCIAL_AUTH_PROVIDERS: Record<SSO_PROVIDERS, SocialAuthProvider> = 
     isConfigured: false,
     configurations: null,
   },
-  twitterX: {
-    value: SSO_PROVIDERS.twitterX,
-    label: 'Twitter X',
-    description: 'Enable the Twitter X login option for your Auth0 applications',
-    icon: 'twitterX-icon',
-    imageSrc: twitterXIcon,
+  x: {
+    value: SSO_PROVIDERS.x,
+    label: 'X',
+    description: 'Enable the X login option for your Auth0 applications',
+    icon: 'x-icon',
+    imageSrc: xIcon,
     isAvailable: true,
     isConfigured: false,
     configurations: null,
