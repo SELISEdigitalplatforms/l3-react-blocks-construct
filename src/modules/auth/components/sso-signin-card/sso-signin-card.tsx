@@ -92,19 +92,13 @@ const SSOSigninCard = ({
   };
 
   const buttonContent = (
-    <Button
-      variant="outline"
-      className={`${getButtonWidth()} h-12`}
-      onClick={onClickHandler}
-      disabled={!providerConfig.isAvailable}
-      data-state={providerConfig.isAvailable ? 'enabled' : 'disabled'}
-    >
+    <Button variant="outline" className={`${getButtonWidth()} h-12`} onClick={onClickHandler}>
       <img
         src={providerConfig.imageSrc}
         width={20}
         height={20}
         alt={`${providerConfig.label} logo`}
-        className={`${!providerConfig.isAvailable ? 'opacity-50' : ''} ${showText ? 'mr-2 font-bold' : ''}`}
+        className={`${showText ? 'mr-2 font-bold' : ''}`}
       />
       {showText && `Log in with ${providerConfig.label}`}
     </Button>
