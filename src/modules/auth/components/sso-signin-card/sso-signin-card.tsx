@@ -31,6 +31,8 @@ const SSOSigninCard = ({
         return 'w-1/3';
       case 4:
         return 'w-1/4';
+      case 5:
+        return 'w-1/5';
       default:
         return 'w-full';
     }
@@ -89,7 +91,7 @@ const SSOSigninCard = ({
     }
   };
 
-  return (
+  const buttonContent = (
     <Button
       variant="outline"
       className={`${getButtonWidth()} h-12`}
@@ -107,6 +109,8 @@ const SSOSigninCard = ({
       {showText && `Log in with ${providerConfig.label}`}
     </Button>
   );
+
+  return buttonContent;
 };
 
 export default SSOSigninCard;
