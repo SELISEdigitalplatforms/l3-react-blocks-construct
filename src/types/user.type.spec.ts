@@ -18,6 +18,7 @@ describe('User Type', () => {
     isMfaVerified: true,
     profileImageUrl: 'https://example.com/profile.jpg',
     lastLoggedInTime: '2023-01-03T00:00:00Z',
+    permissions: ['read', 'write', 'delete'],
     mfaEnabled: true,
     userMfaType: 0,
   });
