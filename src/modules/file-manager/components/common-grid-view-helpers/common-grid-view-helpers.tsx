@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-// hooks/usePagination.ts
 import { useState, useEffect, useCallback } from 'react';
 import { Row } from '@tanstack/react-table';
 import { IFileDataWithSharing } from '../../utils/file-manager';
 import { FileTableRowActions } from '../file-manager-row-actions/file-manager-row-actions';
-import { IFileData } from '../../hooks/use-mock-files-query';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { IFileData } from '../../types/file-manager.type';
 import { RegularFileDetailsSheet } from '../regular-file-details-sheet/regular-file-details-sheet';
 
 export interface PaginationState {
@@ -16,11 +14,9 @@ export interface PaginationState {
 }
 
 export const usePagination = (filters?: any) => {
-  const isMobile = useIsMobile();
-
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: isMobile ? 20 : 50,
+    pageSize: 50,
     totalCount: 0,
   });
 

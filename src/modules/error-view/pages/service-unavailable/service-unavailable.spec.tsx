@@ -6,7 +6,7 @@ import {
   expectErrorPageImage,
   expectTextElements,
   type ErrorPageTestData,
-} from '@/test-utils/shared-test-utils';
+} from '@/lib/utils/test-utils/shared-test-utils';
 import { ServiceUnavailablePage } from './service-unavailable';
 
 // Mock UI Button component

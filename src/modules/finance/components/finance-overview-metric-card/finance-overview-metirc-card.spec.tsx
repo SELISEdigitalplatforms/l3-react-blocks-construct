@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FinanceOverviewMetricCard } from './finance-overview-metric-card';
 import { MetricData } from '../../types/finance.type';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // Helper functions to reduce duplication
 const createMockTranslation = () => (key: string) => key;

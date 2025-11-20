@@ -1,4 +1,3 @@
-import API_CONFIG from '@/config/api';
 import { clients } from '@/lib/https';
 import { LanguageResponse, ModuleResponse, UilmFileParams } from '../types/language.types';
 
@@ -20,11 +19,14 @@ import { LanguageResponse, ModuleResponse, UilmFileParams } from '../types/langu
  *   moduleName: 'dashboard'
  * });
  */
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+
 export const getUilmFile = async ({ language, moduleName }: UilmFileParams): Promise<any> => {
   const params = new URLSearchParams({
     Language: language,
     ModuleName: moduleName,
-    ProjectKey: API_CONFIG.blocksKey,
+    ProjectKey: projectKey,
   });
   const url = `/uilm/v1/Key/GetUilmFile?${params.toString()}`;
   const res = await clients.get<any>(url);
@@ -50,7 +52,7 @@ export const getUilmFile = async ({ language, moduleName }: UilmFileParams): Pro
  */
 export const getLanguage = async (): Promise<LanguageResponse> => {
   const params = new URLSearchParams({
-    ProjectKey: API_CONFIG.blocksKey,
+    ProjectKey: projectKey,
   });
   const url = `/uilm/v1/Language/Gets?${params.toString()}`;
   const res = await clients.get<LanguageResponse>(url);
@@ -76,7 +78,7 @@ export const getLanguage = async (): Promise<LanguageResponse> => {
  */
 export const getModule = async (): Promise<ModuleResponse> => {
   const params = new URLSearchParams({
-    ProjectKey: API_CONFIG.blocksKey,
+    ProjectKey: projectKey,
   });
   const url = `/uilm/v1/Module/Gets?${params.toString()}`;
   const res = await clients.get<ModuleResponse>(url);

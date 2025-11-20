@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FinanceRevenueExpenseTooltipContent } from './finance-revenue-expense-graph-tooltip';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // Mock finance services
 vi.mock('../../services/finance-services', () => ({

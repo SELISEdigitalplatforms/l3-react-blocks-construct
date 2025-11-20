@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TimelinePage } from './timeline';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 // Mock data - accessible in tests
 

@@ -12,7 +12,7 @@ import {
   createRevenueExpenseServicesMock,
   FINANCE_BAR_CHART_COMPONENTS,
   FINANCE_TIME_PERIODS,
-} from '../../../../test-utils/shared-test-utils';
+} from '../../../../lib/utils/test-utils/shared-test-utils';
 
 import { FinanceRevenueExpenseGraph } from './finance-revenue-expense-graph';
 

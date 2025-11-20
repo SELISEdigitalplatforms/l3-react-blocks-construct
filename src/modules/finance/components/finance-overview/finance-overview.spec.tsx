@@ -8,7 +8,7 @@ import {
   expectFinanceComponentExport,
   createMockIcon,
   createFinanceOverviewServicesMock,
-} from '../../../../test-utils/shared-test-utils';
+} from '../../../../lib/utils/test-utils/shared-test-utils';
 import { FinanceOverview } from './finance-overview';
 
 // Mock Lucide React icons using shared factory

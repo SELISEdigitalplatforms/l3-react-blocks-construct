@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { NotificationItem } from './notification-item';
-import { QueryWrapper } from '@/test-utils/test-providers';
+import { QueryWrapper } from '@/lib/utils/test-utils/test-providers';
 import { vi, expect, it, describe, beforeEach } from 'vitest';
 
 // Mock translation
@@ -64,15 +64,9 @@ describe('NotificationItem', () => {
     expect(screen.getByText(/^TODAY, \d{1,2}:\d{2} [AP]M$/)).toBeInTheDocument();
   });
 
-  it.skip('calls markAsRead with notification id and onError callback when menu item is clicked', () => {
-    render(
-      <QueryWrapper>
-        <NotificationItem notification={mockNotification as any} />
-      </QueryWrapper>
-    );
-    // This test is skipped because dropdown menu interaction is complex to mock
-    // The functionality is covered by integration tests
-  });
+  // Skipped due to complex dropdown menu interaction that needs proper mocking
+  // The functionality is covered by integration tests
+  it.todo('calls markAsRead with notification id and onError callback when menu item is clicked');
 
   it('renders read notification without unread indicator', () => {
     render(

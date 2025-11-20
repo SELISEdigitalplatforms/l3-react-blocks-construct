@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Check, ChevronLeft } from 'lucide-react';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
-import API_CONFIG from '@/config/api';
 import { Button } from '@/components/ui-kit/button';
 import { Card, CardContent } from '@/components/ui-kit/card';
 import { GeneralInfoForm } from '../../component/general-info-form/general-info-form';
@@ -46,6 +45,8 @@ interface StepperProps {
   currentStep: number;
   onStepChange: (step: number) => void;
 }
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
 export function Stepper({ steps, currentStep, onStepChange }: Readonly<StepperProps>) {
   return (
@@ -162,7 +163,7 @@ export const InventoryFormPage = () => {
     try {
       const data = await getPreSignedUrlAsync({
         name: file.name,
-        projectKey: API_CONFIG.blocksKey,
+        projectKey: projectKey,
         itemId: '',
         metaData: '',
         accessModifier: 'Public',

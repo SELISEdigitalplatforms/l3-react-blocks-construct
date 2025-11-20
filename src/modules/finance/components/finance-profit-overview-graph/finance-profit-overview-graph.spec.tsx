@@ -12,7 +12,7 @@ import {
   createFinanceUtilsMock,
   FINANCE_CHART_COMPONENTS,
   FINANCE_TIME_PERIODS,
-} from '../../../../test-utils/shared-test-utils';
+} from '../../../../lib/utils/test-utils/shared-test-utils';
 
 import { FinanceProfitOverviewGraph } from './finance-profit-overview-graph';
 

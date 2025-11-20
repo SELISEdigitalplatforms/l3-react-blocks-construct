@@ -25,7 +25,6 @@ import {
 import { Label } from '@/components/ui-kit/label';
 import { Input } from '@/components/ui-kit/input';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
-import API_CONFIG from '@/config/api';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 
 const getFileType = (file: File): FileType => {
@@ -80,6 +79,8 @@ const getCurrentUser = () => {
   const profile = localStorage.getItem('userProfile');
   return profile ? JSON.parse(profile) : null;
 };
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
 export function AttachmentsSection({
   taskId,
@@ -172,7 +173,7 @@ export function AttachmentsSection({
       getPreSignedUrl(
         {
           name: file.name,
-          projectKey: API_CONFIG.blocksKey,
+          projectKey: projectKey,
           itemId: '',
           metaData: '',
           accessModifier: 'Public',

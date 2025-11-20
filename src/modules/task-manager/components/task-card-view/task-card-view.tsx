@@ -2,7 +2,6 @@ import { useEffect, useMemo, useCallback } from 'react';
 import { DndContext, DragOverlay, closestCorners } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/use-toast';
-import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { Dialog } from '@/components/ui-kit/dialog';
 import {
@@ -19,6 +18,7 @@ import { AddColumn } from '../modals/add-column';
 import { TaskDragOverlay } from '../card-view/task-drag-overlay';
 import { AddTask } from '../modals/add-task';
 import TaskDetailsView from '../task-details-view/task-details-view';
+import { useDeviceCapabilities } from '@/modules/file-manager/hooks/use-device-capabilities';
 
 /**
  * TaskCardView Component
