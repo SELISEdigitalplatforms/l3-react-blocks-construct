@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { Monitor, Smartphone, Trash } from 'lucide-react';
 import { Button } from '@/components/ui-kit/button';
 import { ColumnDef } from '@tanstack/react-table';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
 import { DeviceSession } from '../../types/device.type';
+import { CustomtDateFormat } from '@/lib/utils/custom-date/custom-date';
 
 /**
  * Custom hook that defines and returns the columns for the device session table.

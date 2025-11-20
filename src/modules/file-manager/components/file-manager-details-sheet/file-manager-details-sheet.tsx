@@ -8,8 +8,7 @@ import {
   getSharedUsers,
   SharedUser,
 } from '@/modules/file-manager/utils/file-manager';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/utils/custom-date/custom-date';
 import { FileType } from '@/modules/file-manager/types/file-manager.type';
 
 export interface IFileDataWithSharing {
@@ -78,8 +77,6 @@ export const FileDetailsSheet = ({
   t,
   variant = 'default',
 }: Readonly<BaseFileDetailsSheetProps>) => {
-  const isMobile = useIsMobile();
-
   if (!isOpen || !file) return null;
 
   const IconComponent = getFileTypeIcon(file.fileType);
@@ -97,24 +94,13 @@ export const FileDetailsSheet = ({
   const ownerName = getOwnerName(sharedUsers, variant);
   const creationDate = getDateCreated(file, variant);
   const fileTypeDisplayName = getFileTypeDisplayName(file.fileType);
-
-  const containerClasses = isMobile
-    ? 'p-4 fixed inset-0 z-50  flex flex-col bg-background'
-    : 'w-80 bg-background  flex flex-col h-full rounded-lg shadow-lg ml-4';
-
-  const headerClasses = isMobile ? 'p-4 pb-3  bg-background' : 'p-6 pb-4 ';
-
-  const contentClasses = isMobile
-    ? 'flex-1 overflow-y-auto p-4 space-y-6'
-    : 'flex-1 overflow-y-auto p-6 space-y-6';
-
   const AvatarComponent = Avatar || FallbackAvatar;
   const AvatarImageComponent = AvatarImage || FallbackAvatarImage;
   const AvatarFallbackComponent = AvatarFallback || FallbackAvatarFallback;
 
   return (
-    <div className={containerClasses}>
-      <div className={headerClasses}>
+    <div className="flex flex-col bg-background p-4 fixed inset-0 z-50 md:static md:w-80 md:h-full md:rounded-lg md:shadow-lg md:ml-4 md:p-0">
+      <div className="p-4 pb-3  bg-background md:p-6 md:pb-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-high-emphasis">{t('DETAILS')}</h2>
           <button
@@ -127,7 +113,7 @@ export const FileDetailsSheet = ({
         </div>
       </div>
 
-      <div className={contentClasses}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 md:p-6">
         <div className="flex flex-col items-center space-y-3 py-4">
           <div
             className={`w-16 h-16 rounded-lg flex items-center justify-center ${backgroundColor}`}

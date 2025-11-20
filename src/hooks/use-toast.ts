@@ -183,6 +183,34 @@ function toast({ ...props }: Toast) {
   };
 }
 
+toast.error = (
+  error: Record<string, any>,
+  custom?: Record<string, string>,
+  defaultMessage = 'Something went wrong'
+) => {
+  const messages = [];
+
+  if (typeof error === 'object') {
+    for (const key in error) {
+      if (custom && key in custom) {
+        messages.push(custom[key]);
+        continue;
+      }
+      messages.push(error[key]);
+    }
+  }
+  if (messages.length === 0) {
+    messages.push(defaultMessage);
+  }
+
+  // Display the toast with error variant
+  return toast({
+    variant: 'destructive',
+    title: 'Error',
+    description: messages.join('\n'),
+  });
+};
+
 export function useToast() {
   const [state, setState] = React.useState<State>(memoryState);
 

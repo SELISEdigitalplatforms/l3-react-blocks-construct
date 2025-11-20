@@ -100,28 +100,30 @@ const BaseFilterPopover: React.FC<BaseFilterPopoverProps> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm font-medium">{t(title)}</div>
-            <div className="flex gap-2">
-              {showClearInHeader && onClear && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    onClear();
-                    onOpenChange(false);
-                  }}
-                >
-                  Clear filter
+        <div className="max-h-[80vh] overflow-y-auto">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-medium">{t(title)}</div>
+              <div className="flex gap-2">
+                {showClearInHeader && onClear && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      onClear();
+                      onOpenChange(false);
+                    }}
+                  >
+                    Clear filter
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+                  <X className="h-4 w-4" />
                 </Button>
-              )}
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-                <X className="h-4 w-4" />
-              </Button>
+              </div>
             </div>
+            {children}
           </div>
-          {children}
         </div>
       </PopoverContent>
     </Popover>
@@ -138,21 +140,25 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
 
-  const handleDateSelect = (selectedDate: Date | undefined, type: 'from' | 'to') => {
-    if (!selectedDate) return;
-
-    const cleanDate = new Date(selectedDate);
-
-    if (type === 'from') {
-      cleanDate.setHours(0, 0, 0, 0);
-    } else {
-      cleanDate.setHours(23, 59, 59, 999);
+  const handleDateSelect = (selectedRange: DateRange | undefined) => {
+    if (!selectedRange) {
+      onDateChange(undefined);
+      return;
     }
 
-    const newRange = {
-      from: type === 'from' ? cleanDate : date?.from,
-      to: type === 'to' ? cleanDate : date?.to,
-    };
+    const newRange: DateRange = {};
+
+    if (selectedRange.from) {
+      const fromDate = new Date(selectedRange.from);
+      fromDate.setHours(0, 0, 0, 0);
+      newRange.from = fromDate;
+    }
+
+    if (selectedRange.to) {
+      const toDate = new Date(selectedRange.to);
+      toDate.setHours(23, 59, 59, 999);
+      newRange.to = toDate;
+    }
 
     onDateChange(newRange);
   };
@@ -175,25 +181,14 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
       title={title}
       displayValue={formatDateRange(date)}
     >
-      <div className="space-x-4 flex">
-        <div>
-          <h3 className="text-xs text-muted-foreground mb-2 block">From</h3>
-          <Calendar
-            mode="single"
-            selected={date?.from}
-            onSelect={(date) => handleDateSelect(date, 'from')}
-            className="rounded-md border"
-          />
-        </div>
-        <div>
-          <h3 className="text-xs text-muted-foreground mb-2 block">To</h3>
-          <Calendar
-            mode="single"
-            selected={date?.to}
-            onSelect={(date) => handleDateSelect(date, 'to')}
-            className="rounded-md border"
-          />
-        </div>
+      <div>
+        <Calendar
+          mode="range"
+          selected={date as any}
+          onSelect={handleDateSelect as any}
+          numberOfMonths={1}
+          className="rounded-md border"
+        />
       </div>
       <div className="flex justify-center mt-2">
         <Button variant="outline" onClick={clearDateRange} className="w-full">

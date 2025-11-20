@@ -67,11 +67,11 @@ export const MainLayout = () => {
               {/* <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">
               <Library className="!w-5 !h-5 text-medium-emphasis" />
             </Button> */}
-              <Menubar className="border-none">
+              <Menubar className="border-none p-0">
                 <MenubarMenu>
                   <MenubarTrigger
                     asChild
-                    className="cursor-pointer focus:bg-transparent data-[state=open]:bg-transparent"
+                    className="cursor-pointer focus:bg-transparent data-[state=open]:bg-transparent p-0"
                   >
                     <div className="relative">
                       <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted">

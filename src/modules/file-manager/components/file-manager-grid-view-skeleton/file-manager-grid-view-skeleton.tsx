@@ -16,7 +16,7 @@ export const SkeletonGrid = ({
       <Skeleton className="h-4 w-16" />
       <Skeleton className="h-4 w-8" />
     </div>
-    <div className="grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
+    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
       {Array.from({ length: count }).map((_, index) =>
         type === 'folder' ? (
           <FolderSkeletonCard key={`${title}-folder-skeleton-${index}`} />

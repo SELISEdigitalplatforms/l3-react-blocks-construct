@@ -1,6 +1,8 @@
-import API_CONFIG from '@/config/api';
 import { LoginOption } from '@/constant/sso';
 import { MFASigninResponse } from './auth.service';
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
 const safeJsonParse = async (response: Response) => {
   try {
@@ -45,15 +47,16 @@ export interface SSOLoginResponse {
 export class SSOservice {
   async getSocialLoginEndpoint(payload: any): Promise<SSOLoginResponse> {
     try {
-      const url = `${API_CONFIG.baseUrl}/authentication/v1/OAuth/GetSocialLogInEndPoint`;
+      const url = `${baseUrl}/authentication/v1/OAuth/GetSocialLogInEndPoint`;
 
       const rawResponse = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          'x-blocks-key': API_CONFIG.blocksKey,
+          'x-blocks-key': projectKey,
         },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -82,14 +85,15 @@ export class SSOservice {
 
   async verifyMfaCode(mfaToken: string, code: string): Promise<MFASigninResponse> {
     try {
-      const url = `${API_CONFIG.baseUrl}/authentication/v1/OAuth/VerifyMfaCode`;
+      const url = `${baseUrl}/authentication/v1/OAuth/VerifyMfaCode`;
 
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-blocks-key': API_CONFIG.blocksKey,
+          'x-blocks-key': projectKey,
         },
+        credentials: 'include',
         body: JSON.stringify({
           mfaToken,
           code,
@@ -118,9 +122,15 @@ export class SSOservice {
 
 export const getLoginOption = async (): Promise<LoginOption | null> => {
   try {
-    const response = await fetch(`${API_CONFIG.baseUrl}/authentication/v1/Social/GetLoginOptions`, {
+    const url = `${baseUrl}/authentication/v1/Social/GetLoginOptions`;
+
+    const response = await fetch(url, {
       method: 'GET',
-      headers: { 'X-Blocks-Key': API_CONFIG.blocksKey },
+      headers: {
+        'X-Blocks-Key': projectKey,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
       referrerPolicy: 'no-referrer',
     });
 
@@ -130,7 +140,7 @@ export const getLoginOption = async (): Promise<LoginOption | null> => {
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching login options:', error);
+    console.error('[SSO] Error fetching login options:', error);
     throw error;
   }
 };

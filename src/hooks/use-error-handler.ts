@@ -113,27 +113,36 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
     error: ErrorResponse,
     messageMap: Record<string, string> = {}
   ): string => {
+    const defaultErrorMap: Record<string, string> = {
+      invalid_request: 'EMAIL_PASSWORD_NOT_VALID',
+      ...messageMap,
+    };
+
     if (error.error_description) {
       return error.error_description;
     }
 
-    if (error.error?.code && messageMap[`code_${error.error.code}`]) {
-      return messageMap[`code_${error.error.code}`];
+    if (error.error?.code && defaultErrorMap[`code_${error.error.code}`]) {
+      return defaultErrorMap[`code_${error.error.code}`];
     }
 
     if (error.error?.details) {
       const messages = Object.entries(error.error.details)
-        .map(([key, value]) => messageMap[key] || (Array.isArray(value) ? value.join(', ') : value))
+        .map(
+          ([key, value]) =>
+            defaultErrorMap[key] || (Array.isArray(value) ? value.join(', ') : value)
+        )
         .filter(Boolean);
       if (messages.length) return messages.join('. ');
     }
 
-    return (
-      error.message ??
-      (typeof error.error === 'string' ? error.error : error.error?.message) ??
-      defaultOptions.defaultMessage ??
-      t('SOMETHING_WENT_WRONG')
-    );
+    const errorString =
+      error.message ?? (typeof error.error === 'string' ? error.error : error.error?.message);
+    if (errorString && defaultErrorMap[errorString]) {
+      return defaultErrorMap[errorString];
+    }
+
+    return errorString ?? defaultOptions.defaultMessage ?? t('SOMETHING_WENT_WRONG');
   };
 
   const handleError = (error: unknown, options: ErrorHandlerOptions = {}) => {
@@ -161,8 +170,15 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
         : getErrorMessage(errorDetails, messageMap);
 
       if (isBackendError) {
+        const errorString =
+          errorDetails.message ??
+          (typeof errorDetails.error === 'string'
+            ? errorDetails.error
+            : errorDetails.error?.message);
+        const isAuthError = ['invalid_request'].includes(errorString ?? '');
+
         toast({
-          title: t('SOMETHING_WENT_WRONG'),
+          title: isAuthError ? t('INVALID_CREDENTIALS') : t('SOMETHING_WENT_WRONG'),
           description: finalMessage,
           duration,
           variant,

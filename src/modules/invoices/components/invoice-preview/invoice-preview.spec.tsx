@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import { InvoicePreview } from './invoice-preview';
 import { InvoiceStatus } from '../../types/invoices.types';
 import { vi } from 'vitest';
-import { renderWithProviders } from '../../../../test-utils/test-providers';
+import { renderWithProviders } from '../../../../lib/utils/test-utils/test-providers';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

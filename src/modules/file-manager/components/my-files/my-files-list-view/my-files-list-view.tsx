@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMockFilesQuery } from '@/modules/file-manager/hooks/use-mock-files-query';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { DataTable } from '@/components/core';
 import {
   IFileDataWithSharing,
@@ -53,7 +52,6 @@ export const MyFilesListView = ({
   onNavigateToFolder,
 }: Readonly<MyFilesListViewProps>) => {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<IFileDataWithSharing | null>(null);
@@ -206,11 +204,7 @@ export const MyFilesListView = ({
   }
 
   return (
-    <ResponsiveMainPane
-      isMobile={isMobile}
-      isDetailsOpen={isDetailsOpen}
-      isPreviewOpen={isPreviewOpen}
-    >
+    <ResponsiveMainPane isDetailsOpen={isDetailsOpen} isPreviewOpen={isPreviewOpen}>
       <div className="h-full flex-col flex w-full gap-6 md:gap-8">
         <DataTable
           data={combinedData}

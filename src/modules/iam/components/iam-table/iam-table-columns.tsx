@@ -4,7 +4,7 @@ import { DataTableColumnHeader } from '@/components/core';
 import { compareValues } from '../../services/user-service';
 import { IamData } from '../../types/user.types';
 import { DataTableRowActions } from './iam-table-row-actions';
-import { CustomtDateFormat } from '@/lib/custom-date-formatter';
+import { CustomtDateFormat } from '@/lib/utils/custom-date/custom-date';
 
 /**
  * Creates the columns for the IAM (Identity and Access Management) table.

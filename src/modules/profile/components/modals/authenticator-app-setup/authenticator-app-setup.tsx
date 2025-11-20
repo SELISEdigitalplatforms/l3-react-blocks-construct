@@ -15,7 +15,6 @@ import { useToast } from '@/hooks/use-toast';
 import { User } from '@/types/user.type';
 import { useGetSetUpTotp, useVerifyOTP } from '../../../hooks/use-mfa';
 import QRCodeDummyImage from '@/assets/images/image_off_placeholder.webp';
-import API_CONFIG from '../../../../../config/api';
 import { SetUpTotp, VerifyOTP } from '@/modules/profile/types/mfa.types';
 
 /**
@@ -36,6 +35,8 @@ interface AuthenticatorAppSetupProps {
   onNext: () => void;
   mfaId: string;
 }
+
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
 export const AuthenticatorAppSetup = ({
   userInfo,
@@ -59,7 +60,7 @@ export const AuthenticatorAppSetup = ({
 
     const setUpTotpPayload: SetUpTotp = {
       userId: userInfo?.itemId,
-      projectKey: API_CONFIG.blocksKey,
+      projectKey: projectKey,
     };
 
     setUpTotp(setUpTotpPayload, {

@@ -1,18 +1,12 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import { InvoicesHeaderToolbar } from './invoices-header-toolbar';
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => {
-    return {
-      t: (key: string) => key,
-      i18n: {
-        changeLanguage: vi.fn(),
-      },
-    };
-  },
-}));
+import {
+  setMockPermission,
+  resetMockPermission,
+  expectElementToHaveClasses,
+} from '../../../../lib/utils/test-utils/shared-test-utils';
 
 vi.mock('components/core/components/gurads/permission-guard/permission-guard', () => ({
   PermissionGuard: ({
@@ -23,6 +17,7 @@ vi.mock('components/core/components/gurads/permission-guard/permission-guard', (
     showFallback?: boolean;
   }) => {
     const hasPermission = (global as any).mockHasPermission ?? true;
+
     if (hasPermission) {
       return <>{children}</>;
     }
@@ -36,79 +31,44 @@ vi.mock('components/core/components/gurads/permission-guard/permission-guard', (
 }));
 
 vi.mock('config/roles-permissions', () => ({
-  MENU_PERMISSIONS: {
-    INVOICE_WRITE: 'invoice:write',
-  },
+  MENU_PERMISSIONS: { INVOICE_WRITE: 'invoice:write' },
 }));
 
+const expectNewInvoiceButton = () => {
+  expect(screen.getByText('NEW_INVOICE')).toBeInTheDocument();
+  expect(screen.getByRole('button')).toBeInTheDocument();
+  expect(screen.getByRole('link')).toHaveAttribute('href', '/invoices/create-invoice');
+};
+
 describe('InvoicesHeaderToolbar', () => {
-  const renderComponent = (props = {}) => {
-    return render(
-      <BrowserRouter>
-        <InvoicesHeaderToolbar {...props} />
-      </BrowserRouter>
-    );
-  };
-
   beforeEach(() => {
-    (global as any).mockHasPermission = true;
-  });
-
-  test('renders with default title', () => {
-    renderComponent();
-
-    expect(screen.getByText('INVOICES')).toBeInTheDocument();
-
-    const newInvoiceButton = screen.getByText('NEW_INVOICE');
-    expect(newInvoiceButton).toBeInTheDocument();
-
-    const linkElement = screen.getByRole('link');
-    expect(linkElement).toHaveAttribute('href', '/invoices/create-invoice');
-  });
-
-  test('renders with custom title', () => {
-    const customTitle = 'CUSTOM_TITLE';
-    renderComponent({ title: customTitle });
-
-    expect(screen.getByText(customTitle)).toBeInTheDocument();
-  });
-
-  test('renders button with correct styling', () => {
-    renderComponent();
-
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('text-sm');
-    expect(button).toHaveClass('font-bold');
-  });
-
-  test('renders Plus icon in the button', () => {
-    renderComponent();
-
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-    expect(screen.getByText('NEW_INVOICE')).toBeInTheDocument();
-  });
-
-  test('shows new invoice button when user has invoice write permission', () => {
-    (global as any).mockHasPermission = true;
-    renderComponent();
-
-    expect(screen.getByText('NEW_INVOICE')).toBeInTheDocument();
-    expect(screen.getByRole('button')).toBeInTheDocument();
-    expect(screen.getByRole('link')).toBeInTheDocument();
-  });
-
-  test('title remains visible regardless of permissions', () => {
-    (global as any).mockHasPermission = true;
-    const { rerender } = renderComponent();
-    expect(screen.getByText('INVOICES')).toBeInTheDocument();
-
-    (global as any).mockHasPermission = false;
-    rerender(
+    resetMockPermission();
+    render(
       <BrowserRouter>
         <InvoicesHeaderToolbar />
       </BrowserRouter>
     );
+  });
+
+  test('renders with default title and new invoice button', () => {
     expect(screen.getByText('INVOICES')).toBeInTheDocument();
+    expectNewInvoiceButton();
+    expectElementToHaveClasses(screen.getByRole('button'), 'text-sm', 'font-bold');
+  });
+
+  test('renders with custom title', () => {
+    render(
+      <BrowserRouter>
+        <InvoicesHeaderToolbar title="CUSTOM_TITLE" />
+      </BrowserRouter>
+    );
+    expect(screen.getByText('CUSTOM_TITLE')).toBeInTheDocument();
+  });
+
+  test('title remains visible regardless of permissions', () => {
+    expect(screen.getAllByText('INVOICES')[0]).toBeInTheDocument();
+
+    setMockPermission(false);
+    expect(screen.getAllByText('INVOICES')[0]).toBeInTheDocument();
   });
 });

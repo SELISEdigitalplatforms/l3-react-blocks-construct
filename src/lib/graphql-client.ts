@@ -1,5 +1,4 @@
 import { clients } from './https';
-import API_CONFIG from '@/config/api';
 
 /**
  * GraphQL Client Module
@@ -48,15 +47,15 @@ interface GraphQLClient {
   mutate<T>(request: GraphQLRequest): Promise<T>;
 }
 
-const cleanBaseUrl = API_CONFIG.baseUrl.endsWith('/')
-  ? API_CONFIG.baseUrl.slice(0, -1)
-  : API_CONFIG.baseUrl;
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
-const PROJECT_SHORT_KEY = import.meta.env.VITE_PROJECT_SHORT_KEY || '';
+const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 
-const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${
-  PROJECT_SHORT_KEY ? `/${PROJECT_SHORT_KEY}` : ''
-}/gateway`;
+const PROJECT_SLUG = import.meta.env.VITE_PROJECT_SLUG || '';
+
+const projectSlug = PROJECT_SLUG ? `/${PROJECT_SLUG}` : '';
+const GRAPHQL_BASE_URL = `${cleanBaseUrl}/data/v1${projectSlug}/gateway`;
 
 export const graphqlClient: GraphQLClient = {
   async query<T>(request: GraphQLRequest): Promise<T> {
@@ -70,7 +69,7 @@ export const graphqlClient: GraphQLClient = {
       JSON.stringify(payload),
       {
         'Content-Type': 'application/json',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       }
     );
 
@@ -92,7 +91,7 @@ export const graphqlClient: GraphQLClient = {
       JSON.stringify(payload),
       {
         'Content-Type': 'application/json',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       }
     );
 

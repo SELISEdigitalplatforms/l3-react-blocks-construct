@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui-kit/button';
 import { Separator } from '@/components/ui-kit/separator';
 import { Skeleton } from '@/components/ui-kit/skeleton';
+import { Badge } from '@/components/ui-kit/badge';
 import { User } from '@/types/user.type';
 import { useGetMfaTemplate, useGenerateOTP } from '../../../hooks/use-mfa';
 import { useToast } from '@/hooks/use-toast';
@@ -53,10 +54,19 @@ export const TwoFactorAuthenticationSetup = ({
   const isAuthenticatorAppEnabled = mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(1);
   const isEmailVerificationEnabled =
     mfaTemplate?.enableMfa && mfaTemplate?.userMfaType?.includes(2);
-  const handleAuthenticatorAppClick = () => {
-    if (!isAuthenticatorAppEnabled || !userInfo) return;
 
-    if (userInfo?.isMfaVerified && userInfo?.mfaEnabled && userInfo?.userMfaType === 1) {
+  // Check if MFA is currently active
+  const isAuthenticatorAppActive =
+    userInfo?.isMfaVerified && userInfo?.mfaEnabled && userInfo?.userMfaType === 1;
+  const isEmailVerificationActive =
+    userInfo?.isMfaVerified && userInfo?.mfaEnabled && userInfo?.userMfaType === 2;
+  const hasActiveMfa = isAuthenticatorAppActive || isEmailVerificationActive;
+  const handleAuthenticatorAppClick = () => {
+    // Don't allow click if disabled or if another MFA is active
+    if (!isAuthenticatorAppEnabled || !userInfo || (hasActiveMfa && !isAuthenticatorAppActive))
+      return;
+
+    if (isAuthenticatorAppActive) {
       setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION);
     } else {
       generateOTP(
@@ -81,9 +91,11 @@ export const TwoFactorAuthenticationSetup = ({
   };
 
   const handleEmailVerificationClick = () => {
-    if (!isEmailVerificationEnabled || !userInfo) return;
+    // Don't allow click if disabled or if another MFA is active
+    if (!isEmailVerificationEnabled || !userInfo || (hasActiveMfa && !isEmailVerificationActive))
+      return;
 
-    if (userInfo?.isMfaVerified && userInfo?.mfaEnabled && userInfo?.userMfaType === 2) {
+    if (isEmailVerificationActive) {
       setCurrentDialog(MfaDialogState.MANAGE_TWO_FACTOR_AUTHENTICATION);
     } else {
       generateOTP(
@@ -150,23 +162,39 @@ export const TwoFactorAuthenticationSetup = ({
       );
     }
 
+    const isDisabled = !isAuthenticatorAppEnabled || (hasActiveMfa && !isAuthenticatorAppActive);
+
     return (
       <button
         type="button"
-        disabled={!isAuthenticatorAppEnabled}
+        disabled={isDisabled}
         className={`
         w-full flex items-center justify-between p-4
-        ${isAuthenticatorAppEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
+        ${!isDisabled ? 'hover:bg-muted/50 cursor-pointer' : 'opacity-50 cursor-not-allowed'}
       `}
         onClick={handleAuthenticatorAppClick}
       >
         <div className="flex items-center gap-3">
           <div className="p-2 bg-surface rounded-md">
-            <Smartphone className="text-secondary" size={24} />
+            <Smartphone
+              className={isDisabled ? 'text-medium-emphasis' : 'text-secondary'}
+              size={24}
+            />
           </div>
-          <h3 className="text-sm font-semibold text-high-emphasis">{t('AUTHENTICATOR_APP')}</h3>
+          <div className="flex items-center gap-2">
+            <h3
+              className={`text-sm font-semibold ${isDisabled ? 'text-medium-emphasis' : 'text-high-emphasis'}`}
+            >
+              {t('AUTHENTICATOR_APP')}
+            </h3>
+            {isAuthenticatorAppActive && (
+              <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/10">
+                {t('ACTIVE')}
+              </Badge>
+            )}
+          </div>
         </div>
-        <ChevronRight className="text-primary" size={20} />
+        {!isDisabled && <ChevronRight className="text-primary" size={20} />}
       </button>
     );
   };
@@ -203,26 +231,39 @@ export const TwoFactorAuthenticationSetup = ({
       );
     }
 
+    const isDisabled = !isEmailVerificationEnabled || (hasActiveMfa && !isEmailVerificationActive);
+
     return (
       <button
         type="button"
-        disabled={!isEmailVerificationEnabled}
+        disabled={isDisabled}
         className={`
         w-full flex items-center justify-between p-4
-        ${isEmailVerificationEnabled ? 'hover:bg-muted/50' : 'opacity-50'}
+        ${!isDisabled ? 'hover:bg-muted/50 cursor-pointer' : 'opacity-50 cursor-not-allowed'}
       `}
         onClick={handleEmailVerificationClick}
       >
         <div className="flex items-center gap-3">
           <div className="p-2 bg-surface rounded-md">
-            <Mail className="text-secondary" size={24} />
+            <Mail className={isDisabled ? 'text-medium-emphasis' : 'text-secondary'} size={24} />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-high-emphasis">{t('EMAIL_VERIFICATION')}</h3>
+            <div className="flex items-center gap-2">
+              <h3
+                className={`text-sm font-semibold ${isDisabled ? 'text-medium-emphasis' : 'text-high-emphasis'}`}
+              >
+                {t('EMAIL_VERIFICATION')}
+              </h3>
+              {isEmailVerificationActive && (
+                <Badge className="bg-success/10 text-success border-success/20 hover:bg-success/10">
+                  {t('ACTIVE')}
+                </Badge>
+              )}
+            </div>
             <p className="text-xs text-medium-emphasis">{userInfo?.email}</p>
           </div>
         </div>
-        <ChevronRight className="text-primary" size={20} />
+        {!isDisabled && <ChevronRight className="text-primary" size={20} />}
       </button>
     );
   };

@@ -6,7 +6,7 @@ import {
   expectErrorPageButton,
   expectErrorPageImage,
   expectTextElements,
-} from '@/test-utils/shared-test-utils';
+} from '@/lib/utils/test-utils/shared-test-utils';
 import { NotFoundPage } from './not-found';
 
 // Mock UI Button component

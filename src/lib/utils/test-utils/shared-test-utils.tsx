@@ -215,6 +215,232 @@ export const createMockIcon = (testId: string, title?: string) => {
 
 export const createMockTranslation = () => (key: string) => key;
 
+// ------------------ UI Component Mock Factories ------------------
+// Reusable UI component mocks to eliminate duplication across test files
+
+/**
+ * Creates mock Card component family (Card, CardHeader, CardContent, CardTitle, CardDescription)
+ * Used by: dashboard, invoices, and other components using card UI
+ *
+ * NOTE: Copy this implementation inline in vi.mock() - do not import and call this function
+ */
+export const createCardComponentMocks = () => ({
+  Card: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
+  CardHeader: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-header" {...props}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
+  CardTitle: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-title" {...props}>
+      {children}
+    </div>
+  ),
+  CardDescription: ({ children, className, ...props }: any) => (
+    <div className={className} data-testid="card-description" {...props}>
+      {children}
+    </div>
+  ),
+});
+
+/**
+ * Creates mock Select component family
+ * Used by: dashboard, finance, and filter components
+ */
+export const createSelectComponentMocks = (mockItems?: string[]) => ({
+  Select: ({ children, ...props }: any) => (
+    <div data-testid="select" {...props}>
+      {children}
+    </div>
+  ),
+  SelectTrigger: ({ children, className, ...props }: any) => (
+    <button className={className} data-testid="select-trigger" {...props}>
+      {children}
+    </button>
+  ),
+  SelectValue: ({ placeholder, ...props }: any) => (
+    <span data-testid="select-value" {...props}>
+      {placeholder}
+    </span>
+  ),
+  SelectContent: ({ children, ...props }: any) => (
+    <div data-testid="select-content" {...props}>
+      {children}
+    </div>
+  ),
+  SelectGroup: ({ children, ...props }: any) => (
+    <div data-testid="select-group" {...props}>
+      {mockItems?.map((item) => (
+        <div key={item} data-testid={`select-item-${item}`} data-value={item}>
+          {item}
+        </div>
+      ))}
+      {children}
+    </div>
+  ),
+  SelectItem: ({ children, value, ...props }: any) => (
+    <div data-testid={`select-item-${value}`} data-value={value} {...props}>
+      {children}
+    </div>
+  ),
+});
+
+/**
+ * Creates mock Dialog component family
+ * Used by: chat, modals, and confirmation dialogs
+ */
+export const createDialogComponentMocks = () => ({
+  Dialog: ({ open, children }: any) => (open ? <div>{children}</div> : null),
+  DialogContent: ({ children }: any) => <div>{children}</div>,
+  DialogHeader: ({ children }: any) => <div>{children}</div>,
+  DialogTitle: ({ children }: any) => <div>{children}</div>,
+  DialogDescription: ({ children }: any) => <div>{children}</div>,
+  DialogFooter: ({ children }: any) => <div>{children}</div>,
+});
+
+/**
+ * Creates mock Button component
+ * Used by: most components with buttons
+ */
+export const createButtonComponentMock = () => ({
+  Button: ({ children, loading, disabled, onClick, ...props }: any) => (
+    <button disabled={!!loading || !!disabled} onClick={onClick} {...props}>
+      {children}
+    </button>
+  ),
+});
+
+/**
+ * Creates mock Input component
+ * Used by: forms and input fields
+ */
+export const createInputComponentMock = () => ({
+  Input: (props: any) => <input {...props} />,
+});
+
+/**
+ * Creates mock Textarea component
+ * Used by: forms with text areas
+ */
+export const createTextareaComponentMock = () => ({
+  Textarea: (props: any) => <textarea {...props} />,
+});
+
+/**
+ * Creates mock Avatar component family
+ * Used by: chat, profile, and user display components
+ */
+export const createAvatarComponentMocks = () => ({
+  Avatar: ({ children }: any) => <div>{children}</div>,
+  AvatarImage: (props: any) => <img {...props} alt="profile" />,
+  AvatarFallback: (props: any) => <span {...props} />,
+});
+
+/**
+ * Creates mock Chart UI components
+ * Used by: dashboard charts and analytics
+ */
+export const createChartUIComponentMocks = () => ({
+  ChartContainer: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="chart-container">{children}</div>
+  ),
+  ChartTooltip: ({ content }: { content: any }) => {
+    const mockPayload = [{ payload: { devices: 'windows', users: 200 } }];
+    return (
+      <div data-testid="chart-tooltip">
+        {content({ payload: mockPayload }) && (
+          <div data-testid="chart-tooltip-content">
+            <p>WINDOWS:</p>
+            <p>200 USERS</p>
+          </div>
+        )}
+      </div>
+    );
+  },
+  ChartLegend: ({ content }: { content: React.ReactNode }) => (
+    <div data-testid="chart-legend">
+      {content || <div data-testid="chart-legend-content">Legend Content</div>}
+    </div>
+  ),
+  ChartTooltipContent: () => <div data-testid="chart-tooltip-content">Tooltip Content</div>,
+  ChartLegendContent: () => <div data-testid="chart-legend-content">Legend Content</div>,
+});
+
+/**
+ * Creates mock Recharts components (PieChart, Pie, Label, etc.)
+ * Used by: dashboard charts
+ */
+export const createRechartsComponentMocks = () => ({
+  PieChart: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="pie-chart">{children}</div>
+  ),
+  Pie: ({
+    data,
+    dataKey,
+    nameKey,
+    innerRadius,
+    strokeWidth,
+    children,
+  }: {
+    data: any;
+    dataKey: string;
+    nameKey: string;
+    innerRadius: number;
+    strokeWidth: number;
+    children: React.ReactNode;
+  }) => (
+    <div
+      data-testid="pie"
+      data-data-key={dataKey}
+      data-name-key={nameKey}
+      data-inner-radius={innerRadius}
+      data-stroke-width={strokeWidth}
+      data-chart={JSON.stringify(data)}
+    >
+      {children}
+    </div>
+  ),
+  Label: () => <div data-testid="label" />,
+  Tooltip: ({ children }: { children?: React.ReactNode }) => (
+    <div data-testid="recharts-tooltip">{children}</div>
+  ),
+  Legend: ({ children }: { children?: React.ReactNode }) => (
+    <div data-testid="recharts-legend">{children}</div>
+  ),
+  ResponsiveContainer: ({ children }: { children?: React.ReactNode }) => (
+    <div data-testid="responsive-container">{children}</div>
+  ),
+});
+
+/**
+ * Creates mock lucide-react icons
+ * Used by: dashboard and UI components with icons
+ */
+export const createLucideIconMocks = (icons: string[]) => {
+  const mocks: Record<string, any> = {};
+  icons.forEach((icon) => {
+    mocks[icon] = ({ className }: { className?: string }) => (
+      <svg
+        data-testid={`icon-${icon
+          .toLowerCase()
+          .replace(/([A-Z])/g, '-$1')
+          .slice(1)}`}
+        className={`lucide-${icon.toLowerCase()} ${className ?? ''}`}
+      />
+    );
+  });
+  return mocks;
+};
+
 // ------------------ Common Test Data Patterns ------------------
 // Reusable test data structures
 
@@ -279,13 +505,21 @@ export const suppressConsoleErrors = () => {
 // ------------------ Error Page Specific Helpers ------------------
 // Shared utilities for error page components
 
+/**
+ * Internal helper to verify element has specific classes
+ * Used by both expectElementWithClassesDirect and expectElementToHaveClasses
+ */
+const verifyElementClasses = (element: HTMLElement, classes: string[]) => {
+  classes.forEach((className) => {
+    expect(element).toHaveClass(className);
+  });
+};
+
 export const expectElementWithClassesDirect = (
   element: HTMLElement,
   classes: readonly string[]
 ) => {
-  classes.forEach((className) => {
-    expect(element).toHaveClass(className);
-  });
+  verifyElementClasses(element, [...classes]);
 };
 
 export const expectErrorPageStructure = (titleText: string) => {
@@ -796,4 +1030,109 @@ export const createErrorPageTestSuite = (
       createAdditionalTestSuites(additionalTests);
     });
   };
+};
+
+// ============================================================================
+// ADDITIONAL COMMON TEST MOCKS & HELPERS
+// ============================================================================
+// NOTE: These factory functions are useful for test files that DON'T import
+// shared-test-utils.tsx. If your test file imports shared-test-utils.tsx,
+// react-i18next is already mocked globally, so you should define mocks inline
+// to avoid Vitest hoisting conflicts.
+
+/**
+ * Creates a PermissionGuard mock that respects global permission state
+ *
+ * IMPORTANT: Define this mock INLINE in your test file to avoid hoisting issues:
+ *
+ * vi.mock('components/core/components/gurads/permission-guard/permission-guard', () => ({
+ *   PermissionGuard: ({ children, showFallback }) => {
+ *     const hasPermission = (global as any).mockHasPermission ?? true;
+ *     if (hasPermission) return <>{children}</>;
+ *     if (showFallback) return <div data-testid="permission-denied">No Permission</div>;
+ *     return null;
+ *   },
+ * }));
+ *
+ * Then use setMockPermission() and resetMockPermission() helpers from this file.
+ */
+export const createPermissionGuardMock = () => ({
+  PermissionGuard: ({
+    children,
+    showFallback,
+  }: {
+    children: React.ReactNode;
+    showFallback?: boolean;
+  }) => {
+    const hasPermission = (global as any).mockHasPermission ?? true;
+    if (hasPermission) {
+      return <>{children}</>;
+    }
+
+    if (showFallback) {
+      return <div data-testid="permission-denied">No Permission</div>;
+    }
+
+    return null;
+  },
+});
+
+/**
+ * Creates a basic react-i18next mock with translation function
+ * Usage: vi.mock('react-i18next', createReactI18nextMock);
+ */
+export const createReactI18nextMock = () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: vi.fn(),
+    },
+  }),
+});
+
+/**
+ * Creates a roles-permissions config mock
+ * Usage: vi.mock('config/roles-permissions', () => createRolesPermissionsMock({ INVOICE_WRITE: 'invoice:write' }));
+ */
+export const createRolesPermissionsMock = (permissions: Record<string, string>) => ({
+  MENU_PERMISSIONS: permissions,
+});
+
+/**
+ * Helper to set global permission state for tests
+ */
+export const setMockPermission = (hasPermission: boolean) => {
+  (global as any).mockHasPermission = hasPermission;
+};
+
+/**
+ * Helper to reset global permission state
+ */
+export const resetMockPermission = () => {
+  (global as any).mockHasPermission = true;
+};
+
+/**
+ * Helper to verify element has specific classes
+ */
+export const expectElementToHaveClasses = (element: HTMLElement, ...classes: string[]) => {
+  verifyElementClasses(element, classes);
+};
+
+/**
+ * Helper to verify multiple text elements are in document
+ */
+export const expectTextsToBeInDocument = (...texts: string[]) => {
+  texts.forEach((text) => {
+    expect(screen.getByText(text)).toBeInTheDocument();
+  });
+};
+
+/**
+ * Helper to verify element with role and text
+ */
+export const expectRoleWithText = (role: string, text: string) => {
+  const element = screen.getByRole(role);
+  expect(element).toBeInTheDocument();
+  expect(element).toHaveTextContent(text);
 };

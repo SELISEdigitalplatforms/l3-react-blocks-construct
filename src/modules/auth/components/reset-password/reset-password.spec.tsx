@@ -2,7 +2,7 @@ import { vi, Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ResetpasswordForm } from './reset-password';
 import { useResetPassword } from '../../hooks/use-auth';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 const TEST_PASSWORD = 'testPassword123';
 

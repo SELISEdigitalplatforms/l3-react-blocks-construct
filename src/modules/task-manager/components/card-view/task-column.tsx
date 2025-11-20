@@ -9,9 +9,9 @@ import { TaskCard } from './task-card';
 import { Dialog } from '@/components/ui-kit/dialog';
 import TaskDetailsView from '../task-details-view/task-details-view';
 import { ColumnMenu } from './column-menu';
-import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import { getResponsiveContainerHeight } from '@/lib/mobile-responsiveness';
 import { TaskSection } from '../../types/task-manager.types';
+import { useDeviceCapabilities } from '@/modules/file-manager/hooks/use-device-capabilities';
 
 /**
  * TaskColumn Component
@@ -98,7 +98,8 @@ export function TaskColumn({
   const MIN_COLUMN_HEIGHT = '150px';
 
   const taskIds = useMemo(
-    () => tasks.map((task) => `task-${(task && (task.ItemId || task.id)) || ''}`),
+    () =>
+      tasks.map((task, index) => `task-${(task && (task.ItemId || task.id)) || `temp-${index}`}`),
     [tasks]
   );
 
@@ -209,7 +210,7 @@ export function TaskColumn({
             <div className="space-y-3">
               {tasks.map((task, index) => (
                 <div
-                  key={`task-${task.ItemId || task.id || 'temp-' + index}`}
+                  key={task.ItemId || task.id || `task-temp-${column.ItemId}-${index}`}
                   className="task-card-container"
                 >
                   <TaskCard

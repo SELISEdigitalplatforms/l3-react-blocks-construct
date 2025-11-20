@@ -1,13 +1,13 @@
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
-import { useTranslation } from 'react-i18next';
-import { useGetLoginOptions, useSigninMutation } from '@/modules/auth/hooks/use-auth';
 import { Signin } from '../../components/signin/signin';
-import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/state/store/auth';
-import { SignInResponse } from '@/modules/auth/services/auth.service';
+import { useGetLoginOptions, useSigninMutation } from '../../hooks/use-auth';
+import { SignInResponse } from '../../services/auth.service';
 
 export const SigninPage = () => {
   const { theme } = useTheme();

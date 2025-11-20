@@ -131,18 +131,20 @@ export const ActivityLogToolbar = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="p-0 w-auto">
-            <Calendar
-              mode="range"
-              selected={dateRange}
-              onSelect={handleDateRangeChange}
-              numberOfMonths={2}
-              className="rounded-md border"
-              defaultMonth={dateRange?.from || new Date()}
-            />
-            <div className="p-2 border-t">
-              <Button variant="ghost" onClick={clearDateRange} className="w-full" size="sm">
-                {t('CLEAR_FILTER')}
-              </Button>
+            <div className="max-h-[80vh] overflow-y-auto">
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={handleDateRangeChange}
+                numberOfMonths={1}
+                className="rounded-md border"
+                defaultMonth={dateRange?.from || new Date()}
+              />
+              <div className="p-2 border-t">
+                <Button variant="ghost" onClick={clearDateRange} className="w-full" size="sm">
+                  {t('CLEAR_FILTER')}
+                </Button>
+              </div>
             </div>
           </PopoverContent>
         </Popover>

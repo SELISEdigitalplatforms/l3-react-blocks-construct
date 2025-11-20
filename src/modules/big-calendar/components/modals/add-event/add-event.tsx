@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState, useMemo, useEffect } from 'react';
-import { generateUuid } from '@/utils/uuid';
+import { generateUuid } from '@/lib/utils/uuid';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';

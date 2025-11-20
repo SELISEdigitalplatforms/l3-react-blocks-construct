@@ -1,4 +1,3 @@
-import API_CONFIG, { getApiUrl } from '../../../config/api';
 import { clients, HttpError } from '@/lib/https';
 import { useAuthStore } from '@/state/store/auth';
 import {
@@ -35,7 +34,6 @@ import {
  * - Uses `fetch` or `clients.post` for API communication
  * - All endpoints are protected with proper headers and credentials
  * - Throws structured `HttpError` for non-OK responses
- * - Uses global project key (`API_CONFIG.blocksKey`) in headers or body
  * - Supports CAPTCHA where applicable
  *
  * Example:
@@ -93,6 +91,17 @@ export interface SigninBySSOPayload {
   state: string;
 }
 
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+const getApiUrl = (path: string) => {
+  const baseUrl = apiBaseUrl.endsWith('/') ? apiBaseUrl.slice(0, -1) : apiBaseUrl;
+
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+
+  return `${baseUrl}${cleanPath}`;
+};
+
 export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'password'>(
   payload: PasswordSigninPayload | MFASigninPayload | SigninBySSOPayload
 ): Promise<T extends 'password' | 'social' ? SignInResponse : MFASigninResponse> => {
@@ -111,7 +120,7 @@ export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'pas
       body: passwordFormData,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       },
       credentials: 'include',
     });
@@ -133,7 +142,7 @@ export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'pas
       body: signinBySSOData,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       },
       credentials: 'include',
     });
@@ -157,7 +166,7 @@ export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'pas
       body: mfaFormData,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'x-blocks-key': API_CONFIG.blocksKey,
+        'x-blocks-key': projectKey,
       },
       credentials: 'include',
     });
@@ -193,12 +202,12 @@ export const getRefreshToken = async () => {
   formData.append('grant_type', 'refresh_token');
   formData.append('refresh_token', useAuthStore.getState().refreshToken ?? '');
 
-  const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
+  const response = await fetch(`${apiBaseUrl}${url}`, {
     method: 'POST',
     body: formData,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'x-blocks-key': API_CONFIG.blocksKey,
+      'x-blocks-key': projectKey,
     },
     credentials: 'include',
   });
@@ -235,7 +244,7 @@ export const resetPassword = async (data: { code: string; password: string }) =>
   const payload = {
     ...data,
     logoutFromAllDevices: true,
-    ProjectKey: API_CONFIG.blocksKey,
+    ProjectKey: projectKey,
   };
 
   const url = '/iam/v1/Account/ResetPassword';

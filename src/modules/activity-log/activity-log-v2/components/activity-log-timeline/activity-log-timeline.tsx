@@ -45,7 +45,10 @@ export const ActivityLogTimeline = ({ activities }: { activities: ActivityGroup[
         </div>
       ) : (
         <Card className="w-full border-none rounded-[8px] shadow-sm">
-          <div ref={containerRef} className="px-12 py-8 h-[800px] overflow-y-auto scrollbar-hide">
+          <div
+            ref={containerRef}
+            className="px-2 py-6 md:px-12 md:py-8 h-[800px] overflow-y-auto scrollbar-hide"
+          >
             <div className="relative">
               {visibleActivities.length > 0 && (
                 <div

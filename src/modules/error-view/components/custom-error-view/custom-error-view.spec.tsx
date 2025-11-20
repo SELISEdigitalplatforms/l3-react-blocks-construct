@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import '../../../../test-utils/shared-test-utils';
+import '../../../../lib/utils/test-utils/shared-test-utils';
 
 import { CustomErrorView } from './custom-error-view';
 

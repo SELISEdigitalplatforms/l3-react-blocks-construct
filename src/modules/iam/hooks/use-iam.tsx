@@ -1,17 +1,6 @@
 import { useGlobalQuery } from '@/state/query-client/hooks';
 import { getUsers, getRoles, RoleData } from '../services/user-service';
-import { IamData } from '../types/user.types';
-
-export interface UserFilter {
-  email?: string;
-  name?: string;
-}
-
-export interface GetUsersPayload {
-  page: number;
-  pageSize: number;
-  filter?: UserFilter;
-}
+import { GetUsersPayload, IamData } from '../types/user.types';
 
 export interface GetUsersResponse {
   data: IamData[];

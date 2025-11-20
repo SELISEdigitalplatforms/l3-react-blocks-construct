@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ActivityLogItem } from './activity-log-item';
 import { ActivityItem } from '../../types/activity-log.types';
-import '../../../../../test-utils/shared-test-utils';
+import '../../../../../lib/utils/test-utils/shared-test-utils';
 
 // Test data
 const mockActivityItem: ActivityItem = {

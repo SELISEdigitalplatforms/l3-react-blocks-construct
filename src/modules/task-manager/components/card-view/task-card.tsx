@@ -8,9 +8,9 @@ import { priorityStyle, TaskItem, TaskSection } from '../../types/task-manager.t
 import { StatusCircle } from '../status-circle/status-circle';
 import { useTaskDetails } from '../../hooks/use-task-details';
 import { useDeleteTaskItem, useGetTaskComments } from '../../hooks/use-task-manager';
-import { useDeviceCapabilities } from '@/hooks/use-device-capabilities';
 import { TaskManagerDropdownMenu } from '../task-manager-ui/task-manager-dropdown-menu';
 import { TaskManagerBadge } from '../task-manager-ui/task-manager-badge';
+import { useDeviceCapabilities } from '@/modules/file-manager/hooks/use-device-capabilities';
 
 interface ITaskCardProps {
   task: TaskItem;
@@ -195,10 +195,10 @@ export function TaskCard({
 
           {task.ItemTag &&
             task.ItemTag.length > 0 &&
-            task.ItemTag.map((tag) => (
+            task.ItemTag.map((tag, tagIndex) => (
               <TaskManagerBadge
                 className="px-2 py-0.5"
-                key={tag.ItemId}
+                key={tag.ItemId || `tag-${tag.TagLabel}-${tagIndex}`}
                 asButton={false}
                 onClick={handleInteractiveElementClick}
               >
