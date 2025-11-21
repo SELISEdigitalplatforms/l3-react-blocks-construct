@@ -19,7 +19,9 @@ export const ProtectedFragment = ({
 }: ProtectedFragmentProps) => {
   const { isProtected, isAuthenticated } = useIsProtected({ roles, permissions, opt });
 
-  if (!isAuthenticated) throw new Error('Unauthenticated');
+  if (!isAuthenticated) {
+    return mode === 'hidden' ? null : <>{children}</>;
+  }
 
   if (mode === 'disabled') {
     return (
