@@ -1,4 +1,7 @@
+import { User } from '@/types/user.type';
+
 export type AuthState = {
+  user: User | null;
   isAuthenticated: boolean;
   accessToken: string | null;
   refreshToken: string | null;
@@ -10,4 +13,5 @@ export type AuthState = {
   setAccessToken: (accessToken: string) => void;
   logout: () => void;
   setTokens: (tokens: { accessToken: string; refreshToken: string }) => void;
+  setUser: (user: User | null) => void;
 };

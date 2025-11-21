@@ -10,7 +10,7 @@ export type User = {
   userName: string;
   phoneNumber: string | null;
   roles: string[];
-  permissions?: string[];
+  permissions: string[];
   active: boolean;
   isVarified: boolean;
   profileImageUrl: string;
