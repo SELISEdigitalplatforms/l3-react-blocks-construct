@@ -14,6 +14,7 @@ import IamTableToolbar from '../../components/iam-table/iam-table-toolbar';
 import { useGetUsersQuery } from '../../hooks/use-iam';
 import { createIamTableColumns } from '../../components/iam-table/iam-table-columns';
 import { ExpandedUserDetails } from '../../components/user-details-mobile-view/expanded-user-details';
+import { ProtectedFragment } from '@/state/store/auth/protected-fragment';
 
 interface PaginationState {
   pageIndex: number;
@@ -216,36 +217,34 @@ export const UsersTablePage = () => {
           <h2 className="text-2xl font-bold tracking-tight">{t('IDENTITY_ACCESS_MANAGEMENT')}</h2>
 
           <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
-            <DialogTrigger asChild>
-              <Button variant="default" className="flex items-center">
-                <Plus size={20} />
-                {t('ADD_USER')}
-              </Button>
-            </DialogTrigger>
-
+            <ProtectedFragment roles={['admin']}>
+              <DialogTrigger asChild>
+                <Button variant="default" className="flex items-center">
+                  <Plus size={20} />
+                  {t('ADD_USER')}
+                </Button>
+              </DialogTrigger>
+            </ProtectedFragment>
             {isAddUserModalOpen && <AddUser onClose={() => setIsAddUserModalOpen(false)} />}
           </Dialog>
         </div>
-
-        {/* Renders the user management table with filtering, pagination, and expandable rows */}
-
         <DataTable
-          data={data?.data || []} // Table data fetched from the API
-          columns={columns} // Column definitions including actions like view details, reset password, etc.
-          onRowClick={handleViewDetails} // Opens user details when a row is clicked
-          isLoading={isLoading} // Shows a loading state when data is being fetched
-          error={error} // Displays an error message if data fetching fails
-          toolbar={(table) => renderFilterToolbar(table)} // Renders the table toolbar for filters and actions
+          data={data?.data || []}
+          columns={columns}
+          onRowClick={handleViewDetails}
+          isLoading={isLoading}
+          error={error}
+          toolbar={(table) => renderFilterToolbar(table)}
           pagination={{
-            pageIndex: paginationState.pageIndex, // Current page index
-            pageSize: paginationState.pageSize, // Number of rows per page
-            totalCount: paginationState.totalCount, // Total number of records
+            pageIndex: paginationState.pageIndex,
+            pageSize: paginationState.pageSize,
+            totalCount: paginationState.totalCount,
           }}
-          onPaginationChange={handlePaginationChange} // Handles page and page size changes
-          manualPagination={true} // Enables server-side pagination instead of client-side
-          expandedContent={renderExpandedContent} // Provides content for row expansion
-          mobileColumns={['fullName']} // Defines columns visible in mobile view
-          expandable={true} // Enables row expansion functionality
+          onPaginationChange={handlePaginationChange}
+          manualPagination={true}
+          expandedContent={renderExpandedContent}
+          mobileColumns={['fullName']}
+          expandable={true}
         />
       </div>
 
