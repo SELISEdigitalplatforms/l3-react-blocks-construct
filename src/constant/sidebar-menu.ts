@@ -30,21 +30,6 @@ const createMenuItemWithChildren = (
   ...options,
 });
 
-{
-  /* for permission wise restriction 
-createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', {
-  isIntegrated: true,
-  permissions: [MENU_PERMISSIONS.INVOICE_READ, MENU_PERMISSIONS.INVOICE_WRITE],
-}),
-*/
-  /* for role wise restriction 
-  createMenuItem('iam', 'IAM', '/identity-management', 'Users', {
-    isIntegrated: true,
-    roles: MENU_PERMISSIONS.ADMIN_ONLY,
-  }),
-*/
-}
-
 export const menuItems: MenuItem[] = [
   createMenuItem('dashboard', 'DASHBOARD', '/dashboard', 'LayoutDashboard'),
   createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined', {
