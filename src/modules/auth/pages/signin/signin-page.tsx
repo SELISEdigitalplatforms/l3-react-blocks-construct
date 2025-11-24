@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Loader2 } from 'lucide-react';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
@@ -18,33 +19,55 @@ export const SigninPage = () => {
   const { mutateAsync: signinMutate } = useSigninMutation<'social'>();
   const { login, setTokens } = useAuthStore();
   const isExchangingRef = useRef(false);
+  const code = searchParams.get('code');
+  const state = searchParams.get('state');
+  const isSSOCallback = !!(code && state);
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    const state = searchParams.get('state');
-    if (code && state && !isExchangingRef.current) {
-      isExchangingRef.current = true;
-      (async () => {
-        try {
-          const res = (await signinMutate({ grantType: 'social', code, state })) as SignInResponse;
-          if (res.enable_mfa) {
-            navigate(`/verify-mfa?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
-              replace: true,
-            });
-            return;
-          }
-          login(res.access_token ?? '', res.refresh_token ?? '');
-          setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
-          navigate('/', { replace: true });
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error('SSO code exchange failed:', error);
-        } finally {
-          isExchangingRef.current = false;
-        }
-      })();
+    if (!code || !state || isExchangingRef.current) {
+      return;
     }
-  }, [searchParams, signinMutate, login, setTokens, navigate]);
+
+    isExchangingRef.current = true;
+
+    (async () => {
+      try {
+        const res = (await signinMutate({ grantType: 'social', code, state })) as SignInResponse;
+
+        if (res.enable_mfa) {
+          navigate(`/verify-mfa?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
+            replace: true,
+          });
+          return;
+        }
+
+        login(res.access_token ?? '', res.refresh_token ?? '');
+        setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
+        navigate('/', { replace: true });
+      } catch (error) {
+        console.error('[SSO Callback] Token exchange failed:', error);
+        console.error('[SSO Callback] Error details:', {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+        navigate('/login', { replace: true });
+      } finally {
+        isExchangingRef.current = false;
+      }
+    })();
+  }, [code, state, signinMutate, login, setTokens, navigate]);
+
+  if (isSSOCallback) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <div className="text-center space-y-2">
+          <p className="text-lg font-semibold text-high-emphasis">Completing Sign In...</p>
+          <p className="text-sm text-muted-foreground">Please wait while we authenticate you</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
