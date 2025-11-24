@@ -12,6 +12,7 @@ import {
 import { Dialog } from '@/components/ui-kit/dialog';
 import { IamData } from '../../types/user.types';
 import { EditIamProfileDetails } from '@/modules/profile/components/modals/edit-iam-profile-details/edit-iam-profile-details';
+import { ProtectedFragment } from '@/state/store/auth/protected-fragment';
 
 /**
  * Renders the actions for a row in the IAM (Identity and Access Management) table.
@@ -76,36 +77,43 @@ export function DataTableRowActions({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button variant="ghost" className="h-8 w-8 p-0 hidden md:flex">
             <span className="sr-only">Open menu</span>
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={(e) => handleItemClick(onViewDetails, e)}>
+          <DropdownMenuItem
+            onClick={(e) => handleItemClick(onViewDetails, e)}
+            className="hidden md:flex"
+          >
             {t('VIEW_DETAILS')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleEditClick}>{t('EDIT_PROFILE')}</DropdownMenuItem>
-          {user.active ? (
-            <>
-              <DropdownMenuItem onClick={(e) => handleItemClick(onResetPassword, e)}>
-                {t('RESET_PASSWORD')}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => e.stopPropagation()}
-                disabled
-                className="text-error cursor-not-allowed opacity-50"
-              >
-                {t('DEACTIVATE_USER')}
-              </DropdownMenuItem>
-            </>
-          ) : (
-            onResendActivation && (
-              <DropdownMenuItem onClick={(e) => handleItemClick(onResendActivation, e)}>
-                {t('RESEND_ACTIVATION_LINK')}
-              </DropdownMenuItem>
-            )
-          )}
+          <ProtectedFragment roles={['admin']}>
+            <DropdownMenuItem onClick={handleEditClick}>{t('EDIT_PROFILE')}</DropdownMenuItem>
+          </ProtectedFragment>
+          <ProtectedFragment roles={['admin']}>
+            {user.active ? (
+              <>
+                <DropdownMenuItem onClick={(e) => handleItemClick(onResetPassword, e)}>
+                  {t('RESET_PASSWORD')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={(e) => e.stopPropagation()}
+                  disabled
+                  className="text-error cursor-not-allowed opacity-50"
+                >
+                  {t('DEACTIVATE_USER')}
+                </DropdownMenuItem>
+              </>
+            ) : (
+              onResendActivation && (
+                <DropdownMenuItem onClick={(e) => handleItemClick(onResendActivation, e)}>
+                  {t('RESEND_ACTIVATION_LINK')}
+                </DropdownMenuItem>
+              )
+            )}
+          </ProtectedFragment>
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -106,7 +106,7 @@ export const ProfileMenu = () => {
             ) : (
               <h2 className="text-xs font-semibold text-high-emphasis">{fullName}</h2>
             )}
-            <p className="text-[10px] text-low-emphasis capitalize">{t('ADMIN')}</p>
+            <p className="text-[10px] text-low-emphasis capitalize">{data?.roles?.join(', ')}</p>
           </div>
           {isDropdownOpen ? (
             <ChevronUp className="h-5 w-5 text-medium-emphasis" />
