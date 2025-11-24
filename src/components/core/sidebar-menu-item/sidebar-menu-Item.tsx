@@ -89,7 +89,7 @@ export const SidebarMenuItemComponent = ({
                     variant="outline"
                     className="ml-2 text-[10px] px-1.5 py-0 h-4 border-primary bg-primary/10 text-primary hover:bg-primary/10 font-semibold"
                   >
-                    Admin
+                    {t('ADMIN')}
                   </Badge>
                 )}
                 {showText && (
@@ -147,7 +147,7 @@ export const SidebarMenuItemComponent = ({
               variant="outline"
               className="ml-auto text-[10px] px-1.5 py-0 h-4 border-primary bg-primary/10 text-primary hover:bg-primary/10 font-semibold"
             >
-              Admin
+              {t('ADMIN')}
             </Badge>
           )}
         </Link>
