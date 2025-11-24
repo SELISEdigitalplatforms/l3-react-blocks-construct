@@ -61,6 +61,13 @@ export const ProfileCard = ({
     setImageError(true);
   };
 
+  const translatedRoles = userInfo?.roles
+    ?.map((role: any) => {
+      const roleKey = role.toUpperCase();
+      return t(roleKey);
+    })
+    .join(', ');
+
   return (
     <Card className="w-full border-none rounded-[8px] shadow-sm">
       <CardHeader className="p-0 hidden">
@@ -128,6 +135,10 @@ export const ProfileCard = ({
             ))
           ) : (
             <>
+              <div>
+                <p className="text-medium-emphasis text-xs font-normal">{t('ROLES')}</p>
+                <p className="text-high-emphasis text-sm">{translatedRoles ?? '-'}</p>
+              </div>
               <div>
                 <p className="text-medium-emphasis text-xs font-normal">{t('MOBILE_NO')}</p>
                 <p className="text-high-emphasis text-sm">{userInfo?.phoneNumber ?? '-'}</p>
