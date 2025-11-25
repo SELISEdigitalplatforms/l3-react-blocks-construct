@@ -161,8 +161,8 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
 
       if (!data.isSuccess || !data.uploadUrl) {
         toast({
-          title: t('UPLOAD_FAILED'),
-          description: t('FAILED_TO_GET_UPLOAD_URL'),
+          title: t('IMAGE_TOO_LARGE'),
+          description: t('PLEASE_UPLOAD_IMAGE_SMALLER_SIZE'),
           variant: 'destructive',
         });
         return null;
