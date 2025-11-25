@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import bgAuthLight from '@/assets/images/bg_auth_light.svg';
 import bgAuthDark from '@/assets/images/bg_auth_dark.svg';
 import { useGetLoginOptions } from '@/modules/auth/hooks/use-auth';
@@ -13,16 +13,6 @@ export const AuthLayout = () => {
   const navigate = useNavigate();
   const { isMounted, isAuthenticated } = useAuthState();
   const { theme } = useTheme();
-  const [searchParams] = useSearchParams();
-
-  // Check for SSO callback parameters synchronously
-  // Also check window.location directly as a fallback
-  const code = searchParams.get('code');
-  const state = searchParams.get('state');
-  const urlParams = new URLSearchParams(window.location.search);
-  const codeFromUrl = urlParams.get('code');
-  const stateFromUrl = urlParams.get('state');
-  const isSSOCallback = !!(code && state) || !!(codeFromUrl && stateFromUrl);
 
   useEffect(() => {
     // Don't redirect if we're on the MFA verification page
@@ -150,21 +140,6 @@ export const AuthLayout = () => {
 
     return <Outlet />;
   };
-
-  // Show SSO callback loading state BEFORE any layout wrapper
-  if (isSSOCallback) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-6">
-          <Loader2 className="h-16 w-16 animate-spin text-primary" />
-          <div className="text-center space-y-2">
-            <p className="text-xl font-semibold text-high-emphasis">Completing Sign In...</p>
-            <p className="text-sm text-muted-foreground">Please wait while we authenticate you</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoading) return null;
 

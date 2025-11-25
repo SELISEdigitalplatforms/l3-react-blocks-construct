@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { Signin } from '../../components/signin/signin';
-import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/state/store/auth';
 import { useGetLoginOptions, useSigninMutation } from '../../hooks/use-auth';
 import { SignInResponse } from '../../services/auth.service';
@@ -20,14 +19,13 @@ export const SigninPage = () => {
   const { login, setTokens } = useAuthStore();
   const isExchangingRef = useRef(false);
 
-  // Initialize SSO processing state based on URL parameters
+  // Handle SSO callback parameters
   const code = searchParams.get('code');
   const state = searchParams.get('state');
-  const [isProcessingSSO, setIsProcessingSSO] = useState(!!(code && state));
+  const isSSOCallback = !!(code && state);
 
   useEffect(() => {
     if (code && state && !isExchangingRef.current) {
-      setIsProcessingSSO(true);
       isExchangingRef.current = true;
 
       (async () => {
@@ -52,23 +50,14 @@ export const SigninPage = () => {
           navigate('/login', { replace: true });
         } finally {
           isExchangingRef.current = false;
-          setIsProcessingSSO(false);
         }
       })();
     }
   }, [code, state, searchParams, signinMutate, login, setTokens, navigate]);
 
-  // Show loading state during SSO processing
-  if (isProcessingSSO) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-6">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        <div className="text-center space-y-2">
-          <p className="text-xl font-semibold text-high-emphasis">Completing Sign In...</p>
-          <p className="text-sm text-muted-foreground">Please wait while we authenticate you</p>
-        </div>
-      </div>
-    );
+  // Don't render login form during SSO callback processing
+  if (isSSOCallback) {
+    return null;
   }
 
   return (
