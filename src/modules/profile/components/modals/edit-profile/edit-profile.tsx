@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
 import { User } from '@/types/user.type';
+import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import { ImageCropper } from '../image-cropper/image-cropper';
 import {
   DialogContent,
@@ -23,7 +24,7 @@ import { Input } from '@/components/ui-kit/input';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui-kit/form';
 import { UIPhoneInput } from '@/components/core';
 import DummyProfile from '@/assets/images/dummy_profile.png';
-import { ACCOUNT_QUERY_KEY, useUpdateAccount } from '@/modules/profile/hooks/use-account';
+import { useUpdateAccount } from '@/modules/profile/hooks/use-account';
 
 /**
  * `EditProfile` component allows the user to edit their profile details, including their full name, email, phone number, and profile image.
@@ -63,15 +64,19 @@ type EditProfileProps = {
   onClose: () => void;
 };
 
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
+
 export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) => {
   const [previewImage, setPreviewImage] = useState<string>(DummyProfile);
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [showCropper, setShowCropper] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string>('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { mutateAsync: getPreSignedUrlAsync } = useGetPreSignedUrlForUpload();
 
   const parseFullName = (fullName: string) => {
     const names = fullName.trim().split(' ');
@@ -83,8 +88,8 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
 
   const { mutate: updateAccount, isPending } = useUpdateAccount({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ACCOUNT_QUERY_KEY });
-      queryClient.refetchQueries({ queryKey: ACCOUNT_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['getAccount'] });
+      queryClient.refetchQueries({ queryKey: ['getAccount'] });
       onClose();
       navigate('/profile');
     },
@@ -127,24 +132,60 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
     );
   }, [watchedValues, userInfo]);
 
-  const onSubmit = async (data: FormData) => {
-    const { firstName, lastName } = parseFullName(data.fullName);
-    let profileImageUrl = '';
+  const uploadFile = async (url: string, file: File) => {
+    await fetch(url, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+        'x-ms-blob-type': 'BlockBlob',
+      },
+    });
+    return { uploadUrl: url.split('?')[0] };
+  };
 
-    if (typeof data.profileImageUrl === 'object') {
-      const file = data.profileImageUrl;
-      if (file.size > 2 * 1024 * 1024) {
+  const uploadProfileImage = async (file: File): Promise<string | null> => {
+    try {
+      setIsUploadingImage(true);
+
+      const data = await getPreSignedUrlAsync({
+        name: file.name,
+        projectKey: projectKey,
+        itemId: '',
+        metaData: '',
+        accessModifier: 'Public',
+        configurationName: 'Default',
+        parentDirectoryId: '',
+        tags: '',
+      });
+
+      if (!data.isSuccess || !data.uploadUrl) {
         toast({
           title: t('IMAGE_TOO_LARGE'),
           description: t('PLEASE_UPLOAD_IMAGE_SMALLER_SIZE'),
           variant: 'destructive',
         });
-        return;
+        return null;
       }
-      profileImageUrl = await convertFileToBase64(file);
-    } else {
-      profileImageUrl = data.profileImageUrl;
+
+      const { uploadUrl } = await uploadFile(data.uploadUrl, file);
+      return uploadUrl;
+    } catch (error) {
+      toast({
+        title: t('UPLOAD_FAILED'),
+        description: t('ERROR_OCCURRED_WHILE_UPLOADING_IMAGE'),
+        variant: 'destructive',
+      });
+      return null;
+    } finally {
+      setIsUploadingImage(false);
     }
+  };
+
+  const onSubmit = async (data: FormData) => {
+    const { firstName, lastName } = parseFullName(data.fullName);
+
+    const profileImageUrl = typeof data.profileImageUrl === 'string' ? data.profileImageUrl : '';
 
     const payload = {
       itemId: data.itemId,
@@ -161,15 +202,6 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
   const handleRemoveImage = () => {
     setValue('profileImageUrl', '');
     setPreviewImage(DummyProfile);
-  };
-
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('Failed to read file as Base64'));
-    });
   };
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -297,7 +329,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
               {t('CANCEL')}
             </Button>
             <Button type="submit" loading={isPending} disabled={isPending || !isFormChanged}>
-              {t('SAVE')}
+              {isPending ? t('SAVING') : t('SAVE')}
             </Button>
           </DialogFooter>
         </form>
@@ -307,23 +339,39 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
         <ImageCropper
           image={imageToCrop}
           onClose={() => setShowCropper(false)}
-          onCropComplete={(croppedImage) => {
-            fetch(croppedImage)
-              .then((res) => res.blob())
-              .then((blob) => {
-                if (blob.size > 2 * 1024 * 1024) {
-                  toast({
-                    title: t('IMAGE_TOO_LARGE'),
-                    description: t('CROPPED_IMAGE_TOO_LARGE'),
-                    variant: 'destructive',
-                  });
-                  return;
-                }
-                const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
-                setValue('profileImageUrl', file);
+          isUploading={isUploadingImage}
+          onCropComplete={async (croppedImage) => {
+            try {
+              const res = await fetch(croppedImage);
+              const blob = await res.blob();
+
+              if (blob.size > 2 * 1024 * 1024) {
+                toast({
+                  title: t('IMAGE_TOO_LARGE'),
+                  description: t('CROPPED_IMAGE_TOO_LARGE'),
+                  variant: 'destructive',
+                });
+                return;
+              }
+
+              const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+
+              // Upload image immediately after cropping
+              const uploadedUrl = await uploadProfileImage(file);
+
+              if (uploadedUrl) {
+                // Store the uploaded URL instead of the file
+                setValue('profileImageUrl', uploadedUrl);
                 setPreviewImage(croppedImage);
                 setShowCropper(false);
+              }
+            } catch (error) {
+              toast({
+                title: t('UPLOAD_FAILED'),
+                description: t('ERROR_OCCURRED_WHILE_UPLOADING_IMAGE'),
+                variant: 'destructive',
               });
+            }
           }}
           aspect={1}
         />
