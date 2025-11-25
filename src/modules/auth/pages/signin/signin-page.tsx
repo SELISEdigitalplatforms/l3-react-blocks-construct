@@ -8,6 +8,7 @@ import { Signin } from '../../components/signin/signin';
 import { useAuthStore } from '@/state/store/auth';
 import { useGetLoginOptions, useSigninMutation } from '../../hooks/use-auth';
 import { SignInResponse } from '../../services/auth.service';
+import { LoadingOverlay } from '@/components/core/loading-overlay/loading-overlay';
 
 export const SigninPage = () => {
   const { theme } = useTheme();
@@ -55,9 +56,9 @@ export const SigninPage = () => {
     }
   }, [code, state, searchParams, signinMutate, login, setTokens, navigate]);
 
-  // Don't render login form during SSO callback processing
+  // Show loading overlay during SSO callback processing
   if (isSSOCallback) {
-    return null;
+    return <LoadingOverlay />;
   }
 
   return (
