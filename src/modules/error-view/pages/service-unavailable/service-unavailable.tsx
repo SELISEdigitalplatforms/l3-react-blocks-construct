@@ -6,6 +6,10 @@ import { CustomErrorView } from '../../components/custom-error-view/custom-error
 export const ServiceUnavailablePage = () => {
   const { t } = useTranslation();
 
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
     <CustomErrorView
       image={temporaryUnavailable}
@@ -13,6 +17,7 @@ export const ServiceUnavailablePage = () => {
       description={t('SCHEDULED_MAINTENANCE_IN_PROGRESS')}
       buttonText={t('RELOAD_PAGE')}
       buttonIcon={<RefreshCcw />}
+      onButtonClick={handleReload}
     />
   );
 };
