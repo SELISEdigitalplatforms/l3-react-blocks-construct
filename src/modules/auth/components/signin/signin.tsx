@@ -9,7 +9,7 @@ type SigninProps = {
   loginOption?: LoginOption;
 };
 
-export const Signin = ({ loginOption }: SigninProps) => {
+export const Signin = ({ loginOption }: Readonly<SigninProps>) => {
   const { t } = useTranslation();
   const passwordGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.password);
   const socialGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);

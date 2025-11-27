@@ -6,7 +6,7 @@ type SsoSigninProps = {
   loginOption: LoginOption;
 };
 
-export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
+export const SsoSignin = ({ loginOption }: Readonly<SsoSigninProps>) => {
   const socialGrantAllowed = loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);
 
   if (!socialGrantAllowed) {

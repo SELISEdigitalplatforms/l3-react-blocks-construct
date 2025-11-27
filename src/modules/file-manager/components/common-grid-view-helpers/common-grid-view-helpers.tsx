@@ -119,7 +119,7 @@ export interface DirectFileActionsProps extends FileActionProps {
   className?: string;
 }
 
-export const DirectFileActions: React.FC<DirectFileActionsProps> = ({
+export function DirectFileActions({
   file,
   onViewDetails,
   onDownload,
@@ -128,7 +128,7 @@ export const DirectFileActions: React.FC<DirectFileActionsProps> = ({
   onRename,
   onMove,
   className,
-}) => {
+}: Readonly<DirectFileActionsProps>) {
   return (
     <div className={className}>
       {onViewDetails && (
@@ -163,7 +163,7 @@ export const DirectFileActions: React.FC<DirectFileActionsProps> = ({
       )}
     </div>
   );
-};
+}
 
 export const useFileActions = (props: FileActionProps) => {
   const renderActions = useCallback(

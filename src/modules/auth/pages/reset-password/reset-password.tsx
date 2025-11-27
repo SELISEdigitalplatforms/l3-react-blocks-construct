@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import { redirect, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthState } from '@/state/client-middleware';
@@ -10,7 +10,7 @@ export const ResetPasswordPage = () => {
   const { isMounted, isAuthenticated } = useAuthState();
   const { t } = useTranslation();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) redirect('/');
   }, [isAuthenticated]);
 

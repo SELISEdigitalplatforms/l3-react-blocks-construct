@@ -50,11 +50,11 @@ interface LanguageProviderProps {
  */
 const translationCache: Record<string, Set<string>> = {};
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+export function LanguageProvider({
   children,
   defaultLanguage = 'en-US',
   defaultModules = ['common', 'auth'],
-}) => {
+}: Readonly<LanguageProviderProps>) {
   const location = useLocation();
   // Start with a temporary language - will be updated once API default is loaded
   const [currentLanguage, setCurrentLanguage] = useState<string>(defaultLanguage);
@@ -292,7 +292,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
-};
+}
 
 export const useLanguageContext = (): LanguageContextType => {
   const context = useContext(LanguageContext);

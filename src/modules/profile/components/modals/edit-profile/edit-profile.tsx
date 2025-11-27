@@ -66,7 +66,7 @@ type EditProfileProps = {
 
 const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
-export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) => {
+export function EditProfile({ userInfo, onClose }: Readonly<EditProfileProps>) {
   const [previewImage, setPreviewImage] = useState<string>(DummyProfile);
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [showCropper, setShowCropper] = useState(false);
@@ -378,4 +378,4 @@ export const EditProfile: React.FC<EditProfileProps> = ({ userInfo, onClose }) =
       )}
     </DialogContent>
   );
-};
+}

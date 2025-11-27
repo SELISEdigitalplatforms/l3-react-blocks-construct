@@ -80,7 +80,7 @@ interface BaseFilterPopoverProps {
   children: React.ReactNode;
 }
 
-const BaseFilterPopover: React.FC<BaseFilterPopoverProps> = ({
+function BaseFilterPopover({
   isOpen,
   onOpenChange,
   title,
@@ -88,7 +88,7 @@ const BaseFilterPopover: React.FC<BaseFilterPopoverProps> = ({
   onClear,
   showClearInHeader = false,
   children,
-}) => {
+}: Readonly<BaseFilterPopoverProps>) {
   const { t } = useTranslation();
 
   return (
@@ -128,7 +128,7 @@ const BaseFilterPopover: React.FC<BaseFilterPopoverProps> = ({
       </PopoverContent>
     </Popover>
   );
-};
+}
 
 interface DateRangeFilterProps {
   date?: DateRange;
@@ -136,7 +136,7 @@ interface DateRangeFilterProps {
   title: string;
 }
 
-const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, title }) => {
+function DateRangeFilter({ date, onDateChange, title }: Readonly<DateRangeFilterProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -197,7 +197,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({ date, onDateChange, t
       </div>
     </BaseFilterPopover>
   );
-};
+}
 
 interface UserFilterProps {
   value?: string;
@@ -206,7 +206,7 @@ interface UserFilterProps {
   users: User[];
 }
 
-const UserFilter: React.FC<UserFilterProps> = ({ value, onValueChange, title, users }) => {
+function UserFilter({ value, onValueChange, title, users }: Readonly<UserFilterProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -251,7 +251,7 @@ const UserFilter: React.FC<UserFilterProps> = ({ value, onValueChange, title, us
       </div>
     </BaseFilterPopover>
   );
-};
+}
 
 interface SelectFilterProps {
   value?: string;
@@ -263,7 +263,7 @@ interface SelectFilterProps {
   className?: string;
 }
 
-const SelectFilter: React.FC<SelectFilterProps> = ({
+function SelectFilter({
   value,
   onValueChange,
   title,
@@ -271,7 +271,7 @@ const SelectFilter: React.FC<SelectFilterProps> = ({
   allValue = 'all',
   allLabel = 'All',
   className,
-}) => {
+}: Readonly<SelectFilterProps>) {
   const { t } = useTranslation();
 
   return (
@@ -290,7 +290,7 @@ const SelectFilter: React.FC<SelectFilterProps> = ({
       </SelectContent>
     </Select>
   );
-};
+}
 
 interface ActiveFilterBadgeProps {
   label: string;
@@ -298,11 +298,11 @@ interface ActiveFilterBadgeProps {
   variant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
-const ActiveFilterBadge: React.FC<ActiveFilterBadgeProps> = ({
+function ActiveFilterBadge({
   label,
   onRemove,
   variant = 'secondary',
-}) => {
+}: Readonly<ActiveFilterBadgeProps>) {
   return (
     <Badge variant={variant} className="h-6 text-foreground">
       {label}
@@ -311,7 +311,7 @@ const ActiveFilterBadge: React.FC<ActiveFilterBadgeProps> = ({
       </Button>
     </Badge>
   );
-};
+}
 
 interface ActiveFiltersContainerProps {
   children: React.ReactNode;
@@ -319,11 +319,11 @@ interface ActiveFiltersContainerProps {
   resetLabel?: string;
 }
 
-const ActiveFiltersContainer: React.FC<ActiveFiltersContainerProps> = ({
+function ActiveFiltersContainer({
   children,
   onResetAll,
   resetLabel = 'RESET',
-}) => {
+}: Readonly<ActiveFiltersContainerProps>) {
   const { t } = useTranslation();
 
   return (
@@ -337,7 +337,7 @@ const ActiveFiltersContainer: React.FC<ActiveFiltersContainerProps> = ({
       )}
     </div>
   );
-};
+}
 
 interface SearchInputProps {
   value: string;
@@ -347,13 +347,13 @@ interface SearchInputProps {
   onClear?: () => void;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({
+function SearchInput({
   value,
   onChange,
   placeholder,
   className,
   onClear,
-}) => {
+}: Readonly<SearchInputProps>) {
   const { t } = useTranslation();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -386,7 +386,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
       )}
     </div>
   );
-};
+}
 
 const getDateRangeLabel = (dateRange?: DateRange) => {
   if (!dateRange?.from && !dateRange?.to) return null;

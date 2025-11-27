@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -112,7 +112,7 @@ export const DynamicBreadcrumb = ({ breadcrumbIndex }: Readonly<DynamicBreadcrum
           // - If you want to support custom formatting for other dynamic values, add logic here
 
           return (
-            <React.Fragment key={breadcrumb.href}>
+            <Fragment key={breadcrumb.href}>
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage className="text-xs text-muted-foreground">
@@ -130,7 +130,7 @@ export const DynamicBreadcrumb = ({ breadcrumbIndex }: Readonly<DynamicBreadcrum
                 )}
               </BreadcrumbItem>
               {!isLast && <BreadcrumbSeparator />}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </BreadcrumbList>

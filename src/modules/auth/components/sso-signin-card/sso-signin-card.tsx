@@ -17,7 +17,7 @@ const SSOSigninCard = ({
   providerConfig,
   showText = false,
   totalProviders = 1,
-}: SSOSigninCardProps) => {
+}: Readonly<SSOSigninCardProps>) => {
   const ssoService = new SSOservice();
   const navigate = useNavigate();
 
