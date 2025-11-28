@@ -100,7 +100,7 @@ export default function TaskManagerToolbar({
   }, [searchQuery, onSearch]);
 
   const handleTaskModalOpen = () => {
-    viewMode === 'board' && onOpen();
+    onOpen();
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
