@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, ComponentProps } from 'react';
 import PhoneInput, { Country, Value } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './phone-input.css';
@@ -51,7 +51,7 @@ import { cn } from '../../../lib/utils';
  * />
  */
 
-type PhoneInputProps = React.ComponentProps<typeof PhoneInput>;
+type PhoneInputProps = ComponentProps<typeof PhoneInput>;
 
 interface UIPhoneInputProps extends Omit<PhoneInputProps, 'value' | 'onChange'> {
   onChange(value?: Value): void;
@@ -62,7 +62,7 @@ interface UIPhoneInputProps extends Omit<PhoneInputProps, 'value' | 'onChange'> 
   className?: string;
 }
 
-const UIPhoneInput = React.forwardRef<any, UIPhoneInputProps>(
+const UIPhoneInput = forwardRef<any, UIPhoneInputProps>(
   (
     {
       onChange,

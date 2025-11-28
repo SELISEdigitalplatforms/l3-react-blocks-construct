@@ -19,7 +19,7 @@ import { setPasswordFormDefaultValue, getSetPasswordFormValidationSchema } from 
  *
  */
 
-export const SetpasswordForm = ({ code }: { code: string }) => {
+export const SetpasswordForm = ({ code }: Readonly<{ code: string }>) => {
   const { t } = useTranslation();
   const { isPending, mutateAsync } = useAccountActivation();
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);

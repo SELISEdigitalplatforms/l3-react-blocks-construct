@@ -5,7 +5,7 @@ import { cn } from '../../lib/utils';
 import { LoaderCircle } from 'lucide-react';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[6px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4 [&_svg]:shrink-0',
+  'button-text-select inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[6px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*="size-"])]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -40,6 +40,7 @@ function Button({
   asChild = false,
   loading = false,
   children,
+  onClick,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
@@ -48,10 +49,25 @@ function Button({
   }) {
   const Comp = asChild ? Slot : 'button';
 
+  // Help the user select text in the button, need this for the uilm extension edge cases
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Check if user is selecting text - if so, prevent button click
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    // Otherwise, trigger the original onClick handler
+    onClick?.(e);
+  };
+
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      onClick={handleClick}
       {...props}
     >
       {loading && <LoaderCircle className="animate-spin" />}

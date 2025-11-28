@@ -220,7 +220,7 @@ interface DateTimePickerProps {
   elementRef: React.RefObject<HTMLDivElement | null>;
 }
 
-const DateTimePicker: React.FC<DateTimePickerProps> = ({
+function DateTimePicker({
   date,
   time,
   isAllDay,
@@ -233,82 +233,84 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   timeLabel,
   width,
   elementRef,
-}) => (
-  <>
-    <div className="flex flex-col gap-[6px]">
-      <Label className="font-normal text-sm">{label}</Label>
-      <Popover>
-        <PopoverTrigger asChild>
-          <div className="relative">
-            <Input
-              readOnly
-              value={date ? format(date, 'dd.MM.yyyy') : ''}
-              className="cursor-pointer"
-            />
-            <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-medium-emphasis" />
-          </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={(day) => onDateChange(day || new Date())}
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
-    {!isAllDay && (
+}: DateTimePickerProps) {
+  return (
+    <>
       <div className="flex flex-col gap-[6px]">
-        <Label className="font-normal text-sm">{timeLabel}</Label>
-        <Popover
-          modal={true}
-          open={isTimeOpen}
-          onOpenChange={(open) => {
-            onTimeOpenChange(open);
-            if (open && elementRef.current) {
-              // Width update logic handled by parent
-            }
-          }}
-        >
-          <PopoverAnchor asChild>
-            <div ref={elementRef} className="relative w-full">
+        <Label className="font-normal text-sm">{label}</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className="relative">
               <Input
-                type="time"
-                step="60"
-                value={time}
-                onChange={(e) => onTimeChange(e.target.value)}
-                className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                readOnly
+                value={date ? format(date, 'dd.MM.yyyy') : ''}
+                className="cursor-pointer"
               />
-              <PopoverTrigger asChild>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                  <ChevronDown className="h-4 w-4 opacity-50" />
-                </div>
-              </PopoverTrigger>
+              <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-medium-emphasis" />
             </div>
-          </PopoverAnchor>
-          <PopoverContent
-            sideOffset={4}
-            align="start"
-            className="max-h-60 overflow-auto p-1 bg-popover shadow-md rounded-md"
-            style={width > 0 ? { width, boxSizing: 'border-box' } : undefined}
-          >
-            {timePickerRange.map((timeOption) => (
-              <PopoverClose asChild key={timeOption}>
-                <button
-                  type="button"
-                  onClick={() => onTimeChange(timeOption)}
-                  className="w-full text-left cursor-pointer px-3 py-1 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
-                >
-                  {timeOption}
-                </button>
-              </PopoverClose>
-            ))}
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(day) => onDateChange(day || new Date())}
+            />
           </PopoverContent>
         </Popover>
       </div>
-    )}
-  </>
-);
+      {!isAllDay && (
+        <div className="flex flex-col gap-[6px]">
+          <Label className="font-normal text-sm">{timeLabel}</Label>
+          <Popover
+            modal={true}
+            open={isTimeOpen}
+            onOpenChange={(open) => {
+              onTimeOpenChange(open);
+              if (open && elementRef.current) {
+                // Width update logic handled by parent
+              }
+            }}
+          >
+            <PopoverAnchor asChild>
+              <div ref={elementRef} className="relative w-full">
+                <Input
+                  type="time"
+                  step="60"
+                  value={time}
+                  onChange={(e) => onTimeChange(e.target.value)}
+                  className="flex h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                />
+                <PopoverTrigger asChild>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </div>
+                </PopoverTrigger>
+              </div>
+            </PopoverAnchor>
+            <PopoverContent
+              sideOffset={4}
+              align="start"
+              className="max-h-60 overflow-auto p-1 bg-popover shadow-md rounded-md"
+              style={width > 0 ? { width, boxSizing: 'border-box' } : undefined}
+            >
+              {timePickerRange.map((timeOption) => (
+                <PopoverClose asChild key={timeOption}>
+                  <button
+                    type="button"
+                    onClick={() => onTimeChange(timeOption)}
+                    className="w-full text-left cursor-pointer px-3 py-1 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                  >
+                    {timeOption}
+                  </button>
+                </PopoverClose>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
+    </>
+  );
+}
 
 /**
  * EditEvent Component

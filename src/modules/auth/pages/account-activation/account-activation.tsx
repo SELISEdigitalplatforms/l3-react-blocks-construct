@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { redirect, useSearchParams } from 'react-router-dom';
 import { SetpasswordForm } from '@/modules/auth/components/set-password';
@@ -10,7 +10,7 @@ export const AccountActivationPage = () => {
   const { isMounted, isAuthenticated } = useAuthState();
   const { t } = useTranslation();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) redirect('/');
   }, [isAuthenticated]);
 

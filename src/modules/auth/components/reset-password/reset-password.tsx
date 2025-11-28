@@ -27,7 +27,7 @@ import { resetPasswordFormDefaultValue, getResetPasswordFormValidationSchema } f
  * <ResetPasswordForm code="abc123def456" />
  */
 
-export const ResetpasswordForm = ({ code }: { code: string }) => {
+export const ResetpasswordForm = ({ code }: Readonly<{ code: string }>) => {
   const { t } = useTranslation();
   const { isPending, mutateAsync } = useResetPassword();
 

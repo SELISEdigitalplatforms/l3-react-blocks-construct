@@ -177,10 +177,7 @@ const useFormChangeDetection = (watchedValues: FormData, userInfo: User | IamDat
  *
  * <EditIamProfileDetails userInfo={userInfo} onClose={() => {}} />
  */
-export const EditIamProfileDetails: React.FC<EditIamProfileDetailsProps> = ({
-  userInfo,
-  onClose,
-}) => {
+export function EditIamProfileDetails({ userInfo, onClose }: Readonly<EditIamProfileDetailsProps>) {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const { availableRoles, isLoadingRoles } = useRolesData();
@@ -445,4 +442,4 @@ export const EditIamProfileDetails: React.FC<EditIamProfileDetailsProps> = ({
       </Form>
     </DialogContent>
   );
-};
+}
