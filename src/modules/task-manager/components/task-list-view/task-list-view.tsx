@@ -54,9 +54,16 @@ interface TaskListViewProps {
       to?: Date;
     };
   };
+  isNewTaskModalOpen?: boolean;
+  setNewTaskModalOpen?: (open: boolean) => void;
 }
 
-export function TaskListView({ searchQuery = '', filters }: Readonly<TaskListViewProps>) {
+export function TaskListView({
+  searchQuery = '',
+  filters,
+  isNewTaskModalOpen = false,
+  setNewTaskModalOpen,
+}: Readonly<TaskListViewProps>) {
   const { t } = useTranslation();
   const { tasks, createTask, updateTaskOrder, isLoading } = useListTasks();
 
@@ -132,26 +139,14 @@ export function TaskListView({ searchQuery = '', filters }: Readonly<TaskListVie
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Handle Add Item button click from toolbar via prop
   useEffect(() => {
-    const handleAddItemClick = () => {
+    if (isNewTaskModalOpen) {
       setShowNewTaskInput(true);
-    };
-
-    const addItemButton =
-      document.querySelector('button[class*="add-item"]') ||
-      document.querySelector('button:has(svg[class*="plus"])') ||
-      document.querySelector('button:contains("Add Item")');
-
-    if (addItemButton) {
-      addItemButton.addEventListener('click', handleAddItemClick);
+      // Reset the modal state after handling
+      setNewTaskModalOpen?.(false);
     }
-
-    return () => {
-      if (addItemButton) {
-        addItemButton.removeEventListener('click', handleAddItemClick);
-      }
-    };
-  }, []);
+  }, [isNewTaskModalOpen, setNewTaskModalOpen]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {

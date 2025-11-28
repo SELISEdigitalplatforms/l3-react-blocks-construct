@@ -1,15 +1,15 @@
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui-kit/button';
 import githubIcon from '@/assets/images/social_media_github.svg';
 import linkedinIcon from '@/assets/images/social_media_in.svg';
 import microsoftIcon from '@/assets/images/social_media_ms.svg';
 import googleIcon from '@/assets/images/social_media_google.svg';
-import { SignupForm } from '@/modules/auth/components/signup';
 import darkLogo from '@/assets/images/construct_logo_dark.svg';
 import lightLogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { Divider } from '@/components/core';
+import { SignupForm } from '@/modules/auth/components/signup';
 
 const socialButtons = [
   { icon: googleIcon, alt: 'Google Logo' },

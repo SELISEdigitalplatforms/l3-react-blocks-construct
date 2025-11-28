@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
 import lightlogo from '@/assets/images/construct_logo_light.svg';
 import { useTheme } from '@/styles/theme/theme-provider';
-import { Signin } from '../../components/signin/signin';
 import { useAuthStore } from '@/state/store/auth';
 import { useGetLoginOptions, useSigninMutation } from '../../hooks/use-auth';
 import { SignInResponse } from '../../services/auth.service';
 import { LoadingOverlay } from '@/components/core/loading-overlay/loading-overlay';
+import { Signin } from '@/modules/auth/components/signin';
 
 export const SigninPage = () => {
   const { theme } = useTheme();
