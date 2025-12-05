@@ -35,7 +35,6 @@ export const LmtProvider = ({ children, config }: LmtProviderProps) => {
   return <LmtContext.Provider value={{ lmt: lmtInstance.current }}>{children}</LmtContext.Provider>;
 };
 
-// Custom hook to use LMT context
 type UseLmtReturnType = {
   logger?: LMT['logger'];
   shutdown?: LMT['shutdown'];
