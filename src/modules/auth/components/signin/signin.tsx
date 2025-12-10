@@ -12,17 +12,17 @@ type SigninProps = {
 export const Signin = ({ loginOption }: Readonly<SigninProps>) => {
   const { t } = useTranslation();
   const passwordGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.password);
-  const socialGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);
+  const socialOrOidcGrantAllowed = !!loginOption?.ssoInfo?.length || !!loginOption?.oidc?.clientId;
 
   return (
     <div className="w-full">
       {passwordGrantAllowed && <SigninEmail />}
-      {passwordGrantAllowed && socialGrantAllowed && (
+      {passwordGrantAllowed && socialOrOidcGrantAllowed && (
         <div className="my-6">
           <Divider text={t('AUTH_OR')} />
         </div>
       )}
-      {socialGrantAllowed && loginOption && <SsoSignin loginOption={loginOption} />}
+      {socialOrOidcGrantAllowed && loginOption && <SsoSignin loginOption={loginOption} />}
     </div>
   );
 };

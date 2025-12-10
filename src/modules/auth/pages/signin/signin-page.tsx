@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import darklogo from '@/assets/images/construct_logo_dark.svg';
@@ -10,10 +10,13 @@ import { SignInResponse } from '../../services/auth.service';
 import { LoadingOverlay } from '@/components/core/loading-overlay/loading-overlay';
 import { Signin } from '@/modules/auth/components/signin';
 
+const blocksOIdCClientId = import.meta.env.VITE_BLOCKS_OIDC_CLIENT_ID;
+const oidcRedirectUri = import.meta.env.VITE_BLOCKS_OIDC_REDIRECT_URI;
+
 export const SigninPage = () => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const { data: loginOption } = useGetLoginOptions();
+  const { data } = useGetLoginOptions();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { mutateAsync: signinMutate } = useSigninMutation<'social'>();
@@ -56,10 +59,22 @@ export const SigninPage = () => {
     }
   }, [code, state, searchParams, signinMutate, login, setTokens, navigate]);
 
+  const loginOption = useMemo(() => {
+    if (!data && !blocksOIdCClientId) return null;
+    if (!data)
+      return {
+        oidc: { clientId: blocksOIdCClientId, redirectUrl: oidcRedirectUri },
+        allowedGrantTypes: [],
+        ssoInfo: [],
+      };
+    return {
+      ...data,
+      oidc: { clientId: blocksOIdCClientId, redirectUrl: '/login' },
+    };
+  }, [data]);
+
   // Show loading overlay during SSO callback processing
-  if (isSSOCallback) {
-    return <LoadingOverlay />;
-  }
+  if (isSSOCallback) return <LoadingOverlay />;
 
   return (
     <div className="flex flex-col gap-6">
