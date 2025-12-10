@@ -40,7 +40,7 @@ export const SsoSignin = ({ loginOption }: Readonly<SsoSigninProps>) => {
     e.stopPropagation();
     const oidc = loginOption.oidc;
     if (oidc?.clientId) {
-      const oidcUrl = `${import.meta.env.VITE_API_BASE_URL}/authentication/v1/oauth/authorize?X-Blocks-Key=${import.meta.env.VITE_X_BLOCKS_KEY}&client_id=${oidc.clientId}&redirect_uri=${oidc.redirectUrl}&response_type=code"`;
+      const oidcUrl = `${import.meta.env.VITE_API_BASE_URL}/authentication/v1/oauth/authorize?X-Blocks-Key=${import.meta.env.VITE_X_BLOCKS_KEY}&client_id=${oidc.clientId}&redirect_uri=${oidc.redirectUrl}&response_type=code`;
       window.location.href = oidcUrl;
     }
   };
