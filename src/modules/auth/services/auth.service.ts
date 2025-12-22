@@ -105,7 +105,7 @@ const getApiUrl = (path: string) => {
 export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'password'>(
   payload: PasswordSigninPayload | MFASigninPayload | SigninBySSOPayload
 ): Promise<T extends 'password' | 'social' ? SignInResponse : MFASigninResponse> => {
-  const url = getApiUrl('/authentication/v1/OAuth/Token');
+  const url = getApiUrl('/idp/v1/Authentication/Token');
 
   // sign in flow
   if (payload.grantType === 'password') {
@@ -183,7 +183,7 @@ export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'pas
 export const signout = async (): Promise<{ isSuccess: true }> => {
   try {
     localStorage.removeItem('auth-storage');
-    const url = '/authentication/v1/Authentication/Logout';
+    const url = '/idp/v1/Authentication/Logout';
     return await clients.post(
       url,
       JSON.stringify({
@@ -197,7 +197,7 @@ export const signout = async (): Promise<{ isSuccess: true }> => {
 };
 
 export const getRefreshToken = async () => {
-  const url = '/authentication/v1/OAuth/Token';
+  const url = '/idp/v1/Authentication/Token';
   const formData = new URLSearchParams();
   formData.append('grant_type', 'refresh_token');
   formData.append('refresh_token', useAuthStore.getState().refreshToken ?? '');
@@ -225,7 +225,7 @@ export const accountActivation = async (data: AccountActivationPayload) => {
     ...data,
     preventPostEvent: true,
   };
-  const url = '/iam/v1/Account/Activate';
+  const url = '/idp/v1/Iam/Activate';
   return clients.post(url, JSON.stringify(payload));
 };
 
@@ -236,7 +236,7 @@ export const forgotPassword = async (
     ...payload,
     mailPurpose: 'RecoverAccount',
   };
-  const url = '/iam/v1/Account/Recover';
+  const url = '/idp/v1/Iam/Recover';
   return clients.post(url, JSON.stringify(modified));
 };
 
@@ -247,7 +247,7 @@ export const resetPassword = async (data: { code: string; password: string }) =>
     ProjectKey: projectKey,
   };
 
-  const url = '/iam/v1/Account/ResetPassword';
+  const url = '/idp/v1/Iam/ResetPassword';
   return clients.post(url, JSON.stringify(payload));
 };
 
@@ -257,12 +257,12 @@ export const resendActivation = async (data: { userId: string }) => {
     mailPurpose: 'ResendActivation',
   };
 
-  const url = '/iam/v1/Account/ResendActivation';
+  const url = '/idp/v1/Iam/ResendActivation';
   return clients.post(url, JSON.stringify(payload));
 };
 
 export const logoutAll = async () => {
-  const url = '/authentication/v1/Authentication/LogoutAll';
+  const url = '/idp/v1/Authentication/LogoutAll';
   return clients.post(url, '');
 };
 
@@ -271,7 +271,7 @@ export const signinByEmail = (payload: SigninEmailPayload): Promise<SigninEmailR
   body.append('grant_type', 'password');
   body.append('username', payload.username);
   body.append('password', payload.password);
-  const url = '/authentication/v1/OAuth/Token';
+  const url = '/idp/v1/Authentication/Token';
   return clients.post(url, body, {
     'Content-Type': 'application/x-www-form-urlencoded',
   });
