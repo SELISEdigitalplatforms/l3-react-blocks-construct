@@ -138,7 +138,7 @@ export const getMfaTemplate = async (): Promise<GetMfaTemplateResponse> => {
   const params = new URLSearchParams({
     projectKey: projectKey,
   });
-  const url = `/mfa/v1/Configuration/Get?${params.toString()}`; //not finding
+  const url = `/cloudconfiguration/v1/MFA/Get?${params.toString()}`; //not finding
   const res = await clients.get<GetMfaTemplateResponse>(url);
 
   return res;
