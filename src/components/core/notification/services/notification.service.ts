@@ -31,7 +31,7 @@ export const getNotifications = async (context: {
     }
   });
 
-  const url = `/notification/v1/Notifier/GetNotifications?${searchParams.toString()}`;
+  const url = `/communication/v1/Notifier/GetNotifications?${searchParams.toString()}`;
   const res = await clients.get<GetNotificationsResponse>(url);
   return res;
 };
@@ -43,7 +43,7 @@ export const markNotificationAsRead = async (
     id,
   };
   const res = await clients.post<MarkNotificationAsReadResponse>(
-    '/notification/v1/Notifier/MarkNotificationAsRead',
+    '/communication/v1/Notifier/MarkNotificationAsRead',
     JSON.stringify(requestPayload)
   );
   return res;
@@ -51,7 +51,7 @@ export const markNotificationAsRead = async (
 
 export const markAllNotificationAsRead = async (): Promise<MarkAllNotificationAsReadResponse> => {
   const res = await clients.post<MarkAllNotificationAsReadResponse>(
-    '/notification/v1/Notifier/MarkAllNotificationAsRead',
+    '/communication/v1/Notifier/MarkAllNotificationAsRead',
     JSON.stringify({})
   );
   return res;
