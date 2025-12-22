@@ -5,11 +5,11 @@ import { CreateUserFormType, ProfileFormType } from '../components/utils/index.u
 
 export const changePassword = async (payload: ChangePasswordPayload) => {
   payload.projectKey = payload.projectKey ?? import.meta.env.VITE_X_BLOCKS_KEY;
-  return clients.post('/iam/v1/Account/ChangePassword', JSON.stringify(payload));
+  return clients.post('/idp/v1/Iam/ChangePassword', JSON.stringify(payload));
 };
 
 export const getAccount = async (): Promise<User> => {
-  const res = await clients.get<{ data: User }>('/iam/v1/User/GetAccount');
+  const res = await clients.get<{ data: User }>('/idp/v1/Iam/GetAccount');
   return res.data;
 };
 
@@ -18,7 +18,7 @@ export const updateAccount = (data: ProfileFormType) => {
     itemId: string;
     errors: unknown;
     isSuccess: boolean;
-  }>('/iam/v1/user/UpdateAccount', JSON.stringify(data));
+  }>('/idp/v1/Iam/UpdateAccount', JSON.stringify(data));
 };
 
 export const createAccount = (data: CreateUserFormType) => {
@@ -26,5 +26,5 @@ export const createAccount = (data: CreateUserFormType) => {
     itemId: string;
     errors: unknown;
     isSuccess: boolean;
-  }>('/iam/v1/User/Create', JSON.stringify(data));
+  }>('/idp/v1/Iam/Create', JSON.stringify(data));
 };

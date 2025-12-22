@@ -35,7 +35,7 @@ export const generateOTP = async (payload: GenerateOTPPayload): Promise<Generate
     projectKey: projectKey,
   };
   const res = await clients.post<GenerateOTPResponse>(
-    '/mfa/v1/Management/GenerateOTP',
+    '/idp/v1/Mfa/GenerateOTP',
     JSON.stringify(requestPayload)
   );
   return res;
@@ -64,7 +64,7 @@ export const verifyOTP = async (payload: VerifyOTP): Promise<VerifyOTPResponse> 
     projectKey: projectKey,
   };
   const res = await clients.post<VerifyOTPResponse>(
-    '/mfa/v1/Management/VerifyOTP',
+    '/idp/v1/Mfa/VerifyOTP',
     JSON.stringify(verifyOTPPayload)
   );
   return res;
@@ -92,7 +92,7 @@ export const getSetUpTotp = async (context: {
     Object.entries(queryParams).map(([key, value]) => [key, String(value)])
   );
   const params = new URLSearchParams(stringifiedParams as Record<string, string>);
-  const url = `/mfa/v1/Management/SetUpTotp?${params.toString()}`;
+  const url = `/idp/v1/Mfa/SetUpTotp?${params.toString()}`;
   const res = await clients.get<GetSetUpTotpResponse>(url);
 
   return res;
@@ -115,7 +115,7 @@ export const resendOtp = async (mfaId: string): Promise<ResendOtpResponse> => {
     projectKey: projectKey,
   };
   const res = await clients.post<ResendOtpResponse>(
-    '/mfa/v1/Management/ResendOtp',
+    '/idp/v1/Mfa/ResendOtp',
     JSON.stringify(requestPayload)
   );
   return res;
@@ -138,7 +138,7 @@ export const getMfaTemplate = async (): Promise<GetMfaTemplateResponse> => {
   const params = new URLSearchParams({
     projectKey: projectKey,
   });
-  const url = `/mfa/v1/Configuration/Get?${params.toString()}`;
+  const url = `/mfa/v1/Configuration/Get?${params.toString()}`; //not finding
   const res = await clients.get<GetMfaTemplateResponse>(url);
 
   return res;
@@ -164,7 +164,7 @@ export const disableUserMfa = async (userId: string): Promise<DisableUserMfaResp
     projectKey: projectKey,
   };
   const res = await clients.post<DisableUserMfaResponse>(
-    '/mfa/v1/Management/DisableUserMfa',
+    '/idp/v1/Mfa/DisableUserMfa',
     JSON.stringify(payload)
   );
   return res;
