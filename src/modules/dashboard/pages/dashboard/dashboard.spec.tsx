@@ -28,7 +28,7 @@ vi.mock('../../../config/api', () => ({
     baseUrl: 'http://localhost:3000',
     blocksKey: 'test-key',
     auth: {
-      token: '/authentication/v1/OAuth/Token',
+      token: '/idp/v1/Authentication/Token',
     },
   },
   getApiUrl: (path: string) => {

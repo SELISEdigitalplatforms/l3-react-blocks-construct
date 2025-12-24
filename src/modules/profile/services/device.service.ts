@@ -27,7 +27,7 @@ export const getSessions = async ({
     projectkey: projectkey,
     'filter.userId': filter.userId,
   });
-  const response = await clients.get<any>(`/iam/v1/Activity/GetSessions?${queryParams.toString()}`);
+  const response = await clients.get<any>(`/idp/v1/Iam/GetSessions?${queryParams.toString()}`);
   const parsedSessions = response.data
     .map((session: string) => parseMongoSession(session))
     .filter((s: any) => s !== null);
