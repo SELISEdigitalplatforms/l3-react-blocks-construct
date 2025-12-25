@@ -47,7 +47,7 @@ export interface SSOLoginResponse {
 export class SSOservice {
   async getSocialLoginEndpoint(payload: any): Promise<SSOLoginResponse> {
     try {
-      const url = `${baseUrl}/authentication/v1/OAuth/GetSocialLogInEndPoint`;
+      const url = `${baseUrl}/idp/v1/Authentication/GetSocialLogInEndPoint`;
 
       const rawResponse = await fetch(url, {
         method: 'POST',
@@ -85,7 +85,7 @@ export class SSOservice {
 
   async verifyMfaCode(mfaToken: string, code: string): Promise<MFASigninResponse> {
     try {
-      const url = `${baseUrl}/authentication/v1/OAuth/VerifyMfaCode`;
+      const url = `${baseUrl}/authentication/v1/OAuth/VerifyMfaCode`; //not finding
 
       const response = await fetch(url, {
         method: 'POST',
@@ -122,7 +122,7 @@ export class SSOservice {
 
 export const getLoginOption = async (): Promise<LoginOption | null> => {
   try {
-    const url = `${baseUrl}/authentication/v1/Social/GetLoginOptions`;
+    const url = `${baseUrl}/idp/v1/Authentication/GetLoginOptions`;
 
     const response = await fetch(url, {
       method: 'GET',
