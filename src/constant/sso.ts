@@ -168,4 +168,8 @@ type SSO_INFO = {
 export type LoginOption = {
   allowedGrantTypes: GRANT_TYPES[];
   ssoInfo: SSO_INFO[];
+  oidc?: {
+    clientId: string;
+    redirectUrl: string;
+  };
 };
