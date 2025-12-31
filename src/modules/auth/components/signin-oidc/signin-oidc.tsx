@@ -8,7 +8,7 @@ export const SigninOidc = () => {
   const oidcClickHandler = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const oidcUrl = `${import.meta.env.VITE_API_BASE_URL}/authentication/v1/oauth/authorize?X-Blocks-Key=${import.meta.env.VITE_X_BLOCKS_KEY}&client_id=${blocksOIdCClientId}&redirect_uri=${oidcRedirectUri}&response_type=code`;
+    const oidcUrl = `${import.meta.env.VITE_API_BASE_URL}/idp/v1/Authentication/authorize?X-Blocks-Key=${import.meta.env.VITE_X_BLOCKS_KEY}&client_id=${blocksOIdCClientId}&redirect_uri=${oidcRedirectUri}&response_type=code`;
     window.location.href = oidcUrl;
   };
 
