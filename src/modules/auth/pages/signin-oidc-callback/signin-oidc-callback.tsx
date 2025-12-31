@@ -27,13 +27,6 @@ export const SigninOidcCallBackPage = () => {
             code,
           })) as SignInResponse;
 
-          //   if (res.enable_mfa) {
-          //     navigate(`/verify-mfa?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
-          //       replace: true,
-          //     });
-          //     return;
-          //   }
-
           login(res.access_token ?? '', res.refresh_token ?? '');
           setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
           navigate('/', { replace: true });

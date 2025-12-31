@@ -909,5 +909,5 @@ export const getUsers = (payload: GetUsersPayload) => {
   return clients.post<{
     data: IamData[];
     totalCount: number;
-  }>('/iam/v1/User/GetUsers', JSON.stringify(requestBody));
+  }>('/idp/v1/Iam/GetUsers', JSON.stringify(requestBody));
 };

@@ -53,7 +53,7 @@ export const sharedUsers: SharedUser[] = [
   },
 ];
 
-function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
+function Avatar({ name, size = 'md' }: Readonly<{ name: string; size?: 'sm' | 'md' }>) {
   const initials = name
     .split(' ')
     .map((n) => n[0])
@@ -74,11 +74,11 @@ function PermissionDropdown({
   value,
   onChange,
   options,
-}: {
+}: Readonly<{
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
-}) {
+}>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

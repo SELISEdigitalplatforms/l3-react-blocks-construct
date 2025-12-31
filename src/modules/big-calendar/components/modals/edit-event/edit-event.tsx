@@ -233,7 +233,7 @@ function DateTimePicker({
   timeLabel,
   width,
   elementRef,
-}: DateTimePickerProps) {
+}: Readonly<DateTimePickerProps>) {
   return (
     <>
       <div className="flex flex-col gap-[6px]">

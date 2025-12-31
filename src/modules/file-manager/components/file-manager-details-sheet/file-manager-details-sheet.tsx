@@ -56,14 +56,11 @@ const getDateCreated = (file: IFileDataWithSharing, variant: 'default' | 'trash'
 function FallbackAvatar({
   className = '',
   children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+}: Readonly<{ className?: string; children: React.ReactNode }>) {
   return <div className={`rounded-full overflow-hidden ${className}`}>{children}</div>;
 }
 
-function FallbackAvatarImage({ src, alt }: { src?: string; alt: string }) {
+function FallbackAvatarImage({ src, alt }: Readonly<{ src?: string; alt: string }>) {
   if (!src) return null;
   return <img src={src} alt={alt} className="w-full h-full object-cover" />;
 }
@@ -71,10 +68,7 @@ function FallbackAvatarImage({ src, alt }: { src?: string; alt: string }) {
 function FallbackAvatarFallback({
   className = '',
   children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+}: Readonly<{ className?: string; children: React.ReactNode }>) {
   return (
     <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
   );

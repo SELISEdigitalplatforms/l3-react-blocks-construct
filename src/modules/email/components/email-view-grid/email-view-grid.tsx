@@ -194,7 +194,7 @@ function ReplyEditor({
   formData,
   setFormData,
   t,
-}: {
+}: Readonly<{
   content: string;
   handleContentChange: (content: string) => void;
   handleSendEmail: (emailId: string, category: 'inbox' | 'sent', reply?: any) => void;
@@ -204,7 +204,7 @@ function ReplyEditor({
   formData?: any;
   setFormData?: (data: any) => void;
   t: any;
-}) {
+}>) {
   return (
     <EmailTextEditor
       value={content}
@@ -231,11 +231,11 @@ function MainActionButtons({
   handleSetActive,
   handleComposeEmailForward,
   t,
-}: {
+}: Readonly<{
   handleSetActive: (action: 'reply' | 'replyAll' | 'forward') => void;
   handleComposeEmailForward: () => void;
   t: any;
-}) {
+}>) {
   return (
     <div className="flex gap-4 text-sm px-4 pb-8">
       <Button variant="outline" size="sm" onClick={() => handleSetActive('reply')}>

@@ -59,16 +59,18 @@ function Button({
       return;
     }
 
-    // Otherwise, trigger the original onClick handler
-    onClick?.(e);
+    // Otherwise, trigger the original onClick handler if it exists
+    if (onClick) {
+      onClick(e);
+    }
   };
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      onClick={handleClick}
       {...props}
+      onClick={handleClick}
     >
       {loading && <LoaderCircle className="animate-spin" />}
       {children}
