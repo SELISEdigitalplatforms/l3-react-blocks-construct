@@ -34,17 +34,15 @@ export const SsoSignin = ({ loginOption }: Readonly<SsoSigninProps>) => {
   const isSingleProvider = providersToShow.length === 1;
 
   return (
-    <>
-      <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
-        {providersToShow.map((item) => (
-          <SSOSigninCard
-            key={item?.value}
-            providerConfig={item}
-            showText={isSingleProvider}
-            totalProviders={providersToShow.length}
-          />
-        ))}
-      </div>
-    </>
+    <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
+      {providersToShow.map((item) => (
+        <SSOSigninCard
+          key={item?.value}
+          providerConfig={item}
+          showText={isSingleProvider}
+          totalProviders={providersToShow.length}
+        />
+      ))}
+    </div>
   );
 };

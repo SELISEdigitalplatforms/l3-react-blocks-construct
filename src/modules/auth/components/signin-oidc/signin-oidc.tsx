@@ -16,8 +16,8 @@ export const SigninOidc = () => {
 
   return (
     <Button className="w-full h-12 font-bold" variant={'outline'} onClick={oidcClickHandler}>
-      <img src={seliseSmallLogo} width={25} height={25} alt="Blocks logo" className="mr-2" />
-      Log in with Blocks
+      <img src={seliseSmallLogo} width={25} height={25} alt="Blocks logo" className="mr-2" /> Log in
+      with Blocks
     </Button>
   );
 };
