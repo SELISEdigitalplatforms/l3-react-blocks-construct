@@ -91,6 +91,11 @@ export interface SigninBySSOPayload {
   state: string;
 }
 
+export interface SigninByBlocksOidcPayload {
+  grantType: 'authorization_code';
+  code: string;
+}
+
 const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -102,8 +107,10 @@ const getApiUrl = (path: string) => {
   return `${baseUrl}${cleanPath}`;
 };
 
-export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'password'>(
-  payload: PasswordSigninPayload | MFASigninPayload | SigninBySSOPayload
+export const signin = async <
+  T extends 'password' | 'social' | 'mfa_code' | 'authorization_code' = 'password',
+>(
+  payload: PasswordSigninPayload | MFASigninPayload | SigninBySSOPayload | SigninByBlocksOidcPayload
 ): Promise<T extends 'password' | 'social' ? SignInResponse : MFASigninResponse> => {
   const url = getApiUrl('/idp/v1/Authentication/Token');
 
@@ -147,6 +154,25 @@ export const signin = async <T extends 'password' | 'social' | 'mfa_code' = 'pas
       credentials: 'include',
     });
 
+    if (!response.ok) {
+      const err = await response.json();
+      throw new HttpError(response.status, err);
+    }
+
+    return response.json();
+  } else if (payload.grantType === 'authorization_code') {
+    const signinBySSOData = new URLSearchParams();
+    signinBySSOData.append('grant_type', 'authorization_code');
+    signinBySSOData.append('code', payload.code);
+    const response = await fetch(url, {
+      method: 'POST',
+      body: signinBySSOData,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'x-blocks-key': projectKey,
+      },
+      credentials: 'include',
+    });
     if (!response.ok) {
       const err = await response.json();
       throw new HttpError(response.status, err);

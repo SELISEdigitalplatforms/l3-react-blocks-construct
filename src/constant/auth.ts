@@ -2,6 +2,7 @@ export enum GRANT_TYPES {
   password = 'password',
   social = 'social',
   clientCredential = 'client-credential',
+  oidc = 'authorization_code',
 }
 
 export const GRANT_TYPES_OPTIONS: { id: GRANT_TYPES; label: string; value: string }[] = [
