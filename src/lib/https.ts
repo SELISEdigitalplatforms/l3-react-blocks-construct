@@ -1,6 +1,6 @@
-import { useAuthStore } from 'state/store/auth';
-import { getRefreshToken } from 'features/auth/services/auth.service';
-import API_CONFIG, { isLocalhost } from 'config/api';
+import { useAuthStore } from '@/state/store/auth';
+import { getRefreshToken } from '@/modules/auth/services/auth.service';
+import { isLocalhost } from './utils/localhost-checker/locahost-checker';
 
 /**
  * HTTP Client Module
@@ -48,8 +48,8 @@ import API_CONFIG, { isLocalhost } from 'config/api';
  * }
  *
  * @note Requires environment variables:
- * - REACT_APP_PUBLIC_BLOCKS_API_URL: Base URL for API requests
- * - REACT_APP_PUBLIC_X_BLOCKS_KEY: API key for authentication
+ * - VITE_PUBLIC_BLOCKS_API_URL: Base URL for API requests
+ * - VITE_X_BLOCKS_KEY: API key for authentication
  *
  */
 
@@ -82,8 +82,8 @@ export class HttpError extends Error {
   }
 }
 
-const BASE_URL = API_CONFIG.baseUrl?.replace(/\/$/, '');
-const BLOCKS_KEY = API_CONFIG.blocksKey ?? '';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+const projectKey = import.meta.env.VITE_X_BLOCKS_KEY ?? '';
 const localHostChecker = isLocalhost();
 
 export const clients: Https = {
@@ -148,7 +148,7 @@ export const clients: Https = {
 
     const baseHeaders = {
       'Content-Type': 'application/json',
-      'x-blocks-key': BLOCKS_KEY,
+      'x-blocks-key': projectKey,
       ...(authToken && { Authorization: `bearer ${authToken}` }),
     };
 

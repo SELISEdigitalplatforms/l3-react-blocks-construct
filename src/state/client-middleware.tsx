@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useLayoutEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth';
-import { publicRoutes } from 'constant/auth-public-routes';
+import { publicRoutes } from '@/constant/auth-public-routes';
 
 /**
  * useAuthState Hook
@@ -79,11 +79,24 @@ export const ClientMiddleware: React.FC<ClientMiddlewareProps> = ({ children }) 
   const { isMounted, isAuthenticated } = useAuthState();
   const isPublicRoute = publicRoutes.includes(currentPath);
 
+  // Check if we're processing an SSO callback (has code and state parameters)
+  const urlParams = new URLSearchParams(location.search);
+  const isSSOCallback = !!(urlParams.get('code') && urlParams.get('state'));
+
   useLayoutEffect(() => {
+    if (isSSOCallback) {
+      return;
+    }
+
     if (isMounted && !isAuthenticated && !isPublicRoute) {
       navigate('/login');
     }
-  }, [isAuthenticated, isMounted, isPublicRoute, navigate]);
+  }, [isAuthenticated, isMounted, isPublicRoute, isSSOCallback, navigate, currentPath]);
+
+  // Don't block rendering if we're processing SSO callback
+  if (isSSOCallback) {
+    return <>{children}</>;
+  }
 
   if ((!isMounted || !isAuthenticated) && !isPublicRoute) return null;
 

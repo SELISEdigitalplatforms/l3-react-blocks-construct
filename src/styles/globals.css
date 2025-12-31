@@ -16,6 +16,24 @@ html.dark {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Hide scrollbars for webkit browsers */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Help the user select text in the button, need this for the uilm extension edge cases */
+  .button-text-select {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
 }
 
 @layer base {

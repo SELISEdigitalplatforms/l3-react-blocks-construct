@@ -30,24 +30,11 @@ const createMenuItemWithChildren = (
   ...options,
 });
 
-{
-  /* for permission wise restriction 
-createMenuItem('invoices', 'INVOICES', '/invoices', 'ReceiptText', {
-  isIntegrated: true,
-  permissions: [MENU_PERMISSIONS.INVOICE_READ, MENU_PERMISSIONS.INVOICE_WRITE],
-}),
-*/
-  /* for role wise restriction 
-  createMenuItem('iam', 'IAM', '/identity-management', 'Users', {
-    isIntegrated: true,
-    roles: MENU_PERMISSIONS.ADMIN_ONLY,
-  }),
-*/
-}
-
 export const menuItems: MenuItem[] = [
   createMenuItem('dashboard', 'DASHBOARD', '/dashboard', 'LayoutDashboard'),
-  createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined'),
+  createMenuItem('finance', 'FINANCE', '/finance', 'ChartNoAxesCombined', {
+    roles: ['admin'],
+  }),
   createMenuItem('iam', 'IAM', '/identity-management', 'Users', {
     isIntegrated: true,
   }),
@@ -62,8 +49,12 @@ export const menuItems: MenuItem[] = [
   createMenuItem('mail', 'MAIL', '/mail/inbox', 'Inbox'),
   createMenuItem('calendar', 'CALENDAR', '/calendar', 'Calendar'),
   createMenuItem('activity-log', 'ACTIVITY_LOG', '/activity-log', 'FileClock', {}),
-  createMenuItem('timeline', 'TIMELINE', '/timeline', 'History'),
-  createMenuItem('chat', 'CHAT', '/chat', 'MessageSquareText'),
+  createMenuItem('timeline', 'TIMELINE', '/timeline', 'History', {
+    roles: ['admin'],
+  }),
+  createMenuItem('chat', 'CHAT', '/chat', 'MessageSquareText', {
+    roles: ['admin'],
+  }),
   createMenuItemWithChildren('file-manager', 'FILE_MANAGER', '/file-manager', 'Folder', [
     createMenuItem('my-files', 'MY_FILES', '/file-manager/my-files'),
     createMenuItem('shared-files', 'SHARED_WITH_ME', '/file-manager/shared-files'),

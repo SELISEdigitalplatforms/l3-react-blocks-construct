@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,8 +8,8 @@ import {
   BreadcrumbItem,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from 'components/ui/breadcrumb';
-import { DYNAMIC_BREADCRUMB_TITLES } from 'constant/dynamic-breadcrumb-title';
+} from '@/components/ui-kit/breadcrumb';
+import { DYNAMIC_BREADCRUMB_TITLES } from '@/constant/dynamic-breadcrumb-title';
 
 /**
  * DynamicBreadcrumb Component
@@ -28,8 +28,6 @@ import { DYNAMIC_BREADCRUMB_TITLES } from 'constant/dynamic-breadcrumb-title';
  * Props:
  * @param {number} [breadcrumbIndex] - Optional index to start displaying breadcrumbs from
  *   (e.g., breadcrumbIndex=2 will skip the first breadcrumb segment)
- *
- * @returns {JSX.Element} A breadcrumb navigation component
  *
  * @example
  * // Basic usage showing all path segments
@@ -52,7 +50,7 @@ type DynamicBreadcrumbProps = {
   breadcrumbIndex?: number;
 };
 
-const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }) => {
+export const DynamicBreadcrumb = ({ breadcrumbIndex }: Readonly<DynamicBreadcrumbProps>) => {
   const location = useLocation();
   const { t } = useTranslation();
   const pathSegments = location.pathname.split('/').filter((segment) => segment);
@@ -114,7 +112,7 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
           // - If you want to support custom formatting for other dynamic values, add logic here
 
           return (
-            <React.Fragment key={breadcrumb.href}>
+            <Fragment key={breadcrumb.href}>
               <BreadcrumbItem>
                 {isLast ? (
                   <BreadcrumbPage className="text-xs text-muted-foreground">
@@ -132,12 +130,10 @@ const DynamicBreadcrumb: React.FC<DynamicBreadcrumbProps> = ({ breadcrumbIndex }
                 )}
               </BreadcrumbItem>
               {!isLast && <BreadcrumbSeparator />}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </BreadcrumbList>
     </Breadcrumb>
   );
 };
-
-export default DynamicBreadcrumb;

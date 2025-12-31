@@ -34,7 +34,7 @@ on:
         required: true
 
 env:
-  SERVICE_TYPE: 'webclient'
+  SERVICE_TYPE: "webclient"
 
 jobs:
   integrateWeb:
@@ -44,9 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #Checks out the repository this file is in
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          submodules: 'true'
+          submodules: "true"
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
       - name: Update submodule
@@ -59,11 +59,11 @@ jobs:
 
       - name: Remove invisible CSS classes
         run: |
-          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/pages/auth/signin/signin-page.tsx
+          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
       
       # Logs in with your Azure credentials
       - name: Azure login
-        uses: azure/login@v1.4.6
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -83,9 +83,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       #Checks out the repository this file is in
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          submodules: 'true'
+          submodules: "true"
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
       - name: Update submodule
@@ -96,40 +96,38 @@ jobs:
         with:
           varFilePath: ./.github/variables/vars.env
 
-      - name: Remove invisible CSS classes
-        run: |
-          sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/pages/auth/signin/signin-page.tsx
+      # - name: Remove invisible CSS classes
+      #   run: |
+      #     sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
 
       # Logs in with your Azure credentials
       - name: Azure login
-        uses: azure/login@v1.4.6
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: pull helm repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: SELISEdigitalplatforms/l0-yml-infrastructure-helm
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 
         # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
       - name: Get K8s context
-        uses: azure/aks-set-context@v3
+        uses: azure/aks-set-context@v4
         with:
           resource-group: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.CLUSTER_NAME }}
 
-
-
       - name: Add kubelogin
         uses: azure/use-kubelogin@v1
         with:
-          kubelogin-version: "v0.0.24"
+          kubelogin-version: 'v0.0.24'
 
       - name: Convert kubeconfig to use AAD
         run: |
           kubelogin convert-kubeconfig -l azurecli
       - name: Setup Helm Installer
-        uses: Azure/setup-helm@v3.5
+        uses: Azure/setup-helm@v4.3.0
         with:
           token: ${{ secrets.SELISE_GITHUB_PAT }}
 

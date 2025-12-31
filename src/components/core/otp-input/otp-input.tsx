@@ -1,7 +1,6 @@
-import React from 'react';
 import OtpInput, { AllowedInputTypes, InputProps } from 'react-otp-input';
-import { Input } from 'components/ui/input';
-import { cn } from 'lib/utils';
+import { Input } from '@/components/ui-kit/input';
+import { cn } from '@/lib/utils';
 
 /**
  * UIOtpInput Component
@@ -30,8 +29,6 @@ import { cn } from 'lib/utils';
  * @param {React.CSSProperties | string} [inputStyle] - Custom styles for each input
  * @param {AllowedInputTypes} [inputType] - Type of input (text, number, etc.)
  * @param {boolean} [skipDefaultStyles] - Whether to skip default styling
- *
- * @returns {JSX.Element} A series of input fields for OTP entry
  *
  * @example
  * // Basic usage
@@ -77,13 +74,13 @@ export interface UIOtpInputProps {
   skipDefaultStyles?: boolean;
 }
 
-const UIOtpInput: React.FC<UIOtpInputProps> = ({
+export const UIOtpInput = ({
   numInputs = 6,
   value,
   inputStyle,
   onChange,
   renderInput = (props) => <Input {...props} />,
-}) => {
+}: Readonly<UIOtpInputProps>) => {
   return (
     <OtpInput
       containerStyle="flex w-full justify-between"
@@ -95,5 +92,3 @@ const UIOtpInput: React.FC<UIOtpInputProps> = ({
     />
   );
 };
-
-export default UIOtpInput;
