@@ -9,4 +9,5 @@ export const publicRoutes = [
   '/forgot-password',
   '/verify-mfa',
   '/sso-activation',
+  '/oidc',
 ];

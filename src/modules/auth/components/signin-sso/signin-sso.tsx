@@ -34,7 +34,7 @@ export const SsoSignin = ({ loginOption }: Readonly<SsoSigninProps>) => {
   const isSingleProvider = providersToShow.length === 1;
 
   return (
-    <div className="flex items-center gap-8">
+    <>
       <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
         {providersToShow.map((item) => (
           <SSOSigninCard
@@ -45,6 +45,6 @@ export const SsoSignin = ({ loginOption }: Readonly<SsoSigninProps>) => {
           />
         ))}
       </div>
-    </div>
+    </>
   );
 };
