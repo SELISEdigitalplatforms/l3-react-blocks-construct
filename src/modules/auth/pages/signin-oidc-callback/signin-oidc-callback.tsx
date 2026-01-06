@@ -6,36 +6,26 @@ import { SignInResponse } from '../../services/auth.service';
 import { LoadingOverlay } from '@/components/core/loading-overlay/loading-overlay';
 import { Signin } from '@/modules/auth/components/signin';
 
-export const SigninPage = () => {
+export const SigninOidcCallBackPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { mutateAsync: signinMutate } = useSigninMutation<'social'>();
+  const { mutateAsync: signinMutate } = useSigninMutation<'authorization_code'>();
   const { login, setTokens } = useAuthStore();
   const isExchangingRef = useRef(false);
 
-  // Handle SSO callback parameters
   const code = searchParams.get('code');
-  const state = searchParams.get('state');
-  const isSSOCallback = !!(code && state);
+  const isOidcCallback = !!code;
 
   useEffect(() => {
-    if (code && state && !isExchangingRef.current) {
+    if (code && !isExchangingRef.current) {
       isExchangingRef.current = true;
 
       (async () => {
         try {
           const res = (await signinMutate({
-            grantType: 'social',
+            grantType: 'authorization_code',
             code,
-            state,
           })) as SignInResponse;
-
-          if (res.enable_mfa) {
-            navigate(`/verify-mfa?mfa_id=${res.mfaId}&mfa_type=${res.mfaType}&sso=true`, {
-              replace: true,
-            });
-            return;
-          }
 
           login(res.access_token ?? '', res.refresh_token ?? '');
           setTokens({ accessToken: res.access_token ?? '', refreshToken: res.refresh_token ?? '' });
@@ -47,8 +37,9 @@ export const SigninPage = () => {
         }
       })();
     }
-  }, [code, state, searchParams, signinMutate, login, setTokens, navigate]);
+  }, [code, searchParams, signinMutate, login, setTokens, navigate]);
 
-  if (isSSOCallback) return <LoadingOverlay />;
+  if (isOidcCallback) return <LoadingOverlay />;
+
   return <Signin />;
 };
