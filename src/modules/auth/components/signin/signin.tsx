@@ -16,7 +16,9 @@ export const Signin = () => {
   const { t } = useTranslation();
 
   const passwordGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.password);
-  const socialGrantAllowed = !!loginOption?.ssoInfo?.length || !!loginOption?.oidc?.clientId;
+  const socialGrantAllowed =
+    !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social) &&
+    !!loginOption?.ssoInfo?.length;
   const oidcGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.oidc);
 
   const isDivider = passwordGrantAllowed && (socialGrantAllowed || oidcGrantAllowed);

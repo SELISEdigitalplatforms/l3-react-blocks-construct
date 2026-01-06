@@ -65,7 +65,7 @@
     "emoji-picker-react": "^4.12.2",
     "html2canvas": "^1.4.1",
     "i18next": "^22.5.1",
-    "jspdf": "^3.0.2",
+    "jspdf": "^4.0.0",
     "lucide-react": "^0.453.0",
     "papaparse": "^5.5.2",
     "quill": "^2.0.3",
