@@ -13,7 +13,7 @@ import { Membership } from '@/types/user.type';
  * ```
  */
 export const getUserRoles = (user: { memberships: Membership[] } | null): string[] => {
-  if (!user || !user.memberships || user.memberships.length === 0) {
+  if (!user?.memberships?.length) {
     return [];
   }
 
