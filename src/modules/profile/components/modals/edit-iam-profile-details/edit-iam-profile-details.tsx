@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { isPossiblePhoneNumber, isValidPhoneNumber, Value } from 'react-phone-number-input';
 import { User } from '@/types/user.type';
+import { getUserRoles } from '@/hooks/use-user-roles';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   DialogContent,
@@ -126,8 +127,9 @@ const useFormInitialization = (userInfo: User | IamData, setValue: UseFormSetVal
     setValue('phoneNumber', userInfo.phoneNumber ?? '');
     setValue('itemId', userInfo.itemId ?? '');
 
-    if (userInfo.roles && Array.isArray(userInfo.roles)) {
-      setValue('roles', userInfo.roles.slice(0, MAX_ROLES));
+    const userRoles = getUserRoles(userInfo);
+    if (userRoles.length > 0) {
+      setValue('roles', userRoles.slice(0, MAX_ROLES));
     }
   }, [userInfo, setValue]);
 };
@@ -141,7 +143,7 @@ const useFormChangeDetection = (watchedValues: FormData, userInfo: User | IamDat
     const initialValues = {
       fullName: createFullName(userInfo.firstName ?? undefined, userInfo.lastName ?? undefined),
       phoneNumber: userInfo.phoneNumber ?? '',
-      roles: userInfo.roles ?? [],
+      roles: getUserRoles(userInfo),
     };
 
     const rolesEqual =
