@@ -19,6 +19,7 @@ import { UserDetailItem } from './user-details-item';
 import { IamData } from '../../types/user.types';
 import { EditIamProfileDetails } from '@/modules/profile/components/modals/edit-iam-profile-details/edit-iam-profile-details';
 import { ProtectedFragment } from '@/state/store/auth/protected-fragment';
+import { getUserRoles } from '@/hooks/use-user-roles';
 
 /**
  * Displays detailed information about a selected user in a sheet modal.
@@ -144,8 +145,8 @@ export const UserDetails = ({
                   label={t('IAM_ROLES')}
                   icon={User}
                   value={
-                    selectedUser.roles && selectedUser.roles.length > 0
-                      ? selectedUser.roles.join(', ')
+                    getUserRoles(selectedUser).length > 0
+                      ? getUserRoles(selectedUser).join(', ')
                       : '-'
                   }
                 />
