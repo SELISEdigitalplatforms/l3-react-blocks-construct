@@ -1,4 +1,5 @@
 import { User } from './user.type';
+import { getUserRoles } from '@/hooks/use-user-roles';
 
 describe('User Type', () => {
   const createValidUser = (): User => ({
@@ -12,7 +13,12 @@ describe('User Type', () => {
     email: 'john.doe@example.com',
     userName: 'johndoe',
     phoneNumber: '+1234567890',
-    roles: ['user', 'admin'],
+    memberships: [
+      {
+        organizationId: 'org-123',
+        roles: ['user', 'admin'],
+      },
+    ],
     active: true,
     isVarified: true,
     isMfaVerified: true,
@@ -21,6 +27,9 @@ describe('User Type', () => {
     permissions: ['read', 'write', 'delete'],
     mfaEnabled: true,
     userMfaType: 0,
+    userCreationType: 0,
+    lastLoggedInDeviceInfo: 'Chrome/Windows',
+    logInCount: 5,
   });
 
   test('should create a valid User object with all required fields', () => {
@@ -35,7 +44,7 @@ describe('User Type', () => {
     expect(typeof user.lastName).toBe('string');
     expect(typeof user.email).toBe('string');
     expect(typeof user.userName).toBe('string');
-    expect(Array.isArray(user.roles)).toBe(true);
+    expect(Array.isArray(user.memberships)).toBe(true);
     expect(typeof user.active).toBe('boolean');
     expect(typeof user.isVarified).toBe('boolean');
     expect(typeof user.profileImageUrl).toBe('string');
@@ -54,7 +63,7 @@ describe('User Type', () => {
     expect(user).toHaveProperty('email');
     expect(user).toHaveProperty('userName');
     expect(user).toHaveProperty('phoneNumber');
-    expect(user).toHaveProperty('roles');
+    expect(user).toHaveProperty('memberships');
     expect(user).toHaveProperty('active');
     expect(user).toHaveProperty('isVarified');
     expect(user).toHaveProperty('profileImageUrl');
@@ -83,13 +92,17 @@ describe('User Type', () => {
     expect(user.email).toMatch(emailRegex);
   });
 
-  test('should validate roles as non-empty array of strings', () => {
+  test('should validate memberships structure', () => {
     const user = createValidUser();
 
-    expect(Array.isArray(user.roles)).toBe(true);
-    expect(user.roles.length).toBeGreaterThan(0);
-    user.roles.forEach((role) => {
-      expect(typeof role).toBe('string');
+    expect(Array.isArray(user.memberships)).toBe(true);
+    expect(user.memberships.length).toBeGreaterThan(0);
+    user.memberships.forEach((membership) => {
+      expect(typeof membership.organizationId).toBe('string');
+      expect(Array.isArray(membership.roles)).toBe(true);
+      membership.roles.forEach((role) => {
+        expect(typeof role).toBe('string');
+      });
     });
   });
 
@@ -149,19 +162,29 @@ describe('User Type', () => {
     expect(user.profileImageUrl).toMatch(urlRegex);
   });
 
-  test('should handle multiple roles', () => {
+  test('should handle multiple roles across memberships', () => {
     const user = createValidUser();
 
     const multiRoleUser: User = {
       ...user,
-      roles: ['user', 'admin', 'moderator', 'support'],
+      memberships: [
+        {
+          organizationId: 'org-123',
+          roles: ['user', 'admin'],
+        },
+        {
+          organizationId: 'org-456',
+          roles: ['moderator', 'support'],
+        },
+      ],
     };
 
-    expect(multiRoleUser.roles).toHaveLength(4);
-    expect(multiRoleUser.roles).toContain('user');
-    expect(multiRoleUser.roles).toContain('admin');
-    expect(multiRoleUser.roles).toContain('moderator');
-    expect(multiRoleUser.roles).toContain('support');
+    const allRoles = getUserRoles(multiRoleUser);
+    expect(allRoles).toHaveLength(4);
+    expect(allRoles).toContain('user');
+    expect(allRoles).toContain('admin');
+    expect(allRoles).toContain('moderator');
+    expect(allRoles).toContain('support');
   });
 
   test('should handle user transformation', () => {
@@ -201,5 +224,51 @@ describe('User Type', () => {
     expect(userWithAppMfa.userMfaType).toBe(1);
     const userWithEmailMfa = { ...user, userMfaType: 2 };
     expect(userWithEmailMfa.userMfaType).toBe(2);
+  });
+
+  test('should extract roles from memberships using getUserRoles', () => {
+    const user = createValidUser();
+
+    const roles = getUserRoles(user);
+    expect(roles).toHaveLength(2);
+    expect(roles).toContain('user');
+    expect(roles).toContain('admin');
+  });
+
+  test('should handle empty memberships in getUserRoles', () => {
+    const user: User = {
+      ...createValidUser(),
+      memberships: [],
+    };
+
+    const roles = getUserRoles(user);
+    expect(roles).toHaveLength(0);
+  });
+
+  test('should deduplicate roles across multiple memberships', () => {
+    const user: User = {
+      ...createValidUser(),
+      memberships: [
+        {
+          organizationId: 'org-123',
+          roles: ['user', 'admin'],
+        },
+        {
+          organizationId: 'org-456',
+          roles: ['admin', 'moderator'],
+        },
+      ],
+    };
+
+    const roles = getUserRoles(user);
+    expect(roles).toHaveLength(3);
+    expect(roles).toContain('user');
+    expect(roles).toContain('admin');
+    expect(roles).toContain('moderator');
+  });
+
+  test('should return empty array for null user in getUserRoles', () => {
+    const roles = getUserRoles(null);
+    expect(roles).toHaveLength(0);
   });
 });

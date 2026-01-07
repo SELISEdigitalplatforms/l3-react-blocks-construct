@@ -1,3 +1,5 @@
+import { Membership } from '@/types/user.type';
+
 export interface IamData {
   itemId: string;
   createdDate: string;
@@ -10,12 +12,17 @@ export interface IamData {
   email: string;
   userName: string;
   phoneNumber: string | null;
-  roles: string[];
+  memberships: Membership[];
   permissions: string[];
   active: boolean;
   isVarified: boolean;
   profileImageUrl: string | null;
   mfaEnabled: boolean;
+  isMfaVerified: boolean;
+  userMfaType: number;
+  userCreationType: number;
+  lastLoggedInDeviceInfo: string;
+  logInCount: number;
 }
 
 export interface UserFilter {
