@@ -15,6 +15,7 @@ import DummyProfile from '@/assets/images/dummy_profile.png';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { useGetAccount } from '@/modules/profile/hooks/use-account';
+import { getUserRoles } from '@/hooks/use-user-roles';
 
 /**
  * ProfileMenu Component
@@ -67,8 +68,9 @@ export const ProfileMenu = () => {
 
   const fullName = `${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim() ?? ' ';
 
-  const translatedRoles = data?.roles
-    ?.map((role) => {
+  const userRoles = getUserRoles(data ?? null);
+  const translatedRoles = userRoles
+    .map((role: string) => {
       const roleKey = role.toUpperCase();
       return t(roleKey);
     })

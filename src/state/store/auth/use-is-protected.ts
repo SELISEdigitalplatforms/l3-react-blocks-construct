@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useAuthStore } from '.';
+import { getUserRoles } from '@/hooks/use-user-roles';
 
 type UseIsProtectedOptions = {
   roles?: string[];
@@ -44,13 +45,15 @@ export const useIsProtected = ({
     if (!isAuthenticated || !user) return false;
     if (roles.length === 0 && permissions.length === 0) return false;
 
+    const userRoles = getUserRoles(user);
+
     if (opt === 'all') {
-      const hasAllRoles = checkAllRoles(user.roles, roles);
+      const hasAllRoles = checkAllRoles(userRoles, roles);
       const hasAllPermissions = checkAllPermissions(user.permissions, permissions);
       return hasAllRoles && hasAllPermissions;
     }
 
-    const hasAnyRole = checkAnyRole(user.roles, roles);
+    const hasAnyRole = checkAnyRole(userRoles, roles);
     const hasAnyPermission = checkAnyPermission(user.permissions, permissions);
     return hasAnyRole || hasAnyPermission;
   }, [isAuthenticated, user, roles, permissions, opt]);
