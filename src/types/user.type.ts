@@ -1,3 +1,8 @@
+export type Membership = {
+  organizationId: string;
+  roles: string[];
+};
+
 export type User = {
   itemId: string;
   createdDate: string;
@@ -9,8 +14,8 @@ export type User = {
   email: string;
   userName: string;
   phoneNumber: string | null;
-  roles: string[];
-  permissions?: string[];
+  memberships: Membership[];
+  permissions: string[];
   active: boolean;
   isVarified: boolean;
   profileImageUrl: string;
@@ -18,4 +23,7 @@ export type User = {
   isMfaVerified: boolean;
   mfaEnabled: boolean;
   userMfaType: number;
+  userCreationType: number;
+  lastLoggedInDeviceInfo: string;
+  logInCount: number;
 };

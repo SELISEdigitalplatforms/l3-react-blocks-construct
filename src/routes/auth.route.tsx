@@ -9,10 +9,12 @@ import { SignupPage } from '@/modules/auth/pages/signup';
 import { ResetPasswordPage } from '@/modules/auth/pages/reset-password';
 import { VerifyOtpKeyPage } from '@/modules/auth/pages/verify-otp-key';
 import { VerificationFailed } from '@/modules/auth/pages/verification-failed';
+import { SigninOidcCallBackPage } from '@/modules/auth/pages/signin-oidc-callback';
 
 export const AuthRoutes = (
   <Route element={<AuthLayout />}>
     <Route path="/login" element={<SigninPage />} />
+    <Route path="/oidc" element={<SigninOidcCallBackPage />} />
     <Route path="/signup" element={<SignupPage />} />
     <Route path="/sent-email" element={<EmailSentPage />} />
     <Route path="/activate" element={<AccountActivationPage />} />

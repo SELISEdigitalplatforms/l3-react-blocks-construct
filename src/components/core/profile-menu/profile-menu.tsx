@@ -15,6 +15,7 @@ import DummyProfile from '@/assets/images/dummy_profile.png';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useTheme } from '@/styles/theme/theme-provider';
 import { useGetAccount } from '@/modules/profile/hooks/use-account';
+import { getUserRoles } from '@/hooks/use-user-roles';
 
 /**
  * ProfileMenu Component
@@ -67,7 +68,14 @@ export const ProfileMenu = () => {
 
   const fullName = `${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim() ?? ' ';
 
-  // Store user profile data in localStorage when it's available
+  const userRoles = getUserRoles(data ?? null);
+  const translatedRoles = userRoles
+    .map((role: string) => {
+      const roleKey = role.toUpperCase();
+      return t(roleKey);
+    })
+    .join(', ');
+
   useEffect(() => {
     if (data) {
       localStorage.setItem(
@@ -106,7 +114,7 @@ export const ProfileMenu = () => {
             ) : (
               <h2 className="text-xs font-semibold text-high-emphasis">{fullName}</h2>
             )}
-            <p className="text-[10px] text-low-emphasis capitalize">{t('ADMIN')}</p>
+            <p className="text-[10px] text-low-emphasis capitalize">{translatedRoles}</p>
           </div>
           {isDropdownOpen ? (
             <ChevronUp className="h-5 w-5 text-medium-emphasis" />

@@ -55,13 +55,13 @@ interface ActionButtonsProps {
   deleteEmailsPermanently: (ids: string[]) => void;
 }
 
-const AttachmentDisplay: React.FC<AttachmentDisplayProps & { t: any }> = ({
+function AttachmentDisplay({
   attachments = [],
   images = [],
   isReplyVisible,
   handleToggleReplyVisibility,
   t,
-}) => {
+}: Readonly<AttachmentDisplayProps> & { t: any }) {
   const totalAttachments = attachments.length + images.length;
 
   if (totalAttachments === 0) return null;
@@ -109,9 +109,9 @@ const AttachmentDisplay: React.FC<AttachmentDisplayProps & { t: any }> = ({
       )}
     </div>
   );
-};
+}
 
-const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
+function EmailActionButtons({
   selectedEmail,
   category,
   updateEmailReadStatus,
@@ -119,7 +119,7 @@ const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
   restoreEmailsToCategory,
   deleteEmailsPermanently,
   t,
-}) => {
+}: Readonly<ActionButtonsProps> & { t: any }) {
   const renderTooltipAction = (
     Icon: React.ComponentType<any>,
     tooltipText: string,
@@ -182,19 +182,9 @@ const EmailActionButtons: React.FC<ActionButtonsProps & { t: any }> = ({
       )}
     </div>
   );
-};
+}
 
-const ReplyEditor: React.FC<{
-  content: string;
-  handleContentChange: (content: string) => void;
-  handleSendEmail: (emailId: string, category: 'inbox' | 'sent', reply?: any) => void;
-  onCancel: () => void;
-  selectedEmail: any;
-  reply?: any;
-  formData?: any;
-  setFormData?: (data: any) => void;
-  t: any;
-}> = ({
+function ReplyEditor({
   content,
   handleContentChange,
   handleSendEmail,
@@ -204,47 +194,65 @@ const ReplyEditor: React.FC<{
   formData,
   setFormData,
   t,
-}) => (
-  <EmailTextEditor
-    value={content}
-    onChange={handleContentChange}
-    submitName={t('SEND')}
-    cancelButton={t('DISCARD')}
-    showIcons={true}
-    formData={formData}
-    setFormData={setFormData}
-    onSubmit={() =>
-      handleSendEmail(
-        selectedEmail.id,
-        (selectedEmail.sectionCategory as 'inbox' | 'sent') || 'sent',
-        reply
-      )
-    }
-    onCancel={onCancel}
-  />
-);
+}: Readonly<{
+  content: string;
+  handleContentChange: (content: string) => void;
+  handleSendEmail: (emailId: string, category: 'inbox' | 'sent', reply?: any) => void;
+  onCancel: () => void;
+  selectedEmail: any;
+  reply?: any;
+  formData?: any;
+  setFormData?: (data: any) => void;
+  t: any;
+}>) {
+  return (
+    <EmailTextEditor
+      value={content}
+      onChange={handleContentChange}
+      submitName={t('SEND')}
+      cancelButton={t('DISCARD')}
+      showIcons={true}
+      formData={formData}
+      setFormData={setFormData}
+      onSubmit={() =>
+        handleSendEmail(
+          selectedEmail.id,
+          (selectedEmail.sectionCategory as 'inbox' | 'sent') || 'sent',
+          reply
+        )
+      }
+      onCancel={onCancel}
+    />
+  );
+}
 
 // Extracted component for main action buttons
-const MainActionButtons: React.FC<{
+function MainActionButtons({
+  handleSetActive,
+  handleComposeEmailForward,
+  t,
+}: Readonly<{
   handleSetActive: (action: 'reply' | 'replyAll' | 'forward') => void;
   handleComposeEmailForward: () => void;
   t: any;
-}> = ({ handleSetActive, handleComposeEmailForward, t }) => (
-  <div className="flex gap-4 text-sm px-4 pb-8">
-    <Button variant="outline" size="sm" onClick={() => handleSetActive('reply')}>
-      <Reply className="h-4 w-4" />
-      {t('REPLY')}
-    </Button>
-    <Button variant="outline" size="sm" onClick={() => handleSetActive('replyAll')}>
-      <ReplyAll className="h-4 w-4" />
-      {t('REPLY_ALL')}
-    </Button>
-    <Button variant="outline" size="sm" onClick={handleComposeEmailForward}>
-      <Forward className="h-4 w-4" />
-      {t('FORWARD')}
-    </Button>
-  </div>
-);
+}>) {
+  return (
+    <div className="flex gap-4 text-sm px-4 pb-8">
+      <Button variant="outline" size="sm" onClick={() => handleSetActive('reply')}>
+        <Reply className="h-4 w-4" />
+        {t('REPLY')}
+      </Button>
+      <Button variant="outline" size="sm" onClick={() => handleSetActive('replyAll')}>
+        <ReplyAll className="h-4 w-4" />
+        {t('REPLY_ALL')}
+      </Button>
+      <Button variant="outline" size="sm" onClick={handleComposeEmailForward}>
+        <Forward className="h-4 w-4" />
+        {t('FORWARD')}
+      </Button>
+    </div>
+  );
+}
 
 /**
  * EmailViewGrid Component

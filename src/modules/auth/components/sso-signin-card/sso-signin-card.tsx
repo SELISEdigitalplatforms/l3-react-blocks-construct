@@ -17,7 +17,7 @@ const SSOSigninCard = ({
   providerConfig,
   showText = false,
   totalProviders = 1,
-}: SSOSigninCardProps) => {
+}: Readonly<SSOSigninCardProps>) => {
   const ssoService = new SSOservice();
   const navigate = useNavigate();
 
@@ -49,7 +49,7 @@ const SSOSigninCard = ({
 
       if (!providerConfig?.audience || !providerConfig?.provider) {
         const errorMsg = 'Provider configuration is incomplete';
-        console.error('[SSO] Error:', errorMsg, {
+        console.error('[SSO Button] Configuration error:', errorMsg, {
           audience: providerConfig?.audience,
           provider: providerConfig?.provider,
           fullConfig: providerConfig,
@@ -67,7 +67,7 @@ const SSOSigninCard = ({
       const res: SSOLoginResponse = await ssoService.getSocialLoginEndpoint(requestPayload);
 
       if (res.error) {
-        console.error('[SSO] Authentication error:', res.error);
+        console.error('[SSO Button] Authentication error:', res.error);
         return alert(`Authentication error: ${res.error}`);
       }
 
@@ -84,9 +84,16 @@ const SSOSigninCard = ({
       }
       window.location.href = res.providerUrl;
     } catch (error) {
-      console.error('=== UNEXPECTED ERROR ===');
-      console.error('Error details:', error);
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('[SSO Button] === UNEXPECTED ERROR ===');
+      console.error('[SSO Button] Error details:', error);
+      console.error(
+        '[SSO Button] Error stack:',
+        error instanceof Error ? error.stack : 'No stack trace'
+      );
+      console.error(
+        '[SSO Button] Error message:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
       alert('An unexpected error occurred. Please try again.');
     }
   };

@@ -53,7 +53,7 @@ export const sharedUsers: SharedUser[] = [
   },
 ];
 
-const Avatar: React.FC<{ name: string; size?: 'sm' | 'md' }> = ({ name, size = 'md' }) => {
+function Avatar({ name, size = 'md' }: Readonly<{ name: string; size?: 'sm' | 'md' }>) {
   const initials = name
     .split(' ')
     .map((n) => n[0])
@@ -68,13 +68,17 @@ const Avatar: React.FC<{ name: string; size?: 'sm' | 'md' }> = ({ name, size = '
       {initials}
     </div>
   );
-};
+}
 
-const PermissionDropdown: React.FC<{
+function PermissionDropdown({
+  value,
+  onChange,
+  options,
+}: Readonly<{
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
-}> = ({ value, onChange, options }) => {
+}>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -102,7 +106,7 @@ const PermissionDropdown: React.FC<{
       )}
     </div>
   );
-};
+}
 
 export const ShareWithMeModal = ({
   isOpen,

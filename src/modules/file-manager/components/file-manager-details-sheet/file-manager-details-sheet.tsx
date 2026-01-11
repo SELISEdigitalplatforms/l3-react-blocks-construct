@@ -53,22 +53,26 @@ const getDateCreated = (file: IFileDataWithSharing, variant: 'default' | 'trash'
   return new Date(file.lastModified);
 };
 
-const FallbackAvatar: React.FC<{ className?: string; children: React.ReactNode }> = ({
+function FallbackAvatar({
   className = '',
   children,
-}) => <div className={`rounded-full overflow-hidden ${className}`}>{children}</div>;
+}: Readonly<{ className?: string; children: React.ReactNode }>) {
+  return <div className={`rounded-full overflow-hidden ${className}`}>{children}</div>;
+}
 
-const FallbackAvatarImage: React.FC<{ src?: string; alt: string }> = ({ src, alt }) => {
+function FallbackAvatarImage({ src, alt }: Readonly<{ src?: string; alt: string }>) {
   if (!src) return null;
   return <img src={src} alt={alt} className="w-full h-full object-cover" />;
-};
+}
 
-const FallbackAvatarFallback: React.FC<{ className?: string; children: React.ReactNode }> = ({
+function FallbackAvatarFallback({
   className = '',
   children,
-}) => (
-  <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
-);
+}: Readonly<{ className?: string; children: React.ReactNode }>) {
+  return (
+    <div className={`w-full h-full flex items-center justify-center ${className}`}>{children}</div>
+  );
+}
 
 export const FileDetailsSheet = ({
   isOpen,

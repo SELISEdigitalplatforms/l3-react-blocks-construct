@@ -13,6 +13,7 @@ export const NotFoundPage = () => {
       description={t('PAGE_MAY_MOVED_NO_LONGER_EXISTS')}
       buttonText={t('TAKE_ME_BACK')}
       buttonIcon={<ArrowRight />}
+      buttonLink="/"
     />
   );
 };

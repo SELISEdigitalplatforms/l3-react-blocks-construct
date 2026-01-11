@@ -6,7 +6,7 @@ type SsoSigninProps = {
   loginOption: LoginOption;
 };
 
-export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
+export const SsoSignin = ({ loginOption }: Readonly<SsoSigninProps>) => {
   const socialGrantAllowed = loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.social);
 
   if (!socialGrantAllowed) {
@@ -34,17 +34,15 @@ export const SsoSignin = ({ loginOption }: SsoSigninProps) => {
   const isSingleProvider = providersToShow.length === 1;
 
   return (
-    <div className="flex items-center gap-8">
-      <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
-        {providersToShow.map((item) => (
-          <SSOSigninCard
-            key={item?.value}
-            providerConfig={item}
-            showText={isSingleProvider}
-            totalProviders={providersToShow.length}
-          />
-        ))}
-      </div>
+    <div className={`flex w-full items-center ${isSingleProvider ? 'justify-center' : 'gap-4'}`}>
+      {providersToShow.map((item) => (
+        <SSOSigninCard
+          key={item?.value}
+          providerConfig={item}
+          showText={isSingleProvider}
+          totalProviders={providersToShow.length}
+        />
+      ))}
     </div>
   );
 };

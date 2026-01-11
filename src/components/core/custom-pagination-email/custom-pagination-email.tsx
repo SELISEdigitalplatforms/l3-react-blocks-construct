@@ -67,25 +67,27 @@ export const CustomPaginationEmail = ({
   };
 
   return (
-    <div className="w-full flex justify-between md:justify-center items-center space-x-4 text-sm text-medium-emphasis">
-      <p>{`${start}-${end} of ${totalItems}`}</p>
-      <div className="flex  space-x-1">
-        <Button
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={goToPreviousPage}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={goToNextPage}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+    <div className="flex w-full">
+      <div className="flex w-full items-center justify-between md:justify-end gap-6">
+        <p className="text-sm text-medium-emphasis">{`${start}-${end} of ${totalItems}`}</p>
+        <div className="flex space-x-1">
+          <Button
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            className="h-8 w-8 p-0"
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

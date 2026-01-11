@@ -16,6 +16,8 @@ import {
 } from '@/components/ui-kit/collapsible';
 import { SidebarMenuItemProps } from '@/models/sidebar';
 import { MenuIcon, MenuIconName } from '@/components/core';
+import { Badge } from '@/components/ui-kit/badge';
+import { useIsProtected } from '@/state/store/auth/use-is-protected';
 
 export const SidebarMenuItemComponent = ({
   item,
@@ -39,6 +41,14 @@ export const SidebarMenuItemComponent = ({
   }, [pathname, isParentActive]);
 
   const strokeWidth = 2.2;
+
+  const itemRequiresAdmin =
+    item.roles &&
+    (Array.isArray(item.roles) ? item.roles.includes('admin') : item.roles === 'admin');
+
+  const { isProtected: userHasAdminRole } = useIsProtected({ roles: ['admin'] });
+
+  const shouldShowAdminBadge = itemRequiresAdmin && !userHasAdminRole;
 
   const renderIcon = (iconName: MenuIconName | undefined) => {
     if (!iconName) return null;
@@ -74,6 +84,14 @@ export const SidebarMenuItemComponent = ({
                 >
                   {t(item.name)}
                 </span>
+                {shouldShowAdminBadge && showText && (
+                  <Badge
+                    variant="outline"
+                    className="ml-2 text-[10px] px-1.5 py-0 h-4 border-primary bg-primary/10 text-primary hover:bg-primary/10 font-semibold"
+                  >
+                    {t('ADMIN')}
+                  </Badge>
+                )}
                 {showText && (
                   <ChevronRight
                     strokeWidth={strokeWidth}
@@ -124,6 +142,14 @@ export const SidebarMenuItemComponent = ({
           >
             {t(item.name)}
           </span>
+          {shouldShowAdminBadge && showText && (
+            <Badge
+              variant="outline"
+              className="ml-auto text-[10px] px-1.5 py-0 h-4 border-primary bg-primary/10 text-primary hover:bg-primary/10 font-semibold"
+            >
+              {t('ADMIN')}
+            </Badge>
+          )}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>

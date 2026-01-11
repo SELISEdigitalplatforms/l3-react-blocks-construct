@@ -41,13 +41,13 @@ interface TaskManagerBadgeProps {
   asButton?: boolean;
 }
 
-export const TaskManagerBadge: React.FC<TaskManagerBadgeProps> = ({
+export function TaskManagerBadge({
   withBorder = false,
   className,
   children,
   onClick,
   asButton = false,
-}) => {
+}: Readonly<TaskManagerBadgeProps>) {
   const handleClick = (e: React.MouseEvent) => {
     onClick?.(e);
   };
@@ -71,4 +71,4 @@ export const TaskManagerBadge: React.FC<TaskManagerBadgeProps> = ({
       {children}
     </Badge>
   );
-};
+}

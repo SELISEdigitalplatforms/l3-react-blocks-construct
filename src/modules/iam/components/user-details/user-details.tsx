@@ -18,6 +18,8 @@ import { Dialog } from '@/components/ui-kit/dialog';
 import { UserDetailItem } from './user-details-item';
 import { IamData } from '../../types/user.types';
 import { EditIamProfileDetails } from '@/modules/profile/components/modals/edit-iam-profile-details/edit-iam-profile-details';
+import { ProtectedFragment } from '@/state/store/auth/protected-fragment';
+import { getUserRoles } from '@/hooks/use-user-roles';
 
 /**
  * Displays detailed information about a selected user in a sheet modal.
@@ -143,8 +145,8 @@ export const UserDetails = ({
                   label={t('IAM_ROLES')}
                   icon={User}
                   value={
-                    selectedUser.roles && selectedUser.roles.length > 0
-                      ? selectedUser.roles.join(', ')
+                    getUserRoles(selectedUser).length > 0
+                      ? getUserRoles(selectedUser).join(', ')
                       : '-'
                   }
                 />
@@ -183,21 +185,27 @@ export const UserDetails = ({
             )}
           </div>
           <div className="flex w-full flex-col gap-2">
-            <Button size="default" className="w-full h-9" onClick={() => setActiveModal('edit')}>
-              {t('EDIT')}
-            </Button>
-            <div className="flex w-full flex-col sm:flex-row gap-4">
-              <Button variant="outline" className="w-full" onClick={handlePrimaryAction}>
-                {selectedUser?.active ? t('RESET_PASSWORD') : t('RESEND_ACTIVATION_LINK')}
+            <ProtectedFragment roles={['admin']}>
+              <Button size="default" className="w-full h-9" onClick={() => setActiveModal('edit')}>
+                {t('EDIT')}
               </Button>
-              {selectedUser?.active && (
-                <Button
-                  variant="outline"
-                  className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
-                  onClick={() => {}}
-                >
-                  {t('DEACTIVATE_USER')}
+            </ProtectedFragment>
+            <div className="flex w-full flex-col sm:flex-row gap-4">
+              <ProtectedFragment roles={['admin']}>
+                <Button variant="outline" className="w-full" onClick={handlePrimaryAction}>
+                  {selectedUser?.active ? t('RESET_PASSWORD') : t('RESEND_ACTIVATION_LINK')}
                 </Button>
+              </ProtectedFragment>
+              {selectedUser?.active && (
+                <ProtectedFragment roles={['admin']}>
+                  <Button
+                    variant="outline"
+                    className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
+                    onClick={() => {}}
+                  >
+                    {t('DEACTIVATE_USER')}
+                  </Button>
+                </ProtectedFragment>
               )}
             </div>
           </div>

@@ -3,6 +3,8 @@ import {
   FileDetailsSheet,
 } from '../file-manager-details-sheet/file-manager-details-sheet';
 
-export const RegularFileDetailsSheet: React.FC<Omit<BaseFileDetailsSheetProps, 'variant'>> = (
-  props
-) => <FileDetailsSheet {...props} variant="default" />;
+export function RegularFileDetailsSheet(
+  props: Readonly<Omit<BaseFileDetailsSheetProps, 'variant'>>
+) {
+  return <FileDetailsSheet {...props} variant="default" />;
+}

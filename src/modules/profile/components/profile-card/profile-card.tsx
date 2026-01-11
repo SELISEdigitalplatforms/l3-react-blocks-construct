@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import DummyProfile from '@/assets/images/dummy_profile.png';
+import { getUserRoles } from '@/hooks/use-user-roles';
 import {
   Card,
   CardContent,
@@ -43,7 +44,9 @@ export const ProfileCard = ({
     if (!userInfo?.profileImageUrl || userInfo.profileImageUrl === '') {
       return DummyProfile;
     }
-    return userInfo.profileImageUrl;
+    // Add cache busting parameter to force reload when image changes
+    const timestamp = new Date().getTime();
+    return `${userInfo.profileImageUrl}?t=${timestamp}`;
   }, [userInfo?.profileImageUrl]);
 
   React.useEffect(() => {
@@ -61,6 +64,14 @@ export const ProfileCard = ({
     setImageError(true);
   };
 
+  const userRoles = getUserRoles(userInfo ?? null);
+  const translatedRoles = userRoles
+    .map((role: string) => {
+      const roleKey = role.toUpperCase();
+      return t(roleKey);
+    })
+    .join(', ');
+
   return (
     <Card className="w-full border-none rounded-[8px] shadow-sm">
       <CardHeader className="p-0 hidden">
@@ -75,18 +86,16 @@ export const ProfileCard = ({
                 <Skeleton className="w-16 h-16 rounded-full" />
               ) : (
                 <>
-                  {!imageLoaded && (
+                  {!imageLoaded && !imageError && (
                     <Skeleton className="w-16 h-16 rounded-full absolute inset-0 z-10" />
                   )}
                   <img
                     key={profileImageSrc}
                     src={imageError ? DummyProfile : profileImageSrc}
                     alt="Profile"
-                    loading="lazy"
                     className="w-full h-full object-cover"
                     onLoad={handleImageLoad}
                     onError={handleImageError}
-                    style={{ display: imageLoaded ? 'block' : 'none' }}
                   />
                 </>
               )}
@@ -128,6 +137,10 @@ export const ProfileCard = ({
             ))
           ) : (
             <>
+              <div>
+                <p className="text-medium-emphasis text-xs font-normal">{t('ROLES')}</p>
+                <p className="text-high-emphasis text-sm">{translatedRoles ?? '-'}</p>
+              </div>
               <div>
                 <p className="text-medium-emphasis text-xs font-normal">{t('MOBILE_NO')}</p>
                 <p className="text-high-emphasis text-sm">{userInfo?.phoneNumber ?? '-'}</p>

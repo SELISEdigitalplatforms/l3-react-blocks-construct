@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getUserRoles } from '@/hooks/use-user-roles';
 import { Dialog } from '@/components/ui-kit/dialog';
 import { Button } from '@/components/ui-kit/button';
 import { IamData } from '../../types/user.types';
 import { EditIamProfileDetails } from '@/modules/profile/components/modals/edit-iam-profile-details/edit-iam-profile-details';
+import { ProtectedFragment } from '@/state/store/auth/protected-fragment';
 
 /**
  * Displays detailed information about a user with options to reset their password, resend the activation link,
@@ -87,7 +89,7 @@ export const ExpandedUserDetails = ({
           <div className="flex-1">
             <h3 className="text-sm font-medium text-medium-emphasis">{t('IAM_ROLES')}</h3>
             <p className="text-sm text-high-emphasis first-letter:uppercase">
-              {user.roles && user.roles.length > 0 ? user.roles.join(', ') : '-'}
+              {getUserRoles(user).length > 0 ? getUserRoles(user).join(', ') : '-'}
             </p>
           </div>
         </div>
@@ -134,27 +136,33 @@ export const ExpandedUserDetails = ({
       </div>
 
       <div className="flex w-full flex-col gap-2">
-        <Button size="sm" className="w-full" onClick={handleEditClick}>
-          {t('EDIT')}
-        </Button>
-        <div className="flex w-full flex-row gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={() => onResetPassword(user)}
-          >
-            {user?.active ? t('RESET_PASSWORD') : t('RESEND_ACTIVATION_LINK')}
+        <ProtectedFragment roles={['admin']}>
+          <Button size="sm" className="w-full" onClick={handleEditClick}>
+            {t('EDIT')}
           </Button>
-          {user?.active && (
+        </ProtectedFragment>
+        <div className="flex w-full flex-row gap-4">
+          <ProtectedFragment roles={['admin']}>
             <Button
               variant="outline"
               size="sm"
-              className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
-              onClick={() => {}}
+              className="w-full"
+              onClick={() => onResetPassword(user)}
             >
-              {t('DEACTIVATE_USER')}
+              {user?.active ? t('RESET_PASSWORD') : t('RESEND_ACTIVATION_LINK')}
             </Button>
+          </ProtectedFragment>
+          {user?.active && (
+            <ProtectedFragment roles={['admin']}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full disabled cursor-not-allowed opacity-50 text-error hover:text-error hover:opacity-50"
+                onClick={() => {}}
+              >
+                {t('DEACTIVATE_USER')}
+              </Button>
+            </ProtectedFragment>
           )}
         </div>
       </div>

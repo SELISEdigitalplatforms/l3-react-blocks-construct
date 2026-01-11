@@ -49,7 +49,7 @@ type AddUserProps = {
   onClose: () => void;
 };
 
-export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
+export function AddUser({ onClose }: Readonly<AddUserProps>) {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
@@ -175,4 +175,4 @@ export const AddUser: React.FC<AddUserProps> = ({ onClose }) => {
       </Form>
     </DialogContent>
   );
-};
+}

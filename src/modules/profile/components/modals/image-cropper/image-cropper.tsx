@@ -42,6 +42,7 @@ interface ImageCropperProps {
   onClose: () => void;
   onCropComplete: (croppedImage: string) => void;
   aspect?: number;
+  isUploading?: boolean;
 }
 
 export const ImageCropper = ({
@@ -49,6 +50,7 @@ export const ImageCropper = ({
   onClose,
   onCropComplete,
   aspect = 1,
+  isUploading = false,
 }: Readonly<ImageCropperProps>) => {
   const { t } = useTranslation();
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
@@ -167,11 +169,11 @@ export const ImageCropper = ({
     try {
       const croppedImage = await getCroppedImg(image, croppedAreaPixels);
       onCropComplete(croppedImage);
-      onClose();
+      // Don't close here - let parent handle closing after upload completes
     } catch (e) {
       console.error('Error cropping image', e);
     }
-  }, [croppedAreaPixels, getCroppedImg, image, onClose, onCropComplete]);
+  }, [croppedAreaPixels, getCroppedImg, image, onCropComplete]);
 
   useEffect(() => {
     let isMounted = true;
@@ -282,10 +284,12 @@ export const ImageCropper = ({
         </div>
       </div>
       <DialogFooter className="mt-5 flex justify-end gap-2">
-        <Button variant="outline" onClick={onClose}>
+        <Button variant="outline" onClick={onClose} disabled={isUploading}>
           {t('CANCEL')}
         </Button>
-        <Button onClick={handleSave}>{t('SAVE')}</Button>
+        <Button onClick={handleSave} loading={isUploading} disabled={isUploading}>
+          {isUploading ? t('UPLOADING_IMAGE') : t('UPLOAD')}
+        </Button>
       </DialogFooter>
     </DialogContent>
   );

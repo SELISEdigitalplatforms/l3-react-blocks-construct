@@ -141,7 +141,14 @@ export const TaskManagerPage = () => {
           filters={filters}
         />
       )}
-      {viewMode === 'list' && <TaskListView searchQuery={searchQuery} filters={filters} />}
+      {viewMode === 'list' && (
+        <TaskListView
+          searchQuery={searchQuery}
+          filters={filters}
+          isNewTaskModalOpen={isNewTaskModalOpen}
+          setNewTaskModalOpen={setIsNewTaskModalOpen}
+        />
+      )}
     </div>
   );
 };

@@ -14,7 +14,7 @@ export const getUsers = (payload: GetUsersPayload) => {
   return clients.post<{
     data: IamData[];
     totalCount: number;
-  }>('/iam/v1/User/GetUsers', JSON.stringify(requestBody));
+  }>('/idp/v1/Iam/GetUsers', JSON.stringify(requestBody));
 };
 
 export interface RoleData {
@@ -72,7 +72,7 @@ export const getRoles = (payload: GetRolesPayload) => {
   return clients.post<{
     data: RoleData[];
     totalCount: number;
-  }>('/iam/v1/Resource/GetRoles', JSON.stringify(requestBody));
+  }>('/idp/v1/Iam/GetRoles', JSON.stringify(requestBody));
 };
 
 export function compareValues(a: number, b: number) {
