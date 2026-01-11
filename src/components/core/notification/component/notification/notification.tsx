@@ -172,7 +172,9 @@ export const Notification = () => {
 
       try {
         subscription = subscribeNotifications(
-          `${baseUrl}/communication/v1`, //not finding
+          `${baseUrl}/communication/v1`,
+
+          // `${baseUrl}/cloudconfiguration/v1`,
           {
             projectKey: projectKey,
             accessTokenFactory: () => accessToken,
