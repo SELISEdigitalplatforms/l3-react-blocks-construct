@@ -171,17 +171,15 @@ export const Notification = () => {
       if (!accessToken) return;
 
       try {
-        subscription = subscribeNotifications(
-          `${baseUrl}/communication/v1`,
-
-          // `${baseUrl}/cloudconfiguration/v1`,
+        subscription = await subscribeNotifications(
+          `${baseUrl}/cloudconfiguration/v1`, // Goes to fetchNotificationConfigs → /Notification/Gets
           {
             projectKey: projectKey,
             accessTokenFactory: () => accessToken,
+            signalRBaseUrl: `${baseUrl}/communication/v1`, // Goes to NotificationClientService → /NotificationHub
           },
-          (channel: string, message: unknown) => {
-            // eslint-disable-next-line no-console
-            console.log('Received notification:', { channel, message });
+          () => {
+            void refetch();
           }
         );
       } catch (error) {
@@ -196,7 +194,7 @@ export const Notification = () => {
         void subscription.stop();
       }
     };
-  }, [accessToken]);
+  }, [accessToken, refetch]);
 
   const { mutate: markAllAsRead, isPending } = useMarkAllNotificationAsRead({
     onSuccess: () => {
