@@ -115,6 +115,7 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
   ): string => {
     const defaultErrorMap: Record<string, string> = {
       invalid_request: 'EMAIL_PASSWORD_NOT_VALID',
+      Password: 'SEEN_PASSWORD_TOO_MANY_TIMES',
       ...messageMap,
     };
 
