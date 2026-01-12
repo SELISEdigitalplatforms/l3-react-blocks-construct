@@ -22,6 +22,12 @@ export const Signin = () => {
   const oidcGrantAllowed = !!loginOption?.allowedGrantTypes?.includes(GRANT_TYPES.oidc);
 
   const isDivider = passwordGrantAllowed && (socialGrantAllowed || oidcGrantAllowed);
+
+  const isBannerAllowedToVisible = [
+    'construct.seliseblocks.com',
+    'stg-construct.seliseblocks.com',
+    'dev-construct.seliseblocks.com',
+  ].some((domain) => window.location.hostname === domain);
   return (
     <div className="flex flex-col gap-6">
       <div className="w-32 h-14 mb-2">
@@ -39,7 +45,7 @@ export const Signin = () => {
           </Link>
         </div>
       </div>
-      <div className="w-full invisible h-0">
+      <div className={'w-full ' + (isBannerAllowedToVisible ? 'visible' : 'invisible h-0')}>
         <div className="rounded-lg bg-success-background border border-success p-4">
           <p className="text-xs font-normal text-success-high-emphasis">
             Log in to explore the complete Demo and Documentation. Use the credentials:{' '}
