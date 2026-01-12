@@ -13,16 +13,22 @@ import { useErrorHandler, ErrorResponse } from '../../hooks/use-error-handler';
 
 // Helper to process API errors consistently
 const processApiError = (err: any): ErrorResponse => {
+  // Extract errors object from backend response (e.g., {"isSuccess":false,"errors":{"Password":"..."}})
+  const backendErrors = err.error?.errors || err.response?.data?.errors;
+
   const errorInfo = {
     error: err.error?.error || err.response?.data?.error || 'UNKNOWN_ERROR',
     message: err.error?.message || err.response?.data?.message,
-    details: err.error?.details || err.response?.data?.details,
+    details: backendErrors || err.error?.details || err.response?.data?.details,
   };
 
   const apiError: ErrorResponse = {
     error: errorInfo,
     error_description:
-      err.error_description || err.message || err.response?.data?.error_description,
+      err.error_description ||
+      err.error?.message ||
+      err.message ||
+      err.response?.data?.error_description,
   };
 
   if (errorInfo.error === 'invalid_refresh_token') {
