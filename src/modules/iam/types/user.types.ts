@@ -1,4 +1,5 @@
-import { Membership } from '@/types/user.type';
+//TODO FE: only for the dev environment
+// import { Membership } from '@/types/user.type';
 
 export interface IamData {
   itemId: string;
@@ -12,7 +13,7 @@ export interface IamData {
   email: string;
   userName: string;
   phoneNumber: string | null;
-  memberships: Membership[];
+  roles: string[];
   permissions: string[];
   active: boolean;
   isVarified: boolean;
