@@ -112,8 +112,11 @@ export const clients: Https = {
       method,
       headers: requestHeaders,
       referrerPolicy: 'no-referrer',
-      credentials: 'include', //for oidc token to be sent in cookie
     };
+
+    if (!localHostChecker) {
+      config.credentials = 'include';
+    }
 
     if (body) {
       config.body = body;
