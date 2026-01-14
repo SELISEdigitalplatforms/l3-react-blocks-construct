@@ -115,10 +115,6 @@ export const clients: Https = {
       credentials: 'include', //for oidc token to be sent in cookie
     };
 
-    // if (!localHostChecker) {
-    //   config.credentials = 'include';
-    // }
-
     if (body) {
       config.body = body;
     }
