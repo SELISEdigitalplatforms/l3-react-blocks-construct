@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Building2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,13 +19,35 @@ import { HttpError } from '@/lib/https';
 
 const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
 
+const decodeJWT = (token: string): { org_id?: string } | null => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Failed to decode JWT:', error);
+    return null;
+  }
+};
+
 export const OrgSwitcher = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   const [isSwitching, setIsSwitching] = useState(false);
   const { t } = useTranslation();
-  const { setTokens } = useAuthStore();
+  const { setTokens, accessToken } = useAuthStore();
   const { toast } = useToast();
+
+  const currentOrgId = useMemo(() => {
+    if (!accessToken) return null;
+    const decoded = decodeJWT(accessToken);
+    return decoded?.org_id || null;
+  }, [accessToken]);
 
   const { data, isLoading } = useGetAccount();
   const { data: orgsData, isLoading: isLoadingOrgs } = useGetMultiOrgs({
@@ -37,8 +59,8 @@ export const OrgSwitcher = () => {
   const organizations = orgsData?.organizations ?? [];
   const enabledOrganizations = organizations.filter((org) => org.isEnable);
 
-  const selectedOrg = selectedOrgId
-    ? enabledOrganizations.find((org) => org.itemId === selectedOrgId)
+  const selectedOrg = currentOrgId
+    ? enabledOrganizations.find((org) => org.itemId === currentOrgId)
     : enabledOrganizations[0];
 
   const userRoles = getUserRoles(data ?? null);
@@ -50,7 +72,9 @@ export const OrgSwitcher = () => {
     .join(', ');
 
   const handleOrgSelect = async (orgId: string) => {
-    if (isSwitching || orgId === selectedOrgId) return;
+    if (isSwitching || orgId === currentOrgId) {
+      return;
+    }
 
     try {
       setIsSwitching(true);
@@ -60,9 +84,8 @@ export const OrgSwitcher = () => {
 
       setTokens({
         accessToken: response.access_token,
-        refreshToken: response.refresh_token,
+        refreshToken: response.refresh_token || useAuthStore.getState().refreshToken || '',
       });
-      setSelectedOrgId(orgId);
 
       window.location.reload();
     } catch (error) {
@@ -142,7 +165,7 @@ export const OrgSwitcher = () => {
           <DropdownMenuItem>Organization 1</DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem>{t('CREATE_NEW')}</DropdownMenuItem>
+        <DropdownMenuItem disabled>{t('CREATE_NEW')}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
