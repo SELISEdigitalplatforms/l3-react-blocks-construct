@@ -8,6 +8,7 @@ export type GetPreSignedUrlForUploadPayload = {
   configurationName?: string;
   projectKey: string;
   additionalProperties?: Record<string, string>;
+  moduleName: number;
 };
 
 export type GetPreSignedUrlForUploadResponse = {
