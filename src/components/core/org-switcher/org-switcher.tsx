@@ -29,7 +29,7 @@ export const OrgSwitcher = () => {
   const currentOrgId = useMemo(() => {
     if (!accessToken) return null;
     const decoded = decodeJWT(accessToken);
-    return decoded?.org_id || null;
+    return decoded?.org_id ?? null;
   }, [accessToken]);
 
   const { data, isLoading } = useGetAccount();
@@ -72,7 +72,7 @@ export const OrgSwitcher = () => {
 
       setTokens({
         accessToken: response.access_token,
-        refreshToken: response.refresh_token || useAuthStore.getState().refreshToken || '',
+        refreshToken: (response.refresh_token || useAuthStore.getState().refreshToken) ?? '',
       });
 
       localStorage.setItem('selected-org-id', orgId);
