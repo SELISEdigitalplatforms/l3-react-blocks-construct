@@ -10,31 +10,14 @@ import {
 } from '@/components/ui-kit/dropdown-menu';
 import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useGetAccount } from '@/modules/profile/hooks/use-account';
-import { getUserRoles } from '@/hooks/use-user-roles';
 import { useGetMultiOrgs } from '@/lib/api/hooks/use-multi-orgs';
 import { switchOrganization } from '@/modules/auth/services/auth.service';
 import { useAuthStore } from '@/state/store/auth';
 import { useToast } from '@/hooks/use-toast';
 import { HttpError } from '@/lib/https';
+import { decodeJWT } from '@/lib/utils/decode-jwt-utils';
 
 const projectKey = import.meta.env.VITE_X_BLOCKS_KEY || '';
-
-const decodeJWT = (token: string): { org_id?: string } | null => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('Failed to decode JWT:', error);
-    return null;
-  }
-};
 
 export const OrgSwitcher = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -63,8 +46,13 @@ export const OrgSwitcher = () => {
     ? enabledOrganizations.find((org) => org.itemId === currentOrgId)
     : enabledOrganizations[0];
 
-  const userRoles = getUserRoles(data ?? null);
-  const translatedRoles = userRoles
+  const currentOrgRoles = useMemo(() => {
+    if (!data?.memberships?.length || !currentOrgId) return [];
+    const membership = data.memberships.find((m) => m.organizationId === currentOrgId);
+    return membership?.roles ?? [];
+  }, [data, currentOrgId]);
+
+  const translatedRoles = currentOrgRoles
     .map((role: string) => {
       const roleKey = role.toUpperCase();
       return t(roleKey);
@@ -136,11 +124,18 @@ export const OrgSwitcher = () => {
           </div>
           <div className="flex flex-col">
             {isComponentLoading ? (
-              <Skeleton className="w-24 h-4 mb-1" />
+              <>
+                <Skeleton className="w-24 h-4 mb-1" />
+                <Skeleton className="w-16 h-3" />
+              </>
             ) : (
-              <h2 className="text-xs font-normal text-high-emphasis">{selectedOrg?.name ?? '_'}</h2>
+              <>
+                <h2 className="text-xs font-normal text-high-emphasis">
+                  {selectedOrg?.name ?? '_'}
+                </h2>
+                <p className="text-[10px] text-low-emphasis capitalize">{translatedRoles}</p>
+              </>
             )}
-            <p className="text-[10px] text-low-emphasis capitalize">{translatedRoles}</p>
           </div>
           {isDropdownOpen ? (
             <ChevronUp className="h-5 w-5 text-medium-emphasis" />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -40,6 +40,8 @@ import { useGetAccount } from '@/modules/profile/hooks/use-account';
 
 export const ProfileMenu = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const { t } = useTranslation();
 
   const { logout } = useAuthStore();
@@ -60,6 +62,8 @@ export const ProfileMenu = () => {
   };
 
   const fullName = `${data?.firstName ?? ''} ${data?.lastName ?? ''}`.trim() ?? ' ';
+  const profileImageUrl =
+    data?.profileImageUrl !== '' ? (data?.profileImageUrl ?? DummyProfile) : DummyProfile;
 
   useEffect(() => {
     if (data) {
@@ -73,25 +77,34 @@ export const ProfileMenu = () => {
     }
   }, [data, fullName]);
 
+  useEffect(() => {
+    setIsImageLoaded(false);
+  }, [profileImageUrl]);
+
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalHeight !== 0) {
+      setIsImageLoaded(true);
+    }
+  }, [profileImageUrl, isLoading]);
+
+  const showSkeleton = isLoading || !isImageLoaded;
+
   return (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild className="cursor-pointer p-1 rounded-[2px]">
         <div className="flex justify-between items-center gap-1 sm:gap-3 cursor-pointer">
           <div className="relative overflow-hidden rounded-full border shadow-sm border-white h-8 w-8">
-            {isLoading ? (
-              <Skeleton className="h-8 w-8 rounded-full" />
-            ) : (
-              <img
-                src={
-                  data?.profileImageUrl !== ''
-                    ? (data?.profileImageUrl ?? DummyProfile)
-                    : DummyProfile
-                }
-                alt="profile"
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-            )}
+            {showSkeleton && <Skeleton className="h-8 w-8 rounded-full absolute inset-0 z-10" />}
+            <img
+              ref={imgRef}
+              src={profileImageUrl}
+              alt="profile"
+              className="w-full h-full object-cover"
+              style={{ opacity: showSkeleton ? 0 : 1 }}
+              onLoad={() => setIsImageLoaded(true)}
+              onError={() => setIsImageLoaded(true)}
+            />
           </div>
         </div>
       </DropdownMenuTrigger>
