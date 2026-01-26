@@ -87,6 +87,8 @@ export const OrgSwitcher = () => {
         refreshToken: response.refresh_token || useAuthStore.getState().refreshToken || '',
       });
 
+      localStorage.setItem('selected-org-id', orgId);
+
       window.location.reload();
     } catch (error) {
       console.error('Failed to switch organization:', error);
@@ -136,9 +138,7 @@ export const OrgSwitcher = () => {
             {isComponentLoading ? (
               <Skeleton className="w-24 h-4 mb-1" />
             ) : (
-              <h2 className="text-xs font-normal text-high-emphasis">
-                {selectedOrg?.name || 'Organization 1'}
-              </h2>
+              <h2 className="text-xs font-normal text-high-emphasis">{selectedOrg?.name ?? '_'}</h2>
             )}
             <p className="text-[10px] text-low-emphasis capitalize">{translatedRoles}</p>
           </div>
@@ -162,7 +162,7 @@ export const OrgSwitcher = () => {
             </DropdownMenuItem>
           ))
         ) : (
-          <DropdownMenuItem>Organization 1</DropdownMenuItem>
+          <DropdownMenuItem>No orgs found</DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled>{t('CREATE_NEW')}</DropdownMenuItem>
