@@ -1,11 +1,23 @@
 import { useMemo } from 'react';
 import { useAuthStore } from '.';
-import { getUserRoles } from '@/hooks/use-user-roles';
+import { decodeJWT } from '@/lib/utils/decode-jwt-utils';
 
 type UseIsProtectedOptions = {
   roles?: string[];
   permissions?: string[];
   opt?: 'all' | 'any';
+};
+
+const getCurrentOrgRoles = (user: any, accessToken: string | null): string[] => {
+  if (!user?.memberships?.length || !accessToken) return [];
+
+  const decoded = decodeJWT(accessToken);
+  const currentOrgId = decoded?.org_id;
+
+  if (!currentOrgId) return [];
+
+  const membership = user.memberships.find((m: any) => m.organizationId === currentOrgId);
+  return membership?.roles ?? [];
 };
 
 const checkAllRoles = (userRoles: string[] | undefined, requiredRoles: string[]): boolean => {
@@ -39,13 +51,13 @@ export const useIsProtected = ({
   permissions = [],
   opt = 'any',
 }: UseIsProtectedOptions = {}) => {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, accessToken } = useAuthStore();
 
   const isProtected = useMemo(() => {
     if (!isAuthenticated || !user) return false;
     if (roles.length === 0 && permissions.length === 0) return false;
 
-    const userRoles = getUserRoles(user);
+    const userRoles = getCurrentOrgRoles(user, accessToken);
 
     if (opt === 'all') {
       const hasAllRoles = checkAllRoles(userRoles, roles);
@@ -56,7 +68,7 @@ export const useIsProtected = ({
     const hasAnyRole = checkAnyRole(userRoles, roles);
     const hasAnyPermission = checkAnyPermission(user.permissions, permissions);
     return hasAnyRole || hasAnyPermission;
-  }, [isAuthenticated, user, roles, permissions, opt]);
+  }, [isAuthenticated, user, accessToken, roles, permissions, opt]);
 
   return {
     isProtected,
