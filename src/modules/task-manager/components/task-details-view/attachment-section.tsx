@@ -26,6 +26,7 @@ import { Label } from '@/components/ui-kit/label';
 import { Input } from '@/components/ui-kit/input';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { ModuleName } from '@/constant/modules.constants';
 
 const getFileType = (file: File): FileType => {
   if (file.type.includes('pdf')) return 'pdf';
@@ -180,6 +181,7 @@ export function AttachmentsSection({
           configurationName: 'Default',
           parentDirectoryId: '',
           tags: '',
+          moduleName: ModuleName.DefaultConstruct,
         },
         {
           onSuccess: (data) => handleUploadSuccess(data, file, resolve),
