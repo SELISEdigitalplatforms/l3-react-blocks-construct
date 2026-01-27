@@ -79,22 +79,51 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
 
   const handleErrorObject = (err: any): ErrorResponse => {
     const errorDescriptionResult = handleErrorDescription(err);
-    if (errorDescriptionResult) return errorDescriptionResult;
+    if (errorDescriptionResult) {
+      return {
+        ...errorDescriptionResult,
+        status: err.response?.status ?? err.status,
+      };
+    }
 
     const responseDataResult = handleResponseData(err.response?.data);
-    if (responseDataResult) return responseDataResult;
+    if (responseDataResult) {
+      return {
+        ...responseDataResult,
+        status: err.response?.status ?? err.status,
+      };
+    }
 
     return {
       error: err.error,
       error_description: err.error_description,
       message: err.message || t('UNKNOWN_ERROR_OCCURRED'),
+      status: err.response?.status ?? err.status,
     };
   };
 
   const normalizeError = (error: unknown): ErrorResponse => {
     if (error instanceof Error) {
       const parsed = parseJsonError(error.message);
-      return parsed || { message: error.message };
+      const errorObj = error as any;
+      // Check for status in multiple locations: direct property, response.status, or status property
+      const status = errorObj.status ?? errorObj.response?.status;
+
+      // If error has an 'error' property (like HttpError), merge it
+      if (errorObj.error) {
+        // HttpError stores the full error response in the error property
+        // Extract error_description if it exists in the error object
+        const errorResponse = errorObj.error;
+        return {
+          ...(parsed || {}),
+          error: errorResponse.error ?? errorResponse,
+          error_description: errorResponse.error_description,
+          message: errorResponse.error_description || error.message,
+          status,
+        };
+      }
+
+      return parsed ? { ...parsed, status } : { message: error.message, status };
     }
 
     if (typeof error === 'string') {
@@ -158,25 +187,40 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
       ...options,
     };
 
+    const errorDetails = normalizeError(error);
+
+    // Handle 403 Forbidden errors specifically
+    if (errorDetails.status === 403) {
+      toast({
+        title: t('FORBIDDEN'),
+        description: t('YOU_ARE_NOT_ALLOWED_PERFORM_ACTION'),
+        duration,
+        variant,
+      });
+      return t('YOU_ARE_NOT_ALLOWED_PERFORM_ACTION');
+    }
+
     const finalTitle = translate ? t(title) : title;
     let finalMessage: string;
 
     if (typeof error === 'string' && translate) {
       finalMessage = t(error);
     } else {
-      const errorDetails = normalizeError(error);
       const isBackendError = errorDetails.error_description ?? errorDetails.error;
-      finalMessage = translate
-        ? t(getErrorMessage(errorDetails, messageMap))
-        : getErrorMessage(errorDetails, messageMap);
+      const errorMessage = getErrorMessage(errorDetails, messageMap);
+
+      // Don't translate error_description as it's already human-readable from backend
+      // Only translate if it's a translation key (uppercase with underscores)
+      const isTranslationKey = /^[A-Z_]+$/.test(errorMessage);
+      finalMessage = translate && isTranslationKey ? t(errorMessage) : errorMessage;
 
       if (isBackendError) {
-        const errorString =
-          errorDetails.message ??
-          (typeof errorDetails.error === 'string'
-            ? errorDetails.error
-            : errorDetails.error?.message);
-        const isAuthError = ['invalid_request'].includes(errorString ?? '');
+        // Check the error code field for authentication errors
+        const errorCode =
+          typeof errorDetails.error === 'string' ? errorDetails.error : errorDetails.error?.error;
+        const isAuthError = ['invalid_request', 'invalid_username_password'].includes(
+          errorCode ?? ''
+        );
 
         toast({
           title: isAuthError ? t('INVALID_CREDENTIALS') : t('SOMETHING_WENT_WRONG'),
