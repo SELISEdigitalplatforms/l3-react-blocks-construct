@@ -200,6 +200,21 @@ export const useErrorHandler = (defaultOptions: ErrorHandlerOptions = {}) => {
       return t('YOU_ARE_NOT_ALLOWED_PERFORM_ACTION');
     }
 
+    // Handle expired activation code errors (400 with Code field in errors)
+    if (errorDetails.status === 400 && errorDetails.error?.details?.Code) {
+      const codeErrorMessage = Array.isArray(errorDetails.error.details.Code)
+        ? errorDetails.error.details.Code[0]
+        : errorDetails.error.details.Code;
+
+      toast({
+        title: t('ACTIVATION_EXPIRED'),
+        description: codeErrorMessage,
+        duration,
+        variant,
+      });
+      return codeErrorMessage;
+    }
+
     const finalTitle = translate ? t(title) : title;
     let finalMessage: string;
 
