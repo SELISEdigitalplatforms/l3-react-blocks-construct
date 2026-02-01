@@ -15,6 +15,7 @@ import {
 } from '../../types/inventory.types';
 import { useAddInventoryItem } from '../../hooks/use-inventory';
 import { AdditionalInfoForm } from '../../component/additional-info-form/additional-info-form';
+import { ModuleName } from '@/constant/modules.constants';
 
 /**
  * Stepper component provides a multi-step navigation interface, displaying the steps and allowing the user to
@@ -170,6 +171,7 @@ export const InventoryFormPage = () => {
         configurationName: 'Default',
         parentDirectoryId: '',
         tags: '',
+        moduleName: ModuleName.DefaultConstruct,
       });
 
       if (!data.isSuccess || !data.uploadUrl) {

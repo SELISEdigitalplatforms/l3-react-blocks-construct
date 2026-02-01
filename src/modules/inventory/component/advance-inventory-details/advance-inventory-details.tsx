@@ -28,7 +28,12 @@ import { Skeleton } from '@/components/ui-kit/skeleton';
 import { useGetPreSignedUrlForUpload } from '@/lib/api/hooks/use-storage';
 import { GetPreSignedUrlForUploadResponse } from '@/lib/api/types/storage.types';
 import PlaceHolderImage from '@/assets/images/image_off_placeholder.webp';
-import { useDeleteInventoryItem, useGetInventories, useUpdateInventoryItem } from '../../hooks/use-inventory';
+import {
+  useDeleteInventoryItem,
+  useGetInventories,
+  useUpdateInventoryItem,
+} from '../../hooks/use-inventory';
+import { ModuleName } from '@/constant/modules.constants';
 
 /**
  * A detailed view and editing interface for an individual inventory item.
@@ -116,6 +121,7 @@ export function AdvanceInventoryDetails() {
             configurationName: 'Default',
             parentDirectoryId: '',
             tags: '',
+            moduleName: ModuleName.DefaultConstruct,
           },
           {
             onSuccess: (responseData) => resolve(responseData),

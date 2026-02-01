@@ -25,6 +25,7 @@ import { Form, FormField, FormItem, FormControl, FormMessage } from '@/component
 import { UIPhoneInput } from '@/components/core';
 import DummyProfile from '@/assets/images/dummy_profile.png';
 import { useUpdateAccount } from '@/modules/profile/hooks/use-account';
+import { ModuleName } from '@/constant/modules.constants';
 
 /**
  * `EditProfile` component allows the user to edit their profile details, including their full name, email, phone number, and profile image.
@@ -157,6 +158,7 @@ export function EditProfile({ userInfo, onClose }: Readonly<EditProfileProps>) {
         configurationName: 'Default',
         parentDirectoryId: '',
         tags: '',
+        moduleName: ModuleName.IAMConstruct,
       });
 
       if (!data.isSuccess || !data.uploadUrl) {
@@ -194,6 +196,7 @@ export function EditProfile({ userInfo, onClose }: Readonly<EditProfileProps>) {
       email: data.email,
       phoneNumber: data.phoneNumber,
       profileImageUrl,
+      memberships: userInfo.memberships || [],
     };
 
     updateAccount(payload);
