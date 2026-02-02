@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getUserRoles } from '@/hooks/use-user-roles';
 import { Dialog } from '@/components/ui-kit/dialog';
 import { Button } from '@/components/ui-kit/button';
 import { IamData } from '../../types/user.types';
@@ -89,7 +88,7 @@ export const ExpandedUserDetails = ({
           <div className="flex-1">
             <h3 className="text-sm font-medium text-medium-emphasis">{t('IAM_ROLES')}</h3>
             <p className="text-sm text-high-emphasis first-letter:uppercase">
-              {getUserRoles(user).length > 0 ? getUserRoles(user).join(', ') : '-'}
+              {user.roles && user.roles.length > 0 ? user.roles.join(', ') : '-'}
             </p>
           </div>
         </div>

@@ -1,3 +1,4 @@
+//TODO FE: only for the dev environment
 import { Membership } from '@/types/user.type';
 
 export interface IamData {
@@ -12,7 +13,7 @@ export interface IamData {
   email: string;
   userName: string;
   phoneNumber: string | null;
-  memberships: Membership[];
+  roles: string[];
   permissions: string[];
   active: boolean;
   isVarified: boolean;
@@ -23,6 +24,7 @@ export interface IamData {
   userCreationType: number;
   lastLoggedInDeviceInfo: string;
   logInCount: number;
+  memberships?: Membership[];
 }
 
 export interface UserFilter {
