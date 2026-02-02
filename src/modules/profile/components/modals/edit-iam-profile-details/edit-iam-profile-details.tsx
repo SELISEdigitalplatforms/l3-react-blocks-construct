@@ -260,7 +260,7 @@ export function EditIamProfileDetails({ userInfo, onClose }: Readonly<EditIamPro
       const { firstName, lastName } = parseFullName(data.fullName);
 
       // Get organizationId from existing user memberships
-      const organizationId = userInfo?.memberships?.[0]?.organizationId || '';
+      const organizationId = userInfo?.memberships?.[0]?.organizationId ?? '';
 
       const payload = {
         itemId: data.itemId,
