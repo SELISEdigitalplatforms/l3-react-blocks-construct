@@ -42,9 +42,15 @@ export const OrgSwitcher = () => {
   const organizations = orgsData?.organizations ?? [];
   const enabledOrganizations = organizations.filter((org) => org.isEnable);
 
+  const userOrganizations = useMemo(() => {
+    if (!data?.memberships?.length) return enabledOrganizations;
+    const membershipOrgIds = data.memberships.map((m) => m.organizationId);
+    return enabledOrganizations.filter((org) => membershipOrgIds.includes(org.itemId));
+  }, [data, enabledOrganizations]);
+
   const selectedOrg = currentOrgId
-    ? enabledOrganizations.find((org) => org.itemId === currentOrgId)
-    : enabledOrganizations[0];
+    ? userOrganizations.find((org) => org.itemId === currentOrgId)
+    : userOrganizations[0];
 
   const currentOrgRoles = useMemo(() => {
     if (!data?.memberships?.length || !currentOrgId) return [];
@@ -150,8 +156,8 @@ export const OrgSwitcher = () => {
         side="top"
         sideOffset={10}
       >
-        {enabledOrganizations.length > 0 ? (
-          enabledOrganizations.map((org) => (
+        {userOrganizations.length > 0 ? (
+          userOrganizations.map((org) => (
             <DropdownMenuItem key={org.itemId} onClick={() => handleOrgSelect(org.itemId)}>
               {org.name}
             </DropdownMenuItem>
