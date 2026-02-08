@@ -44,8 +44,8 @@ export const OrgSwitcher = () => {
 
   const userOrganizations = useMemo(() => {
     if (!data?.memberships?.length) return enabledOrganizations;
-    const membershipOrgIds = data.memberships.map((m) => m.organizationId);
-    return enabledOrganizations.filter((org) => membershipOrgIds.includes(org.itemId));
+    const membershipOrgIds = new Set(data.memberships.map((m) => m.organizationId));
+    return enabledOrganizations.filter((org) => membershipOrgIds.has(org.itemId));
   }, [data, enabledOrganizations]);
 
   const selectedOrg = currentOrgId
