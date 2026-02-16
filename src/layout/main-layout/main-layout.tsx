@@ -85,8 +85,8 @@ export const MainLayout = () => {
               </MenubarMenu>
             </Menubar>
             <LanguageSelector />
-            <ProfileMenu />
             <OrgSwitcher />
+            <ProfileMenu />
           </div>
         </div>
         <div
