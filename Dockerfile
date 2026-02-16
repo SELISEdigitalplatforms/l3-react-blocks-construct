@@ -1,18 +1,21 @@
-FROM node:21.7.0-alpine 
+FROM node:21.7.0-alpine AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-#COPY . .
 COPY package*.json ./
+
 RUN npm install 
+
 COPY . .
 
 ARG ci_build
-# ENV ci_build $ci_build 
 
 RUN mkdir -p /app/log
 
-#CMD npm run ${ci_build}
 RUN npm run build:${ci_build}
 
-CMD npm start
+FROM nginx:stable-alpine
+
+COPY --from=builder /app/build /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf

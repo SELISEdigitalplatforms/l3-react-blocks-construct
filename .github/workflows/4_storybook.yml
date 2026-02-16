@@ -1,0 +1,142 @@
+name: Web-Build and push at ACR
+
+on:
+  workflow_call:
+    inputs:
+      CI_BUILD:
+        required: true
+        type: string
+      VERSION:
+        required: false
+        type: string
+      CONTAINER_NAME:
+        required: true
+        type: string
+      NAMESPACE:
+        required: true
+        type: string
+      SERVICE_NAME:
+        required: true
+        type: string
+      CLUSTER_VALUES:
+        required: true
+        type: string
+
+    secrets:
+      SELISE_GITHUB_PAT:
+        required: true
+      AZURE_CREDENTIALS:
+        required: true
+      AZURE_CONTAINER_REGISTRY:
+        required: true
+      ClUSTER_RESOURCE_GROUP:
+        required: true
+      CLUSTER_NAME:
+        required: true
+      ACR_RESOURCE_GROUP:
+        required: true
+
+env:
+  SERVICE_TYPE: 'webclient'
+
+jobs:
+  integrateWeb:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      #Checks out the repository this file is in
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          token: ${{ secrets.SELISE_GITHUB_PAT }}
+
+      - name: Update submodule
+        run: |
+          git submodule update --init
+      - name: Set Environment Variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/vars.env
+
+      # Logs in with your Azure credentials
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # - name: Remove invisible CSS classes
+      #   run: |
+      #     sed -i '/<div className="w-full invisible h-0">/s/invisible h-0//g' src/modules/auth/pages/signin/signin-page.tsx
+
+      - name: Build and push image to ACR
+        run: |
+          az acr build \
+          --image ${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ inputs.CONTAINER_NAME }}:${{ github.sha }} \
+          --registry ${{ secrets.AZURE_CONTAINER_REGISTRY }} -g ${{ secrets.ACR_RESOURCE_GROUP }} \
+          --file ${{ env.STORYBOOK_DOCKERFILE }} \
+          --build-arg ci_build=${{ inputs.CI_BUILD }} .
+
+  deployWebToK8s:
+    needs: [integrateWeb]
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      #Checks out the repository this file is in
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          token: ${{ secrets.SELISE_GITHUB_PAT }}
+
+      - name: Update submodule
+        run: |
+          git submodule update --init
+      - name: Set Environment Variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/vars.env
+
+      # Logs in with your Azure credentials
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: pull helm repo
+        uses: actions/checkout@v3
+        with:
+          repository: SELISEdigitalplatforms/l0-yml-infrastructure-helm
+          token: ${{ secrets.SELISE_GITHUB_PAT }}
+
+        # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
+      - name: Get K8s context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: ${{ secrets.ClUSTER_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.CLUSTER_NAME }}
+
+      - name: Add kubelogin
+        uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: 'v0.0.24'
+
+      - name: Convert kubeconfig to use AAD
+        run: |
+          kubelogin convert-kubeconfig -l azurecli
+      - name: Setup Helm Installer
+        uses: Azure/setup-helm@v4.3.0
+        with:
+          token: ${{ secrets.SELISE_GITHUB_PAT }}
+
+      - name: Deploy To Kubernetes
+        run: |
+          helm upgrade \
+          --install ${{inputs.CONTAINER_NAME}} ./new-templates/ecap3-${{env.SERVICE_TYPE}}/ \
+          --namespace=${{inputs.NAMESPACE}} \
+          --values ./${{inputs.CLUSTER_VALUES}}/${{inputs.SERVICE_NAME}}-storybook.values.yaml \
+          --set image.repository=${{ secrets.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ inputs.CONTAINER_NAME }} \
+          --set image.tag=${{ github.sha }} \
+          --set fullnameOverride=${{inputs.CONTAINER_NAME}} \
+          --set ingress.hosts[0].paths[0].path="/"

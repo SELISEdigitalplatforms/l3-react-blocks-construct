@@ -3,33 +3,39 @@ name: Build (stg)
 on:
   push:
     branches:
-    - stg
+      - stg
 
 env:
-  RUN_UNIT_TEST: "false"
+  RUN_UNIT_TEST: 'false'
 
 jobs:
   initialization:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-22.04
     steps:
-    - name: desciption
-      run: echo 'initializ pipeline with ubuntu-22.04'    
+      - name: desciption
+        run: echo 'initializ pipeline with ubuntu-22.04'
 
   # sonarqube-job:
   #   uses: ./.github/workflows/2_sonar.yml
   #   secrets:
-  #     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}    
+  #     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
   #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_GLOBAL }}
   #   needs: [initialization]
 
   cd-job:
     if: ${{ github.event_name == 'push' }}
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/3_stg_web.yml
     with:
       CONTAINER_NAME: 'stg-$SERVICE_NAME-webclient'
       NAMESPACE: 'stg-$REPO_NAME'
       SERVICE_NAME: $SERVICE_NAME
-      CLUSTER_VALUES: "aks-blocks-stg"
+      CLUSTER_VALUES: 'aks-blocks-stg'
       CI_BUILD: 'stg'
     secrets:
       SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
@@ -39,3 +45,24 @@ jobs:
       CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
       ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
     # needs: [sonarqube-job]
+
+  # storybook-job:
+  #   if: ${{ github.event_name == 'push' }}
+  #   permissions:
+  #       contents: read
+  #       id-token: write
+  #   uses: ./.github/workflows/4_storybook.yml
+  #   with:
+  #     CONTAINER_NAME: 'stg-$SERVICE_NAME-storybook'
+  #     NAMESPACE: 'stg-$REPO_NAME'
+  #     SERVICE_NAME: $SERVICE_NAME
+  #     CLUSTER_VALUES: "aks-blocks-stg"
+  #     CI_BUILD: 'storybook-stg'
+  #   secrets:
+  #     SELISE_GITHUB_PAT: ${{ secrets.SELISE_GITHUB_PAT }}
+  #     AZURE_CREDENTIALS: ${{ secrets.AZURE_AKS_BLOCKS_CREDENTIALS }}
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_BLOCKS_CONTAINER_REGISTRY }}
+  #     ClUSTER_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+  #     CLUSTER_NAME: ${{ secrets.AKS_BLOCKS_DEV_CLUSTER }}
+  #     ACR_RESOURCE_GROUP: ${{ secrets.ClUSTER_AKS_BLOCKS_RESOURCE_GROUP }}
+  #   # needs: [sonarqube-job]

@@ -1,13 +1,23 @@
-/** @type {import('tailwindcss').Config} */
+import tailwindcssAnimate from 'tailwindcss-animate';
+/** @typedef {import('tailwindcss').Config} Config */
 
-module.exports = {
+/** @type {Config} */
+export default {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
-    './public/index.html',
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/features/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/modules/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  safelist: [
+    'bg-purple',
+    'bg-burgundy',
+    'bg-warning',
+    'bg-primary-100',
+    'bg-secondary-100',
+    'bg-purple-100',
+    'bg-burgundy-100',
   ],
   theme: {
     extend: {
@@ -34,6 +44,7 @@ module.exports = {
           200: 'hsl(var(--primary-200))',
           300: 'hsl(var(--primary-300))',
           400: 'hsl(var(--primary-400))',
+          500: 'hsl(var(--primary-500))',
           600: 'hsl(var(--primary-600))',
           700: 'hsl(var(--primary-700))',
           800: 'hsl(var(--primary-800))',
@@ -47,6 +58,7 @@ module.exports = {
           200: 'hsl(var(--secondary-200))',
           300: 'hsl(var(--secondary-300))',
           400: 'hsl(var(--secondary-400))',
+          500: 'hsl(var(--secondary-500))',
           600: 'hsl(var(--secondary-600))',
           700: 'hsl(var(--secondary-700))',
           800: 'hsl(var(--secondary-800))',
@@ -105,6 +117,43 @@ module.exports = {
           700: 'hsl(var(--green-700))',
           800: 'hsl(var(--green-800))',
           900: 'hsl(var(--green-900))',
+        },
+
+        burgundy: {
+          DEFAULT: 'hsl(var(--burgundy-500))',
+          50: 'hsl(var(--burgundy-50))',
+          100: 'hsl(var(--burgundy-100))',
+          200: 'hsl(var(--burgundy-200))',
+          300: 'hsl(var(--burgundy-300))',
+          400: 'hsl(var(--burgundy-400))',
+          500: 'hsl(var(--burgundy-500))',
+          600: 'hsl(var(--burgundy-600))',
+          700: 'hsl(var(--burgundy-700))',
+          800: 'hsl(var(--burgundy-800))',
+          900: 'hsl(var(--burgundy-900))',
+        },
+
+        'file-type': {
+          folder: {
+            icon: 'hsl(var(--folder-icon-color))',
+            background: 'hsl(var(--folder-icon-background))',
+          },
+          file: {
+            icon: 'hsl(var(--file-icon-color))',
+            background: 'hsl(var(--file-icon-background))',
+          },
+          image: {
+            icon: 'hsl(var(--image-icon-color))',
+            background: 'hsl(var(--image-icon-background))',
+          },
+          audio: {
+            icon: 'hsl(var(--audio-icon-color))',
+            background: 'hsl(var(--audio-icon-background))',
+          },
+          video: {
+            icon: 'hsl(var(--video-icon-color))',
+            background: 'hsl(var(--video-icon-background))',
+          },
         },
 
         success: {
@@ -169,5 +218,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [tailwindcssAnimate],
 };

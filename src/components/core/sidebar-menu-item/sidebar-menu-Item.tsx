@@ -1,0 +1,157 @@
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from '@/components/ui-kit/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui-kit/collapsible';
+import { SidebarMenuItemProps } from '@/models/sidebar';
+import { MenuIcon, MenuIconName } from '@/components/core';
+import { Badge } from '@/components/ui-kit/badge';
+import { useIsProtected } from '@/state/store/auth/use-is-protected';
+
+export const SidebarMenuItemComponent = ({
+  item,
+  showText,
+  onClick,
+}: Readonly<SidebarMenuItemProps>) => {
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
+  const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const isParentActive =
+    hasChildren && item.children?.some((child) => pathname.startsWith(child.path));
+  const isActive = pathname.startsWith(item.path) || isParentActive;
+
+  useEffect(() => {
+    if (isParentActive && !isOpen) {
+      setIsOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, isParentActive]);
+
+  const strokeWidth = 2.2;
+
+  const itemRequiresAdmin =
+    item.roles &&
+    (Array.isArray(item.roles) ? item.roles.includes('admin') : item.roles === 'admin');
+
+  const { isProtected: userHasAdminRole } = useIsProtected({ roles: ['admin'] });
+
+  const shouldShowAdminBadge = itemRequiresAdmin && !userHasAdminRole;
+
+  const renderIcon = (iconName: MenuIconName | undefined) => {
+    if (!iconName) return null;
+
+    return (
+      <div className="flex items-center justify-center w-6 h-6">
+        <MenuIcon
+          name={iconName}
+          size={20}
+          strokeWidth={strokeWidth}
+          className={`${isActive ? 'text-primary' : 'text-high-emphasis'}`}
+        />
+      </div>
+    );
+  };
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
+  if (hasChildren) {
+    return (
+      <Collapsible className="group/collapsible" open={isOpen} onOpenChange={setIsOpen}>
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton>
+              <div className="flex items-center justify-start w-full">
+                {renderIcon(item.icon as MenuIconName)}
+                <span
+                  className={`ml-5 truncate ${!showText && 'hidden'} ${isActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
+                >
+                  {t(item.name)}
+                </span>
+                {shouldShowAdminBadge && showText && (
+                  <Badge
+                    variant="outline"
+                    className="ml-2 text-[10px] px-1.5 py-0 h-4 border-primary bg-primary/10 text-primary hover:bg-primary/10 font-semibold"
+                  >
+                    {t('ADMIN')}
+                  </Badge>
+                )}
+                {showText && (
+                  <ChevronRight
+                    strokeWidth={strokeWidth}
+                    className={`${isActive ? 'text-primary' : 'text-high-emphasis'} ml-auto h-5 w-5 transition-transform group-data-[state=open]/collapsible:rotate-90`}
+                  />
+                )}
+              </div>
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {item.children?.map((child) => {
+                const isChildActive = pathname.startsWith(child.path);
+                return (
+                  <SidebarMenuSubItem key={child.id}>
+                    <SidebarMenuSubButton asChild className={isChildActive ? 'bg-surface' : ''}>
+                      <Link
+                        to={child.path}
+                        className="flex items-center w-full"
+                        onClick={handleClick}
+                      >
+                        {renderIcon(child.icon as MenuIconName)}
+                        <span
+                          className={`ml-5 truncate ${!showText && 'hidden'} ${isChildActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
+                        >
+                          {t(child.name)}
+                        </span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                );
+              })}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
+    );
+  }
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild className={isActive ? 'bg-surface' : ''}>
+        <Link to={item.path} className="flex items-center w-full" onClick={handleClick}>
+          {renderIcon(item.icon as MenuIconName)}
+          <span
+            className={`ml-3 truncate ${!showText && 'hidden'} ${isActive ? 'text-primary' : 'text-high-emphasis'} text-base`}
+          >
+            {t(item.name)}
+          </span>
+          {shouldShowAdminBadge && showText && (
+            <Badge
+              variant="outline"
+              className="ml-auto text-[10px] px-1.5 py-0 h-4 border-primary bg-primary/10 text-primary hover:bg-primary/10 font-semibold"
+            >
+              {t('ADMIN')}
+            </Badge>
+          )}
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};

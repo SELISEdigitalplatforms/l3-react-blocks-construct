@@ -1,0 +1,47 @@
+# Selise Blocks AI Documentation
+
+> Comprehensive documentation package for building applications with Selise Blocks component library. Enables AI agents to develop React applications following Selise's 3-layer architecture and established patterns.
+
+## Important Context
+
+This documentation enables AI agents to build applications using Selise Blocks components. The AI agent handles repository access:
+
+- **Repository**: https://github.com/SELISEdigitalplatforms/l3-react-blocks-construct/tree/dev
+- **AI Agent Setup**: AI clones repository when needed for component access
+- **User Setup**: Works in their own React project, copies agent configuration files
+- **Architecture**: 3-layer hierarchy (Feature → Block → UI components)
+
+## Core Documentation
+
+- [Agent Instructions](agent-instructions/selise-development-agent.md): Complete AI agent guide for Selise development
+- [Component Hierarchy](component-catalog/selise-component-hierarchy.md): 3-layer architecture and import patterns
+- [Component Quick Reference](component-catalog/component-quick-reference.md): Fast component lookup and usage patterns
+
+## Implementation Recipes
+
+- [Data Table with CRUD](recipes/data-table-with-crud-operations.md): Complete data table implementation with create, read, update, delete operations
+- [Confirmation Modal Patterns](recipes/confirmation-modal-patterns.md): Standard confirmation dialog implementations for all use cases
+- [React Hook Form Integration](recipes/react-hook-form-integration.md): Form development with validation using React Hook Form and Zod
+
+## Agent Configuration
+
+- [CLAUDE.md](CLAUDE.md): Claude Code specific configuration and patterns
+- [.cursorrules](.cursorrules): Cursor editor rules and development guidelines
+
+## Key Principles
+
+**The 3-Layer Import Hierarchy**: Always start with Feature components (most specific, least work), then Block components (business patterns), finally UI components (maximum control, most work).
+
+**Import vs Create Decision Matrix**: Always import UI components. Import Block components when applicable. Import Feature components only when they solve your exact problem. Never import business logic across features - always create custom.
+
+**Standard Patterns**: Use AdvanceDataTable for data tables, ConfirmationModal for all confirmations, React Hook Form with Zod for forms, React Query for data fetching.
+
+## Selise Cloud Integration
+
+Ready for future Selise Cloud MCP integration. Current implementation assumes GraphQL endpoints are configured by the user.
+
+## Optional
+
+- [Historical Architecture Docs](../SELISE_BLOCKS_COMPONENT_ARCHITECTURE.md): Detailed component architecture analysis
+- [Feature Development Methodology](../SELISE_FEATURE_DEVELOPMENT_METHODOLOGY.md): Complete feature development workflow
+- [Reusability Rules](../REUSABILITY_RULES.md): Component reuse decision framework
